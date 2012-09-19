@@ -1,22 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
+#   <commonzenpython@gmail.com>, 2012.
 # Juan Carizza <sencillomail@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2012-09-19 14:44+0200\n"
-"PO-Revision-Date: 2011-12-17 04:47+0000\n"
-"Last-Translator: Juan Carizza <sencillomail@gmail.com>\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: es_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: es_AR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -64,7 +65,7 @@ msgstr ""
 #: cms_toolbar.py:188 models/moderatormodels.py:45
 #: templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr ""
+msgstr "Pagina"
 
 #: cms_toolbar.py:197
 msgid "Site Administration"
@@ -127,10 +128,9 @@ msgid "Page Title"
 msgstr "Título de la página"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Sobreescribe lo que se muestra en la barra de título del navegador o en los "
-"marcadores"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Sobreescribe lo que se muestra en la barra de título del navegador o en los marcadores"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -162,9 +162,7 @@ msgstr "La descripción de la página se utiliza habitualmente en los buscadores
 
 #: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Una lista de palabras clave separadas por coma se utiliza habitualmente en "
-"los buscadores"
+msgstr "Una lista de palabras clave separadas por coma se utiliza habitualmente en los buscadores"
 
 #: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
@@ -179,10 +177,7 @@ msgstr "usuario"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"El permiso para añadir una página implica también el acceso a los hijos y "
-"descendientes, en caso contrario la página añadida no podría ser cambiada "
-"por su creador."
+msgstr "El permiso para añadir una página implica también el acceso a los hijos y descendientes, en caso contrario la página añadida no podría ser cambiada por su creador."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -225,9 +220,7 @@ msgstr "Avisiar al usuario"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Envia un aviso al usuario ante cambios del nombre de usuario o la clave. "
-"Requiere el e-mail del usuario."
+msgstr "Envia un aviso al usuario ante cambios del nombre de usuario o la clave. Requiere el e-mail del usuario."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -244,15 +237,12 @@ msgstr "La notificación por e-mail requiere una dirección de correo válida"
 #: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"¡El permiso para añadir páginas necesita del permiso para modificar páginas!"
+msgstr "¡El permiso para añadir páginas necesita del permiso para modificar páginas!"
 
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"¡El permiso para añadir nuevos usuarios necesita del permiso para modificar "
-"usuario!"
+msgstr "¡El permiso para añadir nuevos usuarios necesita del permiso para modificar usuario!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -264,8 +254,7 @@ msgstr "Configuración básica."
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Nota: Esta página se recargará si cambias la selección. Guárdala primero."
+msgstr "Nota: Esta página se recargará si cambias la selección. Guárdala primero."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -292,10 +281,9 @@ msgid "Database error"
 msgstr "Error de la base de datos"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "No tienes permisos para cambiar esta página"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -325,8 +313,7 @@ msgstr "No tienes permisos para publicar esta página"
 
 #: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
-"No tienes permisos para cambiar el estado de navegación de esta página."
+msgstr "No tienes permisos para cambiar el estado de navegación de esta página."
 
 #: admin/pageadmin.py:1113
 msgid "You have no permission to add a plugin"
@@ -370,9 +357,7 @@ msgstr ""
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Plugin %(plugin_name)s modificado en la posición %(position)s de "
-"%(placeholder)s"
+msgstr "Plugin %(plugin_name)s modificado en la posición %(position)s de %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -427,7 +412,7 @@ msgstr ""
 
 #: admin/useradmin.py:25
 msgid "User details"
-msgstr ""
+msgstr "Detalles del usuario"
 
 #: admin/useradmin.py:26
 msgid "Groups"
@@ -543,7 +528,7 @@ msgstr ""
 #: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
 #: migrations/0006_apphook.py:62
 msgid "status"
-msgstr ""
+msgstr "estatus"
 
 #: migrations/0001_initial.py:53
 msgid "navigation extenders"
@@ -560,7 +545,7 @@ msgstr ""
 
 #: migrations/0001_initial.py:57
 msgid "author"
-msgstr ""
+msgstr "autor"
 
 #: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
 msgid "reverse url id"
@@ -581,7 +566,7 @@ msgstr ""
 #: migrations/0001_initial.py:64 models/pagemodel.py:69
 #: plugins/snippet/models.py:14
 msgid "template"
-msgstr ""
+msgstr "plantilla"
 
 #: migrations/0001_initial.py:66 models/pagemodel.py:61
 msgid "publication date"
@@ -638,7 +623,7 @@ msgstr ""
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "Usuario"
 
 #: models/moderatormodels.py:50 templatetags/cms_admin.py:147
 msgid "Moderate page"
@@ -932,9 +917,8 @@ msgid "Google Map"
 msgstr ""
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "Opciones avanzadas"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -1308,8 +1292,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1334,7 +1318,7 @@ msgstr ""
 
 #: plugins/video/models.py:22
 msgid "background color"
-msgstr ""
+msgstr "background color"
 
 #: plugins/video/models.py:22 plugins/video/models.py:23
 #: plugins/video/models.py:24 plugins/video/models.py:25
@@ -1868,8 +1852,7 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1910,12 +1893,10 @@ msgid "sidebar column"
 msgstr "background color"
 
 #: test_utils/cli.py:142
-#, fuzzy
 msgid "left column"
 msgstr "background color"
 
 #: test_utils/cli.py:148
-#, fuzzy
 msgid "right column"
 msgstr "background color"
 
@@ -1989,7 +1970,8 @@ msgstr "URL inválida, utiliza el formato /mi/url"
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 

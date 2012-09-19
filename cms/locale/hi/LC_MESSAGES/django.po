@@ -1,21 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-19 14:45+0200\n"
-"PO-Revision-Date: 2011-03-22 15:24+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
-"Language-Team: Hindi (http://www.transifex.net/projects/p/django-cms/team/"
-"hi/)\n"
-"Language: hi\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"Language-Team: Hindi (http://www.transifex.com/projects/p/django-cms/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -126,7 +126,8 @@ msgid "Page Title"
 msgstr "पृष्ठ शीर्षक"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Overwrites आपके ब्राउज़र या बुकमार्क में के शीर्ष पर प्रदर्शित होता है क्या"
 
 #: admin/forms.py:155
@@ -174,18 +175,15 @@ msgstr "उपयोगकर्ता"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"पृष्ठ अनुमति जोड़ें भी बच्चों, या वंश का उपयोग करने की आवश्यकता है, अन्यथा पृष्ठ जोड़े अपने "
-"निर्माता से नहीं बदला जा सकता है."
+msgstr "पृष्ठ अनुमति जोड़ें भी बच्चों, या वंश का उपयोग करने की आवश्यकता है, अन्यथा पृष्ठ जोड़े अपने निर्माता से नहीं बदला जा सकता है."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
 msgstr "पृष्ठ जोड़ें अनुमति भी पृष्ठ को संपादित करने की अनुमति की आवश्यकता है."
 
 #: admin/forms.py:260
-#, fuzzy
 msgid "can_view"
-msgstr "दृश्य"
+msgstr ""
 
 #: admin/forms.py:272
 msgid "Please select user or group first."
@@ -220,9 +218,7 @@ msgstr "सूचित उपयोगकर्ता"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"उपयोगकर्ता नाम या पासवर्ड को बदलने के बारे में उपयोगकर्ता के लिए ईमेल सूचना भेजें. "
-"उपयोगकर्ता ईमेल आवश्यक है."
+msgstr "उपयोगकर्ता नाम या पासवर्ड को बदलने के बारे में उपयोगकर्ता के लिए ईमेल सूचना भेजें. उपयोगकर्ता ईमेल आवश्यक है."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -244,8 +240,7 @@ msgstr "नए पृष्ठ जोड़ने की अनुमति क�
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"नए उपयोगकर्ताओं को जोड़ने की अनुमति उपयोगकर्ताओं को बदलने की अनुमति की आवश्यकता है!"
+msgstr "नए उपयोगकर्ताओं को जोड़ने की अनुमति उपयोगकर्ताओं को बदलने की अनुमति की आवश्यकता है!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -272,9 +267,8 @@ msgid "SEO Settings"
 msgstr "एसईओ सेटिंग्स"
 
 #: admin/pageadmin.py:311
-#, fuzzy
 msgid "You have no permission to change the template"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:498
 msgid "higher"
@@ -285,10 +279,9 @@ msgid "Database error"
 msgstr "डेटाबेस त्रुटि"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -321,9 +314,8 @@ msgid "You do not have permission to change this page's in_navigation status"
 msgstr "आप इस पृष्ठ की in_navigation स्थिति को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1113
-#, fuzzy
 msgid "You have no permission to add a plugin"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:1160 admin/pageadmin.py:1192
 msgid "Language must be set to a supported language!"
@@ -343,9 +335,8 @@ msgid "Language must be different than the copied language!"
 msgstr "भाषा की नकल की भाषा से अलग किया जाना चाहिए!"
 
 #: admin/pageadmin.py:1200
-#, fuzzy
 msgid "You do not have permission to add plugins"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:1207
 #, python-format
@@ -353,14 +344,12 @@ msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "नकल %(language)s के लिए plugins %(placeholder)s"
 
 #: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
-#, fuzzy
 msgid "You have no permission to change this page"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:1255
-#, fuzzy
 msgid "You have no permission to edit a plugin"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:1311
 #, python-format
@@ -369,27 +358,23 @@ msgid ""
 msgstr "%(plugin_name)s  स्थिति %(position)s में संपादित प्लगइन (%(placeholder)s में "
 
 #: admin/pageadmin.py:1370
-#, fuzzy
 msgid "You have no permission to move a plugin"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:1388
 msgid "Plugins where moved"
 msgstr "कहाँ चला गया प्लगइन्स"
 
 #: admin/pageadmin.py:1402
-#, fuzzy
 msgid "You have no permission to remove a plugin"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"%(plugin_name)s की स्थिति %(position)s  में प्लगइन में %(placeholder)s नष्ट किया "
-"गया."
+msgstr "%(plugin_name)s की स्थिति %(position)s  में प्लगइन में %(placeholder)s नष्ट किया गया."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -412,19 +397,16 @@ msgid "Page permissions management"
 msgstr "पृष्ठ अनुमति प्रबंधन"
 
 #: admin/placeholderadmin.py:151 admin/placeholderadmin.py:192
-#, fuzzy
 msgid "You don't have permission to add content here."
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/placeholderadmin.py:188
-#, fuzzy
 msgid "You don't have permission to add plugins"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/placeholderadmin.py:289
-#, fuzzy
 msgid "You don't have permission to delete a plugin"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+msgstr ""
 
 #: admin/useradmin.py:25
 msgid "User details"
@@ -740,9 +722,7 @@ msgstr "सभी पूर्वजों नेविगेशन में �
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"एक अद्वितीय पहचानकर्ता है कि इस पृष्ठ पर जोड़ने के लिए page_url templatetag के साथ "
-"प्रयोग किया जाता है"
+msgstr "एक अद्वितीय पहचानकर्ता है कि इस पृष्ठ पर जोड़ने के लिए page_url templatetag के साथ प्रयोग किया जाता है"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -922,10 +902,8 @@ msgstr "ऊँचाई"
 
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
-#, fuzzy
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
 msgstr ""
-"फ़्लैश प्लगइन गुम. <a href=\"http://adobe.com/flashplayer\">यहाँ</a> डाउनलोड करें"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -937,9 +915,8 @@ msgid "Google Map"
 msgstr "गूगल Map"
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "उन्नत विकल्प"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -982,7 +959,6 @@ msgid "latitude"
 msgstr "अक्षांश"
 
 #: plugins/googlemap/models.py:26
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map position."
 msgstr "का प्रयोग करें अक्षांश और ठीक धुन को देशांतर नक्शा possiton."
 
@@ -1034,9 +1010,7 @@ msgstr "भाषा या पृष्ठ से भरा जाना चा
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"एक पृष्ठ का चयन इस placeholder में अपनी plugins शामिल करने के लिए, खाली वर्तमान पृष्ठ "
-"का चयन होगा"
+msgstr "एक पृष्ठ का चयन इस placeholder में अपनी plugins शामिल करने के लिए, खाली वर्तमान पृष्ठ का चयन होगा"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1084,9 +1058,8 @@ msgid "new window"
 msgstr ""
 
 #: plugins/link/models.py:17
-#, fuzzy
 msgid "parent window"
-msgstr "parent के पहले"
+msgstr ""
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
@@ -1154,8 +1127,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"दर्ज करें एक टेम्पलेट (यानी. \"snippets/plugin_xy.html\"), जो प्रदान किया जाएगा."
+msgstr "दर्ज करें एक टेम्पलेट (यानी. \"snippets/plugin_xy.html\"), जो प्रदान किया जाएगा."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1293,9 +1265,8 @@ msgid "we were checking out"
 msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
-#, fuzzy
 msgid "loading tweets..."
-msgstr "लोड हो रहा है ..."
+msgstr ""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1318,13 +1289,10 @@ msgid "movie url"
 msgstr "फिल्म url"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
-"vimeo या YouTube वीडियो URL. उदाहरण: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1414,9 +1382,7 @@ msgstr "Save और संपादन जारी"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"(पृष्ठ) <a href=\"%(admin_url)s\">%(page)s</a> आपके द्वारा approvement आवश्यकता "
-"हो सकती है."
+msgstr "(पृष्ठ) <a href=\"%(admin_url)s\">%(page)s</a> आपके द्वारा approvement आवश्यकता हो सकती है."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1527,8 +1493,7 @@ msgstr "पृष्ठ राज्यों"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
+msgstr "इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1728,9 +1693,8 @@ msgid "Can move"
 msgstr "कर सकते हैं हिलना"
 
 #: templates/admin/cms/page/permissions.html:14
-#, fuzzy
 msgid "Can view"
-msgstr "कर सकते हैं हिलना"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
@@ -1759,9 +1723,8 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr "एक प्लगइन का एक पुराना संशोधन नहीं बचाया जा सकता है!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
-#, fuzzy
 msgid "Your changes to this plugin have not been saved."
-msgstr "एक प्लगइन का एक पुराना संशोधन नहीं बचाया जा सकता है!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1851,9 +1814,8 @@ msgstr "उपयोगकर्ता नाम"
 
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
-#, fuzzy
 msgid "Login"
-msgstr "लॉग इन"
+msgstr ""
 
 #: templates/cms/toolbar/items/status.html:2
 msgid "Status"
@@ -1888,15 +1850,13 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
-#, fuzzy
 msgid "English"
-msgstr "अप्रकाशित"
+msgstr ""
 
 #: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "French"
@@ -1923,27 +1883,24 @@ msgid "three columns"
 msgstr ""
 
 #: test_utils/cli.py:130
-#, fuzzy
 msgid "navigation examples"
-msgstr "नेविगेशन extenders"
+msgstr ""
 
 #: test_utils/cli.py:136
-#, fuzzy
 msgid "sidebar column"
-msgstr "seekbar color"
+msgstr "seekbar bg color"
 
 #: test_utils/cli.py:142
 msgid "left column"
-msgstr ""
+msgstr "seekbar bg color"
 
 #: test_utils/cli.py:148
 msgid "right column"
-msgstr ""
+msgstr "seekbar bg color"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
-#, fuzzy
 msgid "Test Plugin"
-msgstr "हटाएँ प्लगइन"
+msgstr ""
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1958,14 +1915,12 @@ msgid "Sample App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
-#, fuzzy
 msgid "sample root page"
-msgstr "इस पेज का चयन करें"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample settings page"
-msgstr "इस पेज का चयन करें"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
@@ -2013,37 +1968,16 @@ msgstr "अवैध यूआरएल का प्रयोग करते �
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
-#~ msgid "Page with redirect url %r already exist"
-#~ msgstr "इस काउंटर के साथ एक पृष्ठ पहले से मौजूद है"
-
-#~ msgid "Missing flash plugin."
-#~ msgstr "फ़्लैश प्लगइन ग़ैरहाज़िर."
-
-#~ msgid "Move to %(name)s"
-#~ msgstr "%(name)s में ले जाएँ"
-
 #~ msgid "move"
-#~ msgstr "चलना"
+#~ msgstr "move request"
 
-#~ msgid "add child"
-#~ msgstr "child जोड़ें"
+#~ msgid "fgcolor"
+#~ msgstr "foreground color"
 
-#~ msgid "add sibling"
-#~ msgstr "sibling जोड़ें"
-
-#~ msgid "history"
-#~ msgstr "इतिहास"
-
-#~ msgid "Lock"
-#~ msgstr "ताला"
-
-#~ msgid "Close"
-#~ msgstr "बंद करना"
-
-#~ msgid "Settings"
-#~ msgstr "सेटिंग्स"
+#~ msgid "Wanted language has not been translated yet."
+#~ msgstr "Requested language has not been translated yet."

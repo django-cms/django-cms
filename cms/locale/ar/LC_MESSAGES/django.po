@@ -1,21 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
+# Jonas Obrist <me@ojii.ch>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-19 14:43+0200\n"
-"PO-Revision-Date: 2011-03-22 15:24+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -126,7 +127,8 @@ msgid "Page Title"
 msgstr "عنوان الصفحة"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "حرر المعروض في أعلى متصفحك أو في الـ bookmarks."
 
 #: admin/forms.py:155
@@ -174,18 +176,15 @@ msgstr "مستخدم"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgstr "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
 msgstr "حقوق إضافة الصفحةات تتطلب إضافة حقوق تعديل الصفحات أيضاً."
 
 #: admin/forms.py:260
-#, fuzzy
 msgid "can_view"
-msgstr "عرض"
+msgstr ""
 
 #: admin/forms.py:272
 msgid "Please select user or group first."
@@ -220,9 +219,7 @@ msgstr "أعلم المستخدم"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"بعث رسالة تنبيهية للمسخدم حول تغيير اسم المستخدم أو كلمة المرور. يتطب عنوان "
-"البريد الإلكتروني للمستخدم."
+msgstr "بعث رسالة تنبيهية للمسخدم حول تغيير اسم المستخدم أو كلمة المرور. يتطب عنوان البريد الإلكتروني للمستخدم."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -256,8 +253,7 @@ msgstr "إعدادات إفتراضية"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"ملاحظة: هذه الصفحة ستقوم بإعادة التحميل عند تغيير المحدد. قم بالحفظ أولاً."
+msgstr "ملاحظة: هذه الصفحة ستقوم بإعادة التحميل عند تغيير المحدد. قم بالحفظ أولاً."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -272,9 +268,8 @@ msgid "SEO Settings"
 msgstr "خيارات الإستمثال لمحركات البحث"
 
 #: admin/pageadmin.py:311
-#, fuzzy
 msgid "You have no permission to change the template"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:498
 msgid "higher"
@@ -285,10 +280,9 @@ msgid "Database error"
 msgstr "خطأ في قاعدة البيانات"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -321,9 +315,8 @@ msgid "You do not have permission to change this page's in_navigation status"
 msgstr "لا تملك الحقوق لتغيير حالة تصفح هذه الصفحة"
 
 #: admin/pageadmin.py:1113
-#, fuzzy
 msgid "You have no permission to add a plugin"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:1160 admin/pageadmin.py:1192
 msgid "Language must be set to a supported language!"
@@ -343,9 +336,8 @@ msgid "Language must be different than the copied language!"
 msgstr ""
 
 #: admin/pageadmin.py:1200
-#, fuzzy
 msgid "You do not have permission to add plugins"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:1207
 #, python-format
@@ -353,44 +345,37 @@ msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "تم نسخ إضافات اللغة %(language)s الى %(placeholder)s"
 
 #: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
-#, fuzzy
 msgid "You have no permission to change this page"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:1255
-#, fuzzy
 msgid "You have no permission to edit a plugin"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:1311
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"تم تعديل الإضافة %(plugin_name)s في %(position)s الموجودة في %(placeholder)s"
+msgstr "تم تعديل الإضافة %(plugin_name)s في %(position)s الموجودة في %(placeholder)s"
 
 #: admin/pageadmin.py:1370
-#, fuzzy
 msgid "You have no permission to move a plugin"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:1388
 msgid "Plugins where moved"
 msgstr "تم نقل الإضافات"
 
 #: admin/pageadmin.py:1402
-#, fuzzy
 msgid "You have no permission to remove a plugin"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"تم حذف الإضافة %(plugin_name)s الموجودة في %(placeholder)s في المكان "
-"%(position)s."
+msgstr "تم حذف الإضافة %(plugin_name)s الموجودة في %(placeholder)s في المكان %(position)s."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -413,19 +398,16 @@ msgid "Page permissions management"
 msgstr "إدارة حقوق الصفحة"
 
 #: admin/placeholderadmin.py:151 admin/placeholderadmin.py:192
-#, fuzzy
 msgid "You don't have permission to add content here."
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/placeholderadmin.py:188
-#, fuzzy
 msgid "You don't have permission to add plugins"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/placeholderadmin.py:289
-#, fuzzy
 msgid "You don't have permission to delete a plugin"
-msgstr "لا تملك الحقوق لتغيير هذه الصفحة"
+msgstr ""
 
 #: admin/useradmin.py:25
 msgid "User details"
@@ -727,9 +709,7 @@ msgstr "مغير من قبل"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgstr "When the page should go live. Status must be \"Published\" for page to go live."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -743,9 +723,7 @@ msgstr "لن يتم عرض الآباء في التصفح"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"An unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgstr "An unique identifier that is used with the page_url templatetag for linking to this page"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -925,11 +903,8 @@ msgstr "الطول"
 
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
-#, fuzzy
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
 msgstr ""
-"لم يتم العثور على مشغل فلاش. حمل من <a href=\"http://adobe.com/flashplayer"
-"\">هنا</a>"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -941,9 +916,8 @@ msgid "Google Map"
 msgstr "خرائط غوغل"
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "خيارات متقدمة"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -986,7 +960,6 @@ msgid "latitude"
 msgstr "خط العرض"
 
 #: plugins/googlemap/models.py:26
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map position."
 msgstr "استخدم خطوط الطول والعرض لتحديد الموضع على الخريطة بدقة."
 
@@ -1038,9 +1011,7 @@ msgstr "يجب أن يتم تعبئة اللغة أو الصفحة"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"قم باختيار صفحة ليتم وضع إضافاتها في مكان محدد، سيتم إختيار الصفحة الحالية "
-"عند عدم التحديد."
+msgstr "قم باختيار صفحة ليتم وضع إضافاتها في مكان محدد، سيتم إختيار الصفحة الحالية عند عدم التحديد."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1088,9 +1059,8 @@ msgid "new window"
 msgstr ""
 
 #: plugins/link/models.py:17
-#, fuzzy
 msgid "parent window"
-msgstr "الأب أولاً"
+msgstr ""
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
@@ -1296,9 +1266,8 @@ msgid "we were checking out"
 msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
-#, fuzzy
 msgid "loading tweets..."
-msgstr "جاري التحميل..."
+msgstr ""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1321,13 +1290,10 @@ msgid "movie url"
 msgstr "عنوان url لملف الفيديو"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
-"عنوان url لفيديو على فيميو أو يوتيوب. مثال http://www.youtube.com/watch?"
-"v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1532,9 +1498,7 @@ msgstr "حالة الصفحة"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"يجب إدارة الصفحة من مستخدم بمستوى %(moderation_level)s، أرسل رسالة إلى "
-"المدير."
+msgstr "يجب إدارة الصفحة من مستخدم بمستوى %(moderation_level)s، أرسل رسالة إلى المدير."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1734,9 +1698,8 @@ msgid "Can move"
 msgstr "يستطيع النقل"
 
 #: templates/admin/cms/page/permissions.html:14
-#, fuzzy
 msgid "Can view"
-msgstr "يستطيع النقل"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
@@ -1765,9 +1728,8 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr "يمكنك حفظ نسخة سابقة من الإضافة!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
-#, fuzzy
 msgid "Your changes to this plugin have not been saved."
-msgstr "يمكنك حفظ نسخة سابقة من الإضافة!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1857,9 +1819,8 @@ msgstr "اسم المستخدم"
 
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
-#, fuzzy
 msgid "Login"
-msgstr "تسجيل دخول"
+msgstr ""
 
 #: templates/cms/toolbar/items/status.html:2
 msgid "Status"
@@ -1894,15 +1855,13 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
-#, fuzzy
 msgid "English"
-msgstr "التراجع عن النشر"
+msgstr ""
 
 #: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "French"
@@ -1929,27 +1888,24 @@ msgid "three columns"
 msgstr ""
 
 #: test_utils/cli.py:130
-#, fuzzy
 msgid "navigation examples"
-msgstr "توسيع التصفح"
+msgstr ""
 
 #: test_utils/cli.py:136
-#, fuzzy
 msgid "sidebar column"
-msgstr "لون شريط التنقل"
+msgstr "لون خلفية شريط التنقل"
 
 #: test_utils/cli.py:142
 msgid "left column"
-msgstr ""
+msgstr "لون خلفية شريط التنقل"
 
 #: test_utils/cli.py:148
 msgid "right column"
-msgstr ""
+msgstr "لون خلفية شريط التنقل"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
-#, fuzzy
 msgid "Test Plugin"
-msgstr "احذف الإضافة"
+msgstr ""
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1964,14 +1920,12 @@ msgid "Sample App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
-#, fuzzy
 msgid "sample root page"
-msgstr "حدد هذه الصفحة"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample settings page"
-msgstr "حدد هذه الصفحة"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
@@ -2019,7 +1973,8 @@ msgstr "عنوان الـ URL غير صحيح. مثال: /my/url "
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
@@ -2027,33 +1982,11 @@ msgstr[3] ""
 msgstr[4] ""
 msgstr[5] ""
 
-#, fuzzy
-#~ msgid "Page with redirect url %r already exist"
-#~ msgstr "توجد صفحة سابقة بنفس الـ Slug"
-
-#~ msgid "Missing flash plugin."
-#~ msgstr "لا يوجد دعم لفلاش."
-
-#~ msgid "Move to %(name)s"
-#~ msgstr "قم بالنقل الى %(name)s"
-
 #~ msgid "move"
-#~ msgstr "انقل"
+#~ msgstr "move request"
 
-#~ msgid "add child"
-#~ msgstr "أضف ولداً"
+#~ msgid "fgcolor"
+#~ msgstr "foreground color"
 
-#~ msgid "add sibling"
-#~ msgstr "أضف أخوة"
-
-#~ msgid "history"
-#~ msgstr "التاريخ"
-
-#~ msgid "Lock"
-#~ msgstr "اقفل"
-
-#~ msgid "Close"
-#~ msgstr "أغلق"
-
-#~ msgid "Settings"
-#~ msgstr "خيارات"
+#~ msgid "Wanted language has not been translated yet."
+#~ msgstr "Requested language has not been translated yet."

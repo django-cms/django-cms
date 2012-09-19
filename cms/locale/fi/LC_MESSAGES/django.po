@@ -1,20 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
+#   <klaus.dahlen@gmail.com>, 2011.
+# nanook <klaus.dahlen@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-19 14:45+0200\n"
-"PO-Revision-Date: 2011-05-12 06:22+0000\n"
-"Last-Translator: nanook <klaus.dahlen@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -25,7 +28,7 @@ msgstr "Muokkaustila"
 
 #: cms_toolbar.py:79
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
 #: cms_toolbar.py:110 templates/admin/cms/page/menu_item.html:69
 msgid "Publish"
@@ -78,7 +81,7 @@ msgstr "Näytä historia"
 
 #: cms_toolbar.py:213
 msgid "Admin"
-msgstr ""
+msgstr "Ylläpitäjä"
 
 #: plugin_base.py:65
 msgid "Advanced options"
@@ -125,7 +128,8 @@ msgid "Page Title"
 msgstr "Sivun otsikko"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Yliajaa selaimen ylälaidassa ja kirjanmerkeissä näytettävän tekstin"
 
 #: admin/forms.py:155
@@ -173,18 +177,15 @@ msgstr "käyttäjä"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja "
-"ei voi muokata sitä myöhemmin."
+msgstr "Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja ei voi muokata sitä myöhemmin."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
 msgstr "Sivun luonti vaatii myös oikeuden muokata sivuja."
 
 #: admin/forms.py:260
-#, fuzzy
 msgid "can_view"
-msgstr "näkymä"
+msgstr ""
 
 #: admin/forms.py:272
 msgid "Please select user or group first."
@@ -219,9 +220,7 @@ msgstr "Huomauta käyttäjää"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. "
-"Vaatii käyttäjän sähköpostiosoitteen."
+msgstr "Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. Vaatii käyttäjän sähköpostiosoitteen."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -255,9 +254,7 @@ msgstr "Perusasetukset"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna "
-"ensin."
+msgstr "Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna ensin."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -272,9 +269,8 @@ msgid "SEO Settings"
 msgstr "Hakukoneiden optimointiasetukset (SEO)"
 
 #: admin/pageadmin.py:311
-#, fuzzy
 msgid "You have no permission to change the template"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä mallipohjan muuttamiseen"
 
 #: admin/pageadmin.py:498
 msgid "higher"
@@ -285,10 +281,9 @@ msgid "Database error"
 msgstr "Tietokantavirhe"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -321,9 +316,8 @@ msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Sinulla ei ole oikeutta vaihtaa tämän sivun valikkonäkyvyyttä"
 
 #: admin/pageadmin.py:1113
-#, fuzzy
 msgid "You have no permission to add a plugin"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä liitännäisen lisäämiseen"
 
 #: admin/pageadmin.py:1160 admin/pageadmin.py:1192
 msgid "Language must be set to a supported language!"
@@ -343,56 +337,46 @@ msgid "Language must be different than the copied language!"
 msgstr "Kopioidun kielen tulee poiketa lähdekielestä!"
 
 #: admin/pageadmin.py:1200
-#, fuzzy
 msgid "You do not have permission to add plugins"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä liitännäisten lisäämiseen"
 
 #: admin/pageadmin.py:1207
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
-"Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
+msgstr "Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
 
 #: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
-#, fuzzy
 msgid "You have no permission to change this page"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä tämän sivun muokkaamiseen"
 
 #: admin/pageadmin.py:1255
-#, fuzzy
 msgid "You have no permission to edit a plugin"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä liitännäisen muokkaamiseen"
 
 #: admin/pageadmin.py:1311
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa "
-"%(placeholder)s."
+msgstr "Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa %(placeholder)s."
 
 #: admin/pageadmin.py:1370
-#, fuzzy
 msgid "You have no permission to move a plugin"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä liitännäisen siirtämiseen"
 
 #: admin/pageadmin.py:1388
 msgid "Plugins where moved"
 msgstr "Liitännäisiä siirrettiin"
 
 #: admin/pageadmin.py:1402
-#, fuzzy
 msgid "You have no permission to remove a plugin"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä liitännäisen poistamiseen"
 
 #: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta "
-"%(placeholder)s."
+msgstr "Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta %(placeholder)s."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -415,19 +399,16 @@ msgid "Page permissions management"
 msgstr "Sivun oikeuksien hallinta"
 
 #: admin/placeholderadmin.py:151 admin/placeholderadmin.py:192
-#, fuzzy
 msgid "You don't have permission to add content here."
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä sisällön lisäämiseen tähän."
 
 #: admin/placeholderadmin.py:188
-#, fuzzy
 msgid "You don't have permission to add plugins"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä liitännäisten lisäämiseen"
 
 #: admin/placeholderadmin.py:289
-#, fuzzy
 msgid "You don't have permission to delete a plugin"
-msgstr "Sinulla ei ole oikeutta muokata tätä sivua"
+msgstr "Oikeutesi eivät riitä liitännäisen poistamiseen"
 
 #: admin/useradmin.py:25
 msgid "User details"
@@ -729,9 +710,7 @@ msgstr "muokkaaja"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" "
-"jotta se tulee näkyviin. "
+msgstr "Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" jotta se tulee näkyviin. "
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -745,13 +724,11 @@ msgstr "Kaikkia vanhempia ei näytetä navigaatiossa"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa "
-"tämän sivun linkittämiseksi asettelutiedostoissa. "
+msgstr "Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa tämän sivun linkittämiseksi asettelutiedostoissa. "
 
 #: models/pagemodel.py:66
 msgid "attached menu"
-msgstr ""
+msgstr "liitetty valikko"
 
 #: models/pagemodel.py:67
 msgid "is published"
@@ -775,11 +752,11 @@ msgstr "moderointitila"
 
 #: models/pagemodel.py:80
 msgid "menu visibility"
-msgstr ""
+msgstr "näytä valikossa"
 
 #: models/pagemodel.py:80
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "rajoita tämän sivun näkyvyyttä valikossa"
 
 #: models/pagemodel.py:100
 msgid "pages"
@@ -839,9 +816,7 @@ msgstr "voi palauttaa minkä tahansa poistetun sivun"
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-"jos mitään ei ole valittu käyttäjälle myönnetään oikeudet kaikkiin "
-"sivustoihin"
+msgstr "jos mitään ei ole valittu käyttäjälle myönnetään oikeudet kaikkiin sivustoihin"
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -912,7 +887,7 @@ msgstr "tiedosto"
 
 #: plugins/file/templates/cms/plugins/file.html:6
 msgid "file missing!"
-msgstr ""
+msgstr "tiedosto puuttuu!"
 
 #: plugins/flash/cms_plugins.py:9
 msgid "Flash"
@@ -929,25 +904,21 @@ msgstr "korkeus"
 
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
-#, fuzzy
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-"Flash-laajennus puuttuu. <a href=\"http://adobe.com/flashplayer\">Lataa "
-"tästä</a>."
+msgstr "Flash puuttuu. Lataa uusin Adobe Flash Player:"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
 msgid "Get Adobe Flash Player"
-msgstr ""
+msgstr "Lataa Adobe Flash Player"
 
 #: plugins/googlemap/cms_plugins.py:10
 msgid "Google Map"
 msgstr "Google Map"
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "Edistyneet valinnat"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -990,7 +961,6 @@ msgid "latitude"
 msgstr "leveysaste"
 
 #: plugins/googlemap/models.py:26
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map position."
 msgstr "Käytä leveys- ja pituusasteita määrittääksesi kartan sijainnin"
 
@@ -1024,7 +994,7 @@ msgstr "Kartta"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:72
 msgid "Your address: "
-msgstr ""
+msgstr "Osoitteesi: "
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:74
 msgid "Calculate route"
@@ -1042,9 +1012,7 @@ msgstr "Kieli tai sivu pitää olla täytettynä"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä "
-"valitsee nykyisen sivun"
+msgstr "Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä valitsee nykyisen sivun"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1092,9 +1060,8 @@ msgid "new window"
 msgstr ""
 
 #: plugins/link/models.py:17
-#, fuzzy
 msgid "parent window"
-msgstr "vanhempi ensin"
+msgstr ""
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
@@ -1162,9 +1129,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan "
-"ruudulle."
+msgstr "Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan ruudulle."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1248,7 +1213,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/cms_plugins.py:23
 msgid "Twitter Search"
-msgstr ""
+msgstr "Twitter-haku"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1272,7 +1237,7 @@ msgstr "Jos täytetty vinkki näytetään linkkinä Twitter-tiliisi"
 
 #: plugins/twitter/models.py:16
 msgid "query"
-msgstr ""
+msgstr "kysely"
 
 #: plugins/twitter/models.py:16
 msgid ""
@@ -1302,9 +1267,8 @@ msgid "we were checking out"
 msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
-#, fuzzy
 msgid "loading tweets..."
-msgstr "Ladataan…"
+msgstr ""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1327,13 +1291,10 @@ msgid "movie url"
 msgstr "videon osoite"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
-"Vimeo tai Youtube videon URL. Esimerkiksi: http://www.youtube.com/watch?"
-"v=YFa59lK-kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1423,9 +1384,7 @@ msgstr "Tallenna ja jatka muokkausta"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta "
-"hyväksyntää."
+msgstr "Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta hyväksyntää."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1536,9 +1495,7 @@ msgstr "Sivun tilat"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti "
-"moderaattorille."
+msgstr "Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti moderaattorille."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1738,9 +1695,8 @@ msgid "Can move"
 msgstr "Voi siirtää"
 
 #: templates/admin/cms/page/permissions.html:14
-#, fuzzy
 msgid "Can view"
-msgstr "Voi siirtää"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
@@ -1769,9 +1725,8 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr "Liitännäisen vanhaa versiota ei voi tallentaa!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
-#, fuzzy
 msgid "Your changes to this plugin have not been saved."
-msgstr "Liitännäisen vanhaa versiota ei voi tallentaa!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1805,7 +1760,7 @@ msgstr "Valitse kopioi asetukset"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
-msgstr ""
+msgstr "Yleinen"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 msgid "Add Plugin"
@@ -1829,9 +1784,7 @@ msgstr "Yhtään liitäännäistä ei ole valittuna. Valitse vasemmalta laidalta
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
-"Yhtään liitännäistä ei ole asetettu. Lisää liitännäinen tähän "
-"sisältökenttään."
+msgstr "Yhtään liitännäistä ei ole asetettu. Lisää liitännäinen tähän sisältökenttään."
 
 #: templates/cms/toolbar/placeholder.html:33
 msgid "Available plugins"
@@ -1863,9 +1816,8 @@ msgstr "Käyttäjänimi"
 
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
-#, fuzzy
 msgid "Login"
-msgstr "kirjaudu sisään"
+msgstr ""
 
 #: templates/cms/toolbar/items/status.html:2
 msgid "Status"
@@ -1900,15 +1852,13 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
-#, fuzzy
 msgid "English"
-msgstr "Piilota"
+msgstr ""
 
 #: test_utils/cli.py:101 test_utils/cli.py:108
 msgid "French"
@@ -1935,27 +1885,24 @@ msgid "three columns"
 msgstr ""
 
 #: test_utils/cli.py:130
-#, fuzzy
 msgid "navigation examples"
-msgstr "navigaation laajentajat"
+msgstr ""
 
 #: test_utils/cli.py:136
-#, fuzzy
 msgid "sidebar column"
-msgstr "Hakupalkin väri"
+msgstr "hakupalkin taustaväri"
 
 #: test_utils/cli.py:142
 msgid "left column"
-msgstr ""
+msgstr "hakupalkin taustaväri"
 
 #: test_utils/cli.py:148
 msgid "right column"
-msgstr ""
+msgstr "hakupalkin taustaväri"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
-#, fuzzy
 msgid "Test Plugin"
-msgstr "Poista liitännäinen"
+msgstr ""
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1970,14 +1917,12 @@ msgid "Sample App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
-#, fuzzy
 msgid "sample root page"
-msgstr "valitse tämä sivu"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample settings page"
-msgstr "valitse tämä sivu"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
@@ -2025,43 +1970,16 @@ msgstr "Epäkelpo URL. Ole hyvä ja käytä muotoa /minun/url/"
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
-#~ msgid "Page with redirect url %r already exist"
-#~ msgstr "Toinen sivu tällä slugilla on jo olemassa"
-
-#~ msgid "Missing flash plugin."
-#~ msgstr "Flash-liitännäinen puuttuu."
-
-#~ msgid "Move to %(name)s"
-#~ msgstr "Siirrä kohtaan %(name)s"
-
 #~ msgid "move"
-#~ msgstr "siirrä"
-
-#~ msgid "add child"
-#~ msgstr "lisää lapsi"
-
-#~ msgid "add sibling"
-#~ msgstr "lisää sisar"
-
-#~ msgid "history"
-#~ msgstr "historia"
-
-#~ msgid "Lock"
-#~ msgstr "Lukitse"
-
-#~ msgid "Close"
-#~ msgstr "Sulje"
-
-#~ msgid "Settings"
-#~ msgstr "Asetukset"
+#~ msgstr "move request"
 
 #~ msgid "fgcolor"
-#~ msgstr "etualan väri"
+#~ msgstr "foreground color"
 
 #~ msgid "Wanted language has not been translated yet."
-#~ msgstr "Pyydetty kieli ei ole vielä käännetty."
+#~ msgstr "Requested language has not been translated yet."
