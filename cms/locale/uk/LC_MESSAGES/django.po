@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-12 15:35+0200\n"
+"POT-Creation-Date: 2012-09-19 14:47+0200\n"
 "PO-Revision-Date: 2012-08-18 15:16+0300\n"
 "Last-Translator: Roman Kozlovskyi <krzroman@gmail.com>\n"
 "Language-Team: Ukrainian Team <LL@li.org>\n"
@@ -1960,11 +1960,11 @@ msgstr "затвердити"
 msgid "CMS - Page %s requires approvement."
 msgstr ""
 
-#: utils/page_resolver.py:142
+#: utils/page_resolver.py:146
 msgid "Invalid URL, use /my/url format."
 msgstr ""
 
-#: utils/page_resolver.py:168
+#: utils/page_resolver.py:176
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
