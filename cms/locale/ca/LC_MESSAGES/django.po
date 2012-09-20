@@ -1,22 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Roger Pons <rogerpons@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-14 16:08+0200\n"
-"PO-Revision-Date: 2012-06-05 18:51+0000\n"
-"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: ca\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -127,10 +127,9 @@ msgid "Page Title"
 msgstr "Títol de la pàgina"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Sobreescriu el que es mostra a la part superior del navegador o en els seus "
-"favorits"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Sobreescriu el que es mostra a la part superior del navegador o en els seus favorits"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -162,9 +161,7 @@ msgstr "Una descripció de la pàgina a vegades utilitzada pels motors de cerca.
 
 #: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Una llista de paraules clau separades per comes a vegades utilitzada pels "
-"motors de cerca."
+msgstr "Una llista de paraules clau separades per comes a vegades utilitzada pels motors de cerca."
 
 #: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
@@ -179,9 +176,7 @@ msgstr "usuari"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Afegir el permís pàgina requereix també l'accés als fills, o descendents, en "
-"cas contrari la  pàgina afegida no podria ser modificada pel seu creador."
+msgstr "Afegir el permís pàgina requereix també l'accés als fills, o descendents, en cas contrari la  pàgina afegida no podria ser modificada pel seu creador."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -224,9 +219,7 @@ msgstr "Notificar a l'usuari"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Enviar notificació per correu electrònic a l'usuari sobre el canvi nom "
-"d'usuari o contrasenya. Requereix del correu electrònic de l'usuari."
+msgstr "Enviar notificació per correu electrònic a l'usuari sobre el canvi nom d'usuari o contrasenya. Requereix del correu electrònic de l'usuari."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -238,21 +231,17 @@ msgstr "Nova confirmació de la contrasenya"
 
 #: admin/forms.py:351
 msgid "Email notification requires valid email address."
-msgstr ""
-"Notificació per correu electrònic requereix d'una adreça de correu "
-"electrònic vàlida."
+msgstr "Notificació per correu electrònic requereix d'una adreça de correu electrònic vàlida."
 
 #: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"El permís per afegir noves pàgines requereix el permís per modificar pàgines!"
+msgstr "El permís per afegir noves pàgines requereix el permís per modificar pàgines!"
 
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"El permís per afegir nous usuaris requereix el permís per modificar usuaris!"
+msgstr "El permís per afegir nous usuaris requereix el permís per modificar usuaris!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -264,9 +253,7 @@ msgstr "Configuració bàsica"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Nota: Aquesta plana es torna a carregar si canvia la selecció. Desa-la "
-"primer."
+msgstr "Nota: Aquesta plana es torna a carregar si canvia la selecció. Desa-la primer."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -293,10 +280,9 @@ msgid "Database error"
 msgstr "Error de la base de dades"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "No tens permisos per modificar aquesta pàgina"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -370,9 +356,7 @@ msgstr "Sense permisos per editar un plugin"
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"El connector %(plugin_name)s s'ha editat a la posició %(position)s de "
-"%(placeholder)s"
+msgstr "El connector %(plugin_name)s s'ha editat a la posició %(position)s de %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -391,9 +375,7 @@ msgstr "Sense permisos per treure un plugin"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"El connector %(plugin_name)s a la posició %(position)s de %(placeholder)s "
-"s'ha esborrat"
+msgstr "El connector %(plugin_name)s a la posició %(position)s de %(placeholder)s s'ha esborrat"
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -447,7 +429,7 @@ msgstr "Copiar permisos"
 msgid "Copy moderation"
 msgstr "Copiar moderació"
 
-#: conf/patch.py:14
+#: conf/patch.py:28
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Hereta la plantilla del l'ancestre més pròxim"
 
@@ -741,9 +723,7 @@ msgstr "Tots els avantpassats no es mostraran al menú de navegació"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Un identificador únic que s'utilitza amb el page_url_templatetag per "
-"enllaçar-se a aquesta pàgina"
+msgstr "Un identificador únic que s'utilitza amb el page_url_templatetag per enllaçar-se a aquesta pàgina"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -781,11 +761,11 @@ msgstr "limitar quan aquesta pàgina és visible al menú"
 msgid "pages"
 msgstr "pàgines"
 
-#: models/pagemodel.py:267
+#: models/pagemodel.py:268
 msgid "Page was copied."
 msgstr "Pàgina copiada"
 
-#: models/pagemodel.py:689
+#: models/pagemodel.py:690
 msgid "default"
 msgstr "defecte"
 
@@ -835,8 +815,7 @@ msgstr "pot recuperar qualsevol pàgina eliminada"
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-"Si no hi ha res seleccionat, l'usuari tindrà permisos concedits a tot arreu."
+msgstr "Si no hi ha res seleccionat, l'usuari tindrà permisos concedits a tot arreu."
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -925,9 +904,7 @@ msgstr "alçada"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-"No s'ha trobat el plugin de flash. Descarregar l'última versió d'Adobe Flash "
-"Player:"
+msgstr "No s'ha trobat el plugin de flash. Descarregar l'última versió d'Adobe Flash Player:"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -939,9 +916,8 @@ msgid "Google Map"
 msgstr "Google Map"
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "Opcions avançades"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -984,7 +960,6 @@ msgid "latitude"
 msgstr "latitud"
 
 #: plugins/googlemap/models.py:26
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map position."
 msgstr "L'ús de latitud i longitud per afinar la posició en el mapa."
 
@@ -1036,9 +1011,7 @@ msgstr "Es necessari emplenar la llengua o la pàgina"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Trieu una pàgina per incloure-hi els connectors en aquest marcador de "
-"posició, deixant-ho buit triarà la pàgina actual"
+msgstr "Trieu una pàgina per incloure-hi els connectors en aquest marcador de posició, deixant-ho buit triarà la pàgina actual"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1086,9 +1059,8 @@ msgid "new window"
 msgstr ""
 
 #: plugins/link/models.py:17
-#, fuzzy
 msgid "parent window"
-msgstr "primer pare"
+msgstr ""
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
@@ -1156,9 +1128,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Introduex la plantilla (i.e. \"snippets/plugin_xy.html\") que serà "
-"renderitzada. "
+msgstr "Introduex la plantilla (i.e. \"snippets/plugin_xy.html\") que serà renderitzada. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1262,8 +1232,7 @@ msgstr "ajuda de l'enllaç"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-"Si s'indica, l'ajuda es mostrarà com a enllaç al seu perfil de Twitter."
+msgstr "Si s'indica, l'ajuda es mostrarà com a enllaç al seu perfil de Twitter."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1274,10 +1243,7 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr ""
-"Exemple: \"cervells AND zombis AND from:paraigues AND to:nemesis\": tweets "
-"de l'usuari \"paraigues\" a l'usuari \"nemesis\" que conté les paraules "
-"\"cervells\" i \"zombis\""
+msgstr "Exemple: \"cervells AND zombis AND from:paraigues AND to:nemesis\": tweets de l'usuari \"paraigues\" a l'usuari \"nemesis\" que conté les paraules \"cervells\" i \"zombis\""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1325,11 +1291,9 @@ msgstr "url de la película"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"url de video de vimeo o youtubel. Exemple: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "url de video de vimeo o youtubel. Exemple: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1419,8 +1383,7 @@ msgstr "Guardar i continuar editant"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"La pàgina <a href=\"%(admin_url)s\">%(page)s</a> pot requerir que l'aprovis."
+msgstr "La pàgina <a href=\"%(admin_url)s\">%(page)s</a> pot requerir que l'aprovis."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1531,9 +1494,7 @@ msgstr "Estat de la pàgina"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Aquesta pàgina ha de ser moderat en el nivell %(moderation_level)s , envia "
-"un missatge per al moderador."
+msgstr "Aquesta pàgina ha de ser moderat en el nivell %(moderation_level)s , envia un missatge per al moderador."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1763,9 +1724,8 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr "Una revisió antiga d'un connector no es pot guardar!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
-#, fuzzy
 msgid "Your changes to this plugin have not been saved."
-msgstr "Una revisió antiga d'un connector no es pot guardar!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1823,8 +1783,7 @@ msgstr "Ho has seleccionat cap connector. Tria'n un de l'esquerra"
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
-"No hi ha connectors. Afegir un connector per aquest marcador de posició."
+msgstr "No hi ha connectors. Afegir un connector per aquest marcador de posició."
 
 #: templates/cms/toolbar/placeholder.html:33
 msgid "Available plugins"
@@ -1892,66 +1851,57 @@ msgstr "Pàgina no trobada a %(domain)s"
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"Una etiqueta de la plantilla no ha pogut trobat la pàgina amb els arguments "
-"de lookup `%(page_lookup)s\n"
-"`. La URL de la petició ha estat: http://%(host)s%(path)s"
-
-#: test_utils/cli.py:99 test_utils/cli.py:106
-#, fuzzy
-msgid "English"
-msgstr "No publicar"
+msgstr "Una etiqueta de la plantilla no ha pogut trobat la pàgina amb els arguments de lookup `%(page_lookup)s\n`. La URL de la petició ha estat: http://%(host)s%(path)s"
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
-msgid "French"
+msgid "English"
 msgstr ""
 
 #: test_utils/cli.py:101 test_utils/cli.py:108
-msgid "German"
+msgid "French"
 msgstr ""
 
 #: test_utils/cli.py:102 test_utils/cli.py:109
-msgid "Brazilian Portuguese"
+msgid "German"
 msgstr ""
 
 #: test_utils/cli.py:103 test_utils/cli.py:110
+msgid "Brazil"
+msgstr ""
+
+#: test_utils/cli.py:104 test_utils/cli.py:111
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:127
+#: test_utils/cli.py:128
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:129
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:129
-#, fuzzy
+#: test_utils/cli.py:130
 msgid "navigation examples"
-msgstr "extensions a la navegació"
+msgstr ""
 
-#: test_utils/cli.py:135
+#: test_utils/cli.py:136
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:141
-#, fuzzy
+#: test_utils/cli.py:142
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:147
-#, fuzzy
+#: test_utils/cli.py:148
 msgid "right column"
 msgstr "background color"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
-#, fuzzy
 msgid "Test Plugin"
-msgstr "Afegir connector"
+msgstr ""
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1965,19 +1915,13 @@ msgstr ""
 msgid "Sample App"
 msgstr ""
 
-#: test_utils/project/sampleapp/cms_app.py:15
-msgid "Namespaced App"
+#: test_utils/project/sampleapp/menu.py:16
+msgid "sample root page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:16
-#, fuzzy
-msgid "sample root page"
-msgstr "seleccioneu aquesta pàgina"
-
 #: test_utils/project/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample settings page"
-msgstr "seleccioneu aquesta pàgina"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
@@ -1994,11 +1938,6 @@ msgstr ""
 #: test_utils/project/sampleapp/menu.py:47
 msgid "Static Menu2"
 msgstr ""
-
-#: test_utils/project/sampleapp/urls.py:11
-#, fuzzy
-msgid "^account/$"
-msgstr "comptar"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
@@ -2021,21 +1960,19 @@ msgstr "aprovar"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - La pàgina %s requereix aprovació."
 
-#: utils/page_resolver.py:148
+#: utils/page_resolver.py:146
 msgid "Invalid URL, use /my/url format."
 msgstr "URL no vàlida, utilitzeu  el format /meu/url. "
 
-#: utils/page_resolver.py:177
+#: utils/page_resolver.py:176
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Page with redirect url %r already exist"
-#~ msgstr "La pàgina amb redirecció a la url %r ja existeix"
 
 #~ msgid "move"
 #~ msgstr "move request"

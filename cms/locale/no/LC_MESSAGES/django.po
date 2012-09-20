@@ -1,23 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 #   <oyvind.saltvik@gmail.com>, 2011.
 #   <smyrman@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-14 16:11+0200\n"
-"PO-Revision-Date: 2011-09-10 18:43+0000\n"
-"Last-Translator: fivethreeo <oyvind.saltvik@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: no\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: no\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -128,9 +128,9 @@ msgid "Page Title"
 msgstr "Sidetittel"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Overstyrer hva som vises på toppen av nettleseren din eller i bokmerker"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Overstyrer hva som vises på toppen av nettleseren din eller i bokmerker"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -177,9 +177,7 @@ msgstr "bruker"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Legg til side tillatelse krever også tilgang til barn eller undernivå, "
-"ellers kan ikke endres av den som opprettet den."
+msgstr "Legg til side tillatelse krever også tilgang til barn eller undernivå, ellers kan ikke endres av den som opprettet den."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -222,9 +220,7 @@ msgstr "Varsle bruker"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Send epostvarsling til brukeren om brukernavn eller passordendring. Krever "
-"epost."
+msgstr "Send epostvarsling til brukeren om brukernavn eller passordendring. Krever epost."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -241,15 +237,12 @@ msgstr "Epostvarsling krever en gyldig epostadresse"
 #: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"Rettigheren for å legge til nye sider krever rettigheten til å endre sider!"
+msgstr "Rettigheren for å legge til nye sider krever rettigheten til å endre sider!"
 
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Rettigheten for å legge til nye brukere krever rettigheten til å endre "
-"brukere!"
+msgstr "Rettigheten for å legge til nye brukere krever rettigheten til å endre brukere!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -288,10 +281,9 @@ msgid "Database error"
 msgstr "Databasefeil"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Du har ikke rettigheter til å endre denne siden"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -321,8 +313,7 @@ msgstr "Du har ikke rettigheter til å publisere denne siden"
 
 #: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
-"Du har ikke rettigheter til å endre denne sidens \"i navigasjon\" status"
+msgstr "Du har ikke rettigheter til å endre denne sidens \"i navigasjon\" status"
 
 #: admin/pageadmin.py:1113
 msgid "You have no permission to add a plugin"
@@ -366,8 +357,7 @@ msgstr "Du har ingen rettigheter til å endre en plugin"
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"%(plugin_name)s plugin redigert på posisjon %(position)s i %(placeholder)s"
+msgstr "%(plugin_name)s plugin redigert på posisjon %(position)s i %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -386,9 +376,7 @@ msgstr "Du har ingen rettigheter til å slette en plugin"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"%(plugin_name)s plugin på posisjon %(position)s i %(placeholder)s ble "
-"slettet."
+msgstr "%(plugin_name)s plugin på posisjon %(position)s i %(placeholder)s ble slettet."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -442,7 +430,7 @@ msgstr "Kopier rettigheter"
 msgid "Copy moderation"
 msgstr "Kopier moderering"
 
-#: conf/patch.py:14
+#: conf/patch.py:28
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Arv mal med nærmeste stamfar"
 
@@ -722,9 +710,7 @@ msgstr "endret av"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"Når sideb skal gjøres offentlig. Status må være \"Publisert\" for at siden "
-"skal vises."
+msgstr "Når sideb skal gjøres offentlig. Status må være \"Publisert\" for at siden skal vises."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -738,9 +724,7 @@ msgstr "Alle undernivå vil ikke vises i navigasjonen"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"En unik identifikaror sum brukes med page_url templatetag for å linke til en "
-"side"
+msgstr "En unik identifikaror sum brukes med page_url templatetag for å linke til en side"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -778,11 +762,11 @@ msgstr "begrens når denne siden er synlig i menyen"
 msgid "pages"
 msgstr "sider"
 
-#: models/pagemodel.py:267
+#: models/pagemodel.py:268
 msgid "Page was copied."
 msgstr "Siden ble kopiert."
 
-#: models/pagemodel.py:689
+#: models/pagemodel.py:690
 msgid "default"
 msgstr "standard"
 
@@ -921,8 +905,7 @@ msgstr "høyde"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-"Manglende flash plugin. Vennligst last ned den siste Adobe Flash Player:"
+msgstr "Manglende flash plugin. Vennligst last ned den siste Adobe Flash Player:"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -934,9 +917,8 @@ msgid "Google Map"
 msgstr "Google kart"
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "Avanserte valg"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -979,7 +961,6 @@ msgid "latitude"
 msgstr "breddegrad"
 
 #: plugins/googlemap/models.py:26
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map position."
 msgstr "Bruk breddegrad og lengdegrad for å fininstille kartposisjonen."
 
@@ -1031,9 +1012,7 @@ msgstr "Språk eller side må være fyllt inn"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Velg en side som skal inkludere sine plugins inn i denne plassholderen, "
-"tomme vil velge denne siden"
+msgstr "Velg en side som skal inkludere sine plugins inn i denne plassholderen, tomme vil velge denne siden"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1081,9 +1060,8 @@ msgid "new window"
 msgstr ""
 
 #: plugins/link/models.py:17
-#, fuzzy
 msgid "parent window"
-msgstr "forelder først"
+msgstr ""
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
@@ -1151,8 +1129,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
+msgstr "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1267,10 +1244,7 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr ""
-"Eksempel: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
-"fra brukeren \"umbrella\" til brukeren \"nemesis\" som inneholder ordene "
-"\"brains\" og \"zombies\""
+msgstr "Eksempel: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets fra brukeren \"umbrella\" til brukeren \"nemesis\" som inneholder ordene \"brains\" og \"zombies\""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1318,11 +1292,9 @@ msgstr "videoadresse"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"vimeo eller youtube video adresse. Eksempel: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "vimeo eller youtube video adresse. Eksempel: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1412,8 +1384,7 @@ msgstr "Lagre of fortsett å redigere"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Siden <a href=\"%(admin_url)s\">%(page)s</a> kan behøve godkjenning av deg."
+msgstr "Siden <a href=\"%(admin_url)s\">%(page)s</a> kan behøve godkjenning av deg."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1524,9 +1495,7 @@ msgstr "Side nivåer"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Denne diden må modereres på nivå %(moderation_level)s, post en beskjed for "
-"moderator."
+msgstr "Denne diden må modereres på nivå %(moderation_level)s, post en beskjed for moderator."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1756,9 +1725,8 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr "En gammel versjon av en plugin kan ikke lagres!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
-#, fuzzy
 msgid "Your changes to this plugin have not been saved."
-msgstr "En gammel versjon av en plugin kan ikke lagres!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1771,8 +1739,7 @@ msgstr "Gjenopprett slettede %(verbose_name)s"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
-"Trykk på lagreknappen under for å gjenopprette denne versjonen av objektet."
+msgstr "Trykk på lagreknappen under for å gjenopprette denne versjonen av objektet."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1781,8 +1748,7 @@ msgstr "Tilmakestill %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
-"Trykk på save knappen for å tilbakestille til denne versjonen av objektet."
+msgstr "Trykk på save knappen for å tilbakestille til denne versjonen av objektet."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1886,65 +1852,57 @@ msgstr "Side ikke funnet på %(domain)s "
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"En maltag kunne ikke finne siden med søkeargumenter `%(page_lookup)s\n"
-"`. Adressen til forespørselen var: http://%(host)s%(path)s"
-
-#: test_utils/cli.py:99 test_utils/cli.py:106
-#, fuzzy
-msgid "English"
-msgstr "Upubliser"
+msgstr "En maltag kunne ikke finne siden med søkeargumenter `%(page_lookup)s\n`. Adressen til forespørselen var: http://%(host)s%(path)s"
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
-msgid "French"
+msgid "English"
 msgstr ""
 
 #: test_utils/cli.py:101 test_utils/cli.py:108
-msgid "German"
+msgid "French"
 msgstr ""
 
 #: test_utils/cli.py:102 test_utils/cli.py:109
-msgid "Brazilian Portuguese"
+msgid "German"
 msgstr ""
 
 #: test_utils/cli.py:103 test_utils/cli.py:110
+msgid "Brazil"
+msgstr ""
+
+#: test_utils/cli.py:104 test_utils/cli.py:111
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:127
+#: test_utils/cli.py:128
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:129
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:129
-#, fuzzy
+#: test_utils/cli.py:130
 msgid "navigation examples"
-msgstr "navigasjonsutvidere"
+msgstr ""
 
-#: test_utils/cli.py:135
+#: test_utils/cli.py:136
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:141
-#, fuzzy
+#: test_utils/cli.py:142
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:147
-#, fuzzy
+#: test_utils/cli.py:148
 msgid "right column"
 msgstr "background color"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
-#, fuzzy
 msgid "Test Plugin"
-msgstr "Legg til plugin"
+msgstr ""
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1958,19 +1916,13 @@ msgstr ""
 msgid "Sample App"
 msgstr ""
 
-#: test_utils/project/sampleapp/cms_app.py:15
-msgid "Namespaced App"
+#: test_utils/project/sampleapp/menu.py:16
+msgid "sample root page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:16
-#, fuzzy
-msgid "sample root page"
-msgstr "velg denne siden"
-
 #: test_utils/project/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample settings page"
-msgstr "velg denne siden"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
@@ -1987,11 +1939,6 @@ msgstr ""
 #: test_utils/project/sampleapp/menu.py:47
 msgid "Static Menu2"
 msgstr ""
-
-#: test_utils/project/sampleapp/urls.py:11
-#, fuzzy
-msgid "^account/$"
-msgstr "antall"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
@@ -2014,21 +1961,19 @@ msgstr "godkjenn"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Siden %s må godkjennes"
 
-#: utils/page_resolver.py:148
+#: utils/page_resolver.py:146
 msgid "Invalid URL, use /my/url format."
 msgstr "Ugyldig adresse, bruk formatet /min/adresse ."
 
-#: utils/page_resolver.py:177
+#: utils/page_resolver.py:176
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Page with redirect url %r already exist"
-#~ msgstr "Side med redireksjonsadresse %r finnes allerede"
 
 #~ msgid "move"
 #~ msgstr "move request"

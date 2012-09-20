@@ -18,7 +18,7 @@ ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
 
 
-def get_page_queryset_from_path(path, preview=False):
+def get_page_queryset_from_path(path, preview=False, site=None):
     """ Returns a queryset of pages corresponding to the path given
     In may returns None or a single page is no page is present or root path is given
     """
@@ -26,8 +26,9 @@ def get_page_queryset_from_path(path, preview=False):
         admin_base = reverse('admin:index')
     else:
         admin_base = None
-    
-    site = Site.objects.get_current()
+
+    if not site:
+        site = Site.objects.get_current()
     # Check if this is called from an admin request
     if admin_base and path.startswith(admin_base):
         # if so, get the page ID to query the page
@@ -47,10 +48,13 @@ def get_page_queryset_from_path(path, preview=False):
     else:
         pages = Page.objects.public()
 
+    # PageQuerySet.published filter on page site.
+    # We have to explicitly filter on site only in preview mode
+    # we can skip pages.filter
     if not preview:
-        pages = pages.published()
-
-    pages = pages.filter(site=site)
+        pages = pages.published(site)
+    else:
+        pages = pages.filter(site=site)
 
     # Check if there are any pages
     if not pages.all_root().exists():
@@ -139,19 +143,23 @@ def get_page_from_request(request, use_path=None):
     return page
 
 
-def is_valid_url(url,instance,create_links=True):
+def is_valid_url(url,instance,create_links=True, site=None):
     """ Checks for conflicting urls
     """
     if url:
         # Url sanity check via regexp
         if not any_path_re.match(url):
             raise ValidationError(_('Invalid URL, use /my/url format.'))
+        # We only check page FK to site object to allow is_valid_url check on
+        # incomplete Page instances
+        if not site and (instance.site_id):
+            site = instance.site
         # Retrieve complete queryset of pages with corresponding URL
         # This uses the same resolving function as ``get_page_from_path``
         page_root = urllib.unquote(reverse("pages-root"))
         if url.startswith(page_root):
             url = url[len(page_root):]
-        page_qs = get_page_queryset_from_path(url.strip('/'))
+        page_qs = get_page_queryset_from_path(url.strip('/'), site=site)
         url_clashes = []
         # If queryset has pages checks for conflicting urls
         if page_qs is not None:

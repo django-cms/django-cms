@@ -1,23 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Boris Chervenkov <office@sentido.bg>, 2012.
 # masarliev <mitko@masarliev.net>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-14 16:08+0200\n"
-"PO-Revision-Date: 2012-01-26 13:34+0000\n"
-"Last-Translator: Boris Chervenkov <office@sentido.bg>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: bg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: bg\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -128,7 +128,8 @@ msgid "Page Title"
 msgstr "Заглавие на страницата"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Изписва показаното отгоре във Вашия браузър или отметки"
 
 #: admin/forms.py:155
@@ -145,8 +146,7 @@ msgstr "Напиши URL адрес"
 
 #: admin/forms.py:159
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
-"Оставете това поле празно, ако трябва да бъде използван стандартен път."
+msgstr "Оставете това поле празно, ако трябва да бъде използван стандартен път."
 
 #: admin/forms.py:165
 msgid "Redirect"
@@ -162,8 +162,7 @@ msgstr "Описание на страницата, което понякога 
 
 #: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Списък с думи, разделени със запетая, който понякога използват търсачките."
+msgstr "Списък с думи, разделени със запетая, който понякога използват търсачките."
 
 #: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
@@ -178,9 +177,7 @@ msgstr "потребител"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Правата за създаване на страница изискват достъп и до подстраниците. В "
-"противен случай добавената страница не може да бъде променяна от своя автор."
+msgstr "Правата за създаване на страница изискват достъп и до подстраниците. В противен случай добавената страница не може да бъде променяна от своя автор."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -223,9 +220,7 @@ msgstr "Предупреди потребителя"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Изпратете имейл предупреждение на потребителя относно промяна на "
-"потребителско име или парола. Изисква се имейл на потребителя."
+msgstr "Изпратете имейл предупреждение на потребителя относно промяна на потребителско име или парола. Изисква се имейл на потребителя."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -247,9 +242,7 @@ msgstr "Правото за добавяне изисква и право за �
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Правото за добавяне на нови потребители изисква и правото за тяхното "
-"редактиране!"
+msgstr "Правото за добавяне на нови потребители изисква и правото за тяхното редактиране!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -261,9 +254,7 @@ msgstr "Основни настройки"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Забележка: страницата се презарежда ако промените значението. Запазете "
-"промените първо."
+msgstr "Забележка: страницата се презарежда ако промените значението. Запазете промените първо."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -290,10 +281,9 @@ msgid "Database error"
 msgstr "Грешка в базата данни"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Нямате право да променяте тази страница"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -367,9 +357,7 @@ msgstr "Нямате право да редактирате добавка."
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"%(plugin_name)s добавка беше редактирана в позиция %(position)s на "
-"%(placeholder)s"
+msgstr "%(plugin_name)s добавка беше редактирана в позиция %(position)s на %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -388,9 +376,7 @@ msgstr "Нямате право да премахвате добавка"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"%(plugin_name)s добавка в позиция %(position)s на %(placeholder)s беше "
-"изтрита."
+msgstr "%(plugin_name)s добавка в позиция %(position)s на %(placeholder)s беше изтрита."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -444,7 +430,7 @@ msgstr "Копирай права"
 msgid "Copy moderation"
 msgstr "Копирай модериране"
 
-#: conf/patch.py:14
+#: conf/patch.py:28
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Наследи шаблона от най-близката главна страница"
 
@@ -738,9 +724,7 @@ msgstr "Всички прародители няма да бъдат показ�
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Уникален идентификатор, използван с page_url етикета на темплейта за "
-"създаване на връзка до тази страница."
+msgstr "Уникален идентификатор, използван с page_url етикета на темплейта за създаване на връзка до тази страница."
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -778,11 +762,11 @@ msgstr "ограничи, когато тази страница е видима
 msgid "pages"
 msgstr "страници"
 
-#: models/pagemodel.py:267
+#: models/pagemodel.py:268
 msgid "Page was copied."
 msgstr "Страницата беше копирана."
 
-#: models/pagemodel.py:689
+#: models/pagemodel.py:690
 msgid "default"
 msgstr "по подразбиране"
 
@@ -921,8 +905,7 @@ msgstr "височина"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-"Липсваща добавка. Моля, изтеглете последната версия на Adobe Flash Player"
+msgstr "Липсваща добавка. Моля, изтеглете последната версия на Adobe Flash Player"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -934,9 +917,8 @@ msgid "Google Map"
 msgstr "Google Карта"
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "Разширени опции"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -979,10 +961,8 @@ msgid "latitude"
 msgstr "ширина"
 
 #: plugins/googlemap/models.py:26
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map position."
-msgstr ""
-"Използвайте latitude & longitude, за да определите позицията на картата."
+msgstr "Използвайте latitude & longitude, за да определите позицията на картата."
 
 #: plugins/googlemap/models.py:28
 msgid "longitude"
@@ -1032,9 +1012,7 @@ msgstr "Поле \"Език\" или \"Страница\" трябва да бъ
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Изберете страница за включване на добавки на това място; ако оставите празно "
-"ще бъде използвана текущата страница."
+msgstr "Изберете страница за включване на добавки на това място; ако оставите празно ще бъде използвана текущата страница."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1082,9 +1060,8 @@ msgid "new window"
 msgstr ""
 
 #: plugins/link/models.py:17
-#, fuzzy
 msgid "parent window"
-msgstr "първо главните страници"
+msgstr ""
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
@@ -1152,8 +1129,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Въведете шаблон (i.e. \"snippets/plugin_xy.html\") , който да бъде зает."
+msgstr "Въведете шаблон (i.e. \"snippets/plugin_xy.html\") , който да бъде зает."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1257,9 +1233,7 @@ msgstr "подсказка на връзката"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-"Ако бъде предоставено, подсказката ще бъде показана като връзка към Вашия "
-"Twitter профил."
+msgstr "Ако бъде предоставено, подсказката ще бъде показана като връзка към Вашия Twitter профил."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1270,10 +1244,7 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr ""
-"Пример: \"усмивки AND целувки AND from:снежинка AND to:капка\": изпраща туит "
-"от потребител \"снежинка\" до потребител \"капка\", което съдържа думите "
-"\"усмивки\" and \"целувки\""
+msgstr "Пример: \"усмивки AND целувки AND from:снежинка AND to:капка\": изпраща туит от потребител \"снежинка\" до потребител \"капка\", което съдържа думите \"усмивки\" and \"целувки\""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1313,9 +1284,7 @@ msgstr "премести заявка"
 
 #: plugins/video/models.py:9
 msgid "use .flv file or h264 encoded video file"
-msgstr ""
-"използвайте видео файлове във формат .FLV или видео файл кодиран в h264 "
-"формат"
+msgstr "използвайте видео файлове във формат .FLV или видео файл кодиран в h264 формат"
 
 #: plugins/video/models.py:10
 msgid "movie url"
@@ -1323,11 +1292,9 @@ msgstr "премести заявка"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"адрес на видео във Vimeo или  YouTube, например http://www.youtube.com/watch?"
-"v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "адрес на видео във Vimeo или  YouTube, например http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1417,9 +1384,7 @@ msgstr "Запазете и продължете да редактирате"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Страницата <a href=\"%(admin_url)s\">%(page)s</a> може да изисква "
-"потвърждение от Вас."
+msgstr "Страницата <a href=\"%(admin_url)s\">%(page)s</a> може да изисква потвърждение от Вас."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1530,9 +1495,7 @@ msgstr "Статуси на страниците"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Тази страница може да бъде модерирана от модератор с ниво "
-"%(moderation_level)s; Моля, свържете се с модератор с такива права."
+msgstr "Тази страница може да бъде модерирана от модератор с ниво %(moderation_level)s; Моля, свържете се с модератор с такива права."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1762,9 +1725,8 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr "Стара версия на добавка не може да бъде запазена!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
-#, fuzzy
 msgid "Your changes to this plugin have not been saved."
-msgstr "Стара версия на добавка не може да бъде запазена!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1890,65 +1852,57 @@ msgstr "Страницата не е открита на %(domain)s"
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"Не може да бъде намерена страница при търсене с `%(page_lookup)s` . URL "
-"адресът на заявката е бил: http://%(host)s%(path)s"
-
-#: test_utils/cli.py:99 test_utils/cli.py:106
-#, fuzzy
-msgid "English"
-msgstr "Не публикувай"
+msgstr "Не може да бъде намерена страница при търсене с `%(page_lookup)s` . URL адресът на заявката е бил: http://%(host)s%(path)s"
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
-msgid "French"
+msgid "English"
 msgstr ""
 
 #: test_utils/cli.py:101 test_utils/cli.py:108
-msgid "German"
+msgid "French"
 msgstr ""
 
 #: test_utils/cli.py:102 test_utils/cli.py:109
-msgid "Brazilian Portuguese"
+msgid "German"
 msgstr ""
 
 #: test_utils/cli.py:103 test_utils/cli.py:110
+msgid "Brazil"
+msgstr ""
+
+#: test_utils/cli.py:104 test_utils/cli.py:111
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:127
+#: test_utils/cli.py:128
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:129
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:129
-#, fuzzy
+#: test_utils/cli.py:130
 msgid "navigation examples"
-msgstr "разширители на навигацията"
+msgstr ""
 
-#: test_utils/cli.py:135
+#: test_utils/cli.py:136
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:141
-#, fuzzy
+#: test_utils/cli.py:142
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:147
-#, fuzzy
+#: test_utils/cli.py:148
 msgid "right column"
 msgstr "background color"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
-#, fuzzy
 msgid "Test Plugin"
-msgstr "Сложи добавка"
+msgstr ""
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1962,19 +1916,13 @@ msgstr ""
 msgid "Sample App"
 msgstr ""
 
-#: test_utils/project/sampleapp/cms_app.py:15
-msgid "Namespaced App"
+#: test_utils/project/sampleapp/menu.py:16
+msgid "sample root page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:16
-#, fuzzy
-msgid "sample root page"
-msgstr "избери тази страница"
-
 #: test_utils/project/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample settings page"
-msgstr "избери тази страница"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
@@ -1991,11 +1939,6 @@ msgstr ""
 #: test_utils/project/sampleapp/menu.py:47
 msgid "Static Menu2"
 msgstr ""
-
-#: test_utils/project/sampleapp/urls.py:11
-#, fuzzy
-msgid "^account/$"
-msgstr "количество"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
@@ -2018,21 +1961,19 @@ msgstr "одобри"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Страницата %s изисква одобрение."
 
-#: utils/page_resolver.py:148
+#: utils/page_resolver.py:146
 msgid "Invalid URL, use /my/url format."
 msgstr "Невалиден  URL адрес, използвайте формат от типа на /моя/адрес"
 
-#: utils/page_resolver.py:177
+#: utils/page_resolver.py:176
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Page with redirect url %r already exist"
-#~ msgstr "Страница с пренасочен url %r вече съществува"
 
 #~ msgid "move"
 #~ msgstr "move request"

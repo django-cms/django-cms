@@ -1,20 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-14 16:12+0200\n"
-"PO-Revision-Date: 2011-03-22 15:24+0000\n"
-"Last-Translator: ojii <me@ojii.ch>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -125,10 +126,9 @@ msgid "Page Title"
 msgstr "Názov stránky"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Prepísať to, čo je zobrazené v hornej časti vášho prehliadača alebo v "
-"záložkách."
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Prepísať to, čo je zobrazené v hornej časti vášho prehliadača alebo v záložkách."
 
 #: admin/forms.py:155
 msgid "Application"
@@ -144,8 +144,7 @@ msgstr "Prepísať URL"
 
 #: admin/forms.py:159
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
-"Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná cesta."
+msgstr "Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná cesta."
 
 #: admin/forms.py:165
 msgid "Redirect"
@@ -161,8 +160,7 @@ msgstr "Popis stránky, ktorý môžu indexovať vyhľadávače."
 
 #: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Zoznam kľúčových slov oddelených čiarkou, ktoré môžu indexovať vyhľadávače."
+msgstr "Zoznam kľúčových slov oddelených čiarkou, ktoré môžu indexovať vyhľadávače."
 
 #: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
@@ -177,18 +175,15 @@ msgstr "užívateľ"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam "
-"(potomkom). Inak nebude môcť takéto stránky editovať ich autor."
+msgstr "Právo na pridanie stránky vyžaduje taktiež prístup k vnoreným stránkam (potomkom). Inak nebude môcť takéto stránky editovať ich autor."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
 msgstr "Právo na pridanie stránky vyžaduje taktiež právo na editáciu stránky."
 
 #: admin/forms.py:260
-#, fuzzy
 msgid "can_view"
-msgstr "pozrieť"
+msgstr ""
 
 #: admin/forms.py:272
 msgid "Please select user or group first."
@@ -223,9 +218,7 @@ msgstr "Notifikovať užívateľa"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského mena "
-"alebo hesla. Vyžaduje sa e-mail užívateľa."
+msgstr "Posielať užívateľovi e-mailové notifikácie ohľadom zmeny užívateľského mena alebo hesla. Vyžaduje sa e-mail užívateľa."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -242,14 +235,12 @@ msgstr "Notifikácia vyžaduje platnú e-mailovú adresu."
 #: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"Právo na pridávanie stránok vyžaduje taktiež právo na editáciu stránok!"
+msgstr "Právo na pridávanie stránok vyžaduje taktiež právo na editáciu stránok!"
 
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu užívateľov!"
+msgstr "Právo na pridávanie užívateľov vyžaduje taktiež právo na zmenu užívateľov!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -261,9 +252,7 @@ msgstr "Základné nastavenia"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju musíte "
-"uložiť."
+msgstr "Poznámka: táto stránka sa znova načíta ak zmeníte výber. Najskôr ju musíte uložiť."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -278,9 +267,8 @@ msgid "SEO Settings"
 msgstr "Nastavenia SEO"
 
 #: admin/pageadmin.py:311
-#, fuzzy
 msgid "You have no permission to change the template"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:498
 msgid "higher"
@@ -291,10 +279,9 @@ msgid "Database error"
 msgstr "Databázová chyba"
 
 #: admin/pageadmin.py:779
-#, fuzzy
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -327,9 +314,8 @@ msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Nemáte právo meniť status (zobrazenie v navigácii) tejto stránky"
 
 #: admin/pageadmin.py:1113
-#, fuzzy
 msgid "You have no permission to add a plugin"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:1160 admin/pageadmin.py:1192
 msgid "Language must be set to a supported language!"
@@ -349,9 +335,8 @@ msgid "Language must be different than the copied language!"
 msgstr ""
 
 #: admin/pageadmin.py:1200
-#, fuzzy
 msgid "You do not have permission to add plugins"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:1207
 #, python-format
@@ -359,45 +344,37 @@ msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "Skopírované %(language)s zásuvné moduly do %(placeholder)s"
 
 #: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
-#, fuzzy
 msgid "You have no permission to change this page"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:1255
-#, fuzzy
 msgid "You have no permission to edit a plugin"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:1311
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Zásuvný modul %(plugin_name)s bol zmenený na pozícii%(position)s v "
-"%(placeholder)s"
+msgstr "Zásuvný modul %(plugin_name)s bol zmenený na pozícii%(position)s v %(placeholder)s"
 
 #: admin/pageadmin.py:1370
-#, fuzzy
 msgid "You have no permission to move a plugin"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:1388
 msgid "Plugins where moved"
 msgstr "Zásuvné moduly boli presunuté"
 
 #: admin/pageadmin.py:1402
-#, fuzzy
 msgid "You have no permission to remove a plugin"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"Zásuvný modul %(plugin_name)s na pozícii %(position)s v %(placeholder)s bol "
-"vymazaný."
+msgstr "Zásuvný modul %(plugin_name)s na pozícii %(position)s v %(placeholder)s bol vymazaný."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -420,19 +397,16 @@ msgid "Page permissions management"
 msgstr "Manažment práv k stránkam"
 
 #: admin/placeholderadmin.py:151 admin/placeholderadmin.py:192
-#, fuzzy
 msgid "You don't have permission to add content here."
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/placeholderadmin.py:188
-#, fuzzy
 msgid "You don't have permission to add plugins"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/placeholderadmin.py:289
-#, fuzzy
 msgid "You don't have permission to delete a plugin"
-msgstr "Nemáte právo meniť túto stránku"
+msgstr ""
 
 #: admin/useradmin.py:25
 msgid "User details"
@@ -454,7 +428,7 @@ msgstr "Kopírovať práva"
 msgid "Copy moderation"
 msgstr "Kopírovať moderovanie"
 
-#: conf/patch.py:14
+#: conf/patch.py:28
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Zdediť šablónu od najbližšieho predchodcu"
 
@@ -738,9 +712,7 @@ msgstr "Aby bola stránka publikovaná treba zmeniť stav na  \"publikované\"."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
-"Kedy má stránka expirovať. Ponechajte prázdne, ak má mať neobmedzenú "
-"platnosť."
+msgstr "Kedy má stránka expirovať. Ponechajte prázdne, ak má mať neobmedzenú platnosť."
 
 #: models/pagemodel.py:64
 msgid "All ancestors will not be displayed in the navigation"
@@ -750,9 +722,7 @@ msgstr "Nie všetci predkovia budú zobrazení v navigácii"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Unikátny indentifikátor, ktorý použije templatetag page_url na vytvorenie "
-"odkazu na stránku"
+msgstr "Unikátny indentifikátor, ktorý použije templatetag page_url na vytvorenie odkazu na stránku"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -790,11 +760,11 @@ msgstr ""
 msgid "pages"
 msgstr "stránky"
 
-#: models/pagemodel.py:267
+#: models/pagemodel.py:268
 msgid "Page was copied."
 msgstr "Stránka bola skopírovaná."
 
-#: models/pagemodel.py:689
+#: models/pagemodel.py:690
 msgid "default"
 msgstr "predvolené"
 
@@ -932,11 +902,8 @@ msgstr "výška"
 
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
-#, fuzzy
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
 msgstr ""
-"Chýbajúci flash plugin. Stiahnuť ho môžete <a href=\"http://adobe.com/"
-"flashplayer\">tu</a"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -948,9 +915,8 @@ msgid "Google Map"
 msgstr "Google mapa"
 
 #: plugins/googlemap/cms_plugins.py:19
-#, fuzzy
 msgid "Advanced"
-msgstr "Pokročilé nastavenia"
+msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -993,7 +959,6 @@ msgid "latitude"
 msgstr "zemepisná šírka"
 
 #: plugins/googlemap/models.py:26
-#, fuzzy
 msgid "Use latitude & longitude to fine tune the map position."
 msgstr "Použite zemepisnú šírku a dĺžku na presné určenie pozície na mape."
 
@@ -1045,9 +1010,7 @@ msgstr "Jazyk alebo stránka musia byť vyplnené"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto oblasti. "
-"Prázdne pole znamená aktuálnu stránku."
+msgstr "Vyberte stránku, ktorej zásuvné moduly sa majú vložiť do tejto oblasti. Prázdne pole znamená aktuálnu stránku."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1095,9 +1058,8 @@ msgid "new window"
 msgstr ""
 
 #: plugins/link/models.py:17
-#, fuzzy
 msgid "parent window"
-msgstr "najskôr rodič"
+msgstr ""
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
@@ -1165,9 +1127,7 @@ msgstr "HTML kód"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Zadajte cestu k šablóne (napr. \"snippets/plugin_xy.html\"), ktorá sa má "
-"zobraziť. "
+msgstr "Zadajte cestu k šablóne (napr. \"snippets/plugin_xy.html\"), ktorá sa má zobraziť. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1305,9 +1265,8 @@ msgid "we were checking out"
 msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
-#, fuzzy
 msgid "loading tweets..."
-msgstr "Nahrávanie..."
+msgstr ""
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1330,13 +1289,10 @@ msgid "movie url"
 msgstr "url videa"
 
 #: plugins/video/models.py:10
-#, fuzzy
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
-"vimeo alebo youtube video url. Napr.: http://www.youtube.com/watch?v=YFa59lK-"
-"kpo"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1426,9 +1382,7 @@ msgstr "Uložiť a pokračovať v úpravách"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Stránka <a href=\"%(admin_url)s\">%(page)s</a> môže vyžadovať Vaše "
-"schválenie."
+msgstr "Stránka <a href=\"%(admin_url)s\">%(page)s</a> môže vyžadovať Vaše schválenie."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1540,9 +1494,7 @@ msgstr "Stavy stránky"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Táto stránka musí byť moderovaná na úrovni %(moderation_level)s. Pošlite "
-"správu moderátorovi."
+msgstr "Táto stránka musí byť moderovaná na úrovni %(moderation_level)s. Pošlite správu moderátorovi."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1742,9 +1694,8 @@ msgid "Can move"
 msgstr "Môže presunúť"
 
 #: templates/admin/cms/page/permissions.html:14
-#, fuzzy
 msgid "Can view"
-msgstr "Môže presunúť"
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
@@ -1773,9 +1724,8 @@ msgid "An old revision of a plugin can not be saved!"
 msgstr "Stará revízia zásuvného modulu nemôže byť uložená!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
-#, fuzzy
 msgid "Your changes to this plugin have not been saved."
-msgstr "Stará revízia zásuvného modulu nemôže byť uložená!"
+msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1865,9 +1815,8 @@ msgstr "Užívateľské meno"
 
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
-#, fuzzy
 msgid "Login"
-msgstr "prihlásiť"
+msgstr ""
 
 #: templates/cms/toolbar/items/status.html:2
 msgid "Status"
@@ -1902,62 +1851,57 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:99 test_utils/cli.py:106
-#, fuzzy
-msgid "English"
-msgstr "Odpublikovať"
-
 #: test_utils/cli.py:100 test_utils/cli.py:107
-msgid "French"
+msgid "English"
 msgstr ""
 
 #: test_utils/cli.py:101 test_utils/cli.py:108
-msgid "German"
+msgid "French"
 msgstr ""
 
 #: test_utils/cli.py:102 test_utils/cli.py:109
-msgid "Brazilian Portuguese"
+msgid "German"
 msgstr ""
 
 #: test_utils/cli.py:103 test_utils/cli.py:110
+msgid "Brazil"
+msgstr ""
+
+#: test_utils/cli.py:104 test_utils/cli.py:111
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:127
+#: test_utils/cli.py:128
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:129
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:129
-#, fuzzy
+#: test_utils/cli.py:130
 msgid "navigation examples"
-msgstr "rozšírenia navigácie"
+msgstr ""
 
-#: test_utils/cli.py:135
-#, fuzzy
+#: test_utils/cli.py:136
 msgid "sidebar column"
 msgstr "farba seekbar"
 
-#: test_utils/cli.py:141
+#: test_utils/cli.py:142
 msgid "left column"
-msgstr ""
+msgstr "farba seekbar"
 
-#: test_utils/cli.py:147
+#: test_utils/cli.py:148
 msgid "right column"
-msgstr ""
+msgstr "farba seekbar"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
-#, fuzzy
 msgid "Test Plugin"
-msgstr "Zmazať zásuvný modul"
+msgstr ""
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
@@ -1971,19 +1915,13 @@ msgstr ""
 msgid "Sample App"
 msgstr ""
 
-#: test_utils/project/sampleapp/cms_app.py:15
-msgid "Namespaced App"
+#: test_utils/project/sampleapp/menu.py:16
+msgid "sample root page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:16
-#, fuzzy
-msgid "sample root page"
-msgstr "vybrať túto stránku"
-
 #: test_utils/project/sampleapp/menu.py:17
-#, fuzzy
 msgid "sample settings page"
-msgstr "vybrať túto stránku"
+msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
@@ -2000,11 +1938,6 @@ msgstr ""
 #: test_utils/project/sampleapp/menu.py:47
 msgid "Static Menu2"
 msgstr ""
-
-#: test_utils/project/sampleapp/urls.py:11
-#, fuzzy
-msgid "^account/$"
-msgstr "počet"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
@@ -2027,50 +1960,26 @@ msgstr "schváliť"
 msgid "CMS - Page %s requires approvement."
 msgstr "CMS - Stránka %s vyžaduje schválenie."
 
-#: utils/page_resolver.py:148
+#: utils/page_resolver.py:146
 msgid "Invalid URL, use /my/url format."
 msgstr "Neplatná URL, použite formát /moja/url/adresa."
 
-#: utils/page_resolver.py:177
+#: utils/page_resolver.py:176
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#, fuzzy
-#~ msgid "Page with redirect url %r already exist"
-#~ msgstr "Už existuje stránka s týmto identifikátorom"
-
-#~ msgid "Missing flash plugin."
-#~ msgstr "Chýbajúci flash plugin."
-
-#~ msgid "Move to %(name)s"
-#~ msgstr "Presunúť do %(name)s "
-
 #~ msgid "move"
-#~ msgstr "presunúť"
-
-#~ msgid "add child"
-#~ msgstr "pridať potomka"
-
-#~ msgid "add sibling"
-#~ msgstr "pridať na rovnakej úrovni"
-
-#~ msgid "history"
-#~ msgstr "história"
-
-#~ msgid "Lock"
-#~ msgstr "Uzamknúť"
-
-#~ msgid "Close"
-#~ msgstr "Zatvoriť"
-
-#~ msgid "Settings"
-#~ msgstr "Nastavenia"
+#~ msgstr "move request"
 
 #~ msgid "fgcolor"
-#~ msgstr "farba popredia"
+#~ msgstr "foreground color"
+
+#~ msgid "Wanted language has not been translated yet."
+#~ msgstr "Requested language has not been translated yet."

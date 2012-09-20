@@ -693,6 +693,18 @@ class PagesTestCase(CMSTestCase):
                 bar.save()
             self.assertFalse(bar.published)
 
+    def test_valid_url_multisite(self):
+        with SettingsOverride(CMS_MODERATOR=False):
+            site1 = Site.objects.get_current()
+            site3 = Site.objects.create(domain="sample3.com", name="sample3.com")
+            home = create_page('home', 'nav_playground.html', 'en', published=True, site=site1)
+            bar = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home, site=site1)
+            home_s3= create_page('home', 'nav_playground.html', 'en', published=True, site=site3)
+            bar_s3 = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home_s3, site=site3)
+
+            self.assertTrue(is_valid_url(bar.get_absolute_url('en'), bar))
+            self.assertTrue(is_valid_url(bar_s3.get_absolute_url('en'), bar_s3))
+
     def test_home_slug_not_accessible(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en', published=True)
