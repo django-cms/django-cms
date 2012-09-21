@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.i18n import get_default_language
 from django.conf import settings

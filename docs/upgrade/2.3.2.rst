@@ -7,7 +7,7 @@ What's new in 2.3.2
 *******************
 
 Google map plugin
-===================
+=================
 
 Google map plugin now supports width and height fields so that plugin size
 can be modified in the page admin or frontend editor.
