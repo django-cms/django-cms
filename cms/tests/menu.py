@@ -10,10 +10,12 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
+from cms.utils.i18n import force_lang
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
+from django.utils.translation import activate
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
@@ -45,6 +47,7 @@ class BaseMenuTest(SettingsOverrideTestCase):
         self.old_menu = menu_pool.menus
         menu_pool.menus = {'CMSMenu': self.old_menu['CMSMenu']}
         menu_pool.clear(settings.SITE_ID)
+        activate("en")
         
     def tearDown(self):
         menu_pool.menus = self.old_menu
@@ -83,7 +86,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     
     def test_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
-        response = self.client.get(self.get_pages_root()) # path = '/'
+        with force_lang("en"):
+            response = self.client.get(self.get_pages_root()) # path = '/'
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
         

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.translation import activate
 
 import os
 
@@ -190,6 +191,7 @@ def configure(**extra):
     version =  django.get_version()
     if version[:3] == "1.3":
         defaults['INSTALLED_APPS'].append("i18nurls")
+        defaults['MIDDLEWARE_CLASSES'][4] = 'i18nurls.middleware.LocaleMiddleware'
     else:
         from django.utils.functional import empty
         settings._wrapped = empty

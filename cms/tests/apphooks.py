@@ -130,8 +130,8 @@ class ApphooksTestCase(CMSTestCase):
             create_title("de", "aphooked-page-de", page, apphook="SampleApp")
             self.assertTrue(page.publish())
             self.assertTrue(blank_page.publish())
-
-            response = self.client.get(self.get_pages_root())
+            with force_lang("en"):
+                response = self.client.get(self.get_pages_root())
             self.assertTemplateUsed(response, 'sampleapp/home.html')
 
             response = self.client.get('/en/blankapp/')
@@ -160,7 +160,6 @@ class ApphooksTestCase(CMSTestCase):
             en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
             with force_lang("en"):
                 path = reverse('sample-settings')
-
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
@@ -177,7 +176,6 @@ class ApphooksTestCase(CMSTestCase):
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
-
             attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash and language prefix
             self.assertEquals(attached_to_page.pk, de_title.page.pk)
 
@@ -299,13 +297,12 @@ class ApphooksTestCase(CMSTestCase):
             # not-home is what breaks stuff, because it contains the slug of the home page
             not_home = create_page("not-home", "nav_playground.html", "en", published=True, parent=child)
             create_page("subchild", "nav_playground.html", "en", published=True, parent=not_home, apphook='SampleApp')
-
-            self.reload_urls()
-
-            urlpatterns = get_app_patterns()
-            resolver = urlpatterns[0]
-            url = resolver.reverse('sample-root')
-            self.assertEqual(url, 'child/not-home/subchild/')
+            with force_lang("en"):
+                self.reload_urls()
+                urlpatterns = get_app_patterns()
+                resolver = urlpatterns[0]
+                url = resolver.reverse('sample-root')
+                self.assertEqual(url, 'child/not-home/subchild/')
 
 
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):
