@@ -5,13 +5,14 @@
 # Translators:
 # Daigo Sakamoto <superdaigo@gmail.com>, 2011.
 # Jonas Obrist <me@ojii.ch>, 2011.
+# Jonas Obrist <ojiidotch@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2012-09-19 14:44+0200\n"
-"PO-Revision-Date: 2012-09-19 14:44+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2012-09-21 09:40+0000\n"
+"Last-Translator: Jonas Obrist <ojiidotch@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -958,7 +959,7 @@ msgstr "ズームレベル"
 
 #: plugins/googlemap/models.py:24
 msgid "latitude"
-msgstr ""
+msgstr "緯度"
 
 #: plugins/googlemap/models.py:26
 msgid "Use latitude & longitude to fine tune the map position."
@@ -966,7 +967,7 @@ msgstr ""
 
 #: plugins/googlemap/models.py:28
 msgid "longitude"
-msgstr ""
+msgstr "経度"
 
 #: plugins/googlemap/models.py:31
 msgid "route planer title"
@@ -1158,7 +1159,7 @@ msgstr "テキスト"
 
 #: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr ""
+msgstr "本文"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
@@ -1168,7 +1169,7 @@ msgstr "プラグイン"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr ""
+msgstr "プラグインを選んで下さい"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:112
