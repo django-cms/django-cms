@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.conf.urls.defaults import handler500, handler404, patterns, include, \
     url
-from django.conf.urls.i18n import i18n_patterns
+try:
+    from django.conf.urls.i18n import i18n_patterns
+except ImportError:
+    from i18nurls.i18n import i18n_patterns
 from django.contrib import admin
 
 admin.autodiscover()

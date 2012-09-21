@@ -29,7 +29,7 @@ class Title(models.Model):
         app_label = 'cms'
 
     def __unicode__(self):
-        return "%s (%s)" % (self.title, self.slug)
+        return "%s (%s, %s)" % (self.title, self.slug, self.language)
 
     def save(self, *args, **kwargs):
         # Update the path attribute before saving

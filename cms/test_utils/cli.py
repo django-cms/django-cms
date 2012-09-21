@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.utils.functional import empty
+
 import os
 
 gettext = lambda s: s
@@ -186,12 +186,21 @@ def configure(**extra):
             'django.contrib.auth.hashers.MD5PasswordHasher',
         )
     )
+    import django
+    version =  django.get_version()
+    if version[:3] == "1.3":
+        defaults['INSTALLED_APPS'].append("i18nurls")
+    else:
+        from django.utils.functional import empty
+        settings._wrapped = empty
     defaults.update(extra)
-    settings._wrapped = empty
+
     settings.configure(**defaults)
     from cms.conf import patch_settings
     patch_settings()
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
     from django.contrib import admin
+
+
     admin.autodiscover()
