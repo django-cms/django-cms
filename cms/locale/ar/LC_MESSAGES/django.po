@@ -1,22 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Jonas Obrist <me@ojii.ch>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-21 14:52+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -127,8 +128,7 @@ msgid "Page Title"
 msgstr "عنوان الصفحة"
 
 #: admin/forms.py:154
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "حرر المعروض في أعلى متصفحك أو في الـ bookmarks."
 
 #: admin/forms.py:155
@@ -176,7 +176,9 @@ msgstr "مستخدم"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
+msgstr ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -219,7 +221,9 @@ msgstr "أعلم المستخدم"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "بعث رسالة تنبيهية للمسخدم حول تغيير اسم المستخدم أو كلمة المرور. يتطب عنوان البريد الإلكتروني للمستخدم."
+msgstr ""
+"بعث رسالة تنبيهية للمسخدم حول تغيير اسم المستخدم أو كلمة المرور. يتطب عنوان "
+"البريد الإلكتروني للمستخدم."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -253,7 +257,8 @@ msgstr "إعدادات إفتراضية"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "ملاحظة: هذه الصفحة ستقوم بإعادة التحميل عند تغيير المحدد. قم بالحفظ أولاً."
+msgstr ""
+"ملاحظة: هذه الصفحة ستقوم بإعادة التحميل عند تغيير المحدد. قم بالحفظ أولاً."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -356,7 +361,8 @@ msgstr ""
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "تم تعديل الإضافة %(plugin_name)s في %(position)s الموجودة في %(placeholder)s"
+msgstr ""
+"تم تعديل الإضافة %(plugin_name)s في %(position)s الموجودة في %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -375,7 +381,9 @@ msgstr ""
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr "تم حذف الإضافة %(plugin_name)s الموجودة في %(placeholder)s في المكان %(position)s."
+msgstr ""
+"تم حذف الإضافة %(plugin_name)s الموجودة في %(placeholder)s في المكان "
+"%(position)s."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -709,7 +717,9 @@ msgstr "مغير من قبل"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "When the page should go live. Status must be \"Published\" for page to go live."
+msgstr ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -723,7 +733,9 @@ msgstr "لن يتم عرض الآباء في التصفح"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr "An unique identifier that is used with the page_url templatetag for linking to this page"
+msgstr ""
+"An unique identifier that is used with the page_url templatetag for linking "
+"to this page"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -1011,7 +1023,9 @@ msgstr "يجب أن يتم تعبئة اللغة أو الصفحة"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr "قم باختيار صفحة ليتم وضع إضافاتها في مكان محدد، سيتم إختيار الصفحة الحالية عند عدم التحديد."
+msgstr ""
+"قم باختيار صفحة ليتم وضع إضافاتها في مكان محدد، سيتم إختيار الصفحة الحالية "
+"عند عدم التحديد."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1291,8 +1305,8 @@ msgstr "عنوان url لملف الفيديو"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: "
-"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1498,7 +1512,9 @@ msgstr "حالة الصفحة"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr "يجب إدارة الصفحة من مستخدم بمستوى %(moderation_level)s، أرسل رسالة إلى المدير."
+msgstr ""
+"يجب إدارة الصفحة من مستخدم بمستوى %(moderation_level)s، أرسل رسالة إلى "
+"المدير."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1855,7 +1871,8 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1973,8 +1990,7 @@ msgstr "عنوان الـ URL غير صحيح. مثال: /my/url "
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""

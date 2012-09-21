@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # pykhmer <admin@pykhmer.org>, 2011.
 # សុវិចិត្រ Sovichet ទេព Tep <sovichet.tep@gmail.com>, 2011.
@@ -9,15 +9,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-21 14:53+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: km\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: km\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -129,8 +129,7 @@ msgid "Page Title"
 msgstr "ចំណង​ជើង​ទំព័រ"
 
 #: admin/forms.py:154
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "ជំនួស​ពី​លើ អ្វី​ដែល​បាន​បង្ហាញ​នៅ​ផ្នែក​កំពូល​នៃ​កម្មវិធី​រុក​រក​របស់​អ្នក ឬ នៅ​ក្នុង​សៀវភៅ​កត់​ចំណាំ"
 
 #: admin/forms.py:155
@@ -221,7 +220,9 @@ msgstr "ឲ្យ​ដំណឹង​ទៅ​កាន់​អ្នក​ប
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "ផ្ញើ​ការ​ជូន​ដំណឹង​តាម​អ៊ីមែល​ទៅ​កាន់​អ្នក​ប្រើ អំពី​ការ​ប្ដូរ​ឈ្មោះ​ប្រើ​ប្រាស់ ឬ ពាក្យ​សម្ងាត់។ គឺស្នើ​អោយ​មាន​អាសយ​ដ្ឋាន​មែល​របស់​អ្នក​ប្រើ។"
+msgstr ""
+"ផ្ញើ​ការ​ជូន​ដំណឹង​តាម​អ៊ីមែល​ទៅ​កាន់​អ្នក​ប្រើ អំពី​ការ​ប្ដូរ​ឈ្មោះ​ប្រើ​ប្រាស់ ឬ ពាក្យ​សម្ងាត់។ គឺស្នើ​អោយ​មាន​អាសយ​"
+"ដ្ឋាន​មែល​របស់​អ្នក​ប្រើ។"
 
 #: admin/forms.py:330
 msgid "New password"
@@ -1293,8 +1294,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: "
-"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1852,7 +1853,8 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1970,8 +1972,7 @@ msgstr "URL មិន​ត្រឹម​ត្រូវ, ប្រើ​ទ្
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 
 #~ msgid "move"
