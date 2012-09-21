@@ -6,9 +6,13 @@
 What's new in 2.4
 *****************
 
-..
-    New feature
-    ===========
+Removed the MultilingualMiddleware
+==================================
+
+We removed the MultilingualMiddleware. This removed the very ugly monkey patching of the
+reverse() function as well. As a benefit we now support localization of urls and Apphook urls.
+
+
 
 ..
     Feature description
@@ -26,7 +30,9 @@ Backwards incompatible changes
 New minimum requirements for dependencies
 =========================================
 
-.. * ``package`` must now be at version X.Y
+If you are running django 1.3.X you need to install django-i18nurls, if you want
+multilingual features. The cms.urls needs to be in a i18n url pattern.
+
 
 
 ********************
