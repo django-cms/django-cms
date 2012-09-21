@@ -1,21 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Alireza Savand <alireza.savand@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-21 14:54+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fa\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -127,8 +127,7 @@ msgid "Page Title"
 msgstr "عنوان صفحه"
 
 #: admin/forms.py:154
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr " عنوان مرورگر یا بوک مارک ها جاینوشت می-شوند"
 
 #: admin/forms.py:155
@@ -161,7 +160,9 @@ msgstr "شرح صفحه که توسط موتورهای جستجو استفاده
 
 #: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "لیست کلمات کلیدی با ویرگول از هم جداشده که توسط موتورهای جستجو استفاده می شود."
+msgstr ""
+"لیست کلمات کلیدی با ویرگول از هم جداشده که توسط موتورهای جستجو استفاده می "
+"شود."
 
 #: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
@@ -176,11 +177,15 @@ msgstr "کاربر"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr " اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن را نخواهد داشت."
+msgstr ""
+" اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات "
+"فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن "
+"را نخواهد داشت."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
-msgstr "اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را دارد."
+msgstr ""
+"اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را دارد."
 
 #: admin/forms.py:260
 msgid "can_view"
@@ -219,7 +224,9 @@ msgstr "هشدار به کاربر"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع کن. نیاز به ایمیل کاربر دارد."
+msgstr ""
+"از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع کن. نیاز "
+"به ایمیل کاربر دارد."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -253,7 +260,9 @@ msgstr "تنظیمات پایه"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "توجه: اگر انتخابتان را تغییر دهید، این صفحه بارگذاری مجدد می-شود. آن را ابتدا ذخیره کنید."
+msgstr ""
+"توجه: اگر انتخابتان را تغییر دهید، این صفحه بارگذاری مجدد می-شود. آن را "
+"ابتدا ذخیره کنید."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -356,7 +365,8 @@ msgstr ""
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s تغییر کرد."
+msgstr ""
+"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s تغییر کرد."
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -375,7 +385,8 @@ msgstr ""
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s حذف شد."
+msgstr ""
+"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s حذف شد."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -709,7 +720,8 @@ msgstr "تغییریافته به وسیله"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ دهد."
+msgstr ""
+"زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ دهد."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -723,7 +735,9 @@ msgstr "تمامی اجداد در گردش نمایش داده نمی-شوند.
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr "شناسه-ی بکتایی که برای تگ الگوی page_url برای آدرس به این صفحه استفاده می-شود."
+msgstr ""
+"شناسه-ی بکتایی که برای تگ الگوی page_url برای آدرس به این صفحه استفاده می-"
+"شود."
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -815,7 +829,9 @@ msgstr "می-تواند هر صفحه پاک-شده را بازیابی کند"
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr "اگر انتخابی صورت نگیرد، کاربر در تمام وبگاه-ها، اختیارات داده-شده را خواهد داشت."
+msgstr ""
+"اگر انتخابی صورت نگیرد، کاربر در تمام وبگاه-ها، اختیارات داده-شده را خواهد "
+"داشت."
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -1011,7 +1027,9 @@ msgstr "زبان صفحه باید مشخص شود."
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr "صفحه‌ای را برای دربرداشتن افزونه‌هایش در این placeholder انتخاب کنید. در صورت عدم انتخاب صفحه جاری انتخاب می‌شود."
+msgstr ""
+"صفحه‌ای را برای دربرداشتن افزونه‌هایش در این placeholder انتخاب کنید. در صورت "
+"عدم انتخاب صفحه جاری انتخاب می‌شود."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1232,7 +1250,9 @@ msgstr "راهنمایی پیوند"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr "در صورت مشخص کردن راهنمایی به عنوان پیوند به صفحه شخصی شما در توییتر نمایش داده می‌شود."
+msgstr ""
+"در صورت مشخص کردن راهنمایی به عنوان پیوند به صفحه شخصی شما در توییتر نمایش "
+"داده می‌شود."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1291,8 +1311,8 @@ msgstr "آدرس اینترنتی ویدیو"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: "
-"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1383,7 +1403,9 @@ msgstr "ذخیره و ادامه ویرایش"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr "صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز به تایید شما داشته باشد."
+msgstr ""
+"صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز به تایید شما داشته "
+"باشد."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1493,7 +1515,9 @@ msgstr "حالت‌های صفحه"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr "این صفحه باید در سطح %(moderation_level)s نظارت شود، پیامی برای ناظر آن بفرستید."
+msgstr ""
+"این صفحه باید در سطح %(moderation_level)s نظارت شود، پیامی برای ناظر آن "
+"بفرستید."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1850,7 +1874,8 @@ msgstr "صغحه پیدا نشد روی %(domain)s"
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1968,8 +1993,7 @@ msgstr "آدرس نامعتبر، از الگوی /my/url استفاده کنی�
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 
 #~ msgid "move"

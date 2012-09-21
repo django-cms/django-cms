@@ -9,6 +9,20 @@ Welcome to django CMS's documentation!
 
 This document refers to version |release|
 
+*******
+Install
+*******
+
+.. toctree::
+    :maxdepth: 1
+
+    getting_started/installation
+    upgrade/2.3.3
+    upgrade/2.3.2
+    upgrade/2.3
+    upgrade/2.2
+    upgrade/2.1
+
 ***************
 Getting Started
 ***************
@@ -17,8 +31,6 @@ Getting Started
     :maxdepth: 2
     :numbered:
 
-    getting_started/installation
-    upgrade/index
     getting_started/tutorial
     getting_started/using_south
     getting_started/configuration
@@ -39,6 +51,7 @@ Advanced
     advanced/sitemap
     advanced/templatetags
     advanced/cli
+    advanced/permissions_reference
 
 
 *****************

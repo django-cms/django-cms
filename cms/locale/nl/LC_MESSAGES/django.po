@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # André Hendriks <andre.hendriks@deltares.nl>, 2011.
 #   <bouke@webatoom.nl>, 2012.
@@ -13,15 +13,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-21 14:52+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -133,9 +133,10 @@ msgid "Page Title"
 msgstr "Pagina-titel"
 
 #: admin/forms.py:154
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Overschrijft wat wordt weergegeven in de titelbalk van de browser of in bladwijzers"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr ""
+"Overschrijft wat wordt weergegeven in de titelbalk van de browser of in "
+"bladwijzers"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -163,11 +164,14 @@ msgstr "Stuurt door naar deze URL."
 
 #: admin/forms.py:168
 msgid "A description of the page sometimes used by search engines."
-msgstr "Een beschrijving van de pagina die soms door zoekmachines wordt gebruikt."
+msgstr ""
+"Een beschrijving van de pagina die soms door zoekmachines wordt gebruikt."
 
 #: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "Een door komma's gescheiden lijst van trefwoorden die soms door zoekmachines wordt gebruikt."
+msgstr ""
+"Een door komma's gescheiden lijst van trefwoorden die soms door zoekmachines "
+"wordt gebruikt."
 
 #: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
@@ -182,11 +186,16 @@ msgstr "gebruiker"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr "Om het recht te hebben pagina's toe te voegen, is ook toegang nodig tot de kinderen (of afstammelingen), anders kan de toegevoegde pagina niet door zijn maker worden aangepast."
+msgstr ""
+"Om het recht te hebben pagina's toe te voegen, is ook toegang nodig tot de "
+"kinderen (of afstammelingen), anders kan de toegevoegde pagina niet door "
+"zijn maker worden aangepast."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
-msgstr "Voor het recht om pagina's toe te voegen is ook het recht nodig pagina's te bewerken."
+msgstr ""
+"Voor het recht om pagina's toe te voegen is ook het recht nodig pagina's te "
+"bewerken."
 
 #: admin/forms.py:260
 msgid "can_view"
@@ -225,7 +234,10 @@ msgstr "Licht gebruiker in"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "Stuur een e-mailnotificatie naar de gebruiker over het aanpassen van de gebruikersnaam of het wachtwoord. Hiervoor is het e-mailadres van de gebruiker nodig."
+msgstr ""
+"Stuur een e-mailnotificatie naar de gebruiker over het aanpassen van de "
+"gebruikersnaam of het wachtwoord. Hiervoor is het e-mailadres van de "
+"gebruiker nodig."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -242,12 +254,15 @@ msgstr "Voor e-mailnotificatie is een geldig e-mailadres vereist."
 #: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr "Het recht om pagina's toe te voegen vereist het recht pagina's aan te passen!"
+msgstr ""
+"Het recht om pagina's toe te voegen vereist het recht pagina's aan te passen!"
 
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr "Het recht om gebruikers toe te voegen vereist het recht om gebruikers aan te passen!"
+msgstr ""
+"Het recht om gebruikers toe te voegen vereist het recht om gebruikers aan te "
+"passen!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -259,7 +274,9 @@ msgstr "Basisinstelling"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Opmerking: Deze pagina herlaadt wanneer je de selectie verandert. Sla het eerst op."
+msgstr ""
+"Opmerking: Deze pagina herlaadt wanneer je de selectie verandert. Sla het "
+"eerst op."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -318,7 +335,9 @@ msgstr "Je hebt geen toestemming deze pagina te publiceren"
 
 #: admin/pageadmin.py:1088
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Je bent niet toegestaan om de in_navigatie toestand van deze pagina aan te passen"
+msgstr ""
+"Je bent niet toegestaan om de in_navigatie toestand van deze pagina aan te "
+"passen"
 
 #: admin/pageadmin.py:1113
 msgid "You have no permission to add a plugin"
@@ -362,7 +381,8 @@ msgstr "U heeft geen toestemming om een plugin toe te wijzigen"
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "%(plugin_name)s-plugin bewerkt op positie %(position)s in %(placeholder)s"
+msgstr ""
+"%(plugin_name)s-plugin bewerkt op positie %(position)s in %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -381,7 +401,9 @@ msgstr "U heeft geen toestemming om een plugin toe te verwijderen"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr "%(plugin_name)s-plugin op positie %(position)s in %(placeholder)s is verwijderd."
+msgstr ""
+"%(plugin_name)s-plugin op positie %(position)s in %(placeholder)s is "
+"verwijderd."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -715,7 +737,9 @@ msgstr "bewerkt door"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "Wanneer de pagina publiek moet worden. Status moet op \"Gepubliceerd\" staan om publiek te worden."
+msgstr ""
+"Wanneer de pagina publiek moet worden. Status moet op \"Gepubliceerd\" staan "
+"om publiek te worden."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -729,7 +753,9 @@ msgstr "Alle ouders zullen niet worden weergegeven in de navigatie"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr "Een unieke naam die door de 'page_url' sjabloon-tag wordt gebruikt om naar deze pagina te verwijzen."
+msgstr ""
+"Een unieke naam die door de 'page_url' sjabloon-tag wordt gebruikt om naar "
+"deze pagina te verwijzen."
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -910,7 +936,9 @@ msgstr "hoogte"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr "Flash-plugin ontbreekt. Gelieve de laatste versie van Adobe Flash Player te downloaden:"
+msgstr ""
+"Flash-plugin ontbreekt. Gelieve de laatste versie van Adobe Flash Player te "
+"downloaden:"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -967,7 +995,9 @@ msgstr "breedtegraad"
 
 #: plugins/googlemap/models.py:26
 msgid "Use latitude & longitude to fine tune the map position."
-msgstr "Gebruik breedtegraad & lengtegraad om de positie op de kaart nauwkeurig in te stellen."
+msgstr ""
+"Gebruik breedtegraad & lengtegraad om de positie op de kaart nauwkeurig in "
+"te stellen."
 
 #: plugins/googlemap/models.py:28
 msgid "longitude"
@@ -1017,7 +1047,9 @@ msgstr "Taal of Pagina moet ingevuld zijn"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr "Kies een pagina om diens plugins in de 'placeholder' in te voegen, indien leeggelaten wordt de huidige pagina gekozen"
+msgstr ""
+"Kies een pagina om diens plugins in de 'placeholder' in te voegen, indien "
+"leeggelaten wordt de huidige pagina gekozen"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1134,7 +1166,9 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr "Voer een sjabloon in (bijv. \"knipsels/plugin_xy.html\") dat weergegeven zal worden."
+msgstr ""
+"Voer een sjabloon in (bijv. \"knipsels/plugin_xy.html\") dat weergegeven zal "
+"worden."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1184,7 +1218,8 @@ msgstr "Geselecteerde plugin bewerken"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr "Tekst-bewerker biedt geen ondersteuning voor het bewerken van objecten."
+msgstr ""
+"Tekst-bewerker biedt geen ondersteuning voor het bewerken van objecten."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
@@ -1195,7 +1230,8 @@ msgstr "Geen object geselecteerd."
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr "Tekst-bewerker biedt geen ondersteuning voor het invoegen van objecten."
+msgstr ""
+"Tekst-bewerker biedt geen ondersteuning voor het invoegen van objecten."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
@@ -1238,7 +1274,9 @@ msgstr "link hint"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr "Indien opgegeven wordt deze hint weergegeven als een link naar je Twitter-profiel."
+msgstr ""
+"Indien opgegeven wordt deze hint weergegeven als een link naar je Twitter-"
+"profiel."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1249,7 +1287,10 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr "Voorbeeld: \"hersenen AND zombies AND from:umbrella AND to:nemesis\": tweets van de gebruiker \"umbrella\" aan de gebruiker \"nemesis\" die de woorden \"hersenen\" en \"zombies\" bevatten"
+msgstr ""
+"Voorbeeld: \"hersenen AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"van de gebruiker \"umbrella\" aan de gebruiker \"nemesis\" die de woorden "
+"\"hersenen\" en \"zombies\" bevatten"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1297,9 +1338,10 @@ msgstr "video url"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: "
-"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
-msgstr "Vimeo- of YouTube-URL. Voorbeeld: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
+msgstr ""
+"Vimeo- of YouTube-URL. Voorbeeld: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1389,7 +1431,9 @@ msgstr "Opslaan en opnieuw bewerken"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr "Pagina <a href=\"%(admin_url)s\">%(page)s</a> moet mogelijk door jou worden goedgekeurd."
+msgstr ""
+"Pagina <a href=\"%(admin_url)s\">%(page)s</a> moet mogelijk door jou worden "
+"goedgekeurd."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1500,7 +1544,9 @@ msgstr "Pagina toestanden"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr "Deze pagina moet gemodereerd worden op %(moderation_level)s-niveau, stuur een bericht naar de moderator."
+msgstr ""
+"Deze pagina moet gemodereerd worden op %(moderation_level)s-niveau, stuur "
+"een bericht naar de moderator."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1744,7 +1790,9 @@ msgstr "Herstel verwijderde %(verbose_name)s"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr "Druk op de Opslaan-knop hieronder om deze versie van het object te herstellen."
+msgstr ""
+"Druk op de Opslaan-knop hieronder om deze versie van het object te "
+"herstellen."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1753,7 +1801,9 @@ msgstr "Stel %(verbose_name)s terug"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr "Druk op de Oplaan-knop hieronder om naa deze versie van het object terug te stellen."
+msgstr ""
+"Druk op de Oplaan-knop hieronder om naa deze versie van het object terug te "
+"stellen."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1797,7 +1847,8 @@ msgstr "Beschikbare plugins"
 
 #: templates/cms/toolbar/toolbar.html:27
 msgid "The selected element can not be moved to the desired location."
-msgstr "Het geselecteerde element kan niet naar de gewenste locatie verplaatst worden"
+msgstr ""
+"Het geselecteerde element kan niet naar de gewenste locatie verplaatst worden"
 
 #: templates/cms/toolbar/toolbar.html:28
 msgid "Are you sure you want to delete this plugin?"
@@ -1857,9 +1908,12 @@ msgstr "Pagina niet gevonden in %(domain)s"
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr "Een template tag kan de pagina met opzoek argumenten `%(page_lookup)s\n` niet vinden. De URL van het verzoek was: http://%(host)s%(path)s"
+msgstr ""
+"Een template tag kan de pagina met opzoek argumenten `%(page_lookup)s\n"
+"` niet vinden. De URL van het verzoek was: http://%(host)s%(path)s"
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "English"
@@ -1975,8 +2029,7 @@ msgstr "Ongeldige URL, gebruik het formaat /mijn/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 

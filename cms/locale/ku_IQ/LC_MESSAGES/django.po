@@ -1,21 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 #   <muhammad.khalid@asiacell.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-21 14:53+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: ku_IQ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ku_IQ\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -127,8 +127,7 @@ msgid "Page Title"
 msgstr "ناونیشانی پەڕە"
 
 #: admin/forms.py:154
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "ئەو نووسینانەی پیشان ئەدرێن لە بەشی سەرەوەی پەڕە یا لە نیشانەکاندا"
 
 #: admin/forms.py:155
@@ -161,7 +160,9 @@ msgstr "پێناسەی پەڕە - هەندێک جار لە لایەن بزوێن
 
 #: admin/forms.py:170
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "خشتەی ئەو کۆمایەنەی کا کلیلە ووشەکان لەیەکتر جیا دەکاتەوە - هەندێک جار لە لایەن بزوێنەری گەڕانەوە بەکاردێت - "
+msgstr ""
+"خشتەی ئەو کۆمایەنەی کا کلیلە ووشەکان لەیەکتر جیا دەکاتەوە - هەندێک جار لە "
+"لایەن بزوێنەری گەڕانەوە بەکاردێت - "
 
 #: admin/forms.py:186
 msgid "A page with this reverse URL id exists already."
@@ -176,7 +177,9 @@ msgstr "بەکارهێنەر"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr "زیادکردنی مۆڵەت بۆ پەڕە پێویستی بە گەشتن بە لقەکان هەیە بە پێچەوانەوە پەڕەی زیادکراو ناگۆڕدرێت لە لایەن دروستەکەرەکەیەوە"
+msgstr ""
+"زیادکردنی مۆڵەت بۆ پەڕە پێویستی بە گەشتن بە لقەکان هەیە بە پێچەوانەوە پەڕەی "
+"زیادکراو ناگۆڕدرێت لە لایەن دروستەکەرەکەیەوە"
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -209,7 +212,9 @@ msgstr "سڕینەوە"
 
 #: admin/forms.py:282
 msgid "Recover (any) pages"
-msgstr "گەراندەوەی پەڕەکان - بەدەست خستنەوەی پەڕەکان\n "
+msgstr ""
+"گەراندەوەی پەڕەکان - بەدەست خستنەوەی پەڕەکان\n"
+" "
 
 #: admin/forms.py:309
 msgid "Notify user"
@@ -219,7 +224,9 @@ msgstr "ئاگادار کردنەوەی بەکارهێنەر"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "پەیامی ئاگادارکردنەوە بنێرە بۆ بەکارهێنەر دەربارەی گۆڕینی ناوی بەکارهێنەر یان تێپەڕە ووشەکەی - پێویستی بە ئەدرەسی بەکارهێنەر هەیە"
+msgstr ""
+"پەیامی ئاگادارکردنەوە بنێرە بۆ بەکارهێنەر دەربارەی گۆڕینی ناوی بەکارهێنەر "
+"یان تێپەڕە ووشەکەی - پێویستی بە ئەدرەسی بەکارهێنەر هەیە"
 
 #: admin/forms.py:330
 msgid "New password"
@@ -236,12 +243,15 @@ msgstr "ئاگادارکردنەوە لە ڕێگەی پەیام پێویستی �
 #: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr "مۆڵەتی زیادکردنی پەڕەی نوێ پێویستی بە مۆڵەتی دەستکاریکردنی پەڕەکان هەیە"
+msgstr ""
+"مۆڵەتی زیادکردنی پەڕەی نوێ پێویستی بە مۆڵەتی دەستکاریکردنی پەڕەکان هەیە"
 
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr "مۆڵەی زیادکردنی بەکارهینەری نوێ پێویستی بە مۆڵەتی دەستکاریکردنی بەکارهێنەرەکان هەیە"
+msgstr ""
+"مۆڵەی زیادکردنی بەکارهینەری نوێ پێویستی بە مۆڵەتی دەستکاریکردنی "
+"بەکارهێنەرەکان هەیە"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -253,7 +263,9 @@ msgstr "ڕێکخستنە بنچینەیەکان"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "تێبینی: ئەم پەڕەیە باردەکرێتەوە ئەگەر گۆڕانکاری بکەیت لە دەستنیشانکراوەکان. سەرەتا پاشەکەوتی بکە  "
+msgstr ""
+"تێبینی: ئەم پەڕەیە باردەکرێتەوە ئەگەر گۆڕانکاری بکەیت لە دەستنیشانکراوەکان. "
+"سەرەتا پاشەکەوتی بکە  "
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -356,7 +368,9 @@ msgstr "مۆڵەت پێدراو نیت بۆ دەستکاری کردنی پێوە
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "%(position)s لە  %(placeholder)sپێوەکراوەکان دەستکاریکراوە لە شوێنی%(plugin_name)s "
+msgstr ""
+"%(position)s لە  %(placeholder)sپێوەکراوەکان دەستکاریکراوە لە شوێنی"
+"%(plugin_name)s "
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -375,7 +389,8 @@ msgstr "مۆڵەت پێدراو نیت بۆ سڕینەوەی پێوەکراو"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr " سڕدراوەتەوە%(position)s in %(placeholder)s پێوەکراو لە شوێنی%(plugin_name)s "
+msgstr ""
+" سڕدراوەتەوە%(position)s in %(placeholder)s پێوەکراو لە شوێنی%(plugin_name)s "
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -723,7 +738,9 @@ msgstr "هەموو پێشینەکان پیشان نادرێن لە ڕێنیشا�
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr "ناسەرەوەیەکی تاک و تەنها کە بەکاردێت لەگەڵ ئەدرەسی قاڵبی پەڕە بۆ بەستنەوەی بەم پەڕەیەوە"
+msgstr ""
+"ناسەرەوەیەکی تاک و تەنها کە بەکاردێت لەگەڵ ئەدرەسی قاڵبی پەڕە بۆ بەستنەوەی "
+"بەم پەڕەیەوە"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -815,7 +832,9 @@ msgstr "توانای بەدەست خستنەوەی هەر پەڕەیەکئ سڕ�
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr "ئەگەر هیچ هەڵبژاردنەک دیاری نەکردوە ،بەکارهێنەر مؤڵەتی هەموو شوێنەکانی پێ بەخشراوە"
+msgstr ""
+"ئەگەر هیچ هەڵبژاردنەک دیاری نەکردوە ،بەکارهێنەر مؤڵەتی هەموو شوێنەکانی پێ "
+"بەخشراوە"
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -961,7 +980,8 @@ msgstr "پانی جوگرافیایی"
 
 #: plugins/googlemap/models.py:26
 msgid "Use latitude & longitude to fine tune the map position."
-msgstr "بەکارهێنانی پانی جوگرافیایی و درێژی جوگرافیایی بۆ دۆزینەوەی شوێنی نەخشە"
+msgstr ""
+"بەکارهێنانی پانی جوگرافیایی و درێژی جوگرافیایی بۆ دۆزینەوەی شوێنی نەخشە"
 
 #: plugins/googlemap/models.py:28
 msgid "longitude"
@@ -1011,7 +1031,9 @@ msgstr "زمان یان پەرگە کە پێویستە پڕ بکردرێتەوە
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr "بە بەتاڵی جێهێشتن پەڕەی ئێستا دیاری ئەکات، placeholderدیاریکردنی پەڕەیەک بۆ داخل کردنی پێوەکراوەکانی بۆ ئەم "
+msgstr ""
+"بە بەتاڵی جێهێشتن پەڕەی ئێستا دیاری ئەکات، placeholderدیاریکردنی پەڕەیەک بۆ "
+"داخل کردنی پێوەکراوەکانی بۆ ئەم "
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1232,7 +1254,8 @@ msgstr "بیرخەرەوەی لینک"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr "ئەگەر درا بوو، بیرخەرەوەکە وەک لینک پیشان ئەدرێت لە پرۆفایلی تویتەرەکەت"
+msgstr ""
+"ئەگەر درا بوو، بیرخەرەوەکە وەک لینک پیشان ئەدرێت لە پرۆفایلی تویتەرەکەت"
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1243,7 +1266,10 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets from the user \"umbrella\" to the user \"nemesis\" that contain the words \"brains\" and \"zombies\""
+msgstr ""
+"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
+"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
+"\"brains\" and \"zombies\""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1291,9 +1317,11 @@ msgstr "داواکاری گواستنەوە"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: "
-"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
-msgstr "vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
+msgstr ""
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1383,7 +1411,9 @@ msgstr "پاشەکەوتکردن و بەردەوام بوون لەسەر دەس�
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr "ڕەنگە پێویستی بە پەسەند کردنی تۆبێت<a href=\"%(admin_url)s\">%(page)s</a>پەڕەی"
+msgstr ""
+"ڕەنگە پێویستی بە پەسەند کردنی تۆبێت<a href=\"%(admin_url)s\">%(page)s</"
+"a>پەڕەی"
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1435,7 +1465,8 @@ msgstr "( ئاست%(moderation_level)sپەسەندکردن داواکراوە ل
 
 #: templates/admin/cms/page/change_form.html:81
 msgid "(you can perform actions on this page directly)"
-msgstr "(ئەتوانیت چالاکیەکان بە ئەنجام بگەیەنیت لەسەر ئەم پەڕەیە بە ڕاستەوخۆیی)"
+msgstr ""
+"(ئەتوانیت چالاکیەکان بە ئەنجام بگەیەنیت لەسەر ئەم پەڕەیە بە ڕاستەوخۆیی)"
 
 #: templates/admin/cms/page/change_form.html:94
 msgid "Remove delete request"
@@ -1494,7 +1525,9 @@ msgstr "دۆخی پەڕە"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr "بە پەیامێک میانڕەوکەر ئاگادار بکەرەوە%(moderation_level)s,ئەم پەڕەیە پێویستی بە میانرەوکردن هەیە لە ئاستی "
+msgstr ""
+"بە پەیامێک میانڕەوکەر ئاگادار بکەرەوە%(moderation_level)s,ئەم پەڕەیە پێویستی "
+"بە میانرەوکردن هەیە لە ئاستی "
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1747,7 +1780,9 @@ msgstr "%(verbose_name)s بی گەڕێنەوە سەر باری سەرەتایی 
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr "دوگمەی پاشەکەوت کردن کرتە بکە بۆ گەراندنەوە سەر باری سەرەتایی ئەم ڤێرژنەی ئۆبجێکتەکە"
+msgstr ""
+"دوگمەی پاشەکەوت کردن کرتە بکە بۆ گەراندنەوە سەر باری سەرەتایی ئەم ڤێرژنەی "
+"ئۆبجێکتەکە"
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1851,9 +1886,13 @@ msgstr " %(domain)s پەرە نە دۆزرایەوە لە "
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. The URL of the request was: http://%(host)s%(path)s"
+msgstr ""
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
+"`. The URL of the request was: http://%(host)s%(path)s"
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "English"
@@ -1969,8 +2008,7 @@ msgstr "ئەدرەسێکی نەشیاو  "
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 

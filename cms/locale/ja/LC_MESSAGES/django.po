@@ -1,22 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Daigo Sakamoto <superdaigo@gmail.com>, 2011.
 # Jonas Obrist <me@ojii.ch>, 2011.
+# Jonas Obrist <ojiidotch@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
-"PO-Revision-Date: 2012-09-19 14:44+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-21 14:52+0200\n"
+"PO-Revision-Date: 2012-09-21 09:40+0000\n"
+"Last-Translator: Jonas Obrist <ojiidotch@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -128,9 +129,9 @@ msgid "Page Title"
 msgstr "ページタイトル"
 
 #: admin/forms.py:154
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr ""
+"ブラウザのタイトルやブックマークに表示されているタイトルを上書きします。"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -220,7 +221,9 @@ msgstr "ユーザに通知"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザメールが必要です。"
+msgstr ""
+"パスワードや、ユーザ名が変更された時に、ユーザに通知メールを送信する。ユーザ"
+"メールが必要です。"
 
 #: admin/forms.py:330
 msgid "New password"
@@ -292,7 +295,8 @@ msgstr "ページを承認しました。"
 #: admin/pageadmin.py:952
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
+msgstr ""
+"プライマリキー %(key)r を持って「%(name)s」というオブジェクトが存在しません。"
 
 #: admin/pageadmin.py:958
 msgid "There only exists one translation for this page"
@@ -958,7 +962,7 @@ msgstr "ズームレベル"
 
 #: plugins/googlemap/models.py:24
 msgid "latitude"
-msgstr ""
+msgstr "緯度"
 
 #: plugins/googlemap/models.py:26
 msgid "Use latitude & longitude to fine tune the map position."
@@ -966,7 +970,7 @@ msgstr ""
 
 #: plugins/googlemap/models.py:28
 msgid "longitude"
-msgstr ""
+msgstr "経度"
 
 #: plugins/googlemap/models.py:31
 msgid "route planer title"
@@ -1158,7 +1162,7 @@ msgstr "テキスト"
 
 #: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
 msgid "body"
-msgstr ""
+msgstr "本文"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
@@ -1168,7 +1172,7 @@ msgstr "プラグイン"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr ""
+msgstr "プラグインを選んで下さい"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:112
@@ -1292,8 +1296,8 @@ msgstr "ムービーのURL"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: "
-"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
+"iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1851,7 +1855,8 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1969,8 +1974,7 @@ msgstr "無効なURLです。 /my/url のように入力してください。"
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 
 #~ msgid "move"
