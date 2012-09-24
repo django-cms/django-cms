@@ -724,10 +724,7 @@ WYMeditor.computeWymPath = function () {
                 return (
                     s.src.match(
                         /jquery\.wymeditor(\.pack|\.min|\.packed)?\.js(\?.*)?$/
-                    ) ||
-                    s.src.match(
-                            /\/core\.js(\?.*)?$/
-                        )
+                    )
                 );
             }
         )
@@ -1695,7 +1692,7 @@ rangy.createModule("DomUtil", function(api, module) {
     var dom = api.dom;
     var DomPosition = dom.DomPosition;
     var DOMException = api.DOMException;
-    
+
     /*----------------------------------------------------------------------------------------------------------------*/
 
     // Utility functions
