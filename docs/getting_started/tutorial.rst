@@ -130,12 +130,13 @@ You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_C
 at the right position::
 
     MIDDLEWARE_CLASSES = (
-        'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
-        'cms.middleware.multilingual.MultilingualURLMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.doc.XViewMiddleware',
+        'django.middleware.common.CommonMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',

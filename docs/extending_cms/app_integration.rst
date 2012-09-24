@@ -211,30 +211,8 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
     default :class:`~django.template.Context` instance.
 
 
-Language Namespaces
--------------------
-
-An additional feature of apphooks is that if you use the
-:class:`cms.middleware.multilingual.MultilingualURLMiddleware` all apphook urls
-are language namespaced.
-
-What this means:
-
-To reverse the first url from above you would use something like this in your
-template:
-
-.. code-block:: html+django
-
-    {% url app_main %}
-
-If you want to access the same url but in a different language use a language
-namespace:
-
-.. code-block:: html+django
-
-    {% url de:app_main %}
-    {% url en:app_main %}
-    {% url fr:app_main %}
+Apphook Menus
+-------------
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
@@ -331,14 +309,15 @@ As seen for Language Namespaces, you can reverse namespaced apps similarly:
 
     {% url myapp_namespace:app_main %}
 
-If you want to access the same url but in a different language use a language
-namespace:
+If you want to access the same url but in a different language use the language
+templatetag:
 
 .. code-block:: html+django
 
-    {% url de:myapp_namespace:app_main %}
-    {% url en:myapp_namespace:app_main %}
-    {% url fr:myapp_namespace:app_main %}
+    {% load i18n %}
+    {% language "de" %}
+        {% url myapp_namespace:app_main %}
+    {% endlanguage %}
 
 What makes namespaced app hooks really interesting is the fact that you can
 hook them up to more than one page and reverse their URLs by using their

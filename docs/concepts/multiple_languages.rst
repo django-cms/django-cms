@@ -20,6 +20,8 @@ django CMS determines the user's language based on (in order of priority):
 * the last language the user chose in the language chooser
 * the language that the browser says its user prefers
 
+It uses the django built in capabilities for this.
+
 How django CMS determines what language to serve
 ================================================
 
