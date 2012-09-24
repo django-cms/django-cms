@@ -328,7 +328,6 @@ class RenderingTestCase(SettingsOverrideTestCase):
             r = self.strip_rendered(response.content)
             self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
 
-<<<<<<< HEAD
     def test_render_placeholder_toolbar(self):
         placeholder = Placeholder()
         placeholder.slot = 'test'
@@ -350,7 +349,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         output = render_placeholder_toolbar(placeholder, context, '', 'test')
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
-=======
+
     def test_14_multilingual_urls_point_to_original_language_when_not_redirecting(self):
         """
         When using the fallback language for a request, the replaced urls point to
@@ -374,6 +373,3 @@ class RenderingTestCase(SettingsOverrideTestCase):
             response = middleware.process_response(request, response)
             self.assertContains(response, '/%s/slug' % requested_language)
             self.assertNotContains(response, '/%s/slug' % fallback_language)
-
-
->>>>>>> 67305cc... Language fallback without redirect: Use original language code in urls
