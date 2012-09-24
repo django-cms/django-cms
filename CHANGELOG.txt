@@ -105,7 +105,9 @@
 - Made the PageAttribute templatetag an 'asTag'
 - JQuery namespace fixes in admin
 
+==== 2.3.3 ====
 
+ - fixed an incompatibility with Python 2.5
 
 
 
