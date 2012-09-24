@@ -26,10 +26,42 @@ of the new functionality in django 1.4 and can be found here:
 What you need to do:
 
 - Remove the MultilingualMiddleware from your settings.
-- Be sure the LocaleMiddleware is in your settings.
-- Be sure that the cms.urls is included in a i18n_patterns.
+- Be sure the LocaleMiddleware is in your settings and that it comes after the SessionMiddleware.
+- Be sure that the cms.urls is included in a i18n_patterns::
+
+        from django.conf.urls.defaults import *
+        from django.conf.urls.i18n import i18n_patterns
+        from django.contrib import admin
+        from django.conf import settings
+
+        admin.autodiscover()
+
+        urlpatterns = i18n_patterns('',
+            url(r'^admin/', include(admin.site.urls)),
+            url(r'^', include('cms.urls')),
+        )
+
+        if settings.DEBUG:
+            urlpatterns = patterns('',
+            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+            url(r'', include('django.contrib.staticfiles.urls')),
+        ) + urlpatterns
+
 - Change your url and reverse calls to language namespaces. We now support the django way of
   calling other language urls either via '{% language %}' templatetag or via 'activate("de")' function call in views.
+
+  Before ::
+
+    {% url "de:myview" %}
+
+  After::
+
+      {% load i18n %}
+      {% language "de" %}
+      {% url "myview_name" %}
+      {% endlanguage %}
+
 - reverse urls now return the language prefix as well. So maybe there is some code that adds language prefixes. Remove
   this code.
 
