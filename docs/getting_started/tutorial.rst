@@ -228,13 +228,14 @@ You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
 urlpatterns. We suggest starting with the following ``urls.py``::
 
     from django.conf.urls.defaults import *
+    from django.conf.urls.i18n import i18n_patterns
     from django.contrib import admin
     from django.conf import settings
 
     admin.autodiscover()
 
-    urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
+    urlpatterns = i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
         url(r'^', include('cms.urls')),
     )
 
