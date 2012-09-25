@@ -1,3 +1,5 @@
+from classytags.arguments import Argument
+from classytags.core import Tag, Options
 from django import template
 
 register = template.Library()
@@ -9,3 +11,4 @@ def language(parser, token):
     except ImportError:
         from i18nurls.templatetags.i18nurls import language
     return language(parser, token)
+

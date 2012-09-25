@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import activate
-
+from distutils.version import LooseVersion
+import django
 import os
 
 gettext = lambda s: s
 
 urlpatterns = []
+DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(**extra):
     from django.conf import settings
@@ -187,9 +188,7 @@ def configure(**extra):
             'django.contrib.auth.hashers.MD5PasswordHasher',
         )
     )
-    import django
-    version =  django.get_version()
-    if version[:3] == "1.3":
+    if DJANGO_1_3:
         defaults['INSTALLED_APPS'].append("i18nurls")
         defaults['MIDDLEWARE_CLASSES'][4] = 'i18nurls.middleware.LocaleMiddleware'
     else:

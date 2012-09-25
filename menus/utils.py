@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.utils.i18n import force_lang
+from cms.utils.i18n import ForceLang
 from django.conf import settings
 import warnings
 
@@ -91,7 +91,7 @@ class DefaultLanguageChanger(object):
     def get_page_path(self, lang):
         page = getattr(self.request, 'current_page', None)
         if page:
-            with force_lang(lang):
+            with ForceLang(lang):
                 try:
                     return page.get_absolute_url(language=lang, fallback=False)
                 except Title.DoesNotExist:

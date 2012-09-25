@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.apphook_pool import apphook_pool
-from cms.utils.i18n import force_lang
+from cms.utils.i18n import ForceLang
 from cms.utils.moderator import get_page_queryset
 
 from django.conf import settings
@@ -203,7 +203,7 @@ def get_app_patterns():
             app_ns = app.app_name, inst_ns
         else:
             app_ns = None, None
-        with force_lang(title.language):
+        with ForceLang(title.language):
             hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title))
         included.append(mix_id)
     # Build the app patterns to be included in the cms urlconfs

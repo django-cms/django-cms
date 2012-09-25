@@ -10,7 +10,7 @@ from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
     SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.i18n import force_lang
+from cms.utils.i18n import ForceLang
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
 
@@ -851,19 +851,19 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
 class ModeratorSwitchCommandTest(CMSTestCase):
     def test_switch_moderator_on(self):
-        with force_lang("en"):
+        with ForceLang("en"):
             pages_root = urllib.unquote(reverse("pages-root"))
         with SettingsOverride(CMS_MODERATOR=False):
             page1 = create_page('page', 'nav_playground.html', 'en', published=True)
         with SettingsOverride(CMS_MODERATOR=True):
             call_command('cms', 'moderator', 'on')
-            with force_lang("en"):
+            with ForceLang("en"):
                 path = page1.get_absolute_url()[len(pages_root):].strip('/')
                 page2 = get_page_from_path(path)
         self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
         
     def test_switch_moderator_off(self):
-        with force_lang("en"):
+        with ForceLang("en"):
             pages_root = urllib.unquote(reverse("pages-root"))
             with SettingsOverride(CMS_MODERATOR=True):
                 page1 = create_page('page', 'nav_playground.html', 'en', published=True)

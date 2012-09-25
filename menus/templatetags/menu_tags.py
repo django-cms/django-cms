@@ -4,7 +4,7 @@ from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.models.pagemodel import Page
 from cms.models.titlemodels import Title
-from cms.utils.i18n import force_lang
+from cms.utils.i18n import ForceLang
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -278,7 +278,7 @@ def _raw_language_marker(language, lang_code):
     return language
 
 def _native_language_marker(language, lang_code):
-    with force_lang(lang_code):
+    with ForceLang(lang_code):
         return unicode(ugettext(language))
 
 def _current_language_marker(language, lang_code):

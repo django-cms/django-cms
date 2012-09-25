@@ -10,7 +10,7 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, 
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils.i18n import force_lang
+from cms.utils.i18n import ForceLang
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
 from django.contrib.sites.models import Site
@@ -86,7 +86,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     
     def test_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
-        with force_lang("en"):
+        with ForceLang("en"):
             response = self.client.get(self.get_pages_root()) # path = '/'
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
