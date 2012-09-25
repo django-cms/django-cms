@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.utils.i18n import ForceLang
 from cms.utils.moderator import get_page_queryset
