@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
-from cms.models.pagemodel import Page
-from cms.models.titlemodels import Title
 from cms.utils.i18n import ForceLang
 from django import template
 from django.conf import settings
@@ -14,10 +13,6 @@ from django.utils.translation import activate, get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 import urllib
-from django.core.urlresolvers import reverse
-from django.utils.translation import activate
-from django.utils import translation
-
 
 register = template.Library()
 
