@@ -17,9 +17,9 @@
 <script type="text/javascript">
 //<![CDATA[	
 
-	$(document).ready(function (){
-		$("#id_title").keyup(function () {
-			var e = $("#id_slug")[0];
+	jQuery(document).ready(function (){
+		jQuery("#id_title").keyup(function () {
+			var e = jQuery("#id_slug")[0];
 			if(!e._changed) {
 				e.value = URLify(this.value, 64);
 			}
