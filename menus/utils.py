@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.utils.i18n import ForceLang
 from django.conf import settings
 import warnings
-from __future__ import with_statement
 from cms.models.titlemodels import Title
 
 
