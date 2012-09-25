@@ -88,6 +88,7 @@
 
 ==== 2.3.2 ====
 
+- MIGRATION: 0036_auto__add_field_cmsplugin_changed_date.py - new field changed_date on CMSPlugin
 - CMS_FRONTEND_LANGUAGES limits django languages as well during language selection
 - Wymeditor updated to 1.0.4a
 - icon_url escape fixed
