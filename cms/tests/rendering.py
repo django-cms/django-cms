@@ -1,17 +1,33 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms import plugin_rendering
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_rendering import (render_plugins, PluginContext, 
-    render_placeholder_toolbar)
+from cms.plugin_rendering import (
+    PluginContext,
+    render_placeholder_toolbar,
+    render_plugins,
+    )
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
+from cms.test_utils.util.context_managers import (
+    ChangeModel,
+    SettingsOverride,
+    )
 from cms.test_utils.util.mock import AttributeObject
+from cms.middleware.multilingual import MultilingualURLMiddleware
+from cms.models import CMSPlugin, Page, Title
+from cms.plugin_rendering import PluginContext, render_plugins
+from cms.plugins.text.models import Text
+from cms.test.testcases import CMSTestCase
+from cms.test.util.context_managers import (
+    ChangeModel,
+    SettingsOverride,
+    )
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
-from django.template import Template, RequestContext
+from django.template import RequestContext, Template
 from sekizai.context import SekizaiContext
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
@@ -333,3 +349,27 @@ class RenderingTestCase(SettingsOverrideTestCase):
         output = render_placeholder_toolbar(placeholder, context, '', 'test')
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
+
+    def test_14_multilingual_urls_point_to_original_language_when_not_redirecting(self):
+        """
+        When using the fallback language for a request, the replaced urls point to
+        the requsted, instead of the fallback language.
+        """
+        from cms.views import details
+        middleware = MultilingualURLMiddleware()
+        requested_language = settings.LANGUAGES[1][0]
+        fallback_language = settings.LANGUAGES[0][0]
+
+        test_settings = dict(CMS_TEMPLATES = ((TEMPLATE_NAME, ''),),
+                             CMS_LANGUAGE_FALLBACK = 'no_redirect')
+
+        with SettingsOverride(**test_settings):
+            instance, plugin_class = CMSPlugin.objects.all()[0].get_plugin_instance()
+            instance.body = '<a href="/slug/">fnord</a>'
+            instance.save()
+            request = self.get_request(path="/fr/renderingtestcase-slug ", language=requested_language)
+            middleware.process_request(request)
+            response = details(request, slug=self.test_page.get_slug())
+            response = middleware.process_response(request, response)
+            self.assertContains(response, '/%s/slug' % requested_language)
+            self.assertNotContains(response, '/%s/slug' % fallback_language)

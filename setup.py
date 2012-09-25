@@ -20,7 +20,7 @@ setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
     name='django-cms',
-    version='2.2-3',
+    version='2.2-4',
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     url='https://www.django-cms.org/',
