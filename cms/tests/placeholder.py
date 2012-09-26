@@ -3,6 +3,7 @@ from __future__ import with_statement
 from cms.api import add_plugin, create_page
 from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
+from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
@@ -245,6 +246,9 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_scanning_nested_super(self):
         placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
         self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
+
+    def test_placeholder_field_no_related_name(self):
+        self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
