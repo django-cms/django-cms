@@ -36,8 +36,10 @@ placeholder. The configuration is the same as for placeholders in the CMS.
 
 .. warning::
 
-    For security reasons the related name fo a :class:`~cms.models.fields.PlaceholderField` may not be surpressed using
-    ``'+'`` to allow the cms to check permissions properly. Attempting to do so will raise a :exc:`ValueError`.
+    For security reasons the related_name for a
+    :class:`~cms.models.fields.PlaceholderField` may not be surpressed using
+    ``'+'`` to allow the cms to check permissions properly. Attempting to do
+    so will raise a :exc:`ValueError`.
 
 If you install this model in the admin application, you have to use
 :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` instead of
