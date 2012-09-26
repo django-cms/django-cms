@@ -11,6 +11,8 @@ from django.utils.text import capfirst
 class PlaceholderField(models.ForeignKey):
     def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
         validate_placeholder_name(slotname)
+        if kwargs.get('related_name', None) == '+':
+            raise ValueError("PlaceholderField does not support disabling of related names via '+'.")
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()

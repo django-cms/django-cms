@@ -34,6 +34,13 @@ The :class:`~cms.models.fields.PlaceholderField` takes a string as its first
 argument which will be used to configure which plugins can be used in this
 placeholder. The configuration is the same as for placeholders in the CMS.
 
+.. warning::
+
+    For security reasons the related_name for a
+    :class:`~cms.models.fields.PlaceholderField` may not be surpressed using
+    ``'+'`` to allow the cms to check permissions properly. Attempting to do
+    so will raise a :exc:`ValueError`.
+
 If you install this model in the admin application, you have to use
 :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` instead of
 :class:`~django.contrib.admin.ModelAdmin` so the interface renders
