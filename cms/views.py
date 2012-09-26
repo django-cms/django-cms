@@ -3,7 +3,7 @@ from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.i18n import get_fallback_languages, ForceLang
+from cms.utils.i18n import get_fallback_languages, force_language
 from cms.utils.page_resolver import get_page_from_request
 from django.conf import settings
 from django.conf.urls.defaults import patterns
@@ -46,7 +46,7 @@ def details(request, slug):
             # fallback languages (CMS_LANGUAGE_CONF)
             for alt_lang in get_fallback_languages(current_language):
                 if alt_lang in available_languages:
-                    with ForceLang(alt_lang):
+                    with force_language(alt_lang):
                         path = page.get_absolute_url(language=alt_lang, fallback=True)
                     # In the case where the page is not available in the
                     # preferred language, *redirect* to the fallback page. This

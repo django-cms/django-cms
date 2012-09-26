@@ -23,3 +23,6 @@ class MultilingualTestCase(CMSTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
 
+    def test_frontend_lang(self):
+        pass
+

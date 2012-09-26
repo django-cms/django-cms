@@ -44,7 +44,7 @@ def get_fallback_languages(language):
 
 
 
-class ForceLang(object):
+class force_language(object):
     def __init__(self, new_lang):
         self.new_lang = new_lang
         self.old_lang = translation.get_language()

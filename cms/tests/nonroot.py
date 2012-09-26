@@ -4,7 +4,7 @@ from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.i18n import ForceLang
+from cms.utils.i18n import force_language
 from django.contrib.auth.models import User
 from django.middleware.locale import LocaleMiddleware
 from django.template import Template
@@ -82,7 +82,7 @@ class NonRootCase(CMSTestCase):
         Tests for correct form URL mangling in preview_link templatetag
         """
         language = 'en'
-        with ForceLang("en"):
+        with force_language("en"):
             pages_root = self.get_pages_root()
             link = preview_link(self.page2,language=language)
         self.assertEqual(link,'%s%s/' % (pages_root,self.page2.get_slug()))
