@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.utils import get_template_from_request, get_language_from_request
