@@ -1,4 +1,4 @@
 -r requirements_base.txt
 Django==1.3.2
--e git://github.com/brocaar/django-i18nurls.git#egg=django-i18nurls
+-e git://github.com/digi604/django-i18nurls.git#egg=django-i18nurls
 django-reversion==1.5.3
