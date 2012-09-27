@@ -322,17 +322,14 @@ class LanguageChooser(InclusionTag):
         current_lang = get_language()
         site = Site.objects.get_current()
         site_languages = settings.CMS_SITE_LANGUAGES.get(site.pk, cms_languages.keys())
-        cache_key = '%s-language-chooser-%s-%s-%s' % (settings.CMS_CACHE_PREFIX, site.pk, current_lang, i18n_mode)
-        languages = cache.get(cache_key, [])
+        languages = []
         if not languages:
             for lang in settings.CMS_FRONTEND_LANGUAGES:
                 if lang in cms_languages and lang in site_languages:
                     languages.append((lang, marker(cms_languages[lang], lang)))
-            cache.set(cache_key, languages)
-        lang = get_language()
         context.update({
             'languages':languages,
-            'current_language':lang,
+            'current_language':current_lang,
             'template':template,
         })
         return context

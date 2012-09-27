@@ -54,8 +54,7 @@ def get_language_from_request(request, current_page=None):
         if not language in dict(settings.CMS_LANGUAGES).keys():
             language = None
 
-    # TODO: This smells like a refactoring oversight - was current_page ever a page object? It appears to be a string now
-    if language is None and isinstance(current_page, Page):
+    if language is None and current_page:
         # in last resort, get the first language available in the page
         languages = current_page.get_languages()
 

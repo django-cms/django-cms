@@ -267,21 +267,22 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
         
     def test_language_chooser(self):
-        # test simple language chooser with default args 
-        context = self.get_context(path=self.get_page(3).get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% language_chooser %}")
-        tpl.render(context) 
-        self.assertEqual(len(context['languages']), 2)
-        # try a different template and some different args
-        tpl = Template("{% load menu_tags %}{% language_chooser 'menu/test_language_chooser.html' %}")
-        tpl.render(context) 
-        self.assertEqual(context['template'], 'menu/test_language_chooser.html')
-        tpl = Template("{% load menu_tags %}{% language_chooser 'short' 'menu/test_language_chooser.html' %}")
-        tpl.render(context) 
-        self.assertEqual(context['template'], 'menu/test_language_chooser.html')
-        for lang in context['languages']:
-            self.assertEqual(*lang)
-                    
+        # test simple language chooser with default args
+        with SettingsOverride(CMS_FRONTEND_LANGUAGES = ('fr','de','nl')):
+            context = self.get_context(path=self.get_page(3).get_absolute_url())
+            tpl = Template("{% load menu_tags %}{% language_chooser %}")
+            tpl.render(context)
+            self.assertEqual(len(context['languages']), 2)
+            # try a different template and some different args
+            tpl = Template("{% load menu_tags %}{% language_chooser 'menu/test_language_chooser.html' %}")
+            tpl.render(context)
+            self.assertEqual(context['template'], 'menu/test_language_chooser.html')
+            tpl = Template("{% load menu_tags %}{% language_chooser 'short' 'menu/test_language_chooser.html' %}")
+            tpl.render(context)
+            self.assertEqual(context['template'], 'menu/test_language_chooser.html')
+            for lang in context['languages']:
+                self.assertEqual(*lang)
+
     def test_page_language_url(self):
         path = self.get_page(3).get_absolute_url()
         context = self.get_context(path=path)
