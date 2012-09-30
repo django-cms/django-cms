@@ -116,7 +116,7 @@ class PageAddForm(forms.ModelForm):
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
-        if self.cleaned_data['published'] and page.title_set.count():
+        if self.cleaned_data.get('published') and page.title_set.count():
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
