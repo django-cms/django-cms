@@ -526,7 +526,7 @@ class PageAdmin(ModelAdmin):
 
 
             #activate(user_lang_set)
-            extra_context = {
+            context = {
                 'placeholders': self.get_fieldset_placeholders(selected_template),
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
@@ -541,7 +541,8 @@ class PageAdmin(ModelAdmin):
                 'show_delete_translation': len(obj.get_languages()) > 1,
                 'current_site_id': settings.SITE_ID,
             }
-            extra_context = self.update_language_tab_context(request, obj, extra_context)
+            context.update(extra_context or {})
+            extra_context = self.update_language_tab_context(request, obj, context)
         tab_language = request.GET.get("language", None)
         response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
 
