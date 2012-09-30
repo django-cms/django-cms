@@ -1,24 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 #   <angular.circle@gmail.com>, 2012.
 #   <sebastian@kalinowski.eu>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-21 14:54+0200\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -129,9 +128,9 @@ msgid "Page Title"
 msgstr "Tytuł strony"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Nadpisuje to co jest wyświetlane u góry przeglądarki lub w jej zakładkach"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Nadpisuje to co jest wyświetlane u góry przeglądarki lub w jej zakładkach"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -178,9 +177,7 @@ msgstr "użytkownik"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Dodanie praw do strony wymaga dostępu do ich dzieci lub potomków, inaczej "
-"dodana strona nie może zostać zmieniona przez jego twórcę."
+msgstr "Dodanie praw do strony wymaga dostępu do ich dzieci lub potomków, inaczej dodana strona nie może zostać zmieniona przez jego twórcę."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -223,9 +220,7 @@ msgstr "Powiadom użytkownika"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Wyślij użytkownikowi email z powiadomieniem o zmianie loginu lub hasła. "
-"Wymaga emaila użytkownika."
+msgstr "Wyślij użytkownikowi email z powiadomieniem o zmianie loginu lub hasła. Wymaga emaila użytkownika."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -237,22 +232,17 @@ msgstr "Potwierdź hasło"
 
 #: admin/forms.py:351
 msgid "Email notification requires valid email address."
-msgstr ""
-"Powiadomienie email'em wymaga podania poprawnego adresu poczty "
-"elektronicznej."
+msgstr "Powiadomienie email'em wymaga podania poprawnego adresu poczty elektronicznej."
 
 #: admin/forms.py:353
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"Uprawnienie dodawania nowych stron wymaga uprawnienia do ich modyfikacji!"
+msgstr "Uprawnienie dodawania nowych stron wymaga uprawnienia do ich modyfikacji!"
 
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Uprawnienie dodawania nowych użytkowników wymaga uprawnienia do modyfikacji "
-"ich kont."
+msgstr "Uprawnienie dodawania nowych użytkowników wymaga uprawnienia do modyfikacji ich kont."
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -264,9 +254,7 @@ msgstr "Ustawienia podstawowe"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Uwaga: gdy zmienione zostanie zaznaczenie wybranego elementu strona zostanie "
-"automatycznie przeładowana, aby nie utracić danych najpierw zapisz."
+msgstr "Uwaga: gdy zmienione zostanie zaznaczenie wybranego elementu strona zostanie automatycznie przeładowana, aby nie utracić danych najpierw zapisz."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -369,9 +357,7 @@ msgstr "Nie posiadasz uprawnień do edycji wtyczki"
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Wtyczka %(plugin_name)s została zmieniona na pozycji %(position)s w "
-"%(placeholder)s"
+msgstr "Wtyczka %(plugin_name)s została zmieniona na pozycji %(position)s w %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -390,9 +376,7 @@ msgstr "Nie posiadasz uprawnień by usunąć wtyczkę"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"Wtyczka %(plugin_name)s na pozycji %(position)s w %(placeholder)s została "
-"usunięta."
+msgstr "Wtyczka %(plugin_name)s na pozycji %(position)s w %(placeholder)s została usunięta."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -726,15 +710,11 @@ msgstr "zmienione przez"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"Aby strona była publicznie widoczna w internecie musi zostać \"opublikowana"
-"\". W tym celu ustaw status \"opublikowano\"."
+msgstr "Aby strona była publicznie widoczna w internecie musi zostać \"opublikowana\". W tym celu ustaw status \"opublikowano\"."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
-"Czas kiedy strona ma przestać być publikowana. Pozostaw to pole puste, gdy "
-"strona zawsze ma być publikowana."
+msgstr "Czas kiedy strona ma przestać być publikowana. Pozostaw to pole puste, gdy strona zawsze ma być publikowana."
 
 #: models/pagemodel.py:64
 msgid "All ancestors will not be displayed in the navigation"
@@ -744,9 +724,7 @@ msgstr "Wszyscy przodkowie nie będą wyświetlani w menu nawigacyjnym"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Unikalny identyfikator używany przez templatetag page_url do tworzenia "
-"odnośnika do tej strony"
+msgstr "Unikalny identyfikator używany przez templatetag page_url do tworzenia odnośnika do tej strony"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -838,9 +816,7 @@ msgstr "może odzyskać każdą usuniętą stronę"
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-"Jeśli niczego nie zaznaczono użytkownicy mają uprawnienia do wszystkich "
-"witryn."
+msgstr "Jeśli niczego nie zaznaczono użytkownicy mają uprawnienia do wszystkich witryn."
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -986,9 +962,7 @@ msgstr "szerokość geograficzna"
 
 #: plugins/googlemap/models.py:26
 msgid "Use latitude & longitude to fine tune the map position."
-msgstr ""
-"Użyj szerokości i długości geograficznej w celu dostosowania współrzędnych "
-"na mapie."
+msgstr "Użyj szerokości i długości geograficznej w celu dostosowania współrzędnych na mapie."
 
 #: plugins/googlemap/models.py:28
 msgid "longitude"
@@ -1038,10 +1012,7 @@ msgstr "Pola \"język\", bądź \"storna\" muszą zostać wypełnione"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Wybierz stronę z której wtyczki mają zostać umieszczone w  tym "
-"placeholderze. Pozostaw to pole puste, by wykorzystana została aktualna "
-"strona."
+msgstr "Wybierz stronę z której wtyczki mają zostać umieszczone w  tym placeholderze. Pozostaw to pole puste, by wykorzystana została aktualna strona."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1158,9 +1129,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Podaj ścieżkę do szablonu (np. \"snippets/plugin_xy.html\"), który ma zostać "
-"wyrenderowany. "
+msgstr "Podaj ścieżkę do szablonu (np. \"snippets/plugin_xy.html\"), który ma zostać wyrenderowany. "
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1264,9 +1233,7 @@ msgstr "podpowiedź dla odnośnika"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-"Jeśli podana, wskazówka jest wyświetlana jako link do twojego profilu w "
-"Twitterze."
+msgstr "Jeśli podana, wskazówka jest wyświetlana jako link do twojego profilu w Twitterze."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1325,11 +1292,9 @@ msgstr "url pliku wideo"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"Adres URL do klipu wideo z Vimeo lub YouTube. Przykład: http://www.youtube."
-"com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "Adres URL do klipu wideo z Vimeo lub YouTube. Przykład: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1419,9 +1384,7 @@ msgstr "Zapisz i kontynuuj edycję"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Strona <a href=\"%(admin_url)s\">%(page)s</a> może wymagać zatwierdzenia "
-"przez ciebie."
+msgstr "Strona <a href=\"%(admin_url)s\">%(page)s</a> może wymagać zatwierdzenia przez ciebie."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1431,8 +1394,7 @@ msgstr "Ostatnie zmiany"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
-"zaloguj się do panelu administracyjnego <a href=\"%(login_url)s\">tutaj</a>."
+msgstr "zaloguj się do panelu administracyjnego <a href=\"%(login_url)s\">tutaj</a>."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
@@ -1534,9 +1496,7 @@ msgstr "Statusy strony"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Ta strona musi być moderowana na poziomie %(moderation_level)s, wyślij "
-"wiadomość do moderatora."
+msgstr "Ta strona musi być moderowana na poziomie %(moderation_level)s, wyślij wiadomość do moderatora."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1893,13 +1853,9 @@ msgstr "Strona nie została odnaleziona na %(domain)s"
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"Nie udało się odnaleźć podstrony za pośrednictwem tagu w szablonie do "
-"którego przekazano następujące argumenty: `%(page_lookup)s`. Adres URL "
-"zapytania to: http://%(host)s%(path)s"
+msgstr "Nie udało się odnaleźć podstrony za pośrednictwem tagu w szablonie do którego przekazano następujące argumenty: `%(page_lookup)s`. Adres URL zapytania to: http://%(host)s%(path)s"
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "English"
@@ -2015,7 +1971,8 @@ msgstr "Nieprawidłowy URL. Użyj formatu /moj/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""

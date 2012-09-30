@@ -1,36 +1,35 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
+# Dimmus <dmitri.chudinov@gmail.com>, 2011.
+# Gleb Chipiga <gleb.chipiga@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-14 09:45-0500\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2011-08-14 09:44-0500\n"
 "PO-Revision-Date: 2011-03-22 15:38+0000\n"
-"Last-Translator: gleb_chipiga <gleb.chipiga@gmail.com>\n"
+"Last-Translator: Gleb Chipiga <gleb.chipiga@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: static/cms/js/change_form.js:31
 msgid ""
 "Are you sure you want to change the %(field_name)s without saving the page "
 "first?"
-msgstr ""
-"Вы уверены, что хотите изменить %(field_name)s без сохранения страницы?"
+msgstr "Вы уверены, что хотите изменить %(field_name)s без сохранения страницы?"
 
 #: static/cms/js/change_form.js:69
 msgid ""
 "Not all plugins are saved. Are you sure you want to save the page?\n"
 "All unsaved plugin content will tried to save."
-msgstr ""
-"Не все плагины сохранены. Вы уверены, что хотите сохранить страницу?\n"
-"Будет предпринята попытка сохранить не сохранённое содержимое плагинов."
+msgstr "Не все плагины сохранены. Вы уверены, что хотите сохранить страницу?\nБудет предпринята попытка сохранить не сохранённое содержимое плагинов."
 
 #: static/cms/js/change_form.js:127
 msgid "Are you sure you want to change tabs without saving the page first?"
