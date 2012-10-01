@@ -119,7 +119,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             "body":"Hello World!!",
             "_cancel":True,
         }
-        response = self.client.post(URL_CMS_PAGE_ADD, data)
+        edit_url = '%s%d/' % (URL_CMS_PLUGIN_EDIT, created_plugin_id)
+        response = self.client.post(edit_url, data)
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
