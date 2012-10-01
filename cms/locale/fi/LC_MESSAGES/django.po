@@ -1,22 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 #   <klaus.dahlen@gmail.com>, 2011.
 # nanook <klaus.dahlen@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-21 14:52+0200\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -128,7 +128,8 @@ msgid "Page Title"
 msgstr "Sivun otsikko"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Yliajaa selaimen ylälaidassa ja kirjanmerkeissä näytettävän tekstin"
 
 #: admin/forms.py:155
@@ -176,9 +177,7 @@ msgstr "käyttäjä"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja "
-"ei voi muokata sitä myöhemmin."
+msgstr "Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja ei voi muokata sitä myöhemmin."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -221,9 +220,7 @@ msgstr "Huomauta käyttäjää"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. "
-"Vaatii käyttäjän sähköpostiosoitteen."
+msgstr "Lähetä sähköpostia käyttäjälle käyttäjänimen tai salasanan vaihtumisesta. Vaatii käyttäjän sähköpostiosoitteen."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -257,9 +254,7 @@ msgstr "Perusasetukset"
 
 #: admin/pageadmin.py:111
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna "
-"ensin."
+msgstr "Huomautus: Tämä sivu uudelleenladataan mikäli muokkaat valintaa. Tallenna ensin."
 
 #: admin/pageadmin.py:113 admin/pageadmin.py:165
 msgid "Hidden"
@@ -348,8 +343,7 @@ msgstr "Oikeutesi eivät riitä liitännäisten lisäämiseen"
 #: admin/pageadmin.py:1207
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
-"Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
+msgstr "Kopioutu lähteen %(language)s liitännäiset sisältöpaikkaan %(placeholder)s."
 
 #: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
 msgid "You have no permission to change this page"
@@ -363,9 +357,7 @@ msgstr "Oikeutesi eivät riitä liitännäisen muokkaamiseen"
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa "
-"%(placeholder)s."
+msgstr "Liitännäistä %(plugin_name)s muokattu kohdassa %(position)s sisältöpaikassa %(placeholder)s."
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -384,9 +376,7 @@ msgstr "Oikeutesi eivät riitä liitännäisen poistamiseen"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta "
-"%(placeholder)s."
+msgstr "Liitännäinen %(plugin_name)s poistettu kohdasta %(position)s sisältöpaikasta %(placeholder)s."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -720,9 +710,7 @@ msgstr "muokkaaja"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" "
-"jotta se tulee näkyviin. "
+msgstr "Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" jotta se tulee näkyviin. "
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -736,9 +724,7 @@ msgstr "Kaikkia vanhempia ei näytetä navigaatiossa"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa "
-"tämän sivun linkittämiseksi asettelutiedostoissa. "
+msgstr "Yksilöllinen tunniste jota voidaan käyttää page_url templatetagin kanssa tämän sivun linkittämiseksi asettelutiedostoissa. "
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -830,9 +816,7 @@ msgstr "voi palauttaa minkä tahansa poistetun sivun"
 
 #: models/permissionmodels.py:53
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-"jos mitään ei ole valittu käyttäjälle myönnetään oikeudet kaikkiin "
-"sivustoihin"
+msgstr "jos mitään ei ole valittu käyttäjälle myönnetään oikeudet kaikkiin sivustoihin"
 
 #: models/permissionmodels.py:53
 msgid "sites"
@@ -1028,9 +1012,7 @@ msgstr "Kieli tai sivu pitää olla täytettynä"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä "
-"valitsee nykyisen sivun"
+msgstr "Valitse sivu jolta sisällytetään liitännäiset tähän sisältökenttään, tyhjä valitsee nykyisen sivun"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1147,9 +1129,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan "
-"ruudulle."
+msgstr "Syötä asettelutiedosto (esim. \"snippets/plugin_xy.html\") joka tulostetaan ruudulle."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1312,8 +1292,8 @@ msgstr "videon osoite"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1404,9 +1384,7 @@ msgstr "Tallenna ja jatka muokkausta"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta "
-"hyväksyntää."
+msgstr "Sivu <a href=\"%(admin_url)s\">%(page)s</a> saattaa vaatia sinulta hyväksyntää."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1517,9 +1495,7 @@ msgstr "Sivun tilat"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti "
-"moderaattorille."
+msgstr "Tätä sivua täytyy moderoida tasolla %(moderation_level)s, lähetä viesti moderaattorille."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1808,9 +1784,7 @@ msgstr "Yhtään liitäännäistä ei ole valittuna. Valitse vasemmalta laidalta
 
 #: templates/admin/cms/page/widgets/plugin_editor.html:17
 msgid "No Plugins present. Add a plugin to this placeholder-slot."
-msgstr ""
-"Yhtään liitännäistä ei ole asetettu. Lisää liitännäinen tähän "
-"sisältökenttään."
+msgstr "Yhtään liitännäistä ei ole asetettu. Lisää liitännäinen tähän sisältökenttään."
 
 #: templates/cms/toolbar/placeholder.html:33
 msgid "Available plugins"
@@ -1878,8 +1852,7 @@ msgstr ""
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
@@ -1997,7 +1970,8 @@ msgstr "Epäkelpo URL. Ole hyvä ja käytä muotoa /minun/url/"
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 

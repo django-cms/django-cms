@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 #   <hannseman@gmail.com>, 2011.
 # Patrik Gärdeman <patrik.gardeman@gmail.com>, 2011.
@@ -10,15 +10,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-21 14:54+0200\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2012-09-19 14:44+0200\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -130,7 +130,8 @@ msgid "Page Title"
 msgstr "Sidrubrik"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Anger vad som visas i webbläsarens topp eller i bokmärken"
 
 #: admin/forms.py:155
@@ -178,9 +179,7 @@ msgstr "användare"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Tillåtelse att lägga till sida kräver också tillgång till barn eller "
-"efterkommande annars kan inte tillagd sida redigeras av den som skapat den."
+msgstr "Tillåtelse att lägga till sida kräver också tillgång till barn eller efterkommande annars kan inte tillagd sida redigeras av den som skapat den."
 
 #: admin/forms.py:233
 msgid "Add page permission also requires edit page permission."
@@ -223,9 +222,7 @@ msgstr "Meddela användare"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Skicka e-postmeddelande till användare om användarnamn eller "
-"lösenordsförändring. E-postadress på användare krävs."
+msgstr "Skicka e-postmeddelande till användare om användarnamn eller lösenordsförändring. E-postadress på användare krävs."
 
 #: admin/forms.py:330
 msgid "New password"
@@ -247,8 +244,7 @@ msgstr "Tillåtelse att lägga till sidor kräver tillåtelse att redigera sidor
 #: admin/forms.py:355
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Tillåtelse att lägga till användare kröver tillåtelse att redigera användare!"
+msgstr "Tillåtelse att lägga till användare kröver tillåtelse att redigera användare!"
 
 #: admin/forms.py:357
 msgid "To add permissions you also need to edit them!"
@@ -363,8 +359,7 @@ msgstr "Du har ingen behörighet att redigera plugins"
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"%(plugin_name)s plugin har redigerats på plats %(position)s i %(placeholder)s"
+msgstr "%(plugin_name)s plugin har redigerats på plats %(position)s i %(placeholder)s"
 
 #: admin/pageadmin.py:1370
 msgid "You have no permission to move a plugin"
@@ -383,9 +378,7 @@ msgstr "Du har ingen behörighet att ta bort plugins"
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"%(plugin_name)s plugin på position %(position)s i %(placeholder)s har "
-"raderats."
+msgstr "%(plugin_name)s plugin på position %(position)s i %(placeholder)s har raderats."
 
 #: admin/permissionadmin.py:94
 msgid "View restriction"
@@ -719,9 +712,7 @@ msgstr "ändrad av"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå "
-"live."
+msgstr "När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå live."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -735,9 +726,7 @@ msgstr "Alla ovanstående sidor kommer inte att visas i navigeringen"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Ett unikt id som används med mallkommandot page_url för att länka till denna "
-"sida"
+msgstr "Ett unikt id som används med mallkommandot page_url för att länka till denna sida"
 
 #: models/pagemodel.py:66
 msgid "attached menu"
@@ -1025,9 +1014,7 @@ msgstr "Språk eller Sida måste vara ifylld"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Välj en sida för att inkludera dess plugins till denna platshållare, lämna "
-"blankt för nuvarande sida"
+msgstr "Välj en sida för att inkludera dess plugins till denna platshållare, lämna blankt för nuvarande sida"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1144,8 +1131,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Ange en mall (t.ex. \"snippets/plugin_xy.html\") som kommer att användas."
+msgstr "Ange en mall (t.ex. \"snippets/plugin_xy.html\") som kommer att användas."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1260,10 +1246,7 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr ""
-"Exempel: \"hjärnor AND zombies AND from:paraply AND to:Nemesis\": tweets "
-"från användaren \"paraply\" till användaren \"Nemesis\" som innehåller orden "
-"\"hjärnor\" och \"zombies\""
+msgstr "Exempel: \"hjärnor AND zombies AND from:paraply AND to:Nemesis\": tweets från användaren \"paraply\" till användaren \"Nemesis\" som innehåller orden \"hjärnor\" och \"zombies\""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1311,11 +1294,9 @@ msgstr "film url"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"vimeo eller youtube video url. Exempel: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "vimeo eller youtube video url. Exempel: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1405,8 +1386,7 @@ msgstr "Spara och fortsätt redigera"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Sida <a href=\"%(admin_url)s\">%(page)s</a> kan behöva godkännande av dig."
+msgstr "Sida <a href=\"%(admin_url)s\">%(page)s</a> kan behöva godkännande av dig."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1517,9 +1497,7 @@ msgstr "Sidstatus"
 msgid ""
 "This page must be moderated at level %(moderation_level)s, post a message "
 "for moderator."
-msgstr ""
-"Denna sida måste godkännas på nivå %(moderation_level)s, skicka ett "
-"meddelande till moderatorn."
+msgstr "Denna sida måste godkännas på nivå %(moderation_level)s, skicka ett meddelande till moderatorn."
 
 #: templates/admin/cms/page/change_form.html:190
 msgid "Request approvemet"
@@ -1772,8 +1750,7 @@ msgstr "Återgå till %(verbose_name)s"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
-"Tryck på spara-knappen nedan för att återgå till denna version av objektet."
+msgstr "Tryck på spara-knappen nedan för att återgå till denna version av objektet."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1877,13 +1854,9 @@ msgstr "Sidan hittades inte på %(domain)s "
 #: templatetags/cms_tags.py:80
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"En mall-tagg kunde inte hitta sidan med uppslags-argumenten `"
-"%(page_lookup)s\n"
-"`. Webbadressen för begäran var: http://%(host)s%(path)s"
+msgstr "En mall-tagg kunde inte hitta sidan med uppslags-argumenten `%(page_lookup)s\n`. Webbadressen för begäran var: http://%(host)s%(path)s"
 
 #: test_utils/cli.py:100 test_utils/cli.py:107
 msgid "English"
@@ -1999,7 +1972,8 @@ msgstr "Felaktig URL, använd följande format: /min/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 
