@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.utils.i18n import force_language
+from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
 import warnings
 from cms.models.titlemodels import Title
@@ -95,7 +95,7 @@ class DefaultLanguageChanger(object):
                 try:
                     return page.get_absolute_url(language=lang, fallback=False)
                 except Title.DoesNotExist:
-                    if settings.CMS_HIDE_UNTRANSLATED:
+                    if hide_untranslated(lang):
                         return '/%s/' % lang
                     else:
                         return page.get_absolute_url(language=lang, fallback=True)

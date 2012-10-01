@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import copy
 from cms.api import create_page
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
@@ -268,11 +269,13 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         
     def test_language_chooser(self):
         # test simple language chooser with default args
-        with SettingsOverride(CMS_FRONTEND_LANGUAGES = ('fr','de','nl')):
+        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings[1][0]['public'] = False
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(path=self.get_page(3).get_absolute_url())
             tpl = Template("{% load menu_tags %}{% language_chooser %}")
             tpl.render(context)
-            self.assertEqual(len(context['languages']), 2)
+            self.assertEqual(len(context['languages']), 3)
             # try a different template and some different args
             tpl = Template("{% load menu_tags %}{% language_chooser 'menu/test_language_chooser.html' %}")
             tpl.render(context)

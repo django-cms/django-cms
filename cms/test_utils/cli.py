@@ -104,21 +104,55 @@ def configure(**extra):
             ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
         ),
-        CMS_LANGUAGES = (
-            ('en', gettext('English')),
-            ('fr', gettext('French')),
-            ('de', gettext('German')),
-            ('pt-br', gettext('Brazilian Portuguese')),
-            ('nl', gettext("Dutch")),
-        ),
-        CMS_LANGUAGE_CONF = {
-            'de':['fr', 'en'],
-            'en':['fr', 'de'],
-        },
-        CMS_SITE_LANGUAGES = {
-            1:['en','de','fr','pt-br'],
-            2:['de','fr'],
-            3:['nl'],
+        CMS_LANGUAGES = {
+            1: [
+                {
+                    'code':'en',
+                    'name':gettext('English'),
+                    'fallbacks':['fr','de'],
+                    'public':True,
+                },
+                {
+                    'code':'de',
+                    'name':gettext('German'),
+                    'fallbacks':['fr','en'],
+                    'public':True,
+                },
+                {
+                    'code':'fr',
+                    'name':gettext('French'),
+                    'public':True,
+                },
+                {
+                    'code':'pt-br',
+                    'name':gettext('Brazilian Portuguese'),
+                    'public':True,
+                },
+            ],
+            2: [
+                {
+                    'code':'de',
+                    'name':gettext('German'),
+                    'fallbacks':['fr','en'],
+                    'public':True,
+                },
+                {
+                    'code':'fr',
+                    'name':gettext('French'),
+                    'public':True,
+                },
+            ],
+            3: [
+                {
+                    'code':'nl',
+                    'name':gettext('Dutch'),
+                    'fallbacks':['fr','en'],
+                    'public':True,
+                },
+            ],
+            'default': {
+                'hide_untranslated':False,
+            },
         },
         CMS_TEMPLATES = (
             ('col_two.html', gettext('two columns')),
@@ -163,7 +197,6 @@ def configure(**extra):
         CMS_SEO_FIELDS = True,
         CMS_FLAT_URLS = False,
         CMS_MENU_TITLE_OVERWRITE = True,
-        CMS_HIDE_UNTRANSLATED = False,
         CMS_URL_OVERWRITE = True,
         CMS_SHOW_END_DATE = True,
         CMS_SHOW_START_DATE = True,

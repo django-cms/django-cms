@@ -70,33 +70,44 @@ CMS_FLAT_URLS = False
 # Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = False
 
-#Hide untranslated Pages
-CMS_HIDE_UNTRANSLATED = True
 
-#Fall back to another language if the requested page isn't available in the preferred language
-CMS_LANGUAGE_FALLBACK = True
 
-#Configuration on how to order the fallbacks for languages.
-# example: {'de': ['en', 'fr'],
-#           'en': ['de'],
-#          }
-CMS_LANGUAGE_CONF = {}
+# Defines which languages should be offered and what are the defaults
+# example:
+# CMS_LANGUAGES = {
+#    1: [
+#        {
+#            'code': 'en',
+#            'name': _('English'),
+#            'fallbacks': ['de', 'fr'],
+#            'public': True,
+#            'hide_untranslated': True,
+#            'redirect_on_fallback':False,
+#            },
+#        {
+#            'code': 'de',
+#            'name': _('Deutsch'),
+#            'fallbacks': ['en', 'fr'],
+#            'public': True,
+#            },
+#        {
+#            'code': 'fr',
+#            'public': False,
+#            }
+#    ],
+#    'defaults': {
+#        'fallbacks': ['en', 'de', 'fr'],
+#        'redirect_on_fallback':True,
+#        'public': False,
+#        'hide_untranslated': False,
+#        }
+#}
 
-# Defines which languages should be offered.
-CMS_LANGUAGES = settings.LANGUAGES
+CMS_LANGUAGES = {}
 
-# If you have different sites with different languages you can configure them here
-# and you will only be able to edit the languages that are actually on the site.
-# example: {1:['en','de'],
-#           2:['en','fr'],
-#           3:['en'],}
-CMS_SITE_LANGUAGES = {}
 
 CMS_SITE_CHOICES_CACHE_KEY = 'CMS:site_choices'
 CMS_PAGE_CHOICES_CACHE_KEY = 'CMS:page_choices'
-
-# Languages that are visible in the frontend (Language Chooser)
-CMS_FRONTEND_LANGUAGES = [x[0] for x in CMS_LANGUAGES]
 
 
 # Path for CMS media (uses <MEDIA_ROOT>/cms by default)

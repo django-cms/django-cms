@@ -46,3 +46,32 @@ def post_patch_check():
                 "I can't find the namespaces in %r."
                 % template[0]
             )
+    VALID_LANG_PROPS = ['code', 'name', 'fallbacks', 'hide_untranslated', 'redirect_on_fallback', 'public']
+
+    for site in settings.CMS_LANGUAGES.keys():
+        try:
+            int(site)
+        except ValueError:
+            if not site =="default":
+                raise ImproperlyConfigured("CMS_LANGUAGES can only be filled with integers (site ids) and 'default' for\n"
+                                           " default values. %s is not a valid key." % site)
+        for lang in settings.CMS_LANGUAGES[site]:
+            if site == "default":
+                if lang not in VALID_LANG_PROPS:
+                    raise ImproperlyConfigured("CMS_LANGUAGES has an invalid property on the site %(site)s and language %(language)s: %(property)s" % {'site':site, 'language':lang['code'], 'property':key})
+                continue
+            if not "code" in lang.keys():
+                raise ImproperlyConfigured("CMS_LANGUAGES has language without a 'code' property")
+            if not 'name' in lang.keys():
+                raise ImproperlyConfigured("CMS_LANGUAGES has a language without a 'name' property")
+            for key in lang.keys():
+                if key not in VALID_LANG_PROPS:
+                    raise ImproperlyConfigured("CMS_LANGUAGES has an invalid property on the site %(site)s and language %(language)s: %(property)s" % {'site':site, 'language':lang['code'], 'property':key})
+
+
+
+
+
+
+
+

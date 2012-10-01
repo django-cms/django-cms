@@ -397,7 +397,7 @@ class PagesTestCase(CMSTestCase):
         page_data = self.get_new_page_data()
         page_data['site'] = site.pk
         page_data['title'] = 'changed title'
-        TESTLANG = settings.CMS_SITE_LANGUAGES[site.pk][0]
+        TESTLANG = settings.CMS_LANGUAGES[site.pk][0]['code']
         page_data['language'] = TESTLANG
         superuser = self.get_superuser()
         with self.login_user_context(superuser):

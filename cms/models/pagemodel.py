@@ -530,6 +530,8 @@ class Page(MPTTModel):
             self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
             self.all_languages = list(self.all_languages)
             self.all_languages.sort()
+            for x in xrange(len(self.all_languages)):
+                self.all_languages[x] = str(self.all_languages[x])
         return self.all_languages
 
     def get_cached_ancestors(self, ascending=True):

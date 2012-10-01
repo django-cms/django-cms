@@ -7,7 +7,7 @@ from django.utils import simplejson
 from django.contrib.sites.models import Site
 
 from cms.models import Page
-from cms.utils import permissions, moderator, get_language_from_request
+from cms.utils import permissions, moderator, get_language_from_request, get_language_list
 from cms.utils.permissions import has_global_page_permission
 
 NOT_FOUND_RESPONSE = "NotFound"
@@ -91,12 +91,7 @@ def render_admin_menu_item(request, page, template=None):
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
         
     # languages
-    languages = []
-    if page.site_id in settings.CMS_SITE_LANGUAGES:
-        languages = settings.CMS_SITE_LANGUAGES[page.site_id]
-    else:
-        languages = [x[0] for x in settings.CMS_LANGUAGES]
-    
+    languages = get_language_list(page.site_id)
     context = RequestContext(request, {
         'has_add_permission': permissions.has_page_add_permission(request),
         'site_languages': languages,

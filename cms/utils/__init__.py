@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
-from cms.utils.i18n import get_default_language
+from cms.utils.i18n import get_default_language, get_language_list
 from distutils.version import LooseVersion
 from django.conf import settings
 from django.core.files.storage import get_storage_class
@@ -46,12 +46,12 @@ def get_language_from_request(request, current_page=None):
     """
     language = request.REQUEST.get('language', None)
     if language:
-        if not language in dict(settings.CMS_LANGUAGES).keys():
+        if not language in get_language_list():
             language = None
     if language is None:
         language = getattr(request, 'LANGUAGE_CODE', None)
     if language:
-        if not language in dict(settings.CMS_LANGUAGES).keys():
+        if not language in get_language_list():
             language = None
 
     if language is None and current_page:
