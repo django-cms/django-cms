@@ -30,7 +30,7 @@ eggs
 parts
 bin
 /dist
-*.rst~
+*~
 /docs/*.html
 distribute-*.tar.gz
 include/
