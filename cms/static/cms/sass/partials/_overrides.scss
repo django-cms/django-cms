@@ -1,0 +1,57 @@
+//--------------------------------
+// CSS Reset
+//--------------------------------
+@include html5-boilerplate-reset;
+
+
+//--------------------------------
+// Base Fonts
+//--------------------------------
+@include html5-boilerplate-fonts($base-font-family, $base-font-size, $base-line-height);
+
+
+//--------------------------------
+// Minimal Base Styles
+//--------------------------------
+html { @include force-scrollbar; }
+
+ul, ol { margin-left: $list-left-margin; }
+ol { list-style-type: decimal; }
+
+td, td img { vertical-align: top; }
+
+sub { @include sub; }
+
+sup { @include sup; }
+
+textarea { overflow: auto; }
+
+@include accessible-focus;
+
+@include quoted-pre;
+
+@include hand-cursor-inputs;
+
+@include reset-form-elements;
+
+@include selected-text;
+
+@include webkit-tap-highlight;
+
+@include ie-hacks;
+
+@include no-nav-margins;
+
+
+//--------------------------------
+// Helpers
+//--------------------------------
+.ir { @include image-replacement; }
+
+.hidden { @include hidden; }
+
+.visuallyhidden { @include visually-hidden; }
+
+.clearfix {
+  @include micro-clearfix;
+}

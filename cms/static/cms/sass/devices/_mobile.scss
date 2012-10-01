@@ -1,0 +1,52 @@
+// Imports
+@import "partials/nav";
+
+// Custom styles
+header .row .eightcol { padding-left: 0; padding-right: 0; } // Find a generic way to select
+
+.vr { display: none; }
+
+.logo.left { float: none!important; }
+
+button { 
+	margin: 10px; 
+}
+
+.title-section { 
+	text-align: center;
+	hr {
+		display: none; 
+	}
+	.main-control.right {
+		float: none;
+		padding: 20px 0 10px 0;
+	}
+}
+
+
+section { 
+	@include border-radius(0);
+}
+
+.top-controls section .sub-section { 
+	padding: 20px 0; 
+}
+
+.version-controls, .site-controls { 
+	float: none; text-align: center; padding: 20px 10px; 
+}
+
+.row-lists .row strong { margin-left: 0; }
+
+.page-controls {
+	text-align: center;
+	padding: 10px 0; 
+	.right { 
+		float: none!important; 
+	}
+}
+
+
+.site-controls { padding-bottom: 10px; }
+
+footer { text-align: center; }

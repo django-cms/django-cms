@@ -1,0 +1,126 @@
+$font-color: #444 !default;  //looks better than black: twitter.com/H_FJ/statuses/11800719859
+$link-color: #607890 !default;
+$link-hover-color: #036 !default;
+$link-active-color: #607890 !default;
+$link-visited-color: #607890 !default;
+$selected-font-color: #fff !default;
+$selected-background-color: #ff5e99 !default;
+$list-left-margin: 1.8em !default;
+
+//
+// Minimal base styles
+//
+
+@mixin html5-boilerplate-styles {
+	html { @include force-scrollbar; }
+
+	ul, ol { margin-left: $list-left-margin; }
+	ol { list-style-type: decimal; }
+
+	td { vertical-align: top; }
+
+	sub { @include sub; }
+
+	sup { @include sup; }
+
+	@include accessible-focus;
+
+	@include quoted-pre;
+
+	@include hand-cursor-inputs;
+
+	@include reset-form-elements;
+
+	@include selected-text;
+
+	@include webkit-tap-highlight;
+
+	@include ie-hacks;
+
+	@include no-nav-margins;
+}
+
+// set sub, sup without affecting line-height: gist.github.com/413930
+@mixin sub{
+	font-size: 75%; line-height: 0; position: relative; bottom: -0.25em;
+}
+@mixin sup{
+	font-size: 75%; line-height: 0; position: relative; top: -0.5em;
+}
+
+// accessible focus treatment: people.opera.com/patrickl/experiments/keyboard/test
+@mixin accessible-focus {
+	a:hover, a:active { outline: none; }
+}
+
+// www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap
+@mixin quoted-pre {
+	pre {
+		white-space: pre; white-space: pre-wrap; word-wrap: break-word;
+		padding: 15px;
+	}
+}
+
+// Align checkboxes, radios, text inputs with their label by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css
+@mixin align-input-labels {
+	@warn "The 'align-input-labels' mixin has been deprecated.";
+}
+
+// Hand cursor on clickable input elements
+@mixin hand-cursor-inputs {
+	label, input[type="button"], input[type="submit"], input[type="image"], button { cursor: pointer; }
+}
+
+@mixin reset-form-elements {
+	// 1) Make inputs and buttons play nice in IE: www.viget.com/inspire/styling-the-button-element-in-internet-explorer/
+	// 2) WebKit browsers add a 2px margin outside the chrome of form elements.
+	//    Firefox adds a 1px margin above and below textareas
+	// 3) Set font-size to match <body>'s, and font-family to sans-serif
+	// 4) Align to baseline
+	button, input, select, textarea { width: auto; overflow: visible; margin: 0; font-size: 100%; font-family: sans-serif; vertical-align: baseline; }
+
+	// 1) Remove default scrollbar in IE: www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/
+	// 2) Align to text-top
+	textarea { overflow: auto; vertical-align: text-top; }
+
+	// Remove extra padding and inner border in Firefox
+	input::-moz-focus-inner,
+	button::-moz-focus-inner { border: 0; padding: 0; }
+}
+
+@mixin webkit-reset-form-elements {
+	@warn "The 'webkit-reset-form-elements' mixin has been deprecated. Use 'reset-form-elements' instead.";
+}
+
+// These selection declarations have to be separate.
+// No text-shadow: twitter.com/miketaylr/status/12228805301
+// Also: hot pink!
+@mixin selected-text {
+	::-moz-selection{ background:$selected-background-color; color: $selected-font-color; text-shadow: none; }
+	::selection { background: $selected-background-color; color: $selected-font-color; text-shadow: none; }
+}
+
+// j.mp/webkit-tap-highlight-color
+@mixin webkit-tap-highlight {
+	a:link { -webkit-tap-highlight-color: $selected-background-color; }
+}
+
+// 1) Always force a scrollbar in non-IE
+// 2) Remove iOS text size adjust without disabling user zoom:
+//    www.456bereastreet.com/archive/201012/controlling_text_size_in_safari_for_ios_without_disabling_user_zoom/
+@mixin force-scrollbar {
+	overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;
+}
+
+@mixin ie-hacks {
+	// Bicubic resizing for non-native sized IMG:
+	// code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/
+	.ie7 img { -ms-interpolation-mode: bicubic; }
+
+	.ie6 legend, .ie7 legend { margin-left: -7px; }
+}
+
+@mixin no-nav-margins {
+	// remove margins for navigation lists
+	nav ul, nav li { margin: 0; list-style:none; list-style-image: none; }
+}

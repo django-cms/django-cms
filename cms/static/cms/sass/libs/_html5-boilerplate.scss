@@ -1,0 +1,20 @@
+// HTML5 Boilerplate
+//
+// Credit is left where credit is due.
+// Much inspiration was taken from these projects:
+// - yui.yahooapis.com/2.8.1/build/base/base.css
+// - camendesign.com/design/
+// - praegnanz.de/weblog/htmlcssjs-kickstart
+
+@import "html5-boilerplate/reset";
+@import "html5-boilerplate/fonts";
+@import "html5-boilerplate/styles";
+@import "html5-boilerplate/helpers";
+@import "html5-boilerplate/media";
+
+@mixin html5-boilerplate {
+	@include html5-boilerplate-reset;
+	@include html5-boilerplate-fonts;
+	@include html5-boilerplate-styles;
+	@include html5-boilerplate-helpers;
+}

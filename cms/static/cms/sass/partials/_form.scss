@@ -1,0 +1,398 @@
+// Add the 'required' attribute on your
+// inputs if you want to use these
+input:valid, textarea:valid {}
+input:invalid, textarea:invalid {
+  @include pie; 
+  @include border-radius();
+}
+.no-boxshadow input:invalid,
+.no-boxshadow textarea:invalid { background-color: #f0dddd; }
+
+// Form
+form {
+	small {
+		color: $font-color-light; 
+	}
+	hr {
+		margin: 5px 0;
+	}
+	fieldset {
+		vertical-align: middle;
+		line-height: 2em;
+	}
+	label { 
+		min-width: 160px;
+		color: $font-color-light;
+		display: inline-block;
+		&.required {
+			font-weight: bold;
+		}
+	}
+	// Input
+	input, textarea {
+		@include pie; 
+		@include border-radius();
+		border: 1px solid $button-silver-dark-color;
+		color: $button-silver-font-color;
+		padding: 6px 5px;
+		outline: none;
+		width: 250px;
+	}
+	input[type="checkbox"], input[type="radio"] {
+		border: 0;
+		display: inline;
+		width: auto;
+		margin-right: 6px;
+	}
+	input[type="file"] {
+		@include pie; 
+		@include border-radius();
+		border: 1px solid $button-silver-dark-color;
+		color: $button-silver-font-color;
+		padding: 6px 5px;
+		outline: none;
+		width: 250px;
+	}	
+	select {
+		font-weight: normal;
+	}
+	small {
+		margin-left: 15px;
+	}
+	.form-controls {
+		text-align: right;
+		margin: 15px 0 0 0;
+		p {
+			margin-top: 6px;
+		}
+	}
+	.input-list {
+		display: inline-block;
+		vertical-align: top;
+		line-height: 20px;		
+	}
+	.extra {
+		.right {
+			float: right;
+			margin-right: 10px;
+		}
+	}
+}
+
+/* Standard */ 
+@mixin stripes($stripe-opacity){
+	@include background-size (100% 400%);
+	@include background-image(linear-gradient(-45deg, rgba(255, 255, 255, $stripe-opacity) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, $stripe-opacity) 50%, rgba(255, 255, 255, $stripe-opacity) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0)));			
+}
+
+@mixin button-common-init {
+	@include background-image(linear-gradient($button-silver-light-color, $button-silver-medium-color) !important);
+ 	@include box-shadow($button-silver-light-color 0 0 $button-shadow-width inset !important);	
+ 	background-color: $button-silver-medium-color !important; 
+	border: 1px solid $button-silver-medium-color !important;
+	border-bottom: 1px solid $button-silver-dark-color !important;
+}
+
+@mixin button-common() {
+	@include pie; 
+	@include border-radius(3px);
+	@include button-common-init();
+	color: $button-silver-font-color !important;
+	font-weight: bolder !important;
+	overflow: visible;
+	padding: 5px 10px 6px !important;
+	text-decoration: none !important;
+	width: auto !important;
+	&.small { 
+		padding: 3px 8px 4px !important; 
+	}
+	&:hover, &:active, &.select, &:visited {
+		background: $button-silver-light-color;
+		color: $button-silver-font-color;		
+		text-decoration: none;	
+	}
+	&.animate {
+		@include stripes(.2);
+	}
+}
+
+@mixin button-blue {
+	@include pie; 
+	@include background-image(linear-gradient($button-blue-light-color, $button-blue-medium-color) !important);
+ 	@include box-shadow($button-blue-light-color 0 0 $button-shadow-width inset !important);	
+	background-color: $button-blue-medium-color !important; 
+	border: 1px solid $button-blue-light-color !important;
+	border-bottom: 1px solid $button-blue-dark-color !important;
+	color: $button-blue-font-color !important;
+	&:hover {
+		background: $button-blue-light-color !important;
+		color: $button-blue-font-color !important; 	
+	}
+	&:active { 
+		background: $button-blue-medium-color !important; 
+	}
+	&.animate {
+		@include stripes(.1);
+	}
+}
+
+@mixin button-green {
+	@include pie; 
+	@include background-image(linear-gradient($button-green-light-color, $button-green-medium-color) !important);
+ 	@include box-shadow($button-green-light-color 0 0$button-shadow-width inset !important);	
+	background-color: $button-green-medium-color !important; 
+	border: 1px solid $button-green-light-color !important;	
+	border-bottom: 1px solid $button-green-dark-color !important;
+	color: $button-green-font-color !important;
+	&:hover { 
+		background: $button-green-light-color  !important;
+		color: $button-green-font-color  !important;	 
+	}
+	&:active { 
+		background: $button-green-medium-color  !important; 
+	}
+	&.animate {
+		@include stripes(.1);
+	}
+}
+
+@mixin button-orange {
+	@include pie; 
+	@include background-image(linear-gradient($button-orange-light-color, $button-orange-medium-color));
+ 	@include box-shadow($button-orange-light-color 0 0 $button-shadow-width inset);	
+	background-color: $button-orange-medium-color !important; 
+	border: 1px solid $button-orange-light-color !important;	
+	border-bottom: 1px solid $button-orange-dark-color !important;
+	color: $button-orange-font-color !important;
+	&:hover { 
+		background: $button-orange-light-color; 
+		color: $button-orange-font-color; 	
+	}
+	&:active { 
+		background: $button-orange-medium-color; 
+	}
+	&.animate {
+		@include stripes(.2);
+	}
+}
+
+@mixin button-red {
+	@include pie; 
+	@include background-image(linear-gradient($button-red-light-color, $button-red-medium-color));
+ 	@include box-shadow($button-red-light-color 0 0 $button-shadow-width inset);	
+	background-color: $button-red-medium-color !important; 
+	border: 1px solid $button-red-light-color;	
+	border-bottom: 1px solid $button-red-dark-color;
+	color: $button-red-font-color !important;
+	&:hover { 
+		background: $button-red-light-color; 
+		color: $button-red-font-color; 	
+	}
+	&:active { 
+		background: $button-red-medium-color; 
+	}
+	&.animate {
+		@include stripes(.2);
+	}
+}
+
+@mixin button-black {
+	@include pie; 
+	@include background-image(linear-gradient($button-black-light-color, $button-black-medium-color));
+ 	@include box-shadow($button-black-light-color 0 0 $button-shadow-width inset);	
+	background-color: $button-black-medium-color !important; 
+	border: 1px solid $button-black-light-color;	
+	border-bottom: 1px solid $button-black-dark-color;
+	color: $button-inactive-font-color !important;
+	cursor: default;
+	&:hover {
+		@include background-image(linear-gradient($button-black-light-color, $button-black-medium-color));		
+		border-color: $button-black-medium-color;
+		color: $button-black-font-color;
+
+	}
+	&:active, &.select { 
+		@include background-image(linear-gradient($button-black-light-color, $button-black-medium-color));
+		border-color: $button-black-medium-color;
+		color: $button-black-font-color;
+	}
+	&.animate {
+		@include stripes(.1);
+	}
+}
+
+@mixin button-inactive {
+	@include pie; 
+	@include background-image(linear-gradient($button-inactive-light-color, $button-inactive-medium-color));
+ 	@include box-shadow($button-inactive-light-color 0 0 $button-shadow-width inset);	
+	background-color: $button-inactive-medium-color !important; 
+	border: 1px solid $button-inactive-light-color;	
+	border-bottom: 1px solid $button-inactive-dark-color;
+	color: $button-inactive-font-color;
+	cursor: default;
+	&:hover {
+		@include background-image(linear-gradient($button-inactive-light-color, $button-inactive-medium-color));		
+		border-color: $button-inactive-medium-color;
+		color: $button-inactive-font-color;
+
+	}
+	&:active, &.select { 
+		@include background-image(linear-gradient($button-inactive-light-color, $button-inactive-medium-color));
+		border-color: $button-inactive-medium-color;
+		color: $button-inactive-font-color;
+	}
+	&.animate {
+		@include stripes(.1);
+	}
+}
+
+
+button {
+	@include button-common();
+	&.green {
+		@include button-green();
+	}
+	&.orange {
+		@include button-orange();
+	}
+	&.red {
+		@include button-red();
+	}
+	&.black {
+		@include button-black();
+	}
+	&.inactive, &[disabled] {
+		@include button-inactive();
+	}
+}
+
+input[type="submit"], input[type="button"] {
+	@include button-common();
+	&.orange {
+		@include button-orange();
+	}
+	&.red {
+		@include button-red();
+	}
+	&.black {
+		@include button-black();
+	}
+	&.inactive {
+		@include button-inactive();
+	}	
+	&.default {
+		@include button-blue();
+	}
+}
+
+a.button {
+	text-decoration: none;
+	cursor: pointer;
+	@include button-common();
+	&.green {
+		@include button-green();
+	}
+	&.orange {
+		@include button-orange();
+	}
+	&.red {
+		@include button-red();
+	}
+	&.black {
+		@include button-black();
+	}
+	&.inactive {
+		@include button-inactive();
+	}	
+	&.tab {
+		@include border-radius(0);
+	}	
+}
+
+
+/* Object Tools */
+.object-tools {
+	li {
+		list-style: none;
+		background: none;		
+		&:hover {
+			background: none;
+		}
+		a {
+			background: none !important;
+		}
+	}
+	.addlink { 
+		@include button-common();
+		@include button-green();
+		color: $button-green-font-color !important;
+		margin-top: -22px;
+		margin-right: 10px;
+	}
+	.historylink {
+		@include button-common();
+		margin-top: -22px;	
+		margin-right: 10px;
+				color: $button-green-font-color !important;
+
+	}
+
+}
+
+
+
+/* Tables */
+table {
+	thead th, tfoot td {
+		background: $background-color-ultralight;
+	}
+	td, th {
+		font-family: $base-font-family;
+		padding: 10px 0 !important;
+	}
+	tr {
+		&:first-child th, &:first-child td {
+			border-top: 1px solid $line-color-ultralight;		
+		}
+		th, td {
+			border-bottom: 1px solid $line-color-ultralight;
+
+		}
+	}
+	th {
+		a:link, a:visited, a:link:visited {
+			color: $font-color;
+		}		
+	}
+	.row1 {
+		background: $background-color-white;		
+	}
+	.row2 {
+		background: $background-color-ultralight;		
+	}
+}
+
+.change-list {
+	table {
+		thead {
+			tr {
+				&:first-child th, &:first-child td {
+					background: none;
+				}
+			}
+		}
+		tbody {
+			th {
+				a:link, a:visited, a:link:visited {	
+					color: $link-color;		
+					padding-left: 5px;
+				}
+			}
+			tr.selected {
+				background: $background-color-highlight !important;
+			}	
+		}
+	}
+}
+
+form .aligned p.help { padding-left: 100px !important; }

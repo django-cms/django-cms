@@ -1,0 +1,269 @@
+/* Statuses Mixins */
+
+@mixin message-info {
+	@include pie; 
+	@include background-image(linear-gradient( $info-color-light, $info-color 80%, $info-color-dark)); 
+	.close {
+		@include box-shadow($info-color 0 0 2px inset);
+		background: $info-color;
+		border: 1px solid $info-color;
+		&:hover{
+			@include background-image(linear-gradient( $info-color-light, $info-color-dark)); 
+			@include box-shadow(none);
+			border: 1px solid $info-color;
+		}	
+	}
+}
+@mixin message-success {
+	@include pie; 
+	@include background-image(linear-gradient( $success-color-light, $success-color 80%, $success-color-dark)); 
+	.close {
+		@include box-shadow($success-color 0 0 2px inset);
+		background: $success-color;
+		border: 1px solid $success-color;
+		&:hover{
+			@include background-image(linear-gradient( $success-color-light, $success-color-dark)); 
+			@include box-shadow(none);
+			border: 1px solid $success-color;
+		}	
+	}
+}
+@mixin message-warning {
+	@include pie; 
+	@include background-image(linear-gradient( $warning-color-light, $warning-color 80%, $warning-color-dark)); 
+	.close {
+		@include box-shadow($warning-color 0 0 2px inset);
+		background: $warning-color;
+		border: 1px solid $warning-color;
+		&:hover{
+			@include background-image(linear-gradient( $warning-color-light, $warning-color-dark)); 
+			@include box-shadow(none);
+			border: 1px solid $warning-color;
+		}	
+	}
+}
+
+@mixin message-error {
+	@include pie; 
+	@include background-image(linear-gradient( $error-color-light, $error-color 80%, $error-color-dark)); 
+	.close {
+		@include box-shadow($error-color 0 0 2px inset);
+		background: $error-color;
+		border: 1px solid $error-color;
+		&:hover{
+			@include background-image(linear-gradient( $error-color-light, $error-color-dark)); 
+			@include box-shadow(none);
+			border: 1px solid $error-color;
+		}	
+	}
+}
+
+@mixin stripes($stripe-opacity){
+	@include background-size (60px 60px);
+	@include background-image(linear-gradient(-45deg, rgba(255, 255, 255, $stripe-opacity) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, $stripe-opacity) 50%, rgba(255, 255, 255, $stripe-opacity) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0)));			
+}
+
+/* Messages */
+.messages {
+	color: #fff;
+	font-weight: bold;
+	font-size: 125%;
+	text-align: center;
+	position: fixed;
+	width: 100%;
+	z-index: 1000;
+		
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		//border-bottom: 1px solid $line-color-medium;
+	}
+	li {
+		line-height: 2.9;	
+	}
+	.close {
+		@include pie; 
+		@include border-radius(10px); 
+		display: block;
+		cursor: pointer;
+		color: #fff;
+		height: 20px; 
+		line-height: 2.5;
+		margin-right: 20px; 
+		margin-top: 12px;
+		font-size: 10px;
+		vertical-align: middle; 
+		width: 20px; 
+		&:hover {
+			text-decoration: none;
+		}
+		span {
+			display: block;
+			margin-top: -2px;
+			margin-left: 1px;
+		}
+	}
+	
+	.info {
+		@include message-info;
+	}
+	.success {
+		@include message-success;		
+	}
+	.warning {
+		@include message-warning;
+	}
+	.error {
+		@include message-error;
+	}	
+}
+
+.inline-messages {
+	color: #fff;
+	font-size: 100%;
+	text-align: left;
+	position: relative;
+	.inline-message {
+		@include border-radius(5px);
+		font-weight: bold;
+		padding: 5px 10px;			
+	}
+	.animate {
+		@include stripes(0.1);
+	}	
+	.inline-info {
+		background-color: $info-color;
+		border: 1px solid $info-color-dark;
+	}
+	.inline-success {
+		@include message-success;	
+		border: 1px solid $success-color-dark;
+	}
+	.inline-warning {
+		@include message-warning;
+		border: 1px solid $warning-color-dark;
+	}
+	.inline-error {
+		@include message-error;
+		border: 1px solid $error-color-dark;
+	}	
+}
+
+header {
+	&.header-info {
+		@include message-info;	
+		.meta small {
+			color: #fff;
+		}
+		nav li.internal {
+			@include box-shadow(0 0 0 0);
+		}
+	}
+	&.header-success {
+		@include message-success;	
+		.meta small {
+			color: #fff;
+		}
+		nav li.internal {
+			@include box-shadow(0 0 0 0);
+		}
+	}
+	&.header-warning {
+		@include message-warning;
+		.meta small {
+			color: #fff;
+		}
+		nav li.internal {
+			@include box-shadow(0 0 0 0);
+		}
+	}
+	&.header-error {
+		@include message-error;
+		.meta small {
+			color: #fff;
+		}
+		nav li.internal {
+			@include box-shadow(0 0 0 0);
+		}
+	}
+}
+
+.hint {
+	@include border-radius(5px);
+	border-top: 1px solid $line-color-white;
+	margin-bottom: 15px; 
+	padding: 15px 20px;
+	&.hint-info{
+		@include box-shadow($info-color-light 0 1px 1px 0px);
+		background-color: $background-color-highlighter;
+		color: $info-color;
+		text-align: center;
+		h1, h2, h3, h4, h5, h6 {
+			margin: 5px 0;
+			color: $info-color;
+		}
+		p {
+			margin-top: 5px;
+		}
+		a {
+			text-decoration: underline;
+			&:hover {
+				color: $info-color-dark;
+			}
+		}
+		.close {
+			background: url(../images/sprite.png) no-repeat 0 -100px; 
+			display: inline-block; 
+			height: 16px; 
+			width: 16px;
+		}
+	}
+	&.hint-success {
+		@include box-shadow($success-color-light 0 1px 1px 0px);
+		background-color: $success-color-ultralight;
+		color: $success-color;
+		font-size: 120%;
+		.icon {
+			margin-right: 10px;
+		}
+		span {
+			display: inline-block;
+		}
+	}	
+	&.hint-warning {
+		@include box-shadow($warning-color-light 0 1px 1px 0px);
+		background-color: $warning-color-ultralight;
+		color: $warning-color;
+		font-size: 120%;
+		.icon {
+			margin-right: 10px;
+		}
+		span {
+			display: inline-block;
+		}
+		.button {
+			margin-top: -5px;
+		}
+	}	
+	&.hint-error {
+		@include box-shadow($error-color-light 0 1px 1px 0px);
+		background-color: $error-color-ultralight;
+		color: $error-color;
+		font-size: 120%;
+		.icon {
+			margin-right: 10px;
+		}
+		span {
+			display: inline-block;
+		}
+		.button {
+			margin-top: -5px;
+			&.small {
+				margin-top: -2px;
+			}
+		}
+	}	
+	
+	
+}

@@ -1,0 +1,14 @@
+nav li { 
+	@include box-shadow(none);  
+	@include border-radius(0);
+	float: none; 
+	margin: 0;
+	padding: 7px 20px;
+	&:last-child {
+		border-bottom: 1px solid #444;
+
+	}
+}
+
+div.meta { float: none; text-align: center; }	
+

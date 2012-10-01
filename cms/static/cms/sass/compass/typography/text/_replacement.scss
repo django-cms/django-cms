@@ -1,0 +1,34 @@
+// Hides html text and replaces it with an image.
+// If you use this on an inline element, you will need to change the display to block or inline-block.
+// Also, if the size of the image differs significantly from the font size, you'll need to set the width and/or height.
+//
+// Parameters:
+//
+// * `img` -- the relative path from the project image directory to the image.
+// * `x` -- the x position of the background image.
+// * `y` -- the y position of the background image.
+@mixin replace-text($img, $x: 50%, $y: 50%) {
+  @include hide-text;
+  background: {
+    image: image-url($img);
+    repeat: no-repeat;
+    position: $x $y;
+  };
+}
+
+// Like the `replace-text` mixin, but also sets the width
+// and height of the element according the dimensions of the image.
+@mixin replace-text-with-dimensions($img, $x: 50%, $y: 50%) {
+  @include replace-text($img, $x, $y);
+  width: image-width($img);
+  height: image-height($img);
+}
+
+// Hides text in an element so you can see the background.
+@mixin hide-text {
+  $approximate_em_value: 12px / 1em;
+  $wider_than_any_screen: -9999em;
+  text-indent: $wider_than_any_screen * $approximate_em_value;
+  overflow: hidden;
+  text-align: left;
+}

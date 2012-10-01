@@ -1,0 +1,67 @@
+// Here's where we define some default constants
+@import "partials/base";
+
+// Then we'll import the compass extension
+@import "libs/html5-boilerplate";
+
+// Now, you can simply include everything
+// (except media) by uncommeting this line
+@include html5-boilerplate;
+
+// Compass mixins
+@import "compass";
+
+// Note: Each element that has PIE enabled on it will add about 10ms to your page load.
+@import "libs/pie";
+
+// Set this to wherever you end up putting your behavior file.
+//
+// **Note:** this file must be served as a root-relative resource or
+// else IE will interpret it as relative to the current webpage
+// instead of the stylesheet.
+//
+// **Also Note:** this file must be delivered with a mime-type of:
+//
+//    text/x-component
+$pie-behavior: url("/static/stylesheets/PIE.htc");
+
+// It is suggested that you use Sass's @extend directive to apply the PIE
+// behavior to your elements. Setting this variable will tell the `pie` mixin
+// to extend it. Or you can just extend the base class yourself.
+$pie-base-class: pie-element;
+
+
+// Finally, put your own styles in these partials
+// and add more as needed (i.e. forms, tables, nav)
+@import "partials/djangocms";
+@import "partials/fonts";
+@import "partials/form";
+@import "partials/icons";
+@import "partials/list";
+@import "partials/messages";
+@import "partials/nav";
+@import "partials/notifications";
+@import "partials/page";
+@import "partials/shared";
+@import "partials/table";
+
+
+// Media should come last
+//@import "partials/media";
+
+// Layout for pad version
+@media only screen and (max-width: 1024px) {
+	@import "devices/pad";
+}
+
+
+// Layout for mobile version
+/*@media handheld, only screen and (max-width: 767px) {
+	@import "devices/mobile";
+}
+
+
+// Provide higher res assets for iPhone 4
+@media only screen and (-webkit-min-device-pixel-ratio: 2) { 
+	@import "devices/retina";
+}*/

@@ -1,0 +1,42 @@
+/* Use the following CSS code if you want to have a class per icon */
+.addlink,
+.changelink,
+#changelist-search label,
+.deletelink 
+{
+	background: none !important;
+	padding-left: 10px;
+	&:hover {
+		text-decoration: none !important;
+	}
+	
+}
+
+.addlink:before,
+.changelink:before,
+#changelist-search label:before,
+.deletelink:before
+{
+	font-family: 'django-admin-icons';
+	font-style: normal;
+	speak: none;
+	font-weight: normal;
+	font-size: 75%;
+	-webkit-font-smoothing: antialiased;
+	padding-right: 5px;
+}
+
+.addlink { color: $success-color !important; }
+.addlink:before { content: "\22";  }
+
+.changelink:before { content: "\21"; }
+#changelist-search label:before { content: "\23"; }
+.deletelink:before { content: "\24"; }
+
+.actionlist {
+	.addlink { padding-left: 0; }
+}
+
+#changelist-search label { font-weight: bold; }
+#changelist-search label img { display: none;}
+.help-tooltip { display: none; }

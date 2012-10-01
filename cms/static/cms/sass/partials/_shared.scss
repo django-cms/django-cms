@@ -1,0 +1,258 @@
+/* Window */
+.window { 
+	left: 50%;
+	margin-left: -155px; 
+	position: absolute;
+	top: 25%;
+	width: 310px; 
+	fieldset {
+		margin-bottom: 10px;
+		input { 
+			width: 300px; 
+		}
+		label { 
+			display: block;	
+			margin-bottom: 5px;	
+		}
+	}
+	.logo { 
+		margin-top: -12px; 
+	}
+}
+
+/* Big Form */
+.big-form {
+	background: $background-color-ultralight;
+	font-size: 125%;	
+	margin-bottom: 20px;
+	p {
+		margin-bottom: 0;
+	}
+	input {
+		padding: 9px;
+	}
+	.button {
+		margin-top: 0;
+	}
+	.cost {
+		display: block;
+		margin-top: 3px;
+		position: relative;
+		width: 100px;
+		strong {
+			font-size: 125%;
+			display: block;
+			margin-top: -10px;
+		}
+		small {
+			display: block;
+			color: $font-color-ultralight;
+			font-size: 10px;
+		}
+	}
+}
+
+.counter {
+	@include border-radius(7px);
+	background: $background-color-white;
+	border: 1px solid $line-color-light;
+	display: inline-block;
+	margin: -11px 10px;
+	padding: 5px;
+	strong {
+		display: inline-block;
+		margin: 0 10px;
+	}
+	.button {
+		display: inline-block;
+		text-align: center;
+		width: 10px;		
+	}
+
+}
+
+#signup.window {
+	position: relative;
+	top: 20px;
+	margin-bottom: 60px;
+	padding-bottom: 40px;
+	select {
+		width: 310px;
+	}
+}
+
+/* Version */
+.version { color: $font-color-light;}
+
+
+.odd { background: $background-color-white; }
+.even { background: $background-color-ultralight; }
+
+.odd .odd { background: $background-color-ultralight; }
+.odd .even { background: $background-color-white; }
+
+.collected { color: $success-color-dark; }
+.open, .past_due { color: $warning-color-dark; }
+.failed { color: $error-color-dark; }
+
+
+.underlay {
+	input {
+		width: 100%;
+	}
+}
+
+.errors {
+	color: $error-color;
+	ul {
+		margin: 20px 0;
+		padding-left: 0;
+		padding-right: 20px;
+		li {
+			list-style: none;
+			margin-left: 0px;
+		}
+	}
+}
+
+.new {
+	color: $success-color;
+}
+
+.price {
+	@include pie; 
+	@include border-radius();
+	background: $info-color;
+	color: $font-color-white;
+	font-weight: bold;
+	line-height: 13px;
+	padding: 3px 6px 3px 6px;
+	position: relative;
+	margin: -1px 2px 0 0;
+	font-size: 10px;
+	&.free {
+		background: $success-color-light;
+	}
+}
+
+.tag {
+	@include pie; 
+	@include border-radius();
+	@include background-image(linear-gradient($button-silver-light-color, $button-silver-medium-color));
+	@include box-shadow($button-silver-light-color 0 0 $button-shadow-width inset);	
+	color: $button-silver-font-color;
+	border: 1px solid $button-silver-dark-color;
+	line-height: 13px;
+	padding: 3px 19px 3px 6px;
+	position: relative;
+	margin: -1px 2px 0 0;
+}
+.tag-delete {
+	position: absolute;
+	right: 5px;
+	top: 6px;
+	display: block;
+	width: 8px;
+	height: 9px;
+	font-size: 1px;
+	background: url(../images/chosen-sprite.png) right top no-repeat;	
+	&:hover {
+		background-position: right -9px;
+	}
+}
+
+/* Filter */
+.filters {
+	.filter {
+		@include pie;
+		@include border-radius(10px);
+		background: $background-color-ultralight;
+		border: 1px solid $line-color-light;
+		color: $font-color-light;
+		font-size: 11px;
+		padding: 3px 15px 4px 15px;
+		margin-right: 5px;
+		&:hover {
+			background: $background-color-light;	
+			border: 1px solid $line-color-medium;
+			color: $font-color-light;
+			text-decoration: none;
+		}
+		
+		&.active {
+			@include box-shadow(#777 0 0 5px inset);
+			border: none;
+			background: #bbb;	
+			font-weight: bold;
+			color: $font-color-white;	
+		}
+	}
+
+}
+
+/* Circle Status */
+.status { 
+	@include pie; 
+	@include border-radius(5px); 
+	display: inline-block; 
+	height: 10px; 
+	margin-right: 5px; 
+	margin-top: -3px;
+	text-indent: -1000em; 
+	vertical-align: middle; 
+	width: 10px; 
+	&.new { 
+		background: $info-color; 
+	}
+	&.deployed { 
+		background: $success-color; 
+	}
+	&.offline { 
+		background: $inactive-color; 
+	}
+	&.error {
+		background: $error-color;
+	}
+	&.public, &.private, &.sandbox, &.certified {
+		@include border-radius(0);
+		height: 15px;
+		width: 15px;
+	}
+	&.public {
+		background: url(../images/sprite.png) 0 -80px no-repeat!important;
+	}
+	&.private {
+		background: url(../images/sprite.png) -15px -80px no-repeat!important;
+	}	
+	&.sandbox {
+		background: url(../images/sprite.png) -17px -100px no-repeat!important;
+	}	
+	&.certified {
+		background: url(../images/sprite.png) -34px -100px no-repeat!important;
+	}	
+
+}
+
+/* Step Navigation */
+.step-internal {
+	margin-left: 0px;
+	margin-top: 20px;
+	width: 960px;
+	height: 32px;
+	&.three-step {
+		background: url('/static/images/step-sprite_3.png');
+	}
+
+	&.step1 {
+		background-position: 0 0;	
+	}
+	&.step2 {
+		background-position: 0 -40px;	
+	}
+	&.step3 {
+		background-position: 0 -80px;	
+	}
+}
+
+
+

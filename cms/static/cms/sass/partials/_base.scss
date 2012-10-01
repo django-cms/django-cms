@@ -1,0 +1,147 @@
+// This file must be imported before loading html5-boilerplate
+$base-font-family: unquote('sans-serif');  // default font-family
+$base-font-size: 13px;  // default font-size for YUI fonts
+$base-line-height: 1.231;  // default line-height for YUI fonts
+
+
+$info-color-ultralight: #addef6;
+$info-color-light: #5bbdee;
+$info-color: #029eee;	
+$info-color-dark: #0072ac;
+
+$success-color-ultralight: #f5fbe1;
+$success-color-light: #bcd077;
+$success-color: #9ab933;				
+$success-color-dark: #8fad28;
+
+$warning-color-ultralight: #fffde4;
+$warning-color-light: #ffc600;
+$warning-color: #ffb400;
+$warning-color-dark: #ffa800;
+
+$error-color-ultralight: #fff3f3;
+$error-color-light: #ef4a4a;
+$error-color: #e80101;
+$error-color-dark: #d50101;
+
+$inactive-color: #ccc;
+
+
+// Background
+$background-color-white: #fff;
+$background-color-ultralight: #fcfcfc;
+$background-color-light: #f1f1f1;
+$background-color-medium: #464b50 ;
+$background-color-dark: #595f65;
+$background-color-highlight: #f6fcff;
+
+$background-color-ok-light: #e6f1bf;
+$background-color-ok: #d3e1a3;
+$background-color-fail: #f2d1cf;
+$background-color-highlighter: #f1faff;
+$background-color-transparent: rgba(255,255,255, .2);
+
+$button-font-color-yellow: #fff;
+$button-font-color-yellow-hover: #fff;
+
+$button-border-color-yellow: #f6c509;
+$button-shadow-color-yellow: #fff;
+$button-background-color-top-yellow: #ffeb4c;
+$button-background-color-bottom-yellow: #ffca00;
+$button-background-color-top-yellow-hover: #ffeb4c;
+$button-background-color-bottom-yellow-hover: #ffca00;
+
+// Navigation
+$navigation-color-light: #5d6267;
+$navigation-color-medium: #464b50;
+$navigation-color-highlight: #676E74;
+$navigation-color-active-light: #fff;
+$navigation-color-active-medium: #fcfcfc;
+
+// Font
+$font-color-white: #fff;
+$font-color-ultralight: #ccc;
+$font-color-light: #888;
+$font-color-medium: #666; 
+$font-color-dark: #222;
+$font-color: #444;
+
+// Border
+$default-border-radius: 5px;
+$line-color-white: #fff;
+$line-color-ultralight: #f3f3f3;
+$line-color-light: #ddd;
+$line-color-medium: #ccc;
+$line-color-dark: #444;
+
+
+// Links
+$link-color: #029eee;
+$link-hover-color: #2070b3;
+$link-active-color: #2070b3;
+$link-visited-color: #029eee;
+
+
+// Selected Text
+$selected-font-color: none;  // color for selected text
+$selected-background-color: none;  // bg-color for selected text
+
+// List
+$list-left-margin: 2em;  // left margin for ul an ol
+
+// Buttons
+
+/* Dimensions */
+$button-shadow-width: 2px;
+
+/* inactive */
+$button-inactive-light-color: #fff;
+$button-inactive-medium-color: #efefef;
+$button-inactive-dark-color: #eee;
+$button-inactive-font-color: #bbb;
+
+/* Silver */
+$button-silver-light-color: #fff;
+$button-silver-medium-color: #efefef;
+$button-silver-dark-color: #ccc;
+$button-silver-font-color: #555;
+
+/* Blue */ 
+$button-blue-light-color: #5bbdee;
+$button-blue-medium-color: #029eee;
+$button-blue-dark-color: #0072ac;
+$button-blue-font-color: #fff;
+
+/* Orange */ 
+$button-orange-light-color: #efaa4a;
+$button-orange-medium-color: #e88801;
+$button-orange-dark-color: #de8200;
+$button-orange-font-color: #fff;
+
+/* Red */ 
+$button-red-light-color: #ef4a4a;
+$button-red-medium-color: #e80101;
+$button-red-dark-color: #d50101;
+$button-red-font-color: #fff;
+
+
+/* Green */ 
+$button-green-light-color: #bcd077;
+$button-green-medium-color: #9ab933;
+$button-green-dark-color: #8fad28;
+$button-green-font-color: #fff;
+
+/* Black */ 
+$button-black-light-color: #5d6267;
+$button-black-medium-color: #464b50;
+$button-black-dark-color: #333;
+$button-black-font-color: #fff;
+
+/* Paddings */
+$section-padding: 30px;
+$top-section-padding: 15px;
+
+/* Template Editor */
+$editor-height: 100%;
+$tree-width: 250px;
+

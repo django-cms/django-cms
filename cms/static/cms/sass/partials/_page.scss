@@ -1,0 +1,266 @@
+@import "compass/css3";
+
+//-----------------------------------------------
+// The following html5-boilerplate styles should
+// probably be customized for each site
+//-----------------------------------------------
+html, body {
+	height: 100%;  
+	min-width: 1024px;
+}
+
+html{
+	overflow: auto !important; 
+}
+
+body { 
+	background: url('../images/bg-pattern-light.jpg') $background-color-ultralight repeat!important;
+}
+
+body, select, input, textarea {
+  color: $font-color;
+}
+
+h1 { font-size: 150%; color: $font-color-medium; font-weight: bold; margin: 20px 10px;  }
+h2 { font-size: 130%; color: $font-color-medium; font-weight: bold; line-height: 1.75em;}
+h3 { font-size: 120%; color: $font-color; font-weight: bold; }
+h4 { font-size: 110%; color: $font-color-medium; font-weight: bold;}
+h5 { font-size: 100%; color: $font-color; }
+h6 { font-size: 100%; color: $font-color-medium; }
+
+a, a:link { 
+	color: $link-color; 
+	text-decoration: none; 
+	&:hover {
+		color: $link-hover-color; 
+		text-decoration: underline; 
+	}
+	&:active { 
+		color: $link-active-color; 
+	}
+	&:visited {
+		color: $link-visited-color; 
+	}
+}
+
+p { font-weight: normal; margin-bottom: 6px; }
+
+code {
+  font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  background: inherit;
+  color: #666;
+  font-size: 11px;
+  strong {
+    color: #930;
+  }
+}
+
+pre {
+  font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  background: inherit;
+  color: #666;
+  font-size: 11px;
+  &.literal-block {
+	background: #eee;  
+  }
+}
+
+/* Rulers */
+div hr { 
+	background: $line-color-light;
+	margin: 20px 0;
+	border: none; 
+}
+
+strong { font-weight: bold; }
+.small, small { font-size: 85%; margin-top: 0; }
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+::selection {
+	background: #AFD7FF;
+	color: #444;
+	text-shadow: none;
+}
+
+::-moz-selection {
+	background: #AFD7FF;
+	color: #444;
+	text-shadow: none;
+}
+
+//-----------------------------------
+// Add your own custom styles below
+//-----------------------------------
+
+/* Header */ 
+#header { 
+	@include pie; 
+	@include background-image(linear-gradient($background-color-dark, $background-color-medium));
+	background-color: $background-color-dark; 
+	color: $font-color-white !important; 
+	height: 46px;
+}
+
+#branding {
+	h1 {
+		color: $font-color-white;
+		padding-top: 3px;
+	}
+}
+
+/* Box Mixin */
+@mixin box(){
+	@include border-radius(5px);
+	@include box-shadow($line-color-light 0 2px 3px 0px);
+	background: $background-color-white;
+	border: 0;
+	border-top: 1px solid #F6F6F6;
+	margin-bottom: 5px;
+	padding: 0;
+	h2, h3, h4, h5, h6 {
+		margin-bottom: 12px;
+		margin-top: 0;
+	}
+}
+
+/* Dashboard */
+.dashboard {
+	#content {
+		width: 740px;
+	}
+	.module {
+		padding: 0 30px 10px 30px !important;
+	}
+}
+
+/* Module */
+#content-main {
+	.module {
+		@include box();
+		margin-bottom: 10px;
+		h2 {
+			margin-bottom: 12px;
+			margin-top: 0;
+		}
+		caption {
+			background: none;
+			color: $font-color-medium; 
+			font-size: 130%; 
+			font-weight: bold;
+			line-height: 1.75em;
+			margin-bottom: 10px;
+			padding: 0;
+			a.section:link, a.section:visited {
+				color: $font-color-medium; 
+			}
+			
+		}
+	}
+	.form-row {
+		border-bottom: none;
+	}
+	
+	.submit-row {
+		@include box();
+		border-top: none;
+		background: $background-color-transparent !important;
+		padding: 10px;
+	}
+	.selector {
+		.selector-available, .selector-chosen {
+			@include border-radius(5px);		
+			border: 1px solid $line-color-light;
+			h2 {
+				color: $font-color !important;			
+				background: none !important;
+				border: none;
+				margin-bottom: 0;		 
+			}
+			input {
+				width: 252px;
+			}
+		}
+		.selector-filter {
+			border: none;
+		}
+		select[multiple] {
+			border: 1px solid $line-color-light;			
+			border-left: none;
+			border-right: none;
+		}
+	}
+}
+
+#content-related {
+	.module {
+		@include border-radius(5px);		
+		border: 1px solid $line-color-light;
+		background: $background-color-transparent !important;
+		margin-left: 10px;
+		padding: 10px 20px !important;
+		ul.actionlist {
+			padding: 0;
+		}
+		h2 {
+			background: none;
+			color: $font-color-light;
+			padding: 0 0 5px 0;
+		}
+		h3 {
+			border-bottom: 1px solid $line-color-light;
+			line-height: 20px;
+			margin: 0 0 5px 0;
+			padding: 0;		
+		}
+		p {
+			padding: 0;
+		}
+	}	
+}
+
+#changelist {
+	#toolbar {
+		background: none !important;
+		border: 0 !important;
+		form {
+			#searchbar {
+				padding: 4px 5px 6px 5px !important;
+			}
+		}
+	}
+	#changelist-search {
+		div {
+			float: right;
+			margin-right: 2px;
+		}
+		label { 
+			min-width: auto;
+			font-size: 150%; 
+		}
+	}
+	#result_list {
+		margin: 0 !important;
+	}
+	.actions {
+		background: none !important;
+		border: 0 !important;
+		padding: 0px 3px 6px 3px !important;
+	}
+	.paginator {
+		border-top: none !important;
+		border-bottom: none !important;
+		background: none !important;
+	}
+}
+
+div.breadcrumbs {
+	background: $background-color-ultralight;
+}
+
