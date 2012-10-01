@@ -95,7 +95,7 @@ CMS_SOFTROOT = False
 #            'public': False,
 #            }
 #    ],
-#    'defaults': {
+#    'default': {
 #        'fallbacks': ['en', 'de', 'fr'],
 #        'redirect_on_fallback':True,
 #        'public': False,
@@ -103,7 +103,7 @@ CMS_SOFTROOT = False
 #        }
 #}
 
-CMS_LANGUAGES = {}
+#CMS_LANGUAGES = {}
 
 
 CMS_SITE_CHOICES_CACHE_KEY = 'CMS:site_choices'

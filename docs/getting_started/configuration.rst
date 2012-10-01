@@ -208,94 +208,128 @@ Currently the following variables are available:
 I18N and L10N
 *************
 
-.. setting:: CMS_HIDE_UNTRANSLATED
-
-CMS_HIDE_UNTRANSLATED
-=====================
-
-Default: ``True``
-
-By default django CMS hides menu items that are not yet translated into the
-current language. With this setting set to False they will show up anyway.
-
 .. setting:: CMS_LANGUAGES
 
 CMS_LANGUAGES
 =============
 
-Default: Value of :setting:`django:LANGUAGES`
+Default: Value of :setting:`django:LANGUAGES` converted to this format
 
 Defines the languages available in django CMS.
 
 Example::
 
-    CMS_LANGUAGES = (
-        ('fr', gettext('French')),
-        ('de', gettext('German')),
-        ('en', gettext('English')),
-    )
+    CMS_LANGUAGES = {
+        1: [
+            {
+                'code': 'en',
+                'name': gettext('English'),
+                'fallbacks': ['de', 'fr'],
+                'public': True,
+                'hide_untranslated': True,
+                'redirect_on_fallback':False,
+            },
+            {
+                'code': 'de',
+                'name': gettext('Deutsch'),
+                'fallbacks': ['en', 'fr'],
+                'public': True,
+            },
+            {
+                'code': 'fr',
+                'name': gettext('French'),
+                'public': False,
+            },
+        ],
+        2: [
+            {
+                'code': 'nl',
+                'name': gettext('Dutch'),
+                'public': True,
+                'fallbacks': ['en'],
+            },
+        ],
+        'default': {
+            'fallbacks': ['en', 'de', 'fr'],
+            'redirect_on_fallback':True,
+            'public': False,
+            'hide_untranslated': False,
+        }
+    }
 
 .. note:: Make sure you only define languages which are also in :setting:`django:LANGUAGES`.
 
-.. setting:: CMS_LANGUAGE_FALLBACK
+CMS_LANGUAGES has different options where you can granular define how different languages behave.
 
-CMS_LANGUAGE_FALLBACK
-=====================
+On the first level you can define SITE_IDs and default values. In the example above we define two sites. The first site
+has 3 languages (English, German and French) and the second site has only Dutch. The `default` node defines
+default behavior for all languages. You can overwrite the default settings with language specific properties.
+For example we define `hide_untranslated` as False globally. The English language overwrites this behavior.
 
+Every language node needs at least a `code` and a `name` property. `code` is the iso 2 code for the language. And
+name is the English name of the language.
+
+.. note:: With a gettext() lambda function you can make language names translatable. To enable this add
+          `gettext = lambda s: s` at the beginning of your settings file
+
+What are the properties a language node can have?
+
+.. setting::code
+
+code
+----
+
+String. Iso 2 code of the language.
+
+Example: ``"en"``.
+
+.. note:: Is required for every language.
+
+name
+----
+String. The English name of the language.
+
+.. note:: Is required for every language.
+
+.. setting::public
+
+public
+------
+Is this language accessible in the frontend? For example, if you decide you want to add a new language to your page
+but don't want to show it to the world yet.
+
+Type: Boolean
 Default: ``True``
 
-This will redirect the browser to the same page in another language if the
-page is not available in the current language.
+.. setting::fallbacks
 
-.. setting:: CMS_LANGUAGE_CONF
+fallbacks
+---------
 
-CMS_LANGUAGE_CONF
-=================
+A list of languages that are used if a page is not translated yet. The ordering is relevant.
 
-Default: ``{}``
+Example: ``['de', 'fr']``
+Default: ``[]``
 
-Language fallback ordering for each language.
+.. setting::hide_untranslated
 
-Example::
+hide_untranslated
+-----------------
+Should untranslated pages be hidden in the menu?
 
-    CMS_LANGUAGE_CONF = {
-        'de': ['en', 'fr'],
-        'en': ['de'],
-    }
+Type: Boolean
+Default: ``True``
 
-.. setting:: CMS_SITE_LANGUAGES
+.. setting::redirect_on_fallback
 
-CMS_SITE_LANGUAGES
-==================
+redirect_on_fallback
+--------------------
 
-Default: ``{}``
+If a page is not available should there be a redirect to a language that is, or should the content be displayed
+in the other language in this page?
 
-If you have more than one site and :setting:`CMS_LANGUAGES` differs between
-the sites, you may want to fill this out so that when you switch between sites
-in the admin you only get the languages available to that particular site.
-
-Example::
-
-    CMS_SITE_LANGUAGES = {
-        1:['en','de'],
-        2:['en','fr'],
-        3:['en'],
-    }
-
-.. setting:: CMS_FRONTEND_LANGUAGES
-
-CMS_FRONTEND_LANGUAGES
-======================
-
-Default: Value of :setting:`CMS_LANGUAGES`
-
-A list of languages django CMS uses in the frontend. For example, if
-you decide you want to add a new language to your page but don't want to
-show it to the world yet.
-
-Example::
-
-    CMS_FRONTEND_LANGUAGES = ("de", "en", "pt-BR")
+Type: Boolean
+Default:``True``
 
 
 **************
