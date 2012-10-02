@@ -129,4 +129,10 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         lang_settings[1][0]['fallbacks'] = []
         lang_settings[1][1]['fallbacks'] = []
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
-            self.assertRaises(Http404, details, request, '')
+            response = self.client.get("/de/")
+            self.assertEquals(response.status_code, 404)
+        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings['default']['redirect_on_fallback'] = False
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+            response = self.client.get("/de/")
+            self.assertEquals(response.status_code, 200)

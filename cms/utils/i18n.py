@@ -84,10 +84,15 @@ def get_language_object(language_code, site_id=None):
                 else:
                     language['fallbacks'] = fallbacks
             if not language.has_key('public'):
-                if settings.CMS_LANGUAGES.has_key('defaults'):
+                if settings.CMS_LANGUAGES.has_key('default'):
                     language['public'] = settings.CMS_LANGUAGES['default'].get('public', True)
                 else:
                     language['public'] = True
+            if not language.has_key('redirect_on_fallback'):
+                if settings.CMS_LANGUAGES.has_key('default'):
+                    language['redirect_on_fallback'] = settings.CMS_LANGUAGES['default'].get('redirect_on_fallback', True)
+                else:
+                    language['redirect_on_fallback'] = True
             if not language.has_key('hide_untranslated'):
                 if settings.CMS_LANGUAGES.has_key('default'):
                     language['hide_untranslated'] = settings.CMS_LANGUAGES['default'].get('hide_untranslated', True)
@@ -141,6 +146,17 @@ def get_fallback_languages(language, site_id=None):
     site_id = get_site(site_id)
     language = get_language_object(language, site_id)
     return language['fallbacks']
+
+def get_redirect_on_fallback(language, site_id=None):
+    """
+    returns if you should redirect on language fallback
+    :param language:
+    :param site_id:
+    :return: Boolean
+    """
+    site_id = get_site(site_id)
+    language = get_language_object(language, site_id)
+    return language['redirect_on_fallback']
 
 def hide_untranslated(language, site_id=None):
     """

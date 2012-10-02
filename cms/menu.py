@@ -272,7 +272,7 @@ class CMSMenu(Menu):
                     nodes.append(page_to_node(page, home, home_cut))
                     ids.remove(page.pk)
 
-        if ids: # get fallback languages
+        if ids and not hide_untranslated(lang): # get fallback languages if allowed
             fallbacks = get_fallback_languages(lang)
             for lang in fallbacks:
                 titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))

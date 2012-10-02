@@ -744,8 +744,10 @@ class PagesTestCase(CMSTestCase):
 
             # trigger the apphook query so that it doesn't get in our way
             reverse('pages-root')
+            # trigger the get_languages query so it doesn't get in our way
+            context = self.get_context()
+            context['request'].current_page.get_languages()
             with self.assertNumQueries(4):
-                context = self.get_context()
                 for i, placeholder in enumerate(placeholders):
                     content = get_placeholder_content(context, context['request'], page, placeholder.slot, False)
                     for j in range(5):
