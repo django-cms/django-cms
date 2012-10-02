@@ -64,5 +64,32 @@ a.active.selector-chooseall {  }
 .selector-remove:before, .selector-add:before { color: $font-color; }
 .inline-group div.add-row a { color: $success-color !important; padding-left: 5px !important; }
 
+/* Shortcuts */
+.admin_shortcuts .shortcuts li a {
+	background: none !important;
+	padding-left: 10px;
+	&:hover {
+		text-decoration: none !important;
+	}
+}
+
+.admin_shortcuts .shortcuts li a:before
+{
+	font-family: 'django-admin-icons';
+	font-style: normal;
+	speak: none;
+	font-weight: normal;
+	font-size: 200%;
+	-webkit-font-smoothing: antialiased;
+	padding-right: 5px;
+	vertical-align: middle;
+}
+
+.admin_shortcuts .shortcuts li a.pages:before { content: "\27"; }
+.admin_shortcuts .shortcuts li a.home:before { content: "\28"; }
+.admin_shortcuts .shortcuts li a.user:before { content: "\29"; }
+.admin_shortcuts .shortcuts li a.files:before { content: "\2a"; }
+.admin_shortcuts .shortcuts li a.contact:before { content: "\2b"; }
+
 /* Sepcials */
 .selector ul.selector-chooser { @include border-radius(10px); background: $background-color-light !important; height: 44px !important; }

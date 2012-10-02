@@ -1198,8 +1198,56 @@ a.active.selector-chooseall:before,
   padding-left: 5px !important;
 }
 
-/* Sepcials */
+/* Shortcuts */
 /* line 68, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a {
+  background: none !important;
+  padding-left: 10px;
+}
+/* line 71, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a:hover {
+  text-decoration: none !important;
+}
+
+/* line 77, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a:before {
+  font-family: 'django-admin-icons';
+  font-style: normal;
+  speak: none;
+  font-weight: normal;
+  font-size: 200%;
+  -webkit-font-smoothing: antialiased;
+  padding-right: 5px;
+  vertical-align: middle;
+}
+
+/* line 88, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.pages:before {
+  content: "\27";
+}
+
+/* line 89, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.home:before {
+  content: "\28";
+}
+
+/* line 90, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.user:before {
+  content: "\29";
+}
+
+/* line 91, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.files:before {
+  content: "\2a";
+}
+
+/* line 92, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.contact:before {
+  content: "\2b";
+}
+
+/* Sepcials */
+/* line 95, ../sass/partials/_icons.scss */
 .selector ul.selector-chooser {
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
@@ -2005,23 +2053,54 @@ div.breadcrumbs a:hover {
 }
 
 /* line 132, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts {
+  box-shadow: none;
+  background: #595f65;
+  border-top: 1px solid #444444;
+  color: #cccccc;
+}
+/* line 137, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts h2 {
+  border-bottom: 1px solid #444444;
+}
+/* line 141, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a {
+  background: #464b50 10px 50% no-repeat;
+  border: 1px solid #444444;
+  padding: 20px 10px 20px 15px;
+}
+/* line 145, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a:hover {
+  background-color: #595f65;
+}
+/* line 148, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a .count {
+  color: #888888;
+}
+/* line 151, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a .count_new {
+  background: #029eee;
+  border-color: #5bbdee;
+}
+
+/* line 159, ../sass/partials/_page.scss */
 #user-tools {
   padding: 20px 25px;
 }
 
 /* Box Mixin */
 /* Dashboard */
-/* line 154, ../sass/partials/_page.scss */
+/* line 181, ../sass/partials/_page.scss */
 .dashboard #content {
   width: 740px;
 }
-/* line 157, ../sass/partials/_page.scss */
+/* line 184, ../sass/partials/_page.scss */
 .dashboard .module {
   padding: 0 30px 10px 30px !important;
 }
 
 /* Module */
-/* line 164, ../sass/partials/_page.scss */
+/* line 191, ../sass/partials/_page.scss */
 #content-main .module {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2040,12 +2119,12 @@ div.breadcrumbs a:hover {
   padding: 0;
   margin-bottom: 10px;
 }
-/* line 146, ../sass/partials/_page.scss */
+/* line 173, ../sass/partials/_page.scss */
 #content-main .module h2, #content-main .module h3, #content-main .module h4, #content-main .module h5, #content-main .module h6 {
   margin-bottom: 12px;
   margin-top: 0;
 }
-/* line 167, ../sass/partials/_page.scss */
+/* line 194, ../sass/partials/_page.scss */
 #content-main .module h2 {
   background: none;
   border-bottom: 1px solid #dddddd;
@@ -2055,7 +2134,7 @@ div.breadcrumbs a:hover {
   margin-top: 0;
   padding: 10px;
 }
-/* line 176, ../sass/partials/_page.scss */
+/* line 203, ../sass/partials/_page.scss */
 #content-main .module caption {
   background: none;
   color: #666666;
@@ -2065,11 +2144,11 @@ div.breadcrumbs a:hover {
   margin-bottom: 10px;
   padding: 0;
 }
-/* line 184, ../sass/partials/_page.scss */
+/* line 211, ../sass/partials/_page.scss */
 #content-main .module caption a.section:link, #content-main .module caption a.section:visited {
   color: #666666;
 }
-/* line 190, ../sass/partials/_page.scss */
+/* line 217, ../sass/partials/_page.scss */
 #content-main .inline-group {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2085,7 +2164,7 @@ div.breadcrumbs a:hover {
   background: rgba(255, 255, 255, 0.2) !important;
   padding: 10px;
 }
-/* line 196, ../sass/partials/_page.scss */
+/* line 223, ../sass/partials/_page.scss */
 #content-main .inline-group h2 {
   background: none !important;
   color: #444444;
@@ -2093,21 +2172,21 @@ div.breadcrumbs a:hover {
   margin-bottom: 10px;
   padding: 0 10px 8px 0px;
 }
-/* line 203, ../sass/partials/_page.scss */
+/* line 230, ../sass/partials/_page.scss */
 #content-main .inline-group div.add-row {
   background: none !important;
   border-bottom: 0 !important;
 }
-/* line 207, ../sass/partials/_page.scss */
+/* line 234, ../sass/partials/_page.scss */
 #content-main .inline-group .form-row {
   border-bottom: none !important;
 }
-/* line 213, ../sass/partials/_page.scss */
+/* line 240, ../sass/partials/_page.scss */
 #content-main .inline-related h3 {
   background: none;
   border-bottom: none;
 }
-/* line 219, ../sass/partials/_page.scss */
+/* line 246, ../sass/partials/_page.scss */
 #content-main .submit-row {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2123,7 +2202,7 @@ div.breadcrumbs a:hover {
   background: rgba(255, 255, 255, 0.2) !important;
   padding: 10px;
 }
-/* line 227, ../sass/partials/_page.scss */
+/* line 254, ../sass/partials/_page.scss */
 #content-main .selector .selector-available, #content-main .selector .selector-chosen {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2133,22 +2212,22 @@ div.breadcrumbs a:hover {
   border-radius: 5px;
   border: 1px solid #dddddd;
 }
-/* line 230, ../sass/partials/_page.scss */
+/* line 257, ../sass/partials/_page.scss */
 #content-main .selector .selector-available h2, #content-main .selector .selector-chosen h2 {
   color: #444444 !important;
   background: none !important;
   border: none;
   margin-bottom: 0;
 }
-/* line 236, ../sass/partials/_page.scss */
+/* line 263, ../sass/partials/_page.scss */
 #content-main .selector .selector-available input, #content-main .selector .selector-chosen input {
   width: 252px;
 }
-/* line 240, ../sass/partials/_page.scss */
+/* line 267, ../sass/partials/_page.scss */
 #content-main .selector .selector-filter {
   border: none;
 }
-/* line 243, ../sass/partials/_page.scss */
+/* line 270, ../sass/partials/_page.scss */
 #content-main .selector select[multiple] {
   border: 1px solid #dddddd;
   border-left: none;
@@ -2156,7 +2235,7 @@ div.breadcrumbs a:hover {
   margin-bottom: 0;
 }
 
-/* line 253, ../sass/partials/_page.scss */
+/* line 280, ../sass/partials/_page.scss */
 #content-related .module {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2173,83 +2252,83 @@ div.breadcrumbs a:hover {
   margin-left: 10px;
   padding: 10px 20px !important;
 }
-/* line 260, ../sass/partials/_page.scss */
+/* line 287, ../sass/partials/_page.scss */
 #content-related .module ul.actionlist {
   padding: 0;
 }
-/* line 263, ../sass/partials/_page.scss */
+/* line 290, ../sass/partials/_page.scss */
 #content-related .module h2 {
   background: none;
   color: #888888;
   padding: 0 0 5px 0;
 }
-/* line 268, ../sass/partials/_page.scss */
+/* line 295, ../sass/partials/_page.scss */
 #content-related .module h3 {
   border-bottom: 1px solid #dddddd;
   line-height: 20px;
   margin: 0 0 5px 0;
   padding: 0;
 }
-/* line 274, ../sass/partials/_page.scss */
+/* line 301, ../sass/partials/_page.scss */
 #content-related .module p {
   padding: 0;
 }
 
-/* line 281, ../sass/partials/_page.scss */
+/* line 308, ../sass/partials/_page.scss */
 #changelist #toolbar {
   background: none !important;
   border: 0 !important;
 }
-/* line 285, ../sass/partials/_page.scss */
+/* line 312, ../sass/partials/_page.scss */
 #changelist #toolbar form #searchbar {
   padding: 4px 5px 6px 5px !important;
 }
-/* line 291, ../sass/partials/_page.scss */
+/* line 318, ../sass/partials/_page.scss */
 #changelist #changelist-search div {
   float: right;
   margin-right: 2px;
 }
-/* line 295, ../sass/partials/_page.scss */
+/* line 322, ../sass/partials/_page.scss */
 #changelist #changelist-search label {
   min-width: auto;
   font-size: 150%;
 }
-/* line 300, ../sass/partials/_page.scss */
+/* line 327, ../sass/partials/_page.scss */
 #changelist #changelist-filter {
   background: rgba(255, 255, 255, 0.2);
 }
-/* line 302, ../sass/partials/_page.scss */
+/* line 329, ../sass/partials/_page.scss */
 #changelist #changelist-filter h2 {
   background: none;
   color: #888888;
   padding: 2px 9px;
 }
-/* line 307, ../sass/partials/_page.scss */
+/* line 334, ../sass/partials/_page.scss */
 #changelist #changelist-filter ul {
   font-size: 12px;
   margin-bottom: 10px;
 }
-/* line 310, ../sass/partials/_page.scss */
+/* line 337, ../sass/partials/_page.scss */
 #changelist #changelist-filter ul li.selected {
   border-left: none !important;
   padding-left: 0 !important;
   margin-left: 0 !important;
 }
-/* line 314, ../sass/partials/_page.scss */
+/* line 341, ../sass/partials/_page.scss */
 #changelist #changelist-filter ul li.selected a {
   color: #029eee !important;
 }
-/* line 320, ../sass/partials/_page.scss */
+/* line 347, ../sass/partials/_page.scss */
 #changelist #result_list {
   margin: 0 !important;
 }
-/* line 323, ../sass/partials/_page.scss */
+/* line 350, ../sass/partials/_page.scss */
 #changelist .actions {
   background: none !important;
   border: 0 !important;
   padding: 0px 3px 6px 3px !important;
 }
-/* line 328, ../sass/partials/_page.scss */
+/* line 355, ../sass/partials/_page.scss */
 #changelist .paginator {
   border-top: none !important;
   border-bottom: none !important;

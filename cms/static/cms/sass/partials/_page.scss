@@ -129,6 +129,33 @@ div.breadcrumbs {
 	}
 }
 
+div.admin_shortcuts .shortcuts {
+	box-shadow: none;
+	background: $background-color-dark;
+	border-top: 1px solid $line-color-dark;
+	color: $font-color-ultralight;
+	h2 {
+		border-bottom: 1px solid $line-color-dark;
+	}
+	li {
+		a {
+			background: $background-color-medium 10px 50% no-repeat;
+			border: 1px solid $line-color-dark;
+			padding: 20px 10px 20px 15px;
+			&:hover {
+				background-color: $background-color-dark;
+			}
+			.count {
+				color: $font-color-light;
+			}
+			.count_new {
+				background: $button-blue-medium-color;
+				border-color: $button-blue-light-color;
+			}
+		}		
+	}
+}
+
 #user-tools {
 	padding: 20px 25px;
 }

@@ -72,6 +72,7 @@ def configure(**extra):
             'cms',
             'menus',
             'mptt',
+            'admin_shortcuts',
             'django.contrib.admin',
             'cms.plugins.text',
             'cms.plugins.picture',
@@ -185,7 +186,38 @@ def configure(**extra):
         ROOT_URLCONF = 'cms.test_utils.cli',
         PASSWORD_HASHERS = (
             'django.contrib.auth.hashers.MD5PasswordHasher',
-        )
+        ),       
+	    ADMIN_SHORTCUTS = [
+	    {
+	        'shortcuts': [
+	            {
+	                'url': '/',
+	                'open_new_window': True,
+	            },
+	            {
+	                'url_name': 'admin:cms_page_changelist',
+	                'title': 'Pages',
+	                'class': 'pages',
+	            },
+	            {
+	                'url': '/',
+	                'title': 'Files',
+	                'class': 'files',
+	            },
+	            {
+	                'url_name': 'admin:auth_user_changelist',
+	                'title': 'Users',
+	                'count_new': '10',
+	            },
+	            {
+	                'url': '/',
+	                'title': 'Contact forms',
+	                'count': '10',
+	                'class': 'contact',
+	            },
+	        ]
+	    },
+	    ]
     )
     defaults.update(extra)
     settings.configure(**defaults)
