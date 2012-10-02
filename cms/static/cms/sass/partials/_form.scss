@@ -99,8 +99,9 @@ form {
 	@include button-common-init();
 	color: $button-silver-font-color !important;
 	font-weight: bolder !important;
+	font-size: 12px !important;
 	overflow: visible;
-	padding: 5px 10px 6px !important;
+	padding: 5px 10px 5px !important;
 	text-decoration: none !important;
 	width: auto !important;
 	&.small { 
@@ -268,20 +269,10 @@ button {
 
 input[type="submit"], input[type="button"] {
 	@include button-common();
-	&.orange {
-		@include button-orange();
-	}
-	&.red {
-		@include button-red();
-	}
-	&.black {
-		@include button-black();
-	}
-	&.inactive {
-		@include button-inactive();
-	}	
 	&.default {
 		@include button-blue();
+		padding: 7px 10px 7px !important;
+		margin-top: 1px;
 	}
 }
 
@@ -289,21 +280,6 @@ a.button {
 	text-decoration: none;
 	cursor: pointer;
 	@include button-common();
-	&.green {
-		@include button-green();
-	}
-	&.orange {
-		@include button-orange();
-	}
-	&.red {
-		@include button-red();
-	}
-	&.black {
-		@include button-black();
-	}
-	&.inactive {
-		@include button-inactive();
-	}	
 	&.tab {
 		@include border-radius(0);
 	}	
@@ -333,66 +309,11 @@ a.button {
 		@include button-common();
 		margin-top: -22px;	
 		margin-right: 10px;
-				color: $button-green-font-color !important;
-
 	}
 
 }
 
-
-
-/* Tables */
-table {
-	thead th, tfoot td {
-		background: $background-color-ultralight;
-	}
-	td, th {
-		font-family: $base-font-family;
-		padding: 10px 0 !important;
-	}
-	tr {
-		&:first-child th, &:first-child td {
-			border-top: 1px solid $line-color-ultralight;		
-		}
-		th, td {
-			border-bottom: 1px solid $line-color-ultralight;
-
-		}
-	}
-	th {
-		a:link, a:visited, a:link:visited {
-			color: $font-color;
-		}		
-	}
-	.row1 {
-		background: $background-color-white;		
-	}
-	.row2 {
-		background: $background-color-ultralight;		
-	}
-}
-
-.change-list {
-	table {
-		thead {
-			tr {
-				&:first-child th, &:first-child td {
-					background: none;
-				}
-			}
-		}
-		tbody {
-			th {
-				a:link, a:visited, a:link:visited {	
-					color: $link-color;		
-					padding-left: 5px;
-				}
-			}
-			tr.selected {
-				background: $background-color-highlight !important;
-			}	
-		}
-	}
-}
 
 form .aligned p.help { padding-left: 100px !important; }
+
+

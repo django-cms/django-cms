@@ -466,7 +466,7 @@ form .extra .right {
 }
 
 /* Standard */
-/* line 250, ../sass/partials/_form.scss */
+/* line 251, ../sass/partials/_form.scss */
 button {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -489,22 +489,23 @@ button {
   border-bottom: 1px solid #cccccc !important;
   color: #555555 !important;
   font-weight: bolder !important;
+  font-size: 12px !important;
   overflow: visible;
-  padding: 5px 10px 6px !important;
+  padding: 5px 10px 5px !important;
   text-decoration: none !important;
   width: auto !important;
 }
-/* line 106, ../sass/partials/_form.scss */
+/* line 107, ../sass/partials/_form.scss */
 button.small {
   padding: 3px 8px 4px !important;
 }
-/* line 109, ../sass/partials/_form.scss */
+/* line 110, ../sass/partials/_form.scss */
 button:hover, button:active, button.select, button:visited {
   background: white;
   color: #555555;
   text-decoration: none;
 }
-/* line 114, ../sass/partials/_form.scss */
+/* line 115, ../sass/partials/_form.scss */
 button.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -517,7 +518,7 @@ button.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 252, ../sass/partials/_form.scss */
+/* line 253, ../sass/partials/_form.scss */
 button.green {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #9ab933)) !important;
   background-image: -webkit-linear-gradient(#bcd077, #9ab933) !important;
@@ -534,16 +535,16 @@ button.green {
   border-bottom: 1px solid #8fad28 !important;
   color: white !important;
 }
-/* line 147, ../sass/partials/_form.scss */
+/* line 148, ../sass/partials/_form.scss */
 button.green:hover {
   background: #bcd077 !important;
   color: white !important;
 }
-/* line 151, ../sass/partials/_form.scss */
+/* line 152, ../sass/partials/_form.scss */
 button.green:active {
   background: #9ab933 !important;
 }
-/* line 154, ../sass/partials/_form.scss */
+/* line 155, ../sass/partials/_form.scss */
 button.green.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -556,7 +557,7 @@ button.green.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 255, ../sass/partials/_form.scss */
+/* line 256, ../sass/partials/_form.scss */
 button.orange {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #efaa4a), color-stop(100%, #e88801));
   background-image: -webkit-linear-gradient(#efaa4a, #e88801);
@@ -573,16 +574,16 @@ button.orange {
   border-bottom: 1px solid #de8200 !important;
   color: white !important;
 }
-/* line 167, ../sass/partials/_form.scss */
+/* line 168, ../sass/partials/_form.scss */
 button.orange:hover {
   background: #efaa4a;
   color: white;
 }
-/* line 171, ../sass/partials/_form.scss */
+/* line 172, ../sass/partials/_form.scss */
 button.orange:active {
   background: #e88801;
 }
-/* line 174, ../sass/partials/_form.scss */
+/* line 175, ../sass/partials/_form.scss */
 button.orange.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -595,7 +596,7 @@ button.orange.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 258, ../sass/partials/_form.scss */
+/* line 259, ../sass/partials/_form.scss */
 button.red {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(100%, #e80101));
   background-image: -webkit-linear-gradient(#ef4a4a, #e80101);
@@ -612,16 +613,16 @@ button.red {
   border-bottom: 1px solid #d50101;
   color: white !important;
 }
-/* line 187, ../sass/partials/_form.scss */
+/* line 188, ../sass/partials/_form.scss */
 button.red:hover {
   background: #ef4a4a;
   color: white;
 }
-/* line 191, ../sass/partials/_form.scss */
+/* line 192, ../sass/partials/_form.scss */
 button.red:active {
   background: #e80101;
 }
-/* line 194, ../sass/partials/_form.scss */
+/* line 195, ../sass/partials/_form.scss */
 button.red.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -634,7 +635,7 @@ button.red.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 261, ../sass/partials/_form.scss */
+/* line 262, ../sass/partials/_form.scss */
 button.black {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
   background-image: -webkit-linear-gradient(#5d6267, #464b50);
@@ -652,7 +653,7 @@ button.black {
   color: #bbbbbb !important;
   cursor: default;
 }
-/* line 208, ../sass/partials/_form.scss */
+/* line 209, ../sass/partials/_form.scss */
 button.black:hover {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
   background-image: -webkit-linear-gradient(#5d6267, #464b50);
@@ -663,7 +664,7 @@ button.black:hover {
   border-color: #464b50;
   color: white;
 }
-/* line 214, ../sass/partials/_form.scss */
+/* line 215, ../sass/partials/_form.scss */
 button.black:active, button.black.select {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
   background-image: -webkit-linear-gradient(#5d6267, #464b50);
@@ -674,7 +675,7 @@ button.black:active, button.black.select {
   border-color: #464b50;
   color: white;
 }
-/* line 219, ../sass/partials/_form.scss */
+/* line 220, ../sass/partials/_form.scss */
 button.black.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -687,7 +688,7 @@ button.black.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 264, ../sass/partials/_form.scss */
+/* line 265, ../sass/partials/_form.scss */
 button.inactive, button[disabled] {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
   background-image: -webkit-linear-gradient(#ffffff, #efefef);
@@ -705,7 +706,7 @@ button.inactive, button[disabled] {
   color: #bbbbbb;
   cursor: default;
 }
-/* line 233, ../sass/partials/_form.scss */
+/* line 234, ../sass/partials/_form.scss */
 button.inactive:hover, button[disabled]:hover {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
   background-image: -webkit-linear-gradient(#ffffff, #efefef);
@@ -716,7 +717,7 @@ button.inactive:hover, button[disabled]:hover {
   border-color: #efefef;
   color: #bbbbbb;
 }
-/* line 239, ../sass/partials/_form.scss */
+/* line 240, ../sass/partials/_form.scss */
 button.inactive:active, button.inactive.select, button[disabled]:active, button[disabled].select {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
   background-image: -webkit-linear-gradient(#ffffff, #efefef);
@@ -727,7 +728,7 @@ button.inactive:active, button.inactive.select, button[disabled]:active, button[
   border-color: #efefef;
   color: #bbbbbb;
 }
-/* line 244, ../sass/partials/_form.scss */
+/* line 245, ../sass/partials/_form.scss */
 button.inactive.animate, button[disabled].animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -741,7 +742,7 @@ button.inactive.animate, button[disabled].animate {
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
 
-/* line 269, ../sass/partials/_form.scss */
+/* line 270, ../sass/partials/_form.scss */
 input[type="submit"], input[type="button"] {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -764,22 +765,23 @@ input[type="submit"], input[type="button"] {
   border-bottom: 1px solid #cccccc !important;
   color: #555555 !important;
   font-weight: bolder !important;
+  font-size: 12px !important;
   overflow: visible;
-  padding: 5px 10px 6px !important;
+  padding: 5px 10px 5px !important;
   text-decoration: none !important;
   width: auto !important;
 }
-/* line 106, ../sass/partials/_form.scss */
+/* line 107, ../sass/partials/_form.scss */
 input[type="submit"].small, input[type="button"].small {
   padding: 3px 8px 4px !important;
 }
-/* line 109, ../sass/partials/_form.scss */
+/* line 110, ../sass/partials/_form.scss */
 input[type="submit"]:hover, input[type="submit"]:active, input[type="submit"].select, input[type="submit"]:visited, input[type="button"]:hover, input[type="button"]:active, input[type="button"].select, input[type="button"]:visited {
   background: white;
   color: #555555;
   text-decoration: none;
 }
-/* line 114, ../sass/partials/_form.scss */
+/* line 115, ../sass/partials/_form.scss */
 input[type="submit"].animate, input[type="button"].animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -792,191 +794,7 @@ input[type="submit"].animate, input[type="button"].animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 271, ../sass/partials/_form.scss */
-input[type="submit"].orange, input[type="button"].orange {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #efaa4a), color-stop(100%, #e88801));
-  background-image: -webkit-linear-gradient(#efaa4a, #e88801);
-  background-image: -moz-linear-gradient(#efaa4a, #e88801);
-  background-image: -o-linear-gradient(#efaa4a, #e88801);
-  background-image: -ms-linear-gradient(#efaa4a, #e88801);
-  background-image: linear-gradient(#efaa4a, #e88801);
-  -moz-box-shadow: #efaa4a 0 0 2px inset;
-  -webkit-box-shadow: #efaa4a 0 0 2px inset;
-  -o-box-shadow: #efaa4a 0 0 2px inset;
-  box-shadow: #efaa4a 0 0 2px inset;
-  background-color: #e88801 !important;
-  border: 1px solid #efaa4a !important;
-  border-bottom: 1px solid #de8200 !important;
-  color: white !important;
-}
-/* line 167, ../sass/partials/_form.scss */
-input[type="submit"].orange:hover, input[type="button"].orange:hover {
-  background: #efaa4a;
-  color: white;
-}
-/* line 171, ../sass/partials/_form.scss */
-input[type="submit"].orange:active, input[type="button"].orange:active {
-  background: #e88801;
-}
-/* line 174, ../sass/partials/_form.scss */
-input[type="submit"].orange.animate, input[type="button"].orange.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 274, ../sass/partials/_form.scss */
-input[type="submit"].red, input[type="button"].red {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(100%, #e80101));
-  background-image: -webkit-linear-gradient(#ef4a4a, #e80101);
-  background-image: -moz-linear-gradient(#ef4a4a, #e80101);
-  background-image: -o-linear-gradient(#ef4a4a, #e80101);
-  background-image: -ms-linear-gradient(#ef4a4a, #e80101);
-  background-image: linear-gradient(#ef4a4a, #e80101);
-  -moz-box-shadow: #ef4a4a 0 0 2px inset;
-  -webkit-box-shadow: #ef4a4a 0 0 2px inset;
-  -o-box-shadow: #ef4a4a 0 0 2px inset;
-  box-shadow: #ef4a4a 0 0 2px inset;
-  background-color: #e80101 !important;
-  border: 1px solid #ef4a4a;
-  border-bottom: 1px solid #d50101;
-  color: white !important;
-}
-/* line 187, ../sass/partials/_form.scss */
-input[type="submit"].red:hover, input[type="button"].red:hover {
-  background: #ef4a4a;
-  color: white;
-}
-/* line 191, ../sass/partials/_form.scss */
-input[type="submit"].red:active, input[type="button"].red:active {
-  background: #e80101;
-}
-/* line 194, ../sass/partials/_form.scss */
-input[type="submit"].red.animate, input[type="button"].red.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 277, ../sass/partials/_form.scss */
-input[type="submit"].black, input[type="button"].black {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  -moz-box-shadow: #5d6267 0 0 2px inset;
-  -webkit-box-shadow: #5d6267 0 0 2px inset;
-  -o-box-shadow: #5d6267 0 0 2px inset;
-  box-shadow: #5d6267 0 0 2px inset;
-  background-color: #464b50 !important;
-  border: 1px solid #5d6267;
-  border-bottom: 1px solid #333333;
-  color: #bbbbbb !important;
-  cursor: default;
-}
-/* line 208, ../sass/partials/_form.scss */
-input[type="submit"].black:hover, input[type="button"].black:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  border-color: #464b50;
-  color: white;
-}
-/* line 214, ../sass/partials/_form.scss */
-input[type="submit"].black:active, input[type="submit"].black.select, input[type="button"].black:active, input[type="button"].black.select {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  border-color: #464b50;
-  color: white;
-}
-/* line 219, ../sass/partials/_form.scss */
-input[type="submit"].black.animate, input[type="button"].black.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 280, ../sass/partials/_form.scss */
-input[type="submit"].inactive, input[type="button"].inactive {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  -moz-box-shadow: white 0 0 2px inset;
-  -webkit-box-shadow: white 0 0 2px inset;
-  -o-box-shadow: white 0 0 2px inset;
-  box-shadow: white 0 0 2px inset;
-  background-color: #efefef !important;
-  border: 1px solid white;
-  border-bottom: 1px solid #eeeeee;
-  color: #bbbbbb;
-  cursor: default;
-}
-/* line 233, ../sass/partials/_form.scss */
-input[type="submit"].inactive:hover, input[type="button"].inactive:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  border-color: #efefef;
-  color: #bbbbbb;
-}
-/* line 239, ../sass/partials/_form.scss */
-input[type="submit"].inactive:active, input[type="submit"].inactive.select, input[type="button"].inactive:active, input[type="button"].inactive.select {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  border-color: #efefef;
-  color: #bbbbbb;
-}
-/* line 244, ../sass/partials/_form.scss */
-input[type="submit"].inactive.animate, input[type="button"].inactive.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 283, ../sass/partials/_form.scss */
+/* line 272, ../sass/partials/_form.scss */
 input[type="submit"].default, input[type="button"].default {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #029eee)) !important;
   background-image: -webkit-linear-gradient(#5bbdee, #029eee) !important;
@@ -992,17 +810,19 @@ input[type="submit"].default, input[type="button"].default {
   border: 1px solid #5bbdee !important;
   border-bottom: 1px solid #0072ac !important;
   color: white !important;
+  padding: 7px 10px 7px !important;
+  margin-top: 1px;
 }
-/* line 127, ../sass/partials/_form.scss */
+/* line 128, ../sass/partials/_form.scss */
 input[type="submit"].default:hover, input[type="button"].default:hover {
   background: #5bbdee !important;
   color: white !important;
 }
-/* line 131, ../sass/partials/_form.scss */
+/* line 132, ../sass/partials/_form.scss */
 input[type="submit"].default:active, input[type="button"].default:active {
   background: #029eee !important;
 }
-/* line 134, ../sass/partials/_form.scss */
+/* line 135, ../sass/partials/_form.scss */
 input[type="submit"].default.animate, input[type="button"].default.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -1016,7 +836,7 @@ input[type="submit"].default.animate, input[type="button"].default.animate {
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
 
-/* line 288, ../sass/partials/_form.scss */
+/* line 279, ../sass/partials/_form.scss */
 a.button {
   text-decoration: none;
   cursor: pointer;
@@ -1041,22 +861,23 @@ a.button {
   border-bottom: 1px solid #cccccc !important;
   color: #555555 !important;
   font-weight: bolder !important;
+  font-size: 12px !important;
   overflow: visible;
-  padding: 5px 10px 6px !important;
+  padding: 5px 10px 5px !important;
   text-decoration: none !important;
   width: auto !important;
 }
-/* line 106, ../sass/partials/_form.scss */
+/* line 107, ../sass/partials/_form.scss */
 a.button.small {
   padding: 3px 8px 4px !important;
 }
-/* line 109, ../sass/partials/_form.scss */
+/* line 110, ../sass/partials/_form.scss */
 a.button:hover, a.button:active, a.button.select, a.button:visited {
   background: white;
   color: #555555;
   text-decoration: none;
 }
-/* line 114, ../sass/partials/_form.scss */
+/* line 115, ../sass/partials/_form.scss */
 a.button.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -1069,230 +890,7 @@ a.button.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 292, ../sass/partials/_form.scss */
-a.button.green {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #9ab933)) !important;
-  background-image: -webkit-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: -moz-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: -o-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: -ms-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: linear-gradient(#bcd077, #9ab933) !important;
-  -moz-box-shadow: #bcd077 0 0 2px inset !important;
-  -webkit-box-shadow: #bcd077 0 0 2px inset !important;
-  -o-box-shadow: #bcd077 0 0 2px inset !important;
-  box-shadow: #bcd077 0 0 2px inset !important;
-  background-color: #9ab933 !important;
-  border: 1px solid #bcd077 !important;
-  border-bottom: 1px solid #8fad28 !important;
-  color: white !important;
-}
-/* line 147, ../sass/partials/_form.scss */
-a.button.green:hover {
-  background: #bcd077 !important;
-  color: white !important;
-}
-/* line 151, ../sass/partials/_form.scss */
-a.button.green:active {
-  background: #9ab933 !important;
-}
-/* line 154, ../sass/partials/_form.scss */
-a.button.green.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 295, ../sass/partials/_form.scss */
-a.button.orange {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #efaa4a), color-stop(100%, #e88801));
-  background-image: -webkit-linear-gradient(#efaa4a, #e88801);
-  background-image: -moz-linear-gradient(#efaa4a, #e88801);
-  background-image: -o-linear-gradient(#efaa4a, #e88801);
-  background-image: -ms-linear-gradient(#efaa4a, #e88801);
-  background-image: linear-gradient(#efaa4a, #e88801);
-  -moz-box-shadow: #efaa4a 0 0 2px inset;
-  -webkit-box-shadow: #efaa4a 0 0 2px inset;
-  -o-box-shadow: #efaa4a 0 0 2px inset;
-  box-shadow: #efaa4a 0 0 2px inset;
-  background-color: #e88801 !important;
-  border: 1px solid #efaa4a !important;
-  border-bottom: 1px solid #de8200 !important;
-  color: white !important;
-}
-/* line 167, ../sass/partials/_form.scss */
-a.button.orange:hover {
-  background: #efaa4a;
-  color: white;
-}
-/* line 171, ../sass/partials/_form.scss */
-a.button.orange:active {
-  background: #e88801;
-}
-/* line 174, ../sass/partials/_form.scss */
-a.button.orange.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 298, ../sass/partials/_form.scss */
-a.button.red {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(100%, #e80101));
-  background-image: -webkit-linear-gradient(#ef4a4a, #e80101);
-  background-image: -moz-linear-gradient(#ef4a4a, #e80101);
-  background-image: -o-linear-gradient(#ef4a4a, #e80101);
-  background-image: -ms-linear-gradient(#ef4a4a, #e80101);
-  background-image: linear-gradient(#ef4a4a, #e80101);
-  -moz-box-shadow: #ef4a4a 0 0 2px inset;
-  -webkit-box-shadow: #ef4a4a 0 0 2px inset;
-  -o-box-shadow: #ef4a4a 0 0 2px inset;
-  box-shadow: #ef4a4a 0 0 2px inset;
-  background-color: #e80101 !important;
-  border: 1px solid #ef4a4a;
-  border-bottom: 1px solid #d50101;
-  color: white !important;
-}
-/* line 187, ../sass/partials/_form.scss */
-a.button.red:hover {
-  background: #ef4a4a;
-  color: white;
-}
-/* line 191, ../sass/partials/_form.scss */
-a.button.red:active {
-  background: #e80101;
-}
-/* line 194, ../sass/partials/_form.scss */
-a.button.red.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 301, ../sass/partials/_form.scss */
-a.button.black {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  -moz-box-shadow: #5d6267 0 0 2px inset;
-  -webkit-box-shadow: #5d6267 0 0 2px inset;
-  -o-box-shadow: #5d6267 0 0 2px inset;
-  box-shadow: #5d6267 0 0 2px inset;
-  background-color: #464b50 !important;
-  border: 1px solid #5d6267;
-  border-bottom: 1px solid #333333;
-  color: #bbbbbb !important;
-  cursor: default;
-}
-/* line 208, ../sass/partials/_form.scss */
-a.button.black:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  border-color: #464b50;
-  color: white;
-}
-/* line 214, ../sass/partials/_form.scss */
-a.button.black:active, a.button.black.select {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  border-color: #464b50;
-  color: white;
-}
-/* line 219, ../sass/partials/_form.scss */
-a.button.black.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 304, ../sass/partials/_form.scss */
-a.button.inactive {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  -moz-box-shadow: white 0 0 2px inset;
-  -webkit-box-shadow: white 0 0 2px inset;
-  -o-box-shadow: white 0 0 2px inset;
-  box-shadow: white 0 0 2px inset;
-  background-color: #efefef !important;
-  border: 1px solid white;
-  border-bottom: 1px solid #eeeeee;
-  color: #bbbbbb;
-  cursor: default;
-}
-/* line 233, ../sass/partials/_form.scss */
-a.button.inactive:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  border-color: #efefef;
-  color: #bbbbbb;
-}
-/* line 239, ../sass/partials/_form.scss */
-a.button.inactive:active, a.button.inactive.select {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  border-color: #efefef;
-  color: #bbbbbb;
-}
-/* line 244, ../sass/partials/_form.scss */
-a.button.inactive.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 307, ../sass/partials/_form.scss */
+/* line 283, ../sass/partials/_form.scss */
 a.button.tab {
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
@@ -1303,20 +901,20 @@ a.button.tab {
 }
 
 /* Object Tools */
-/* line 315, ../sass/partials/_form.scss */
+/* line 291, ../sass/partials/_form.scss */
 .object-tools li {
   list-style: none;
   background: none;
 }
-/* line 318, ../sass/partials/_form.scss */
+/* line 294, ../sass/partials/_form.scss */
 .object-tools li:hover {
   background: none;
 }
-/* line 321, ../sass/partials/_form.scss */
+/* line 297, ../sass/partials/_form.scss */
 .object-tools li a {
   background: none !important;
 }
-/* line 325, ../sass/partials/_form.scss */
+/* line 301, ../sass/partials/_form.scss */
 .object-tools .addlink {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -1339,8 +937,9 @@ a.button.tab {
   border-bottom: 1px solid #cccccc !important;
   color: #555555 !important;
   font-weight: bolder !important;
+  font-size: 12px !important;
   overflow: visible;
-  padding: 5px 10px 6px !important;
+  padding: 5px 10px 5px !important;
   text-decoration: none !important;
   width: auto !important;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #9ab933)) !important;
@@ -1361,17 +960,17 @@ a.button.tab {
   margin-top: -22px;
   margin-right: 10px;
 }
-/* line 106, ../sass/partials/_form.scss */
+/* line 107, ../sass/partials/_form.scss */
 .object-tools .addlink.small {
   padding: 3px 8px 4px !important;
 }
-/* line 109, ../sass/partials/_form.scss */
+/* line 110, ../sass/partials/_form.scss */
 .object-tools .addlink:hover, .object-tools .addlink:active, .object-tools .addlink.select, .object-tools .addlink:visited {
   background: white;
   color: #555555;
   text-decoration: none;
 }
-/* line 114, ../sass/partials/_form.scss */
+/* line 115, ../sass/partials/_form.scss */
 .object-tools .addlink.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -1384,16 +983,16 @@ a.button.tab {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 147, ../sass/partials/_form.scss */
+/* line 148, ../sass/partials/_form.scss */
 .object-tools .addlink:hover {
   background: #bcd077 !important;
   color: white !important;
 }
-/* line 151, ../sass/partials/_form.scss */
+/* line 152, ../sass/partials/_form.scss */
 .object-tools .addlink:active {
   background: #9ab933 !important;
 }
-/* line 154, ../sass/partials/_form.scss */
+/* line 155, ../sass/partials/_form.scss */
 .object-tools .addlink.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -1406,7 +1005,7 @@ a.button.tab {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 332, ../sass/partials/_form.scss */
+/* line 308, ../sass/partials/_form.scss */
 .object-tools .historylink {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -1429,25 +1028,25 @@ a.button.tab {
   border-bottom: 1px solid #cccccc !important;
   color: #555555 !important;
   font-weight: bolder !important;
+  font-size: 12px !important;
   overflow: visible;
-  padding: 5px 10px 6px !important;
+  padding: 5px 10px 5px !important;
   text-decoration: none !important;
   width: auto !important;
   margin-top: -22px;
   margin-right: 10px;
-  color: white !important;
 }
-/* line 106, ../sass/partials/_form.scss */
+/* line 107, ../sass/partials/_form.scss */
 .object-tools .historylink.small {
   padding: 3px 8px 4px !important;
 }
-/* line 109, ../sass/partials/_form.scss */
+/* line 110, ../sass/partials/_form.scss */
 .object-tools .historylink:hover, .object-tools .historylink:active, .object-tools .historylink.select, .object-tools .historylink:visited {
   background: white;
   color: #555555;
   text-decoration: none;
 }
-/* line 114, ../sass/partials/_form.scss */
+/* line 115, ../sass/partials/_form.scss */
 .object-tools .historylink.animate {
   -moz-background-size: 100% 400%;
   -webkit-background-size: 100% 400%;
@@ -1461,78 +1060,54 @@ a.button.tab {
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
 
-/* Tables */
-/* line 346, ../sass/partials/_form.scss */
-table thead th, table tfoot td {
-  background: #fcfcfc;
-}
-/* line 349, ../sass/partials/_form.scss */
-table td, table th {
-  font-family: sans-serif;
-  padding: 10px 0 !important;
-}
-/* line 354, ../sass/partials/_form.scss */
-table tr:first-child th, table tr:first-child td {
-  border-top: 1px solid #f3f3f3;
-}
-/* line 357, ../sass/partials/_form.scss */
-table tr th, table tr td {
-  border-bottom: 1px solid #f3f3f3;
-}
-/* line 363, ../sass/partials/_form.scss */
-table th a:link, table th a:visited, table th a:link:visited {
-  color: #444444;
-}
-/* line 367, ../sass/partials/_form.scss */
-table .row1 {
-  background: white;
-}
-/* line 370, ../sass/partials/_form.scss */
-table .row2 {
-  background: #fcfcfc;
-}
-
-/* line 379, ../sass/partials/_form.scss */
-.change-list table thead tr:first-child th, .change-list table thead tr:first-child td {
-  background: none;
-}
-/* line 386, ../sass/partials/_form.scss */
-.change-list table tbody th a:link, .change-list table tbody th a:visited, .change-list table tbody th a:link:visited {
-  color: #029eee;
-  padding-left: 5px;
-}
-/* line 391, ../sass/partials/_form.scss */
-.change-list table tbody tr.selected {
-  background: #f6fcff !important;
-}
-
-/* line 398, ../sass/partials/_form.scss */
+/* line 317, ../sass/partials/_form.scss */
 form .aligned p.help {
   padding-left: 100px !important;
 }
 
 /* Use the following CSS code if you want to have a class per icon */
-/* line 6, ../sass/partials/_icons.scss */
+/* line 13, ../sass/partials/_icons.scss */
 .addlink,
 .changelink,
 #changelist-search label,
-.deletelink {
+.deletelink,
+a.selector-clearall,
+a.active.selector-clearall,
+a.selector-chooseall,
+a.active.selector-chooseall,
+.selector-remove,
+.selector-add,
+.inline-group div.add-row a {
   background: none !important;
   padding-left: 10px;
 }
-/* line 9, ../sass/partials/_icons.scss */
+/* line 16, ../sass/partials/_icons.scss */
 .addlink:hover,
 .changelink:hover,
 #changelist-search label:hover,
-.deletelink:hover {
+.deletelink:hover,
+a.selector-clearall:hover,
+a.active.selector-clearall:hover,
+a.selector-chooseall:hover,
+a.active.selector-chooseall:hover,
+.selector-remove:hover,
+.selector-add:hover,
+.inline-group div.add-row a:hover {
   text-decoration: none !important;
 }
 
-/* line 19, ../sass/partials/_icons.scss */
+/* line 33, ../sass/partials/_icons.scss */
 .addlink:before,
 .changelink:before,
 #changelist-search label:before,
-.deletelink:before {
+.deletelink:before,
+a.selector-clearall:before,
+a.active.selector-clearall:before,
+a.selector-chooseall:before,
+a.active.selector-chooseall:before,
+.selector-remove:before,
+.selector-add:before,
+.inline-group div.add-row a:before {
   font-family: 'django-admin-icons';
   font-style: normal;
   speak: none;
@@ -1542,216 +1117,98 @@ form .aligned p.help {
   padding-right: 5px;
 }
 
-/* line 29, ../sass/partials/_icons.scss */
-.addlink {
-  color: #9ab933 !important;
-}
-
-/* line 30, ../sass/partials/_icons.scss */
+/* line 44, ../sass/partials/_icons.scss */
 .addlink:before {
   content: "\22";
 }
 
-/* line 32, ../sass/partials/_icons.scss */
+/* line 45, ../sass/partials/_icons.scss */
 .changelink:before {
   content: "\21";
 }
 
-/* line 33, ../sass/partials/_icons.scss */
+/* line 46, ../sass/partials/_icons.scss */
 #changelist-search label:before {
   content: "\23";
 }
 
-/* line 34, ../sass/partials/_icons.scss */
+/* line 47, ../sass/partials/_icons.scss */
 .deletelink:before {
   content: "\24";
 }
 
-/* line 37, ../sass/partials/_icons.scss */
-.actionlist .addlink {
+/* line 48, ../sass/partials/_icons.scss */
+.selector-remove:before, a.selector-clearall:before, a.active.selector-clearall:before {
+  content: "\25";
+  font-size: 100%;
+}
+
+/* line 49, ../sass/partials/_icons.scss */
+.selector-add:before, a.selector-chooseall:before, a.active.selector-chooseall:before {
+  content: "\26";
+  font-size: 100%;
+}
+
+/* line 50, ../sass/partials/_icons.scss */
+.inline-group div.add-row a:before {
+  content: "\22";
+}
+
+/* line 53, ../sass/partials/_icons.scss */
+.actionlist .addlink, .actionlist .changelink {
   padding-left: 0;
 }
 
-/* line 40, ../sass/partials/_icons.scss */
+/* line 58, ../sass/partials/_icons.scss */
+.addlink {
+  color: #9ab933 !important;
+}
+
+/* line 59, ../sass/partials/_icons.scss */
 #changelist-search label {
   font-weight: bold;
 }
 
-/* line 41, ../sass/partials/_icons.scss */
+/* line 60, ../sass/partials/_icons.scss */
 #changelist-search label img {
   display: none;
 }
 
-/* line 42, ../sass/partials/_icons.scss */
+/* line 61, ../sass/partials/_icons.scss */
 .help-tooltip {
   display: none;
 }
 
-/* Box-list */
-/* line 3, ../sass/partials/_list.scss */
-.box-list.half {
-  width: 49%;
-  float: left;
-}
-/* line 6, ../sass/partials/_list.scss */
-.box-list.half.last {
-  margin-left: 2%;
-}
-/* line 10, ../sass/partials/_list.scss */
-.box-list .box-list-content {
-  margin-top: 15px;
-}
-/* line 12, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-desc {
-  -moz-border-radius: 5px 5px 0 0;
-  -webkit-border-radius: 5px 5px 0 0;
-  -o-border-radius: 5px 5px 0 0;
-  -ms-border-radius: 5px 5px 0 0;
-  -khtml-border-radius: 5px 5px 0 0;
-  border-radius: 5px 5px 0 0;
-  border: 1px solid #dddddd;
-  min-height: 100px;
-  padding: 15px 20px 15px 20px;
-}
-/* line 18, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-desc h3 {
-  margin-bottom: 0;
-}
-/* line 21, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-desc .label {
-  display: inline-block;
-}
-/* line 25, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-controls {
-  -moz-border-radius: 0 0 5px 5px;
-  -webkit-border-radius: 0 0 5px 5px;
-  -o-border-radius: 0 0 5px 5px;
-  -ms-border-radius: 0 0 5px 5px;
-  -khtml-border-radius: 0 0 5px 5px;
-  border-radius: 0 0 5px 5px;
-  background: #fcfcfc;
-  border: 1px solid #dddddd;
-  border-top: 0;
-  color: #888888;
-  padding: 8px 6px 8px 14px;
-}
-/* line 33, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-controls .switch {
-  float: right;
-  margin-top: -32px;
-}
-/* line 37, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-controls .button {
-  text-transform: uppercase;
-  margin-top: -24px;
-}
-/* line 42, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-controls .combobox-hor.small {
-  margin-top: -3px;
-}
-/* line 46, ../sass/partials/_list.scss */
-.box-list .box-list-content .box-list-controls .inline {
-  margin-top: 0;
+/* line 63, ../sass/partials/_icons.scss */
+.selector-remove, .selector-add {
+  display: inline !important;
+  font-size: 125% !important;
+  padding-left: 1px;
+  color: white !important;
 }
 
-/* Row-list*/
-/* Highlighted Rows */
-/* line 62, ../sass/partials/_list.scss */
-.row-list-container {
-  border-bottom: 1px solid #f3f3f3;
-}
-/* line 64, ../sass/partials/_list.scss */
-.row-list-container .row-list {
-  border-bottom: none;
+/* line 64, ../sass/partials/_icons.scss */
+.selector-remove:before, .selector-add:before {
+  color: #444444;
 }
 
-/* line 69, ../sass/partials/_list.scss */
-.row-list {
-  border-top: none;
-  border-bottom: 1px solid #f3f3f3;
+/* line 65, ../sass/partials/_icons.scss */
+.inline-group div.add-row a {
+  color: #9ab933 !important;
+  padding-left: 5px !important;
 }
-/* line 72, ../sass/partials/_list.scss */
-.row-list.collapse {
-  color: #666666;
-  display: none;
-}
-/* line 77, ../sass/partials/_list.scss */
-.row-list.highlighter .row:hover {
-  background: #f1faff;
-}
-/* line 81, ../sass/partials/_list.scss */
-.row-list .row {
-  border-top: 1px solid #f3f3f3;
-  line-height: normal;
-  min-height: 20px;
-  padding: 10px 3px 6px 3px;
-}
-/* line 86, ../sass/partials/_list.scss */
-.row-list .row button, .row-list .row a.button, .row-list .row input[type="submit"] {
-  margin-top: -6px;
-  margin-right: 0;
-}
-/* line 89, ../sass/partials/_list.scss */
-.row-list .row button.right, .row-list .row a.button.right, .row-list .row input[type="submit"].right {
-  margin-left: 3px;
-}
-/* line 92, ../sass/partials/_list.scss */
-.row-list .row button.small, .row-list .row a.button.small, .row-list .row input[type="submit"].small {
-  margin-top: -3px;
-}
-/* line 96, ../sass/partials/_list.scss */
-.row-list .row input {
-  margin-top: -5px;
-}
-/* line 99, ../sass/partials/_list.scss */
-.row-list .row span.version {
-  margin-right: 10px;
-}
-/* line 102, ../sass/partials/_list.scss */
-.row-list .row .align {
-  display: inline-block;
-}
-/* line 105, ../sass/partials/_list.scss */
-.row-list .row .switch {
-  margin-top: -6px;
-  margin-right: 3px;
-}
-/* line 109, ../sass/partials/_list.scss */
-.row-list .row .tags-container {
-  margin-left: 0;
-}
-/* line 112, ../sass/partials/_list.scss */
-.row-list .row .inline {
-  margin-top: -5px;
-  line-height: 18px;
-}
-/* line 116, ../sass/partials/_list.scss */
-.row-list .row.ok {
-  background: #d3e1a3;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e6f1bf), color-stop(100%, #d3e1a3));
-  background-image: -webkit-linear-gradient(#e6f1bf, #d3e1a3);
-  background-image: -moz-linear-gradient(#e6f1bf, #d3e1a3);
-  background-image: -o-linear-gradient(#e6f1bf, #d3e1a3);
-  background-image: -ms-linear-gradient(#e6f1bf, #d3e1a3);
-  background-image: linear-gradient(#e6f1bf, #d3e1a3);
-}
-/* line 120, ../sass/partials/_list.scss */
-.row-list .row.fail {
-  background: #f2d1cf;
-  -moz-background-size: 10px 10px;
-  -webkit-background-size: 10px 10px;
-  -o-background-size: 10px 10px;
-  background-size: 10px 10px;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 124, ../sass/partials/_list.scss */
-.row-list .row .chzn-container {
-  display: inline-block;
+
+/* Sepcials */
+/* line 68, ../sass/partials/_icons.scss */
+.selector ul.selector-chooser {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -o-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -khtml-border-radius: 10px;
+  border-radius: 10px;
+  background: #f1f1f1 !important;
+  height: 44px !important;
 }
 
 /* Statuses Mixins */
@@ -2356,219 +1813,6 @@ header.header-error nav li.internal {
   margin-top: -2px;
 }
 
-/* Meta */
-/* line 2, ../sass/partials/_nav.scss */
-div .meta {
-  margin-top: 22px;
-  margin-right: 12px;
-  text-align: right;
-}
-/* line 6, ../sass/partials/_nav.scss */
-div .meta a {
-  color: white;
-  font-weight: bold;
-}
-/* line 10, ../sass/partials/_nav.scss */
-div .meta small {
-  color: #cccccc;
-  font-weight: bold;
-  margin: 0;
-}
-/* line 15, ../sass/partials/_nav.scss */
-div .meta .vr {
-  color: #888888;
-}
-
-/* Top controls Tabs */
-/* line 21, ../sass/partials/_nav.scss */
-.top-controls {
-  position: relative;
-}
-/* line 23, ../sass/partials/_nav.scss */
-.top-controls nav {
-  position: absolute;
-  margin: -46px 0 0 354px;
-}
-/* line 26, ../sass/partials/_nav.scss */
-.top-controls nav li {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  -moz-box-shadow: #dddddd 0 0 1px 1px;
-  -webkit-box-shadow: #dddddd 0 0 1px 1px;
-  -o-box-shadow: #dddddd 0 0 1px 1px;
-  box-shadow: #dddddd 0 0 1px 1px;
-  background-color: white;
-  border: none;
-}
-/* line 31, ../sass/partials/_nav.scss */
-.top-controls nav li a {
-  color: #666666;
-}
-/* line 34, ../sass/partials/_nav.scss */
-.top-controls nav li:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #efefef), color-stop(100%, #ffffff));
-  background-image: -webkit-linear-gradient(#efefef, #ffffff);
-  background-image: -moz-linear-gradient(#efefef, #ffffff);
-  background-image: -o-linear-gradient(#efefef, #ffffff);
-  background-image: -ms-linear-gradient(#efefef, #ffffff);
-  background-image: linear-gradient(#efefef, #ffffff);
-  -moz-box-shadow: #dddddd 0 0 1px 1px;
-  -webkit-box-shadow: #dddddd 0 0 1px 1px;
-  -o-box-shadow: #dddddd 0 0 1px 1px;
-  box-shadow: #dddddd 0 0 1px 1px;
-  background-color: white;
-}
-/* line 38, ../sass/partials/_nav.scss */
-.top-controls nav li:hover a {
-  color: #444444;
-}
-/* line 43, ../sass/partials/_nav.scss */
-.top-controls nav li.active, .top-controls nav li.active:hover {
-  -moz-box-shadow: #dddddd 0 0 1px 1px;
-  -webkit-box-shadow: #dddddd 0 0 1px 1px;
-  -o-box-shadow: #dddddd 0 0 1px 1px;
-  box-shadow: #dddddd 0 0 1px 1px;
-}
-
-/* Navigation */
-/* line 51, ../sass/partials/_nav.scss */
-nav {
-  margin-left: 213px;
-}
-/* line 53, ../sass/partials/_nav.scss */
-nav a {
-  color: white;
-  font-weight: bolder;
-  text-decoration: none;
-}
-/* line 57, ../sass/partials/_nav.scss */
-nav a:hover {
-  color: white;
-  text-decoration: none;
-}
-/* line 61, ../sass/partials/_nav.scss */
-nav a:visited {
-  color: white;
-  text-decoration: none;
-}
-/* line 66, ../sass/partials/_nav.scss */
-nav li {
-  background-color: #464b50;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  -moz-box-shadow: #5d6267 0 0 1px 1px inset;
-  -webkit-box-shadow: #5d6267 0 0 1px 1px inset;
-  -o-box-shadow: #5d6267 0 0 1px 1px inset;
-  box-shadow: #5d6267 0 0 1px 1px inset;
-  -moz-border-radius: 5px 5px 0 0;
-  -webkit-border-radius: 5px 5px 0 0;
-  -o-border-radius: 5px 5px 0 0;
-  -ms-border-radius: 5px 5px 0 0;
-  -khtml-border-radius: 5px 5px 0 0;
-  border-radius: 5px 5px 0 0;
-  border: 1px solid #444444;
-  border-bottom: 0;
-  cursor: pointer;
-  float: left;
-  margin: 15px 0 0 5px;
-}
-/* line 77, ../sass/partials/_nav.scss */
-nav li a {
-  display: block;
-  padding: 7px 20px;
-}
-/* line 81, ../sass/partials/_nav.scss */
-nav li.active, nav li.active:hover {
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-  -o-box-shadow: none;
-  box-shadow: none;
-  background: url("/static/images/bg-pattern-light.jpg") #fcfcfc repeat !important;
-  margin-bottom: -1px;
-}
-/* line 85, ../sass/partials/_nav.scss */
-nav li.active a, nav li.active:hover a {
-  color: #444444;
-}
-/* line 90, ../sass/partials/_nav.scss */
-nav li.internal {
-  -moz-box-shadow: #029eee 0px -2px 5px 0px;
-  -webkit-box-shadow: #029eee 0px -2px 5px 0px;
-  -o-box-shadow: #029eee 0px -2px 5px 0px;
-  box-shadow: #029eee 0px -2px 5px 0px;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #029eee));
-  background-image: -webkit-linear-gradient(#5bbdee, #029eee);
-  background-image: -moz-linear-gradient(#5bbdee, #029eee);
-  background-image: -o-linear-gradient(#5bbdee, #029eee);
-  background-image: -ms-linear-gradient(#5bbdee, #029eee);
-  background-image: linear-gradient(#5bbdee, #029eee);
-}
-/* line 93, ../sass/partials/_nav.scss */
-nav li.internal.active, nav li.internal.active:hover {
-  background-color: #fcfcfc;
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-  -o-box-shadow: none;
-  box-shadow: none;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #fcfcfc));
-  background-image: -webkit-linear-gradient(#ffffff, #fcfcfc);
-  background-image: -moz-linear-gradient(#ffffff, #fcfcfc);
-  background-image: -o-linear-gradient(#ffffff, #fcfcfc);
-  background-image: -ms-linear-gradient(#ffffff, #fcfcfc);
-  background-image: linear-gradient(#ffffff, #fcfcfc);
-  border-bottom: 1px solid #fcfcfc;
-}
-/* line 98, ../sass/partials/_nav.scss */
-nav li.internal.active .commandcenter, nav li.internal.active:hover .commandcenter {
-  background: url(../images/sprite.png) -70px -100px no-repeat !important;
-}
-/* line 102, ../sass/partials/_nav.scss */
-nav li.internal .commandcenter {
-  width: 16px;
-  display: inline-block;
-  text-indent: -1000em;
-  background: url(../images/sprite.png) -50px -100px no-repeat !important;
-}
-/* line 110, ../sass/partials/_nav.scss */
-nav li:hover {
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-  -o-box-shadow: none;
-  box-shadow: none;
-  background: #676e74;
-  cursor: pointer;
-}
-/* line 114, ../sass/partials/_nav.scss */
-nav li:hover .sub-menu {
-  display: block;
-  position: absolute;
-}
-
-/* line 1, ../sass/partials/_notifications.scss */
-.meta .notifications-counter {
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -o-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -khtml-border-radius: 5px;
-  border-radius: 5px;
-  background: #398DD5;
-  padding: 3px 6px;
-  margin-left: 5px;
-}
-/* line 6, ../sass/partials/_notifications.scss */
-.meta .notifications-counter:hover {
-  text-decoration: none;
-}
-
 /* line 7, ../sass/partials/_page.scss */
 html, body {
   height: 100%;
@@ -2740,22 +1984,44 @@ strong {
 /* line 112, ../sass/partials/_page.scss */
 #branding h1 {
   color: white;
-  padding-top: 3px;
+  padding: 3px 25px;
+}
+
+/* line 118, ../sass/partials/_page.scss */
+div.breadcrumbs {
+  background: #595f65;
+  border-top: 1px solid #444444;
+  color: #cccccc;
+  padding-left: 25px;
+}
+/* line 123, ../sass/partials/_page.scss */
+div.breadcrumbs a {
+  color: #888888;
+}
+/* line 125, ../sass/partials/_page.scss */
+div.breadcrumbs a:hover {
+  color: #cccccc;
+  text-decoration: none;
+}
+
+/* line 132, ../sass/partials/_page.scss */
+#user-tools {
+  padding: 20px 25px;
 }
 
 /* Box Mixin */
 /* Dashboard */
-/* line 135, ../sass/partials/_page.scss */
+/* line 154, ../sass/partials/_page.scss */
 .dashboard #content {
   width: 740px;
 }
-/* line 138, ../sass/partials/_page.scss */
+/* line 157, ../sass/partials/_page.scss */
 .dashboard .module {
   padding: 0 30px 10px 30px !important;
 }
 
 /* Module */
-/* line 145, ../sass/partials/_page.scss */
+/* line 164, ../sass/partials/_page.scss */
 #content-main .module {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2774,17 +2040,22 @@ strong {
   padding: 0;
   margin-bottom: 10px;
 }
-/* line 127, ../sass/partials/_page.scss */
+/* line 146, ../sass/partials/_page.scss */
 #content-main .module h2, #content-main .module h3, #content-main .module h4, #content-main .module h5, #content-main .module h6 {
   margin-bottom: 12px;
   margin-top: 0;
 }
-/* line 148, ../sass/partials/_page.scss */
+/* line 167, ../sass/partials/_page.scss */
 #content-main .module h2 {
-  margin-bottom: 12px;
+  background: none;
+  border-bottom: 1px solid #dddddd;
+  color: #444444;
+  font-size: 100%;
+  margin-bottom: 2px;
   margin-top: 0;
+  padding: 10px;
 }
-/* line 152, ../sass/partials/_page.scss */
+/* line 176, ../sass/partials/_page.scss */
 #content-main .module caption {
   background: none;
   color: #666666;
@@ -2794,15 +2065,49 @@ strong {
   margin-bottom: 10px;
   padding: 0;
 }
-/* line 160, ../sass/partials/_page.scss */
+/* line 184, ../sass/partials/_page.scss */
 #content-main .module caption a.section:link, #content-main .module caption a.section:visited {
   color: #666666;
 }
-/* line 166, ../sass/partials/_page.scss */
-#content-main .form-row {
+/* line 190, ../sass/partials/_page.scss */
+#content-main .inline-group {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: white 0 0 2px inset !important;
+  -webkit-box-shadow: white 0 0 2px inset !important;
+  -o-box-shadow: white 0 0 2px inset !important;
+  box-shadow: white 0 0 2px inset !important;
+  border: 1px solid #dddddd;
+  background: rgba(255, 255, 255, 0.2) !important;
+  padding: 10px;
+}
+/* line 196, ../sass/partials/_page.scss */
+#content-main .inline-group h2 {
+  background: none !important;
+  color: #444444;
+  font-size: 100%;
+  margin-bottom: 10px;
+  padding: 0 10px 8px 0px;
+}
+/* line 203, ../sass/partials/_page.scss */
+#content-main .inline-group div.add-row {
+  background: none !important;
+  border-bottom: 0 !important;
+}
+/* line 207, ../sass/partials/_page.scss */
+#content-main .inline-group .form-row {
+  border-bottom: none !important;
+}
+/* line 213, ../sass/partials/_page.scss */
+#content-main .inline-related h3 {
+  background: none;
   border-bottom: none;
 }
-/* line 170, ../sass/partials/_page.scss */
+/* line 219, ../sass/partials/_page.scss */
 #content-main .submit-row {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2810,25 +2115,15 @@ strong {
   -ms-border-radius: 5px;
   -khtml-border-radius: 5px;
   border-radius: 5px;
-  -moz-box-shadow: #dddddd 0 2px 3px 0px;
-  -webkit-box-shadow: #dddddd 0 2px 3px 0px;
-  -o-box-shadow: #dddddd 0 2px 3px 0px;
-  box-shadow: #dddddd 0 2px 3px 0px;
-  background: white;
-  border: 0;
-  border-top: 1px solid #F6F6F6;
-  margin-bottom: 5px;
-  padding: 0;
-  border-top: none;
+  -moz-box-shadow: white 0 0 2px inset !important;
+  -webkit-box-shadow: white 0 0 2px inset !important;
+  -o-box-shadow: white 0 0 2px inset !important;
+  box-shadow: white 0 0 2px inset !important;
+  border: 1px solid #dddddd;
   background: rgba(255, 255, 255, 0.2) !important;
   padding: 10px;
 }
-/* line 127, ../sass/partials/_page.scss */
-#content-main .submit-row h2, #content-main .submit-row h3, #content-main .submit-row h4, #content-main .submit-row h5, #content-main .submit-row h6 {
-  margin-bottom: 12px;
-  margin-top: 0;
-}
-/* line 177, ../sass/partials/_page.scss */
+/* line 227, ../sass/partials/_page.scss */
 #content-main .selector .selector-available, #content-main .selector .selector-chosen {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2838,29 +2133,30 @@ strong {
   border-radius: 5px;
   border: 1px solid #dddddd;
 }
-/* line 180, ../sass/partials/_page.scss */
+/* line 230, ../sass/partials/_page.scss */
 #content-main .selector .selector-available h2, #content-main .selector .selector-chosen h2 {
   color: #444444 !important;
   background: none !important;
   border: none;
   margin-bottom: 0;
 }
-/* line 186, ../sass/partials/_page.scss */
+/* line 236, ../sass/partials/_page.scss */
 #content-main .selector .selector-available input, #content-main .selector .selector-chosen input {
   width: 252px;
 }
-/* line 190, ../sass/partials/_page.scss */
+/* line 240, ../sass/partials/_page.scss */
 #content-main .selector .selector-filter {
   border: none;
 }
-/* line 193, ../sass/partials/_page.scss */
+/* line 243, ../sass/partials/_page.scss */
 #content-main .selector select[multiple] {
   border: 1px solid #dddddd;
   border-left: none;
   border-right: none;
+  margin-bottom: 0;
 }
 
-/* line 202, ../sass/partials/_page.scss */
+/* line 253, ../sass/partials/_page.scss */
 #content-related .module {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -2868,428 +2164,96 @@ strong {
   -ms-border-radius: 5px;
   -khtml-border-radius: 5px;
   border-radius: 5px;
+  -moz-box-shadow: white 0 0 2px inset !important;
+  -webkit-box-shadow: white 0 0 2px inset !important;
+  -o-box-shadow: white 0 0 2px inset !important;
+  box-shadow: white 0 0 2px inset !important;
   border: 1px solid #dddddd;
   background: rgba(255, 255, 255, 0.2) !important;
   margin-left: 10px;
   padding: 10px 20px !important;
 }
-/* line 208, ../sass/partials/_page.scss */
+/* line 260, ../sass/partials/_page.scss */
 #content-related .module ul.actionlist {
   padding: 0;
 }
-/* line 211, ../sass/partials/_page.scss */
+/* line 263, ../sass/partials/_page.scss */
 #content-related .module h2 {
   background: none;
   color: #888888;
   padding: 0 0 5px 0;
 }
-/* line 216, ../sass/partials/_page.scss */
+/* line 268, ../sass/partials/_page.scss */
 #content-related .module h3 {
   border-bottom: 1px solid #dddddd;
   line-height: 20px;
   margin: 0 0 5px 0;
   padding: 0;
 }
-/* line 222, ../sass/partials/_page.scss */
+/* line 274, ../sass/partials/_page.scss */
 #content-related .module p {
   padding: 0;
 }
 
-/* line 229, ../sass/partials/_page.scss */
+/* line 281, ../sass/partials/_page.scss */
 #changelist #toolbar {
   background: none !important;
   border: 0 !important;
 }
-/* line 233, ../sass/partials/_page.scss */
+/* line 285, ../sass/partials/_page.scss */
 #changelist #toolbar form #searchbar {
   padding: 4px 5px 6px 5px !important;
 }
-/* line 239, ../sass/partials/_page.scss */
+/* line 291, ../sass/partials/_page.scss */
 #changelist #changelist-search div {
   float: right;
   margin-right: 2px;
 }
-/* line 243, ../sass/partials/_page.scss */
+/* line 295, ../sass/partials/_page.scss */
 #changelist #changelist-search label {
   min-width: auto;
   font-size: 150%;
 }
-/* line 248, ../sass/partials/_page.scss */
+/* line 300, ../sass/partials/_page.scss */
+#changelist #changelist-filter {
+  background: rgba(255, 255, 255, 0.2);
+}
+/* line 302, ../sass/partials/_page.scss */
+#changelist #changelist-filter h2 {
+  background: none;
+  color: #888888;
+  padding: 2px 9px;
+}
+/* line 307, ../sass/partials/_page.scss */
+#changelist #changelist-filter ul {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+/* line 310, ../sass/partials/_page.scss */
+#changelist #changelist-filter ul li.selected {
+  border-left: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+/* line 314, ../sass/partials/_page.scss */
+#changelist #changelist-filter ul li.selected a {
+  color: #029eee !important;
+}
+/* line 320, ../sass/partials/_page.scss */
 #changelist #result_list {
   margin: 0 !important;
 }
-/* line 251, ../sass/partials/_page.scss */
+/* line 323, ../sass/partials/_page.scss */
 #changelist .actions {
   background: none !important;
   border: 0 !important;
   padding: 0px 3px 6px 3px !important;
 }
-/* line 256, ../sass/partials/_page.scss */
+/* line 328, ../sass/partials/_page.scss */
 #changelist .paginator {
   border-top: none !important;
   border-bottom: none !important;
   background: none !important;
-}
-
-/* line 263, ../sass/partials/_page.scss */
-div.breadcrumbs {
-  background: #fcfcfc;
-}
-
-/* Window */
-/* line 2, ../sass/partials/_shared.scss */
-.window {
-  left: 50%;
-  margin-left: -155px;
-  position: absolute;
-  top: 25%;
-  width: 310px;
-}
-/* line 8, ../sass/partials/_shared.scss */
-.window fieldset {
-  margin-bottom: 10px;
-}
-/* line 10, ../sass/partials/_shared.scss */
-.window fieldset input {
-  width: 300px;
-}
-/* line 13, ../sass/partials/_shared.scss */
-.window fieldset label {
-  display: block;
-  margin-bottom: 5px;
-}
-/* line 18, ../sass/partials/_shared.scss */
-.window .logo {
-  margin-top: -12px;
-}
-
-/* Big Form */
-/* line 24, ../sass/partials/_shared.scss */
-.big-form {
-  background: #fcfcfc;
-  font-size: 125%;
-  margin-bottom: 20px;
-}
-/* line 28, ../sass/partials/_shared.scss */
-.big-form p {
-  margin-bottom: 0;
-}
-/* line 31, ../sass/partials/_shared.scss */
-.big-form input {
-  padding: 9px;
-}
-/* line 34, ../sass/partials/_shared.scss */
-.big-form .button {
-  margin-top: 0;
-}
-/* line 37, ../sass/partials/_shared.scss */
-.big-form .cost {
-  display: block;
-  margin-top: 3px;
-  position: relative;
-  width: 100px;
-}
-/* line 42, ../sass/partials/_shared.scss */
-.big-form .cost strong {
-  font-size: 125%;
-  display: block;
-  margin-top: -10px;
-}
-/* line 47, ../sass/partials/_shared.scss */
-.big-form .cost small {
-  display: block;
-  color: #cccccc;
-  font-size: 10px;
-}
-
-/* line 55, ../sass/partials/_shared.scss */
-.counter {
-  -moz-border-radius: 7px;
-  -webkit-border-radius: 7px;
-  -o-border-radius: 7px;
-  -ms-border-radius: 7px;
-  -khtml-border-radius: 7px;
-  border-radius: 7px;
-  background: white;
-  border: 1px solid #dddddd;
-  display: inline-block;
-  margin: -11px 10px;
-  padding: 5px;
-}
-/* line 62, ../sass/partials/_shared.scss */
-.counter strong {
-  display: inline-block;
-  margin: 0 10px;
-}
-/* line 66, ../sass/partials/_shared.scss */
-.counter .button {
-  display: inline-block;
-  text-align: center;
-  width: 10px;
-}
-
-/* line 74, ../sass/partials/_shared.scss */
-#signup.window {
-  position: relative;
-  top: 20px;
-  margin-bottom: 60px;
-  padding-bottom: 40px;
-}
-/* line 79, ../sass/partials/_shared.scss */
-#signup.window select {
-  width: 310px;
-}
-
-/* Version */
-/* line 85, ../sass/partials/_shared.scss */
-.version {
-  color: #888888;
-}
-
-/* line 88, ../sass/partials/_shared.scss */
-.odd {
-  background: white;
-}
-
-/* line 89, ../sass/partials/_shared.scss */
-.even {
-  background: #fcfcfc;
-}
-
-/* line 91, ../sass/partials/_shared.scss */
-.odd .odd {
-  background: #fcfcfc;
-}
-
-/* line 92, ../sass/partials/_shared.scss */
-.odd .even {
-  background: white;
-}
-
-/* line 94, ../sass/partials/_shared.scss */
-.collected {
-  color: #8fad28;
-}
-
-/* line 95, ../sass/partials/_shared.scss */
-.open, .past_due {
-  color: #ffa800;
-}
-
-/* line 96, ../sass/partials/_shared.scss */
-.failed {
-  color: #d50101;
-}
-
-/* line 100, ../sass/partials/_shared.scss */
-.underlay input {
-  width: 100%;
-}
-
-/* line 105, ../sass/partials/_shared.scss */
-.errors {
-  color: #e80101;
-}
-/* line 107, ../sass/partials/_shared.scss */
-.errors ul {
-  margin: 20px 0;
-  padding-left: 0;
-  padding-right: 20px;
-}
-/* line 111, ../sass/partials/_shared.scss */
-.errors ul li {
-  list-style: none;
-  margin-left: 0px;
-}
-
-/* line 118, ../sass/partials/_shared.scss */
-.new {
-  color: #9ab933;
-}
-
-/* line 122, ../sass/partials/_shared.scss */
-.price {
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -o-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -khtml-border-radius: 5px;
-  border-radius: 5px;
-  background: #029eee;
-  color: white;
-  font-weight: bold;
-  line-height: 13px;
-  padding: 3px 6px 3px 6px;
-  position: relative;
-  margin: -1px 2px 0 0;
-  font-size: 10px;
-}
-/* line 133, ../sass/partials/_shared.scss */
-.price.free {
-  background: #bcd077;
-}
-
-/* line 138, ../sass/partials/_shared.scss */
-.tag {
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -o-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -khtml-border-radius: 5px;
-  border-radius: 5px;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  -moz-box-shadow: white 0 0 2px inset;
-  -webkit-box-shadow: white 0 0 2px inset;
-  -o-box-shadow: white 0 0 2px inset;
-  box-shadow: white 0 0 2px inset;
-  color: #555555;
-  border: 1px solid #cccccc;
-  line-height: 13px;
-  padding: 3px 19px 3px 6px;
-  position: relative;
-  margin: -1px 2px 0 0;
-}
-
-/* line 150, ../sass/partials/_shared.scss */
-.tag-delete {
-  position: absolute;
-  right: 5px;
-  top: 6px;
-  display: block;
-  width: 8px;
-  height: 9px;
-  font-size: 1px;
-  background: url(../images/chosen-sprite.png) right top no-repeat;
-}
-/* line 159, ../sass/partials/_shared.scss */
-.tag-delete:hover {
-  background-position: right -9px;
-}
-
-/* Filter */
-/* line 166, ../sass/partials/_shared.scss */
-.filters .filter {
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  -o-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -khtml-border-radius: 10px;
-  border-radius: 10px;
-  background: #fcfcfc;
-  border: 1px solid #dddddd;
-  color: #888888;
-  font-size: 11px;
-  padding: 3px 15px 4px 15px;
-  margin-right: 5px;
-}
-/* line 175, ../sass/partials/_shared.scss */
-.filters .filter:hover {
-  background: #f1f1f1;
-  border: 1px solid #cccccc;
-  color: #888888;
-  text-decoration: none;
-}
-/* line 182, ../sass/partials/_shared.scss */
-.filters .filter.active, .filters nav li.filter.active:hover, nav .filters li.filter.active:hover {
-  -moz-box-shadow: #777777 0 0 5px inset;
-  -webkit-box-shadow: #777777 0 0 5px inset;
-  -o-box-shadow: #777777 0 0 5px inset;
-  box-shadow: #777777 0 0 5px inset;
-  border: none;
-  background: #bbb;
-  font-weight: bold;
-  color: white;
-}
-
-/* Circle Status */
-/* line 194, ../sass/partials/_shared.scss */
-.status {
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -o-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -khtml-border-radius: 5px;
-  border-radius: 5px;
-  display: inline-block;
-  height: 10px;
-  margin-right: 5px;
-  margin-top: -3px;
-  text-indent: -1000em;
-  vertical-align: middle;
-  width: 10px;
-}
-/* line 204, ../sass/partials/_shared.scss */
-.status.new {
-  background: #029eee;
-}
-/* line 207, ../sass/partials/_shared.scss */
-.status.deployed {
-  background: #9ab933;
-}
-/* line 210, ../sass/partials/_shared.scss */
-.status.offline {
-  background: #cccccc;
-}
-/* line 213, ../sass/partials/_shared.scss */
-.status.error {
-  background: #e80101;
-}
-/* line 216, ../sass/partials/_shared.scss */
-.status.public, .status.private, .status.sandbox, .status.certified {
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-  -o-border-radius: 0;
-  -ms-border-radius: 0;
-  -khtml-border-radius: 0;
-  border-radius: 0;
-  height: 15px;
-  width: 15px;
-}
-/* line 221, ../sass/partials/_shared.scss */
-.status.public {
-  background: url(../images/sprite.png) 0 -80px no-repeat !important;
-}
-/* line 224, ../sass/partials/_shared.scss */
-.status.private {
-  background: url(../images/sprite.png) -15px -80px no-repeat !important;
-}
-/* line 227, ../sass/partials/_shared.scss */
-.status.sandbox {
-  background: url(../images/sprite.png) -17px -100px no-repeat !important;
-}
-/* line 230, ../sass/partials/_shared.scss */
-.status.certified {
-  background: url(../images/sprite.png) -34px -100px no-repeat !important;
-}
-
-/* Step Navigation */
-/* line 237, ../sass/partials/_shared.scss */
-.step-internal {
-  margin-left: 0px;
-  margin-top: 20px;
-  width: 960px;
-  height: 32px;
-}
-/* line 242, ../sass/partials/_shared.scss */
-.step-internal.three-step {
-  background: url("/static/images/step-sprite_3.png");
-}
-/* line 246, ../sass/partials/_shared.scss */
-.step-internal.step1 {
-  background-position: 0 0;
-}
-/* line 249, ../sass/partials/_shared.scss */
-.step-internal.step2 {
-  background-position: 0 -40px;
-}
-/* line 252, ../sass/partials/_shared.scss */
-.step-internal.step3 {
-  background-position: 0 -80px;
 }
 
 /* Tables */
@@ -3316,6 +2280,51 @@ table th, table td {
   padding: 5px 10px;
   text-align: left;
   vertical-align: middle;
+}
+
+/* Tables */
+/* line 21, ../sass/partials/_table.scss */
+table thead th, table tfoot td {
+  background: #fcfcfc;
+}
+/* line 24, ../sass/partials/_table.scss */
+table td, table th {
+  font-family: sans-serif;
+  padding: 5px !important;
+}
+/* line 29, ../sass/partials/_table.scss */
+table tr:first-child th, table tr:first-child td {
+  border-top: 1px solid #f3f3f3;
+}
+/* line 32, ../sass/partials/_table.scss */
+table tr th, table tr td {
+  border-bottom: 1px solid #f3f3f3;
+}
+/* line 38, ../sass/partials/_table.scss */
+table th a:link, table th a:visited, table th a:link:visited {
+  color: #444444;
+}
+/* line 42, ../sass/partials/_table.scss */
+table .row1 {
+  background: white;
+}
+/* line 45, ../sass/partials/_table.scss */
+table .row2 {
+  background: #fcfcfc;
+}
+
+/* line 54, ../sass/partials/_table.scss */
+.change-list table thead tr:first-child th, .change-list table thead tr:first-child td {
+  background: none;
+}
+/* line 61, ../sass/partials/_table.scss */
+.change-list table tbody th a:link, .change-list table tbody th a:visited, .change-list table tbody th a:link:visited {
+  color: #029eee;
+  padding-left: 5px;
+}
+/* line 66, ../sass/partials/_table.scss */
+.change-list table tbody tr.selected {
+  background: #f6fcff !important;
 }
 
 @media only screen and (max-width: 1024px) {

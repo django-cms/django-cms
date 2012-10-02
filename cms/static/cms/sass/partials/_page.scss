@@ -111,9 +111,28 @@ strong { font-weight: bold; }
 #branding {
 	h1 {
 		color: $font-color-white;
-		padding-top: 3px;
+		padding: 3px 25px;
 	}
 }
+
+div.breadcrumbs {
+	background: $background-color-dark;
+	border-top: 1px solid $line-color-dark;
+	color: $font-color-ultralight;
+	padding-left: 25px;
+	a {
+		color: $font-color-light;
+		&:hover {
+			color: $font-color-ultralight;	
+			text-decoration: none;		
+		}
+	}
+}
+
+#user-tools {
+	padding: 20px 25px;
+}
+
 
 /* Box Mixin */
 @mixin box(){
@@ -146,8 +165,13 @@ strong { font-weight: bold; }
 		@include box();
 		margin-bottom: 10px;
 		h2 {
-			margin-bottom: 12px;
+			background: none;
+			border-bottom: 1px solid $line-color-light;
+			color: $font-color;
+			font-size: 100%;
+			margin-bottom: 2px;
 			margin-top: 0;
+			padding: 10px;
 		}
 		caption {
 			background: none;
@@ -163,13 +187,39 @@ strong { font-weight: bold; }
 			
 		}
 	}
-	.form-row {
-		border-bottom: none;
+	.inline-group { 
+		@include border-radius(5px);	
+	 	@include box-shadow($background-color-white 0 0 $button-shadow-width inset !important);	
+		border: 1px solid $line-color-light;
+		background: $background-color-transparent !important;
+		padding: 10px;
+		h2 {
+			background: none !important;
+			color: $font-color;
+			font-size: 100%;
+			margin-bottom: 10px;
+			padding: 0 10px 8px 0px;
+		}
+		div.add-row { 
+			background: none !important; 
+			border-bottom: 0 !important;
+		}
+		.form-row {
+			border-bottom: none !important;
+		}
 	}
 	
+	.inline-related {
+		h3 {
+			background: none;
+			border-bottom: none;
+		}
+	}
+		
 	.submit-row {
-		@include box();
-		border-top: none;
+		@include border-radius(5px);	
+	 	@include box-shadow($background-color-white 0 0 $button-shadow-width inset !important);	
+		border: 1px solid $line-color-light;
 		background: $background-color-transparent !important;
 		padding: 10px;
 	}
@@ -194,13 +244,15 @@ strong { font-weight: bold; }
 			border: 1px solid $line-color-light;			
 			border-left: none;
 			border-right: none;
+			margin-bottom: 0;
 		}
 	}
 }
 
 #content-related {
 	.module {
-		@include border-radius(5px);		
+		@include border-radius(5px);	
+	 	@include box-shadow($background-color-white 0 0 $button-shadow-width inset !important);	
 		border: 1px solid $line-color-light;
 		background: $background-color-transparent !important;
 		margin-left: 10px;
@@ -245,6 +297,26 @@ strong { font-weight: bold; }
 			font-size: 150%; 
 		}
 	}
+	#changelist-filter {
+		background: $background-color-transparent;
+		h2 {
+			background: none;
+			color: $font-color-light;
+			padding: 2px 9px;
+		}
+		ul {
+			font-size: 12px;
+			margin-bottom: 10px;
+			li.selected {
+				border-left: none !important;
+				padding-left: 0 !important;
+				margin-left: 0 !important;
+				a {
+					color: $link-color !important;
+				}
+			}
+		}
+	}
 	#result_list {
 		margin: 0 !important;
 	}
@@ -258,9 +330,6 @@ strong { font-weight: bold; }
 		border-bottom: none !important;
 		background: none !important;
 	}
-}
-
-div.breadcrumbs {
-	background: $background-color-ultralight;
+	
 }
 

@@ -2,7 +2,14 @@
 .addlink,
 .changelink,
 #changelist-search label,
-.deletelink 
+.deletelink,
+a.selector-clearall,
+a.active.selector-clearall,
+a.selector-chooseall,
+a.active.selector-chooseall,
+.selector-remove,
+.selector-add,
+.inline-group div.add-row a
 {
 	background: none !important;
 	padding-left: 10px;
@@ -15,7 +22,14 @@
 .addlink:before,
 .changelink:before,
 #changelist-search label:before,
-.deletelink:before
+.deletelink:before,
+a.selector-clearall:before,
+a.active.selector-clearall:before,
+a.selector-chooseall:before,
+a.active.selector-chooseall:before,
+.selector-remove:before,
+.selector-add:before,
+.inline-group div.add-row a:before
 {
 	font-family: 'django-admin-icons';
 	font-style: normal;
@@ -26,17 +40,29 @@
 	padding-right: 5px;
 }
 
-.addlink { color: $success-color !important; }
-.addlink:before { content: "\22";  }
 
+.addlink:before { content: "\22";  }
 .changelink:before { content: "\21"; }
 #changelist-search label:before { content: "\23"; }
 .deletelink:before { content: "\24"; }
+.selector-remove:before, a.selector-clearall:before, a.active.selector-clearall:before { content: "\25"; font-size: 100%; }
+.selector-add:before, a.selector-chooseall:before, a.active.selector-chooseall:before { content: "\26"; font-size: 100%; }
+.inline-group div.add-row a:before { content: "\22";  }
 
 .actionlist {
-	.addlink { padding-left: 0; }
+	.addlink, .changelink { padding-left: 0; }
 }
 
+
+
+.addlink { color: $success-color !important; }
 #changelist-search label { font-weight: bold; }
 #changelist-search label img { display: none;}
 .help-tooltip { display: none; }
+a.active.selector-chooseall {  }
+.selector-remove, .selector-add { display: inline !important; font-size: 125% !important; padding-left: 1px; color: $font-color-white !important; }
+.selector-remove:before, .selector-add:before { color: $font-color; }
+.inline-group div.add-row a { color: $success-color !important; padding-left: 5px !important; }
+
+/* Sepcials */
+.selector ul.selector-chooser { @include border-radius(10px); background: $background-color-light !important; height: 44px !important; }

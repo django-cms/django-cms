@@ -16,3 +16,56 @@ table {
 	}
 }
 
+/* Tables */
+table {
+	thead th, tfoot td {
+		background: $background-color-ultralight;
+	}
+	td, th {
+		font-family: $base-font-family;
+		padding: 5px !important;
+	}
+	tr {
+		&:first-child th, &:first-child td {
+			border-top: 1px solid $line-color-ultralight;		
+		}
+		th, td {
+			border-bottom: 1px solid $line-color-ultralight;
+
+		}
+	}
+	th {
+		a:link, a:visited, a:link:visited {
+			color: $font-color;
+		}		
+	}
+	.row1 {
+		background: $background-color-white;		
+	}
+	.row2 {
+		background: $background-color-ultralight;		
+	}
+}
+
+.change-list {
+	table {
+		thead {
+			tr {
+				&:first-child th, &:first-child td {
+					background: none;
+				}
+			}
+		}
+		tbody {
+			th {
+				a:link, a:visited, a:link:visited {	
+					color: $link-color;		
+					padding-left: 5px;
+				}
+			}
+			tr.selected {
+				background: $background-color-highlight !important;
+			}	
+		}
+	}
+}
