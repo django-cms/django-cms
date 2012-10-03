@@ -249,6 +249,16 @@ class CMSTestCase(testcases.TestCase):
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
+
+        class MockStorage(object):
+
+            def add(self, level, message, extra_tags=''):
+                pass
+
+            def update(self, response):
+                pass
+
+        request._messages = MockStorage()
         return request
 
     def check_published_page_attributes(self, page):
