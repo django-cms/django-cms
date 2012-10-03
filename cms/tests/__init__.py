@@ -9,7 +9,6 @@ from cms.tests.forms import *
 from cms.tests.mail import *
 from cms.tests.menu import *
 from cms.tests.menu_utils import *
-from cms.tests.middleware import *
 from cms.tests.multilingual import *
 from cms.tests.navextender import *
 from cms.tests.nonroot import *

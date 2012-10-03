@@ -7,6 +7,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+from cms.utils.i18n import get_language_list
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -125,7 +126,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     assert template in [tpl[0] for tpl in settings.CMS_TEMPLATES]
     
     # validate language:
-    assert language in [lang[0] for lang in settings.CMS_LANGUAGES]
+    assert language in get_language_list()
     
     # set default slug:
     if not slug:
@@ -220,7 +221,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate language:
-    assert language in [lang[0] for lang in settings.CMS_LANGUAGES]
+    assert language in get_language_list()
     
     # validate page
     assert isinstance(page, Page)

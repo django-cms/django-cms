@@ -64,7 +64,7 @@ class CMSToolbar(Toolbar):
         
     def init(self):
         self.is_staff = self.request.user.is_staff
-        self.can_change = (self.request.current_page and
+        self.can_change = (hasattr(self.request.current_page, 'has_change_permission') and
                            self.request.current_page.has_change_permission(self.request))
         self.edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
                                            _('Edit mode'))
