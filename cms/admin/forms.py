@@ -92,10 +92,7 @@ class PageAddForm(forms.ModelForm):
         
     def clean(self):
         cleaned_data = self.cleaned_data
-        if 'slug' in cleaned_data.keys():
-            slug = cleaned_data['slug']
-        else:
-            slug = ""
+        slug = cleaned_data.get('slug', '')
         
         page = self.instance
         lang = cleaned_data.get('language', None)
@@ -123,7 +120,7 @@ class PageAddForm(forms.ModelForm):
             title = page.get_title_obj(lang)
             if title:
                 oldslug = title.slug
-                title.slug = self.cleaned_data['slug']
+                title.slug = slug
                 title.save()
                 try:
                     is_valid_url(title.path,page)
