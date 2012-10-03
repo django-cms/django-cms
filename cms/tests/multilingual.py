@@ -68,8 +68,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
                 1:[
-                    {'code':'x-klingon', 'name':'Klingon'},
-                    {'code':'x-elvish', 'name':'Elvish'},
+                    {'code':'x-klingon', 'name':'Klingon','public':True, 'fallbacks':[]},
+                    {'code':'x-elvish', 'name':'Elvish', 'public':True, 'fallbacks':[]},
                ]}):
             from cms.views import details
             request = AttributeObject(
@@ -93,8 +93,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
                 1:[
-                    {'code':'x-klingon', 'name':'Klingon'},
-                    {'code':'x-elvish', 'name':'Elvish', 'fallbacks':['x-klingon', 'en', ]},
+                    {'code':'x-klingon', 'name':'Klingon', 'public':True, 'fallbacks':[]},
+                    {'code':'x-elvish', 'name':'Elvish', 'public':True, 'fallbacks':['x-klingon', 'en', ]},
                     ]},
             ):
             create_title("x-klingon", "futla ak", page, slug=page.get_slug())
@@ -132,7 +132,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             response = self.client.get("/de/")
             self.assertEquals(response.status_code, 404)
         lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
-        lang_settings['default']['redirect_on_fallback'] = False
+        lang_settings[1][0]['redirect_on_fallback'] = False
+        lang_settings[1][1]['redirect_on_fallback'] = False
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             response = self.client.get("/de/")
             self.assertEquals(response.status_code, 200)

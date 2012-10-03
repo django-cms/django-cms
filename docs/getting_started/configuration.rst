@@ -267,10 +267,11 @@ default behavior for all languages. You can overwrite the default settings with 
 For example we define `hide_untranslated` as False globally. The English language overwrites this behavior.
 
 Every language node needs at least a `code` and a `name` property. `code` is the iso 2 code for the language. And
-name is the English name of the language.
+name is the verbose name of the language.
 
 .. note:: With a gettext() lambda function you can make language names translatable. To enable this add
-          `gettext = lambda s: s` at the beginning of your settings file
+          `gettext = lambda s: s` at the beginning of your settings file. But maybe you want to leave the language name
+          as it is.
 
 What are the properties a language node can have?
 
@@ -279,7 +280,7 @@ What are the properties a language node can have?
 code
 ----
 
-String. Iso 2 code of the language.
+String. RFC5646 code of the language.
 
 Example: ``"en"``.
 
@@ -287,7 +288,7 @@ Example: ``"en"``.
 
 name
 ----
-String. The English name of the language.
+String. The verbose name of the language.
 
 .. note:: Is required for every language.
 

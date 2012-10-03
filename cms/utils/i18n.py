@@ -60,44 +60,12 @@ def get_public_languages(site_id=None):
 
 def get_language_object(language_code, site_id=None):
     """
-    :param language_code: iso2 language code
+    :param language_code: RFC5646 language code
     :return: the language object filled up by defaults
     """
     site_id = get_site(site_id)
     for language in settings.CMS_LANGUAGES[site_id]:
         if language['code'] == language_code:
-            language = language.copy()
-            if not language.has_key('fallbacks'):
-                fallbacks = []
-                for tmp_language in settings.CMS_LANGUAGES[site_id]:
-                    tmp_language = tmp_language.copy()
-                    if not tmp_language.has_key('public'):
-                        if settings.CMS_LANGUAGES.has_key('default'):
-                            tmp_language['public'] = settings.CMS_LANGUAGES['default'].get('public', True)
-                        else:
-                            tmp_language['public'] = True
-                    if tmp_language['public']:
-                        fallbacks.append(tmp_language['code'])
-                fallbacks.remove(language_code)
-                if settings.CMS_LANGUAGES.has_key('default'):
-                    language['fallbacks'] = settings.CMS_LANGUAGES['default'].get('fallbacks', fallbacks)
-                else:
-                    language['fallbacks'] = fallbacks
-            if not language.has_key('public'):
-                if settings.CMS_LANGUAGES.has_key('default'):
-                    language['public'] = settings.CMS_LANGUAGES['default'].get('public', True)
-                else:
-                    language['public'] = True
-            if not language.has_key('redirect_on_fallback'):
-                if settings.CMS_LANGUAGES.has_key('default'):
-                    language['redirect_on_fallback'] = settings.CMS_LANGUAGES['default'].get('redirect_on_fallback', True)
-                else:
-                    language['redirect_on_fallback'] = True
-            if not language.has_key('hide_untranslated'):
-                if settings.CMS_LANGUAGES.has_key('default'):
-                    language['hide_untranslated'] = settings.CMS_LANGUAGES['default'].get('hide_untranslated', True)
-                else:
-                    language['hide_untranslated'] = True
             return language
     raise LanguageError('Language not found: %s' % language_code)
 
@@ -145,7 +113,7 @@ def get_fallback_languages(language, site_id=None):
     """
     site_id = get_site(site_id)
     language = get_language_object(language, site_id)
-    return language['fallbacks']
+    return language.get('fallbacks', [])
 
 def get_redirect_on_fallback(language, site_id=None):
     """
@@ -156,7 +124,7 @@ def get_redirect_on_fallback(language, site_id=None):
     """
     site_id = get_site(site_id)
     language = get_language_object(language, site_id)
-    return language['redirect_on_fallback']
+    return language.get('redirect_on_fallback', True)
 
 def hide_untranslated(language, site_id=None):
     """
@@ -167,7 +135,7 @@ def hide_untranslated(language, site_id=None):
     """
     site_id = get_site(site_id)
     language = get_language_object(language, site_id)
-    return language['hide_untranslated']
+    return language.get('hide_untranslated', True)
 
 def get_site(site):
     if site is None:

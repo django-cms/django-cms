@@ -144,7 +144,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
                              in_navigation=True, reverse_id='page3')
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
         lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
-        lang_settings['default']['hide_untranslated'] = False
+        lang_settings[1][1]['hide_untranslated'] = False
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2
@@ -155,7 +155,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             context['request'].current_page = page_3
             res = tpl.render(context)
             self.assertEqual(res,"/de/page-3/")
-        lang_settings['default']['hide_untranslated'] = True
+        lang_settings[1][1]['hide_untranslated'] = True
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2
