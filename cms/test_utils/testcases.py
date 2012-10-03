@@ -252,6 +252,12 @@ class CMSTestCase(testcases.TestCase):
 
         class MockStorage(object):
 
+            def __len__(self):
+                return 0
+
+            def __iter__(self):
+                return iter([])
+
             def add(self, level, message, extra_tags=''):
                 pass
 
