@@ -452,6 +452,42 @@ class PlaceholderAdminTest(CMSTestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, "This placeholder already has the maximum number (1) of TextPlugin plugins.")
 
+    def test_edit_plugin_and_cancel(self):
+        placeholder = self.get_placeholder()
+        admin = self.get_admin()
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': placeholder.pk,
+            'language': 'en',
+        }
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request(data)
+                response = admin.add_plugin(request)
+                self.assertEqual(response.status_code, 200)
+                plugin_id = int(response.content)
+                data = {
+                    'body': 'Hello World',
+                    }
+                request = self.get_post_request(data)
+                response = admin.edit_plugin(request, plugin_id)
+                self.assertEqual(response.status_code, 200)
+                text_plugin = Text.objects.get(pk=plugin_id)
+                self.assertEquals('Hello World', text_plugin.body)
+
+                # edit again, but this time press cancel
+                data = {
+                    'body': 'Hello World!!',
+                    '_cancel': True,
+                    }
+                request = self.get_post_request(data)
+                response = admin.edit_plugin(request, plugin_id)
+                self.assertEqual(response.status_code, 200)
+                text_plugin = Text.objects.get(pk=plugin_id)
+                self.assertEquals('Hello World', text_plugin.body)
+
+
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
 
