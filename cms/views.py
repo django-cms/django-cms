@@ -70,6 +70,7 @@ def details(request, slug):
                 pattern_list += urlpatterns
             urlpatterns = patterns('', *pattern_list)
             try:
+                context.current_app = page.reverse_id if page.reverse_id else app.app_name
                 view, args, kwargs = resolve('/', tuple(urlpatterns))
                 return view(request, *args, **kwargs)
             except Resolver404:
@@ -110,4 +111,4 @@ def details(request, slug):
     if not context['has_view_permissions']:
         return _handle_no_page(request, slug)
     
-    return render_to_response(template_name, context)
+    return render_to_response(template_name, context_instance=context)
