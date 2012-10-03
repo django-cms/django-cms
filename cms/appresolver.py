@@ -32,8 +32,8 @@ def applications_page_check(request, current_page=None, path=None):
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
     for lang in get_language_list():
-        if path.startswith(lang+"/"):
-            path = path[len(lang+"/"):]
+        if path.startswith(lang + "/"):
+            path = path[len(lang + "/"):]
     for resolver in APP_RESOLVERS:
         try:
             page_id = resolver.resolve_page_id(path)
