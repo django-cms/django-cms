@@ -11,9 +11,7 @@ If you use more than one language, django CMS urls need
 to be referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see the
 official django `documentation`_.
 
-Main `urls.py` example:
-
-.. code-block:: html+django
+Main `urls.py` example::
 
     from django.conf import settings
     from django.conf.urls.defaults import patterns, include, url
