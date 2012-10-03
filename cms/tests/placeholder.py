@@ -396,14 +396,8 @@ class PlaceholderModelTests(CMSTestCase):
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
         
-class PlaceholderAdminTest(CMSTestCase):
-    placeholderconf = {'test': {
-            'limits': {
-                'global': 2,
-                'TextPlugin': 1,
-            }
-        }
-    }
+
+class PlaceholderAdminTestBase(CMSTestCase):
     def get_placeholder(self):
         return Placeholder.objects.create(slot='test')
     
@@ -414,6 +408,15 @@ class PlaceholderAdminTest(CMSTestCase):
     def get_post_request(self, data):
         return self.get_request(post_data=data)
     
+
+class PlaceholderAdminTest(PlaceholderAdminTestBase):
+    placeholderconf = {'test': {
+            'limits': {
+                'global': 2,
+                'TextPlugin': 1,
+            }
+        }
+    }
     def test_global_limit(self):
         placeholder = self.get_placeholder()
         admin = self.get_admin()
@@ -489,7 +492,7 @@ class PlaceholderAdminTest(CMSTestCase):
 
 
 
-class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
+class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
 
     def _testuser(self):
         u = User(username="test", is_staff = True, is_active = True, is_superuser = False)
