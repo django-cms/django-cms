@@ -80,7 +80,7 @@ class PagesTestCase(CMSTestCase):
             
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             
-            if settings.i18n_installed:
+            if settings.USE_I18N:
                 self.assertEqual(response.status_code, 302)
                 # did we got right redirect?
                 self.assertEqual(response['Location'].endswith(URL_CMS_PAGE), True)
@@ -167,10 +167,10 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             page =  Page.objects.get(title_set__slug=page_data['slug'])
-            response = self.client.get('/admin/cms/page/%s/' %page.id)
+            response = self.client.get('/en/admin/cms/page/%s/' %page.id)
             self.assertEqual(response.status_code, 200)
             page_data['title'] = 'changed title'
-            response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
+            response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'changed title')
 
@@ -191,7 +191,7 @@ class PagesTestCase(CMSTestCase):
                 page_data['has_url_overwrite'] = True
                 response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
                 self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertEqual(page.get_absolute_url(), '/hello/')
+                self.assertEqual(page.get_absolute_url(), '/en/hello/')
                 title = Title.objects.all()[0]
                 page.publish()
                 page_data['title'] = 'new title'
@@ -212,10 +212,10 @@ class PagesTestCase(CMSTestCase):
             page_data["meta_keywords"] = "page,cms,stuff"
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             page =  Page.objects.get(title_set__slug=page_data['slug'])
-            response = self.client.get('/admin/cms/page/%s/' %page.id)
+            response = self.client.get('/en/admin/cms/page/%s/' %page.id)
             self.assertEqual(response.status_code, 200)
             page_data['meta_description'] = 'I am a duck'
-            response = self.client.post('/admin/cms/page/%s/' %page.id, page_data)
+            response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             page = Page.objects.get(title_set__slug=page_data["slug"])
             self.assertEqual(page.get_meta_description(), 'I am a duck')
@@ -231,7 +231,7 @@ class PagesTestCase(CMSTestCase):
             page_data["meta_keywords"] = "page,cms,stuff"
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page =  Page.objects.get(title_set__slug=page_data['slug'])
-            self.client.post('/admin/cms/page/%s/' %page.id, page_data)
+            self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
             t = template.Template("{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
             req = HttpRequest()
             page.published = True
@@ -269,9 +269,9 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             pk = Page.objects.all()[0].pk
-            response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"en" })
+            response = self.client.get("/en/admin/cms/page/%s/" % pk, {"language":"en" })
             self.assertEqual(response.status_code, 200)
-            response = self.client.get("/admin/cms/page/%s/" % pk, {"language":"de" })
+            response = self.client.get("/en/admin/cms/page/%s/" % pk, {"language":"de" })
             self.assertEqual(response.status_code, 200)
         
     def test_move_page(self):
@@ -287,9 +287,9 @@ class PagesTestCase(CMSTestCase):
             page2 = Page.objects.all()[1]
             page3 = Page.objects.all()[2]
             # move pages
-            response = self.client.post("/admin/cms/page/%s/move-page/" % page3.pk, {"target": page2.pk, "position": "last-child"})
+            response = self.client.post("/en/admin/cms/page/%s/move-page/" % page3.pk, {"target": page2.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
-            response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "last-child"})
+            response = self.client.post("/en/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
             # check page2 path and url
             page2 = Page.objects.get(pk=page2.pk)
@@ -314,7 +314,7 @@ class PagesTestCase(CMSTestCase):
             public_page3 = page3.publisher_public
             self.assertEqual(public_page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
             # move page2 back to root and check path of 2 and 3
-            response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "right"})
+            response = self.client.post("/en/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "right"})
             self.assertEqual(response.status_code, 200)
             page1 = Page.objects.get(pk=page1.pk)
             self.assertEqual(page1.get_path(), page_data1['slug'])
@@ -397,7 +397,7 @@ class PagesTestCase(CMSTestCase):
         page_data = self.get_new_page_data()
         page_data['site'] = site.pk
         page_data['title'] = 'changed title'
-        TESTLANG = settings.CMS_SITE_LANGUAGES[site.pk][0]
+        TESTLANG = settings.CMS_LANGUAGES[site.pk][0]['code']
         page_data['language'] = TESTLANG
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -535,7 +535,7 @@ class PagesTestCase(CMSTestCase):
                            published=True, parent=root)
         root.publish()
         page.publish()
-        request = self.get_request('/page')
+        request = self.get_request('/en/page')
         found_page = get_page_from_request(request)
         self.assertFalse(found_page is None)
     
@@ -708,7 +708,7 @@ class PagesTestCase(CMSTestCase):
     def test_home_slug_not_accessible(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en', published=True)
-            self.assertEqual(page.get_absolute_url('en'), '/')
+            self.assertEqual(page.get_absolute_url('en'), '/en/')
             resp = self.client.get('/en/')
             self.assertEqual(resp.status_code, HttpResponse.status_code)
             resp = self.client.get('/en/page/')
@@ -744,8 +744,10 @@ class PagesTestCase(CMSTestCase):
 
             # trigger the apphook query so that it doesn't get in our way
             reverse('pages-root')
+            # trigger the get_languages query so it doesn't get in our way
+            context = self.get_context()
+            context['request'].current_page.get_languages()
             with self.assertNumQueries(4):
-                context = self.get_context()
                 for i, placeholder in enumerate(placeholders):
                     content = get_placeholder_content(context, context['request'], page, placeholder.slot, False)
                     for j in range(5):
@@ -766,7 +768,7 @@ class NoAdminPageTests(CMSTestCase):
         self._ctx.__exit__(None, None, None)
     
     def test_get_page_from_request_fakeadmin_nopage(self):
-        request = self.get_request('/admin/')
+        request = self.get_request('/en/admin/')
         page = get_page_from_request(request)
         self.assertEqual(page, None)
 

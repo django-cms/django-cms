@@ -1,0 +1,152 @@
+##################################
+2.4 release notes (IN DEVELOPMENT)
+##################################
+
+*****************
+What's new in 2.4
+*****************
+
+Removed the MultilingualMiddleware
+==================================
+
+We removed the MultilingualMiddleware. This removed the very ugly monkey patching of the
+reverse() function as well. As a benefit we now support localization of urls and Apphook urls with standard django helpers.
+
+
+For django 1.4 more infos can be found here:
+
+    https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
+
+If you are still running django 1.3 you are able to archieve the same functionality with django-i18nurl. It is a backport
+of the new functionality in django 1.4 and can be found here:
+
+    https://github.com/brocaar/django-i18nurls
+
+
+What you need to do:
+
+- Remove the MultilingualMiddleware from your settings.
+- Be sure the LocaleMiddleware is in your settings and that it comes after the SessionMiddleware.
+- Be sure that the cms.urls is included in a i18n_patterns::
+
+        from django.conf.urls.defaults import *
+        from django.conf.urls.i18n import i18n_patterns
+        from django.contrib import admin
+        from django.conf import settings
+
+        admin.autodiscover()
+
+        urlpatterns = i18n_patterns('',
+            url(r'^admin/', include(admin.site.urls)),
+            url(r'^', include('cms.urls')),
+        )
+
+        if settings.DEBUG:
+            urlpatterns = patterns('',
+            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+            url(r'', include('django.contrib.staticfiles.urls')),
+        ) + urlpatterns
+
+- Change your url and reverse calls to language namespaces. We now support the django way of
+  calling other language urls either via '{% language %}' templatetag or via 'activate("de")' function call in views.
+
+  Before ::
+
+        {% url "de:myview" %}
+
+  After::
+
+        {% load i18n %}{% language "de" %}
+        {% url "myview_name" %}
+        {% endlanguage %}
+
+- reverse urls now return the language prefix as well. So maybe there is some code that adds language prefixes. Remove
+  this code.
+
+CMS_LANGUAGES
+=============
+
+:setting:`CMS_LANGUAGES` has be overhauled. It is no longer a list of tuples like the ``LANGUAGES`` settings.
+
+An example explains more than thousand words::
+
+    CMS_LANGUAGES = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': gettext('English'),
+                    'fallbacks': ['de', 'fr'],
+                    'public': True,
+                    'hide_untranslated': True,
+                    'redirect_on_fallback':False,
+                },
+                {
+                    'code': 'de',
+                    'name': gettext('Deutsch'),
+                    'fallbacks': ['en', 'fr'],
+                    'public': True,
+                },
+                {
+                    'code': 'fr',
+                    'name': gettext('French'),
+                    'public': False,
+                },
+            ],
+            2: [
+                {
+                    'code': 'nl',
+                    'name': gettext('Dutch'),
+                    'public': True,
+                    'fallbacks': ['en'],
+                },
+            ],
+            'default': {
+                'fallbacks': ['en', 'de', 'fr'],
+                'redirect_on_fallback':True,
+                'public': False,
+                'hide_untranslated': False,
+            }
+        }
+
+
+For more details on what all the parameters mean please refer to the :setting:`CMS_LANGUAGES` docs.
+
+The following settings are not needed any more and have been removed:
+
+- `CMS_HIDE_UNTRANSLATED`
+- `CMS_LANGUAGE_FALLBACK`
+- `CMS_LANGUAGE_CONF`
+- `CMS_SITE_LANGUAGES`
+- `CMS_FRONTEND_LANGUAGES`
+
+Please remove them from your settings.py
+
+
+..
+    Feature description
+
+Minor improvements
+==================
+
+.. * Some minor improvement.
+
+
+******************************
+Backwards incompatible changes
+******************************
+
+New minimum requirements for dependencies
+=========================================
+
+If you are running django 1.3.X you need to install django-i18nurls, if you want
+multilingual features. The cms.urls needs to be in a i18n url pattern.
+
+
+
+********************
+Pending deprecations
+********************
+
+* ``simple_language_changer`` will be removed in version 2.5. A bugfix makes
+  this redundant as every non managed url will behave like this.

@@ -17,5 +17,10 @@ def extra_view(request, **kw):
     context = RequestContext(request, kw)
     return render_to_response("sampleapp/extra.html", context)
 
+def current_app(request):
+    app = getattr(request, 'current_app', None)
+    context = RequestContext(request, {'app': app}, current_app=app)
+    return render_to_response("sampleapp/app.html", context)
+
 def notfound(request):
     raise Http404

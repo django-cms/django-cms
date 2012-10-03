@@ -4,6 +4,7 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.utils.admin import get_admin_menu_item_context
+from cms.utils.i18n import get_language_object
 from cms.utils.permissions import get_any_page_view_permissions
 from distutils.version import LooseVersion
 from django import template
@@ -159,15 +160,14 @@ def moderator_choices(page, user):
 
 @register.filter
 def preview_link(page, language):
-    if 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES:
+    if settings.USE_I18N:
         from django.core.urlresolvers import reverse
 
         # Which one of page.get_slug() and page.get_path() is the right
         # one to use in this block? They both seem to return the same thing.
         try:
             # attempt to retrieve the localized path/slug and return
-            root = reverse('pages-root')
-            return "/" + language + root + page.get_absolute_url(language, fallback=False)[len(root):]
+            return page.get_absolute_url(language, fallback=False)
         except:
             # no localized path/slug. therefore nothing to preview. stay on the same page.
             # perhaps the user should be somehow notified for this.
@@ -210,7 +210,7 @@ class PageSubmitRow(InclusionTag):
             'is_popup': is_popup,
             'show_save': True,
             'language': language,
-            'language_name': [name for langcode, name in settings.CMS_LANGUAGES if langcode == language][0],
+            'language_name': get_language_object(language)['name'],
             'show_delete_translation': show_delete_translation
         }
 register.tag(PageSubmitRow)

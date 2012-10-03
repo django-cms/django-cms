@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import Client, RequestFactory
+from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 from urlparse import urljoin
 import sys
@@ -72,6 +73,7 @@ class CMSTestCase(testcases.TestCase):
         super(CMSTestCase, self)._fixture_setup()
         self.create_fixtures()
         self.client = Client()
+        activate("en")
 
     def create_fixtures(self):
         pass
@@ -253,7 +255,7 @@ class CMSTestCase(testcases.TestCase):
                 4 - moderate descendants
                 + combinations
         """
-        response = self.client.post("/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
+        response = self.client.post("/en/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
         self.assertEquals(response.status_code, 200)
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):

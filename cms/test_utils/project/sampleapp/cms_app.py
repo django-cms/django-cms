@@ -7,5 +7,17 @@ class SampleApp(CMSApp):
     name = _("Sample App")
     urls = ["cms.test_utils.project.sampleapp.urls"]
     menus = [SampleAppMenu]
-    
+
 apphook_pool.register(SampleApp)
+
+
+class NamespacedApp(CMSApp):
+    name = _("Namespaced App")
+    urls = [
+        "cms.test_utils.project.sampleapp.ns_urls",
+        "cms.test_utils.project.sampleapp.urls"
+    ]
+    menus = [SampleAppMenu]
+    app_name = 'namespaced_app_ns'
+
+apphook_pool.register(NamespacedApp)

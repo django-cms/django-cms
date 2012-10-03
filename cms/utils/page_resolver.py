@@ -23,7 +23,7 @@ def get_page_queryset_from_path(path, preview=False, site=None):
     In may returns None or a single page is no page is present or root path is given
     """
     if 'django.contrib.admin' in settings.INSTALLED_APPS:
-        admin_base = reverse('admin:index').lstrip('/')
+        admin_base = reverse('admin:index')
     else:
         admin_base = None
 
@@ -112,7 +112,6 @@ def get_page_from_request(request, use_path=None):
         
     The page slug can then be resolved to a Page model object
     """
-    pages_root = urllib.unquote(reverse("pages-root"))
     
     # The following is used by cms.middleware.page.CurrentPageMiddleware
     if hasattr(request, '_current_page_cache'):
@@ -122,15 +121,22 @@ def get_page_from_request(request, use_path=None):
     preview = 'preview' in request.GET and request.user.is_staff
 
     # If use_path is given, someone already did the path cleaning
-    if use_path:
+    if use_path is not None:
         path = use_path
     else:
+        path = request.path
+        pages_root = urllib.unquote(reverse("pages-root"))
         # otherwise strip off the non-cms part of the URL
-        path = request.path[len(pages_root):]
+        if 'django.contrib.admin' in settings.INSTALLED_APPS:
+            admin_base = reverse('admin:index')
+        else:
+            admin_base = None
+        if path.startswith(pages_root) and (not admin_base or not path.startswith(admin_base)):
+            path = path[len(pages_root):]
         # and strip any final slash
         if path.endswith("/"):
             path = path[:-1]
-    
+
     page = get_page_from_path(path, preview)
         
     request._current_page_cache = page
@@ -150,6 +156,9 @@ def is_valid_url(url,instance,create_links=True, site=None):
             site = instance.site
         # Retrieve complete queryset of pages with corresponding URL
         # This uses the same resolving function as ``get_page_from_path``
+        page_root = urllib.unquote(reverse("pages-root"))
+        if url.startswith(page_root):
+            url = url[len(page_root):]
         page_qs = get_page_queryset_from_path(url.strip('/'), site=site)
         url_clashes = []
         # If queryset has pages checks for conflicting urls
