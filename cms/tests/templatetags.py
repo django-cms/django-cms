@@ -1,4 +1,5 @@
 from __future__ import with_statement
+import copy
 from cms.api import create_page, create_title
 from cms.models.pagemodel import Page, Placeholder
 from cms.templatetags.cms_tags import (get_site_id, _get_page_by_untyped_arg,
@@ -142,8 +143,9 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         page_3 = create_page('Page 3', 'nav_playground.html', 'en',  page_2, published=True,
                              in_navigation=True, reverse_id='page3')
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
-
-        with SettingsOverride(CMS_HIDE_UNTRANSLATED=False):
+        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings[1][1]['hide_untranslated'] = False
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2
             res = tpl.render(context)
@@ -153,8 +155,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             context['request'].current_page = page_3
             res = tpl.render(context)
             self.assertEqual(res,"/de/page-3/")
-
-        with SettingsOverride(CMS_HIDE_UNTRANSLATED=True):
+        lang_settings[1][1]['hide_untranslated'] = True
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2
             res = tpl.render(context)

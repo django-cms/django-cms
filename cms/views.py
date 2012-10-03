@@ -2,8 +2,9 @@
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
+from cms.models import Title
 from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.i18n import get_fallback_languages, force_language
+from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
@@ -38,11 +39,11 @@ def details(request, slug):
 
     available_languages = []
     page_languages = page.get_languages()
-    for frontend_lang in settings.CMS_FRONTEND_LANGUAGES:
+    for frontend_lang in get_public_languages():
         if frontend_lang in page_languages:
             available_languages.append(frontend_lang)
     # Check that the language is in FRONTEND_LANGUAGES:
-    if not current_language in settings.CMS_FRONTEND_LANGUAGES:
+    if not current_language in get_public_languages():
         #are we on root?
         if not slug:
             #redirect to supported language
@@ -60,24 +61,24 @@ def details(request, slug):
                 _handle_no_page(request, slug)
         else:
             return _handle_no_page(request, slug)
-    # We resolve an alternate language for the page if it's not available.
-    # Since the "old" details view had an exception for the root page, it is
-    # ported here. So no resolution if the slug is ''.
     if current_language not in available_languages:
-        if settings.CMS_LANGUAGE_FALLBACK:
-            # If we didn't find the required page in the requested (current) 
-            # language, let's try to find a suitable fallback in the list of 
-            # fallback languages (CMS_LANGUAGE_CONF)
-            for alt_lang in get_fallback_languages(current_language):
-                if alt_lang in available_languages:
+        # If we didn't find the required page in the requested (current)
+        # language, let's try to find a fallback
+        found = False
+        for alt_lang in get_fallback_languages(current_language):
+            if alt_lang in available_languages:
+                if get_redirect_on_fallback(current_language):
                     with force_language(alt_lang):
                         path = page.get_absolute_url(language=alt_lang, fallback=True)
                         # In the case where the page is not available in the
                     # preferred language, *redirect* to the fallback page. This
                     # is a design decision (instead of rendering in place)).
                     return HttpResponseRedirect(path)
+                else:
+                    found = True
+        if not found:
             # There is a page object we can't find a proper language to render it
-        _handle_no_page(request, slug)
+            _handle_no_page(request, slug)
 
     if apphook_pool.get_apphooks():
         # There are apphooks in the pool. Let's see if there is one for the
@@ -86,7 +87,10 @@ def details(request, slug):
         # pointless
         # page = applications_page_check(request, page, slug)
         # Check for apphooks! This time for real!
-        app_urls = page.get_application_urls(current_language, False)
+        try:
+            app_urls = page.get_application_urls(current_language, False)
+        except Title.DoesNotExist:
+            app_urls = []
         if app_urls:
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []

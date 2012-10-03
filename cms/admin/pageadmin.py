@@ -17,6 +17,7 @@ from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins, 
     get_template_from_request, get_language_from_request, 
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
+from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 from cms.utils.permissions import has_plugin_permission
@@ -441,13 +442,13 @@ class PageAdmin(ModelAdmin):
                     installed_plugins = plugin_pool.get_all_plugins(placeholder_name, obj)
                     plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by('position')
                     other_plugins = CMSPlugin.objects.filter(placeholder=placeholder, parent=None).exclude(language=language)
-                    dict_cms_languages = dict(settings.CMS_LANGUAGES)
+                    dict_cms_languages = get_language_dict()
                     for plugin in other_plugins:
                         if (not plugin.language in copy_languages) and (plugin.language in dict_cms_languages):
                             copy_languages[plugin.language] = dict_cms_languages[plugin.language]
 
                 language = get_language_from_request(request, obj)
-                if copy_languages and len(settings.CMS_LANGUAGES) > 1:
+                if copy_languages and len(get_language_list()) > 1:
                     show_copy = True
                 widget = PluginEditor(attrs={
                     'installed': installed_plugins,
@@ -565,14 +566,7 @@ class PageAdmin(ModelAdmin):
         site_id = None
         if obj:
             site_id = obj.site_id
-        languages = []
-        if site_id and site_id in settings.CMS_SITE_LANGUAGES:
-            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
-                lang_label = dict(settings.CMS_LANGUAGES).get(lang, dict(settings.LANGUAGES).get(lang, lang))
-                languages.append((lang, lang_label))
-        else:
-            languages = settings.CMS_LANGUAGES
-        return languages
+        return get_language_tuple(site_id)
 
     def update_language_tab_context(self, request, obj, context=None):
         if not context:
@@ -675,11 +669,7 @@ class PageAdmin(ModelAdmin):
         site_id = int(site_id)
         
         # languages
-        languages = []
-        if site_id and site_id in settings.CMS_SITE_LANGUAGES:
-            languages = settings.CMS_SITE_LANGUAGES[site_id]
-        else:
-            languages = [lang[0] for lang in settings.CMS_LANGUAGES]
+        languages = get_language_list(site_id)
 
         # parse the cookie that saves which page trees have
         # been opened already and extracts the page ID
@@ -985,7 +975,7 @@ class PageAdmin(ModelAdmin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': [name for code, name in settings.CMS_LANGUAGES if code == language][0]
+                'language': get_language_object(language)['name']
             }
             self.log_change(request, titleobj, message)
             self.message_user(request, message)
@@ -1188,7 +1178,7 @@ class PageAdmin(ModelAdmin):
 
         if not page.has_change_permission(request):
             return HttpResponseForbidden(ugettext("You do not have permission to change this page"))
-        if not language or not language in [ lang[0] for lang in settings.CMS_LANGUAGES ]:
+        if not language or not language in get_language_list():
             return HttpResponseBadRequest(ugettext("Language must be set to a supported language!"))
         if language == copy_from:
             return HttpResponseBadRequest(ugettext("Language must be different than the copied language!"))

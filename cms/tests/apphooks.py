@@ -355,13 +355,15 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
             url = output['content']
             self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
 
-            output = tag.get_context(fake_context, 'ja')
-            url = output['content']
-            self.assertEqual(url, '/ja/child_page/child_child_page/extra_1/')
+
 
             output = tag.get_context(fake_context, 'de')
             url = output['content']
             # look the extra "_de"
             self.assertEqual(url, '/de/child_page/child_child_page_de/extra_1/')
+
+            output = tag.get_context(fake_context, 'fr')
+            url = output['content']
+            self.assertEqual(url, '/fr/child_page/child_child_page/extra_1/')
 
             apphook_pool.clear()

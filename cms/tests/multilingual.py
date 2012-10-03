@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import copy
 from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
+from django.conf import settings
+
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
 
@@ -36,7 +39,9 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
 
     def test_frontend_lang(self):
-        with SettingsOverride(CMS_FRONTEND_LANGUAGES=('fr', 'de', 'nl')):
+        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings[1][0]['public'] = False
+        with SettingsOverride(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="en"):
             page = create_page("page1", "nav_playground.html", "en")
             create_title("de", page.get_title(), page, slug=page.get_slug())
             page2 = create_page("page2", "nav_playground.html", "en")
@@ -61,12 +66,12 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         page.publish()
 
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-            CMS_LANGUAGES=[
-                ('x-klingon', 'Klingon'),
-                ('x-elvish', 'Elvish')
-            ], CMS_FRONTEND_LANGUAGES=('x-klingon', 'x-elvish')):
+            CMS_LANGUAGES={
+                1:[
+                    {'code':'x-klingon', 'name':'Klingon','public':True, 'fallbacks':[]},
+                    {'code':'x-elvish', 'name':'Elvish', 'public':True, 'fallbacks':[]},
+               ]}):
             from cms.views import details
-
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],
@@ -86,14 +91,12 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         '''
         page = create_page("page1", "nav_playground.html", "en")
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-            CMS_LANGUAGE_CONF={
-                'x-elvish': ['x-klingon', 'en', ]
-            },
-            CMS_LANGUAGES=[
-                ('x-klingon', 'Klingon'),
-                ('x-elvish', 'Elvish'),
-            ],
-            CMS_FRONTEND_LANGUAGES=('x-klingon', 'x-elvish')):
+            CMS_LANGUAGES={
+                1:[
+                    {'code':'x-klingon', 'name':'Klingon', 'public':True, 'fallbacks':[]},
+                    {'code':'x-elvish', 'name':'Elvish', 'public':True, 'fallbacks':['x-klingon', 'en', ]},
+                    ]},
+            ):
             create_title("x-klingon", "futla ak", page, slug=page.get_slug())
             page.publish()
             from cms.views import details
@@ -112,4 +115,25 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             response = details(request, '')
             self.assertTrue(isinstance(response, HttpResponseRedirect))
 
-
+    def test_language_fallback(self):
+        """
+        Test language fallbacks in details view
+        """
+        from cms.views import details
+        p1 = create_page("page", "nav_playground.html", "en", published=True)
+        request = self.get_request('/de/', 'de')
+        response = details(request, p1.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], '/en/')
+        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings[1][0]['fallbacks'] = []
+        lang_settings[1][1]['fallbacks'] = []
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+            response = self.client.get("/de/")
+            self.assertEquals(response.status_code, 404)
+        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings[1][0]['redirect_on_fallback'] = False
+        lang_settings[1][1]['redirect_on_fallback'] = False
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+            response = self.client.get("/de/")
+            self.assertEquals(response.status_code, 200)

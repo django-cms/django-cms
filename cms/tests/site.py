@@ -33,14 +33,14 @@ class SiteTestCase(CMSTestCase):
     def test_site_framework(self):
         #Test the site framework, and test if it's possible to disable it
         with SettingsOverride(SITE_ID=self.site2.pk):
-            create_page("page_2a", "nav_playground.html", "en", site=self.site2)
+            create_page("page_2a", "nav_playground.html", "de", site=self.site2)
     
             response = self.client.get("/en/admin/cms/page/?site__exact=%s" % self.site3.pk)
             self.assertEqual(response.status_code, 200)
-            create_page("page_3b", "nav_playground.html", "en", site=self.site3)
+            create_page("page_3b", "nav_playground.html", "de", site=self.site3)
             
         with SettingsOverride(SITE_ID=self.site3.pk):
-            create_page("page_3a", "nav_playground.html", "en", site=self.site3)
+            create_page("page_3a", "nav_playground.html", "nl", site=self.site3)
             
             # with param
             self.assertEqual(Page.objects.on_site(self.site2.pk).count(), 1)

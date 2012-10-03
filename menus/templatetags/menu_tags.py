@@ -3,7 +3,7 @@ from __future__ import with_statement
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
-from cms.utils.i18n import force_language
+from cms.utils.i18n import force_language, get_language_objects
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -318,15 +318,12 @@ class LanguageChooser(InclusionTag):
             # If there's an exception (500), default context_processors may not be called.
             return {'template': 'cms/content.html'}
         marker = MARKERS[i18n_mode]
-        cms_languages = dict(settings.CMS_LANGUAGES)
         current_lang = get_language()
         site = Site.objects.get_current()
-        site_languages = settings.CMS_SITE_LANGUAGES.get(site.pk, cms_languages.keys())
         languages = []
-        if not languages:
-            for lang in settings.CMS_FRONTEND_LANGUAGES:
-                if lang in cms_languages and lang in site_languages:
-                    languages.append((lang, marker(cms_languages[lang], lang)))
+        for lang in get_language_objects(site.pk):
+            if lang['public']:
+                languages.append((lang['code'], marker(lang['name'], lang['code'])))
         context.update({
             'languages':languages,
             'current_language':current_lang,

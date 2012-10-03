@@ -64,6 +64,64 @@ What you need to do:
 - reverse urls now return the language prefix as well. So maybe there is some code that adds language prefixes. Remove
   this code.
 
+CMS_LANGUAGES
+=============
+
+:setting:`CMS_LANGUAGES` has be overhauled. It is no longer a list of tuples like the ``LANGUAGES`` settings.
+
+An example explains more than thousand words::
+
+    CMS_LANGUAGES = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': gettext('English'),
+                    'fallbacks': ['de', 'fr'],
+                    'public': True,
+                    'hide_untranslated': True,
+                    'redirect_on_fallback':False,
+                },
+                {
+                    'code': 'de',
+                    'name': gettext('Deutsch'),
+                    'fallbacks': ['en', 'fr'],
+                    'public': True,
+                },
+                {
+                    'code': 'fr',
+                    'name': gettext('French'),
+                    'public': False,
+                },
+            ],
+            2: [
+                {
+                    'code': 'nl',
+                    'name': gettext('Dutch'),
+                    'public': True,
+                    'fallbacks': ['en'],
+                },
+            ],
+            'default': {
+                'fallbacks': ['en', 'de', 'fr'],
+                'redirect_on_fallback':True,
+                'public': False,
+                'hide_untranslated': False,
+            }
+        }
+
+
+For more details on what all the parameters mean please refer to the :setting:`CMS_LANGUAGES` docs.
+
+The following settings are not needed any more and have been removed:
+
+- `CMS_HIDE_UNTRANSLATED`
+- `CMS_LANGUAGE_FALLBACK`
+- `CMS_LANGUAGE_CONF`
+- `CMS_SITE_LANGUAGES`
+- `CMS_FRONTEND_LANGUAGES`
+
+Please remove them from your settings.py
+
 
 ..
     Feature description

@@ -66,15 +66,15 @@ Example:
     {% page_language_url "de" %}
 
 
-*********************
-CMS_HIDE_UNTRANSLATED
-*********************
+******************
+hide_unstranslated
+******************
 
-If you put :setting:`CMS_HIDE_UNTRANSLATED` to ``False`` in your
-``settings.py`` all pages will be displayed in all languages even if they are
+If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_unstranslated` to ``False``
+all pages will be displayed in all languages even if they are
 not translated yet.
 
-If :setting:`CMS_HIDE_UNTRANSLATED`  is ``True`` in your ``settings.py``
+If `hide_untranslated`  is ``True`` in your :setting:`CMS_LANGUAGES`
 and you are on a page that doesn't yet have an English translation and you view
 the German version then the language chooser will redirect to ``/``. The same
 goes for urls that are not handled by the cms and display a language chooser.

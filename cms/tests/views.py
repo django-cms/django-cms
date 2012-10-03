@@ -34,17 +34,7 @@ class ViewTests(SettingsOverrideTestCase):
             response = _handle_no_page(request, slug)
             self.assertEqual(response.status_code, 200)
             
-    def test_language_fallback(self):
-        """
-        Test language fallbacks in details view
-        """
-        p1 = create_page("page", "nav_playground.html", "en", published=True)
-        request = self.get_request('/de/', 'de')
-        response = details(request, p1.get_path())
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/en/')
-        with SettingsOverride(CMS_LANGUAGE_FALLBACK=False):
-            self.assertRaises(Http404, details, request, '')
+
     
     def test_apphook_not_hooked(self):
         """

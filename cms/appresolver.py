@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
-from cms.utils.i18n import force_language
+from cms.utils.i18n import force_language, get_language_list
 from cms.utils.moderator import get_page_queryset
 
 from django.conf import settings
@@ -31,7 +31,7 @@ def applications_page_check(request, current_page=None, path=None):
         # This removes the non-CMS part of the URL.
         path = request.path.replace(reverse('pages-root'), '', 1)
     # check if application resolver can resolve this
-    for lang, lang_name in settings.CMS_LANGUAGES:
+    for lang in get_language_list():
         if path.startswith(lang+"/"):
             path = path[len(lang+"/"):]
     for resolver in APP_RESOLVERS:
