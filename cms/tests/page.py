@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import datetime
+import os.path
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+
 from cms.admin.forms import PageForm
 from cms.api import create_page, add_plugin
 from cms.models import Page, Title
@@ -14,19 +23,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
                                       URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride)
-from cms.utils.page_resolver import get_page_from_request
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-    URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride, 
-    SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
-import datetime
-import os.path
 from cms.utils.page import is_valid_page_slug
 
 
@@ -49,21 +46,31 @@ class PagesTestCase(CMSTestCase):
 
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
+            self.assertEqual(Title.objects.all().count(), 0)
+            self.assertEqual(Page.objects.all().count(), 0)
+
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            title = Title.objects.get(slug=page_data['slug'])
-            self.assertNotEqual(title, None)
+
+            #self.assertEqual(Page.objects.all().count(), 2)
+            #self.assertEqual(Title.objects.all().count(), 2)
+
+            title = Title.objects.drafts().get(slug=page_data['slug'])
+            self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
+
             page = title.page
             page.published = True
             page.save()
+            page.publish()
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.placeholders.all().count(), 2)
             
-            # were public instanes created?
+            # were public instances created?
+            self.assertEqual(Title.objects.all().count(), 2)
             title = Title.objects.drafts().get(slug=page_data['slug'])
+            title = Title.objects.public().get(slug=page_data['slug'])
 
-        
     def test_slug_collision(self):
         """
         Test a slug collision
@@ -579,7 +586,7 @@ class PagesTestCase(CMSTestCase):
                                publication_end_date=yesterday, published=True)
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.status_code, 404)
-    
+
     def test_existing_overwrite_url(self):
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             create_page('home', 'nav_playground.html', 'en', published=True)
