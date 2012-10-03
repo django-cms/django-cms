@@ -35,13 +35,12 @@ def get_visible_pages(request, pages, site=None):
 
     for page in pages:
         # taken from for_page as multiple at once version
-        page_q = Q(page__tree_id=page.tree_id) & (
-            Q(page=page) 
-            | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
-            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))  
-        ) 
+        page_q = Q(page__tree_id=page.tree_id) #& (
+            #Q(page=page)
+            #| (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
+            #| (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))
+        #)
         pages_perms_q |= page_q
-        
         
     pages_perms_q &= Q(can_view=True)
     page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
@@ -54,22 +53,26 @@ def get_visible_pages(request, pages, site=None):
             # add the page with the perm itself
             if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN ,ACCESS_PAGE_AND_DESCENDANTS]:
                 restricted_pages[perm.page.pk].append(perm)
-            # add children    
-            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]: 
-                child_ids = perm.page.get_children().values_list('id', flat=True)
-                for id in child_ids:
+                restricted_pages[perm.page.publisher_public_id].append(perm)
+            # add children
+            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]:
+                child_ids = perm.page.get_children().values_list('id', 'publisher_public_id')
+                for id, public_id in child_ids:
                     restricted_pages[id].append(perm)
+                    restricted_pages[public_id].append(perm)
             # add descendants
-            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]: 
-                child_ids = perm.page.get_descendants().values_list('id', flat=True)
-                for id in child_ids:
+            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]:
+                child_ids = perm.page.get_descendants().values_list('id', 'publisher_public_id')
+                for id, public_id in child_ids:
                     restricted_pages[id].append(perm)
-    # anonymous 
+                    restricted_pages[public_id].append(perm)
+
+    # anonymous
     # no restriction applied at all
-    if (not is_auth_user and 
+    if (not is_auth_user and
         is_setting_public_all and 
         not restricted_pages):
-        return [page.pk for page in pages] 
+        return [page.pk for page in pages]
     
    
     if site is None:
@@ -82,13 +85,13 @@ def get_visible_pages(request, pages, site=None):
         ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
         global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
  
-        #no page perms edgcase - all visible
+        #no page perms edge case - all visible
         if ((is_setting_public_all or (
             is_setting_public_staff and request.user.is_staff))and 
             not restricted_pages and
             not global_view_perms):
             return [page.pk for page in pages]
-        #no page perms edgcase - none visible
+        #no page perms edge case - none visible
         elif (is_setting_public_staff and 
             not request.user.is_staff and 
             not restricted_pages and
@@ -118,14 +121,14 @@ def get_visible_pages(request, pages, site=None):
             if user_pk in group_user_ids:
                 has_perm = True
         return has_perm
-    
+
     for page in pages:
         to_add = False
         # default to false, showing a restricted page is bad
         # explicitly check all the conditions
         # of settings and permissions
         is_restricted = page.pk in restricted_pages
-        # restricted_pages contains as key any page.pk that is 
+        # restricted_pages contains as key any page.pk that is
         # affected by a permission grant_on
         if is_auth_user:
             # a global permission was given to the request's user

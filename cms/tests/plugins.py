@@ -346,6 +346,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # publish page
         response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
         self.assertEqual(response.status_code, 200)
+        self.assertEquals(Page.objects.count(), 2)
 
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
@@ -677,6 +678,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
     
     def test_add_plugin_with_m2m(self):
         # add a new text plugin
+        self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
@@ -704,8 +706,10 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(self.section_count, plugin.sections.count())
 
     def test_add_plugin_with_m2m_and_publisher(self):
+        self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertEqual(response.status_code, 302)
         page = Page.objects.all()[0]
         placeholder = page.placeholders.get(slot="body")
 
@@ -744,6 +748,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         page = publish_page(page, self.super_user)
 
         # there should now be two plugins - 1 draft, 1 public
+        self.assertEquals(2, CMSPlugin.objects.all().count())
         self.assertEquals(2, ArticlePluginModel.objects.all().count())
 
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]

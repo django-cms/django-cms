@@ -154,14 +154,14 @@ class Page(MPTTModel):
                   copy_permissions=True, copy_moderation=True,
                   public_copy=False):
         """
-        copy a page [ and all its descendants to a new location ]
+        Copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
 
         Note: public_copy was added in order to enable the creation of a copy for creating the public page during
         the publish operation as it sets the publisher_is_draft=False.
 
         Note for issue #1166: when copying pages there is no need to check for conflicting
-        URLs as pages as copied unplublished.
+        URLs as pages are copied unpublished.
         """
         from cms.utils.moderator import update_moderation_message
 
@@ -320,23 +320,21 @@ class Page(MPTTModel):
             # publisher specific stuff, but only on draft model, this is here
             # because page initializes publish process
 
-            if settings.CMS_MODERATOR:
-                under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
+            under_moderation = force_with_moderation or self.pk and bool(self.get_moderator_queryset().count())
 
             created = not bool(self.pk)
-            if settings.CMS_MODERATOR:
-                if change_state:
-                    if created:
-                        # new page....
-                        self.moderator_state = Page.MODERATOR_CHANGED
-                    elif not self.requires_approvement():
-                        # always change state to need approvement when there is some change
-                        self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+            if change_state:
+                if created:
+                    # new page....
+                    self.moderator_state = Page.MODERATOR_CHANGED
+                elif not self.requires_approvement():
+                    # always change state to need approvement when there is some change
+                    self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
 
-                    if not under_moderation and (self.published or self.publisher_public):
-                        # existing page without moderator - publish it directly if
-                        # published is True
-                        publish_directly = True
+                if not under_moderation and (self.published or self.publisher_public):
+                    # existing page without moderator - publish it directly if
+                    # published is True
+                    publish_directly = True
 
             elif change_state:
                 self.moderator_state = Page.MODERATOR_CHANGED
@@ -369,14 +367,14 @@ class Page(MPTTModel):
                 super(Page, self).save(**kwargs)
 
         #if commit and (publish_directly or created and not under_moderation):
-        if self.publisher_is_draft:
-            if self.published:
-                if commit and publish_directly:
+        #if self.publisher_is_draft:
+        #    if self.published:
+        #        if commit and publish_directly:
 
-                    self.publish()
+        #            self.publish()
 
     def save_base(self, *args, **kwargs):
-        """Overriden save_base. If an instance is draft, and was changed, mark
+        """Overridden save_base. If an instance is draft, and was changed, mark
         it as dirty.
 
         Dirty flag is used for changed nodes identification when publish method
@@ -401,7 +399,7 @@ class Page(MPTTModel):
 
         Returns: True if page was successfully published.
         """
-        # Publish can only be called on moderated and draft pages
+        # Publish can only be called on draft pages
         if not self.publisher_is_draft:
             return
 
@@ -474,7 +472,7 @@ class Page(MPTTModel):
         # for publishing (because of the parent)
         publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
         for page in publish_set:
-            # recursive call to all childrens....
+            # recursive call to all children....
             page.moderator_state = Page.MODERATOR_APPROVED
             page.save(change_state=False)
             page.publish()
@@ -693,8 +691,14 @@ class Page(MPTTModel):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
         from cms.utils.plugins import current_site
 
-        if not self.publisher_is_draft and self.publisher_public:
-            return self.publisher_public.has_view_permission(request)
+        if not self.publisher_is_draft:
+            # Permissions are managed on the draft copy only.
+            # TODO: Refactor all of these checks into get_draft_object()
+            if self.publisher_public:
+                # Seems to be legacy code - point to the draft version of this page and retrieve permissions?
+                return self.publisher_public.has_view_permission(request)
+
+            return Page.objects.drafts.get(publisher_public=self).has_view_permission(request)
         # does any restriction exist?
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()

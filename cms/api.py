@@ -205,7 +205,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page=page,
         overwrite_url=overwrite_url
     )
-        
+
+    if published:
+        page.publish()
+
     del _thread_locals.user
     return page
     
@@ -376,6 +379,7 @@ def publish_page(page, user, approve=False):
     page.published = True
     # the magic happens in the post save signal here... WTF?
     page.save()
+    page.publish()
     # reload page
     page = Page.objects.get(pk=page.pk)
     # approve page if requested

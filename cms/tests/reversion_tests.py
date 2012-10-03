@@ -58,9 +58,9 @@ class ReversionTestCase(CMSTestCase):
             txt = Text.objects.all()[0]
             self.assertEquals("Bye Bye World", txt.body)
             p_data = self.page_data.copy()
-            p_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
+            page.publish()
 
     def test_revert(self):
         """

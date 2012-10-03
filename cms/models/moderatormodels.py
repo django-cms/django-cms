@@ -102,7 +102,7 @@ class PageModeratorState(models.Model):
         (ACTION_MOVE, _('move req.')),
         (ACTION_PUBLISH, _('publish req.')),
         (ACTION_UNPUBLISH, _('unpublish req.')),
-        (ACTION_APPROVE, _('approved')),  # Approved by somebody in approvement process
+        (ACTION_APPROVE, _('approved')),  # Approved by somebody in approval process
     )
 
     page = models.ForeignKey(Page)

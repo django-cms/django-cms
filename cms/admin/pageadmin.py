@@ -227,7 +227,7 @@ class PageAdmin(ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         """
-        Move the page in the tree if neccesary and save every placeholder
+        Move the page in the tree if necessary and save every placeholder
         Content object.
         """
         target = request.GET.get('target', None)
@@ -264,9 +264,8 @@ class PageAdmin(ModelAdmin):
         
         if 'recover' in request.path or 'history' in request.path:
             obj.pagemoderatorstate_set.all().delete()
-            if settings.CMS_MODERATOR:
-                from cms.utils.moderator import page_changed
-                page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+            from cms.utils.moderator import page_changed
+            page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             revert_plugins(request, obj.version.pk, obj)
             
         language = form.cleaned_data['language']
@@ -287,7 +286,7 @@ class PageAdmin(ModelAdmin):
         )
 
         # is there any moderation message? save/update state
-        if settings.CMS_MODERATOR and 'moderator_message' in form.cleaned_data and \
+        if 'moderator_message' in form.cleaned_data and \
             form.cleaned_data['moderator_message']:
             moderator.update_moderation_message(obj, form.cleaned_data['moderator_message'])
             
@@ -914,7 +913,7 @@ class PageAdmin(ModelAdmin):
         if not self.has_delete_permission(request, page):
             raise PermissionDenied
 
-        if settings.CMS_MODERATOR and page.is_under_moderation():
+        if page.is_under_moderation():
             # don't perform a delete action, just mark page for deletion
             page.force_moderation_action = PageModeratorState.ACTION_DELETE
             page.moderator_state = Page.MODERATOR_NEED_DELETE_APPROVEMENT
@@ -1068,6 +1067,7 @@ class PageAdmin(ModelAdmin):
                 if page.published or is_valid_url(page.get_absolute_url(),page,False):
                     page.published = not page.published
                     page.save()
+                    page.publish()
                 return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
             except ValidationError,e:
                 return jsonify_request(HttpResponseBadRequest(e.messages))
