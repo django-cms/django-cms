@@ -7,9 +7,9 @@ Internationalization
 Multilingual URLs
 *****************
 
-If you use more than one language, django-CMS urls need
-to be referenced via a `i18n_patterns`_. For more information about this see the
-official django documentation.
+If you use more than one language, django CMS urls need
+to be referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see the
+official django `documentation`_.
 
 Main `urls.py` example:
 
@@ -35,7 +35,7 @@ Main `urls.py` example:
     )
 
 
-.. _i18n_patterns: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
+.. _documentation: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
 
 ****************
 Language Chooser

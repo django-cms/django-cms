@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
+from cms.exceptions import LanguageError
 from django.conf import settings
 from django.utils import translation
 
 @contextmanager
 def force_language(new_lang):
     old_lang = translation.get_language()
-    translation.activate(new_lang)
+    if old_lang != new_lang:
+        translation.activate(new_lang)
     yield
     translation.activate(old_lang)
 
@@ -142,7 +144,3 @@ def get_site(site):
             return int(site)
         except TypeError:
             return site.pk
-
-
-class LanguageError(Exception):
-    pass

@@ -57,7 +57,7 @@ class AppRegexURLResolver(RegexURLResolver):
     @property
     def url_patterns(self):
         language = get_language()
-        if language in self.url_patterns_dict.keys():
+        if language in self.url_patterns_dict:
             return self.url_patterns_dict[language]
         else:
             return []
