@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 from django.conf import settings
 from django.utils import translation
 
-class force_language(object):
-    def __init__(self, new_lang):
-        self.new_lang = new_lang
-        self.old_lang = translation.get_language()
-
-    def __enter__(self):
-        translation.activate(self.new_lang)
-
-    def __exit__(self, type, value, tb):
-        translation.activate(self.old_lang)
+@contextmanager
+def force_language(new_lang):
+    old_lang = translation.get_language()
+    translation.activate(new_lang)
+    yield
+    translation.activate(old_lang)
 
 
 def get_language_list(site_id=None):
