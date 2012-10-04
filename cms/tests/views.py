@@ -29,22 +29,12 @@ class ViewTests(SettingsOverrideTestCase):
         slug = ''
         self.assertRaises(Http404, _handle_no_page, request, slug)
         with SettingsOverride(DEBUG=True):
-            request = self.get_request('/')
+            request = self.get_request('/en/')
             slug = ''
             response = _handle_no_page(request, slug)
             self.assertEqual(response.status_code, 200)
             
-    def test_language_fallback(self):
-        """
-        Test language fallbacks in details view
-        """
-        create_page("page", "nav_playground.html", "en", published=True)
-        request = self.get_request('/', 'de')
-        response = details(request, '')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/en/')
-        with SettingsOverride(CMS_LANGUAGE_FALLBACK=False):
-            self.assertRaises(Http404, details, request, '')
+
     
     def test_apphook_not_hooked(self):
         """
@@ -59,7 +49,7 @@ class ViewTests(SettingsOverrideTestCase):
         create_page("page2", "nav_playground.html", "en", published=True)
         with SettingsOverride(CMS_APPHOOKS=apphooks):
             apphook_pool.clear()
-            response = self.client.get('/')
+            response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
             apphook_pool.clear()
     
@@ -70,7 +60,7 @@ class ViewTests(SettingsOverrideTestCase):
                           redirect=redirect_one)
         url = one.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, url.strip('/'))
+        response = details(request,one.get_path("en"))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_one)
         
@@ -84,7 +74,7 @@ class ViewTests(SettingsOverrideTestCase):
                           published=True, redirect=redirect_two)
         url = two.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, url.strip('/'))
+        response = details(request, two.get_path())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/en/')
         
@@ -96,7 +86,7 @@ class ViewTests(SettingsOverrideTestCase):
                           redirect=redirect_one)
         three = create_page("three", "nav_playground.html", "en", parent=one,
                             published=True, redirect=redirect_three)
-        url = three.get_absolute_url()
+        url = three.get_slug()
         request = self.get_request(url)
         response = details(request, url.strip('/'))
         self.assertEqual(response.status_code, 302)
@@ -107,25 +97,25 @@ class ViewTests(SettingsOverrideTestCase):
                           redirect='/')
         url = one.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, url.strip('/'))
-        self.assertEqual(response.status_code, HttpResponse.status_code)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 200)
         
     def test_redirect_to_self_with_host(self):
         one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect='http://testserver/')
+                          redirect='http://testserver/en/')
         url = one.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, url.strip('/'))
-        self.assertEqual(response.status_code, HttpResponse.status_code)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 200)
     
     def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,
                          login_required=True)
-        request = self.get_request('/')
+        request = self.get_request('/en/')
         response = details(request, '')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '%s?next=/en/' % settings.LOGIN_URL)
-        with SettingsOverride(i18n_installed=False):
+        with SettingsOverride(USE_I18N=False):
             request = self.get_request('/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)

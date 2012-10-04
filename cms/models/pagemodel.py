@@ -119,9 +119,8 @@ class Page(MPTTModel):
         if settings.CMS_FLAT_URLS:
             path = self.get_slug(language, fallback)
             return urlutils.urljoin(reverse('pages-root'), path)
-        # else
         path = self.get_path(language, fallback)
-        return urlutils.urljoin(reverse('pages-root'), path)
+        return reverse('pages-details-by-slug', kwargs={"slug":path})
 
     def move_page(self, target, position='first-child'):
         """
@@ -529,6 +528,7 @@ class Page(MPTTModel):
             self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
             self.all_languages = list(self.all_languages)
             self.all_languages.sort()
+            self.all_languages = map(str, self.all_languages)
         return self.all_languages
 
     def get_cached_ancestors(self, ascending=True):

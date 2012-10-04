@@ -28,7 +28,7 @@ class NavigationNode(object):
         self.parent = None # do not touch, code depends on this
         self.namespace = None # TODO: Assert why we need this and above
         self.title = title
-        self.url = self._remove_current_root(url)
+        self.url = url
         self.id = id
         self.parent_id = parent_id
         self.parent_namespace = parent_namespace
@@ -41,12 +41,6 @@ class NavigationNode(object):
             
     def __repr__(self):
         return "<Navigation Node: %s>" % smart_str(self.title)
-    
-    def _remove_current_root(self, url):
-        current_root = "/%s/" % get_language()
-        if url[:len(current_root)] == current_root:
-            url = url[len(current_root) - 1:]
-        return url
     
     def get_menu_title(self):
         return self.title

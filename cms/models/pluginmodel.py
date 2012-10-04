@@ -167,7 +167,8 @@ class CMSPlugin(MPTTModel):
             if not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
-            context = PluginContext(context, instance, placeholder)
+            current_app = context.current_app if context else None
+            context = PluginContext(context, instance, placeholder, current_app=current_app)
             context = plugin.render(context, instance, placeholder_slot)
             if plugin.render_plugin:
                 template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
@@ -175,7 +176,7 @@ class CMSPlugin(MPTTModel):
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
                 template = None
-            return render_plugin(context, instance, placeholder, template, processors)
+            return render_plugin(context, instance, placeholder, template, processors, context.current_app)
         return ""
 
     def get_media_path(self, filename):

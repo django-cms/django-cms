@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+from distutils.version import LooseVersion
+import django
 import os
 
 gettext = lambda s: s
 
-
 urlpatterns = []
-
+DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(**extra):
     from django.conf import settings
@@ -53,12 +54,12 @@ def configure(**extra):
         ],
         MIDDLEWARE_CLASSES = [
             'django.contrib.sessions.middleware.SessionMiddleware',
-            'cms.middleware.multilingual.MultilingualURLMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.common.CommonMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.middleware.common.CommonMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
@@ -100,29 +101,58 @@ def configure(**extra):
             ('en', gettext('English')),
             ('fr', gettext('French')),
             ('de', gettext('German')),
-            ('pt-BR', gettext("Brazil")),
+            ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
         ),
-        CMS_LANGUAGES = (
-            ('en', gettext('English')),
-            ('fr', gettext('French')),
-            ('de', gettext('German')),
-            ('pt-BR', gettext("Brazil")),
-            ('nl', gettext("Dutch")),
-        ),
-        CMS_FRONTEND_LANGUAGES = (
-            'fr',
-            'de',
-            'nl',
-        ),
-        CMS_LANGUAGE_CONF = {
-            'de':['fr', 'en'],
-            'en':['fr', 'de'],
-        },
-        CMS_SITE_LANGUAGES = {
-            1:['en','de','fr','pt-BR'],
-            2:['de','fr'],
-            3:['nl'],
+        CMS_LANGUAGES = {
+            1: [
+                {
+                    'code':'en',
+                    'name':gettext('English'),
+                    'fallbacks':['fr','de'],
+                    'public':True,
+                },
+                {
+                    'code':'de',
+                    'name':gettext('German'),
+                    'fallbacks':['fr','en'],
+                    'public':True,
+                },
+                {
+                    'code':'fr',
+                    'name':gettext('French'),
+                    'public':True,
+                },
+                {
+                    'code':'pt-br',
+                    'name':gettext('Brazilian Portuguese'),
+                    'public':True,
+                },
+            ],
+            2: [
+                {
+                    'code':'de',
+                    'name':gettext('German'),
+                    'fallbacks':['fr','en'],
+                    'public':True,
+                },
+                {
+                    'code':'fr',
+                    'name':gettext('French'),
+                    'public':True,
+                },
+            ],
+            3: [
+                {
+                    'code':'nl',
+                    'name':gettext('Dutch'),
+                    'fallbacks':['fr','en'],
+                    'public':True,
+                },
+            ],
+            'default': {
+                'hide_untranslated':False,
+            },
         },
         CMS_TEMPLATES = (
             ('col_two.html', gettext('two columns')),
@@ -167,7 +197,6 @@ def configure(**extra):
         CMS_SEO_FIELDS = True,
         CMS_FLAT_URLS = False,
         CMS_MENU_TITLE_OVERWRITE = True,
-        CMS_HIDE_UNTRANSLATED = False,
         CMS_URL_OVERWRITE = True,
         CMS_SHOW_END_DATE = True,
         CMS_SHOW_START_DATE = True,
@@ -187,11 +216,20 @@ def configure(**extra):
             'django.contrib.auth.hashers.MD5PasswordHasher',
         )
     )
+    if DJANGO_1_3:
+        defaults['INSTALLED_APPS'].append("i18nurls")
+        defaults['MIDDLEWARE_CLASSES'][4] = 'i18nurls.middleware.LocaleMiddleware'
+    else:
+        from django.utils.functional import empty
+        settings._wrapped = empty
     defaults.update(extra)
+
     settings.configure(**defaults)
     from cms.conf import patch_settings
     patch_settings()
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
     from django.contrib import admin
+
+
     admin.autodiscover()

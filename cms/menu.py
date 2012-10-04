@@ -6,7 +6,7 @@ from cms.models.moderatormodels import (ACCESS_DESCENDANTS,
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
-from cms.utils.i18n import get_fallback_languages
+from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.moderator import get_page_queryset, get_title_queryset
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
@@ -232,7 +232,7 @@ class CMSMenu(Menu):
             'site':site,
         }
         
-        if settings.CMS_HIDE_UNTRANSLATED:
+        if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
             
         pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
@@ -275,7 +275,7 @@ class CMSMenu(Menu):
                     nodes.append(page_to_node(page, home, home_cut))
                     ids.remove(page.pk)
 
-        if ids: # get fallback languages
+        if ids and not hide_untranslated(lang): # get fallback languages if allowed
             fallbacks = get_fallback_languages(lang)
             for lang in fallbacks:
                 titles = list(get_title_queryset(request).filter(page__in=ids, language=lang))
