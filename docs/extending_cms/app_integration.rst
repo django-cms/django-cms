@@ -204,7 +204,6 @@ a urls.py that looks like this::
 The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the url ``/hello/world/sublevel/``.
 
-
 .. note::
 
     All views that are attached like this must return a
@@ -212,30 +211,8 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
     default :class:`~django.template.Context` instance.
 
 
-Language Namespaces
--------------------
-
-An additional feature of apphooks is that if you use the
-:class:`cms.middleware.multilingual.MultilingualURLMiddleware` all apphook urls
-are language namespaced.
-
-What this means:
-
-To reverse the first url from above you would use something like this in your
-template:
-
-.. code-block:: html+django
-
-    {% url app_main %}
-
-If you want to access the same url but in a different language use a language
-namespace:
-
-.. code-block:: html+django
-
-    {% url de:app_main %}
-    {% url en:app_main %}
-    {% url fr:app_main %}
+Apphook Menus
+-------------
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
@@ -310,6 +287,73 @@ If you add this menu now to your app-hook::
 
 You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 :class:`CategoryMenu` both attached to the same page.
+
+
+Application and instance namespaces
+-----------------------------------
+
+If you'd like to use application namespaces to reverse the URLs related to
+your app, you can assign a value to the `app_name` attribute of your app
+hook like this::
+
+    class MyNamespacedApphook(CMSApp):
+        name = _("My Namespaced Apphook")
+        urls = ["myapp.urls"]
+        app_name = "myapp_namespace"
+
+    apphook_pool.register(MyNamespacedApphook)
+
+As seen for Language Namespaces, you can reverse namespaced apps similarly:
+
+.. code-block:: html+django
+
+    {% url myapp_namespace:app_main %}
+
+If you want to access the same url but in a different language use the language
+templatetag:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+    {% language "de" %}
+        {% url myapp_namespace:app_main %}
+    {% endlanguage %}
+
+What makes namespaced app hooks really interesting is the fact that you can
+hook them up to more than one page and reverse their URLs by using their
+instance namespace. Django CMS takes the value of the `reverse_id` field
+assigned to a page and uses it as instance namespace for the app hook.
+
+To reverse the URLs you now have two different ways: explicitly by defining
+the instance namespace, or implicitely by specifiyng the application namespace
+and letting the `url` templatetag resolving the correct application instance
+by looking at the currently set `current_app` value.
+
+.. note::
+
+    The official Django documentation has more details about application and
+    instance namespaces, the `current_app` scope and the reversing of such
+    URLs. You can look it up at https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces
+
+When using the `reverse` function, the `current_app` has to be explicitly passed
+as an argument. You can do so by looking up the `current_app` attribute of
+the request instance::
+
+    def myviews(request):
+        ...
+        reversed_url = reverse('myapp_namespace:app_main',
+                current_app=request.current_app)
+        ...
+
+Or, if you are rendering a plugin, of the context instance::
+
+    class MyPlugin(CMSPluginBase):
+        def render(self, context, instance, placeholder):
+            ...
+            reversed_url = reverse('myapp_namespace:app_main',
+                    current_app=context.current_app)
+            ...
+
 
 ********************
 Navigation Modifiers

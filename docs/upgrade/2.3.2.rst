@@ -1,0 +1,19 @@
+###################
+2.3.2 release notes
+###################
+
+*******************
+What's new in 2.3.2
+*******************
+
+Google map plugin
+=================
+
+Google map plugin now supports width and height fields so that plugin size
+can be modified in the page admin or frontend editor.
+
+Zoom level is now set via a select field which ensure only legal values are used.
+
+.. warning:: Due to the above change, `level` field is now marked as `NOT NULL`,
+    and a datamigration has been introduced to modify existing googlemap plugin
+    instance to set the default value if `level` if is `NULL`.

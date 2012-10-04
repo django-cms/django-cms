@@ -18,7 +18,6 @@ if apphook_pool.get_apphooks():
     have standard reverse support.
     """
     from cms.appresolver import get_app_patterns
-    urlpatterns = get_app_patterns() + urlpatterns
-    #urlpatterns = (dynamic_app_regex_url_resolver, ) + urlpatterns
+    urlpatterns += get_app_patterns()
     
 urlpatterns = patterns('', *urlpatterns)

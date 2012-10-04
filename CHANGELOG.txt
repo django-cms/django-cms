@@ -85,3 +85,42 @@
 ==== 2.3.1 ====
 
 - pinned version of django-mptt to 0.5.1 or 0.5.2
+
+==== 2.3.2 ====
+
+- MIGRATION: 0036_auto__add_field_cmsplugin_changed_date.py - new field changed_date on CMSPlugin
+- CMS_FRONTEND_LANGUAGES limits django languages as well during language selection
+- Wymeditor updated to 1.0.4a
+- icon_url escape fixed
+- Ukranian translation added
+- Fixed wrong language prefix handling for form actions and admin preview
+- Admin icons in django 1.4 fixed
+- Added requirements.txt for pip and testing in test_requirements
+- Google map plugin with height and width properties. Migrations will set default values on not-null fields.
+- Docs fixes
+- Code cleanup
+- Switched html5lib to HTML serializer
+- Removed handling of iterables in plugin_pool.register_plugin
+- Performance and reduced queries
+- Link has target support
+- Made the PageAttribute templatetag an 'asTag'
+- JQuery namespace fixes in admin
+
+==== 2.3.3 ====
+
+ - fixed an incompatibility with Python 2.5
+
+==== 2.4.0 ===-
+
+- CMS_LANGUAGE setting has changed
+- CMS_HIDE_UNTRANSLATED setting removed
+- CMS_LANGUAGE_FALLBACK setting removed
+- CMS_LANGUAGE_CONF setting removed
+- CMS_SITE_LANGUAGES setting removed
+- CMS_FRONTEND_LANGUAGES setting removed
+- MultilingualMiddleware has been removed
+
+
+
+
+

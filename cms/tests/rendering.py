@@ -288,52 +288,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             u'|{% placeholder "main" inherit %}|{% placeholder "sub" %}'
         r = self.render(t, self.test_page3)
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|'+self.test_data3['text_sub'])
-        
-    def test_detail_view_404_when_no_language_is_found(self):
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGES=[
-                                  ('x-klingon', 'Klingon'),
-                                  ('x-elvish', 'Elvish')
-                              ]):
-            from cms.views import details
-            request = AttributeObject(
-                REQUEST={'language': 'x-elvish'},
-                GET=[],
-                session={},
-                path='/',
-                user=self.test_user,
-                current_page=None,
-                method='GET',
-            )
-            self.assertRaises(Http404, details, request, '')
 
-    def test_detail_view_fallback_language(self):
-        '''
-        Ask for a page in elvish (doesn't exist), and assert that it fallsback
-        to English
-        '''
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_CONF={
-                                  'x-elvish': ['x-klingon', 'en',]
-                              },
-                              CMS_LANGUAGES=[
-                                  ('x-klingon', 'Klingon'),
-                                  ('x-elvish', 'Elvish'),
-                              ]):
-            from cms.views import details
-            request = AttributeObject(
-                REQUEST={'language': 'x-elvish'},
-                GET=[],
-                session={},
-                path='/',
-                user=self.test_user,
-                current_page=None,
-                method='GET',
-            )
-
-            response = details(request, '')
-            self.assertTrue(isinstance(response,HttpResponseRedirect))
-            
     def test_extra_context_isolation(self):
         with ChangeModel(self.test_page, template='extra_context.html'):
             response = self.client.get(self.test_page.get_absolute_url())

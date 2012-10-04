@@ -18,9 +18,8 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='400px', max_length=6),
                       keep_default=False)
 
-
         # Changing field 'GoogleMap.zoom'
-        db.alter_column('cmsplugin_googlemap', 'zoom', self.gf('django.db.models.fields.PositiveSmallIntegerField')())
+        db.alter_column('cmsplugin_googlemap', 'zoom', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=13))
 
     def backwards(self, orm):
         # Deleting field 'GoogleMap.width'

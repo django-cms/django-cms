@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['fi'] = {
+WYMeditor.STRINGS.fi = {
     Strong:           'Lihavoitu',
     Emphasis:         'Korostus',
     Superscript:      'Yläindeksi',

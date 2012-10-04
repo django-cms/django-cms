@@ -1,12 +1,13 @@
 language: python
 python:
+    - "2.5"
     - "2.6"
     - "2.7"
 env:
-    - DJANGO="django>=1.3,<1.4"
-    - DJANGO="django>=1.4,<1.5"
+    - DJANGO=test_requirements/django-1.3.txt
+    - DJANGO=test_requirements/django-1.4.txt
 install:
-    - pip install -q $DJANGO django-mptt==0.5.1 django-reversion==1.6 django-classy-tags==0.3.4.1 django-sekizai==0.6.1 html5lib==0.95 jinja2==2.6 PIL==1.1.7 pygments==1.5 south==0.7.5 sphinx==1.1.3 argparse
+    - pip install -q -r $DJANGO --use-mirrors
 script:
     python runtests.py
 notifications:

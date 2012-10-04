@@ -222,7 +222,7 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
                            created_by=superuser, published=True)
         
         with self.login_user_context(superuser):
-            response = self.client.get('/?edit')
+            response = self.client.get('/en/?edit')
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
         self.assertContains(response, '<div id="cms_toolbar"')

@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.contrib.sitemaps import Sitemap
-import itertools
+
+def from_iterable(iterables):
+    """
+    Backport of itertools.chain.from_iterable
+    """
+    for it in iterables:
+        for element in it:
+            yield element
 
 class CMSSitemap(Sitemap):
     changefreq = "monthly"
@@ -15,7 +22,7 @@ class CMSSitemap(Sitemap):
     def lastmod(self, page):
         modification_dates = [page.changed_date, page.publication_date]
         plugins_for_placeholder = lambda placeholder: placeholder.cmsplugin_set.all()
-        plugins = itertools.chain.from_iterable(map(plugins_for_placeholder, page.placeholders.all()))
+        plugins = from_iterable(map(plugins_for_placeholder, page.placeholders.all()))
         plugin_modification_dates = map(lambda plugin: plugin.changed_date, plugins)
         modification_dates.extend(plugin_modification_dates)
         return max(modification_dates)

@@ -1,7 +1,7 @@
-WYMeditor.STRINGS['ca'] = {
+WYMeditor.STRINGS.ca = {
     Strong:           'Ressaltar',
     Emphasis:         'Emfatitzar',
-    Superscript:      'Superindex', 
+    Superscript:      'Superindex',
     Subscript:        'Subindex',
     Ordered_List:     'Llistat ordenat',
     Unordered_List:   'Llistat sense ordenar',

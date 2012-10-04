@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['en'] = {
+WYMeditor.STRINGS.en = {
     Strong:           'Strong',
     Emphasis:         'Emphasis',
     Superscript:      'Superscript',
@@ -26,6 +26,7 @@ WYMeditor.STRINGS['en'] = {
     Table_Header:     'Table Header',
     URL:              'URL',
     Title:            'Title',
+    Relationship:     'Relationship',
     Alternative_Text: 'Alternative text',
     Caption:          'Caption',
     Summary:          'Summary',
@@ -42,4 +43,3 @@ WYMeditor.STRINGS['en'] = {
     Status:           'Status',
     Source_Code:      'Source code'
 };
-

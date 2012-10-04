@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['de'] = {
+WYMeditor.STRINGS.de = {
     Strong:           'Fett',
     Emphasis:         'Kursiv',
     Superscript:      'Text hochstellen',

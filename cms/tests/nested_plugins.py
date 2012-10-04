@@ -9,7 +9,7 @@ from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
 
 
-URL_CMS_MOVE_PLUGIN = u'/admin/cms/page/%d/move-plugin/'    
+URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
 
 
 class NestedPluginsTestCase(PluginsTestBaseCase):

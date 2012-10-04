@@ -27,7 +27,7 @@
         .wym_skin_compact .wym_area_right         { display: none; }
 
 
-/*TYPO*/
+/*TYPO*/    
         .wym_skin_compact                { font-size: 10px; font-family: Verdana, Arial, sans-serif; }
         .wym_skin_compact h2             { font-size: 110%; /* = 11px */}
         .wym_skin_compact h3             { font-size: 100%; /* = 10px */}
