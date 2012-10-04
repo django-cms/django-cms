@@ -425,22 +425,6 @@ accessed.
 Note: Don't use this too much. :mod:`django.contrib.redirects` is much more
 flexible, handy, and is designed exactly for this purpose.
 
-.. setting:: CMS_FLAT_URLS
-
-CMS_FLAT_URLS
-=============
-
-.. deprecated:: 2.4
-
-    ``CMS_FLAT_URLS`` will be removed in 2.4.
-
-Default: ``False``
-
-If this is enabled the slugs are not nested in the urls.
-
-So a page with a "world" slug will have a "/world" url, even it is a child of
-the "hello" page. If disabled the page would have the url: "/hello/world/"
-
 .. setting:: CMS_SOFTROOT
 
 CMS_SOFTROOT

@@ -406,28 +406,7 @@ class PagesTestCase(CMSTestCase):
             page =  Page.objects.get(title_set__slug=page_data['slug'])
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
-        
-    def test_flat_urls(self):
-        with SettingsOverride(CMS_FLAT_URLS=True):
-            home_slug = "home"
-            child_slug = "child"
-            grandchild_slug = "grandchild"
-            home = create_page(home_slug, "nav_playground.html", "en",
-                               published=True, in_navigation=True)
-            home.publish()
-            child = create_page(child_slug, "nav_playground.html", "en",
-                                parent=home, published=True, in_navigation=True)
-            child.publish()
-            grandchild = create_page(grandchild_slug, "nav_playground.html", "en",
-                                     parent=child, published=True, in_navigation=True)
-            grandchild.publish()
-            response = self.client.get(home.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            response = self.client.get(child.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            response = self.client.get(grandchild.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            self.assertFalse(child.get_absolute_url() in grandchild.get_absolute_url())
+
 
     def test_templates(self):
         """

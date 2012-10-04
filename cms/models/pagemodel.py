@@ -116,9 +116,6 @@ class Page(MPTTModel):
     def get_absolute_url(self, language=None, fallback=True):
         if self.is_home():
             return reverse('pages-root')
-        if settings.CMS_FLAT_URLS:
-            path = self.get_slug(language, fallback)
-            return urlutils.urljoin(reverse('pages-root'), path)
         path = self.get_path(language, fallback)
         return reverse('pages-details-by-slug', kwargs={"slug":path})
 
