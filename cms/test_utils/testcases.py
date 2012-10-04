@@ -26,6 +26,9 @@ URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE_CHANGE, "edit-plugin/")
 URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE_CHANGE, "remove-plugin/")
 URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
 
+URL_CMS_PAGE_HISTORY = urljoin(URL_CMS_PAGE_CHANGE, "history/%d/")
+URL_CMS_PLUGIN_HISTORY_EDIT = urljoin(URL_CMS_PAGE_HISTORY, "edit-plugin/")
+
 
 class _Warning(object):
     def __init__(self, message, category, filename, lineno):
@@ -218,6 +221,22 @@ class CMSTestCase(testcases.TestCase):
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
+
+        class MockStorage(object):
+
+            def __len__(self):
+                return 0
+
+            def __iter__(self):
+                return iter([])
+
+            def add(self, level, message, extra_tags=''):
+                pass
+
+            def update(self, response):
+                pass
+
+        request._messages = MockStorage()
         return request
 
     def check_published_page_attributes(self, page):

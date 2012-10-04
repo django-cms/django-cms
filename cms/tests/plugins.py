@@ -19,7 +19,7 @@ from cms.test_utils.project.pluginapp.models import Article, Section
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel)
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
-    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE)
+    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, URL_CMS_PLUGIN_HISTORY_EDIT)
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -119,11 +119,37 @@ class PluginsTestCase(PluginsTestBaseCase):
             "body":"Hello World!!",
             "_cancel":True,
         }
-        response = self.client.post(URL_CMS_PAGE_ADD, data)
+        edit_url = '%s%d/' % (URL_CMS_PLUGIN_EDIT, created_plugin_id)
+        response = self.client.post(edit_url, data)
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
 
+    def test_plugin_history_view(self):
+        """
+        Test plugin history view
+        """
+        from reversion.models import Version
+        page_data = self.get_new_page_data()
+        # two versions created by simply creating the page
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        page_id = int(page.pk)
+        # page version 3
+        created_plugin_id = self._create_text_plugin_on_page(page)
+        # page version 4
+        txt = self._edit_text_plugin(created_plugin_id, "Hello Foo")
+        self.assertEquals("Hello Foo", txt.body)
+        # page version 5
+        txt = self._edit_text_plugin(created_plugin_id, "Hello Bar")
+        self.assertEquals("Hello Bar", txt.body)
+        versions = [v.pk for v in Version.objects.get_for_object(page)]
+        history_url = '%s%d/' % (
+            URL_CMS_PLUGIN_HISTORY_EDIT % (page_id, versions[-2]),
+            created_plugin_id)
+        response = self.client.get(history_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertIn('Hello Foo', response.content)
 
     def test_plugin_order(self):
         """
