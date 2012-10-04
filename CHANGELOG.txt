@@ -119,6 +119,8 @@
 - CMS_SITE_LANGUAGES setting removed
 - CMS_FRONTEND_LANGUAGES setting removed
 - MultilingualMiddleware has been removed
+- CMS_FLAT_URLS has been removed
+
 
 
 

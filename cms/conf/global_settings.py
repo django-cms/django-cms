@@ -64,9 +64,6 @@ CMS_SEO_FIELDS = False
 # a tuple of python path to AppHook Classes. Overwrites the auto-discovered apphooks.
 CMS_APPHOOKS = ()  
 
-#Should the tree of the pages be also be displayed in the urls? or should a flat slug structure be used?
-CMS_FLAT_URLS = False
-
 # Wheter the cms has a softroot functionionality
 CMS_SOFTROOT = False
 

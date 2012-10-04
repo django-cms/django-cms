@@ -123,6 +123,14 @@ The following settings are not needed any more and have been removed:
 Please remove them from your settings.py
 
 
+CMS_FLAT_URLS
+=============
+
+Was marked deprecated in 2.3 and has now been removed.
+
+
+
+
 ..
     Feature description
 
