@@ -43,8 +43,7 @@ class TemplatetagTests(TestCase):
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
-    settings_overrides = {'CMS_MODERATOR': False,
-                          'CMS_HIDE_UNTRANSLATED': False}
+    settings_overrides = {'CMS_MODERATOR': False}
 
     def setUp(self):
         self._prev_DEBUG = settings.DEBUG
@@ -155,18 +154,19 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             res = tpl.render(context)
             self.assertEqual(res,"/de/seite-2/")
 
-        # Default configuration has CMS_HIDE_UNTRANSLATED=False
-        context = self.get_context(page_2.get_absolute_url())
-        context['request'].current_page = page_2.publisher_public
-        res = tpl.render(context)
-        self.assertEqual(res,"/de/seite-2/")
+            # Default configuration has CMS_HIDE_UNTRANSLATED=False
+            context = self.get_context(page_2.get_absolute_url())
+            context['request'].current_page = page_2.publisher_public
+            res = tpl.render(context)
+            self.assertEqual(res,"/de/seite-2/")
 
-        context = self.get_context(page_3.get_absolute_url())
-        context['request'].current_page = page_3.publisher_public
-        res = tpl.render(context)
-        self.assertEqual(res,"")
+            context = self.get_context(page_3.get_absolute_url())
+            context['request'].current_page = page_3.publisher_public
+            res = tpl.render(context)
+            self.assertEqual(res,"/de/page-3/")
+        lang_settings[1][1]['hide_untranslated'] = True
 
-        with SettingsOverride(CMS_HIDE_UNTRANSLATED=True):
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2.publisher_public
             res = tpl.render(context)
