@@ -101,7 +101,7 @@ def has_global_page_permission(request, site, **filters):
     """
     A helper function to check for global page permissions for the current user
     and site. Caches the result on a request basis, so multiple calls to this
-    funtion inside of one request/response cycle only generate one query.
+    function inside of one request/response cycle only generate one query.
 
     :param request: the Request object
     :param site: the Site object or ID
@@ -149,7 +149,7 @@ def get_user_permission_level(user):
     try:
         permission = PagePermission.objects.with_can_change_permissions(user).order_by('page__level')[0]
     except IndexError:
-        # user is'nt assigned to any node
+        # user isn't assigned to any node
         raise NoPermissionsException
     return permission.page.level
 
@@ -213,7 +213,7 @@ def get_subordinate_users(user):
 
 def get_subordinate_groups(user):
     """
-    Simillar to get_subordinate_users, but returns queryset of Groups instead
+    Similar to get_subordinate_users, but returns queryset of Groups instead
     of Users.
     """
     if (user.is_superuser or
@@ -289,7 +289,7 @@ def get_user_sites_queryset(user):
 
 def has_plugin_permission(user, plugin_type, permission_type):
     """
-    Checks that a user has permissions for the plugin-type given to performe 
+    Checks that a user has permissions for the plugin-type given to perform
     the action defined in permission_type
     permission_type should be 'add', 'change' or 'delete'.
     """

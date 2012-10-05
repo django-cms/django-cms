@@ -6,8 +6,6 @@ from cms.publisher.query import PublisherQuerySet
 from django.conf import settings
 from cms.exceptions import NoHomeFound
 
-#from cms.utils.urlutils import levelize_path
-
 
 class PageQuerySet(PublisherQuerySet):
     def on_site(self, site=None):

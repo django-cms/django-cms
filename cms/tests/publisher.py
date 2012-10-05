@@ -53,17 +53,7 @@ class PublisherTestCase(CMSTestCase):
         except CommandError:
             raised = True
         self.assertTrue(raised)
-        
-    def test_command_line_should_raise_when_moderator_false(self):
-        with SettingsOverride(CMS_MODERATOR=False):
-            raised = False
-            try:
-                com = publisher_publish.Command()
-                com.handle_noargs()
-            except CommandError:
-                raised = True
-        self.assertTrue(raised)
-        
+
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')

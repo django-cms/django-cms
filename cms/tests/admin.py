@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.admin.change_list import CMSChangeList
-from cms.admin.dialog.forms import (ModeratorForm, PermissionForm, 
-    PermissionAndModeratorForm)
-from cms.admin.dialog.views import _form_class_selector
+from cms.admin.dialog.forms import PermissionForm
 from cms.admin.forms import PageForm
 from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
 from cms.api import create_page, create_title, add_plugin
@@ -66,7 +64,6 @@ class AdminTestsBase(CMSTestCase):
                 can_publish=True,
                 can_change_permissions=False,
                 can_move_page=True,
-                can_moderate=True,
             )
             gpp.sites = Site.objects.all()
         return admin, normal_guy
@@ -253,28 +250,10 @@ class AdminTestCase(AdminTestsBase):
             data = {'post': 'yes'}
             response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            self.assertRaises(Page.DoesNotExist, self.reload, page)
-            self.assertRaises(Page.DoesNotExist, self.reload, child)
-        
-    def test_admin_dialog_form_no_moderation_or_permissions(self):
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
-            result = _form_class_selector()
-            self.assertEqual(result, None)
-            
-    def test_admin_dialog_form_permission_only(self):
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=True):
-            result = _form_class_selector()
-            self.assertEqual(result, PermissionForm)
-            
-    def test_admin_dialog_form_moderation_only(self):
-        with SettingsOverride(CMS_MODERATOR=True, CMS_PERMISSION=False):
-            result = _form_class_selector()
-            self.assertEqual(result, ModeratorForm)
-            
-    def test_admin_dialog_form_moderation_and_permisison(self):
-        with SettingsOverride(CMS_MODERATOR=True, CMS_PERMISSION=True):
-            result = _form_class_selector()
-            self.assertEqual(result, PermissionAndModeratorForm)
+            # TODO - The page should be marked for deletion, but nothing more
+            # until publishing
+            #self.assertRaises(Page.DoesNotExist, self.reload, page)
+            #self.assertRaises(Page.DoesNotExist, self.reload, child)
 
     def test_search_fields(self):
         superuser = self._get_guys(admin_only=True)
@@ -416,16 +395,10 @@ class AdminFieldsetTests(TestCase):
             self.assertEqual(a_attr, b_attr)
         
     def test_no_moderator(self):
-        with SettingsOverride(CMS_MODERATOR=True):
-            control = AttributeObject()
-            contribute_fieldsets(control)
-        with SettingsOverride(CMS_MODERATOR=False):
-            nomod = AttributeObject()
-            contribute_fieldsets(nomod)
-        self.validate_attributes(control, nomod, ['fieldsets', 'additional_hidden_fields'])
-        self.assertEqual(control.additional_hidden_fields, ['moderator_state', 'moderator_message'])
-        self.assertEqual(nomod.additional_hidden_fields, [])
-    
+        control = AttributeObject()
+        contribute_fieldsets(control)
+        self.assertEqual(control.additional_hidden_fields, [])
+
     def test_no_menu_title_overwrite(self):
         with SettingsOverride(CMS_MENU_TITLE_OVERWRITE=True):
             control = AttributeObject()
@@ -541,15 +514,10 @@ class AdminFieldsetTests(TestCase):
 
 class AdminListFilterTests(TestCase):
     def test_no_moderator(self):
-        with SettingsOverride(CMS_MODERATOR=True):
-            control = AttributeObject()
-            contribute_list_filter(control)
-        with SettingsOverride(CMS_MODERATOR=False):
-            experiment = AttributeObject()
-            contribute_list_filter(experiment)
-        self.assertTrue('moderator_state' in control.list_filter, control.list_filter)
-        self.assertFalse('moderator_state' in experiment.list_filter, experiment.list_filter)
-    
+        control = AttributeObject()
+        contribute_list_filter(control)
+        #self.assertTrue('moderator_state' in control.list_filter, control.list_filter)
+
     def test_no_softroot(self):
         with SettingsOverride(CMS_SOFTROOT=True):
             control = AttributeObject()
@@ -589,8 +557,8 @@ class AdminTests(AdminTestsBase):
         admin = self.get_admin()
         with self.login_user_context(permless):
             request = self.get_request()
-            self.assertRaises(Http404, self.admin_class.get_moderation_states,
-                              request, page.pk)
+            response = self.admin_class.get_moderation_states(request, page.pk)
+            self.assertEqual(response.status_code, 200)
         with self.login_user_context(admin):
             request = self.get_request()
             response = self.admin_class.get_moderation_states(request, page.pk)
@@ -678,13 +646,6 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'moderate': '10'})
             self.assertRaises(Http404, self.admin_class.change_moderation,
                               request, page.pk)
-
-    def test_approve_page_requires_perms(self):
-        permless = self.get_permless()
-        with self.login_user_context(permless):
-            request = self.get_request()
-            self.assertRaises(Http404, self.admin_class.approve_page,
-                              request, 1)
 
     def test_publish_page_requires_perms(self):
         permless = self.get_permless()
@@ -793,7 +754,7 @@ class AdminTests(AdminTestsBase):
         }
         admin = self.get_admin()
         url = reverse('admin:cms_page_add_plugin')
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False,
+        with SettingsOverride(CMS_PERMISSION=False,
                               CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.placeholders.get(slot='body')
@@ -817,7 +778,7 @@ class AdminTests(AdminTestsBase):
         }
         admin = self.get_admin()
         url = reverse('admin:cms_page_add_plugin')
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False,
+        with SettingsOverride(CMS_PERMISSION=False,
                               CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.placeholders.get(slot='body')
@@ -882,7 +843,6 @@ class PluginPermissionTests(AdminTestsBase):
             can_publish=True,
             can_change_permissions=False,
             can_move_page=True,
-            can_moderate=True,
         )
         gpp.sites = Site.objects.all()
         if save:
@@ -980,7 +940,7 @@ class AdminFormsTests(AdminTestsBase):
         user.is_superuser = True
         user.pk = 1
         request = type('Request', (object,), {'user': user})
-        with SettingsOverride(CMS_MODERATOR=False):
+        with SettingsOverride():
             data = {
                 'title': 'TestPage',
                 'slug': 'test-page',
@@ -1018,14 +978,14 @@ class AdminFormsTests(AdminTestsBase):
             'reverse_id': dupe_id,
         }
         form = PageForm(data=page2_data, files=None)
-        self.assertTrue(not form.is_valid())
+        self.assertFalse(form.is_valid())
         # reverse_id is the only item that is in __all__ as every other field
         # has it's own clean method. Moving it to be a field error means
         # __all__ is now not available.
-        self.assertTrue('__all__' not in form.errors)
+        self.assertNotIn('__all__', form.errors)
         # In moving it to it's own field, it should be in form.errors, and
         # the values contained therein should match these.
-        self.assertTrue('reverse_id' in form.errors)
+        self.assertIn('reverse_id', form.errors)
         self.assertEqual(1, len(form.errors['reverse_id']))
         self.assertEqual([u'A page with this reverse URL id exists already.'],
             form.errors['reverse_id'])
@@ -1050,7 +1010,7 @@ class AdminFormsTests(AdminTestsBase):
             # reverse_id form row has an errors class. Django's admin avoids
             # collapsing these, so that the error is visible.
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page2.pk, page2_data)
-            self.assertTrue('<div class="form-row errors reverse_id">' in resp.content)
+            self.assertContains(resp, '<div class="form-row errors reverse_id">')
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
@@ -1067,7 +1027,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
         Expected a username only 2 times in the content, but a relationship
         between usercount and pagesize
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=True):
+        with SettingsOverride(CMS_PERMISSION=True):
             admin = self.get_superuser()
             PAGE_NAME = 'TestPage'
             USER_NAME = 'test_size_user_0'

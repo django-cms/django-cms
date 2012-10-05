@@ -23,7 +23,7 @@ class MenusFixture(object):
             'template': 'nav_playground.html',
             'language': 'en',            
         }
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
             p4 = create_page('P4', published=True, in_navigation=True, **defaults)
             p6 = create_page('P6', published=True, in_navigation=False, **defaults)
@@ -56,7 +56,7 @@ class SubMenusFixture(object):
             'template': 'nav_playground.html',
             'language': 'en',            
         }
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
             p4 = create_page('P4', published=True, in_navigation=True, **defaults)
             p6 = create_page('P6', published=True, in_navigation=True, **defaults)
@@ -93,7 +93,7 @@ class SoftrootFixture(object):
             'in_navigation': True,
             'published': True,
         }
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             top = create_page('top', **defaults)
             root = create_page('root', parent=top, **defaults)
             aaa = create_page('aaa', parent=root, **defaults)

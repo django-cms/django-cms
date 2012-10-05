@@ -25,10 +25,7 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 
 class BaseMenuTest(SettingsOverrideTestCase):
-    settings_overrides = {
-        'CMS_MODERATOR': False,
-    }
-    
+
     def _get_nodes(self, path='/'):
         node1 = NavigationNode('1', '/1/', 1)
         node2 = NavigationNode('2', '/2/', 2, 1)
@@ -538,7 +535,6 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
         If we are above that page, the children of this page are not shown.
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': False
     }
         
@@ -781,7 +777,6 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
 class ViewPermissionMenuTests(SettingsOverrideTestCase):
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }
@@ -1127,7 +1122,6 @@ class SoftrootTests(SettingsOverrideTestCase):
                 Instruments
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_SOFTROOT': True,
         'CMS_PERMISSION': False
     }

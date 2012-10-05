@@ -69,12 +69,10 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'has_delete_permission': page.has_delete_permission(request),
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_page_permission,
-        'has_moderate_permission': page.has_moderate_permission(request),
         'page_moderator_state': moderator_state,
         'moderator_should_approve': moderator_state['state'] >= moderator.I_APPROVE,
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
         'CMS_PERMISSION': settings.CMS_PERMISSION,
-        'CMS_MODERATOR': settings.CMS_MODERATOR,
     }
     return context
 

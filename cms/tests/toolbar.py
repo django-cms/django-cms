@@ -40,7 +40,6 @@ class ToolbarUserMixin(object):
 
 
 class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
-    settings_overrides = {'CMS_MODERATOR': False}
 
     @property
     def request_factory(self):
@@ -263,7 +262,6 @@ class ToolbarTests(SettingsOverrideTestCase, ToolbarUserMixin):
         
 
 class ToolbarModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
-    settings_overrides = {'CMS_MODERATOR': True}
 
     def setUp(self):
         self.request_factory = RequestFactory()
@@ -271,7 +269,7 @@ class ToolbarModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
     def test_toolbar_moderate_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.request_factory.get(page.get_absolute_url() + '?edit')
-        request.user = self.get_staff()
+        request.user = self.get_superuser()
         request.current_page = page
         request.session = {}
         toolbar = CMSToolbar(request)
@@ -280,18 +278,12 @@ class ToolbarModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
 
         items = toolbar.get_items({})
 
-        # Logo + edit-mode + moderate + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 6)
+        # Logo + edit-mode + moderate + templates + page-menu + admin-menu + logout
+        self.assertEqual(len(items), 7)
 
         moderate = items[2]
         self.assertTrue(isinstance(moderate, GetButton))
 
-
-class ToolbarNoModeratorTests(SettingsOverrideTestCase, ToolbarUserMixin):
-    settings_overrides = {'CMS_MODERATOR': False}
-
-    def setUp(self):
-        self.request_factory = RequestFactory()
 
     def test_toolbar_no_moderate_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)

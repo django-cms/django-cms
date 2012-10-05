@@ -226,7 +226,6 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
     Test CMS_PUBLIC_FOR=all group access and menu nodes rendering
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }
@@ -419,7 +418,6 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     Test if this affects the menu entries and page visibility
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }

@@ -17,7 +17,6 @@ class MultilingualTestCase(SettingsOverrideTestCase):
     settings_overrides = {
         'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME), ('extra_context.html', 'extra_context.html'),
                           ('nav_playground.html', 'nav_playground.html')],
-        'CMS_MODERATOR': False,
     }
 
 
@@ -32,7 +31,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
         user = User.objects.create_superuser('super', 'super@django-cms.org', 'super')
-        page = publish_page(page, user, True)
+        page = publish_page(page, user)
         public = page.publisher_public
         placeholder = public.placeholders.all()[0]
         self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)

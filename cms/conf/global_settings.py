@@ -118,10 +118,6 @@ CMS_MEDIA_URL = os.path.join(settings.MEDIA_URL, CMS_MEDIA_PATH)
 # Path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
 CMS_PAGE_MEDIA_PATH = 'cms_page_media/'
 
-# moderator mode - if True, approve path can be setup for every page, so there
-# will be some control over the published stuff
-CMS_MODERATOR = False 
-
 # Defines what character will be used for the __unicode__ handling of cms pages
 CMS_TITLE_CHARACTER = '+'
 

@@ -36,7 +36,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
             page = instance.from_page
         else:
             page = instance.page
-        if settings.CMS_MODERATOR and not instance.page.publisher_is_draft and page.publisher_is_draft:
+        if not instance.page.publisher_is_draft and page.publisher_is_draft:
             page = page.publisher_public
             
         plugins = get_cmsplugin_queryset(request).filter(

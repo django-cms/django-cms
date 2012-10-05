@@ -101,8 +101,7 @@ class PageManager(PublisherManager):
         """
         from cms.plugin_pool import plugin_pool
         qs = self.get_query_set()
-        if settings.CMS_MODERATOR:
-            qs = qs.public()
+        qs = qs.public()
 
         if current_site_only:
             site = Site.objects.get_current()
@@ -339,6 +338,8 @@ class PagePermissionManager(BasicPagePermissionManager):
         NOTE: this returns just PagePermission instances, to get complete access
         list merge return of this function with Global permissions.
         """
+        # permissions should be managed on the draft page only
+        page = page.get_draft_object()
         from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN,\
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
         # code taken from
@@ -415,14 +416,6 @@ class PagePermissionsPermissionManager(models.Manager):
         """Give a list of pages which user can move.
         """
         return self.__get_id_list(user, site, "can_move_page")
-
-    def get_moderate_id_list(self, user, site):
-        """Give a list of pages which user can moderate. If moderation isn't
-        installed, nobody can moderate.
-        """
-        if not settings.CMS_MODERATOR:
-            return []
-        return self.__get_id_list(user, site, "can_moderate")
 
     def get_view_id_list(self, user, site):
         """Give a list of pages which user can view.

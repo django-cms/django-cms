@@ -75,13 +75,7 @@
 
 	{% else %}
 
-	<h1>{{ title }}
-	{% if CMS_MODERATOR %}
-		{% if moderation_required %}<span class="moderation-requires-approvement">{% blocktrans %}(requires approvement at {{ moderation_level }} level){% endblocktrans %}</span>
-		{% else %}<span>{% trans '(you can perform actions on this page directly)' %}</span>
-		{% endif %}
-	{% endif %}
-	</h1>
+	<h1>{{ title }}</h1>
 	{% endif %}
 	
 {% endblock %}

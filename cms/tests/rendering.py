@@ -32,7 +32,6 @@ class RenderingTestCase(SettingsOverrideTestCase):
     
     settings_overrides = {
         'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME), ('extra_context.html', 'extra_context.html')],
-        'CMS_MODERATOR': False,
     }
 
     def setUp(self):

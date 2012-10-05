@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import NoHomeFound
+from cms.models import Title
 from cms.models.pagemodel import Page
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
@@ -18,6 +19,22 @@ ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
 
 
+def use_preview(request):
+    """
+    Decision function to determine if the drafts or public pages should be used
+    Public models are used unless looking at preview or edit versions of the page.
+    """
+    preview_draft = ('preview' in request.GET and 'draft' in request.GET)
+    edit_mode = 'edit' in request.GET
+
+    return preview_draft or edit_mode
+
+def get_page_queryset(request=None):
+    if request and use_preview(request):
+        return Page.objects.drafts()
+
+    return Page.objects.public()
+
 def get_page_queryset_from_path(path, preview=False, site=None):
     """ Returns a queryset of pages corresponding to the path given
     In may returns None or a single page is no page is present or root path is given
@@ -31,7 +48,7 @@ def get_page_queryset_from_path(path, preview=False, site=None):
         site = Site.objects.get_current()
     # Check if this is called from an admin request
     if admin_base and path.startswith(admin_base):
-        # if so, get the page ID to query the page
+        # if so, get the page ID to request it directly
         match = ADMIN_PAGE_RE.search(path)
         if not match:
             page = None
@@ -42,24 +59,17 @@ def get_page_queryset_from_path(path, preview=False, site=None):
                 page = None
         return page
 
-    if not settings.CMS_MODERATOR or preview:
-        # We do not use moderator
-        pages = Page.objects.drafts()
-    else:
-        pages = Page.objects.public()
-
     # PageQuerySet.published filter on page site.
     # We have to explicitly filter on site only in preview mode
-    # we can skip pages.filter
-    if not preview:
-        pages = pages.published(site)
+    if preview:
+        pages = Page.objects.drafts().filter(site=site)
     else:
-        pages = pages.filter(site=site)
+        pages = Page.objects.public().published(site)
 
     # Check if there are any pages
     if not pages.all_root().exists():
         return None
-    
+
     # get the home page (needed to get the page)
     try:
         home = pages.get_home()
@@ -117,8 +127,12 @@ def get_page_from_request(request, use_path=None):
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
 
-    # TODO: Isn't there a permission check needed here?
-    preview = 'preview' in request.GET and request.user.is_staff
+    preview = use_preview(request)
+    # If non-staff user, any request for preview/edit results in a "not found"
+    # This is to avoid confusing the toolbar logic into thinking it has an
+    # editable version
+    if preview and not request.user.is_staff:
+        return None
 
     # If use_path is given, someone already did the path cleaning
     if use_path is not None:
@@ -138,7 +152,6 @@ def get_page_from_request(request, use_path=None):
             path = path[:-1]
 
     page = get_page_from_path(path, preview)
-        
     request._current_page_cache = page
     return page
 
@@ -168,9 +181,8 @@ def is_valid_url(url,instance,create_links=True, site=None):
                 page_qs = [page_qs]
             for page in page_qs:
                 # Every page in the queryset except the current one is a conflicting page
-                # When CMS_MODERATOR is active we have to exclude both copies of the page
-                if page and ((not settings.CMS_MODERATOR and page.pk != instance.pk) or
-                             (settings.CMS_MODERATOR and page.publisher_public.pk != instance.pk)):
+                # We have to exclude both copies of the page
+                if page and ((page.publisher_public.pk != instance.pk)):
                     if create_links:
                         # Format return message with page url
                         url_clashes.append('<a href="%(page_url)s%(pk)s" target="_blank">%(page_title)s</a>' %

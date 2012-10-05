@@ -166,7 +166,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_plugin_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk)
         db_plugin_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk)
 
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             self.assertEqual(text_plugin_1.position,1)
             self.assertEqual(db_plugin_1.position,1)
             self.assertEqual(text_plugin_2.position,2)
@@ -368,6 +368,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 1)
 
         # publish page
         response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
@@ -386,7 +387,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
 
         # there should be no plugins
-        self.assertEquals(CMSPlugin.objects.all().count(), 0)
+        self.assertEquals(CMSPlugin.objects.all().count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=False).count(), 1)
 
     def test_remove_plugin_not_associated_to_page(self):
         """
@@ -458,41 +460,42 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test case for InheritPagePlaceholder
         """
-        with SettingsOverride(CMS_MODERATOR=False):
-            inheritfrompage = create_page('page to inherit from',
-                                          'nav_playground.html',
-                                          'en')
-            
-            body = inheritfrompage.placeholders.get(slot="body")
-            
-            plugin = TwitterRecentEntries(
-                plugin_type='TwitterRecentEntriesPlugin',
-                placeholder=body, 
-                position=1, 
-                language=settings.LANGUAGE_CODE,
-                twitter_user='djangocms',
-            )
-            plugin.insert_at(None, position='last-child', save=True)
-            
-            page = create_page('inherit from page',
-                               'nav_playground.html',
-                               'en',
-                               published=True)
-            
-            inherited_body = page.placeholders.get(slot="body")
-                    
-            inherit_plugin = InheritPagePlaceholder(
-                plugin_type='InheritPagePlaceholderPlugin',
-                placeholder=inherited_body, 
-                position=1, 
-                language=settings.LANGUAGE_CODE,
-                from_page=inheritfrompage,
-                from_language=settings.LANGUAGE_CODE)
-            inherit_plugin.insert_at(None, position='last-child', save=True)
-            
-            self.client.logout()
-            response = self.client.get(page.get_absolute_url())
-            self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
+        inheritfrompage = create_page('page to inherit from',
+                                      'nav_playground.html',
+                                      'en')
+
+        body = inheritfrompage.placeholders.get(slot="body")
+
+        plugin = TwitterRecentEntries(
+            plugin_type='TwitterRecentEntriesPlugin',
+            placeholder=body,
+            position=1,
+            language=settings.LANGUAGE_CODE,
+            twitter_user='djangocms',
+        )
+        plugin.insert_at(None, position='last-child', save=True)
+        inheritfrompage.publish()
+
+        page = create_page('inherit from page',
+                           'nav_playground.html',
+                           'en',
+                           published=True)
+
+        inherited_body = page.placeholders.get(slot="body")
+
+        inherit_plugin = InheritPagePlaceholder(
+            plugin_type='InheritPagePlaceholderPlugin',
+            placeholder=inherited_body,
+            position=1,
+            language=settings.LANGUAGE_CODE,
+            from_page=inheritfrompage,
+            from_language=settings.LANGUAGE_CODE)
+        inherit_plugin.insert_at(None, position='last-child', save=True)
+        page.publish()
+
+        self.client.logout()
+        response = self.client.get(page.get_absolute_url())
+        self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
 
     def test_render_textplugin(self):
         # Setup

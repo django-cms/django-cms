@@ -16,11 +16,9 @@ def update_site_and_page_choices(lang=None):
     lang = lang or translation.get_language()
     SITE_CHOICES_KEY = get_site_cache_key(lang)
     PAGE_CHOICES_KEY = get_page_cache_key(lang)
-    if settings.CMS_MODERATOR:
-        title_queryset = Title.objects.filter(page__publisher_is_draft=False)
-    else:
-        title_queryset = Title.objects.filter(page__publisher_is_draft=True)
-    title_queryset = title_queryset.select_related('page', 'page__site').order_by('page__tree_id', 'page__lft', 'page__rght')
+    title_queryset = Title.objects.drafts() \
+        .select_related('page', 'page__site') \
+        .order_by('page__tree_id', 'page__lft', 'page__rght')
     pages = defaultdict(SortedDict)
     sites = {}
     for title in title_queryset:

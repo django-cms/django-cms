@@ -7,6 +7,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+from django.core.exceptions import PermissionDenied
 from cms.utils.i18n import get_language_list
 
 from django.conf import settings
@@ -191,9 +192,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page.insert_at(parent, position)
     page.save()
 
-    if settings.CMS_MODERATOR and _thread_locals.user:
-        page.pagemoderator_set.create(user=_thread_locals.user)
-    
     create_title(
         language=language,
         title=title,
@@ -335,7 +333,7 @@ def create_page_user(created_by, user,
 def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     can_add=False, can_change=False, can_delete=False, 
     can_change_advanced_settings=False, can_publish=False, 
-    can_change_permissions=False, can_move_page=False, can_moderate=False, 
+    can_change_permissions=False, can_move_page=False,
     can_recover_page=True, can_view=False,
     grant_all=False, global_permission=False):
     """
@@ -343,22 +341,18 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     
     See docs/extending_cms/api_reference.rst for more info
     """
-    if grant_all and not global_permission:
-        # shortcut to grant all permissions
-        return assign_user_to_page(page, user, grant_on, True, True, True, True,
-                                   True, True, True, True, True)
-    
+    grant_all = grant_all and not global_permission
     data = {
-        'can_add': can_add,
-        'can_change': can_change,
-        'can_delete': can_delete, 
-        'can_change_advanced_settings': can_change_advanced_settings,
-        'can_publish': can_publish, 
-        'can_change_permissions': can_change_permissions, 
-        'can_move_page': can_move_page, 
-        'can_moderate': can_moderate,  
-        'can_view': can_view,
-    }
+        'can_add': can_add or grant_all,
+        'can_change': can_change or grant_all,
+        'can_delete': can_delete or grant_all,
+        'can_change_advanced_settings': can_change_advanced_settings or grant_all,
+        'can_publish': can_publish or grant_all,
+        'can_change_permissions': can_change_permissions or grant_all,
+        'can_move_page': can_move_page or grant_all,
+        'can_view': can_view or grant_all,
+        }
+
     page_permission = PagePermission(page=page, user=user,
                                      grant_on=grant_on, **data)
     page_permission.save()
@@ -369,28 +363,10 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         page_permission.sites.add(Site.objects.get_current())
     return page_permission
     
-def publish_page(page, user, approve=False):
+def publish_page(page, user):
     """
-    Publish a page. This sets `page.published` to `True` and saves it, which
-    triggers `cms.utils.moderator.page_changed` which does the actual moderation
-    and publishing action.
-    
-    See docs/extending_cms/api_reference.rst for more info
-    """
-    page.published = True
-    # the magic happens in the post save signal here... WTF?
-    page.save()
-    page.publish()
-    # reload page
-    page = Page.objects.get(pk=page.pk)
-    # approve page if requested
-    if approve:
-        page = approve_page(page, user)
-    return page.reload()
-    
-def approve_page(page, user):
-    """
-    Approve a page version.
+    Publish a page. This sets `page.published` to `True` and calls publish()
+    which does the actual publishing.
     
     See docs/extending_cms/api_reference.rst for more info
     """
@@ -398,5 +374,9 @@ def approve_page(page, user):
         def __init__(self, user):
             self.user = user
     request = FakeRequest(user)
-    moderator.approve_page(request, page)
-    return Page.objects.get(pk=page.pk)
+    if not page.has_publish_permission(request):
+        raise PermissionDenied
+    page.published = True
+    page.save()
+    page.publish()
+    return page.reload()

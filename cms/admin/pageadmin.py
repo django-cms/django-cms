@@ -20,10 +20,8 @@ from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins,
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
-from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from distutils.version import LooseVersion
-from django import template
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -35,7 +33,7 @@ from django.core.urlresolvers import reverse
 from django.db import router, transaction, models
 from django.forms import CharField
 from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError)
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import (title, escape, force_escape, 
@@ -88,8 +86,6 @@ def contribute_fieldsets(cls):
         general_fields.append('publication_date')
     elif settings.CMS_SHOW_END_DATE:
         general_fields.append( 'publication_end_date')
-    if settings.CMS_MODERATOR:
-        additional_hidden_fields += ['moderator_state', 'moderator_message']
     if settings.CMS_SEO_FIELDS:
         seo_fields = ['page_title', 'meta_description', 'meta_keywords']
     if not settings.CMS_URL_OVERWRITE:
@@ -137,8 +133,6 @@ def contribute_fieldsets(cls):
 
 def contribute_list_filter(cls):
     list_filter = ['published', 'in_navigation', 'template', 'changed_by']
-    if settings.CMS_MODERATOR:
-        list_filter.append('moderator_state')
     if settings.CMS_SOFTROOT:
         list_filter.append('soft_root')
     setattr(cls, 'list_filter', list_filter)
@@ -211,7 +205,6 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/change-moderation/$', self.change_moderation),
-            pat(r'^([0-9]+)/approve/$', self.approve_page), # approve page
             pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
@@ -489,15 +482,6 @@ class PageAdmin(ModelAdmin):
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
-            moderation_required = moderator.will_require_moderation(
-                request.GET['target'], request.GET['position']
-            )
-            extra_context.update({
-                'moderation_required': moderation_required,
-                'moderation_level': _('higher'),
-                'show_save_and_continue':True,
-            })
         language = get_language_from_request(request)
         extra_context.update({
             'language': language,
@@ -517,10 +501,9 @@ class PageAdmin(ModelAdmin):
             obj = None
         else:
             selected_template = get_template_from_request(request, obj)
-            moderation_level, moderation_required = moderator.get_test_moderation_level(obj, request.user)
 
             # if there is a delete request for this page
-            moderation_delete_request = (settings.CMS_MODERATOR and
+            moderation_delete_request = (
                     obj.pagemoderatorstate_set.get_delete_actions(
                     ).count())
 
@@ -530,14 +513,8 @@ class PageAdmin(ModelAdmin):
                 'placeholders': self.get_fieldset_placeholders(selected_template),
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
-                'CMS_MODERATOR': settings.CMS_MODERATOR,
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'has_change_permissions_permission': obj.has_change_permissions_permission(request),
-                'has_moderate_permission': obj.has_moderate_permission(request),
-                'moderation_level': moderation_level,
-                'moderation_required': moderation_required,
-                'moderator_should_approve': moderator.moderator_should_approve(request, obj),
-                'moderation_delete_request': moderation_delete_request,
                 'show_delete_translation': len(obj.get_languages()) > 1,
                 'current_site_id': settings.SITE_ID,
             }
@@ -585,10 +562,9 @@ class PageAdmin(ModelAdmin):
         some new stuff, which should be published after all other objects on page
         are collected.
         """
-        if settings.CMS_MODERATOR:
-            # save the object again, so all the related changes to page model
-            # can be published if required
-            obj.save()
+        # save the object again, so all the related changes to page model
+        # can be published if required
+        obj.save()
         return super(PageAdmin, self).response_change(request, obj)
 
     def has_add_permission(self, request):
@@ -690,7 +666,6 @@ class PageAdmin(ModelAdmin):
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'softroot': settings.CMS_SOFTROOT,
             'CMS_PERMISSION': settings.CMS_PERMISSION,
-            'CMS_MODERATOR': settings.CMS_MODERATOR,
             'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
@@ -832,7 +807,6 @@ class PageAdmin(ModelAdmin):
                 try:
                     kwargs = {
                         'copy_permissions': request.REQUEST.get('copy_permissions', False),
-                        'copy_moderation': request.REQUEST.get('copy_moderation', False),
                     }
                     page.copy_page(target, site, position, **kwargs)
                     return jsonify_request(HttpResponse("ok"))
@@ -842,50 +816,31 @@ class PageAdmin(ModelAdmin):
         return HttpResponseRedirect('../../')
 
     def get_moderation_states(self, request, page_id):
-        """Returns moderation messsages. Is loaded over ajax to inline-group
+        """Returns moderation messages. Is loaded over ajax to inline-group
         element in change form view.
         """
         page = get_object_or_404(Page, id=page_id)
-        if not page.has_moderate_permission(request):
-            raise Http404()
-
         context = {
             'page': page,
         }
         return render_to_response('admin/cms/page/moderation_messages.html', context)
 
     @transaction.commit_on_success
-    def approve_page(self, request, page_id):
-        """Approve changes on current page by user from request.
-        """
-        #TODO: change to POST method !! get is not safe
+    def publish_page(self, request, page_id):
         page = get_object_or_404(Page, id=page_id)
-        if not page.has_moderate_permission(request):
-            raise Http404()
-
-        moderator.approve_page(request, page)
+        # ensure user has permissions to publish this page
+        if not page.has_publish_permission(request):
+            return HttpResponseForbidden("Denied")
+        page.publish()
 
         # Django SQLite bug. Does not convert to string the lazy instances
         from django.utils.translation import ugettext as _
-        self.message_user(request, _('Page was successfully approved.'))
+        self.message_user(request, _('Page was successfully published.'))
 
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
-        referer = request.META.get('HTTP_REFERER', reverse('admin:cms_page_changelist'))
-        path = '../../'
-        if 'admin' not in referer:
-            path = '%s?edit-off' % referer.split('?')[0]
-        return HttpResponseRedirect( path )
 
-
-    @transaction.commit_on_success
-    def publish_page(self, request, page_id):
-        page = get_object_or_404(Page, id=page_id)
-        # ensure user has permissions to publish this page
-        if not page.has_moderate_permission(request):
-            return HttpResponseForbidden("Denied")
-        page.publish()
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
         # TODO: use admin base here!
@@ -895,7 +850,7 @@ class PageAdmin(ModelAdmin):
 
 
     def delete_view(self, request, object_id, *args, **kwargs):
-        """If page is under modaretion, just mark this page for deletion = add
+        """If page is under moderation, just mark this page for deletion = add
         delete action to page states.
         """
         page = get_object_or_404(Page, id=object_id)
@@ -903,7 +858,7 @@ class PageAdmin(ModelAdmin):
         if not self.has_delete_permission(request, page):
             raise PermissionDenied
 
-        if page.is_under_moderation():
+        if page.published:
             # don't perform a delete action, just mark page for deletion
             page.force_moderation_action = PageModeratorState.ACTION_DELETE
             page.moderator_state = Page.MODERATOR_NEED_DELETE_APPROVEMENT
@@ -1395,17 +1350,19 @@ class PageAdmin(ModelAdmin):
         placeholder = plugin.placeholder
         page = placeholder.page if placeholder else None
 
-        if page and not page.has_change_permission(request):
-            raise Http404
+        if page:
+            if not page.publisher_is_draft:
+                raise Http404
+            if not page.has_change_permission(request):
+                raise HttpResponseForbidden(ugettext("You have no permission to remove a plugin"))
 
-        if page and settings.CMS_MODERATOR and page.is_under_moderation():
             # delete the draft version of the plugin
             plugin.delete()
             # set the page to require approval and save
             page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
             page.save()
         else:
-            plugin.delete_with_public()
+            plugin.delete()
 
         plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
         comment = ugettext(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {

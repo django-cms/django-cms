@@ -184,7 +184,6 @@ def configure(**extra):
             },
         },
         CMS_SOFTROOT = True,
-        CMS_MODERATOR = True,
         CMS_PERMISSION = True,
         CMS_PUBLIC_FOR = 'all',
         CMS_CACHE_DURATIONS = {

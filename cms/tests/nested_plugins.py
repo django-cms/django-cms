@@ -20,7 +20,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         mptt values are correctly showing a parent child relationship
         of a nested plugin
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                position=u"last-child", published=True, in_navigation=True)
@@ -83,7 +83,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         page two (copy target)
         Verify copied page, placeholders, plugins and body text
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             templates = []
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
@@ -291,7 +291,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                     col_right: 1 text plugin with nested link plugin
         verify the copied page structure
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             templates = []
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",

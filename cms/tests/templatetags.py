@@ -43,7 +43,6 @@ class TemplatetagTests(TestCase):
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
-    settings_overrides = {'CMS_MODERATOR': False}
 
     def setUp(self):
         self._prev_DEBUG = settings.DEBUG

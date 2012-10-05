@@ -7,7 +7,8 @@ from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
-from cms.utils.moderator import get_page_queryset, get_title_queryset
+from cms.utils.page_resolver import get_page_queryset
+from cms.utils.moderator import get_title_queryset
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool

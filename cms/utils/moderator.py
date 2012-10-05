@@ -45,7 +45,7 @@ def update_moderation_message(page, message):
     page gets saved (in signal), so this might have a concurrency issue, but 
     probably will work in 99,999%.
     
-    If any page state is'nt found in last UPDATE_TOLERANCE seconds, a new state
+    If any page state isn't found in last UPDATE_TOLERANCE seconds, a new state
     will be created instead of affecting old message.    
     """
 
@@ -78,16 +78,15 @@ def page_moderator_state(request, page):
 
     # TODO: OPTIMIZE!! calls 1 or 2 q per list item (page)
 
-    if settings.CMS_MODERATOR:
-        if state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS:
-            label = _('parent first')
-        elif page.requires_approvement() and page.has_moderate_permission(request) \
-            and under_moderation.filter(user=request.user).count() \
-            and not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
-                # only if he didn't approve already...
-                is_delete = state == Page.MODERATOR_NEED_DELETE_APPROVEMENT
-                state = is_delete and I_APPROVE_DELETE or I_APPROVE 
-                label = is_delete and _('delete') or _('approve')
+    if state == Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS:
+        label = _('parent first')
+    elif page.requires_approvement() and page.has_publish_permission(request) \
+        and under_moderation.filter(user=request.user).count() \
+        and not page.pagemoderatorstate_set.filter(user=request.user, action=PageModeratorState.ACTION_APPROVE).count():
+            # only if he didn't approve already...
+            is_delete = state == Page.MODERATOR_NEED_DELETE_APPROVEMENT
+            state = is_delete and I_APPROVE_DELETE or I_APPROVE
+            label = is_delete and _('delete') or _('approve')
 
     elif not page.is_approved():
         # if no moderator, we have just 2 states => changed / unchanged
@@ -113,8 +112,6 @@ def requires_moderation(page):
 def will_require_moderation(target_id, position):
     """Check if newly added page will require moderation
     """
-    if not settings.CMS_MODERATOR:
-        return False
     target = Page.objects.get(pk=target_id)
     if position == 'first-child':
         return requires_moderation(target)
@@ -139,7 +136,7 @@ def get_test_moderation_level(page, user=None, include_user=True):
 
     qs = page.get_moderator_queryset()
 
-    if not settings.CMS_MODERATOR or (user and user.is_superuser):
+    if user and user.is_superuser:
         if include_user and qs.filter(user__id=user.id, moderate_page=True).count():
             return 0, True
         return 0, False
@@ -210,7 +207,7 @@ def get_model_queryset(model, request=None):
     return model.objects.public()
 
 # queryset helpers for basic models
-get_page_queryset = lambda request=None: get_model_queryset(Page, request) 
+#get_page_queryset = lambda request=None: get_model_queryset(Page, request)
 get_title_queryset = lambda request=None: Title.objects.all()   # not sure if we need to only grab public items here
 get_cmsplugin_queryset = lambda request=None: CMSPlugin.objects.all()   # CMSPlugin is no longer extending from Publisher
 
@@ -222,7 +219,7 @@ def mail_approvement_request(page, user=None):
     Don't send it to current user - he should know about it, because he made the
     change.
     """
-    if not settings.CMS_MODERATOR or not page.requires_approvement():
+    if not page.requires_approvement():
         return
 
     recipient_list = []
