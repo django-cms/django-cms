@@ -294,13 +294,13 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.check_published_page_attributes(copied_page)
         
         
-    def test_subtree_needs_approvement(self):
+    def test_subtree_needs_approval(self):
         # create page under slave_page
         page = create_page("parent", "nav_playground.html", "en",
                            parent=self.home_page)
         self.assertFalse(page.publisher_public)
         
-        # create subpage uner page
+        # create subpage under page
         subpage = create_page("subpage", "nav_playground.html", "en", parent=page)
         self.assertFalse(subpage.publisher_public)
         

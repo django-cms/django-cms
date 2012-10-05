@@ -696,13 +696,7 @@ class Page(MPTTModel):
         from cms.utils.plugins import current_site
 
         if not self.publisher_is_draft:
-            # Permissions are managed on the draft copy only.
-            # TODO: Refactor all of these checks into get_draft_object()
-            if self.publisher_public:
-                # Seems to be legacy code - point to the draft version of this page and retrieve permissions?
-                return self.publisher_public.has_view_permission(request)
-
-            return Page.objects.drafts.get(publisher_public=self).has_view_permission(request)
+            return self.publisher_draft.has_view_permission(request)
         # does any restriction exist?
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
@@ -857,9 +851,6 @@ class Page(MPTTModel):
             Q(page__pk=self.pk, moderate_page=True)
 
         return PageModerator.objects.distinct().filter(query).order_by('page__level')
-
-    def is_under_moderation(self):
-        return bool(self.get_moderator_queryset().count())
 
     def is_approved(self):
         """Returns true, if page is approved and published, or approved, but

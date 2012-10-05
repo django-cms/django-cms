@@ -37,7 +37,6 @@ def has_page_add_permission(request):
     just used for general add buttons - only superuser, or user with can_add in
     globalpagepermission can add page.
     
-    
     Special case occur when page is going to be added from add page button in
     change list - then we have target and position there, so check if user can
     add page under target page will occur. 
@@ -63,7 +62,7 @@ def has_page_add_permission(request):
         elif position in ("left", "right"):
             if page.parent_id:
                 return has_generic_permission(page.parent_id, request.user, "add", page.site)
-                #return page.parent.has_add_permission(request)
+                return page.parent.has_add_permission(request)
     else:
         from cms.utils.plugins import current_site
         site = current_site(request)

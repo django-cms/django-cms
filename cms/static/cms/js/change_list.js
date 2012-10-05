@@ -266,26 +266,7 @@
 				e.stopPropagation();
 				return true;
 			}
-			
-			// moderation
-			if(jtarget.hasClass("moderator-checkbox")) {
-				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-				parent = jtarget.parents('div.col-moderator');
-				
-				value = 0;
-				parent.find('input[type=checkbox]').each(function(i, el){
-					value += $(el).attr("checked") ? parseInt($(el).val()) : 0;
-				});
-				
-				// just reload the page for now in callback... 
-				// TODO: this must be changed sometimes to reloading just the portion
-				// of the tree = current node + descendants
-				
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-moderation/", { moderate: value }, refreshIfChildren(pageId));
-				e.stopPropagation();
-				return true;
-			}
-			
+
 			// quick approve
 			if(jtarget.hasClass("approve")) {
 				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
