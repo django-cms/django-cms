@@ -87,7 +87,7 @@ form {
 
 @mixin button-common-init {
 	@include background-image(linear-gradient($button-silver-light-color, $button-silver-medium-color) !important);
- 	@include box-shadow($button-silver-light-color 0 0 $button-shadow-width inset !important);	
+ 	@include box-shadow($button-silver-medium-color 0 0 $button-shadow-width inset !important);	
  	background-color: $button-silver-medium-color !important; 
 	border: 1px solid $button-silver-medium-color !important;
 	border-bottom: 1px solid $button-silver-dark-color !important;
@@ -254,9 +254,10 @@ button {
 
 input[type="submit"], input[type="button"] {
 	@include button-common();
+	padding: 8px 10px !important;
 	&.default {
 		@include button-blue();
-		padding: 7px 10px 7px !important;
+		padding: 7px 10px !important;
 		margin-top: 1px;
 	}
 }
@@ -276,6 +277,7 @@ a.button {
 	li {
 		list-style: none;
 		background: none;		
+		padding-left: 0;
 		&:hover {
 			background: none;
 		}
@@ -295,7 +297,13 @@ a.button {
 		margin-top: -22px;	
 		margin-right: 10px;
 	}
-
+	.viewsitelink {
+		@include button-common();
+		@include button-blue();
+		margin-top: -22px;	
+		margin-left: 0;
+		margin-right: 10px;	
+	}
 }
 
 
@@ -323,5 +331,41 @@ body.login {
 				}
 			}
 		}
+	}
+}
+
+
+/* Date/Time */
+.form-row {
+	p.datetime{
+		line-height: 30px !important;
+		padding-left: 90px !important;
+	}
+
+}
+
+/* Calendar */
+div.calendar {
+	table {
+		caption {
+			@include background-image(linear-gradient($background-color-dark, $background-color-medium));
+			background-color: $background-color-dark; 
+			color: $font-color-white !important; 
+		}
+	}
+}
+
+div.clockbox {
+	h2 {
+		@include background-image(linear-gradient($background-color-dark, $background-color-medium));
+		background-color: $background-color-dark; 
+		color: $font-color-white !important; 
+	}
+}
+
+div.calendarbox.module {
+	width: 210px !important;
+	.calendarnav-previous, .calendarnav-next {
+		background: none;
 	}
 }

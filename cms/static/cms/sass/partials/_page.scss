@@ -249,6 +249,9 @@ div.admin_shortcuts .shortcuts {
 		border: 1px solid $line-color-light;
 		background: $background-color-transparent !important;
 		padding: 10px;
+		.deletelink-box {
+			margin: 0.5em 0 !important;
+		}
 	}
 	.selector {
 		.selector-available, .selector-chosen {
