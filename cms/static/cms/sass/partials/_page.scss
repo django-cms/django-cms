@@ -13,8 +13,8 @@ html{
 	overflow: auto !important; 
 }
 
-body { 
-	background: url('../images/bg-pattern-light.jpg') $background-color-ultralight repeat!important;
+body {  
+	background: url('../images/bg-pattern-light.jpg') $background-color-ultralight repeat !important;
 }
 
 body, select, input, textarea {
@@ -360,3 +360,43 @@ div.admin_shortcuts .shortcuts {
 	
 }
 
+/* Login */
+body.login {
+	background: url('../images/bg-pattern.jpg') $background-color-ultralight repeat !important;
+	#container {
+		@include box();
+		@include box-shadow(rgba(0, 0, 0, 0.3) 0px 1px 2px, #fff 0px 1px 1px inset); 
+		width: 350px;
+		border: none !important;
+		#header {
+			background: none !important;
+			#branding {
+				h1 {
+					color: $font-color;
+					margin: 20px 0 !important;
+					text-align: center;
+				}
+			}
+		}
+		#content {
+			margin: 0 !important;
+			padding: 25px 40px !important;	
+			#content-main {
+				.submit-row {
+					border: none !important;
+					background: none !important;
+					padding: 0 !important;	
+					input {
+						font-size: 15px !important;
+					}
+				}
+			}
+		}
+		#footer {
+			display: none;
+		}
+	
+	}
+	
+
+}

@@ -250,21 +250,6 @@ form {
 
 button {
 	@include button-common();
-	&.green {
-		@include button-green();
-	}
-	&.orange {
-		@include button-orange();
-	}
-	&.red {
-		@include button-red();
-	}
-	&.black {
-		@include button-black();
-	}
-	&.inactive, &[disabled] {
-		@include button-inactive();
-	}
 }
 
 input[type="submit"], input[type="button"] {
@@ -317,3 +302,26 @@ a.button {
 form .aligned p.help { padding-left: 100px !important; }
 
 
+/* Login */
+
+body.login {
+	#container {
+		#content-main {
+			form {
+				margin-top: 0 !important;
+			}
+			input {
+				font-size: 15px;
+				padding: 0 15px;
+				height: 40px;
+				width: 240px !important;
+			}
+			.submit-row {
+				input {
+					@include button-blue();
+					width: 270px !important;
+				}
+			}
+		}
+	}
+}

@@ -518,231 +518,8 @@ button.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 253, ../sass/partials/_form.scss */
-button.green {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #9ab933)) !important;
-  background-image: -webkit-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: -moz-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: -o-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: -ms-linear-gradient(#bcd077, #9ab933) !important;
-  background-image: linear-gradient(#bcd077, #9ab933) !important;
-  -moz-box-shadow: #bcd077 0 0 2px inset !important;
-  -webkit-box-shadow: #bcd077 0 0 2px inset !important;
-  -o-box-shadow: #bcd077 0 0 2px inset !important;
-  box-shadow: #bcd077 0 0 2px inset !important;
-  background-color: #9ab933 !important;
-  border: 1px solid #bcd077 !important;
-  border-bottom: 1px solid #8fad28 !important;
-  color: white !important;
-}
-/* line 148, ../sass/partials/_form.scss */
-button.green:hover {
-  background: #bcd077 !important;
-  color: white !important;
-}
-/* line 152, ../sass/partials/_form.scss */
-button.green:active {
-  background: #9ab933 !important;
-}
-/* line 155, ../sass/partials/_form.scss */
-button.green.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 256, ../sass/partials/_form.scss */
-button.orange {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #efaa4a), color-stop(100%, #e88801));
-  background-image: -webkit-linear-gradient(#efaa4a, #e88801);
-  background-image: -moz-linear-gradient(#efaa4a, #e88801);
-  background-image: -o-linear-gradient(#efaa4a, #e88801);
-  background-image: -ms-linear-gradient(#efaa4a, #e88801);
-  background-image: linear-gradient(#efaa4a, #e88801);
-  -moz-box-shadow: #efaa4a 0 0 2px inset;
-  -webkit-box-shadow: #efaa4a 0 0 2px inset;
-  -o-box-shadow: #efaa4a 0 0 2px inset;
-  box-shadow: #efaa4a 0 0 2px inset;
-  background-color: #e88801 !important;
-  border: 1px solid #efaa4a !important;
-  border-bottom: 1px solid #de8200 !important;
-  color: white !important;
-}
-/* line 168, ../sass/partials/_form.scss */
-button.orange:hover {
-  background: #efaa4a;
-  color: white;
-}
-/* line 172, ../sass/partials/_form.scss */
-button.orange:active {
-  background: #e88801;
-}
-/* line 175, ../sass/partials/_form.scss */
-button.orange.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 259, ../sass/partials/_form.scss */
-button.red {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(100%, #e80101));
-  background-image: -webkit-linear-gradient(#ef4a4a, #e80101);
-  background-image: -moz-linear-gradient(#ef4a4a, #e80101);
-  background-image: -o-linear-gradient(#ef4a4a, #e80101);
-  background-image: -ms-linear-gradient(#ef4a4a, #e80101);
-  background-image: linear-gradient(#ef4a4a, #e80101);
-  -moz-box-shadow: #ef4a4a 0 0 2px inset;
-  -webkit-box-shadow: #ef4a4a 0 0 2px inset;
-  -o-box-shadow: #ef4a4a 0 0 2px inset;
-  box-shadow: #ef4a4a 0 0 2px inset;
-  background-color: #e80101 !important;
-  border: 1px solid #ef4a4a;
-  border-bottom: 1px solid #d50101;
-  color: white !important;
-}
-/* line 188, ../sass/partials/_form.scss */
-button.red:hover {
-  background: #ef4a4a;
-  color: white;
-}
-/* line 192, ../sass/partials/_form.scss */
-button.red:active {
-  background: #e80101;
-}
-/* line 195, ../sass/partials/_form.scss */
-button.red.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 262, ../sass/partials/_form.scss */
-button.black {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  -moz-box-shadow: #5d6267 0 0 2px inset;
-  -webkit-box-shadow: #5d6267 0 0 2px inset;
-  -o-box-shadow: #5d6267 0 0 2px inset;
-  box-shadow: #5d6267 0 0 2px inset;
-  background-color: #464b50 !important;
-  border: 1px solid #5d6267;
-  border-bottom: 1px solid #333333;
-  color: #bbbbbb !important;
-  cursor: default;
-}
-/* line 209, ../sass/partials/_form.scss */
-button.black:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  border-color: #464b50;
-  color: white;
-}
-/* line 215, ../sass/partials/_form.scss */
-button.black:active, button.black.select {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5d6267), color-stop(100%, #464b50));
-  background-image: -webkit-linear-gradient(#5d6267, #464b50);
-  background-image: -moz-linear-gradient(#5d6267, #464b50);
-  background-image: -o-linear-gradient(#5d6267, #464b50);
-  background-image: -ms-linear-gradient(#5d6267, #464b50);
-  background-image: linear-gradient(#5d6267, #464b50);
-  border-color: #464b50;
-  color: white;
-}
-/* line 220, ../sass/partials/_form.scss */
-button.black.animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
-/* line 265, ../sass/partials/_form.scss */
-button.inactive, button[disabled] {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  -moz-box-shadow: white 0 0 2px inset;
-  -webkit-box-shadow: white 0 0 2px inset;
-  -o-box-shadow: white 0 0 2px inset;
-  box-shadow: white 0 0 2px inset;
-  background-color: #efefef !important;
-  border: 1px solid white;
-  border-bottom: 1px solid #eeeeee;
-  color: #bbbbbb;
-  cursor: default;
-}
-/* line 234, ../sass/partials/_form.scss */
-button.inactive:hover, button[disabled]:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  border-color: #efefef;
-  color: #bbbbbb;
-}
-/* line 240, ../sass/partials/_form.scss */
-button.inactive:active, button.inactive.select, button[disabled]:active, button[disabled].select {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef));
-  background-image: -webkit-linear-gradient(#ffffff, #efefef);
-  background-image: -moz-linear-gradient(#ffffff, #efefef);
-  background-image: -o-linear-gradient(#ffffff, #efefef);
-  background-image: -ms-linear-gradient(#ffffff, #efefef);
-  background-image: linear-gradient(#ffffff, #efefef);
-  border-color: #efefef;
-  color: #bbbbbb;
-}
-/* line 245, ../sass/partials/_form.scss */
-button.inactive.animate, button[disabled].animate {
-  -moz-background-size: 100% 400%;
-  -webkit-background-size: 100% 400%;
-  -o-background-size: 100% 400%;
-  background-size: 100% 400%;
-  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
-}
 
-/* line 270, ../sass/partials/_form.scss */
+/* line 255, ../sass/partials/_form.scss */
 input[type="submit"], input[type="button"] {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -794,7 +571,7 @@ input[type="submit"].animate, input[type="button"].animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 272, ../sass/partials/_form.scss */
+/* line 257, ../sass/partials/_form.scss */
 input[type="submit"].default, input[type="button"].default {
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #029eee)) !important;
   background-image: -webkit-linear-gradient(#5bbdee, #029eee) !important;
@@ -836,7 +613,7 @@ input[type="submit"].default.animate, input[type="button"].default.animate {
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
 
-/* line 279, ../sass/partials/_form.scss */
+/* line 264, ../sass/partials/_form.scss */
 a.button {
   text-decoration: none;
   cursor: pointer;
@@ -890,7 +667,7 @@ a.button.animate {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 283, ../sass/partials/_form.scss */
+/* line 268, ../sass/partials/_form.scss */
 a.button.tab {
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
@@ -901,20 +678,20 @@ a.button.tab {
 }
 
 /* Object Tools */
-/* line 291, ../sass/partials/_form.scss */
+/* line 276, ../sass/partials/_form.scss */
 .object-tools li {
   list-style: none;
   background: none;
 }
-/* line 294, ../sass/partials/_form.scss */
+/* line 279, ../sass/partials/_form.scss */
 .object-tools li:hover {
   background: none;
 }
-/* line 297, ../sass/partials/_form.scss */
+/* line 282, ../sass/partials/_form.scss */
 .object-tools li a {
   background: none !important;
 }
-/* line 301, ../sass/partials/_form.scss */
+/* line 286, ../sass/partials/_form.scss */
 .object-tools .addlink {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -1005,7 +782,7 @@ a.button.tab {
   background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
-/* line 308, ../sass/partials/_form.scss */
+/* line 293, ../sass/partials/_form.scss */
 .object-tools .historylink {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -1060,9 +837,62 @@ a.button.tab {
   background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
 
-/* line 317, ../sass/partials/_form.scss */
+/* line 302, ../sass/partials/_form.scss */
 form .aligned p.help {
   padding-left: 100px !important;
+}
+
+/* Login */
+/* line 310, ../sass/partials/_form.scss */
+body.login #container #content-main form {
+  margin-top: 0 !important;
+}
+/* line 313, ../sass/partials/_form.scss */
+body.login #container #content-main input {
+  font-size: 15px;
+  padding: 0 15px;
+  height: 40px;
+  width: 240px !important;
+}
+/* line 320, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #029eee)) !important;
+  background-image: -webkit-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -moz-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -o-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -ms-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: linear-gradient(#5bbdee, #029eee) !important;
+  -moz-box-shadow: #5bbdee 0 0 2px inset !important;
+  -webkit-box-shadow: #5bbdee 0 0 2px inset !important;
+  -o-box-shadow: #5bbdee 0 0 2px inset !important;
+  box-shadow: #5bbdee 0 0 2px inset !important;
+  background-color: #029eee !important;
+  border: 1px solid #5bbdee !important;
+  border-bottom: 1px solid #0072ac !important;
+  color: white !important;
+  width: 270px !important;
+}
+/* line 128, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input:hover {
+  background: #5bbdee !important;
+  color: white !important;
+}
+/* line 132, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input:active {
+  background: #029eee !important;
+}
+/* line 135, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
 }
 
 /* Use the following CSS code if you want to have a class per icon */
@@ -2333,6 +2163,70 @@ div.admin_shortcuts .shortcuts li a .count_new {
   border-top: none !important;
   border-bottom: none !important;
   background: none !important;
+}
+
+/* Login */
+/* line 364, ../sass/partials/_page.scss */
+body.login {
+  background: url("../images/bg-pattern.jpg") #fcfcfc repeat !important;
+}
+/* line 366, ../sass/partials/_page.scss */
+body.login #container {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: #dddddd 0 2px 3px 0px;
+  -webkit-box-shadow: #dddddd 0 2px 3px 0px;
+  -o-box-shadow: #dddddd 0 2px 3px 0px;
+  box-shadow: #dddddd 0 2px 3px 0px;
+  background: white;
+  border: 0;
+  border-top: 1px solid #F6F6F6;
+  margin-bottom: 5px;
+  padding: 0;
+  -moz-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  -o-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  width: 350px;
+  border: none !important;
+}
+/* line 173, ../sass/partials/_page.scss */
+body.login #container h2, body.login #container h3, body.login #container h4, body.login #container h5, body.login #container h6 {
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+/* line 371, ../sass/partials/_page.scss */
+body.login #container #header {
+  background: none !important;
+}
+/* line 374, ../sass/partials/_page.scss */
+body.login #container #header #branding h1 {
+  color: #444444;
+  margin: 20px 0 !important;
+  text-align: center;
+}
+/* line 381, ../sass/partials/_page.scss */
+body.login #container #content {
+  margin: 0 !important;
+  padding: 25px 40px !important;
+}
+/* line 385, ../sass/partials/_page.scss */
+body.login #container #content #content-main .submit-row {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+/* line 389, ../sass/partials/_page.scss */
+body.login #container #content #content-main .submit-row input {
+  font-size: 15px !important;
+}
+/* line 395, ../sass/partials/_page.scss */
+body.login #container #footer {
+  display: none;
 }
 
 /* Tables */
