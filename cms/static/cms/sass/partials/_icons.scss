@@ -9,7 +9,9 @@ a.selector-chooseall,
 a.active.selector-chooseall,
 .selector-remove,
 .selector-add,
-.inline-group div.add-row a
+.inline-group div.add-row a,
+a[id^="calendarlink"],
+a[id^="clocklink"]
 {
 	background: none !important;
 	padding-left: 10px;
@@ -29,7 +31,10 @@ a.selector-chooseall:before,
 a.active.selector-chooseall:before,
 .selector-remove:before,
 .selector-add:before,
-.inline-group div.add-row a:before
+.inline-group div.add-row a:before,
+.add-another:before,
+a[id^="calendarlink"]:before,
+a[id^="clocklink"]:before
 {
 	font-family: 'django-admin-icons';
 	font-style: normal;
@@ -48,12 +53,13 @@ a.active.selector-chooseall:before,
 .selector-remove:before, a.selector-clearall:before, a.active.selector-clearall:before { content: "\25"; font-size: 100%; }
 .selector-add:before, a.selector-chooseall:before, a.active.selector-chooseall:before { content: "\26"; font-size: 100%; }
 .inline-group div.add-row a:before { content: "\22";  }
+.add-another:before { content: "\22";  }
+a[id^="calendarlink"]:before { content: "\2c";  }
+a[id^="clocklink"]:before { content: "\2d"; }
 
 .actionlist {
 	.addlink, .changelink { padding-left: 0; }
 }
-
-
 
 .addlink { color: $success-color !important; }
 #changelist-search label { font-weight: bold; }
@@ -63,6 +69,24 @@ a.active.selector-chooseall {  }
 .selector-remove, .selector-add { display: inline !important; font-size: 125% !important; padding-left: 1px; color: $font-color-white !important; }
 .selector-remove:before, .selector-add:before { color: $font-color; }
 .inline-group div.add-row a { color: $success-color !important; padding-left: 5px !important; }
+
+.add-another { 
+	margin-left: 10px; 
+	&:hover, &:link:hover {
+		text-decoration: none;
+	}
+}
+.add-another img { display: none; }
+
+
+a[id^="calendarlink"], a[id^="clocklink"] {
+	display: inline-block;
+	font-size: 19px;
+	height: 19px;
+	width: 19px;
+	padding-left: 0 !important; 
+}
+a[id^="calendarlink"] img, , a[id^="clocklink"] img { display: none;}
 
 /* Shortcuts */
 .admin_shortcuts .shortcuts li a {

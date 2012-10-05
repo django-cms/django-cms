@@ -1029,8 +1029,13 @@ div.calendarbox.module .calendarnav-previous, div.calendarbox.module .calendarna
   background: none;
 }
 
+/* line 373, ../sass/partials/_form.scss */
+span.datetimeshortcuts a {
+  color: #029eee;
+}
+
 /* Use the following CSS code if you want to have a class per icon */
-/* line 13, ../sass/partials/_icons.scss */
+/* line 15, ../sass/partials/_icons.scss */
 .addlink,
 .changelink,
 #changelist-search label,
@@ -1041,11 +1046,13 @@ a.selector-chooseall,
 a.active.selector-chooseall,
 .selector-remove,
 .selector-add,
-.inline-group div.add-row a {
+.inline-group div.add-row a,
+a[id^="calendarlink"],
+a[id^="clocklink"] {
   background: none !important;
   padding-left: 10px;
 }
-/* line 16, ../sass/partials/_icons.scss */
+/* line 18, ../sass/partials/_icons.scss */
 .addlink:hover,
 .changelink:hover,
 #changelist-search label:hover,
@@ -1056,11 +1063,13 @@ a.selector-chooseall:hover,
 a.active.selector-chooseall:hover,
 .selector-remove:hover,
 .selector-add:hover,
-.inline-group div.add-row a:hover {
+.inline-group div.add-row a:hover,
+a[id^="calendarlink"]:hover,
+a[id^="clocklink"]:hover {
   text-decoration: none !important;
 }
 
-/* line 33, ../sass/partials/_icons.scss */
+/* line 38, ../sass/partials/_icons.scss */
 .addlink:before,
 .changelink:before,
 #changelist-search label:before,
@@ -1071,7 +1080,10 @@ a.selector-chooseall:before,
 a.active.selector-chooseall:before,
 .selector-remove:before,
 .selector-add:before,
-.inline-group div.add-row a:before {
+.inline-group div.add-row a:before,
+.add-another:before,
+a[id^="calendarlink"]:before,
+a[id^="clocklink"]:before {
   font-family: 'django-admin-icons';
   font-style: normal;
   speak: none;
@@ -1081,69 +1093,84 @@ a.active.selector-chooseall:before,
   padding-right: 5px;
 }
 
-/* line 44, ../sass/partials/_icons.scss */
+/* line 49, ../sass/partials/_icons.scss */
 .addlink:before {
   content: "\22";
 }
 
-/* line 45, ../sass/partials/_icons.scss */
+/* line 50, ../sass/partials/_icons.scss */
 .changelink:before {
   content: "\21";
 }
 
-/* line 46, ../sass/partials/_icons.scss */
+/* line 51, ../sass/partials/_icons.scss */
 #changelist-search label:before {
   content: "\23";
 }
 
-/* line 47, ../sass/partials/_icons.scss */
+/* line 52, ../sass/partials/_icons.scss */
 .deletelink:before {
   content: "\24";
 }
 
-/* line 48, ../sass/partials/_icons.scss */
+/* line 53, ../sass/partials/_icons.scss */
 .selector-remove:before, a.selector-clearall:before, a.active.selector-clearall:before {
   content: "\25";
   font-size: 100%;
 }
 
-/* line 49, ../sass/partials/_icons.scss */
+/* line 54, ../sass/partials/_icons.scss */
 .selector-add:before, a.selector-chooseall:before, a.active.selector-chooseall:before {
   content: "\26";
   font-size: 100%;
 }
 
-/* line 50, ../sass/partials/_icons.scss */
+/* line 55, ../sass/partials/_icons.scss */
 .inline-group div.add-row a:before {
   content: "\22";
 }
 
-/* line 53, ../sass/partials/_icons.scss */
+/* line 56, ../sass/partials/_icons.scss */
+.add-another:before {
+  content: "\22";
+}
+
+/* line 57, ../sass/partials/_icons.scss */
+a[id^="calendarlink"]:before {
+  content: "\2c";
+}
+
+/* line 58, ../sass/partials/_icons.scss */
+a[id^="clocklink"]:before {
+  content: "\2d";
+}
+
+/* line 61, ../sass/partials/_icons.scss */
 .actionlist .addlink, .actionlist .changelink {
   padding-left: 0;
 }
 
-/* line 58, ../sass/partials/_icons.scss */
+/* line 64, ../sass/partials/_icons.scss */
 .addlink {
   color: #9ab933 !important;
 }
 
-/* line 59, ../sass/partials/_icons.scss */
+/* line 65, ../sass/partials/_icons.scss */
 #changelist-search label {
   font-weight: bold;
 }
 
-/* line 60, ../sass/partials/_icons.scss */
+/* line 66, ../sass/partials/_icons.scss */
 #changelist-search label img {
   display: none;
 }
 
-/* line 61, ../sass/partials/_icons.scss */
+/* line 67, ../sass/partials/_icons.scss */
 .help-tooltip {
   display: none;
 }
 
-/* line 63, ../sass/partials/_icons.scss */
+/* line 69, ../sass/partials/_icons.scss */
 .selector-remove, .selector-add {
   display: inline !important;
   font-size: 125% !important;
@@ -1151,29 +1178,57 @@ a.active.selector-chooseall:before,
   color: white !important;
 }
 
-/* line 64, ../sass/partials/_icons.scss */
+/* line 70, ../sass/partials/_icons.scss */
 .selector-remove:before, .selector-add:before {
   color: #444444;
 }
 
-/* line 65, ../sass/partials/_icons.scss */
+/* line 71, ../sass/partials/_icons.scss */
 .inline-group div.add-row a {
   color: #9ab933 !important;
   padding-left: 5px !important;
 }
 
+/* line 73, ../sass/partials/_icons.scss */
+.add-another {
+  margin-left: 10px;
+}
+/* line 75, ../sass/partials/_icons.scss */
+.add-another:hover, .add-another:link:hover {
+  text-decoration: none;
+}
+
+/* line 79, ../sass/partials/_icons.scss */
+.add-another img {
+  display: none;
+}
+
+/* line 82, ../sass/partials/_icons.scss */
+a[id^="calendarlink"], a[id^="clocklink"] {
+  display: inline-block;
+  font-size: 19px;
+  height: 19px;
+  width: 19px;
+  padding-left: 0 !important;
+}
+
+/* line 89, ../sass/partials/_icons.scss */
+a[id^="calendarlink"] img, a[id^="clocklink"] img {
+  display: none;
+}
+
 /* Shortcuts */
-/* line 68, ../sass/partials/_icons.scss */
+/* line 92, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a {
   background: none !important;
   padding-left: 10px;
 }
-/* line 71, ../sass/partials/_icons.scss */
+/* line 95, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a:hover {
   text-decoration: none !important;
 }
 
-/* line 77, ../sass/partials/_icons.scss */
+/* line 101, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a:before {
   font-family: 'django-admin-icons';
   font-style: normal;
@@ -1185,33 +1240,33 @@ a.active.selector-chooseall:before,
   vertical-align: middle;
 }
 
-/* line 88, ../sass/partials/_icons.scss */
+/* line 112, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a.pages:before {
   content: "\27";
 }
 
-/* line 89, ../sass/partials/_icons.scss */
+/* line 113, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a.home:before {
   content: "\28";
 }
 
-/* line 90, ../sass/partials/_icons.scss */
+/* line 114, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a.user:before {
   content: "\29";
 }
 
-/* line 91, ../sass/partials/_icons.scss */
+/* line 115, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a.files:before {
   content: "\2a";
 }
 
-/* line 92, ../sass/partials/_icons.scss */
+/* line 116, ../sass/partials/_icons.scss */
 .admin_shortcuts .shortcuts li a.contact:before {
   content: "\2b";
 }
 
 /* Sepcials */
-/* line 95, ../sass/partials/_icons.scss */
+/* line 119, ../sass/partials/_icons.scss */
 .selector ul.selector-chooser {
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
