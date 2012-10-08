@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
+import urllib
 from cms.toolbar.base import Toolbar
 from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List, 
     GetButton)
 from cms.utils import cms_static_url
-from cms.utils.moderator import page_moderator_state, I_APPROVE
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-import urllib
-from utils.permissions import has_page_change_permission, has_any_page_change_permissions
-from django.conf import settings
+from utils.permissions import has_page_change_permission
 
 
 def _get_page_admin_url(context, toolbar, **kwargs):
@@ -42,9 +40,6 @@ def _get_add_sibling_url(context, toolbar, **kwargs):
 def _get_delete_url(context, toolbar, **kwargs):
     return reverse('admin:cms_page_delete', args=(toolbar.request.current_page.pk,))
 
-def _get_approve_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_approve_page', args=(toolbar.request.current_page.pk,))
-
 def _get_publish_url(context, toolbar, **kwargs):
     return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.pk,))
 
@@ -64,8 +59,7 @@ class CMSToolbar(Toolbar):
         
     def init(self):
         self.is_staff = self.request.user.is_staff
-        self.can_change = (hasattr(self.request.current_page, 'has_change_permission') and
-                           self.request.current_page.has_change_permission(self.request))
+        self.can_change = has_page_change_permission(self.request)
         self.edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
                                            _('Edit mode'))
         self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(self.request)
@@ -81,15 +75,17 @@ class CMSToolbar(Toolbar):
         
         self.page_states = []
         
-        
-        if self.is_staff:
-            
+        if self.can_change:
             items.append(
                 self.edit_mode_switcher
             )
+
+        if self.is_staff:
+
+            current_page = self.request.current_page
             
-            if self.request.current_page:
-                states = self.request.current_page.last_page_states()
+            if current_page:
+                states = current_page.last_page_states()
                 has_states = states.exists()
                 self.page_states = states
                 if has_states:
@@ -100,19 +96,13 @@ class CMSToolbar(Toolbar):
                 
                 # publish button
                 if self.edit_mode:
-                    has_perms = self.request.current_page.has_publish_permission(self.request)
-                    if has_perms:
+                    if current_page.has_publish_permission(self.request):
                         items.append(
                             GetButton(RIGHT, 'moderator', _("Publish"), _get_publish_url)
                         )
 
-                has_global_current_page_change_permission = False
-                if settings.CMS_PERMISSION:
-                    has_global_current_page_change_permission = has_page_change_permission(self.request)
-                has_current_page_change_permission = self.request.current_page.has_change_permission(self.request)
-
                 # The 'templates' Menu
-                if has_global_current_page_change_permission or has_current_page_change_permission:
+                if self.can_change:
                     items.append(self.get_template_menu(context, self.can_change, self.is_staff))
                 
                 # The 'page' Menu
@@ -121,11 +111,7 @@ class CMSToolbar(Toolbar):
             # The 'Admin' Menu
             items.append(self.get_admin_menu(context, self.can_change, self.is_staff))
             
-            items.append(
-                GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                          cms_static_url('images/toolbar/icons/icon_lock.png'))
-            )
-        elif not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated():
             items.append(
                 TemplateHTML(LEFT, 'login', 'cms/toolbar/items/login.html')
             )
@@ -188,7 +174,7 @@ class CMSToolbar(Toolbar):
                      reverse('admin:index'),
                      icon=cms_static_url('images/toolbar/icons/icon_admin.png')),
         ]
-        if can_change:
+        if can_change and self.request.current_page:
             admin_items.append(
                 ListItem('settings', _('Page Settings'),
                          _get_page_admin_url,

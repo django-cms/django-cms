@@ -82,7 +82,8 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             master.user_permissions.add(Permission.objects.get(codename='add_text'))
             master.user_permissions.add(Permission.objects.get(codename='delete_text'))
             master.user_permissions.add(Permission.objects.get(codename='change_text'))
-            
+            master.user_permissions.add(Permission.objects.get(codename='publish_page'))
+
             self.user_master = create_page_user(self.user_super, master, grant_all=True)
             # create non global, non staff user
             self.user_non_global = User(username="nonglobal", is_active=True)
@@ -108,7 +109,8 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             slave.user_permissions.add(Permission.objects.get(codename='add_text'))
             slave.user_permissions.add(Permission.objects.get(codename='delete_text'))
             slave.user_permissions.add(Permission.objects.get(codename='change_text'))
-            
+            slave.user_permissions.add(Permission.objects.get(codename='publish_page'))
+
             self.user_slave = create_page_user(self.user_super, slave,  can_add_page=True,
                                         can_change_page=True, can_delete_page=True)
             
@@ -120,6 +122,8 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             normal = User(username='normal', email='normal@django-cms.org', is_active=True)
             normal.set_password('normal')
             normal.save()
+            normal.user_permissions.add(Permission.objects.get(codename='publish_page'))
+
             self.user_normal = create_page_user(self.user_master, normal)
             # it's allowed for the normal user to view the page
             assign_user_to_page(page_b, self.user_normal, can_view=True)
@@ -647,10 +651,11 @@ class PatricksMoveTest(SettingsOverrideTestCase):
     
             # create master user
             master = User.objects.create(username="master", email="master@django-cms.org", password="master")
-            self.user_master = create_page_user(self.user_super, master, grant_all=True)
+            master.user_permissions.add(Permission.objects.get(codename='publish_page'))
+            #self.user_master = create_page_user(self.user_super, master, grant_all=True)
             
             # assign master user under home page
-            assign_user_to_page(self.home_page, self.user_master,
+            assign_user_to_page(self.home_page, master,
                                 grant_on=ACCESS_DESCENDANTS, grant_all=True)
             
             # and to master page

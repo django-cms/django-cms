@@ -203,6 +203,8 @@ class ListItem(Serializable):
         else:
             self.url = url
 
+    def __repr__(self):
+        return u'<ListItem: %s>' % unicode(self.title)
 
 class List(BaseItem):
     """
@@ -240,3 +242,6 @@ class List(BaseItem):
         return {
             'items': items
         }
+
+    def __repr__(self):
+        return u'<List %s: %r>' % (unicode(self.title), self.raw_items)

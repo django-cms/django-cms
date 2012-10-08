@@ -96,6 +96,7 @@ class Page(MPTTModel):
     class Meta:
         permissions = (
             ('view_page', 'Can view page'),
+            ('publish_page', 'Can publish page'),
         )
         verbose_name = _('page')
         verbose_name_plural = _('pages')
@@ -374,8 +375,6 @@ class Page(MPTTModel):
     def publish(self):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible.
-
-        IMPORTANT: @See utils.moderator.approve_page for publishing permissions
 
         Returns: True if page was successfully published.
         """
@@ -756,7 +755,12 @@ class Page(MPTTModel):
             self.has_generic_permission(request, "delete")
 
     def has_publish_permission(self, request):
-        return self.has_generic_permission(request, "publish")
+        #print 'Checking publish for', request.user
+        if request.user.is_superuser:
+            return True
+        opts = self._meta
+        return request.user.has_perm(opts.app_label + '.' + "publish_page") and \
+            self.has_generic_permission(request, "publish")
     has_moderate_permission = has_publish_permission
 
     def has_advanced_settings_permission(self, request):
@@ -863,7 +867,7 @@ class Page(MPTTModel):
         """
         # If we have a public version it will be published as well.
         # If it isn't published, it should be deleted.
-        return bool(self.publisher_public_id)
+        return self.published and bool(self.publisher_public_id)
 
     def reload(self):
         """

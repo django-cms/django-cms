@@ -503,9 +503,7 @@ class PageAdmin(ModelAdmin):
             selected_template = get_template_from_request(request, obj)
 
             # if there is a delete request for this page
-            moderation_delete_request = (
-                    obj.pagemoderatorstate_set.get_delete_actions(
-                    ).count())
+            delete_requested = obj.pagemoderatorstate_set.get_delete_actions().count()
 
 
             #activate(user_lang_set)
@@ -514,7 +512,10 @@ class PageAdmin(ModelAdmin):
                 'page': obj,
                 'CMS_PERMISSION': settings.CMS_PERMISSION,
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
-                'has_change_permissions_permission': obj.has_change_permissions_permission(request),
+                'can_change': obj.has_change_permission(request),
+                'can_change_permissions': obj.has_change_permissions_permission(request),
+                'can_publish': obj.has_publish_permission(request),
+                'delete_requested': delete_requested,
                 'show_delete_translation': len(obj.get_languages()) > 1,
                 'current_site_id': settings.SITE_ID,
             }

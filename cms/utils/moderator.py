@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 from django.utils.translation import ugettext as _
-from django.conf import settings
 from cms.models import Page, PageModeratorState, PageModerator, CMSPlugin, Title
+
 
 I_APPROVE = 100 # current user should approve page
 I_APPROVE_DELETE = 200
@@ -11,6 +11,9 @@ def page_changed(page, old_page=None, force_moderation_action=None):
     """Called from page post save signal. If page already had pk, old version
     of page is provided in old_page argument.
     """
+    # Only record changes on the draft version
+    if not page.publisher_is_draft:
+        return
     # get user from thread locals
     from cms.utils.permissions import get_current_user
     user = get_current_user()
@@ -24,19 +27,6 @@ def page_changed(page, old_page=None, force_moderation_action=None):
         # just newly created page
         PageModeratorState(user=user, page=page, action=PageModeratorState.ACTION_ADD).save()
 
-    if (old_page is None and page.published) or \
-        (old_page and not old_page.published == page.published):
-        action = page.published and PageModeratorState.ACTION_PUBLISH or PageModeratorState.ACTION_UNPUBLISH
-        PageModeratorState(user=user, page=page, action=action).save()
-
-    if ((old_page and not old_page.moderator_state == page.moderator_state) or not old_page) \
-        and page.requires_approvement():
-        # update_moderation_message can be called after this :S -> recipient will not
-        # see the last message
-        mail_approvement_request(page, user)
-
-    # TODO: if page was changed, remove all approvements from higher instances,
-    # but keep approvements by lower instances, if there are any
 
 
 def update_moderation_message(page, message):
@@ -163,36 +153,6 @@ def get_test_moderation_level(page, user=None, include_user=True):
         return PageModerator.MAX_MODERATION_LEVEL, False
     return moderator.page.level, True
 
-def approve_page(request, page):
-    """Main approving function. Two things can happen here, depending on user
-    level:
-    
-    1.) User is somewhere in the approvement path, but not on the top. In this
-    case just mark this page as approved by this user.
-    
-    2.) User is on top of approvement path. Draft page with all dependencies 
-    will be `copied` to public model, page states log will be cleaned.  
-    
-    """
-    moderation_level, moderation_required = get_test_moderation_level(page, request.user, False)
-    if not moderator_should_approve(request, page):
-        # escape soon if there isn't any approval required by this user
-        if not page.publisher_public or page.get_absolute_url() != page.publisher_public.get_absolute_url():
-            page.publish()
-        else:
-            return
-    if not moderation_required:
-        # this is a second case - user can publish changes
-        if page.pagemoderatorstate_set.get_delete_actions().count():
-            # it is a delete request for this page!!
-            page.delete_with_public()
-        else:
-            page.publish()
-    else:
-        # first case - just mark page as approved from this user
-        PageModeratorState(user=request.user, page=page, action=PageModeratorState.ACTION_APPROVE).save()
-    page.save(change_state=False)
-
 
 def get_model_queryset(model, request=None):
     """Decision function used in frontend - says which model should be used.
@@ -211,40 +171,3 @@ def get_model_queryset(model, request=None):
 get_title_queryset = lambda request=None: Title.objects.all()   # not sure if we need to only grab public items here
 get_cmsplugin_queryset = lambda request=None: CMSPlugin.objects.all()   # CMSPlugin is no longer extending from Publisher
 
-
-def mail_approvement_request(page, user=None):
-    """Sends approvement request over email to all users which should approve
-    this page if they have an email entered.
-    
-    Don't send it to current user - he should know about it, because he made the
-    change.
-    """
-    if not page.requires_approvement():
-        return
-
-    recipient_list = []
-    for moderator in page.get_moderator_queryset():
-        email = moderator.user.email
-        if email and not email in recipient_list:
-            recipient_list.append(email)
-
-    if user and user.email in recipient_list:
-        recipient_list.remove(user.email)
-
-    if not recipient_list:
-        return
-
-    from django.core.urlresolvers import reverse
-    from django.contrib.sites.models import Site
-    from cms.utils.urlutils import urljoin
-    from cms.utils.mail import send_mail
-
-    site = Site.objects.get_current()
-
-    subject = _('CMS - Page %s requires approvement.') % unicode(page)
-    context = {
-        'page': page,
-        'admin_url': "http://%s" % urljoin(site.domain, reverse('admin:index'), 'cms/page', page.id),
-    }
-
-    send_mail(subject, 'admin/cms/mail/approvement_required.txt', recipient_list, context, 'admin/cms/mail/approvement_required.html')
