@@ -82,12 +82,15 @@ class CMSPluginBase(admin.ModelAdmin):
     
     form = None
     change_form_template = "admin/cms/page/plugin_change_form.html"
+    frontend_edit_template = 'cms/toolbar/placeholder_wrapper.html'
     # Should the plugin be rendered in the admin?
     admin_preview = True 
     
     render_template = None
+
     # Should the plugin be rendered at all, or doesn't it have any output?
-    render_plugin = True 
+    render_plugin = True
+
     model = CMSPlugin
     text_enabled = False
     page_only = False

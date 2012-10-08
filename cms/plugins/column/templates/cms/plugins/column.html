@@ -1,0 +1,6 @@
+{% load cms_tags %}
+{% for placeholder in placeholders %}
+        <div style="width: {{ placeholder.default_width }}px;">
+            {% placeholder placeholder.slot placeholder.default_width %}
+        </div>
+{% endfor %}

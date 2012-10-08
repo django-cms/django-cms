@@ -14,7 +14,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         'rendered_content': rendered_content
     }
     original_context.update(data)
-    output = render_to_string('cms/toolbar/placeholder_wrapper.html', original_context)
+    output = render_to_string(instance.get_plugin_class().frontend_edit_template, original_context)
     original_context.pop()
     return output
 

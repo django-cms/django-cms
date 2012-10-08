@@ -7,7 +7,7 @@ from django.conf import settings
 class PicturePlugin(CMSPluginBase):
     model = Picture
     name = _("Picture")
-    render_template = "cms/plugins/picture.html"
+    render_template = "cms/plugins/column.html"
     text_enabled = True
     
     def render(self, context, instance, placeholder):
