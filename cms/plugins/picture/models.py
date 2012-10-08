@@ -1,6 +1,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 from cms.models import CMSPlugin, Page
 from os.path import basename
 
@@ -43,3 +44,8 @@ class Picture(CMSPlugin):
             except:
                 pass
         return "<empty>"
+
+    def clean(self):
+        if self.url and self.page_link:
+            raise ValidationError(
+                             _("You can enter a Link or a Page, but not both."))

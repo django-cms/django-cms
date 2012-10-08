@@ -11,6 +11,7 @@ from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
 from cms.plugins.link.models import Link
+from cms.plugins.picture.models import Picture
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list,
     plugin_tags_to_admin_html)
@@ -25,7 +26,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
@@ -975,3 +976,26 @@ class NoDatabasePluginTests(TestCase):
         class RightMixin: pass
         plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin), {'__module__': 'cms.tests.plugins'})
         self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin2')
+
+class PicturePluginTests(PluginsTestBaseCase):
+
+    def test_link_or_page(self):
+        """Test a validator: you can enter a url or a page_link, but not both."""
+
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        picture = Picture(url="test")
+        # Note: don't call full_clean as it will check ALL fields - including
+        # the image, which we haven't defined. Call clean() instead which
+        # just validates the url and page_link fields.
+        picture.clean()
+
+        picture.page_link = page
+        picture.url = None
+        picture.clean()
+
+        picture.url = "test"
+        self.assertRaises(ValidationError, picture.clean)
+
