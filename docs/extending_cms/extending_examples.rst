@@ -25,13 +25,13 @@ We assume your main ``urls.py`` looks something like this::
 My First Plugin
 ***************
 
-A Plugin is a small bit of content you can place on your pages.
+A Plugin is a small bit of content that you can place on your pages.
 
 The Model
 =========
 
 For our polling app we would like to have a small poll plugin which shows a
-poll and let's the user vote.
+poll and lets the user vote.
 
 In your poll application's ``models.py`` add the following::
 
@@ -51,7 +51,7 @@ In your poll application's ``models.py`` add the following::
     :class:`models.Model <django.db.models.Model>`.
 
 Run ``manage.py syncdb`` to create the database tables for this model or see
-:doc:`../getting_started/using_south` to see how to do it using `South`_
+:doc:`../getting_started/using_south` to see how to do it using `South`_.
 
 
 The Plugin Class
@@ -72,7 +72,7 @@ app folder should look like this::
 The plugin class is responsible for providing the django CMS with the necessary
 information to render your Plugin.
 
-For our poll plugin, write following plugin class::
+For our poll plugin, write the following plugin class::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
