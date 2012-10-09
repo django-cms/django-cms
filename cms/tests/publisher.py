@@ -77,7 +77,34 @@ class PublisherTests(CMSTestCase):
                 
         self.assertEqual(pages_from_output,0)
         self.assertEqual(published_from_output,0)
-        
+
+    def test_command_line_ignores_draft_page(self):
+        # we need to create a superuser (the db is empty)
+        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        create_page("The page!", "nav_playground.html", "en", published=False,
+                    in_navigation=True)
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            com = publisher_publish.Command()
+            com.handle_noargs()
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output,0)
+        self.assertEqual(published_from_output,0)
+
+        self.assertEqual(Page.objects.public().count(), 0)
+
     def test_command_line_publishes_one_page(self):
         """
         Publisher always creates two Page objects for every CMS page,
