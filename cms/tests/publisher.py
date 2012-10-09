@@ -10,19 +10,19 @@ from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 
 class PublisherTestCase(CMSTestCase):
-    '''
+    """
     A test case to exercise publisher
-    '''
+    """
     
     def test_simple_publisher(self):
-        '''
-        Creates the stuff needed for theses tests.
+        """
+        Creates the stuff needed for these tests.
         Please keep this up-to-date (the docstring!)
-                
+
                 A
                / \
               B  C
-        '''
+        """
         # Create a simple tree of 3 pages
         pageA = create_page("Page A", "nav_playground.html", "en",
                             published= True, in_navigation= True)
@@ -39,7 +39,7 @@ class PublisherTestCase(CMSTestCase):
         # Let's publish C now.
         pageC.publish()
         
-        # Assert A and B are published, C unpublished
+        # Assert all are published
         self.assertTrue(pageA.published)
         self.assertTrue(pageB.published)
         self.assertTrue(pageC.published)
@@ -77,15 +77,15 @@ class PublisherTestCase(CMSTestCase):
         self.assertEqual(published_from_output,0)
         
     def test_command_line_publishes_one_page(self):
-        '''
+        """
         Publisher always creates two Page objects for every CMS page,
         one is_draft and one is_public.
-        
+
         The public version of the page can be either published or not.
-        
+
         This bit of code uses sometimes manager methods and sometimes manual
         filters on purpose (this helps test the managers)
-        '''
+        """
         # we need to create a superuser (the db is empty)
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         
@@ -126,18 +126,30 @@ class PublisherTestCase(CMSTestCase):
     def test_unpublish(self):
         page = create_page("Page", "nav_playground.html", "en", published=True,
                            in_navigation=True)
-        page.published = False
-        page.save()
+        self.assertEqual(Page.objects.filter(title_set__title="Page").count(), 2)
+
+        page.unpublish()
         self.assertEqual(page.published, False)
-        page.published = True
-        page.save()
+        self.assertObjectDoesNotExist(Page.objects.public(), title_set__title="Page")
+        self.assertEqual(Page.objects.filter(title_set__title="Page").count(), 1)
+
+        page.publish()
         self.assertEqual(page.published, True)
+        self.assertObjectExist(Page.objects.public(), title_set__title="Page")
+        self.assertEqual(Page.objects.filter(title_set__title="Page").count(), 2)
 
     def test_publish_works_with_descendants(self):
-        '''
+        """
         For help understanding what this tests for, see:
         http://articles.sitepoint.com/print/hierarchical-data-database
-        '''
+
+        Creates this published structure:
+                            home
+                          /      \
+                       item1   item2
+                              /     \
+                         subitem1 subitem2
+        """
         home_page = create_page("home", "nav_playground.html", "en",
                                 published=True, in_navigation=False)
             
@@ -145,8 +157,6 @@ class PublisherTestCase(CMSTestCase):
                     published=True)
         item2 = create_page("item2", "nav_playground.html", "en", parent=home_page,
                             published=True)
-            
-        item2 = self.reload_page(item2)    
 
         create_page("subitem1", "nav_playground.html", "en", parent=item2,
                     published=True)
@@ -180,8 +190,7 @@ class PublisherTestCase(CMSTestCase):
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
 
-            
-        item2 = self.reload_page(item2)    
+        # Now call publish again. The structure should not change.
         item2.publish()
             
         not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))

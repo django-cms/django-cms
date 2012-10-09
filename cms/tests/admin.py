@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.admin.change_list import CMSChangeList
-from cms.admin.dialog.forms import PermissionForm
 from cms.admin.forms import PageForm
 from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter
 from cms.api import create_page, create_title, add_plugin
@@ -26,18 +25,13 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, 
     HttpResponse)
-from django.test.client import Client, RequestFactory
 from django.utils.encoding import smart_str
 from menus.menu_pool import menu_pool
 from types import MethodType
-from unittest import TestCase
 
 
 class AdminTestsBase(CMSTestCase):
-    
-    def setUp(self):
-        self.request_factory = RequestFactory()
-        
+
     @property
     def admin_class(self):
         return site._registry[Page]
@@ -46,26 +40,25 @@ class AdminTestsBase(CMSTestCase):
         admin = self.get_superuser()
         if admin_only:
             return admin
-        with self.login_user_context(admin):
-            USERNAME = 'test'
-            
-            normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
-            normal_guy.is_staff = True
-            normal_guy.is_active = True
-            normal_guy.save()
-            normal_guy.user_permissions = Permission.objects.filter(
-                codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
-            )
-            gpp = GlobalPagePermission.objects.create(
-                user=normal_guy,
-                can_change=True,
-                can_delete=True,
-                can_change_advanced_settings=False,
-                can_publish=True,
-                can_change_permissions=False,
-                can_move_page=True,
-            )
-            gpp.sites = Site.objects.all()
+        USERNAME = 'test'
+
+        normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
+        normal_guy.is_staff = True
+        normal_guy.is_active = True
+        normal_guy.save()
+        normal_guy.user_permissions = Permission.objects.filter(
+            codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
+        )
+        gpp = GlobalPagePermission.objects.create(
+            user=normal_guy,
+            can_change=True,
+            can_delete=True,
+            can_change_advanced_settings=False,
+            can_publish=True,
+            can_change_permissions=False,
+            can_move_page=True,
+        )
+        gpp.sites = Site.objects.all()
         return admin, normal_guy
         
 class AdminTestCase(AdminTestsBase):
@@ -241,7 +234,7 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(title.application_urls, '')
 
     def test_delete(self):
-        admin = self._get_guys(True)
+        admin = self.get_superuser()
         page = create_page("delete-page", "nav_playground.html", "en",
                            created_by=admin, published=True)
         child = create_page('child-page', "nav_playground.html", "en",
@@ -256,7 +249,7 @@ class AdminTestCase(AdminTestsBase):
             #self.assertRaises(Page.DoesNotExist, self.reload, child)
 
     def test_search_fields(self):
-        superuser = self._get_guys(admin_only=True)
+        superuser = self.get_superuser()
         from django.contrib.admin import site
         with self.login_user_context(superuser):
             for model, admin in site._registry.items():
@@ -270,7 +263,7 @@ class AdminTestCase(AdminTestsBase):
                 self.assertEqual(response.status_code, 200, errmsg)
 
     def test_delete_translation(self):
-        admin = self._get_guys(True)
+        admin = self.get_superuser()
         page = create_page("delete-page-translation", "nav_playground.html", "en",
                            created_by=admin, published=True)
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
@@ -304,14 +297,14 @@ class AdminTestCase(AdminTestsBase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'admin/login.html')
-        admin = self._get_guys(True)
+        admin = self.get_superuser()
         with self.login_user_context(admin):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
             self.assertTemplateNotUsed(response, 'admin/login.html')
             
     def test_changelist_items(self):
-        admin = self._get_guys(True)
+        admin = self.get_superuser()
         first_level_page = create_page('level1',  'nav_playground.html', 'en')
         second_level_page_top = create_page('level21', "nav_playground.html", "en",
                             created_by=admin, published=True, parent= first_level_page)
@@ -322,8 +315,8 @@ class AdminTestCase(AdminTestsBase):
         self.assertEquals(Page.objects.all().count(), 4)
         
         url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
-        request = self.request_factory.get(url)
-        
+        request = self.get_request(url)
+
         request.session = {}
         request.user = admin
         
@@ -354,7 +347,7 @@ class AdminTestCase(AdminTestsBase):
         It should be converted to a selenium test to actually test the jstree behaviour.
         Cookie set below is just a forged example (from live session)
         """
-        admin = self._get_guys(True)
+        admin = self.get_superuser()
         first_level_page = create_page('level1',  'nav_playground.html', 'en')
         second_level_page_top = create_page('level21', "nav_playground.html", "en",
                             created_by=admin, published=True, parent= first_level_page)
@@ -364,15 +357,14 @@ class AdminTestCase(AdminTestsBase):
                             created_by=admin, published=True, parent= second_level_page_top)
 
         url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
-        client = Client()
-        client.login(username='admin', password='admin')
-        client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_2'
-        response = client.get(url)
+        self.client.login(username='admin', password='admin')
+        self.client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_2'
+        response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.context["open_menu_trees"], [1,2])
         # tests descendants method for the lazy load ajax call
         url = "%s%d/descendants/" % (url, first_level_page.pk)
-        response = client.get(url)
+        response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         # should include both direct descendant pages
         self.assertTrue('id="page_2"' in response.content)
@@ -381,7 +373,7 @@ class AdminTestCase(AdminTestsBase):
         self.assertFalse('id="page_4"' in response.content)
 
 
-class AdminFieldsetTests(TestCase):
+class AdminFieldsetTests(CMSTestCase):
     def validate_attributes(self, a, b, ignore=None):
         attrs = ['advanced_fields', 'hidden_fields', 'general_fields',
                  'template_fields', 'additional_hidden_fields', 'fieldsets']
@@ -512,7 +504,7 @@ class AdminFieldsetTests(TestCase):
         apphook_pool.get_apphooks = old_get_apphooks
         
 
-class AdminListFilterTests(TestCase):
+class AdminListFilterTests(CMSTestCase):
     def test_no_moderator(self):
         control = AttributeObject()
         contribute_list_filter(control)
@@ -533,7 +525,6 @@ class AdminTests(AdminTestsBase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
     
     def setUp(self):
-        super(AdminTests, self).setUp()
         create_page("testpage", "nav_playground.html", "en")
     
     def get_admin(self):
@@ -572,7 +563,8 @@ class AdminTests(AdminTestsBase):
             request = self.get_request()
             self.assertRaises(PermissionDenied, self.admin_class.remove_delete_state,
                               request, page.pk)
-        PageModeratorState.objects.create(page=page, user=admin, action="DEL")
+        PageModeratorState.objects.create(page=page, user=admin,
+                                          action=PageModeratorState.ACTION_DELETE)
         with self.login_user_context(admin):
             self.assertEqual(page.pagemoderatorstate_set.get_delete_actions().count(), 1)
             request = self.get_request()
@@ -586,13 +578,32 @@ class AdminTests(AdminTestsBase):
         permless = self.get_permless()
         with self.login_user_context(permless):
             request = self.get_request()
-            response = self.admin_class.change_status(request, 1)
+            response = self.admin_class.change_status(request, page.pk)
             self.assertEqual(response.status_code, 405)
-        with self.login_user_context(permless):
+            page = self.reload(page)
+            self.assertFalse(page.published)
+
             request = self.get_request(post_data={'no': 'data'})
             response = self.admin_class.change_status(request, page.pk)
+            # Forbidden
             self.assertEqual(response.status_code, 403)
-    
+            self.assertFalse(page.published)
+
+        admin = self.get_admin()
+        with self.login_user_context(admin):
+            request = self.get_request(post_data={'no': 'data'})
+            response = self.admin_class.change_status(request, page.pk)
+            self.assertEqual(response.status_code, 200)
+
+            page = self.reload(page)
+            self.assertTrue(page.published)
+
+            response = self.admin_class.change_status(request, page.pk)
+            self.assertEqual(response.status_code, 200)
+
+            page = self.reload(page)
+            self.assertFalse(page.published)
+
     def test_change_innavigation(self):
         page = self.get_page()
         permless = self.get_permless()
@@ -687,15 +698,12 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(Http404, self.admin_class.preview_page, request,
                               404)
         page = self.get_page()
-        page.publisher_public_id = None
-        page.save()
+        page.unpublish()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
             self.assertRaises(Http404, self.admin_class.preview_page, request,
                               page.pk)
-        page = self.get_page()
-        page.publisher_public = page
-        page.save()
+        page.publish()
         base_url = page.get_absolute_url()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
@@ -763,7 +771,7 @@ class AdminTests(AdminTestsBase):
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
 
-class NoDBAdminTests(TestCase):
+class NoDBAdminTests(CMSTestCase):
     
     @property
     def admin_class(self):
@@ -779,7 +787,6 @@ class NoDBAdminTests(TestCase):
 class PluginPermissionTests(AdminTestsBase):
     
     def setUp(self):
-        super(PluginPermissionTests, self).setUp()
         self._page = create_page('test page', 'nav_playground.html', 'en')
         self._placeholder = self._page.placeholders.all()[0]
         
@@ -826,81 +833,76 @@ class PluginPermissionTests(AdminTestsBase):
         """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
         admin = self._get_admin()
         self._give_cms_permissions(admin)
-        client = Client()
-        client.login(username='admin', password='admin')
+        self.client.login(username='admin', password='admin')
         url = reverse('admin:cms_page_add_plugin')
         data = {
             'plugin_type': 'TextPlugin',
             'placeholder': self._placeholder.pk,
             'language': 'en',
         }
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self._give_permission(admin, Text, 'add')
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_plugin_edit_requires_permissions(self):
         """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        client = Client()
-        client.login(username='test', password='test')
+        self.client.login(username='test', password='test')
         url = reverse('admin:cms_page_edit_plugin', args=[plugin.id])
-        response = client.post(url, dict())
+        response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
         self._give_permission(normal_guy, Text, 'change')
-        response = client.post(url, dict())
+        response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_plugin_remove_requires_permissions(self):
         """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        client = Client()
-        client.login(username='test', password='test')
+        self.client.login(username='test', password='test')
         url = reverse('admin:cms_page_remove_plugin')
         data = dict(plugin_id=plugin.id)
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
         self._give_permission(normal_guy, Text, 'delete')
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_plugin_move_requires_permissions(self):
         """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        client = Client()
-        client.login(username='test', password='test')
+        self.client.login(username='test', password='test')
         url = reverse('admin:cms_page_move_plugin')
         data = dict(plugin_id=plugin.id,
                     placeholder=self._placeholder)
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
         self._give_permission(normal_guy, Text, 'change')
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_plugins_copy_requires_permissions(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        client = Client()
-        client.login(username='test', password='test')
+        self.client.login(username='test', password='test')
         url = reverse('admin:cms_page_copy_plugins')
         data = dict(plugin_id=plugin.id,
                     placeholder=self._placeholder.pk,
                     language='fr',
                     copy_from='en')
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
         self._give_permission(normal_guy, Text, 'add')
-        response = client.post(url, data)
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
 

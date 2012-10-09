@@ -1000,9 +1000,8 @@ class PageAdmin(ModelAdmin):
         if page.has_publish_permission(request):
             try:
                 if page.published or is_valid_url(page.get_absolute_url(),page,False):
-                    page.published = not page.published
-                    page.save()
-                    page.publish()
+                    method = page.publish if not page.published else page.unpublish
+                    success = method()
                 return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
             except ValidationError,e:
                 return jsonify_request(HttpResponseBadRequest(e.messages))

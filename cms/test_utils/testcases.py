@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.test import testcases
-from django.test.client import Client, RequestFactory
+from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 from urlparse import urljoin
@@ -75,7 +75,6 @@ class CMSTestCase(testcases.TestCase):
     def _fixture_setup(self):
         super(CMSTestCase, self)._fixture_setup()
         self.create_fixtures()
-        self.client = Client()
         activate("en")
 
     def create_fixtures(self):

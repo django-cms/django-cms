@@ -371,7 +371,7 @@ class Page(MPTTModel):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible.
 
-        Returns: True if page was successfully published.
+        :returns: True if page was successfully published.
         """
         # Publish can only be called on draft pages
         if not self.publisher_is_draft:
@@ -464,6 +464,41 @@ class Page(MPTTModel):
         cms_signals.post_publish.send(sender=Page, instance=self)
 
         return published
+
+    def unpublish(self):
+        """
+        Removes this page from the public site
+        :returns: True if this page was successfully unpublished
+        """
+        # Publish can only be called on draft pages
+        if not self.publisher_is_draft:
+            # TODO: Issue a warning
+            return
+        old_public = self.get_public_object()
+        if not old_public:
+            # Make sure the state is up to date
+            self.published = False
+            self.save()
+            return True
+        # If there are any public descendants, we can't remove it from the
+        # site. This simplifies this use case to a single page.
+        if self.get_descendants().filter(published=True).count() or \
+                old_public.get_descendants().count():
+            return False
+
+        self.published = False
+        self.publisher_public = None
+        self.moderator_state = Page.MODERATOR_CHANGED
+        self.save()
+
+        old_public.publisher_state = self.PUBLISHER_STATE_DELETE
+        # remove the one-to-one references between public and draft
+        old_public.publisher_public = None
+        old_public.save()
+        old_public.move_to(None, 'last-child')
+        # moving the object out of the way before deleting works, but why?
+        # finally delete the old public page
+        old_public.delete()
 
     def revert(self):
         """Revert the draft version to the same state as the public version
