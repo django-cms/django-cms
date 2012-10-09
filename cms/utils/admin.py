@@ -52,7 +52,13 @@ def get_admin_menu_item_context(request, page, filtered=False):
         perms = has_global_page_permission(request, page.site_id, can_add=True)
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
-        
+
+    css_class = ""
+    if page.is_dirty():
+        css_class = "publisher_dirty"
+    if page.pagemoderatorstate_set.get_delete_actions().count():
+        css_class = "publisher_delete_requested"
+
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add", page.site)
     #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
@@ -62,6 +68,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'lang': lang,
         'filtered': filtered,
         'metadata': metadata,
+        'css_class': css_class,
         
         'has_change_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),

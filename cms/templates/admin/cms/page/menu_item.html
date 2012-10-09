@@ -1,5 +1,5 @@
 {% load cms_admin i18n adminmedia %}
-<div class="cont">
+<div class="cont {{ css_class }}">
 	<div class="col1">
 		{% if has_change_permission %}
 			<a href="{{ url }}{{ page.id }}/" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>
@@ -53,7 +53,7 @@
 
 
 		<div class="col-draft">
-			{% if has_publish_permission and is_dirty %}<a href="./{{ page.id }}/publish/" class="icon approve" title="{% trans 'Publish' %}"></a>{% endif %}
+			{% if has_publish_permission and page.is_dirty %}<a href="./{{ page.id }}/publish/" class="icon approve" title="{% trans 'Publish' %}"></a>{% endif %}
 			<a href="./{{ page.id }}/preview/" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
 		</div>
 

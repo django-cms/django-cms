@@ -112,6 +112,9 @@ class Page(MPTTModel):
             title = u""
         return unicode(title)
 
+    def is_dirty(self):
+        return self.publisher_state != self.PUBLISHER_STATE_DEFAULT
+
     def get_absolute_url(self, language=None, fallback=True):
         if self.is_home():
             return reverse('pages-root')

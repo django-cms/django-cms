@@ -273,7 +273,7 @@
 				// just reload the page for now in callback... 
 				// TODO: this must be changed sometimes to reloading just the portion
 				// of the tree = current node + descendants 
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/publish/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
 				return false;
 			}
