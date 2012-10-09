@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 from cms.apphook_pool import apphook_pool
-from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
+from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db.models.query_utils import Q
 from django.contrib.auth.models import Permission
+
 
 def get_visible_pages(request, pages, site=None):
     """

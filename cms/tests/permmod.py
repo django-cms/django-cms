@@ -4,7 +4,7 @@ import urllib
 from cms.api import (create_page, publish_page, add_plugin,
                      create_page_user, assign_user_to_page)
 from cms.models import Page, CMSPlugin, Title
-from cms.models.moderatormodels import (ACCESS_DESCENDANTS, 
+from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                         ACCESS_PAGE_AND_DESCENDANTS)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, 
