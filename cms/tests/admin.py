@@ -617,36 +617,6 @@ class AdminTests(AdminTestsBase):
             page = self.reload(page)
             self.assertEqual(old, not page.in_navigation)
 
-    def test_change_moderation(self):
-        page = self.get_page()
-        permless = self.get_permless()
-        admin = self.get_admin()
-        with self.login_user_context(permless):
-            request = self.get_request()
-            response = self.admin_class.change_moderation(request, page.pk)
-            self.assertEqual(response.status_code, 405)
-        with self.login_user_context(admin):
-            request = self.get_request(post_data={'wrongarg': 'blah'})
-            self.assertRaises(Http404, self.admin_class.change_moderation,
-                              request, 1)
-        with self.login_user_context(admin):
-            request = self.get_request(post_data={'moderate': '0'})
-            response = self.admin_class.change_moderation(request, page.pk)
-            self.assertEqual(response.status_code, 200)
-        # TODO: Shouldn't this raise 404?
-        with self.login_user_context(admin):
-            request = self.get_request(post_data={'moderate': 'zero'})
-            response = self.admin_class.change_moderation(request, page.pk)
-            self.assertEqual(response.status_code, 200)
-        with self.login_user_context(admin):
-            request = self.get_request(post_data={'moderate': '1'})
-            response = self.admin_class.change_moderation(request, page.pk)
-            self.assertEqual(response.status_code, 200)
-        with self.login_user_context(admin):
-            request = self.get_request(post_data={'moderate': '10'})
-            self.assertRaises(Http404, self.admin_class.change_moderation,
-                              request, page.pk)
-
     def test_publish_page_requires_perms(self):
         permless = self.get_permless()
         with self.login_user_context(permless):

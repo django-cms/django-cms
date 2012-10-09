@@ -262,21 +262,6 @@ class CMSTestCase(testcases.TestCase):
             self.assertEqual(sibling.id,
                 public_siblings[i - skip].publisher_draft.id)
 
-    def request_moderation(self, page, level):
-        """Assign current logged in user to the moderators / change moderation
-
-        Args:
-            page: Page on which moderation should be changed
-
-            level <0, 7>: Level of moderation,
-                1 - moderate page
-                2 - moderate children
-                4 - moderate descendants
-                + combinations
-        """
-        response = self.client.post("/en/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
-        self.assertEquals(response.status_code, 200)
-
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
         result = _collectWarnings(warningsShown.append, f, *args, **kwargs)

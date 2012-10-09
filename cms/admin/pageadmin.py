@@ -204,7 +204,6 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/change-moderation/$', self.change_moderation),
             pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
@@ -241,8 +240,7 @@ class PageAdmin(ModelAdmin):
             obj.insert_at(parent, save=False)
             obj.pk = pk
             obj.save(no_signals=True)
-            obj.save()
-            
+
         else:
             if 'history' in request.path:
                 old_obj = Page.objects.get(pk=obj.pk)
@@ -251,15 +249,12 @@ class PageAdmin(ModelAdmin):
                 obj.rght = old_obj.rght
                 obj.lft = old_obj.lft
                 obj.tree_id = old_obj.tree_id
-            force_with_moderation = target is not None and position is not None and \
-                moderator.will_require_moderation(target, position)
 
-            obj.save(force_with_moderation=force_with_moderation)
+        obj.save()
         
         if 'recover' in request.path or 'history' in request.path:
             obj.pagemoderatorstate_set.all().delete()
-            from cms.utils.moderator import page_changed
-            page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+            moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             revert_plugins(request, obj.version.pk, obj)
             
         language = form.cleaned_data['language']
@@ -279,11 +274,6 @@ class PageAdmin(ModelAdmin):
             language,
         )
 
-        # is there any moderation message? save/update state
-        if 'moderator_message' in form.cleaned_data and \
-            form.cleaned_data['moderator_message']:
-            moderator.update_moderation_message(obj, form.cleaned_data['moderator_message'])
-            
         if obj and "reversion" in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(obj)
 
@@ -665,14 +655,15 @@ class PageAdmin(ModelAdmin):
             'root_path': reverse('admin:index'),
             'app_label': app_label,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'CMS_SHOW_END_DATE': settings.CMS_SHOW_END_DATE,
             'softroot': settings.CMS_SOFTROOT,
             'CMS_PERMISSION': settings.CMS_PERMISSION,
-            'has_recover_permission': 'reversion' in settings.INSTALLED_APPS and self.has_recover_permission(request),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
             'open_menu_trees': open_menu_trees,
         }
         if 'reversion' in settings.INSTALLED_APPS:
+            context['has_recover_permission'] = self.has_recover_permission(request)
             context['has_change_permission'] = self.has_change_permission(request)
         context.update(extra_context or {})
         return render_to_response(self.change_list_template or [
@@ -861,9 +852,7 @@ class PageAdmin(ModelAdmin):
 
         if page.published:
             # don't perform a delete action, just mark page for deletion
-            page.force_moderation_action = PageModeratorState.ACTION_DELETE
-            page.moderator_state = Page.MODERATOR_NEED_DELETE_APPROVEMENT
-            page.save()
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_DELETE)
 
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
@@ -1378,37 +1367,6 @@ class PageAdmin(ModelAdmin):
 
         return HttpResponse("%s,%s" % (plugin_id, comment))
 
-    def change_moderation(self, request, page_id):
-        """Called when user clicks on a moderation checkbox in tree vies, so if he
-        wants to add/remove/change moderation required by him. Moderate is sum of
-        mask values.
-        """
-        from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
-        if request.method != 'POST':
-            return HttpResponseNotAllowed(['POST'])
-        page = get_object_or_404(Page, id=page_id)
-        moderate = request.POST.get('moderate', None)
-        if moderate is not None and page.has_moderate_permission(request):
-            try:
-                moderate = int(moderate)
-            except:
-                moderate = 0
-
-            if moderate == 0:
-                # kill record with moderation which equals zero
-                try:
-                    page.pagemoderator_set.get(user=request.user).delete()
-                except ObjectDoesNotExist:
-                    pass
-                return admin_utils.render_admin_menu_item(request, page)
-            elif moderate <= MASK_PAGE + MASK_CHILDREN + MASK_DESCENDANTS:
-                page_moderator, created = page.pagemoderator_set.get_or_create(user=request.user)
-                # split value to attributes
-                page_moderator.set_decimal(moderate)
-                page_moderator.save()
-                return admin_utils.render_admin_menu_item(request, page)
-        raise Http404
-    
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
             return True

@@ -151,9 +151,7 @@ class PageForm(PageAddForm):
         help_text=_('Keep this field empty if standard path should be used.'))
     # moderation state
     moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
-    # moderation - message is a fake field
-    moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
-    
+
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
         help_text=_('Redirects to this URL.'))
     meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,

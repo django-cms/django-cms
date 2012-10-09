@@ -11,7 +11,6 @@ from cms.utils.helpers import reversion_register
 from datetime import datetime
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
@@ -144,11 +143,11 @@ class Page(MPTTModel):
 
         # fire signal
         from cms.models.moderatormodels import PageModeratorState
-        self.force_moderation_action = PageModeratorState.ACTION_MOVE
+        from cms.utils import moderator
         import cms.signals as cms_signals
         cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
         self.save(change_state=True)  # always save the page after move, because of publisher
-
+        moderator.page_changed(self, force_moderation_action = PageModeratorState.ACTION_MOVE)
         # check the slugs
         page_utils.check_title_slugs(self)
 
@@ -296,14 +295,10 @@ class Page(MPTTModel):
         return page_copy   # return the page_copy or None
 
     def save(self, no_signals=False, change_state=True, commit=True,
-             force_with_moderation=False, force_state=None, **kwargs):
+             force_state=None, **kwargs):
         """
         Args:
-
             commit: True if model should be really saved
-            force_with_moderation: can be true when new object gets added under
-                some existing page and this new page will require moderation;
-                this is because of how this adding works - first save, then move
         """
 
         # delete template cache
@@ -320,7 +315,7 @@ class Page(MPTTModel):
                 if created:
                     # new page....
                     self.moderator_state = Page.MODERATOR_CHANGED
-                elif not self.requires_approvement():
+                else:
                     # always change state to need approvement when there is some change
                     self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
 
@@ -755,7 +750,6 @@ class Page(MPTTModel):
             self.has_generic_permission(request, "delete")
 
     def has_publish_permission(self, request):
-        #print 'Checking publish for', request.user
         if request.user.is_superuser:
             return True
         opts = self._meta
@@ -843,25 +837,6 @@ class Page(MPTTModel):
             return self.pagemoderatorstate_set.none()
         return self.pagemoderatorstate_set.all().order_by('created',)[:5]
 
-    def get_moderator_queryset(self):
-        """Returns ordered set of all PageModerator instances, which should
-        moderate this page
-        """
-        from cms.models.moderatormodels import PageModerator
-        if not self.tree_id:
-            return PageModerator.objects.get_empty_query_set()
-        query = Q(page__tree_id=self.tree_id, page__level__lt=self.level, moderate_descendants=True) | \
-            Q(page__tree_id=self.tree_id, page__level=self.level - 1, moderate_children=True) | \
-            Q(page__pk=self.pk, moderate_page=True)
-
-        return PageModerator.objects.distinct().filter(query).order_by('page__level')
-
-    def is_approved(self):
-        """Returns true, if page is approved and published, or approved, but
-        parents are missing..
-        """
-        return self.moderator_state in (Page.MODERATOR_APPROVED, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
-
     def is_public_published(self):
         """Returns true if public model is published.
         """
@@ -874,28 +849,6 @@ class Page(MPTTModel):
         Reload a page from the database
         """
         return Page.objects.get(pk=self.pk)
-
-    def requires_approvement(self):
-        return self.moderator_state in (Page.MODERATOR_NEED_APPROVEMENT, Page.MODERATOR_NEED_DELETE_APPROVEMENT)
-
-    def get_moderation_value(self, user):
-        """Returns page moderation value for given user, moderation value is
-        sum of moderations.
-        """
-        moderation_value = getattr(self, '_moderation_value_cache', None)
-        if moderation_value is not None and self._moderation_value_cache_for_user_id == user.pk:
-            return moderation_value
-        try:
-            page_moderator = self.pagemoderator_set.get(user=user)
-        except ObjectDoesNotExist:
-            return 0
-
-        moderation_value = page_moderator.get_decimal()
-
-        self._moderation_value_cache = moderation_value
-        self._moderation_value_cache_for_user_id = user
-
-        return moderation_value
 
     def get_object_queryset(self):
         """Returns smart queryset depending on object type - draft / public

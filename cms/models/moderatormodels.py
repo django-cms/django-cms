@@ -34,50 +34,6 @@ ACCESS_CHOICES = (
 # Moderation
 ################################################################################
 
-class PageModerator(models.Model):
-    """
-    Page moderator holds user / page / moderation type states. User can be
-    assigned to any page (to which he haves permissions), and say which
-    moderation depth he requires.
-    """
-    MAX_MODERATION_LEVEL = sys.maxint  # just an number
-
-    page = models.ForeignKey(Page, verbose_name=_('Page'))
-    user = models.ForeignKey(User, verbose_name=_('User'))
-
-    # TODO: permission stuff could be changed to this structure also, this gives
-    # better querying performance
-    moderate_page = models.BooleanField(_('Moderate page'), blank=True)
-    moderate_children = models.BooleanField(_('Moderate children'), blank=True)
-    moderate_descendants = models.BooleanField(_('Moderate descendants'), blank=True)
-
-    class Meta:
-        verbose_name = _('PageModerator')
-        verbose_name_plural = _('PageModerator')
-        app_label = 'cms'
-
-    def set_decimal(self, state):
-        """Converts and sets binary state to local attributes
-        """
-        self.moderate_page = bool(state & MASK_PAGE)
-        moderate_children = bool(state & MASK_CHILDREN)
-        moderate_descendants = bool(state & MASK_DESCENDANTS)
-
-        if moderate_descendants:
-            moderate_children = True
-
-        self.moderate_children = moderate_children
-        self.moderate_descendants = moderate_descendants
-
-    def get_decimal(self):
-        return self.moderate_page * MASK_PAGE + \
-            self.moderate_children * MASK_CHILDREN + \
-            self.moderate_descendants * MASK_DESCENDANTS
-
-    def __unicode__(self):
-        return u"%s on %s mod: %d" % (self.user, self.page, self.get_decimal())
-
-
 class PageModeratorState(models.Model):
     """PageModeratorState memories all actions made on page.
     Page can be in only one advanced state.

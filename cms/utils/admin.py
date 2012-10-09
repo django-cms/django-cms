@@ -46,7 +46,6 @@ def get_admin_menu_item_context(request, page, filtered=False):
             metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
                 isinstance(e[1], bool) and str(e[1]) or e[1].lower() ), md)) + "}"
         
-    moderator_state = moderator.page_moderator_state(request, page)
     has_add_on_same_level_permission = False
     opts = Page._meta
     if settings.CMS_PERMISSION:
@@ -69,8 +68,6 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'has_delete_permission': page.has_delete_permission(request),
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_page_permission,
-        'page_moderator_state': moderator_state,
-        'moderator_should_approve': moderator_state['state'] >= moderator.I_APPROVE,
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
         'CMS_PERMISSION': settings.CMS_PERMISSION,
     }

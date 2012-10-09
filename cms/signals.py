@@ -187,8 +187,7 @@ if settings.CMS_PERMISSION:
 
 
 def pre_save_page(instance, raw, **kwargs):
-    """Helper pre save signal, assigns old_page attribute, so we can still
-    compare changes. Currently used only if CMS_PUBLISHER
+    """Assigns old_page attribute, so we can compare changes.
     """
     instance.old_page = None
     try:
@@ -198,7 +197,7 @@ def pre_save_page(instance, raw, **kwargs):
 
 
 def post_save_page_moderator(instance, raw, created, **kwargs):   
-    """Helper post save signal, cleans old_page attribute.
+    """Helper post save signal.
     """
     old_page = instance.old_page
 
