@@ -41,24 +41,14 @@ class PageModeratorState(models.Model):
     ACTION_ADD = "ADD"
     ACTION_CHANGED = "CHA"
 
-    ACTION_PUBLISH = "PUB"
-    ACTION_UNPUBLISH = "UNP"
     ACTION_MOVE = "MOV"
-
-    # advanced states
     ACTION_DELETE = "DEL"
-
-    # approve state
-    ACTION_APPROVE = "APP"
 
     _action_choices = (
         (ACTION_ADD, _('created')),
         (ACTION_CHANGED, _('changed')),
         (ACTION_DELETE, _('delete req.')),
         (ACTION_MOVE, _('move req.')),
-        (ACTION_PUBLISH, _('publish req.')),
-        (ACTION_UNPUBLISH, _('unpublish req.')),
-        (ACTION_APPROVE, _('approved')),  # Approved by somebody in approval process
     )
 
     page = models.ForeignKey(Page)

@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import create_page
+from cms.api import create_page, add_plugin
 from cms.management.commands import publisher_publish
+from cms.models import CMSPlugin
 from cms.models.pagemodel import Page
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride, 
+from cms.test_utils.util.context_managers import (SettingsOverride,
     StdoutOverride)
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 
-class PublisherTestCase(CMSTestCase):
+
+class PublisherTests(CMSTestCase):
     """
     A test case to exercise publisher
     """
@@ -137,6 +139,64 @@ class PublisherTestCase(CMSTestCase):
         self.assertEqual(page.published, True)
         self.assertObjectExist(Page.objects.public(), title_set__title="Page")
         self.assertEqual(Page.objects.filter(title_set__title="Page").count(), 2)
+
+    def test_revert_contents(self):
+        user = self.get_superuser()
+        page = create_page("Page", "nav_playground.html", "en", published=True,
+                           created_by=user)
+        placeholder = page.placeholders.get(slot=u"body")
+        deleted_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Deleted content")
+        text_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Public content")
+        page.publish()
+
+        # Modify and delete plugins
+        text_plugin.body = "<p>Draft content</p>"
+        text_plugin.save()
+        deleted_plugin.delete()
+        self.assertEquals(CMSPlugin.objects.count(), 3)
+
+        # Now let's revert and restore
+        page.revert()
+        self.assertEquals(page.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
+        self.assertEquals(page.pagemoderatorstate_set.count(), 0)
+
+        self.assertEquals(CMSPlugin.objects.count(), 4)
+        plugins = CMSPlugin.objects.filter(placeholder__page=page)
+        self.assertEquals(plugins.count(), 2)
+
+        plugins = [plugin.get_plugin_instance()[0] for plugin in plugins]
+        self.assertEquals(plugins[0].body, "Deleted content")
+        self.assertEquals(plugins[1].body, "Public content")
+
+    def test_revert_move(self):
+        parent = create_page("Parent", "nav_playground.html", "en", published=True)
+        parent_url = parent.get_absolute_url()
+        page = create_page("Page", "nav_playground.html", "en", published=True,
+                           parent=parent)
+        other = create_page("Other", "nav_playground.html", "en", published=True)
+        other_url = other.get_absolute_url()
+
+        child = create_page("Child", "nav_playground.html", "en", published=True,
+                            parent=page)
+        self.assertEqual(page.get_absolute_url(), parent_url + "page/")
+        self.assertEqual(child.get_absolute_url(), parent_url + "page/child/")
+
+        # Now let's move it (and the child)
+        page.move_page(other)
+        page = self.reload(page)
+        child = self.reload(child)
+        self.assertEqual(page.get_absolute_url(), other_url + "page/")
+        self.assertEqual(child.get_absolute_url(), other_url + "page/child/")
+        # Public version is still in the same url
+        self.assertEqual(page.publisher_public.get_absolute_url(), parent_url + "page/")
+        self.assertEqual(child.publisher_public.get_absolute_url(), parent_url + "page/child/")
+
+        # Use revert to bring things back to normal
+        page.revert()
+        page = self.reload(page)
+        child = self.reload(child)
+        self.assertEqual(page.get_absolute_url(), other_url + "page/")
+        self.assertEqual(child.get_absolute_url(), other_url + "page/child/")
 
     def test_publish_works_with_descendants(self):
         """

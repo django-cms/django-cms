@@ -68,21 +68,19 @@ class Page(MPTTModel):
     template = models.CharField(_("template"), max_length=100, choices=template_choices, help_text=_('The template used to render the content.'))
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
 
-    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True, editable=False)
+    login_required = models.BooleanField(_("login required"), default=False)
+    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True, help_text=_("limit when this page is visible in the menu"))
 
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
 
-    login_required = models.BooleanField(_("login required"), default=False)
-    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True, help_text=_("limit when this page is visible in the menu"))
-
     # Placeholders (plugins)
     placeholders = models.ManyToManyField(Placeholder, editable=False)
 
     # Publisher fields
-
+    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True, editable=False)
     publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
     #This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft',  null=True, editable=False)
@@ -150,6 +148,56 @@ class Page(MPTTModel):
         moderator.page_changed(self, force_moderation_action = PageModeratorState.ACTION_MOVE)
         # check the slugs
         page_utils.check_title_slugs(self)
+
+    def _copy_titles(self, target):
+        """
+        Copy all the titles to a new page.
+        :param target: The page where the new titles should be stored
+        """
+        # TODO: Make this into a "graceful" copy instead of deleting and overwriting
+        target.title_set.all().delete()
+        titles = list(self.title_set.all())
+        for title in titles:
+            title.pk = None  # setting pk = None creates a new instance
+            title.publisher_public_id = None
+            title.published = False
+            title.page = target
+            title.save()
+
+    def _copy_contents(self, target):
+        """
+        Copy all the plugins to a new page.
+        :param target: The page where the new content should be stored
+        """
+        # TODO: Make this into a "graceful" copy instead of deleting and overwriting
+        # copy the placeholders (and plugins on those placeholders!)
+        CMSPlugin.objects.filter(placeholder__page=target).delete()
+        for ph in self.placeholders.all():
+            plugins = list(ph.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            try:
+                ph = target.placeholders.get(slot=ph.slot)
+            except Placeholder.DoesNotExist:
+                ph.pk = None  # make a new instance
+                ph.save()
+                target.placeholders.add(ph)
+                # update the page copy
+            if plugins:
+                copy_plugins_to(plugins, ph)
+
+    def _copy_attributes(self, target):
+        """
+        Copy all page data to the target. This excludes parent and other values
+        that are specific to an exact instance.
+        :param target: The Page to copy the attributes to
+        """
+        target.publication_date = self.publication_date
+        target.publication_end_date = self.publication_end_date
+        target.in_navigation = self.in_navigation
+        target.soft_root = self.soft_root
+        target.reverse_id = self.reverse_id
+        target.navigation_extenders = self.navigation_extenders
+        target.template = self.template
+        target.site_id = self.site_id
 
     def copy_page(self, target, site, position='first-child',
                   copy_permissions=True, public_copy=False):
@@ -375,7 +423,7 @@ class Page(MPTTModel):
         """
         # Publish can only be called on draft pages
         if not self.publisher_is_draft:
-            # TODO: Issue a warning
+            # TODO: Issue an error
             return
 
         # publish, but only if all parents are published!!
@@ -472,7 +520,7 @@ class Page(MPTTModel):
         """
         # Publish can only be called on draft pages
         if not self.publisher_is_draft:
-            # TODO: Issue a warning
+            # TODO: Issue an error
             return
         old_public = self.get_public_object()
         if not old_public:
@@ -507,7 +555,24 @@ class Page(MPTTModel):
         if not self.publisher_is_draft:
             # TODO: Issue a warning
             return
-        # TO BE IMPLEMENTED
+        if not self.publisher_public:
+            # TODO: Issue an error
+            return
+
+        public = self.publisher_public
+        public._copy_titles(self)
+        if self.parent != (self.publisher_public.parent_id and
+                           self.publisher_public.parent.publisher_draft):
+            # We don't send the signals here
+            self.move_to(public.parent.publisher_draft)
+        public._copy_contents(self)
+        public._copy_attributes(self)
+        self.published = True
+        self.publisher_state = self.PUBLISHER_STATE_DEFAULT
+        self._publisher_keep_state = True
+        self.save()
+        # clean moderation log
+        self.pagemoderatorstate_set.all().delete()
 
     def delete(self):
         """Mark public instance for deletion and delete draft.
@@ -901,18 +966,8 @@ class Page(MPTTModel):
                 raise MpttPublisherCantPublish
         return True
 
-    def _publisher_get_public_copy(self):
-        """This is here because of the relation between CMSPlugins - model
-        inheritance.
-
-        eg. Text.objects.get(pk=1).publisher_public returns instance of CMSPlugin
-        instead of instance of Text, thats why this method must be overriden in
-        CMSPlugin.
-        """
-        return self.publisher_public
-
     def get_next_filtered_sibling(self, **filters):
-        """Very simillar to original mptt method, but adds support for filters.
+        """Very similar to original mptt method, but adds support for filters.
         Returns this model instance's next sibling in the tree, or
         ``None`` if it doesn't have a next sibling.
         """
@@ -945,7 +1000,7 @@ class Page(MPTTModel):
         return sibling
 
     def get_previous_filtered_sibling(self, **filters):
-        """Very simillar to original mptt method, but adds support for filters.
+        """Very similar to original mptt method, but adds support for filters.
         Returns this model instance's previous sibling in the tree, or
         ``None`` if it doesn't have a previous sibling.
         """
