@@ -94,6 +94,9 @@ class CMSPluginBase(admin.ModelAdmin):
     model = CMSPlugin
     text_enabled = False
     page_only = False
+
+    allow_children = False
+    child_classes = None
     
     opts = {}
     module = None #track in which module/application belongs
@@ -205,6 +208,17 @@ class CMSPluginBase(admin.ModelAdmin):
         the plugin object in a text editor.
         """
         return "%s - %s" % (unicode(self.name), unicode(instance))
+
+    def get_child_classes(self, slot, page):
+        from cms.plugin_pool import plugin_pool
+        if self.child_classes:
+            return self.child_classes
+        else:
+            installed_plugins = plugin_pool.get_all_plugins(slot, page)
+            class_names = []
+            for cls in installed_plugins:
+                class_names.append(str(cls.__name__))
+            return class_names
     
     def __repr__(self):
         return smart_str(self.name)

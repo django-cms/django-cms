@@ -169,13 +169,13 @@ def configure(**extra):
 
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin','GoogleMapPlugin','ColumnPlugin'),
+                            'TextPlugin', 'SnippetPlugin','GoogleMapPlugin','MultiColumnPlugin'),
                 'name': gettext("left column")
             },
 
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin','GoogleMapPlugin','ColumnPlugin'),
+                            'TextPlugin', 'SnippetPlugin','GoogleMapPlugin','MultiColumnPlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {

@@ -87,6 +87,7 @@ class CMSPlugin(MPTTModel):
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    childrens = None
 
     class Meta:
         app_label = 'cms'
@@ -162,6 +163,7 @@ class CMSPlugin(MPTTModel):
         return instance, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
+        print "model render plugin", self.__class__
         instance, plugin = self.get_plugin_instance()
         if instance and not (admin and not plugin.admin_preview):
             if not isinstance(placeholder, Placeholder):

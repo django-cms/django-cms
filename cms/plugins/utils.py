@@ -35,13 +35,46 @@ def assign_plugins(request, placeholders, lang=None):
                     request_lang = fallback
                     break
     # get all plugins for the given placeholders
-    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang, parent__isnull=True).order_by('placeholder', 'position')
+    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by('placeholder','tree_id', 'lft')
     plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
+
+    for group in groups:
+        groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
         setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
+
+def build_plugin_tree(plugin_list):
+    root = []
+    last = None
+    last_parent = None
+    for plugin in plugin_list:
+        if not plugin.parent_id:
+            root.append(plugin)
+        else:
+            # find parent
+            for parent in plugin_list:
+                if parent.pk == plugin.parent_id:
+                    if parent.childrens is None:
+                        parent.childrens = []
+                    parent.childrens.append(plugin)
+                    parent.childrens.sort(key=lambda x: x.position)
+                    break
+        last = plugin
+    root.sort(key=lambda x: x.position)
+    print root
+    print_node(root, 0)
+    return root
+
+def print_node(nodes, level):
+    for n in nodes:
+        print level*" ",n.__class__
+        if n.childrens:
+            print_node(n.childrens, level+2)
+        else:
+            print level*" ",[]
 
 
 def downcast_plugins(queryset, select_placeholder=False):

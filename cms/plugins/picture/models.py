@@ -15,8 +15,7 @@ class Picture(CMSPlugin):
                      (LEFT, _("left")),
                      (RIGHT, _("right")),
                      )
-    
-    
+
     image = models.ImageField(_("image"), upload_to=CMSPlugin.get_media_path)
     url = models.CharField(_("link"), max_length=255, blank=True, null=True, help_text=_("if present image will be clickable"))
     page_link = models.ForeignKey(Page, verbose_name=_("page"), null=True, blank=True, help_text=_("if present image will be clickable"))

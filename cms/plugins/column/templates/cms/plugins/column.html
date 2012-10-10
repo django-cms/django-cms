@@ -1,6 +1,6 @@
-{% load cms_tags %}
-{% for placeholder in placeholders %}
-        <div style="width: {{ placeholder.default_width }}px;">
-            {% placeholder placeholder.slot placeholder.default_width %}
-        </div>
+{% load cms_tags i18n %}
+<div style="width: {{ instance.width }}00px;">
+{% for plugin in instance.childrens %}
+    {% render_plugin plugin %}
 {% endfor %}
+</div>
