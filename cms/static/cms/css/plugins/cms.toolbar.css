@@ -62,9 +62,9 @@
 
 /* #TOOLBAR/items/logo# */
 .cms_toolbar-item_logo { padding-right:5px !important; }
-.cms_toolbar-item_logo .cms_toolbar-item_logo-link { float:left; cursor:pointer; text-indent:-1000px; overflow:hidden;
+.cms_toolbar-item_logo .cms_toolbar-link_left { float:left; cursor:pointer; text-indent:-1000px; overflow:hidden;
 	width:105px; height:42px; background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left top; }
-.cms_toolbar-item_logo .cms_toolbar-item_logo-link:hover { background-position:-120px top; }
+.cms_toolbar-item_logo .cms_toolbar-link_left:hover { background-position:-120px top; }
 
 /* #TOOLBAR/items/login# */
 #cms_toolbar-item_login label { float:left; cursor:pointer; padding:4px 10px 0 0; width: auto; }
