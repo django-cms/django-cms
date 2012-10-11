@@ -25,6 +25,7 @@ from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -999,3 +1000,19 @@ class PicturePluginTests(PluginsTestBaseCase):
         picture.url = "test"
         self.assertRaises(ValidationError, picture.clean)
 
+
+class SimplePluginTests(TestCase):
+    def test_simple_naming(self):
+        class MyPlugin(CMSPluginBase):
+            render_template = 'base.html'
+        self.assertEqual(MyPlugin.name, 'My Plugin')
+
+    def test_simple_context(self):
+        class MyPlugin(CMSPluginBase):
+            render_template = 'base.html'
+        plugin = MyPlugin(ArticlePluginModel, admin.site)
+        context = {}
+        out_context = plugin.render(context, 1, 2)
+        self.assertEqual(out_context['instance'], 1)
+        self.assertEqual(out_context['placeholder'], 2)
+        self.assertIs(out_context, context)
