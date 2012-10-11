@@ -732,7 +732,7 @@ msgstr "tilknyttet meny"
 
 #: models/pagemodel.py:67
 msgid "is published"
-msgstr "er poblisert"
+msgstr "er publisert"
 
 #: models/pagemodel.py:69
 msgid "The template used to render the content."
