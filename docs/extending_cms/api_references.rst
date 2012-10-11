@@ -183,7 +183,7 @@ cms.plugin_base
         
     .. attribute:: admin_preview
     
-        Defaults to ``True``, if ``False`` no preview is done in the admin.
+        Defaults to ``False``, if ``True`` there will be a preview in the admin.
         
     .. attribute:: change_form_template
 
