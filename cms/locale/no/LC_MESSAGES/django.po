@@ -710,7 +710,7 @@ msgstr "endret av"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "Når sideb skal gjøres offentlig. Status må være \"Publisert\" for at siden skal vises."
+msgstr "Når siden skal gjøres offentlig. Status må være \"Publisert\" for at siden skal vises."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
