@@ -1,76 +1,52 @@
-
+# -*- coding: utf-8 -*-
 from south.db import db
 from django.db import models
-from cms.plugins.snippet.models import *
+from cms.plugins.link.models import *
 
 class Migration:
     
-    depends_on = (
-        ("cms", "0012_publisher"),
-    )
-    
-    needed_by = (
-        ("cms", "0019_public_table_renames"),
-    )
-
-
     def forwards(self, orm):
-        
-        # Adding model 'PublicSnippetPtr'
-        db.create_table('snippet_publicsnippetptr', (
-            ('snippet', orm['snippet.publicsnippetptr:snippet']),
-            ('mark_delete', orm['snippet.publicsnippetptr:mark_delete']),
-            ('publiccmsplugin_ptr', orm['snippet.publicsnippetptr:publiccmsplugin_ptr']),
-        ))
-        db.send_create_signal('snippet', ['PublicSnippetPtr'])
-        
-        # Adding field 'SnippetPtr.public'
-        db.add_column('snippet_snippetptr', 'public', orm['snippet.snippetptr:public'])
-        
-    
-    
+        "Write your forwards migration here"
+
+
     def backwards(self, orm):
-        
-        # Deleting model 'PublicSnippetPtr'
-        db.delete_table('snippet_publicsnippetptr')
-        
-        # Deleting field 'SnippetPtr.public'
-        db.delete_column('snippet_snippetptr', 'public_id')
-        
+        "Write your backwards migration here"
     
-    
+  
     models = {
-        'snippet.snippet': {
-            'html': ('models.TextField', [], {'blank': 'True'}),
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'}),
-            'name': ('models.CharField', [], {'max_length': '255', 'unique': 'True'})
-        },
-        'cms.publiccmsplugin': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
-        },
-        'cms.publicpage': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
-        },
         'cms.cmsplugin': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'Meta': {'object_name': 'CMSPlugin'},
+            'changed_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'language': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
+            'level': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.CMSPlugin']", 'null': 'True', 'blank': 'True'}),
+            'placeholder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
+            'plugin_type': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
+            'position': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
         },
-        'snippet.publicsnippetptr': {
-            'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'snippet': ('models.ForeignKey', [], {'to': "orm['snippet.Snippet']"})
+        'cms.placeholder': {
+            'Meta': {'object_name': 'Placeholder'},
+            'default_width': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'slot': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'})
+        },
+        'snippet.snippet': {
+            'Meta': {'ordering': "['name']", 'object_name': 'Snippet'},
+            'html': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
+            'template': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
         },
         'snippet.snippetptr': {
-            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['snippet.PublicSnippetPtr']"}),
-            'snippet': ('models.ForeignKey', [], {'to': "orm['snippet.Snippet']"})
-        },
-        'cms.page': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'Meta': {'object_name': 'SnippetPtr', 'db_table': "'cmsplugin_snippetptr'", '_ormbases': ['cms.CMSPlugin']},
+            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'snippet': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['snippet.Snippet']"})
         }
     }
-    
+
     complete_apps = ['snippet']
