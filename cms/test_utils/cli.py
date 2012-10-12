@@ -8,19 +8,39 @@ gettext = lambda s: s
 urlpatterns = []
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
-def configure(**extra):
+def configure(db_data,**extra):
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
+    db_type = db_data.get('DB','sqlite')
+    if db_type == 'sqlite':
+        DB = {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    elif db_type == 'postgres':
+        DB = {
+             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+             'NAME': db_data.get('NAME', 'djangocms'),
+             'USER': db_data.get('USER', 'postgres'),
+             }
+        if db_data.get('PASSWORD', None):
+            DB['PASSWORD'] = db_data['PASSWORD']
+    elif db_type == 'mysql':
+        DB = {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': db_data.get('NAME', 'djangocms'),
+            'USER': db_data.get('USER', 'root'),
+            }
+        if db_data.get('PASSWORD', None):
+            DB['PASSWORD'] = db_data['PASSWORD']
+
     defaults = dict(
         CACHE_BACKEND = 'locmem:///',
         DEBUG = True,
         TEMPLATE_DEBUG = True,
         DATABASE_SUPPORTS_TRANSACTIONS = True,
         DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
-            }
+            'default': DB
         },
         SITE_ID = 1,
         USE_I18N = True,
@@ -222,7 +242,6 @@ def configure(**extra):
         from django.utils.functional import empty
         settings._wrapped = empty
     defaults.update(extra)
-
     settings.configure(**defaults)
     from cms.conf import patch_settings
     patch_settings()
