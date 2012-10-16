@@ -198,7 +198,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         limit_choices = True
         use_raw_id = False
         if hasattr(settings, 'CMS_RAW_ID_USERS') and settings.CMS_RAW_ID_USERS:
-            if len(sub_users) < 500:
+            if sub_users.count() < 500:
                 # If there aren't too many users, proceed as normal and use a raw
                 # id field with limit_choices_to
                 limit_choices = True
