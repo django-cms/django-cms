@@ -1255,7 +1255,9 @@ class PageAdmin(ModelAdmin):
             # just pass id to plugin_admin
             response = plugin_admin.change_view(request, str(plugin_id))
         if request.method == "POST" and plugin_admin.object_successfully_changed:
-            
+            moderator.page_changed(page,
+                force_moderation_action=PageModeratorState.ACTION_CHANGED)
+
             # if reversion is installed, save version of the page plugins
             if 'reversion' in settings.INSTALLED_APPS and page:
                 helpers.make_revision_with_plugins(page)    
@@ -1335,6 +1337,9 @@ class PageAdmin(ModelAdmin):
         if not success:
             return HttpResponse(str("error"))
 
+        moderator.page_changed(page,
+            force_moderation_action=PageModeratorState.ACTION_CHANGED)
+
         if page and 'reversion' in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(page)
             reversion.revision.user = request.user
@@ -1377,6 +1382,10 @@ class PageAdmin(ModelAdmin):
             'position': plugin.position,
             'placeholder': plugin.placeholder,
         }
+
+        moderator.page_changed(page,
+            force_moderation_action=PageModeratorState.ACTION_CHANGED)
+
         if page and 'reversion' in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(page)
             reversion.revision.user = request.user
