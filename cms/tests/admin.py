@@ -525,7 +525,7 @@ class AdminTests(AdminTestsBase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
     
     def setUp(self):
-        create_page("testpage", "nav_playground.html", "en")
+        self.page = create_page("testpage", "nav_playground.html", "en")
     
     def get_admin(self):
         usr = User(username="admin", email="admin@django-cms.org", is_staff=True, is_superuser=True)
@@ -540,7 +540,7 @@ class AdminTests(AdminTestsBase):
         return usr
     
     def get_page(self):
-        return Page.objects.get(pk=1)
+        return self.page
     
     def test_get_moderation_state(self):
         page = self.get_page()
@@ -634,7 +634,23 @@ class AdminTests(AdminTestsBase):
             request = self.get_request()
             response = self.admin_class.publish_page(request, 1)
             self.assertEqual(response.status_code, 403)
-    
+
+    def test_revert_page_requires_perms(self):
+        permless = self.get_permless()
+        with self.login_user_context(permless):
+            request = self.get_request()
+            response = self.admin_class.revert_page(request, 1)
+            self.assertEqual(response.status_code, 403)
+
+    def test_revert_page_redirects(self):
+        admin = self.get_admin()
+        self.page.publish() # Ensure public copy exists before reverting
+        with self.login_user_context(admin):
+            response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk,)))
+            self.assertEqual(response.status_code, 302)
+            url = response['Location']
+            self.assertTrue(url.endswith('?edit'))
+
     def test_remove_plugin_requires_post(self):
         admin = self.get_admin()
         with self.login_user_context(admin):

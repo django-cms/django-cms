@@ -204,6 +204,7 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
+            pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
             pat(r'^([0-9]+)/confirm-delete/$', self.confirm_delete),
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
@@ -841,6 +842,28 @@ class PageAdmin(ModelAdmin):
         # TODO: use admin base here!
         if 'admin' not in referer:
             path = '%s?edit-off' % referer.split('?')[0]
+        return HttpResponseRedirect( path )
+
+    @transaction.commit_on_success
+    def revert_page(self, request, page_id):
+        page = get_object_or_404(Page, id=page_id)
+        # ensure user has permissions to publish this page
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden("Denied")
+
+        page.revert()
+
+        self.message_user(request, ugettext('Page was successfully reverted.'))
+
+        if 'node' in request.REQUEST:
+            # if request comes from tree..
+            return admin_utils.render_admin_menu_item(request, page)
+
+        referer = request.META.get('HTTP_REFERER', '')
+        path = '../../'
+        # TODO: use admin base here!
+        if 'admin' not in referer:
+            path = '%s?edit' % referer.split('?')[0]
         return HttpResponseRedirect( path )
 
     def confirm_delete(self, request, object_id, *args, **kwargs):

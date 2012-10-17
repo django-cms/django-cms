@@ -43,6 +43,12 @@ def _get_delete_url(context, toolbar, **kwargs):
 def _get_publish_url(context, toolbar, **kwargs):
     return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.get_draft_object().pk,))
 
+def _get_revert_url(context, toolbar, **kwargs):
+    return reverse('admin:cms_page_revert_page', args=(toolbar.request.current_page.get_draft_object().pk,))
+
+def _page_is_dirty(request):
+    page = request.current_page
+    return page and page.published and page.get_draft_object().is_dirty()
 
 class CMSToolbarLoginForm(forms.Form):
     cms_username = forms.CharField()
@@ -53,6 +59,9 @@ class CMSToolbar(Toolbar):
     """
     The default CMS Toolbar
     """
+    revert_button = GetButton(RIGHT, 'revert', _("Revert"),
+                              url=_get_revert_url, enable=_page_is_dirty)
+
     def __init__(self, request):
         super(CMSToolbar, self).__init__(request)
         self.init()
@@ -100,6 +109,8 @@ class CMSToolbar(Toolbar):
                         items.append(
                             GetButton(RIGHT, 'moderator', _("Publish"), _get_publish_url)
                         )
+                    if self.revert_button.is_enabled_for(self.request):
+                        items.append(self.revert_button)
 
                 # The 'templates' Menu
                 if self.can_change:

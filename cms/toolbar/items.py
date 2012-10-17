@@ -121,13 +121,13 @@ class GetButton(BaseItem):
         ('url', 'redirect'),
     ]
     
-    def __init__(self, alignment, css_class_suffix, title, url, icon=None):
+    def __init__(self, alignment, css_class_suffix, title, url, icon=None, enable=None):
         """
         title: name of the button
         icon: icon of the button, relative to STATIC_URL
         url: target of the GET request
         """
-        super(GetButton, self).__init__(alignment, css_class_suffix)
+        super(GetButton, self).__init__(alignment, css_class_suffix, enable)
         self.icon = icon
         self.title = title
         if callable(url):
