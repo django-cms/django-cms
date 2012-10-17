@@ -24,7 +24,7 @@ def use_preview(request):
     Decision function to determine if the drafts or public pages should be used
     Public models are used unless looking at preview or edit versions of the page.
     """
-    preview_draft = ('preview' in request.GET and 'draft' in request.GET)
+    preview_draft = 'preview' in request.GET
     edit_mode = 'edit' in request.GET
 
     return preview_draft or edit_mode
@@ -131,7 +131,7 @@ def get_page_from_request(request, use_path=None):
     # If non-staff user, any request for preview/edit results in a "not found"
     # This is to avoid confusing the toolbar logic into thinking it has an
     # editable version
-    if preview and not request.user.is_staff:
+    if preview and not request.user.is_authenticated():
         return None
 
     # If use_path is given, someone already did the path cleaning
@@ -152,6 +152,9 @@ def get_page_from_request(request, use_path=None):
             path = path[:-1]
 
     page = get_page_from_path(path, preview)
+    if preview and page and not page.has_change_permission(request):
+        return None
+
     request._current_page_cache = page
     return page
 
