@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.core.exceptions import PermissionDenied
 from cms.exceptions import NoHomeFound
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
@@ -594,18 +595,39 @@ class Page(MPTTModel):
         super(Page, self).delete()
 
     def delete_with_public(self):
+        """
+        Assuming this page and all its descendants have been marked for
+        deletion, recursively deletes the entire set of pages including the
+        public instance.
+        """
+        descendants = list(self.get_descendants().order_by('level'))
+        descendants.reverse()
+        #TODO: Use a better exception class - PermissionDenied is not quite right
+        for page in descendants:
+            if not page.pagemoderatorstate_set.get_delete_actions().exists():
+                raise PermissionDenied('There are descendant pages not marked for deletion')
+        descendants.append(self)
 
-        placeholders = list(self.placeholders.all())
-        if self.publisher_public_id:
-            placeholders = placeholders + list(self.publisher_public.placeholders.all())
+        # Get all pages that are children of any public page that would be deleted
+        public_children = Page.objects.public().filter(
+            parent__publisher_public__in=descendants)
+        public_pages = Page.objects.public().filter(publisher_public__in=descendants)
+        if set(public_children).difference(public_pages):
+            raise PermissionDenied('There are pages that would be orphaned. '
+                                   'Publish their move requests first.')
 
-        for ph in placeholders:
-            plugin = CMSPlugin.objects.filter(placeholder=ph)
-            plugin.delete()
-            ph.delete()
-        if self.publisher_public_id:
-            self.publisher_public.delete()
-        super(Page, self).delete()
+        for page in descendants:
+            placeholders = list(page.placeholders.all())
+            if page.publisher_public_id:
+                placeholders = placeholders + list(page.publisher_public.placeholders.all())
+
+            plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
+            plugins.delete()
+            for ph in placeholders:
+                ph.delete()
+            if page.publisher_public_id:
+                page.publisher_public.delete()
+            super(Page, page).delete()
 
     def get_draft_object(self):
         if not self.publisher_is_draft:

@@ -877,7 +877,12 @@ class PageAdmin(ModelAdmin):
         if not delete_requested:
             return HttpResponseForbidden("Denied")
 
-        page.delete_with_public()
+        try:
+            page.delete_with_public()
+        except PermissionDenied, e:
+            # TODO: Use messages.error and redirect to the change page
+            return HttpResponseForbidden(e.message)
+
         self.message_user(request, ugettext('Page was successfully deleted.'))
 
         return HttpResponseRedirect("../../")
@@ -902,16 +907,18 @@ class PageAdmin(ModelAdmin):
         if not self.has_delete_permission(request, page):
             raise PermissionDenied
 
-        if page.published:
-            # don't perform a delete action, just mark page for deletion
-            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_DELETE)
+        # Previously, the standard Django delete view was used for non-published
+        # pages. This was actually more difficult to use than the other workflow,
+        # so it has been disabled to keep things consistent.
+        if False and not page.published:
+            return super(PageAdmin, self).delete_view(request, object_id, *args, **kwargs)
 
-            if not self.has_change_permission(request, None):
-                return HttpResponseRedirect("../../../../")
-            return HttpResponseRedirect("../../")
+        # don't perform a delete action, just mark page for deletion
+        moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_DELETE)
 
-        response = super(PageAdmin, self).delete_view(request, object_id, *args, **kwargs)
-        return response
+        if not self.has_change_permission(request, None):
+            return HttpResponseRedirect("../../../../")
+        return HttpResponseRedirect("../../")
 
     @create_on_success
     def delete_translation(self, request, object_id, extra_context=None):
