@@ -15,15 +15,15 @@ from utils.permissions import has_page_change_permission
 
 
 def _get_page_admin_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_change', args=(toolbar.request.current_page.pk,))
+    return reverse('admin:cms_page_change', args=(toolbar.request.current_page.get_draft_object().pk,))
 
 def _get_page_history_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_history', args=(toolbar.request.current_page.pk,))
+    return reverse('admin:cms_page_history', args=(toolbar.request.current_page.get_draft_object().pk,))
 
 def _get_add_child_url(context, toolbar, **kwargs):
     data = {
         'position': 'last-child',
-        'target': toolbar.request.current_page.pk,
+        'target': toolbar.request.current_page.get_draft_object().pk,
     }
     args = urllib.urlencode(data)
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
@@ -33,15 +33,15 @@ def _get_add_sibling_url(context, toolbar, **kwargs):
         'position': 'last-child',
     }
     if toolbar.request.current_page.parent_id:
-        data['target'] = toolbar.request.current_page.parent_id
+        data['target'] = toolbar.request.current_page.get_draft_object().parent_id
     args = urllib.urlencode(data)
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
 
 def _get_delete_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_delete', args=(toolbar.request.current_page.pk,))
+    return reverse('admin:cms_page_delete', args=(toolbar.request.current_page.get_draft_object().pk,))
 
 def _get_publish_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.pk,))
+    return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.get_draft_object().pk,))
 
 
 class CMSToolbarLoginForm(forms.Form):
@@ -124,11 +124,11 @@ class CMSToolbar(Toolbar):
     
     def get_template_menu(self, context, can_change, is_staff):
         menu_items = []
-        url = reverse('admin:cms_page_change_template', args=(self.request.current_page.pk,))
+        url = reverse('admin:cms_page_change_template', args=(self.request.current_page.get_draft_object().pk,))
         for path, name in settings.CMS_TEMPLATES:
             args = urllib.urlencode({'template': path})
             css = 'template'
-            if self.request.current_page.get_template() == path:
+            if self.request.current_page.get_draft_object().get_template() == path:
                 css += ' active'
             menu_items.append(
                 ListItem(css, name, '%s?%s' % (url, args), 'POST'),

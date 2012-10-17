@@ -24,7 +24,7 @@ def use_preview(request):
     Decision function to determine if the drafts or public pages should be used
     Public models are used unless looking at preview or edit versions of the page.
     """
-    preview_draft = 'preview' in request.GET
+    preview_draft = 'preview' in request.GET and 'draft' in request.GET
     edit_mode = 'edit' in request.GET
 
     return preview_draft or edit_mode
