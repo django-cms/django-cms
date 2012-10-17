@@ -293,7 +293,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	background-position: -20px 0px;
 }
 
-#sitemap li .col-draft a.approve {
+#sitemap li .col-draft a.publish {
 	margin-left:4px;
 	background-position: -60px -80px;
 	margin-top:-4px;

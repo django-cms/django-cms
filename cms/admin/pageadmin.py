@@ -43,7 +43,6 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 import django
 
-
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 
@@ -205,6 +204,7 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
+            pat(r'^([0-9]+)/confirm-delete/$', self.confirm_delete),
             pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
@@ -823,11 +823,14 @@ class PageAdmin(ModelAdmin):
         # ensure user has permissions to publish this page
         if not page.has_publish_permission(request):
             return HttpResponseForbidden("Denied")
+
+        delete_requested = page.pagemoderatorstate_set.get_delete_actions().count()
+        if delete_requested:
+            return HttpResponseForbidden("Denied")
+
         page.publish()
 
-        # Django SQLite bug. Does not convert to string the lazy instances
-        from django.utils.translation import ugettext as _
-        self.message_user(request, _('Page was successfully published.'))
+        self.message_user(request, ugettext('Page was successfully published.'))
 
         if 'node' in request.REQUEST:
             # if request comes from tree..
@@ -840,6 +843,32 @@ class PageAdmin(ModelAdmin):
             path = '%s?edit-off' % referer.split('?')[0]
         return HttpResponseRedirect( path )
 
+    def confirm_delete(self, request, object_id, *args, **kwargs):
+        """Remove all delete action from page states, requires change permission
+        """
+        page = get_object_or_404(Page, id=object_id)
+        if not page.has_publish_permission(request):
+            raise PermissionDenied
+
+        delete_requested = page.pagemoderatorstate_set.get_delete_actions().count()
+        if not delete_requested:
+            return HttpResponseForbidden("Denied")
+
+        page.delete_with_public()
+        self.message_user(request, ugettext('Page was successfully deleted.'))
+
+        return HttpResponseRedirect("../../")
+
+    def remove_delete_state(self, request, object_id):
+        """Remove all delete action from page states, requires change permission
+        """
+        page = get_object_or_404(Page, id=object_id)
+        if not self.has_change_permission(request, page):
+            raise PermissionDenied
+        page.pagemoderatorstate_set.get_delete_actions().delete()
+        page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
+        page.save()
+        return HttpResponseRedirect("../../%d/" % page.id)
 
     def delete_view(self, request, object_id, *args, **kwargs):
         """If page is under moderation, just mark this page for deletion = add
@@ -957,17 +986,6 @@ class PageAdmin(ModelAdmin):
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context, context_instance=context_instance)
-
-    def remove_delete_state(self, request, object_id):
-        """Remove all delete action from page states, requires change permission
-        """
-        page = get_object_or_404(Page, id=object_id)
-        if not self.has_change_permission(request, page):
-            raise PermissionDenied
-        page.pagemoderatorstate_set.get_delete_actions().delete()
-        page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
-        page.save()
-        return HttpResponseRedirect("../../%d/" % page.id)
 
     def preview_page(self, request, object_id):
         """Redirecting preview function based on draft_id

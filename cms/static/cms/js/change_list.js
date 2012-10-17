@@ -131,7 +131,7 @@
 		}
 
 		function refreshIfChildren(pageId){
-			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){};
+			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){ return true; };
 		}
 
 		/**
@@ -267,12 +267,12 @@
 				return true;
 			}
 
-			// quick approve
-			if(jtarget.hasClass("approve")) {
+			// quick publish
+			if(jtarget.hasClass("publish")) {
 				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
 				// just reload the page for now in callback... 
 				// TODO: this must be changed sometimes to reloading just the portion
-				// of the tree = current node + descendants 
+				// of the tree = current node + descendants
 				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/publish/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
 				return false;
@@ -455,7 +455,7 @@
 			status = true;
 			if (callback) status = callback(response, textStatus);
 
-			if(status==true) {
+			if (status==true) {
 				if (/page_\d+/.test($(el).attr('id'))) {
 					// one level higher
 					target = $(el).find('div.cont:first');

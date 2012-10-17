@@ -34,6 +34,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         )
         staff.set_password('staff')
         staff.save()
+        staff.user_permissions.add(Permission.objects.get(codename='change_page'))
         return staff
 
     def get_nonstaff(self):
@@ -284,13 +285,27 @@ class ToolbarTests(ToolbarTestBase):
         self.assertIsInstance(publish, GetButton)
 
 
-    def test_toolbar_no_moderate_button(self):
+    def test_toolbar_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_staff(), edit=True)
         toolbar = CMSToolbar(request)
+        self.assertTrue(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_items({})
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 6)
+
+    def test_toolbar_no_change_button(self):
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        user = self.get_staff()
+        user.user_permissions.all().delete()
+        request = self.get_page_request(page, user, edit=True)
+        toolbar = CMSToolbar(request)
+        self.assertFalse(page.has_change_permission(request))
+        self.assertFalse(page.has_publish_permission(request))
+        self.assertTrue(toolbar.edit_mode)
+        items = toolbar.get_items({})
+        # Logo + page-menu + admin-menu + logout
+        self.assertEqual(len(items), 4)
 
