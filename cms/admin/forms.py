@@ -92,7 +92,7 @@ class PageAddForm(forms.ModelForm):
         
     def clean(self):
         cleaned_data = self.cleaned_data
-        if 'slug' in cleaned_data.keys():
+        if 'slug' in cleaned_data:
             slug = cleaned_data['slug']
         else:
             slug = ""
@@ -121,17 +121,18 @@ class PageAddForm(forms.ModelForm):
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
             title = page.get_title_obj(lang)
-            if title:
+            if title and slug:
                 oldslug = title.slug
-                title.slug = self.cleaned_data['slug']
+                title.slug = slug
                 title.save()
                 try:
                     is_valid_url(title.path,page)
                 except ValidationError,e:
                     title.slug = oldslug
                     title.save()
-                    del cleaned_data['published']
-                    self._errors['published'] = ErrorList(e.messages)
+                    if 'slug' in cleaned_data:
+                        del cleaned_data['slug']
+                    self._errors['slug'] = ErrorList(e.messages)
         return cleaned_data
     
     def clean_slug(self):
