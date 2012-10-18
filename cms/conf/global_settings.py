@@ -26,6 +26,9 @@ CMS_PLACEHOLDER_CONF = {}
 # Whether to enable permissions.
 CMS_PERMISSION = False
 
+# Whether to use raw ID lookups for users when CMS_PERMISSION is set to True
+CMS_RAW_ID_USERS = False
+
 # Decides if pages without any view restrictions are public by default, or staff only
 CMS_PUBLIC_FOR = 'all' # or 'staff'
 
