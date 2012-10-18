@@ -51,6 +51,8 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
             tmpctx = copy.copy(context)
             tmpctx.update(template_vars)
             inst, name = plg.get_plugin_instance()
+            if inst is None:
+                continue
             outstr = inst.render_plugin(tmpctx, placeholder)
             plugin_output.append(outstr)
         template_vars['parent_output'] = plugin_output
