@@ -35,7 +35,7 @@ def assign_plugins(request, placeholders, lang=None):
                     request_lang = fallback
                     break
     # get all plugins for the given placeholders
-    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by('placeholder','tree_id', 'lft')
+    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by('placeholder', 'tree_id', 'lft')
     plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
@@ -64,18 +64,7 @@ def build_plugin_tree(plugin_list):
                     break
         last = plugin
     root.sort(key=lambda x: x.position)
-    print root
-    print_node(root, 0)
     return root
-
-def print_node(nodes, level):
-    for n in nodes:
-        print level*" ",n.__class__
-        if n.childrens:
-            print_node(n.childrens, level+2)
-        else:
-            print level*" ",[]
-
 
 def downcast_plugins(queryset, select_placeholder=False):
     plugin_types_map = defaultdict(list)
@@ -105,7 +94,7 @@ def get_plugins_for_page(request, page, lang=None):
         return []
     lang = lang or get_language_from_request(request)
     if not hasattr(page, '_%s_plugins_cache' % lang):
-        setattr(page, '_%s_plugins_cache' % lang,  get_cmsplugin_queryset(request).filter(
+        setattr(page, '_%s_plugins_cache' % lang, get_cmsplugin_queryset(request).filter(
             placeholder__page=page, language=lang, parent__isnull=True
         ).order_by('placeholder', 'position').select_related())
     return getattr(page, '_%s_plugins_cache' % lang)

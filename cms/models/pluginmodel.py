@@ -129,8 +129,8 @@ class CMSPlugin(MPTTModel):
             factory = simple_class_factory
         return (model_unpickle, (model, defers, factory), data)
 
-    def __unicode__(self):
-        return unicode(self.id)
+    #def __unicode__(self):
+    #    return unicode(self.id)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -163,7 +163,6 @@ class CMSPlugin(MPTTModel):
         return instance, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
-        print "model render plugin", self.__class__
         instance, plugin = self.get_plugin_instance()
         if instance and not (admin and not plugin.admin_preview):
             if not isinstance(placeholder, Placeholder):

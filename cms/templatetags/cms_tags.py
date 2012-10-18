@@ -259,11 +259,6 @@ class RenderPlugin(InclusionTag):
     )
 
     def get_context(self, context, plugin):
-        print "++++++++++++++++++++++ render plugin ttag"
-        print plugin
-        print plugin.childrens
-        print plugin.__class__
-
         # Prepend frontedit toolbar output if applicable
         edit = False
         request = context['request']

@@ -7,9 +7,9 @@ from django.conf import settings
 class PicturePlugin(CMSPluginBase):
     model = Picture
     name = _("Picture")
-    render_template = "cms/plugins/column.html"
+    render_template = "cms/plugins/picture.html"
     text_enabled = True
-    
+
     def render(self, context, instance, placeholder):
         if instance.url:
             link = instance.url
@@ -19,13 +19,13 @@ class PicturePlugin(CMSPluginBase):
             link = ""
         context.update({
             'picture': instance,
-            'link': link, 
+            'link': link,
             'placeholder': placeholder
         })
-        return context 
-    
+        return context
+
     def icon_src(self, instance):
         # TODO - possibly use 'instance' and provide a thumbnail image
         return settings.STATIC_URL + u"cms/images/plugins/image.png"
- 
+
 plugin_pool.register_plugin(PicturePlugin)

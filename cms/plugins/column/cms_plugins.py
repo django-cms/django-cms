@@ -25,7 +25,6 @@ class ColumnPlugin(CMSPluginBase):
     allow_children = True
 
     def render(self, context, instance, placeholder):
-        print "column render"
         context.update({
             'instance': instance,
             'placeholder':placeholder,
