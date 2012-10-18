@@ -87,7 +87,7 @@ def render_admin_menu_item(request, page, template=None):
     must be reloaded over ajax.
     """
     if not template:
-        template = "admin/cms/page/menu_item.html"
+        template = "admin/cms/page/menu_fragment.html"
 
     if not page.pk:
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item

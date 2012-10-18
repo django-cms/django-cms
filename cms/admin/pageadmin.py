@@ -23,7 +23,7 @@ from cms.utils.admin import jsonify_request
 from copy import deepcopy
 from distutils.version import LooseVersion
 from django.conf import settings
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_deleted_objects
 from urllib2 import unquote
@@ -827,11 +827,11 @@ class PageAdmin(ModelAdmin):
 
         delete_requested = page.pagemoderatorstate_set.get_delete_actions().count()
         if delete_requested:
-            return HttpResponseForbidden("Denied")
+            messages.error(request, ugettext('The page "%s" has a delete request. Delete or confirm the request first.') % page)
+        else:
+            page.publish()
 
-        page.publish()
-
-        self.message_user(request, ugettext('Page was successfully published.'))
+            self.message_user(request, ugettext('The page "%s" was successfully published.') % page)
 
         if 'node' in request.REQUEST:
             # if request comes from tree..
@@ -853,7 +853,7 @@ class PageAdmin(ModelAdmin):
 
         page.revert()
 
-        self.message_user(request, ugettext('Page was successfully reverted.'))
+        self.message_user(request, ugettext('The page "%s" was successfully reverted.') % page)
 
         if 'node' in request.REQUEST:
             # if request comes from tree..
@@ -871,30 +871,29 @@ class PageAdmin(ModelAdmin):
         """
         page = get_object_or_404(Page, id=object_id)
         if not page.has_publish_permission(request):
-            raise PermissionDenied
-
-        delete_requested = page.pagemoderatorstate_set.get_delete_actions().count()
-        if not delete_requested:
             return HttpResponseForbidden("Denied")
 
-        try:
-            page.delete_with_public()
-        except PermissionDenied, e:
-            # TODO: Use messages.error and redirect to the change page
-            return HttpResponseForbidden(e.message)
-
-        self.message_user(request, ugettext('Page was successfully deleted.'))
-
-        return HttpResponseRedirect("../../")
+        page_title = unicode(page)
+        delete_requested = page.pagemoderatorstate_set.get_delete_actions().count()
+        if not delete_requested:
+            messages.error(request, _('The page "%s" has no delete request.') % page_title)
+        else:
+            try:
+                page.delete_with_public()
+                self.message_user(request, ugettext('The page "%s" was successfully deleted.') % page_title)
+                return HttpResponseRedirect("../../")
+            except PermissionDenied, e:
+                # TODO: Use messages.error and redirect to the change page
+                messages.error(request, e.message)
+        return HttpResponseRedirect("../")
 
     def remove_delete_state(self, request, object_id):
         """Remove all delete action from page states, requires change permission
         """
         page = get_object_or_404(Page, id=object_id)
         if not self.has_change_permission(request, page):
-            raise PermissionDenied
+            return HttpResponseForbidden("Denied")
         page.pagemoderatorstate_set.get_delete_actions().delete()
-        page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
         page.save()
         return HttpResponseRedirect("../../%d/" % page.id)
 
@@ -905,7 +904,7 @@ class PageAdmin(ModelAdmin):
         page = get_object_or_404(Page, id=object_id)
 
         if not self.has_delete_permission(request, page):
-            raise PermissionDenied
+            return HttpResponseForbidden("Denied")
 
         # Previously, the standard Django delete view was used for non-published
         # pages. This was actually more difficult to use than the other workflow,
@@ -1045,16 +1044,24 @@ class PageAdmin(ModelAdmin):
         if request.method != 'POST':
             return HttpResponseNotAllowed(['POST'])
         page = get_object_or_404(Page, pk=page_id)
-        if page.has_publish_permission(request):
-            try:
-                if page.published or is_valid_url(page.get_absolute_url(),page,False):
-                    method = page.publish if not page.published else page.unpublish
-                    success = method()
-                return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
-            except ValidationError,e:
-                return jsonify_request(HttpResponseBadRequest(e.messages))
-        else:
+        if not page.has_publish_permission(request):
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
+
+        try:
+            if page.published or is_valid_url(page.get_absolute_url(),page,False):
+                published = page.published
+                method = page.publish if not published else page.unpublish
+                try:
+                    success = method()
+                    if published:
+                        messages.info(request, _('The page "%s" was successfully unpublished') % page)
+                    else:
+                        messages.info(request, _('The page "%s" was successfully published') % page)
+                except RuntimeError, e:
+                    messages.error(request, e.message)
+            return admin_utils.render_admin_menu_item(request, page)
+        except ValidationError, e:
+            return HttpResponseBadRequest(e.messages)
 
     def change_innavigation(self, request, page_id):
         """

@@ -524,8 +524,7 @@ class Page(MPTTModel):
         """
         # Publish can only be called on draft pages
         if not self.publisher_is_draft:
-            # TODO: Issue an error
-            return
+            raise RuntimeError('The public instance cannot be unpublished. Use draft.')
         old_public = self.get_public_object()
         if not old_public:
             # Make sure the state is up to date
@@ -536,7 +535,7 @@ class Page(MPTTModel):
         # site. This simplifies this use case to a single page.
         if self.get_descendants().filter(published=True).count() or \
                 old_public.get_descendants().count():
-            return False
+            raise RuntimeError('The page has public descendants that would become inaccessible.')
 
         self.published = False
         self.publisher_public = None
@@ -551,6 +550,7 @@ class Page(MPTTModel):
         # moving the object out of the way before deleting works, but why?
         # finally delete the old public page
         old_public.delete()
+        return True
 
     def revert(self):
         """Revert the draft version to the same state as the public version
