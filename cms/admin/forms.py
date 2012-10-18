@@ -92,10 +92,7 @@ class PageAddForm(forms.ModelForm):
         
     def clean(self):
         cleaned_data = self.cleaned_data
-        if 'slug' in cleaned_data:
-            slug = cleaned_data['slug']
-        else:
-            slug = ""
+        slug = cleaned_data.get('slug', '')
         
         page = self.instance
         lang = cleaned_data.get('language', None)
