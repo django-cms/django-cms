@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+import re
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
 from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.options import get_verbose_name
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -71,7 +71,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 ]
         # Set default name
         if not new_plugin.name:
-            new_plugin.name = get_verbose_name(new_plugin.__name__)
+            new_plugin.name = re.sub("([a-z])([A-Z])","\g<1> \g<2>", name)
         return new_plugin
 
 
@@ -82,15 +82,21 @@ class CMSPluginBase(admin.ModelAdmin):
     
     form = None
     change_form_template = "admin/cms/page/plugin_change_form.html"
+    frontend_edit_template = 'cms/toolbar/placeholder_wrapper.html'
     # Should the plugin be rendered in the admin?
-    admin_preview = True 
+    admin_preview = False
     
     render_template = None
+
     # Should the plugin be rendered at all, or doesn't it have any output?
-    render_plugin = True 
+    render_plugin = True
+
     model = CMSPlugin
     text_enabled = False
     page_only = False
+
+    allow_children = False
+    child_classes = None
     
     opts = {}
     module = None #track in which module/application belongs
@@ -106,8 +112,11 @@ class CMSPluginBase(admin.ModelAdmin):
         self.placeholder = None
         self.page = None
 
+
     def render(self, context, instance, placeholder):
-        raise NotImplementedError("render needs to be implemented")
+        context['instance'] = instance
+        context['placeholder'] = placeholder
+        return context
     
     @property
     def parent(self):
@@ -202,6 +211,17 @@ class CMSPluginBase(admin.ModelAdmin):
         the plugin object in a text editor.
         """
         return "%s - %s" % (unicode(self.name), unicode(instance))
+
+    def get_child_classes(self, slot, page):
+        from cms.plugin_pool import plugin_pool
+        if self.child_classes:
+            return self.child_classes
+        else:
+            installed_plugins = plugin_pool.get_all_plugins(slot, page)
+            class_names = []
+            for cls in installed_plugins:
+                class_names.append(str(cls.__name__))
+            return class_names
     
     def __repr__(self):
         return smart_str(self.name)

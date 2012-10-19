@@ -25,6 +25,7 @@ from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -493,6 +494,35 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.client.logout()
             response = self.client.get(page.get_absolute_url())
             self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
+
+    def test_inherit_plugin_with_empty_plugin(self):
+        inheritfrompage = create_page('page to inherit from',
+            'nav_playground.html',
+            'en', published=True)
+
+        body = inheritfrompage.placeholders.get(slot="body")
+        empty_plugin = CMSPlugin(
+            plugin_type='TextPlugin', # create an empty plugin
+            placeholder=body,
+            position=1,
+            language='en',
+        )
+        empty_plugin.insert_at(None, position='last-child', save=True)
+        other_page = create_page('other page', 'nav_playground.html', 'en', published=True)
+        inherited_body = other_page.placeholders.get(slot="body")
+        inherit_plugin = InheritPagePlaceholder(
+            plugin_type='InheritPagePlaceholderPlugin',
+            placeholder=inherited_body,
+            position=1,
+            language='en',
+            from_page=inheritfrompage,
+            from_language='en'
+        )
+        inherit_plugin.insert_at(None, position='last-child', save=True)
+        add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
+        # this should not fail, even if there in an empty plugin
+        rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url()), width=200)
+        self.assertIn("foobar", rendered)
 
     def test_render_textplugin(self):
         # Setup
@@ -999,3 +1029,19 @@ class PicturePluginTests(PluginsTestBaseCase):
         picture.url = "test"
         self.assertRaises(ValidationError, picture.clean)
 
+
+class SimplePluginTests(TestCase):
+    def test_simple_naming(self):
+        class MyPlugin(CMSPluginBase):
+            render_template = 'base.html'
+        self.assertEqual(MyPlugin.name, 'My Plugin')
+
+    def test_simple_context(self):
+        class MyPlugin(CMSPluginBase):
+            render_template = 'base.html'
+        plugin = MyPlugin(ArticlePluginModel, admin.site)
+        context = {}
+        out_context = plugin.render(context, 1, 2)
+        self.assertEqual(out_context['instance'], 1)
+        self.assertEqual(out_context['placeholder'], 2)
+        self.assertIs(out_context, context)
