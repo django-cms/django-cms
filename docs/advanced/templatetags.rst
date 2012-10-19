@@ -137,7 +137,7 @@ cached.
 Arguments:
 
 - ``placeholder_name``
-- ``page_lookup`` (see `Page Lookup`_ for more information)
+- ``page_lookup`` (see `page_lookup`_ for more information)
 - ``language`` (optional)
 - ``site`` (optional)
 
@@ -155,7 +155,7 @@ Displays the URL of a page in the current language.
 
 Arguments:
 
-- ``page_lookup`` (see `Page Lookup`_ for more information)
+- ``page_lookup`` (see `page_lookup`_ for more information)
 
 Example::
 
@@ -173,7 +173,7 @@ current language.
 Arguments:
 
 - ``attribute_name``
-- ``page_lookup`` (optional; see `Page Lookup`_ for more
+- ``page_lookup`` (optional; see `page_lookup`_ for more
   information)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
