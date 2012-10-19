@@ -106,11 +106,7 @@ In there, you place your plugins. For our example, include the following code::
 
     class HelloPlugin(CMSPluginBase):
         model = CMSPlugin
-        name = _("Hello Plugin")
         render_template = "hello_plugin.html"
-
-        def render(self, context, instance, placeholder):
-            return context
 
     plugin_pool.register_plugin(HelloPlugin)
 
@@ -139,10 +135,11 @@ There are three required attributes on those classes:
   closely in a bit).
 * ``name``: The name of your plugin as displayed in the admin. It is generally
   good practice to mark this string as translatable using
-  :func:`django.utils.translation.ugettext_lazy`, however this is optional.
+  :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
+  default the name is a nicer version of the class name.
 * ``render_template``: The template to render this plugin with.
 
-In addition to those three attributes, you must also define a 
+In addition to those three attributes, you can also define a
 :meth:`render` method on your subclasses. It is specifically this `render` 
 method that is the **view** for your plugin.
 
@@ -155,6 +152,13 @@ The `render` method takes three arguments:
 This method must return a dictionary or an instance of
 :class:`django.template.Context`, which will be used as context to render the
 plugin template.
+
+.. versionadded:: 2.4
+
+By default this method will add ``instance`` and ``placeholder`` to the
+context, which means for simple plugins, there is no need to overwrite this
+method.
+
 
 
 *********************

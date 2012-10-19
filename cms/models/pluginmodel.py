@@ -6,7 +6,7 @@ from datetime import datetime, date
 from django.conf import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import (model_unpickle, simple_class_factory)
+from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 
@@ -126,7 +126,7 @@ class CMSPlugin(MPTTModel):
                         obj = self.__class__.__dict__[field.attname]
                         model = obj.model_ref()
         else:
-            factory = simple_class_factory
+            factory = lambda x, y: x
         return (model_unpickle, (model, defers, factory), data)
 
     def __unicode__(self):
