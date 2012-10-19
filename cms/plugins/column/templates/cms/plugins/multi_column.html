@@ -1,6 +1,8 @@
-{% load cms_tags i18n %}
+{% load cms_tags %}
 <div class="multicolumn">
 {% for plugin in instance.childrens %}
-     {% render_plugin plugin %}
+	<div style="width: {{ plugin.width }}00px;">
+     	{% render_plugin plugin %}
+    </div>
 {% endfor %}
 </div>

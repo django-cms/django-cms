@@ -448,3 +448,105 @@ In your ``yourapp.cms_plugin_processors.py``::
 .. _Django admin documentation: http://docs.djangoproject.com/en/1.2/ref/contrib/admin/
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _django-sekizai documentation: http://django-sekizai.readthedocs.org
+
+
+Plugin Attribute Reference
+==========================
+
+A list of all attributes a plugin has and that can be overwritten:
+
+
+change_form_template
+--------------------
+
+The template used to render the form when you edit the plugin.
+
+Default: 
+
+`admin/cms/page/plugin_change_form.html`
+
+Example::
+
+	class MyPlugin(CMSPluginBase):
+	    model = MyModel
+	    name = _("My Plugin")
+	    render_template = "cms/plugins/my_plugin.html"
+		change_form_template = "admin/cms/page/plugin_change_form.html"
+	
+frontend_edit_template
+----------------------
+
+The template used for wrapping the plugin in frontend editing.
+
+Default:
+
+`cms/toolbar/placeholder_wrapper.html`
+	
+
+admin_preview
+-------------
+
+Should the plugin be previewed in admin when you click on the plugin or save it?
+
+Default: True
+
+
+render_template
+---------------
+
+The path to the template used to render the template.
+Is required.
+
+
+render_plugin
+-------------
+
+Should the plugin be rendered at all, or doesn't it have any output?
+
+Default: True
+
+model
+-----
+
+The Model of the Plugin.
+Required.
+
+text_enabled
+------------
+
+Default: False
+Can the plugin be inserted inside the text plugin?
+
+If this is enabled the following function need to be overwritten as well:
+
+***icon_src()*** 
+
+Should return the path to an icon displayed in the text.
+
+***icon_alt()***
+
+Should return the alt text for the icon.
+
+page_only
+---------
+
+Default: False
+
+Can this plugin only be attached to a placeholder that is attached to a page?
+Set this to true if you always need a page for this plugin.
+
+allow_children
+--------------
+
+Default: False
+
+Can this plugin have child plugins? Or can other plugins be placed inside this plugin?
+
+
+child_classes
+-------------
+
+Default: None
+A List of Plugin Class Names. If this is set, only plugins listed here can be added to this plugin.
+
+    

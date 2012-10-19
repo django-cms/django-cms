@@ -1,6 +1,5 @@
-{% load cms_tags i18n %}
-<div style="width: {{ instance.width }}00px;">
+{% load cms_tags %}
 {% for plugin in instance.childrens %}
     {% render_plugin plugin %}
 {% endfor %}
-</div>
+

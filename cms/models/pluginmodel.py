@@ -129,8 +129,8 @@ class CMSPlugin(MPTTModel):
             factory = simple_class_factory
         return (model_unpickle, (model, defers, factory), data)
 
-    #def __unicode__(self):
-    #    return unicode(self.id)
+    def __unicode__(self):
+        return unicode(self.id)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
