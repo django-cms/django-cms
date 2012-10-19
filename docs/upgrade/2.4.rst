@@ -191,7 +191,7 @@ Here is an example of how the MultiColumn plugin uses it::
 	
 	{% load cms_tags %}
 	<div class="multicolumn">
-	{% for plugin in instance.childrens %}
+	{% for plugin in instance.child_plugins %}
     	{% render_plugin plugin %}
 	{% endfor %}
 	</div>

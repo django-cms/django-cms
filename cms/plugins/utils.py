@@ -57,10 +57,10 @@ def build_plugin_tree(plugin_list):
             # find parent
             for parent in plugin_list:
                 if parent.pk == plugin.parent_id:
-                    if parent.childrens is None:
-                        parent.childrens = []
-                    parent.childrens.append(plugin)
-                    parent.childrens.sort(key=lambda x: x.position)
+                    if parent.child_plugins is None:
+                        parent.child_plugins = []
+                    parent.child_plugins.append(plugin)
+                    parent.child_plugins.sort(key=lambda x: x.position)
                     break
         last = plugin
     root.sort(key=lambda x: x.position)

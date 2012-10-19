@@ -228,14 +228,14 @@ Example::
 
 	{% load cms_tags %}
 	<div class="multicolumn">
-	{% for plugin in instance.childrens %}
+	{% for plugin in instance.child_plugins %}
 		<div style="width: {{ plugin.width }}00px;">
      		{% render_plugin plugin %}
 		</div>
 	{% endfor %}
 	</div>
 	
-Normally the childrens of plugins can be accessed via the ``childrens`` atrribute of plugins.
+Normally the children of plugins can be accessed via the ``child_plugins`` atrribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
 
