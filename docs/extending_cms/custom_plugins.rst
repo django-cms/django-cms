@@ -519,11 +519,11 @@ Can the plugin be inserted inside the text plugin?
 
 If this is enabled the following function need to be overwritten as well:
 
-***icon_src()*** 
+**icon_src()**
 
 Should return the path to an icon displayed in the text.
 
-***icon_alt()***
+**icon_alt()**
 
 Should return the alt text for the icon.
 

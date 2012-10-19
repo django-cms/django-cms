@@ -149,12 +149,12 @@ Here is the MultiColumn Plugin as an example::
 	
 There are 2 new properties for plugins:
 
-***allow_children***
+**allow_children**
 
 Boolean
 If set to True it allows adding Plugins.
 
-***child_classes***
+**child_classes**
 
 List
 A List of Plugin Classes that can be added to this plugin.
