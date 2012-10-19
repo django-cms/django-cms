@@ -76,7 +76,7 @@ as a footer.
 Arguments:
 
 * ``placeholder_name``
-* ``page_lookup`` (see `Page Lookup`_ for more information)
+* ``page_lookup`` (see `page_lookup`_ for more information)
 * ``language`` (optional)
 * ``site`` (optional)
 
