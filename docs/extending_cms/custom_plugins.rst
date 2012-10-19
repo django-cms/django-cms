@@ -492,7 +492,7 @@ admin_preview
 
 Should the plugin be previewed in admin when you click on the plugin or save it?
 
-Default: True
+Default: False
 
 
 render_template
