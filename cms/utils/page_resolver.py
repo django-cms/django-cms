@@ -162,7 +162,8 @@ def get_page_from_request(request, use_path=None):
 def is_valid_url(url,instance,create_links=True, site=None):
     """ Checks for conflicting urls
     """
-    if url:
+    page_root = urllib.unquote(reverse("pages-root"))
+    if url and url != page_root:
         # Url sanity check via regexp
         if not any_path_re.match(url):
             raise ValidationError(_('Invalid URL, use /my/url format.'))
@@ -172,7 +173,6 @@ def is_valid_url(url,instance,create_links=True, site=None):
             site = instance.site
         # Retrieve complete queryset of pages with corresponding URL
         # This uses the same resolving function as ``get_page_from_path``
-        page_root = urllib.unquote(reverse("pages-root"))
         if url.startswith(page_root):
             url = url[len(page_root):]
         page_qs = get_page_queryset_from_path(url.strip('/'), site=site)

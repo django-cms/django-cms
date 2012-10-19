@@ -561,8 +561,8 @@ class AdminTests(AdminTestsBase):
         admin = self.get_admin()
         with self.login_user_context(permless):
             request = self.get_request()
-            self.assertRaises(PermissionDenied, self.admin_class.remove_delete_state,
-                              request, page.pk)
+            response = self.admin_class.remove_delete_state(request, page.pk)
+            self.assertEqual(response.status_code, 403)
         PageModeratorState.objects.create(page=page, user=admin,
                                           action=PageModeratorState.ACTION_DELETE)
         with self.login_user_context(admin):

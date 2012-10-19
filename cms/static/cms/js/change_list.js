@@ -222,7 +222,7 @@
 			// published checkbox
 			if(jtarget.hasClass("publish-checkbox")) {
 				pageId = jtarget.attr("name").split("status-")[1];
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", {1:1});
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", {1:1}, refreshIfChildren(pageId));
 				e.stopPropagation();
 				return false;
 			}

@@ -32,15 +32,12 @@ class Page(MPTTModel):
     MODERATOR_NEED_APPROVEMENT = 1
     MODERATOR_NEED_DELETE_APPROVEMENT = 2
     MODERATOR_APPROVED = 10
-    # special case - page was approved, but some of page parents are not approved yet
-    MODERATOR_APPROVED_WAITING_FOR_PARENTS = 11
 
     moderator_state_choices = (
         (MODERATOR_CHANGED, _('changed')),
         (MODERATOR_NEED_APPROVEMENT, _('req. app.')),
         (MODERATOR_NEED_DELETE_APPROVEMENT, _('delete')),
         (MODERATOR_APPROVED, _('approved')),
-        (MODERATOR_APPROVED_WAITING_FOR_PARENTS, _('app. par.')),
     )
 
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
@@ -50,6 +47,8 @@ class Page(MPTTModel):
     PUBLISHER_STATE_DEFAULT = 0
     PUBLISHER_STATE_DIRTY = 1
     PUBLISHER_STATE_DELETE = 2
+    # Page was marked published, but some of page parents are not.
+    PUBLISHER_STATE_PENDING = 4
 
     template_choices = [(x, _(y)) for x, y in settings.CMS_TEMPLATES]
 
@@ -98,7 +97,7 @@ class Page(MPTTModel):
         )
         verbose_name = _('page')
         verbose_name_plural = _('pages')
-        ordering = ('site', 'tree_id', 'lft')
+        ordering = ('tree_id', 'lft')
         app_label = 'cms'
 
     class PublisherMeta:
@@ -114,7 +113,7 @@ class Page(MPTTModel):
         return unicode(title)
 
     def is_dirty(self):
-        return self.publisher_state != self.PUBLISHER_STATE_DEFAULT
+        return self.publisher_state == self.PUBLISHER_STATE_DIRTY
 
     def get_absolute_url(self, language=None, fallback=True):
         if self.is_home():
@@ -346,8 +345,7 @@ class Page(MPTTModel):
         menu_pool.clear(site_id=site.pk)
         return page_copy   # return the page_copy or None
 
-    def save(self, no_signals=False, change_state=True, commit=True,
-             force_state=None, **kwargs):
+    def save(self, no_signals=False, change_state=True, commit=True, **kwargs):
         """
         Args:
             commit: True if model should be really saved
@@ -375,9 +373,6 @@ class Page(MPTTModel):
                 self.moderator_state = Page.MODERATOR_CHANGED
                 #publish_directly = True - no publisher, no publishing!! - we just
                 # use draft models in this case
-
-            if force_state is not None:
-                self.moderator_state = force_state
 
         # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
@@ -473,7 +468,9 @@ class Page(MPTTModel):
             self._publisher_keep_state = True
             published = True
         else:
-            self.moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS
+            self.publisher_state = Page.PUBLISHER_STATE_PENDING
+            self.published = True
+            self._publisher_keep_state = True
 
         self.save(change_state=False)
         # If we are publishing, this page might have become a "home" which
@@ -481,12 +478,12 @@ class Page(MPTTModel):
         for title in self.title_set.all():
             title.save()
 
+        # clean moderation log
+        self.pagemoderatorstate_set.all().delete()
+
         if not published:
             # was not published, escape
             return
-
-        # clean moderation log
-        self.pagemoderatorstate_set.all().delete()
 
         # we delete the old public page - this only deletes the public page as we
         # have removed the old_public.publisher_public=None relationship to the draft page above
@@ -504,12 +501,20 @@ class Page(MPTTModel):
 
         # page was published, check if there are some childs, which are waiting
         # for publishing (because of the parent)
-        publish_set = self.children.filter(moderator_state = Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
+        publish_set = self.get_descendants().filter(published=True)
+
+        #publish_set = self.children.filter(publisher_state = Page.PUBLISHER_STATE_PENDING)
         for page in publish_set:
-            # recursive call to all children....
-            page.moderator_state = Page.MODERATOR_APPROVED
-            page.save(change_state=False)
-            page.publish()
+            if page.publisher_public:
+               if page.publisher_public.parent.published:
+                    page.publisher_public.published = True
+                    page.publisher_public.save()
+                    if page.publisher_state == Page.PUBLISHER_STATE_PENDING:
+                        page.publisher_state = Page.PUBLISHER_STATE_DEFAULT
+                        page._publisher_keep_state = True
+                        page.save()
+            elif page.publisher_state == Page.PUBLISHER_STATE_PENDING:
+                page.publish()
 
         # fire signal after publishing is done
         import cms.signals as cms_signals
@@ -525,31 +530,27 @@ class Page(MPTTModel):
         # Publish can only be called on draft pages
         if not self.publisher_is_draft:
             raise RuntimeError('The public instance cannot be unpublished. Use draft.')
-        old_public = self.get_public_object()
-        if not old_public:
-            # Make sure the state is up to date
-            self.published = False
-            self.save()
-            return True
-        # If there are any public descendants, we can't remove it from the
-        # site. This simplifies this use case to a single page.
-        if self.get_descendants().filter(published=True).count() or \
-                old_public.get_descendants().count():
-            raise RuntimeError('The page has public descendants that would become inaccessible.')
 
+        #First, make sure we are in the correct state
         self.published = False
-        self.publisher_public = None
-        self.moderator_state = Page.MODERATOR_CHANGED
         self.save()
+        public_page = self.get_public_object()
+        if public_page:
+            public_page.published = False
+            public_page.save()
 
-        old_public.publisher_state = self.PUBLISHER_STATE_DELETE
-        # remove the one-to-one references between public and draft
-        old_public.publisher_public = None
-        old_public.save()
-        old_public.move_to(None, 'last-child')
-        # moving the object out of the way before deleting works, but why?
-        # finally delete the old public page
-        old_public.delete()
+            # Go through all children of our public instance
+            descendants = public_page.get_descendants()
+            for child in descendants:
+                child.published = False
+                child.save()
+                draft = child.publisher_public
+                if (draft and draft.published and
+                        draft.publisher_state == Page.PUBLISHER_STATE_DEFAULT):
+                    draft.publisher_state = Page.PUBLISHER_STATE_PENDING
+                    draft._publisher_keep_state = True
+                    draft.save()
+
         return True
 
     def revert(self):
@@ -967,7 +968,7 @@ class Page(MPTTModel):
         """
         # If we have a public version it will be published as well.
         # If it isn't published, it should be deleted.
-        return self.published and bool(self.publisher_public_id)
+        return self.published and self.publisher_public_id and self.publisher_public.published
 
     def reload(self):
         """
@@ -979,7 +980,7 @@ class Page(MPTTModel):
         """Returns smart queryset depending on object type - draft / public
         """
         qs = self.__class__.objects
-        return self.publisher_is_draft and qs.drafts() or qs.public()
+        return self.publisher_is_draft and qs.drafts() or qs.public().published()
 
     def _publisher_can_publish(self):
         """Is parent of this object already published?

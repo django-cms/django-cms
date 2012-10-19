@@ -148,14 +148,14 @@ class CMSTestCase(testcases.TestCase):
             return qs.get(**filter)
         except ObjectDoesNotExist:
             pass
-        raise self.failureException, "ObjectDoesNotExist raised"
+        raise self.failureException, "ObjectDoesNotExist raised for filter %s" % filter
 
     def assertObjectDoesNotExist(self, qs, **filter):
         try:
             qs.get(**filter)
         except ObjectDoesNotExist:
             return
-        raise self.failureException, "ObjectDoesNotExist not raised"
+        raise self.failureException, "ObjectDoesNotExist not raised for filter %s" % filter
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug

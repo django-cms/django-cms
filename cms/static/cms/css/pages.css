@@ -464,7 +464,7 @@ div#sitemap ul.header li{
 #sitemap li .col-lastchange .state-icon.app { background-position: -600px -60px; } 
 
 /* moderation - changed */
-#sitemap li .cont.moderatorstate0 { background-position: 0px -500px; }
+#sitemap li .cont.publisher_pending { background-position: 0px -500px; }
 
 /* moderation - requires deletion approval */
 #sitemap li .cont.publisher_delete_requested { background-position: 0px -600px; }
@@ -478,8 +478,8 @@ div#sitemap ul.header li{
 #sitemap li .cont.moderatorstate10 {} 
 
 /* moderation - you should approve */
-#sitemap li .cont.moderatorstate11 { background-position: 0px -400px; } 
-#sitemap li .cont.moderatorstate11 .col-draft span.state { color: #44ad41; }
+#sitemap li .cont.publisher_draft { background-position: 0px -400px; }
+#sitemap li .cont.publisher_draft .col-draft span.state { color: #44ad41; }
  
 
 /* softroot icon */

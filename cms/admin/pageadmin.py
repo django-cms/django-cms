@@ -883,7 +883,6 @@ class PageAdmin(ModelAdmin):
                 self.message_user(request, ugettext('The page "%s" was successfully deleted.') % page_title)
                 return HttpResponseRedirect("../../")
             except PermissionDenied, e:
-                # TODO: Use messages.error and redirect to the change page
                 messages.error(request, e.message)
         return HttpResponseRedirect("../")
 
@@ -1073,7 +1072,7 @@ class PageAdmin(ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
             page.in_navigation = not page.in_navigation
-            page.save(force_state=Page.MODERATOR_NEED_APPROVEMENT)
+            page.save()
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
 

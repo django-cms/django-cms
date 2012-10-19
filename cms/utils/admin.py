@@ -21,6 +21,11 @@ def jsonify_request(response):
     return HttpResponse(simplejson.dumps({'status':response.status_code,'content':response.content}),
                                 content_type="application/json")
 
+publisher_classes = {
+    Page.PUBLISHER_STATE_DIRTY: "publisher_dirty",
+    Page.PUBLISHER_STATE_PENDING: "publisher_pending",
+}
+
 def get_admin_menu_item_context(request, page, filtered=False):
     """
     Used for rendering the page tree, inserts into context everything what
@@ -53,11 +58,12 @@ def get_admin_menu_item_context(request, page, filtered=False):
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
 
-    css_class = ""
-    if page.is_dirty():
-        css_class = "publisher_dirty"
     if page.pagemoderatorstate_set.get_delete_actions().count():
         css_class = "publisher_delete_requested"
+    elif not page.published:
+        css_class = "publisher_draft"
+    else:
+        css_class = publisher_classes.get(page.publisher_state, "")
 
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add", page.site)

@@ -289,10 +289,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # subpage should not be published, because parent is not published 
         # yet, should be marked as `publish when parent`
         self.assertFalse(subpage.publisher_public) 
-        
-        # pagemoderator state must be set
-        #self.assertEqual(subpage.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
-        
+
         # publish page (parent of subage), so subpage must be published also
         page = publish_page(page, self.user_master)
         self.assertNotEqual(page.publisher_public, None)
@@ -373,7 +370,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertFalse(page.publisher_public)
         
         # waiting for parents
-        self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
+        self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_PENDING)
         
         # publish slave page
         slave_page = publish_page(self.slave_page, self.user_master)
@@ -418,7 +415,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         
         # page should require approval
-        self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED_WAITING_FOR_PARENTS)
+        self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_PENDING)
         
         # master approves and publishes the page
         # first approve slave-home
