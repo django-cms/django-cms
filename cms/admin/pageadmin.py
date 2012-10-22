@@ -1407,7 +1407,6 @@ class PageAdmin(ModelAdmin):
             # delete the draft version of the plugin
             plugin.delete()
             # set the page to require approval and save
-            page.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
             page.save()
         else:
             plugin.delete()

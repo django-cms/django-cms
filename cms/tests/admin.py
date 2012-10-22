@@ -508,7 +508,6 @@ class AdminListFilterTests(CMSTestCase):
     def test_no_moderator(self):
         control = AttributeObject()
         contribute_list_filter(control)
-        #self.assertTrue('moderator_state' in control.list_filter, control.list_filter)
 
     def test_no_softroot(self):
         with SettingsOverride(CMS_SOFTROOT=True):

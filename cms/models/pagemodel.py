@@ -28,18 +28,6 @@ class Page(MPTTModel):
     A simple hierarchical page model
     """
     __metaclass__ = PageMetaClass
-    MODERATOR_CHANGED = 0
-    MODERATOR_NEED_APPROVEMENT = 1
-    MODERATOR_NEED_DELETE_APPROVEMENT = 2
-    MODERATOR_APPROVED = 10
-
-    moderator_state_choices = (
-        (MODERATOR_CHANGED, _('changed')),
-        (MODERATOR_NEED_APPROVEMENT, _('req. app.')),
-        (MODERATOR_NEED_DELETE_APPROVEMENT, _('delete')),
-        (MODERATOR_APPROVED, _('approved')),
-    )
-
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
@@ -80,7 +68,7 @@ class Page(MPTTModel):
     placeholders = models.ManyToManyField(Placeholder, editable=False)
 
     # Publisher fields
-    moderator_state = models.SmallIntegerField(_('moderator state'), choices=moderator_state_choices, default=MODERATOR_NEED_APPROVEMENT, blank=True, editable=False)
+    moderator_state = models.SmallIntegerField(_('moderator state'), default=0, blank=True, editable=False)
     publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
     #This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft',  null=True, editable=False)
@@ -144,7 +132,7 @@ class Page(MPTTModel):
         from cms.utils import moderator
         import cms.signals as cms_signals
         cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
-        self.save(change_state=True)  # always save the page after move, because of publisher
+        self.save()  # always save the page after move, because of publisher
         moderator.page_changed(self, force_moderation_action = PageModeratorState.ACTION_MOVE)
         # check the slugs
         page_utils.check_title_slugs(self)
@@ -252,7 +240,6 @@ class Page(MPTTModel):
             page.lft = None
             page.tree_id = None
             page.published = False
-            page.moderator_state = Page.MODERATOR_CHANGED
             page.publisher_public_id = None
             # only set reverse_id on standard copy
             if not public_copy:
@@ -282,9 +269,8 @@ class Page(MPTTModel):
 
             # override default page settings specific for public copy
             if public_copy:
-                page.published = True
+                page.published = (not page.parent) or page.parent.published
                 page.publisher_is_draft = False
-                page.moderator_state = Page.MODERATOR_APPROVED
                 # we need to set relate this new public copy to its draft page (self)
                 page.publisher_public = self
 
@@ -342,7 +328,7 @@ class Page(MPTTModel):
         menu_pool.clear(site_id=site.pk)
         return page_copy   # return the page_copy or None
 
-    def save(self, no_signals=False, change_state=True, commit=True, **kwargs):
+    def save(self, no_signals=False, commit=True, **kwargs):
         """
         Args:
             commit: True if model should be really saved
@@ -354,23 +340,6 @@ class Page(MPTTModel):
 
         created = not bool(self.pk)
         # Published pages should always have a publication date
-        if self.publisher_is_draft:
-            # publisher specific stuff, but only on draft model, this is here
-            # because page initializes publish process
-
-            if change_state:
-                if created:
-                    # new page....
-                    self.moderator_state = Page.MODERATOR_CHANGED
-                else:
-                    # always change state to need approvement when there is some change
-                    self.moderator_state = Page.MODERATOR_NEED_APPROVEMENT
-
-            elif change_state:
-                self.moderator_state = Page.MODERATOR_CHANGED
-                #publish_directly = True - no publisher, no publishing!! - we just
-                # use draft models in this case
-
         # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
             self.publication_date = datetime.now()
@@ -458,18 +427,20 @@ class Page(MPTTModel):
                 me = self._default_manager.get(pk=self.pk)
                 self.tree_id = me.tree_id
 
-            self.published = True
             self.publisher_public = new_public
-            self.moderator_state = Page.MODERATOR_APPROVED
             self.publisher_state = self.PUBLISHER_STATE_DEFAULT
-            self._publisher_keep_state = True
             published = True
         else:
             self.publisher_state = Page.PUBLISHER_STATE_PENDING
-            self.published = True
-            self._publisher_keep_state = True
 
-        self.save(change_state=False)
+        if self.publisher_public and self.publisher_public.published:
+            self.publisher_state = Page.PUBLISHER_STATE_DEFAULT
+        else:
+            self.publisher_state = Page.PUBLISHER_STATE_PENDING
+
+        self.published = True
+        self._publisher_keep_state = True
+        self.save()
         # If we are publishing, this page might have become a "home" which
         # would change the path
         for title in self.title_set.all():
@@ -488,7 +459,7 @@ class Page(MPTTModel):
             # reparent public child pages before delete so they don't get purged as well
             for child_page in old_public.children.order_by('lft'):
                 child_page.move_to(new_public, 'last-child')
-                child_page.save(change_state=False)
+                child_page.save()
             # reload old_public to get correct tree attrs
             old_public = Page.objects.get(pk=old_public.pk)
             old_public.move_to(None, 'last-child')

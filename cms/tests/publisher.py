@@ -241,6 +241,34 @@ class PublishingTests(TestCase):
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(published, title_set__title=name)
 
+    def test_modify_child_while_pending(self):
+        home = self.create_page("Home", published=True, in_navigation=True)
+        child = self.create_page("Child", published=True, parent=home,
+                                 in_navigation=False)
+        home.unpublish()
+        child = self.reload(child)
+        self.assertTrue(child.published)
+        self.assertFalse(child.publisher_public.published)
+        self.assertFalse(child.in_navigation)
+        self.assertFalse(child.publisher_public.in_navigation)
+
+        child.in_navigation = True
+        child.save()
+        child.publish()
+        child = self.reload(child)
+
+        self.assertTrue(child.published)
+        self.assertFalse(child.publisher_public.published)
+        self.assertTrue(child.in_navigation)
+        self.assertTrue(child.publisher_public.in_navigation)
+        self.assertEqual(child.publisher_state, Page.PUBLISHER_STATE_PENDING)
+
+        home.publish()
+        child = self.reload(child)
+        self.assertTrue(child.publisher_public.published)
+        self.assertTrue(child.publisher_public.in_navigation)
+        self.assertEqual(child.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
+
     def test_republish_with_descendants(self):
         home = self.create_page("Home", published=True)
         child = self.create_page("Child", published=True, parent=home)

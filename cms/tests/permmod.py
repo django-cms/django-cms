@@ -183,8 +183,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             # adds user_slave as page moderator for this page
             # public model shouldn't be available yet, because of the moderation
             # moderators and approval ok?
-            self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
-            
+
             # must not have public object yet
             self.assertFalse(page.publisher_public)
 
@@ -205,16 +204,14 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         page = create_page("page", "nav_playground.html", "en",
                            parent=self.slave_page, created_by=self.user_slave)
         # same as test_slave_can_add_page_under_slave_home        
-        self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
-        
+
         # must not have public object yet
         self.assertFalse(page.publisher_public)
         
         self.assertTrue(has_generic_permission(page.pk, self.user_master, "publish", page.site.pk))
-        # should be True user_master should have publish permissions for childred aswell
-        # don't test for published since publishing must be approved
+        # should be True user_master should have publish permissions for children as well
         publish_page(page, self.user_master)
-        
+        self.assertTrue(page.published)
         # user_master is moderator for top level page / but can't approve descendants?
         # approve / publish as user_master
         # user master should be able to approve descendants
@@ -344,10 +341,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         
         # public must not exist
         self.assertFalse(page.publisher_public)
-        
-        # moderator_state must be changed
-        self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
-    
+
     def test_moderator_flags(self):
         """Add page under slave_home and check its flag
         """
@@ -360,11 +354,6 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
         # check publish box
         page = publish_page(page, self.user_slave)
-        
-        # page should request approval now
-        #self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
-        
-        # approve it by master
 
         # public page must not exist because of parent
         self.assertFalse(page.publisher_public)
@@ -378,15 +367,9 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertFalse(page.publisher_public)
         self.assertTrue(slave_page.publisher_public)
 
-        # master is approved
-        self.assertEqual(slave_page.moderator_state, Page.MODERATOR_APPROVED)
-        
         # reload page
         page = self.reload(page)
-        
-        # page must be approved also now
-        self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
-        
+
     def test_plugins_get_published(self):
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
@@ -404,8 +387,6 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # add plugin
         placeholder = page.placeholders.all()[0]
         plugin = add_plugin(placeholder, "TextPlugin", "en", body="test")
-        
-        self.assertEqual(page.moderator_state, Page.MODERATOR_CHANGED)
 
         # publish page
         page = self.reload(page)
@@ -439,16 +420,11 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             # there should only be a public plugin - since the draft has been deleted
             self.assertEquals(CMSPlugin.objects.all().count(), 1)
             
-            # reload the page as it's moderator value should have been set in pageadmin.remove_plugin
-            self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
             page = self.reload(page)
-    
-            self.assertEqual(page.moderator_state, Page.MODERATOR_NEED_APPROVEMENT)
-    
+
             # login as super user and approve/publish the page
             page = publish_page(page, self.user_super)
-            self.assertEqual(page.moderator_state, Page.MODERATOR_APPROVED)
-    
+
             # there should now be 0 plugins
             self.assertEquals(CMSPlugin.objects.all().count(), 0)
 
