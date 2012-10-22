@@ -194,7 +194,6 @@ def configure(**extra):
         CMS_APPHOOKS=[],
         CMS_REDIRECTS = True,
         CMS_SEO_FIELDS = True,
-        CMS_FLAT_URLS = False,
         CMS_MENU_TITLE_OVERWRITE = True,
         CMS_URL_OVERWRITE = True,
         CMS_SHOW_END_DATE = True,

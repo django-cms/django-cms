@@ -1,30 +1,20 @@
-# encoding: utf-8
-import datetime
+# -*- coding: utf-8 -*-
 from south.db import db
-from south.v2 import DataMigration
 from django.db import models
+from cms.plugins.file.models import *
 
-class Migration(DataMigration):
-
+class Migration:
     def forwards(self, orm):
-        "Write your forwards methods here."
-        for plugin in orm.GoogleMap.objects.filter(models.Q(zoom=None) | models.Q(zoom__lt=0)):
-            plugin.zoom = 13
-            plugin.save()
-            print 'Applying 13 as zoom value for plugin %s. See 2.3.1 Release notes for further info' % plugin.pk
-        for plugin in orm.GoogleMap.objects.filter(zoom__gt=21):
-            plugin.zoom = 21
-            plugin.save()
-            print 'Applying 21 as zoom value for plugin %s. See 2.3.1 Release notes for further info' % plugin.pk
+        "Write your forwards migration here"
 
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        #raise RuntimeError("Cannot reverse this migration.")
+        "Write your backwards migration here"
 
     models = {
         'cms.cmsplugin': {
             'Meta': {'object_name': 'CMSPlugin'},
+            'changed_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
@@ -49,13 +39,15 @@ class Migration(DataMigration):
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'content': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'height': ('django.db.models.fields.CharField', [], {'default': "'400px'", 'max_length': '6'}),
             'lat': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
             'lng': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
             'route_planer': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'route_planer_title': ('django.db.models.fields.CharField', [], {'default': "u'Calculate your fastest way to here'", 'max_length': '150', 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'width': ('django.db.models.fields.CharField', [], {'default': "'100%'", 'max_length': '6'}),
             'zipcode': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'zoom': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'zoom': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '13'})
         }
     }
 
