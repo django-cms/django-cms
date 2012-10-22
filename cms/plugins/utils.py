@@ -35,14 +35,36 @@ def assign_plugins(request, placeholders, lang=None):
                     request_lang = fallback
                     break
     # get all plugins for the given placeholders
-    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang, parent__isnull=True).order_by('placeholder', 'position')
+    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by('placeholder', 'tree_id', 'lft')
     plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
+
+    for group in groups:
+        groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
         setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
 
+def build_plugin_tree(plugin_list):
+    root = []
+    last = None
+    last_parent = None
+    for plugin in plugin_list:
+        if not plugin.parent_id:
+            root.append(plugin)
+        else:
+            # find parent
+            for parent in plugin_list:
+                if parent.pk == plugin.parent_id:
+                    if parent.child_plugins is None:
+                        parent.child_plugins = []
+                    parent.child_plugins.append(plugin)
+                    parent.child_plugins.sort(key=lambda x: x.position)
+                    break
+        last = plugin
+    root.sort(key=lambda x: x.position)
+    return root
 
 def downcast_plugins(queryset, select_placeholder=False):
     plugin_types_map = defaultdict(list)
@@ -72,7 +94,7 @@ def get_plugins_for_page(request, page, lang=None):
         return []
     lang = lang or get_language_from_request(request)
     if not hasattr(page, '_%s_plugins_cache' % lang):
-        setattr(page, '_%s_plugins_cache' % lang,  get_cmsplugin_queryset(request).filter(
+        setattr(page, '_%s_plugins_cache' % lang, get_cmsplugin_queryset(request).filter(
             placeholder__page=page, language=lang, parent__isnull=True
         ).order_by('placeholder', 'position').select_related())
     return getattr(page, '_%s_plugins_cache' % lang)

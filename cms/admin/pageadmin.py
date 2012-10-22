@@ -1154,6 +1154,7 @@ class PageAdmin(ModelAdmin):
 
         if parent:
             plugin.parent = parent
+            plugin.position =  CMSPlugin.objects.filter(parent=parent).count()
         plugin.save()
 
         if 'reversion' in settings.INSTALLED_APPS and page:

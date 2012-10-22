@@ -82,15 +82,21 @@ class CMSPluginBase(admin.ModelAdmin):
     
     form = None
     change_form_template = "admin/cms/page/plugin_change_form.html"
+    frontend_edit_template = 'cms/toolbar/placeholder_wrapper.html'
     # Should the plugin be rendered in the admin?
     admin_preview = False
     
     render_template = None
+
     # Should the plugin be rendered at all, or doesn't it have any output?
-    render_plugin = True 
+    render_plugin = True
+
     model = CMSPlugin
     text_enabled = False
     page_only = False
+
+    allow_children = False
+    child_classes = None
     
     opts = {}
     module = None #track in which module/application belongs
@@ -205,6 +211,17 @@ class CMSPluginBase(admin.ModelAdmin):
         the plugin object in a text editor.
         """
         return "%s - %s" % (unicode(self.name), unicode(instance))
+
+    def get_child_classes(self, slot, page):
+        from cms.plugin_pool import plugin_pool
+        if self.child_classes:
+            return self.child_classes
+        else:
+            installed_plugins = plugin_pool.get_all_plugins(slot, page)
+            class_names = []
+            for cls in installed_plugins:
+                class_names.append(str(cls.__name__))
+            return class_names
     
     def __repr__(self):
         return smart_str(self.name)
