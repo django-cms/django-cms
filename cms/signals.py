@@ -203,7 +203,8 @@ def post_save_page_moderator(instance, raw, created, **kwargs):
 
     # tell moderator something was happen with this page
     from cms.utils.moderator import page_changed
-    page_changed(instance, old_page)
+    if not old_page:
+        page_changed(instance, old_page)
         
 def post_save_page(instance, **kwargs):
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id:

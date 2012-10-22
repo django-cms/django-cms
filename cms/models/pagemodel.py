@@ -106,8 +106,8 @@ class Page(MPTTModel):
     def get_absolute_url(self, language=None, fallback=True):
         if self.is_home():
             return reverse('pages-root')
-        path = self.get_path(language, fallback)
-        return reverse('pages-details-by-slug', kwargs={"slug":path})
+        path = self.get_path(language, fallback) or self.get_slug(language, fallback)
+        return reverse('pages-details-by-slug', kwargs={"slug": path})
 
     def move_page(self, target, position='first-child'):
         """

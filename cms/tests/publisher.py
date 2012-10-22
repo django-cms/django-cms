@@ -2,6 +2,7 @@
 from __future__ import with_statement
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError
+from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin
 from cms.management.commands import publisher_publish
@@ -122,7 +123,9 @@ class PublisherCommandTests(TestCase):
 class PublishingTests(TestCase):
 
     settings_overrides = {'CMS_SHOW_START_DATE': False,
-                          'CMS_SHOW_END_DATE': False}
+                          'CMS_SHOW_END_DATE': False,
+                          # Necessary to trigger an error
+                          'USE_I18N': False}
 
     def create_page(self, title=None, **kwargs):
         return create_page(title or self._testMethodName,
@@ -364,8 +367,9 @@ class PublishingTests(TestCase):
         published = Page.objects.public().published()
 
         self.assertEqual(page.get_descendant_count(), 2)
+        base = reverse('pages-root')
 
-        for url in ('/en/', '/en/child/', '/en/child/grandchild/'):
+        for url in (base, base + 'child/', base + 'child/grandchild/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
@@ -379,7 +383,7 @@ class PublishingTests(TestCase):
 
         self.assertTrue(page.unpublish(), 'Unpublish was not successful')
         self.assertFalse(page.published)
-        for url in ('/en/', '/en/child/', '/en/child/grandchild/'):
+        for url in (base, base + 'child/', base + 'child/grandchild/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
@@ -429,11 +433,18 @@ class PublishingTests(TestCase):
         self.assertFalse(gchild.publisher_public.published)
 
     def test_republish_multiple_root(self):
+        # TODO: The paths do not match expected behaviour
         home = self.create_page("Page", published=True)
         other = self.create_page("Another Page", published=True)
-        home = self.reload(home)
+        child = self.create_page("Child", published=True, parent=home)
+        child2 = self.create_page("Child", published=True, parent=other)
         self.assertTrue(home.is_home())
         self.assertTrue(home.publisher_public.is_home())
+        base = reverse('pages-root')
+        self.assertEqual(home.get_absolute_url(), base)
+        self.assertEqual(child.get_absolute_url(), base+'child/')
+        self.assertEqual(other.get_absolute_url(), base+'another-page/')
+        self.assertEqual(child2.get_absolute_url(), base+'another-page/child/')
 
         home.unpublish()
         home = self.reload(home)
@@ -442,12 +453,22 @@ class PublishingTests(TestCase):
         self.assertFalse(home.publisher_public.is_home())
         self.assertTrue(other.is_home())
         self.assertTrue(other.publisher_public.is_home())
+        self.assertEqual(other.get_absolute_url(), base)
+        self.assertEqual(home.get_absolute_url(), base+'page/')
+        # TODO: This should be 'page/child/'
+        self.assertEqual(child.get_absolute_url(), base+'child/')
+        # TODO: This should be 'another-page/child/'
+        self.assertEqual(child2.get_absolute_url(), base+'another-page/child/')
 
         home.publish()
         home = self.reload(home)
         other = self.reload(other)
         self.assertTrue(home.is_home())
         self.assertTrue(home.publisher_public.is_home())
+        self.assertEqual(home.get_absolute_url(), base)
+        self.assertEqual(child.get_absolute_url(), base+'child/')
+        self.assertEqual(other.get_absolute_url(), base+'another-page/')
+        self.assertEqual(child2.get_absolute_url(), base+'another-page/child/')
 
     def test_revert_contents(self):
         user = self.get_superuser()

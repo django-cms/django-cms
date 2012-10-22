@@ -17,6 +17,7 @@ def page_changed(page, old_page=None, force_moderation_action=None):
 
     if force_moderation_action:
         PageModeratorState(user=user, page=page, action=force_moderation_action).save()
+        page.save() # sets the page to dirty
         return
 
     if not old_page:
