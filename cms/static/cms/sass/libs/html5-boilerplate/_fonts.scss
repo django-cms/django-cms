@@ -1,0 +1,42 @@
+$base-font-family: unquote("sans-serif") !default;
+$base-font-size: 13px !default;
+$base-line-height: 1.231 !default;
+
+//
+// Font normalization inspired by YUI Library's fonts.css: developer.yahoo.com/yui/
+// Whatever parts of this port of YUI to Sass that are copyrightable, are Copyright (c) 2008, Christopher Eppstein. All Rights Reserved.
+//
+
+@mixin html5-boilerplate-fonts($family: $base-font-family, $size: $base-font-size, $line-height: $base-line-height) {
+	body {
+		font-size: $size;
+		font-family: $family;
+		line-height: $line-height; // hack retained to preserve specificity
+		*font-size: small;
+	}
+
+	// Normalize monospace sizing:
+	// en.wikipedia.org/wiki/MediaWiki_talk:Common.css/Archive_11#Teletype_style_fix_for_Chrome
+	pre, code, kbd, samp { font-family: monospace, sans-serif; }
+}
+
+@mixin font-smoothing {
+	@warn "The 'font-smoothing' mixin has been deprecated as it made monospace too thin.";
+}
+
+// Sets the font size specified in pixels using percents so that the base
+// font size changes and 1em has the correct value. When nesting font size
+// declarations, within the DOM tree, the base_font_size must be the parent's
+// effective font-size in pixels.
+// Usage Examples:
+//   .big
+//     +font-size(16px)
+//   .bigger
+//     +font-size(18px)
+//   .big .bigger
+//     +font-size(18px, 16px)
+//
+// For more information see the table found at http://developer.yahoo.com/yui/3/cssfonts/#fontsize
+@mixin font-size($size, $base-font-size: $base-font-size) {
+	font-size: ceil(percentage($size / $base-font-size));
+}

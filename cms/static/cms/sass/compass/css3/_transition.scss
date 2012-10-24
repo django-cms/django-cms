@@ -1,0 +1,119 @@
+@import "shared";
+
+// CSS Transitions
+// Currently only works in Webkit.
+//
+// * expected in CSS3, FireFox 3.6/7 and Opera Presto 2.3
+// * We'll be prepared.
+//
+// Including this submodule sets following defaults for the mixins:
+//
+//     $default-transition-property : all
+//     $default-transition-duration : 1s
+//     $default-transition-function : false
+//     $default-transition-delay    : false
+//
+// Override them if you like. Timing-function and delay are set to false for browser defaults (ease, 0s).
+
+$default-transition-property: all !default;
+
+$default-transition-duration: 1s !default;
+
+$default-transition-function: false !default;
+
+$default-transition-delay: false !default;
+
+// One or more properties to transition
+//
+// * for multiple, use a comma-delimited list
+// * also accepts "all" or "none"
+
+@mixin transition-property($properties: $default-transition-property) {
+  @include experimental(transition-property, unquote($properties),
+    -moz, -webkit, -o, not -ms, not -khtml, official
+  );
+}
+
+// One or more durations in seconds
+//
+// * for multiple, use a comma-delimited list
+// * these durations will affect the properties in the same list position
+
+@mixin transition-duration($duration: $default-transition-duration) {
+  @if type-of($duration) == string { $duration: unquote($duration); }
+  @include experimental(transition-duration, $duration,
+    -moz, -webkit, -o, not -ms, not -khtml, official
+  );
+}
+
+// One or more timing functions
+//
+// * [ ease | linear | ease-in | ease-out | ease-in-out | cubic-bezier(x1, y1, x2, y2)]
+// * For multiple, use a comma-delimited list
+// * These functions will effect the properties in the same list position
+
+@mixin transition-timing-function($function: $default-transition-function) {
+  @include experimental(transition-timing-function, unquote($function),
+    -moz, -webkit, -o, not -ms, not -khtml, official
+  );
+}
+
+// One or more transition-delays in seconds
+//
+// * for multiple, use a comma-delimited list
+// * these delays will effect the properties in the same list position
+
+@mixin transition-delay($delay: $default-transition-delay) {
+  @if type-of($delay) == string { $delay: unquote($delay); }
+  @include experimental(transition-delay, $delay,
+    -moz, -webkit, -o, not -ms, not -khtml, official
+  );
+}
+
+// Transition all-in-one shorthand
+
+@mixin single-transition(
+  $properties: $default-transition-property,
+  $duration: $default-transition-duration,
+  $function: $default-transition-function,
+  $delay: $default-transition-delay
+) {
+  @include transition-property($properties);
+  @include transition-duration($duration);
+  @if $function { @include transition-timing-function($function); }
+  @if $delay { @include transition-delay($delay); }
+}
+
+@mixin transition(
+  $transition-1 : default,
+  $transition-2 : false,
+  $transition-3 : false,
+  $transition-4 : false,
+  $transition-5 : false,
+  $transition-6 : false,
+  $transition-7 : false,
+  $transition-8 : false,
+  $transition-9 : false,
+  $transition-10: false
+) {
+  $legacy: (type-of($transition-1) == string and type-of(if($transition-2, $transition-2, 0)) == number and type-of(if($transition-3, $transition-3, '')) == string and type-of(if($transition-4, $transition-4, 0)) == number and ($transition-2 or $transition-3 or $transition-4));
+  @if $legacy {
+    @warn "Passing separate arguments for a single transition to transition is deprecated. " +
+          "Pass the values as a single space-separated list, or use the single-transition mixin.";
+    @include single-transition(
+      if($transition-1, $transition-1, $default-transition-property),
+      if($transition-2, $transition-2, $default-transition-duration),
+      if($transition-3, $transition-3, $default-transition-function),
+      if($transition-4, $transition-4, $default-transition-delay)
+    );
+  }
+  @else {
+    @if $transition-1 == default {
+      $transition-1 : -compass-space-list(compact($default-transition-property, $default-transition-duration, $default-transition-function, $default-transition-delay));
+    }
+    $transition : compact($transition-1, $transition-2, $transition-3, $transition-4, $transition-5, $transition-6, $transition-7, $transition-8, $transition-9, $transition-10);
+    @include experimental(transition, $transition,
+      -moz, -webkit, -o, not -ms, not -khtml, official
+    );
+  }
+}

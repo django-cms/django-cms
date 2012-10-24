@@ -1,0 +1,405 @@
+@import "compass/css3";
+
+//-----------------------------------------------
+// The following html5-boilerplate styles should
+// probably be customized for each site
+//-----------------------------------------------
+html, body {
+	height: 100%;  
+	min-width: 1024px;
+}
+
+html{
+	overflow: auto !important; 
+}
+
+body {  
+	background: url('../images/bg-pattern-light.jpg') $background-color-ultralight repeat !important;
+}
+
+body, select, input, textarea {
+  color: $font-color;
+}
+
+h1 { font-size: 150%; color: $font-color-medium; font-weight: bold; margin: 20px 10px;  }
+h2 { font-size: 130%; color: $font-color-medium; font-weight: bold; line-height: 1.75em;}
+h3 { font-size: 120%; color: $font-color; font-weight: bold; }
+h4 { font-size: 110%; color: $font-color-medium; font-weight: bold;}
+h5 { font-size: 100%; color: $font-color; }
+h6 { font-size: 100%; color: $font-color-medium; }
+
+a, a:link { 
+	color: $link-color; 
+	text-decoration: none; 
+	&:hover {
+		color: $link-hover-color; 
+		text-decoration: underline; 
+	}
+	&:active { 
+		color: $link-active-color; 
+	}
+	&:visited {
+		color: $link-visited-color; 
+	}
+}
+
+p { font-weight: normal; margin-bottom: 6px; }
+
+code {
+  font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  background: inherit;
+  color: #666;
+  font-size: 11px;
+  strong {
+    color: #930;
+  }
+}
+
+pre {
+  font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  background: inherit;
+  color: #666;
+  font-size: 11px;
+  &.literal-block {
+	background: #eee;  
+  }
+}
+
+/* Rulers */
+div hr { 
+	background: $line-color-light;
+	margin: 20px 0;
+	border: none; 
+}
+
+strong { font-weight: bold; }
+.small, small { font-size: 85%; margin-top: 0; }
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+::selection {
+	background: #AFD7FF;
+	color: #444;
+	text-shadow: none;
+}
+
+::-moz-selection {
+	background: #AFD7FF;
+	color: #444;
+	text-shadow: none;
+}
+
+//-----------------------------------
+// Add your own custom styles below
+//-----------------------------------
+
+/* Header */ 
+#header { 
+	@include pie; 
+	@include background-image(linear-gradient($background-color-dark, $background-color-medium));
+	background-color: $background-color-dark; 
+	color: $font-color-white !important; 
+	height: 46px;
+}
+
+#branding {
+	h1 {
+		color: $font-color-white;
+		padding: 3px 25px;
+	}
+}
+
+div.breadcrumbs {
+	background: $background-color-dark;
+	border-top: 1px solid $line-color-dark;
+	color: $font-color-ultralight;
+	padding-left: 25px;
+	a {
+		color: $font-color-light;
+		&:hover {
+			color: $font-color-ultralight;	
+			text-decoration: none;		
+		}
+	}
+}
+
+div.admin_shortcuts .shortcuts {
+	box-shadow: none;
+	background: $background-color-dark;
+	border-top: 1px solid $line-color-dark;
+	color: $font-color-ultralight;
+	h2 {
+		border-bottom: 1px solid $line-color-dark;
+	}
+	li {
+		a {
+			background: $background-color-medium 10px 50% no-repeat;
+			border: 1px solid $line-color-dark;
+			padding: 20px 10px 20px 15px;
+			&:hover {
+				background-color: $background-color-dark;
+			}
+			.count {
+				color: $font-color-light;
+			}
+			.count_new {
+				background: $button-blue-medium-color;
+				border-color: $button-blue-light-color;
+			}
+		}		
+	}
+}
+
+#user-tools {
+	padding: 20px 25px;
+}
+
+
+/* Box Mixin */
+@mixin box(){
+	@include border-radius(5px);
+	@include box-shadow($line-color-light 0 2px 3px 0px);
+	background: $background-color-white;
+	border: 0;
+	border-top: 1px solid #F6F6F6;
+	margin-bottom: 5px;
+	padding: 0;
+	h2, h3, h4, h5, h6 {
+		margin-bottom: 12px;
+		margin-top: 0;
+	}
+}
+
+/* Dashboard */
+.dashboard {
+	#content {
+		width: 740px;
+	}
+	.module {
+		padding: 0 30px 10px 30px !important;
+	}
+}
+
+/* Module */
+#content-main {
+	.module {
+		@include box();
+		margin-bottom: 10px;
+		h2 {
+			background: none;
+			border-bottom: 1px solid $line-color-light;
+			color: $font-color;
+			font-size: 100%;
+			margin-bottom: 2px;
+			margin-top: 0;
+			padding: 10px;
+		}
+		caption {
+			background: none;
+			color: $font-color-medium; 
+			font-size: 130%; 
+			font-weight: bold;
+			line-height: 1.75em;
+			margin-bottom: 10px;
+			padding: 0;
+			a.section:link, a.section:visited {
+				color: $font-color-medium; 
+			}
+			
+		}
+	}
+	.inline-group { 
+		@include border-radius(5px);	
+	 	@include box-shadow($background-color-white 0 0 $button-shadow-width inset !important);	
+		border: 1px solid $line-color-light;
+		background: $background-color-transparent !important;
+		padding: 10px;
+		h2 {
+			background: none !important;
+			color: $font-color;
+			font-size: 100%;
+			margin-bottom: 10px;
+			padding: 0 10px 8px 0px;
+		}
+		div.add-row { 
+			background: none !important; 
+			border-bottom: 0 !important;
+		}
+		.form-row {
+			border-bottom: none !important;
+		}
+	}
+	
+	.inline-related {
+		h3 {
+			background: none;
+			border-bottom: none;
+		}
+	}
+		
+	.submit-row {
+		@include border-radius(5px);	
+	 	@include box-shadow($background-color-white 0 0 $button-shadow-width inset !important);	
+		border: 1px solid $line-color-light;
+		background: $background-color-transparent !important;
+		padding: 10px;
+		.deletelink-box {
+			margin: 0.5em 0 !important;
+		}
+	}
+	.selector {
+		.selector-available, .selector-chosen {
+			@include border-radius(5px);		
+			border: 1px solid $line-color-light;
+			h2 {
+				color: $font-color !important;			
+				background: none !important;
+				border: none;
+				margin-bottom: 0;		 
+			}
+			input {
+				width: 252px;
+			}
+		}
+		.selector-filter {
+			border: none;
+		}
+		select[multiple] {
+			border: 1px solid $line-color-light;			
+			border-left: none;
+			border-right: none;
+			margin-bottom: 0;
+		}
+	}
+}
+
+#content-related {
+	.module {
+		@include border-radius(5px);	
+	 	@include box-shadow($background-color-white 0 0 $button-shadow-width inset !important);	
+		border: 1px solid $line-color-light;
+		background: $background-color-transparent !important;
+		margin-left: 10px;
+		padding: 10px 20px !important;
+		ul.actionlist {
+			padding: 0;
+		}
+		h2 {
+			background: none;
+			color: $font-color-light;
+			padding: 0 0 5px 0;
+		}
+		h3 {
+			border-bottom: 1px solid $line-color-light;
+			line-height: 20px;
+			margin: 0 0 5px 0;
+			padding: 0;		
+		}
+		p {
+			padding: 0;
+		}
+	}	
+}
+
+#changelist {
+	#toolbar {
+		background: none !important;
+		border: 0 !important;
+		form {
+			#searchbar {
+				padding: 4px 5px 6px 5px !important;
+			}
+		}
+	}
+	#changelist-search {
+		div {
+			float: right;
+			margin-right: 2px;
+		}
+		label { 
+			min-width: auto;
+			font-size: 150%; 
+		}
+	}
+	#changelist-filter {
+		background: $background-color-transparent;
+		h2 {
+			background: none;
+			color: $font-color-light;
+			padding: 2px 9px;
+		}
+		ul {
+			font-size: 12px;
+			margin-bottom: 10px;
+			li.selected {
+				border-left: none !important;
+				padding-left: 0 !important;
+				margin-left: 0 !important;
+				a {
+					color: $link-color !important;
+				}
+			}
+		}
+	}
+	#result_list {
+		margin: 0 !important;
+	}
+	.actions {
+		background: none !important;
+		border: 0 !important;
+		padding: 0px 3px 6px 3px !important;
+	}
+	.paginator {
+		border-top: none !important;
+		border-bottom: none !important;
+		background: none !important;
+	}
+	
+}
+
+/* Login */
+body.login {
+	background: url('../images/bg-pattern.jpg') $background-color-ultralight repeat !important;
+	#container {
+		@include box();
+		@include box-shadow(rgba(0, 0, 0, 0.3) 0px 1px 2px, #fff 0px 1px 1px inset); 
+		width: 350px;
+		border: none !important;
+		#header {
+			background: none !important;
+			#branding {
+				h1 {
+					color: $font-color;
+					margin: 20px 0 !important;
+					text-align: center;
+				}
+			}
+		}
+		#content {
+			margin: 0 !important;
+			padding: 25px 40px !important;	
+			#content-main {
+				.submit-row {
+					border: none !important;
+					background: none !important;
+					padding: 0 !important;	
+					input {
+						font-size: 15px !important;
+					}
+				}
+			}
+		}
+		#footer {
+			display: none;
+		}
+	
+	}
+	
+
+}

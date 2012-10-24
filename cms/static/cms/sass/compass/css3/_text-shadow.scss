@@ -1,0 +1,62 @@
+@import "shared";
+
+// These defaults make the arguments optional for this mixin
+// If you like, set different defaults in your project
+
+$default-text-shadow-color:    #aaa !default;
+$default-text-shadow-h-offset: 0px  !default;
+$default-text-shadow-v-offset: 0px  !default;
+$default-text-shadow-blur:     1px  !default;
+
+// Provides cross-browser text shadows when one or more shadows are needed.
+// Each shadow argument should adhere to the standard css3 syntax for the
+// text-shadow property.
+@mixin text-shadow(
+  $shadow-1 : default,
+  $shadow-2 : false,
+  $shadow-3 : false,
+  $shadow-4 : false,
+  $shadow-5 : false,
+  $shadow-6 : false,
+  $shadow-7 : false,
+  $shadow-8 : false,
+  $shadow-9 : false,
+  $shadow-10: false
+) {
+  // This has to be on a single line due to a bug in the scss parser: https://github.com/nex3/sass/issues/issue/26
+  $legacy: type-of($shadow-1) == color and type-of(if($shadow-2, $shadow-2, 0)) == number and type-of(if($shadow-3, $shadow-3, 0)) == number and type-of(if($shadow-4, $shadow-4, 0)) == number and ($shadow-2 or $shadow-3 or $shadow-4) and not($shadow-5 or $shadow-6 or $shadow-7 or $shadow-8 or $shadow-9 or $shadow-10);
+  @if $legacy {
+    @warn "Passing separate arguments for a single shadow to text-shadow is deprecated. " +
+          "Pass the values as a single space-separated list, or use the single-text-shadow mixin. " +
+          "See http://beta.compass-style.org/help/tutorials/upgrading/antares/ for more info.";
+    @include single-text-shadow(
+      $shadow-1,
+      if($shadow-2, $shadow-2, $default-text-shadow-h-offset),
+      if($shadow-3, $shadow-3, $default-text-shadow-v-offset),
+      if($shadow-4, $shadow-4, $default-text-shadow-blur)
+    );
+  } @else {
+    @if $shadow-1 == default {
+      $shadow-1: $default-text-shadow-color $default-text-shadow-h-offset $default-text-shadow-v-offset $default-text-shadow-blur;
+    }
+    text-shadow: compact($shadow-1, $shadow-2, $shadow-3,
+                         $shadow-4, $shadow-5, $shadow-6,
+                         $shadow-7, $shadow-8, $shadow-9, $shadow-10);
+  }
+}
+
+// Provides a single cross-browser CSS text shadow.
+// Includes default arguments for color, horizontal offset, vertical offset, and blur
+@mixin single-text-shadow(
+  $color: $default-text-shadow-color,
+  $hoff: $default-text-shadow-h-offset,
+  $voff: $default-text-shadow-v-offset,
+  $blur: $default-text-shadow-blur
+) {
+  // XXX I'm surprised we don't need experimental support for this property.
+  @if $color == none {
+    text-shadow: none;
+  } @else {
+    text-shadow: $color $hoff $voff $blur;    
+  }
+}

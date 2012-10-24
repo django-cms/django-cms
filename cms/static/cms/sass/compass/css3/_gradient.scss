@@ -1,0 +1,99 @@
+@import "compass/utilities/general/hacks";
+@import "images";
+
+// The linear gradient mixin works best across browsers if you use percentage-based color stops.
+//
+// Examples:
+//
+//     // This yields a linear gradient spanning from top to bottom
+//     +linear-gradient(color-stops(white, black))
+//
+//     // This yields a linear gradient spanning from bottom to top
+//     +linear-gradient(color-stops(white, black), bottom)
+//
+//     // This yields a linear gradient spanning from left to right
+//     +linear-gradient(color-stops(white, black), left)
+//
+//     // This yields a linear gradient starting at white passing
+//     // thru blue at 33% down and then to black
+//     +linear-gradient(color-stops(white, blue 33%, black))
+//
+//     // This yields a linear gradient starting at white passing
+//     // thru blue at 33% down and then to black at 67% until the end
+//     +linear-gradient(color-stops(white, blue 33%, black 67%))
+//
+//     // This yields a background image on top of the gradient; requires an image
+//     // with an alpha-layer.
+//     +linear-gradient(color_stops(white,black), top, image-url('noise.png'))
+//
+// Browsers Supported:
+//
+// - Chrome
+// - Safari
+// - Firefox 3.6
+// - Opera
+//
+// @deprecated Use the linear-gradient() function in conjunction with a
+//             property mixin like `background-image`.
+@mixin linear-gradient($color-stops, $start: false, $image: false) {
+  @if $image {
+    @if $start {
+      @warn "The linear-gradient mixin is deprecated. Instead use: @include background-image(#{$image}, linear-gradient(#{$start}, #{$color-stops}))";
+    } @else {
+      @warn "The linear-gradient mixin is deprecated. Instead use: @include background-image(#{$image}, linear-gradient(#{$color-stops}))";
+    }
+  } @else {
+    @if $start {
+      @warn "The linear-gradient mixin is deprecated. Instead use: @include background-image(linear-gradient(#{$start}, #{$color-stops}))";
+    } @else {
+      @warn "The linear-gradient mixin is deprecated. Instead use: @include background-image(linear-gradient(#{$color-stops}))";
+    }
+  }
+  @if not $start { $start: top; }
+  @include background-image($image, linear-gradient($start, $color-stops));
+}
+
+// Because of webkit's limitations, the radial gradient mixin works best if you use
+// pixel-based color stops.
+//
+// Examples:
+//
+//     // Defaults to a centered, 100px radius gradient
+//     +radial-gradient(color-stops(#c00, #00c))
+//
+//     // 100px radius gradient in the top left corner
+//     +radial-gradient(color-stops(#c00, #00c), top left)
+//
+//     // Three colors, ending at 50px and passing thru #fff at 25px
+//     +radial-gradient(color-stops(#c00, #fff, #00c 50px))
+//
+//     // A background image on top of a 100px radius gradient; requires an image
+//     // with an alpha-layer.
+//     +radial-gradient(color_stops(#c00, #fff), top left, image-url("noise.png")))
+//
+// Browsers Supported:
+//
+// - Chrome
+// - Safari
+// - Firefox 3.6
+// - Opera
+//
+// @deprecated Use the radial-gradient() function in conjunction with a
+//             property mixin like `background-image`.
+@mixin radial-gradient($color-stops, $center-position: false, $image: false) {
+  @if $image {
+    @if $center-position {
+      @warn "The radial-gradient mixin is deprecated. Instead use: @include background-image(#{$image}, radial-gradient(#{$center-position}, #{$color-stops}))";
+    } @else {
+      @warn "The radial-gradient mixin is deprecated. Instead use: @include background-image(#{$image}, radial-gradient(#{$color-stops}))";
+    }
+  } @else {
+    @if $center-position {
+      @warn "The radial-gradient mixin is deprecated. Instead use: @include background-image(radial-gradient(#{$center-position}, #{$color-stops}))";
+    } @else {
+      @warn "The radial-gradient mixin is deprecated. Instead use: @include background-image(radial-gradient(#{$color-stops}))";
+    }
+  }
+  @if not $center-position { $center-position: center center; }
+  @include background-image($image, radial-gradient($center-position, $color-stops));
+}

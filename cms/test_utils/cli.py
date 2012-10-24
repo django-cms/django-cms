@@ -68,12 +68,13 @@ def configure(**extra):
             'django.contrib.auth',
             'django.contrib.contenttypes',
             'django.contrib.sessions',
-            'django.contrib.admin',
             'django.contrib.sites',
             'django.contrib.staticfiles',
             'cms',
             'menus',
             'mptt',
+            'admin_shortcuts',
+            'django.contrib.admin',
             'cms.plugins.text',
             'cms.plugins.picture',
             'cms.plugins.file',
@@ -213,7 +214,38 @@ def configure(**extra):
         ROOT_URLCONF = 'cms.test_utils.cli',
         PASSWORD_HASHERS = (
             'django.contrib.auth.hashers.MD5PasswordHasher',
-        )
+        ),       
+	    ADMIN_SHORTCUTS = [
+	    {
+	        'shortcuts': [
+	            {
+	                'url': '/',
+	                'open_new_window': True,
+	            },
+	            {
+	                'url_name': 'admin:cms_page_changelist',
+	                'title': 'Pages',
+	                'class': 'pages',
+	            },
+	            {
+	                'url': '/',
+	                'title': 'Files',
+	                'class': 'files',
+	            },
+	            {
+	                'url_name': 'admin:auth_user_changelist',
+	                'title': 'Users',
+	                'count_new': '10',
+	            },
+	            {
+	                'url': '/',
+	                'title': 'Contact forms',
+	                'count': '10',
+	                'class': 'contact',
+	            },
+	        ]
+	    },
+	    ]
     )
     if DJANGO_1_3:
         defaults['INSTALLED_APPS'].append("i18nurls")

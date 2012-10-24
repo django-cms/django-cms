@@ -1,0 +1,70 @@
+@import "compass/typography/text/replacement";
+@import "compass/utilities/general/clearfix";
+
+//
+// Non-semantic helper classes
+// It's better to include these mixins in your own styles
+//
+
+@mixin html5-boilerplate-helpers {
+	.ir { @include image-replacement; }
+
+	.hidden { @include hidden; }
+
+	.visuallyhidden { @include visually-hidden; }
+
+	.clearfix { @include micro-clearfix; }
+}
+
+// Almost the same as compass replace-text
+// but adding direction: ltr
+@mixin image-replacement($img: none, $x: 50%, $y: 50%) {
+	@include hide-text;
+	direction: ltr;
+	background-repeat: no-repeat;
+	@if $img != none {
+		background-image: image-url($img);
+		background-position: $x $y;
+	}
+}
+
+@mixin sized-image-replacement($img, $x: 50%, $y: 50%) {
+	@include image-replacement($img, $x, $y);
+	width: image-width($img);
+	height: image-height($img);
+}
+
+// Hide for both screenreaders and browsers
+// css-discuss.incutio.com/wiki/Screenreader_Visibility
+@mixin hidden {
+	display:none;
+	visibility: hidden;
+}
+
+// Hide only visually, but have it available for screenreaders: by Jon Neal
+// www.webaim.org/techniques/css/invisiblecontent/  &  j.mp/visuallyhidden
+@mixin visually-hidden {
+	border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px;
+	// Extends the .visuallyhidden class to allow the element to be focusable
+	// when navigated to via the keyboard: drupal.org/node/897638
+	&.focusable:active, &.focusable:focus {
+		clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto;
+	}
+}
+
+// Hide visually and from screenreaders, but maintain layout
+@mixin invisible { visibility: hidden; }
+
+// The Magnificent Clearfix: Updated to prevent margin-collapsing on child elements in most situations.
+// nicolasgallagher.com/micro-clearfix-hack/
+@mixin micro-clearfix {
+	&:before, &:after { content: ""; display: table; }
+	&:after { clear: both; }
+	zoom: 1;
+}
+
+// The Magnificent CLEARFIX << j.mp/phayesclearfix
+@mixin magnificent-clearfix {
+	@warn "The 'magnificent-clearfix' mixin has been deprecated. Use 'pie-clearfix' in compass core instead.";
+	@include pie-clearfix;
+}

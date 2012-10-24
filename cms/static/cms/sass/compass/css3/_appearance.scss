@@ -1,0 +1,13 @@
+@import "shared";
+
+// Change the appearance for Mozilla, Webkit and the future
+//
+// @param $ap
+//   [ none | normal | icon | window | button | menu | field ]
+
+@mixin appearance($ap) {
+  $ap: unquote($ap);
+  @include experimental(appearance, $ap,
+    -moz, -webkit, not -o, not -ms, not -khtml, official
+  );
+}

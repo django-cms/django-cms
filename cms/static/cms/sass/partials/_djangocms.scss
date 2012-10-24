@@ -1,0 +1,71 @@
+/* TEXT STYLES & MODIFIERS */
+.help, p.help {
+  color: #999;
+}
+
+.example {
+  background: #efefef;
+}
+
+.inline-group h2 {
+  background: #f1f1f1 url(../img/djeese/default-bg.gif) top left repeat-x !important;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
+  -o-border-radius: 5px 5px 0 0;
+  -ms-border-radius: 5px 5px 0 0;
+  -khtml-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid #ddd;
+  color: #666;
+  padding: 8px 10px;
+}
+
+/* MESSAGES & ERRORS */
+ul.messagelist li {
+  color: #444;
+  background-color: #f5faff;
+  font-weight: bold;
+  padding: 10px 5px 10px 40px;
+  background-position: 10px 0.8em;
+}
+ul.messagelist li.warning {
+  background-image: url(../img/djeese/icon_alert.gif);
+}
+ul.messagelist li.error {
+  background-image: url(../img/djeese/icon_error.gif);
+}
+.errornote {
+  border: 1px solid red;
+  color: red;
+  background: #ffffcc url(../img/djeese/icon_error.gif) 5px 0.3em no-repeat;
+}
+
+.errorlist li {
+  border: 1px solid red;
+  color: white;
+  background: red url(../img/djeese/icon_alert.gif) 5px 0.3em no-repeat;
+}
+.errorlist li a {
+  color: white;
+  text-decoration: underline;
+}
+
+.errors {
+  background: #ffc;
+}
+.errors input, .errors select, .errors textarea {
+  border: 1px solid red;
+}
+div.system-message {
+  background: #ffc;
+}
+
+#sitemap li .cont {
+  background-image: url(../img/djeese/sitemap-li-bg.jpg) !important;
+}
+
+/* LOGIN FORM */
+body.login {
+  background: #fcfcfc!important;
+}
+

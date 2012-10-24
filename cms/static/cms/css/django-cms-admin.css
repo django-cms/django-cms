@@ -1,0 +1,2501 @@
+/* Dimensions */
+/* inactive */
+/* Silver */
+/* Blue */
+/* Orange */
+/* Red */
+/* Green */
+/* Black */
+/* Paddings */
+/* Template Editor */
+/* line 14, ../sass/libs/html5-boilerplate/_reset.scss */
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+/* line 23, ../sass/libs/html5-boilerplate/_reset.scss */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+/* line 27, ../sass/libs/html5-boilerplate/_reset.scss */
+blockquote, q {
+  quotes: none;
+}
+
+/* line 30, ../sass/libs/html5-boilerplate/_reset.scss */
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+/* line 32, ../sass/libs/html5-boilerplate/_reset.scss */
+ins {
+  background-color: #ff9;
+  color: #000;
+  text-decoration: none;
+}
+
+/* line 34, ../sass/libs/html5-boilerplate/_reset.scss */
+mark {
+  background-color: #ff9;
+  color: #000;
+  font-style: italic;
+  font-weight: bold;
+}
+
+/* line 36, ../sass/libs/html5-boilerplate/_reset.scss */
+del {
+  text-decoration: line-through;
+}
+
+/* line 38, ../sass/libs/html5-boilerplate/_reset.scss */
+abbr[title], dfn[title] {
+  border-bottom: 1px dotted;
+  cursor: help;
+}
+
+/* line 40, ../sass/libs/html5-boilerplate/_reset.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 42, ../sass/libs/html5-boilerplate/_reset.scss */
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+/* line 11, ../sass/libs/html5-boilerplate/_fonts.scss */
+body {
+  font-size: 13px;
+  font-family: sans-serif;
+  line-height: 1.231;
+  *font-size: small;
+}
+
+/* line 20, ../sass/libs/html5-boilerplate/_fonts.scss */
+pre, code, kbd, samp {
+  font-family: monospace, sans-serif;
+}
+
+/* line 15, ../sass/libs/html5-boilerplate/_styles.scss */
+html {
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* line 17, ../sass/libs/html5-boilerplate/_styles.scss */
+ul, ol {
+  margin-left: 2em;
+}
+
+/* line 18, ../sass/libs/html5-boilerplate/_styles.scss */
+ol {
+  list-style-type: decimal;
+}
+
+/* line 20, ../sass/libs/html5-boilerplate/_styles.scss */
+td {
+  vertical-align: top;
+}
+
+/* line 22, ../sass/libs/html5-boilerplate/_styles.scss */
+sub {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  bottom: -0.25em;
+}
+
+/* line 24, ../sass/libs/html5-boilerplate/_styles.scss */
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  top: -0.5em;
+}
+
+/* line 53, ../sass/libs/html5-boilerplate/_styles.scss */
+a:hover, a:active {
+  outline: none;
+}
+
+/* line 58, ../sass/libs/html5-boilerplate/_styles.scss */
+pre {
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 15px;
+}
+
+/* line 71, ../sass/libs/html5-boilerplate/_styles.scss */
+label, input[type="button"], input[type="submit"], input[type="image"], button {
+  cursor: pointer;
+}
+
+/* line 80, ../sass/libs/html5-boilerplate/_styles.scss */
+button, input, select, textarea {
+  width: auto;
+  overflow: visible;
+  margin: 0;
+  font-size: 100%;
+  font-family: sans-serif;
+  vertical-align: baseline;
+}
+
+/* line 84, ../sass/libs/html5-boilerplate/_styles.scss */
+textarea {
+  overflow: auto;
+  vertical-align: text-top;
+}
+
+/* line 88, ../sass/libs/html5-boilerplate/_styles.scss */
+input::-moz-focus-inner,
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* line 99, ../sass/libs/html5-boilerplate/_styles.scss */
+::-moz-selection {
+  background: none;
+  color: none;
+  text-shadow: none;
+}
+
+/* line 100, ../sass/libs/html5-boilerplate/_styles.scss */
+::selection {
+  background: none;
+  color: none;
+  text-shadow: none;
+}
+
+/* line 105, ../sass/libs/html5-boilerplate/_styles.scss */
+a:link {
+  -webkit-tap-highlight-color: none;
+}
+
+/* line 118, ../sass/libs/html5-boilerplate/_styles.scss */
+.ie7 img {
+  -ms-interpolation-mode: bicubic;
+}
+
+/* line 120, ../sass/libs/html5-boilerplate/_styles.scss */
+.ie6 legend, .ie7 legend {
+  margin-left: -7px;
+}
+
+/* line 125, ../sass/libs/html5-boilerplate/_styles.scss */
+nav ul, nav li {
+  margin: 0;
+  list-style: none;
+  list-style-image: none;
+}
+
+/* line 10, ../sass/libs/html5-boilerplate/_helpers.scss */
+.ir {
+  text-indent: -119988px;
+  overflow: hidden;
+  text-align: left;
+  direction: ltr;
+  background-repeat: no-repeat;
+}
+
+/* line 12, ../sass/libs/html5-boilerplate/_helpers.scss */
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+/* line 14, ../sass/libs/html5-boilerplate/_helpers.scss */
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+/* line 50, ../sass/libs/html5-boilerplate/_helpers.scss */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus {
+  clip: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  position: static;
+  width: auto;
+}
+
+/* line 16, ../sass/libs/html5-boilerplate/_helpers.scss */
+.clearfix {
+  zoom: 1;
+}
+/* line 61, ../sass/libs/html5-boilerplate/_helpers.scss */
+.clearfix:before, .clearfix:after {
+  content: "";
+  display: table;
+}
+/* line 62, ../sass/libs/html5-boilerplate/_helpers.scss */
+.clearfix:after {
+  clear: both;
+}
+
+/* TEXT STYLES & MODIFIERS */
+/* line 2, ../sass/partials/_djangocms.scss */
+.help, p.help {
+  color: #999;
+}
+
+/* line 6, ../sass/partials/_djangocms.scss */
+.example {
+  background: #efefef;
+}
+
+/* line 10, ../sass/partials/_djangocms.scss */
+.inline-group h2 {
+  background: #f1f1f1 url(../img/djeese/default-bg.gif) top left repeat-x !important;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
+  -o-border-radius: 5px 5px 0 0;
+  -ms-border-radius: 5px 5px 0 0;
+  -khtml-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid #ddd;
+  color: #666;
+  padding: 8px 10px;
+}
+
+/* MESSAGES & ERRORS */
+/* line 24, ../sass/partials/_djangocms.scss */
+ul.messagelist li {
+  color: #444;
+  background-color: #f5faff;
+  font-weight: bold;
+  padding: 10px 5px 10px 40px;
+  background-position: 10px 0.8em;
+}
+
+/* line 31, ../sass/partials/_djangocms.scss */
+ul.messagelist li.warning {
+  background-image: url(../img/djeese/icon_alert.gif);
+}
+
+/* line 34, ../sass/partials/_djangocms.scss */
+ul.messagelist li.error {
+  background-image: url(../img/djeese/icon_error.gif);
+}
+
+/* line 37, ../sass/partials/_djangocms.scss */
+.errornote {
+  border: 1px solid red;
+  color: red;
+  background: #ffffcc url(../img/djeese/icon_error.gif) 5px 0.3em no-repeat;
+}
+
+/* line 43, ../sass/partials/_djangocms.scss */
+.errorlist li {
+  border: 1px solid red;
+  color: white;
+  background: red url(../img/djeese/icon_alert.gif) 5px 0.3em no-repeat;
+}
+
+/* line 48, ../sass/partials/_djangocms.scss */
+.errorlist li a {
+  color: white;
+  text-decoration: underline;
+}
+
+/* line 53, ../sass/partials/_djangocms.scss */
+.errors {
+  background: #ffc;
+}
+
+/* line 56, ../sass/partials/_djangocms.scss */
+.errors input, .errors select, .errors textarea {
+  border: 1px solid red;
+}
+
+/* line 59, ../sass/partials/_djangocms.scss */
+div.system-message {
+  background: #ffc;
+}
+
+/* line 63, ../sass/partials/_djangocms.scss */
+#sitemap li .cont {
+  background-image: url(../img/djeese/sitemap-li-bg.jpg) !important;
+}
+
+/* LOGIN FORM */
+/* line 68, ../sass/partials/_djangocms.scss */
+body.login {
+  background: #fcfcfc!important;
+}
+
+@font-face {
+  font-family: 'django-admin-icons';
+  src: url("../fonts/django-admin-icons.eot");
+  src: url("../fonts/django-admin-icons.eot?#iefix") format("embedded-opentype"), url("../fonts/django-admin-icons.svg#django-admin-icons") format("svg"), url("../fonts/django-admin-icons.woff") format("woff"), url("../fonts/django-admin-icons.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* line 4, ../sass/partials/_form.scss */
+input:invalid, textarea:invalid {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+
+/* line 9, ../sass/partials/_form.scss */
+.no-boxshadow input:invalid,
+.no-boxshadow textarea:invalid {
+  background-color: #f0dddd;
+}
+
+/* line 13, ../sass/partials/_form.scss */
+form small {
+  color: #888888;
+}
+/* line 16, ../sass/partials/_form.scss */
+form hr {
+  margin: 5px 0;
+}
+/* line 19, ../sass/partials/_form.scss */
+form fieldset {
+  vertical-align: middle;
+  line-height: 2em;
+}
+/* line 23, ../sass/partials/_form.scss */
+form label {
+  min-width: 160px;
+  color: #888888;
+  display: inline-block;
+}
+/* line 27, ../sass/partials/_form.scss */
+form label.required {
+  font-weight: bold;
+}
+/* line 32, ../sass/partials/_form.scss */
+form input, form textarea {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid #cccccc;
+  color: #555555;
+  padding: 6px 5px;
+  outline: none;
+  width: 250px;
+}
+/* line 41, ../sass/partials/_form.scss */
+form input[type="checkbox"], form input[type="radio"] {
+  border: 0;
+  display: inline;
+  width: auto;
+  margin-right: 6px;
+}
+/* line 47, ../sass/partials/_form.scss */
+form input[type="file"] {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid #cccccc;
+  color: #555555;
+  padding: 6px 5px;
+  outline: none;
+  width: 250px;
+}
+/* line 56, ../sass/partials/_form.scss */
+form select {
+  font-weight: normal;
+}
+/* line 59, ../sass/partials/_form.scss */
+form small {
+  margin-left: 15px;
+}
+/* line 62, ../sass/partials/_form.scss */
+form .form-controls {
+  text-align: right;
+  margin: 15px 0 0 0;
+}
+/* line 65, ../sass/partials/_form.scss */
+form .form-controls p {
+  margin-top: 6px;
+}
+/* line 69, ../sass/partials/_form.scss */
+form .input-list {
+  display: inline-block;
+  vertical-align: top;
+  line-height: 20px;
+}
+/* line 75, ../sass/partials/_form.scss */
+form .extra .right {
+  float: right;
+  margin-right: 10px;
+}
+
+/* Standard */
+/* line 251, ../sass/partials/_form.scss */
+button {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef)) !important;
+  background-image: -webkit-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -moz-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -o-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -ms-linear-gradient(#ffffff, #efefef) !important;
+  background-image: linear-gradient(#ffffff, #efefef) !important;
+  -moz-box-shadow: #efefef 0 0 2px inset !important;
+  -webkit-box-shadow: #efefef 0 0 2px inset !important;
+  -o-box-shadow: #efefef 0 0 2px inset !important;
+  box-shadow: #efefef 0 0 2px inset !important;
+  background-color: #efefef !important;
+  border: 1px solid #efefef !important;
+  border-bottom: 1px solid #cccccc !important;
+  color: #555555 !important;
+  font-weight: bolder !important;
+  font-size: 12px !important;
+  overflow: visible;
+  padding: 5px 10px 5px !important;
+  text-decoration: none !important;
+  width: auto !important;
+}
+/* line 107, ../sass/partials/_form.scss */
+button.small {
+  padding: 3px 8px 4px !important;
+}
+/* line 110, ../sass/partials/_form.scss */
+button:hover, button:active, button.select, button:visited {
+  background: white;
+  color: #555555;
+  text-decoration: none;
+}
+/* line 115, ../sass/partials/_form.scss */
+button.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+
+/* line 255, ../sass/partials/_form.scss */
+input[type="submit"], input[type="button"] {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef)) !important;
+  background-image: -webkit-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -moz-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -o-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -ms-linear-gradient(#ffffff, #efefef) !important;
+  background-image: linear-gradient(#ffffff, #efefef) !important;
+  -moz-box-shadow: #efefef 0 0 2px inset !important;
+  -webkit-box-shadow: #efefef 0 0 2px inset !important;
+  -o-box-shadow: #efefef 0 0 2px inset !important;
+  box-shadow: #efefef 0 0 2px inset !important;
+  background-color: #efefef !important;
+  border: 1px solid #efefef !important;
+  border-bottom: 1px solid #cccccc !important;
+  color: #555555 !important;
+  font-weight: bolder !important;
+  font-size: 12px !important;
+  overflow: visible;
+  padding: 5px 10px 5px !important;
+  text-decoration: none !important;
+  width: auto !important;
+  padding: 8px 10px !important;
+}
+/* line 107, ../sass/partials/_form.scss */
+input[type="submit"].small, input[type="button"].small {
+  padding: 3px 8px 4px !important;
+}
+/* line 110, ../sass/partials/_form.scss */
+input[type="submit"]:hover, input[type="submit"]:active, input[type="submit"].select, input[type="submit"]:visited, input[type="button"]:hover, input[type="button"]:active, input[type="button"].select, input[type="button"]:visited {
+  background: white;
+  color: #555555;
+  text-decoration: none;
+}
+/* line 115, ../sass/partials/_form.scss */
+input[type="submit"].animate, input[type="button"].animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+/* line 258, ../sass/partials/_form.scss */
+input[type="submit"].default, input[type="button"].default {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #029eee)) !important;
+  background-image: -webkit-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -moz-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -o-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -ms-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: linear-gradient(#5bbdee, #029eee) !important;
+  -moz-box-shadow: #5bbdee 0 0 2px inset !important;
+  -webkit-box-shadow: #5bbdee 0 0 2px inset !important;
+  -o-box-shadow: #5bbdee 0 0 2px inset !important;
+  box-shadow: #5bbdee 0 0 2px inset !important;
+  background-color: #029eee !important;
+  border: 1px solid #5bbdee !important;
+  border-bottom: 1px solid #0072ac !important;
+  color: white !important;
+  padding: 7px 10px !important;
+  margin-top: 1px;
+}
+/* line 128, ../sass/partials/_form.scss */
+input[type="submit"].default:hover, input[type="button"].default:hover {
+  background: #5bbdee !important;
+  color: white !important;
+}
+/* line 132, ../sass/partials/_form.scss */
+input[type="submit"].default:active, input[type="button"].default:active {
+  background: #029eee !important;
+}
+/* line 135, ../sass/partials/_form.scss */
+input[type="submit"].default.animate, input[type="button"].default.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+
+/* line 265, ../sass/partials/_form.scss */
+a.button {
+  text-decoration: none;
+  cursor: pointer;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef)) !important;
+  background-image: -webkit-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -moz-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -o-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -ms-linear-gradient(#ffffff, #efefef) !important;
+  background-image: linear-gradient(#ffffff, #efefef) !important;
+  -moz-box-shadow: #efefef 0 0 2px inset !important;
+  -webkit-box-shadow: #efefef 0 0 2px inset !important;
+  -o-box-shadow: #efefef 0 0 2px inset !important;
+  box-shadow: #efefef 0 0 2px inset !important;
+  background-color: #efefef !important;
+  border: 1px solid #efefef !important;
+  border-bottom: 1px solid #cccccc !important;
+  color: #555555 !important;
+  font-weight: bolder !important;
+  font-size: 12px !important;
+  overflow: visible;
+  padding: 5px 10px 5px !important;
+  text-decoration: none !important;
+  width: auto !important;
+}
+/* line 107, ../sass/partials/_form.scss */
+a.button.small {
+  padding: 3px 8px 4px !important;
+}
+/* line 110, ../sass/partials/_form.scss */
+a.button:hover, a.button:active, a.button.select, a.button:visited {
+  background: white;
+  color: #555555;
+  text-decoration: none;
+}
+/* line 115, ../sass/partials/_form.scss */
+a.button.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+/* line 269, ../sass/partials/_form.scss */
+a.button.tab {
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  -o-border-radius: 0;
+  -ms-border-radius: 0;
+  -khtml-border-radius: 0;
+  border-radius: 0;
+}
+
+/* Object Tools */
+/* line 277, ../sass/partials/_form.scss */
+.object-tools li {
+  list-style: none;
+  background: none;
+  padding-left: 0;
+}
+/* line 281, ../sass/partials/_form.scss */
+.object-tools li:hover {
+  background: none;
+}
+/* line 284, ../sass/partials/_form.scss */
+.object-tools li a {
+  background: none !important;
+}
+/* line 288, ../sass/partials/_form.scss */
+.object-tools .addlink {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef)) !important;
+  background-image: -webkit-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -moz-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -o-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -ms-linear-gradient(#ffffff, #efefef) !important;
+  background-image: linear-gradient(#ffffff, #efefef) !important;
+  -moz-box-shadow: #efefef 0 0 2px inset !important;
+  -webkit-box-shadow: #efefef 0 0 2px inset !important;
+  -o-box-shadow: #efefef 0 0 2px inset !important;
+  box-shadow: #efefef 0 0 2px inset !important;
+  background-color: #efefef !important;
+  border: 1px solid #efefef !important;
+  border-bottom: 1px solid #cccccc !important;
+  color: #555555 !important;
+  font-weight: bolder !important;
+  font-size: 12px !important;
+  overflow: visible;
+  padding: 5px 10px 5px !important;
+  text-decoration: none !important;
+  width: auto !important;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #9ab933)) !important;
+  background-image: -webkit-linear-gradient(#bcd077, #9ab933) !important;
+  background-image: -moz-linear-gradient(#bcd077, #9ab933) !important;
+  background-image: -o-linear-gradient(#bcd077, #9ab933) !important;
+  background-image: -ms-linear-gradient(#bcd077, #9ab933) !important;
+  background-image: linear-gradient(#bcd077, #9ab933) !important;
+  -moz-box-shadow: #bcd077 0 0 2px inset !important;
+  -webkit-box-shadow: #bcd077 0 0 2px inset !important;
+  -o-box-shadow: #bcd077 0 0 2px inset !important;
+  box-shadow: #bcd077 0 0 2px inset !important;
+  background-color: #9ab933 !important;
+  border: 1px solid #bcd077 !important;
+  border-bottom: 1px solid #8fad28 !important;
+  color: white !important;
+  color: white !important;
+  margin-top: -22px;
+  margin-right: 10px;
+}
+/* line 107, ../sass/partials/_form.scss */
+.object-tools .addlink.small {
+  padding: 3px 8px 4px !important;
+}
+/* line 110, ../sass/partials/_form.scss */
+.object-tools .addlink:hover, .object-tools .addlink:active, .object-tools .addlink.select, .object-tools .addlink:visited {
+  background: white;
+  color: #555555;
+  text-decoration: none;
+}
+/* line 115, ../sass/partials/_form.scss */
+.object-tools .addlink.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+/* line 148, ../sass/partials/_form.scss */
+.object-tools .addlink:hover {
+  background: #bcd077 !important;
+  color: white !important;
+}
+/* line 152, ../sass/partials/_form.scss */
+.object-tools .addlink:active {
+  background: #9ab933 !important;
+}
+/* line 155, ../sass/partials/_form.scss */
+.object-tools .addlink.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+/* line 295, ../sass/partials/_form.scss */
+.object-tools .historylink {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef)) !important;
+  background-image: -webkit-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -moz-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -o-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -ms-linear-gradient(#ffffff, #efefef) !important;
+  background-image: linear-gradient(#ffffff, #efefef) !important;
+  -moz-box-shadow: #efefef 0 0 2px inset !important;
+  -webkit-box-shadow: #efefef 0 0 2px inset !important;
+  -o-box-shadow: #efefef 0 0 2px inset !important;
+  box-shadow: #efefef 0 0 2px inset !important;
+  background-color: #efefef !important;
+  border: 1px solid #efefef !important;
+  border-bottom: 1px solid #cccccc !important;
+  color: #555555 !important;
+  font-weight: bolder !important;
+  font-size: 12px !important;
+  overflow: visible;
+  padding: 5px 10px 5px !important;
+  text-decoration: none !important;
+  width: auto !important;
+  margin-top: -22px;
+  margin-right: 10px;
+}
+/* line 107, ../sass/partials/_form.scss */
+.object-tools .historylink.small {
+  padding: 3px 8px 4px !important;
+}
+/* line 110, ../sass/partials/_form.scss */
+.object-tools .historylink:hover, .object-tools .historylink:active, .object-tools .historylink.select, .object-tools .historylink:visited {
+  background: white;
+  color: #555555;
+  text-decoration: none;
+}
+/* line 115, ../sass/partials/_form.scss */
+.object-tools .historylink.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+/* line 300, ../sass/partials/_form.scss */
+.object-tools .viewsitelink {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #efefef)) !important;
+  background-image: -webkit-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -moz-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -o-linear-gradient(#ffffff, #efefef) !important;
+  background-image: -ms-linear-gradient(#ffffff, #efefef) !important;
+  background-image: linear-gradient(#ffffff, #efefef) !important;
+  -moz-box-shadow: #efefef 0 0 2px inset !important;
+  -webkit-box-shadow: #efefef 0 0 2px inset !important;
+  -o-box-shadow: #efefef 0 0 2px inset !important;
+  box-shadow: #efefef 0 0 2px inset !important;
+  background-color: #efefef !important;
+  border: 1px solid #efefef !important;
+  border-bottom: 1px solid #cccccc !important;
+  color: #555555 !important;
+  font-weight: bolder !important;
+  font-size: 12px !important;
+  overflow: visible;
+  padding: 5px 10px 5px !important;
+  text-decoration: none !important;
+  width: auto !important;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #029eee)) !important;
+  background-image: -webkit-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -moz-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -o-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -ms-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: linear-gradient(#5bbdee, #029eee) !important;
+  -moz-box-shadow: #5bbdee 0 0 2px inset !important;
+  -webkit-box-shadow: #5bbdee 0 0 2px inset !important;
+  -o-box-shadow: #5bbdee 0 0 2px inset !important;
+  box-shadow: #5bbdee 0 0 2px inset !important;
+  background-color: #029eee !important;
+  border: 1px solid #5bbdee !important;
+  border-bottom: 1px solid #0072ac !important;
+  color: white !important;
+  margin-top: -22px;
+  margin-left: 0;
+  margin-right: 10px;
+}
+/* line 107, ../sass/partials/_form.scss */
+.object-tools .viewsitelink.small {
+  padding: 3px 8px 4px !important;
+}
+/* line 110, ../sass/partials/_form.scss */
+.object-tools .viewsitelink:hover, .object-tools .viewsitelink:active, .object-tools .viewsitelink.select, .object-tools .viewsitelink:visited {
+  background: white;
+  color: #555555;
+  text-decoration: none;
+}
+/* line 115, ../sass/partials/_form.scss */
+.object-tools .viewsitelink.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.2)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0.2)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+/* line 128, ../sass/partials/_form.scss */
+.object-tools .viewsitelink:hover {
+  background: #5bbdee !important;
+  color: white !important;
+}
+/* line 132, ../sass/partials/_form.scss */
+.object-tools .viewsitelink:active {
+  background: #029eee !important;
+}
+/* line 135, ../sass/partials/_form.scss */
+.object-tools .viewsitelink.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+
+/* line 310, ../sass/partials/_form.scss */
+form .aligned p.help {
+  padding-left: 100px !important;
+}
+
+/* Login */
+/* line 318, ../sass/partials/_form.scss */
+body.login #container #content-main form {
+  margin-top: 0 !important;
+}
+/* line 321, ../sass/partials/_form.scss */
+body.login #container #content-main input {
+  font-size: 15px;
+  padding: 0 15px;
+  height: 40px;
+  width: 240px !important;
+}
+/* line 328, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #029eee)) !important;
+  background-image: -webkit-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -moz-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -o-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: -ms-linear-gradient(#5bbdee, #029eee) !important;
+  background-image: linear-gradient(#5bbdee, #029eee) !important;
+  -moz-box-shadow: #5bbdee 0 0 2px inset !important;
+  -webkit-box-shadow: #5bbdee 0 0 2px inset !important;
+  -o-box-shadow: #5bbdee 0 0 2px inset !important;
+  box-shadow: #5bbdee 0 0 2px inset !important;
+  background-color: #029eee !important;
+  border: 1px solid #5bbdee !important;
+  border-bottom: 1px solid #0072ac !important;
+  color: white !important;
+  width: 270px !important;
+}
+/* line 128, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input:hover {
+  background: #5bbdee !important;
+  color: white !important;
+}
+/* line 132, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input:active {
+  background: #029eee !important;
+}
+/* line 135, ../sass/partials/_form.scss */
+body.login #container #content-main .submit-row input.animate {
+  -moz-background-size: 100% 400%;
+  -webkit-background-size: 100% 400%;
+  -o-background-size: 100% 400%;
+  background-size: 100% 400%;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+
+/* Date/Time */
+/* line 340, ../sass/partials/_form.scss */
+.form-row p.datetime {
+  line-height: 30px !important;
+  padding-left: 90px !important;
+}
+
+/* Calendar */
+/* line 350, ../sass/partials/_form.scss */
+div.calendar table caption {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #595f65), color-stop(100%, #464b50));
+  background-image: -webkit-linear-gradient(#595f65, #464b50);
+  background-image: -moz-linear-gradient(#595f65, #464b50);
+  background-image: -o-linear-gradient(#595f65, #464b50);
+  background-image: -ms-linear-gradient(#595f65, #464b50);
+  background-image: linear-gradient(#595f65, #464b50);
+  background-color: #595f65;
+  color: white !important;
+}
+
+/* line 359, ../sass/partials/_form.scss */
+div.clockbox h2 {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #595f65), color-stop(100%, #464b50));
+  background-image: -webkit-linear-gradient(#595f65, #464b50);
+  background-image: -moz-linear-gradient(#595f65, #464b50);
+  background-image: -o-linear-gradient(#595f65, #464b50);
+  background-image: -ms-linear-gradient(#595f65, #464b50);
+  background-image: linear-gradient(#595f65, #464b50);
+  background-color: #595f65;
+  color: white !important;
+}
+
+/* line 366, ../sass/partials/_form.scss */
+div.calendarbox.module {
+  width: 210px !important;
+}
+/* line 368, ../sass/partials/_form.scss */
+div.calendarbox.module .calendarnav-previous, div.calendarbox.module .calendarnav-next {
+  background: none;
+}
+
+/* line 373, ../sass/partials/_form.scss */
+span.datetimeshortcuts a {
+  color: #029eee;
+}
+
+/* Use the following CSS code if you want to have a class per icon */
+/* line 15, ../sass/partials/_icons.scss */
+.addlink,
+.changelink,
+#changelist-search label,
+.deletelink,
+a.selector-clearall,
+a.active.selector-clearall,
+a.selector-chooseall,
+a.active.selector-chooseall,
+.selector-remove,
+.selector-add,
+.inline-group div.add-row a,
+a[id^="calendarlink"],
+a[id^="clocklink"] {
+  background: none !important;
+  padding-left: 10px;
+}
+/* line 18, ../sass/partials/_icons.scss */
+.addlink:hover,
+.changelink:hover,
+#changelist-search label:hover,
+.deletelink:hover,
+a.selector-clearall:hover,
+a.active.selector-clearall:hover,
+a.selector-chooseall:hover,
+a.active.selector-chooseall:hover,
+.selector-remove:hover,
+.selector-add:hover,
+.inline-group div.add-row a:hover,
+a[id^="calendarlink"]:hover,
+a[id^="clocklink"]:hover {
+  text-decoration: none !important;
+}
+
+/* line 38, ../sass/partials/_icons.scss */
+.addlink:before,
+.changelink:before,
+#changelist-search label:before,
+.deletelink:before,
+a.selector-clearall:before,
+a.active.selector-clearall:before,
+a.selector-chooseall:before,
+a.active.selector-chooseall:before,
+.selector-remove:before,
+.selector-add:before,
+.inline-group div.add-row a:before,
+.add-another:before,
+a[id^="calendarlink"]:before,
+a[id^="clocklink"]:before {
+  font-family: 'django-admin-icons';
+  font-style: normal;
+  speak: none;
+  font-weight: normal;
+  font-size: 75%;
+  -webkit-font-smoothing: antialiased;
+  padding-right: 5px;
+}
+
+/* line 49, ../sass/partials/_icons.scss */
+.addlink:before {
+  content: "\22";
+}
+
+/* line 50, ../sass/partials/_icons.scss */
+.changelink:before {
+  content: "\21";
+}
+
+/* line 51, ../sass/partials/_icons.scss */
+#changelist-search label:before {
+  content: "\23";
+}
+
+/* line 52, ../sass/partials/_icons.scss */
+.deletelink:before {
+  content: "\24";
+}
+
+/* line 53, ../sass/partials/_icons.scss */
+.selector-remove:before, a.selector-clearall:before, a.active.selector-clearall:before {
+  content: "\25";
+  font-size: 100%;
+}
+
+/* line 54, ../sass/partials/_icons.scss */
+.selector-add:before, a.selector-chooseall:before, a.active.selector-chooseall:before {
+  content: "\26";
+  font-size: 100%;
+}
+
+/* line 55, ../sass/partials/_icons.scss */
+.inline-group div.add-row a:before {
+  content: "\22";
+}
+
+/* line 56, ../sass/partials/_icons.scss */
+.add-another:before {
+  content: "\22";
+}
+
+/* line 57, ../sass/partials/_icons.scss */
+a[id^="calendarlink"]:before {
+  content: "\2c";
+}
+
+/* line 58, ../sass/partials/_icons.scss */
+a[id^="clocklink"]:before {
+  content: "\2d";
+}
+
+/* line 61, ../sass/partials/_icons.scss */
+.actionlist .addlink, .actionlist .changelink {
+  padding-left: 0;
+}
+
+/* line 64, ../sass/partials/_icons.scss */
+.addlink {
+  color: #9ab933 !important;
+}
+
+/* line 65, ../sass/partials/_icons.scss */
+#changelist-search label {
+  font-weight: bold;
+}
+
+/* line 66, ../sass/partials/_icons.scss */
+#changelist-search label img {
+  display: none;
+}
+
+/* line 67, ../sass/partials/_icons.scss */
+.help-tooltip {
+  display: none;
+}
+
+/* line 69, ../sass/partials/_icons.scss */
+.selector-remove, .selector-add {
+  display: inline !important;
+  font-size: 125% !important;
+  padding-left: 1px;
+  color: white !important;
+}
+
+/* line 70, ../sass/partials/_icons.scss */
+.selector-remove:before, .selector-add:before {
+  color: #444444;
+}
+
+/* line 71, ../sass/partials/_icons.scss */
+.inline-group div.add-row a {
+  color: #9ab933 !important;
+  padding-left: 5px !important;
+}
+
+/* line 73, ../sass/partials/_icons.scss */
+.add-another {
+  margin-left: 10px;
+}
+/* line 75, ../sass/partials/_icons.scss */
+.add-another:hover, .add-another:link:hover {
+  text-decoration: none;
+}
+
+/* line 79, ../sass/partials/_icons.scss */
+.add-another img {
+  display: none;
+}
+
+/* line 82, ../sass/partials/_icons.scss */
+a[id^="calendarlink"], a[id^="clocklink"] {
+  display: inline-block;
+  font-size: 19px;
+  height: 19px;
+  width: 19px;
+  padding-left: 0 !important;
+}
+
+/* line 89, ../sass/partials/_icons.scss */
+a[id^="calendarlink"] img, a[id^="clocklink"] img {
+  display: none;
+}
+
+/* Shortcuts */
+/* line 92, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a {
+  background: none !important;
+  padding-left: 10px;
+}
+/* line 95, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a:hover {
+  text-decoration: none !important;
+}
+
+/* line 101, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a:before {
+  font-family: 'django-admin-icons';
+  font-style: normal;
+  speak: none;
+  font-weight: normal;
+  font-size: 200%;
+  -webkit-font-smoothing: antialiased;
+  padding-right: 5px;
+  vertical-align: middle;
+}
+
+/* line 112, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.pages:before {
+  content: "\27";
+}
+
+/* line 113, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.home:before {
+  content: "\28";
+}
+
+/* line 114, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.user:before {
+  content: "\29";
+}
+
+/* line 115, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.files:before {
+  content: "\2a";
+}
+
+/* line 116, ../sass/partials/_icons.scss */
+.admin_shortcuts .shortcuts li a.contact:before {
+  content: "\2b";
+}
+
+/* Sepcials */
+/* line 119, ../sass/partials/_icons.scss */
+.selector ul.selector-chooser {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -o-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -khtml-border-radius: 10px;
+  border-radius: 10px;
+  background: #f1f1f1 !important;
+  height: 44px !important;
+}
+
+/* Statuses Mixins */
+/* Messages */
+/* line 67, ../sass/partials/_messages.scss */
+.messages {
+  color: #fff;
+  font-weight: bold;
+  font-size: 125%;
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+/* line 76, ../sass/partials/_messages.scss */
+.messages ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* line 82, ../sass/partials/_messages.scss */
+.messages li {
+  line-height: 2.9;
+}
+/* line 85, ../sass/partials/_messages.scss */
+.messages .close {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -o-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -khtml-border-radius: 10px;
+  border-radius: 10px;
+  display: block;
+  cursor: pointer;
+  color: #fff;
+  height: 20px;
+  line-height: 2.5;
+  margin-right: 20px;
+  margin-top: 12px;
+  font-size: 10px;
+  vertical-align: middle;
+  width: 20px;
+}
+/* line 98, ../sass/partials/_messages.scss */
+.messages .close:hover {
+  text-decoration: none;
+}
+/* line 101, ../sass/partials/_messages.scss */
+.messages .close span {
+  display: block;
+  margin-top: -2px;
+  margin-left: 1px;
+}
+/* line 108, ../sass/partials/_messages.scss */
+.messages .info {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(80%, #029eee), color-stop(100%, #0072ac));
+  background-image: -webkit-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: -moz-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: -o-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: -ms-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+}
+/* line 6, ../sass/partials/_messages.scss */
+.messages .info .close {
+  -moz-box-shadow: #029eee 0 0 2px inset;
+  -webkit-box-shadow: #029eee 0 0 2px inset;
+  -o-box-shadow: #029eee 0 0 2px inset;
+  box-shadow: #029eee 0 0 2px inset;
+  background: #029eee;
+  border: 1px solid #029eee;
+}
+/* line 10, ../sass/partials/_messages.scss */
+.messages .info .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #0072ac));
+  background-image: -webkit-linear-gradient(#5bbdee, #0072ac);
+  background-image: -moz-linear-gradient(#5bbdee, #0072ac);
+  background-image: -o-linear-gradient(#5bbdee, #0072ac);
+  background-image: -ms-linear-gradient(#5bbdee, #0072ac);
+  background-image: linear-gradient(#5bbdee, #0072ac);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #029eee;
+}
+/* line 111, ../sass/partials/_messages.scss */
+.messages .success {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(80%, #9ab933), color-stop(100%, #8fad28));
+  background-image: -webkit-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -moz-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -o-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -ms-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+}
+/* line 20, ../sass/partials/_messages.scss */
+.messages .success .close {
+  -moz-box-shadow: #9ab933 0 0 2px inset;
+  -webkit-box-shadow: #9ab933 0 0 2px inset;
+  -o-box-shadow: #9ab933 0 0 2px inset;
+  box-shadow: #9ab933 0 0 2px inset;
+  background: #9ab933;
+  border: 1px solid #9ab933;
+}
+/* line 24, ../sass/partials/_messages.scss */
+.messages .success .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #8fad28));
+  background-image: -webkit-linear-gradient(#bcd077, #8fad28);
+  background-image: -moz-linear-gradient(#bcd077, #8fad28);
+  background-image: -o-linear-gradient(#bcd077, #8fad28);
+  background-image: -ms-linear-gradient(#bcd077, #8fad28);
+  background-image: linear-gradient(#bcd077, #8fad28);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #9ab933;
+}
+/* line 114, ../sass/partials/_messages.scss */
+.messages .warning {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffc600), color-stop(80%, #ffb400), color-stop(100%, #ffa800));
+  background-image: -webkit-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -moz-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -o-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -ms-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+}
+/* line 34, ../sass/partials/_messages.scss */
+.messages .warning .close {
+  -moz-box-shadow: #ffb400 0 0 2px inset;
+  -webkit-box-shadow: #ffb400 0 0 2px inset;
+  -o-box-shadow: #ffb400 0 0 2px inset;
+  box-shadow: #ffb400 0 0 2px inset;
+  background: #ffb400;
+  border: 1px solid #ffb400;
+}
+/* line 38, ../sass/partials/_messages.scss */
+.messages .warning .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffc600), color-stop(100%, #ffa800));
+  background-image: -webkit-linear-gradient(#ffc600, #ffa800);
+  background-image: -moz-linear-gradient(#ffc600, #ffa800);
+  background-image: -o-linear-gradient(#ffc600, #ffa800);
+  background-image: -ms-linear-gradient(#ffc600, #ffa800);
+  background-image: linear-gradient(#ffc600, #ffa800);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #ffb400;
+}
+/* line 117, ../sass/partials/_messages.scss */
+.messages .error {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(80%, #e80101), color-stop(100%, #d50101));
+  background-image: -webkit-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -moz-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -o-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -ms-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+}
+/* line 49, ../sass/partials/_messages.scss */
+.messages .error .close {
+  -moz-box-shadow: #e80101 0 0 2px inset;
+  -webkit-box-shadow: #e80101 0 0 2px inset;
+  -o-box-shadow: #e80101 0 0 2px inset;
+  box-shadow: #e80101 0 0 2px inset;
+  background: #e80101;
+  border: 1px solid #e80101;
+}
+/* line 53, ../sass/partials/_messages.scss */
+.messages .error .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(100%, #d50101));
+  background-image: -webkit-linear-gradient(#ef4a4a, #d50101);
+  background-image: -moz-linear-gradient(#ef4a4a, #d50101);
+  background-image: -o-linear-gradient(#ef4a4a, #d50101);
+  background-image: -ms-linear-gradient(#ef4a4a, #d50101);
+  background-image: linear-gradient(#ef4a4a, #d50101);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #e80101;
+}
+
+/* line 122, ../sass/partials/_messages.scss */
+.inline-messages {
+  color: #fff;
+  font-size: 100%;
+  text-align: left;
+  position: relative;
+}
+/* line 127, ../sass/partials/_messages.scss */
+.inline-messages .inline-message {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 5px 10px;
+}
+/* line 132, ../sass/partials/_messages.scss */
+.inline-messages .animate {
+  -moz-background-size: 60px 60px;
+  -webkit-background-size: 60px 60px;
+  -o-background-size: 60px 60px;
+  background-size: 60px 60px;
+  background-image: -webkit-gradient(linear, -45deg, -45deg, color-stop(25%, rgba(255, 255, 255, 0.1)), color-stop(25%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0.1)), color-stop(75%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0));
+}
+/* line 135, ../sass/partials/_messages.scss */
+.inline-messages .inline-info {
+  background-color: #029eee;
+  border: 1px solid #0072ac;
+}
+/* line 139, ../sass/partials/_messages.scss */
+.inline-messages .inline-success {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(80%, #9ab933), color-stop(100%, #8fad28));
+  background-image: -webkit-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -moz-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -o-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -ms-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  border: 1px solid #8fad28;
+}
+/* line 20, ../sass/partials/_messages.scss */
+.inline-messages .inline-success .close {
+  -moz-box-shadow: #9ab933 0 0 2px inset;
+  -webkit-box-shadow: #9ab933 0 0 2px inset;
+  -o-box-shadow: #9ab933 0 0 2px inset;
+  box-shadow: #9ab933 0 0 2px inset;
+  background: #9ab933;
+  border: 1px solid #9ab933;
+}
+/* line 24, ../sass/partials/_messages.scss */
+.inline-messages .inline-success .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #8fad28));
+  background-image: -webkit-linear-gradient(#bcd077, #8fad28);
+  background-image: -moz-linear-gradient(#bcd077, #8fad28);
+  background-image: -o-linear-gradient(#bcd077, #8fad28);
+  background-image: -ms-linear-gradient(#bcd077, #8fad28);
+  background-image: linear-gradient(#bcd077, #8fad28);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #9ab933;
+}
+/* line 143, ../sass/partials/_messages.scss */
+.inline-messages .inline-warning {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffc600), color-stop(80%, #ffb400), color-stop(100%, #ffa800));
+  background-image: -webkit-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -moz-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -o-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -ms-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  border: 1px solid #ffa800;
+}
+/* line 34, ../sass/partials/_messages.scss */
+.inline-messages .inline-warning .close {
+  -moz-box-shadow: #ffb400 0 0 2px inset;
+  -webkit-box-shadow: #ffb400 0 0 2px inset;
+  -o-box-shadow: #ffb400 0 0 2px inset;
+  box-shadow: #ffb400 0 0 2px inset;
+  background: #ffb400;
+  border: 1px solid #ffb400;
+}
+/* line 38, ../sass/partials/_messages.scss */
+.inline-messages .inline-warning .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffc600), color-stop(100%, #ffa800));
+  background-image: -webkit-linear-gradient(#ffc600, #ffa800);
+  background-image: -moz-linear-gradient(#ffc600, #ffa800);
+  background-image: -o-linear-gradient(#ffc600, #ffa800);
+  background-image: -ms-linear-gradient(#ffc600, #ffa800);
+  background-image: linear-gradient(#ffc600, #ffa800);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #ffb400;
+}
+/* line 147, ../sass/partials/_messages.scss */
+.inline-messages .inline-error {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(80%, #e80101), color-stop(100%, #d50101));
+  background-image: -webkit-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -moz-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -o-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -ms-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  border: 1px solid #d50101;
+}
+/* line 49, ../sass/partials/_messages.scss */
+.inline-messages .inline-error .close {
+  -moz-box-shadow: #e80101 0 0 2px inset;
+  -webkit-box-shadow: #e80101 0 0 2px inset;
+  -o-box-shadow: #e80101 0 0 2px inset;
+  box-shadow: #e80101 0 0 2px inset;
+  background: #e80101;
+  border: 1px solid #e80101;
+}
+/* line 53, ../sass/partials/_messages.scss */
+.inline-messages .inline-error .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(100%, #d50101));
+  background-image: -webkit-linear-gradient(#ef4a4a, #d50101);
+  background-image: -moz-linear-gradient(#ef4a4a, #d50101);
+  background-image: -o-linear-gradient(#ef4a4a, #d50101);
+  background-image: -ms-linear-gradient(#ef4a4a, #d50101);
+  background-image: linear-gradient(#ef4a4a, #d50101);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #e80101;
+}
+
+/* line 154, ../sass/partials/_messages.scss */
+header.header-info {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(80%, #029eee), color-stop(100%, #0072ac));
+  background-image: -webkit-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: -moz-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: -o-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: -ms-linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+  background-image: linear-gradient(#5bbdee, #029eee 80%, #0072ac);
+}
+/* line 6, ../sass/partials/_messages.scss */
+header.header-info .close {
+  -moz-box-shadow: #029eee 0 0 2px inset;
+  -webkit-box-shadow: #029eee 0 0 2px inset;
+  -o-box-shadow: #029eee 0 0 2px inset;
+  box-shadow: #029eee 0 0 2px inset;
+  background: #029eee;
+  border: 1px solid #029eee;
+}
+/* line 10, ../sass/partials/_messages.scss */
+header.header-info .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #5bbdee), color-stop(100%, #0072ac));
+  background-image: -webkit-linear-gradient(#5bbdee, #0072ac);
+  background-image: -moz-linear-gradient(#5bbdee, #0072ac);
+  background-image: -o-linear-gradient(#5bbdee, #0072ac);
+  background-image: -ms-linear-gradient(#5bbdee, #0072ac);
+  background-image: linear-gradient(#5bbdee, #0072ac);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #029eee;
+}
+/* line 156, ../sass/partials/_messages.scss */
+header.header-info .meta small {
+  color: #fff;
+}
+/* line 159, ../sass/partials/_messages.scss */
+header.header-info nav li.internal {
+  -moz-box-shadow: 0 0 0 0;
+  -webkit-box-shadow: 0 0 0 0;
+  -o-box-shadow: 0 0 0 0;
+  box-shadow: 0 0 0 0;
+}
+/* line 163, ../sass/partials/_messages.scss */
+header.header-success {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(80%, #9ab933), color-stop(100%, #8fad28));
+  background-image: -webkit-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -moz-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -o-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: -ms-linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+  background-image: linear-gradient(#bcd077, #9ab933 80%, #8fad28);
+}
+/* line 20, ../sass/partials/_messages.scss */
+header.header-success .close {
+  -moz-box-shadow: #9ab933 0 0 2px inset;
+  -webkit-box-shadow: #9ab933 0 0 2px inset;
+  -o-box-shadow: #9ab933 0 0 2px inset;
+  box-shadow: #9ab933 0 0 2px inset;
+  background: #9ab933;
+  border: 1px solid #9ab933;
+}
+/* line 24, ../sass/partials/_messages.scss */
+header.header-success .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bcd077), color-stop(100%, #8fad28));
+  background-image: -webkit-linear-gradient(#bcd077, #8fad28);
+  background-image: -moz-linear-gradient(#bcd077, #8fad28);
+  background-image: -o-linear-gradient(#bcd077, #8fad28);
+  background-image: -ms-linear-gradient(#bcd077, #8fad28);
+  background-image: linear-gradient(#bcd077, #8fad28);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #9ab933;
+}
+/* line 165, ../sass/partials/_messages.scss */
+header.header-success .meta small {
+  color: #fff;
+}
+/* line 168, ../sass/partials/_messages.scss */
+header.header-success nav li.internal {
+  -moz-box-shadow: 0 0 0 0;
+  -webkit-box-shadow: 0 0 0 0;
+  -o-box-shadow: 0 0 0 0;
+  box-shadow: 0 0 0 0;
+}
+/* line 172, ../sass/partials/_messages.scss */
+header.header-warning {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffc600), color-stop(80%, #ffb400), color-stop(100%, #ffa800));
+  background-image: -webkit-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -moz-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -o-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: -ms-linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+  background-image: linear-gradient(#ffc600, #ffb400 80%, #ffa800);
+}
+/* line 34, ../sass/partials/_messages.scss */
+header.header-warning .close {
+  -moz-box-shadow: #ffb400 0 0 2px inset;
+  -webkit-box-shadow: #ffb400 0 0 2px inset;
+  -o-box-shadow: #ffb400 0 0 2px inset;
+  box-shadow: #ffb400 0 0 2px inset;
+  background: #ffb400;
+  border: 1px solid #ffb400;
+}
+/* line 38, ../sass/partials/_messages.scss */
+header.header-warning .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffc600), color-stop(100%, #ffa800));
+  background-image: -webkit-linear-gradient(#ffc600, #ffa800);
+  background-image: -moz-linear-gradient(#ffc600, #ffa800);
+  background-image: -o-linear-gradient(#ffc600, #ffa800);
+  background-image: -ms-linear-gradient(#ffc600, #ffa800);
+  background-image: linear-gradient(#ffc600, #ffa800);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #ffb400;
+}
+/* line 174, ../sass/partials/_messages.scss */
+header.header-warning .meta small {
+  color: #fff;
+}
+/* line 177, ../sass/partials/_messages.scss */
+header.header-warning nav li.internal {
+  -moz-box-shadow: 0 0 0 0;
+  -webkit-box-shadow: 0 0 0 0;
+  -o-box-shadow: 0 0 0 0;
+  box-shadow: 0 0 0 0;
+}
+/* line 181, ../sass/partials/_messages.scss */
+header.header-error {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(80%, #e80101), color-stop(100%, #d50101));
+  background-image: -webkit-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -moz-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -o-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: -ms-linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+  background-image: linear-gradient(#ef4a4a, #e80101 80%, #d50101);
+}
+/* line 49, ../sass/partials/_messages.scss */
+header.header-error .close {
+  -moz-box-shadow: #e80101 0 0 2px inset;
+  -webkit-box-shadow: #e80101 0 0 2px inset;
+  -o-box-shadow: #e80101 0 0 2px inset;
+  box-shadow: #e80101 0 0 2px inset;
+  background: #e80101;
+  border: 1px solid #e80101;
+}
+/* line 53, ../sass/partials/_messages.scss */
+header.header-error .close:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ef4a4a), color-stop(100%, #d50101));
+  background-image: -webkit-linear-gradient(#ef4a4a, #d50101);
+  background-image: -moz-linear-gradient(#ef4a4a, #d50101);
+  background-image: -o-linear-gradient(#ef4a4a, #d50101);
+  background-image: -ms-linear-gradient(#ef4a4a, #d50101);
+  background-image: linear-gradient(#ef4a4a, #d50101);
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #e80101;
+}
+/* line 183, ../sass/partials/_messages.scss */
+header.header-error .meta small {
+  color: #fff;
+}
+/* line 186, ../sass/partials/_messages.scss */
+header.header-error nav li.internal {
+  -moz-box-shadow: 0 0 0 0;
+  -webkit-box-shadow: 0 0 0 0;
+  -o-box-shadow: 0 0 0 0;
+  box-shadow: 0 0 0 0;
+}
+
+/* line 192, ../sass/partials/_messages.scss */
+.hint {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  border-top: 1px solid white;
+  margin-bottom: 15px;
+  padding: 15px 20px;
+}
+/* line 197, ../sass/partials/_messages.scss */
+.hint.hint-info {
+  -moz-box-shadow: #5bbdee 0 1px 1px 0px;
+  -webkit-box-shadow: #5bbdee 0 1px 1px 0px;
+  -o-box-shadow: #5bbdee 0 1px 1px 0px;
+  box-shadow: #5bbdee 0 1px 1px 0px;
+  background-color: #f1faff;
+  color: #029eee;
+  text-align: center;
+}
+/* line 202, ../sass/partials/_messages.scss */
+.hint.hint-info h1, .hint.hint-info h2, .hint.hint-info h3, .hint.hint-info h4, .hint.hint-info h5, .hint.hint-info h6 {
+  margin: 5px 0;
+  color: #029eee;
+}
+/* line 206, ../sass/partials/_messages.scss */
+.hint.hint-info p {
+  margin-top: 5px;
+}
+/* line 209, ../sass/partials/_messages.scss */
+.hint.hint-info a {
+  text-decoration: underline;
+}
+/* line 211, ../sass/partials/_messages.scss */
+.hint.hint-info a:hover {
+  color: #0072ac;
+}
+/* line 215, ../sass/partials/_messages.scss */
+.hint.hint-info .close {
+  background: url(../images/sprite.png) no-repeat 0 -100px;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+}
+/* line 222, ../sass/partials/_messages.scss */
+.hint.hint-success {
+  -moz-box-shadow: #bcd077 0 1px 1px 0px;
+  -webkit-box-shadow: #bcd077 0 1px 1px 0px;
+  -o-box-shadow: #bcd077 0 1px 1px 0px;
+  box-shadow: #bcd077 0 1px 1px 0px;
+  background-color: #f5fbe1;
+  color: #9ab933;
+  font-size: 120%;
+}
+/* line 227, ../sass/partials/_messages.scss */
+.hint.hint-success .icon {
+  margin-right: 10px;
+}
+/* line 230, ../sass/partials/_messages.scss */
+.hint.hint-success span {
+  display: inline-block;
+}
+/* line 234, ../sass/partials/_messages.scss */
+.hint.hint-warning {
+  -moz-box-shadow: #ffc600 0 1px 1px 0px;
+  -webkit-box-shadow: #ffc600 0 1px 1px 0px;
+  -o-box-shadow: #ffc600 0 1px 1px 0px;
+  box-shadow: #ffc600 0 1px 1px 0px;
+  background-color: #fffde4;
+  color: #ffb400;
+  font-size: 120%;
+}
+/* line 239, ../sass/partials/_messages.scss */
+.hint.hint-warning .icon {
+  margin-right: 10px;
+}
+/* line 242, ../sass/partials/_messages.scss */
+.hint.hint-warning span {
+  display: inline-block;
+}
+/* line 245, ../sass/partials/_messages.scss */
+.hint.hint-warning .button {
+  margin-top: -5px;
+}
+/* line 249, ../sass/partials/_messages.scss */
+.hint.hint-error {
+  -moz-box-shadow: #ef4a4a 0 1px 1px 0px;
+  -webkit-box-shadow: #ef4a4a 0 1px 1px 0px;
+  -o-box-shadow: #ef4a4a 0 1px 1px 0px;
+  box-shadow: #ef4a4a 0 1px 1px 0px;
+  background-color: #fff3f3;
+  color: #e80101;
+  font-size: 120%;
+}
+/* line 254, ../sass/partials/_messages.scss */
+.hint.hint-error .icon {
+  margin-right: 10px;
+}
+/* line 257, ../sass/partials/_messages.scss */
+.hint.hint-error span {
+  display: inline-block;
+}
+/* line 260, ../sass/partials/_messages.scss */
+.hint.hint-error .button {
+  margin-top: -5px;
+}
+/* line 262, ../sass/partials/_messages.scss */
+.hint.hint-error .button.small {
+  margin-top: -2px;
+}
+
+/* line 7, ../sass/partials/_page.scss */
+html, body {
+  height: 100%;
+  min-width: 1024px;
+}
+
+/* line 12, ../sass/partials/_page.scss */
+html {
+  overflow: auto !important;
+}
+
+/* line 16, ../sass/partials/_page.scss */
+body {
+  background: url("../images/bg-pattern-light.jpg") #fcfcfc repeat !important;
+}
+
+/* line 20, ../sass/partials/_page.scss */
+body, select, input, textarea {
+  color: #444444;
+}
+
+/* line 24, ../sass/partials/_page.scss */
+h1 {
+  font-size: 150%;
+  color: #666666;
+  font-weight: bold;
+  margin: 20px 10px;
+}
+
+/* line 25, ../sass/partials/_page.scss */
+h2 {
+  font-size: 130%;
+  color: #666666;
+  font-weight: bold;
+  line-height: 1.75em;
+}
+
+/* line 26, ../sass/partials/_page.scss */
+h3 {
+  font-size: 120%;
+  color: #444444;
+  font-weight: bold;
+}
+
+/* line 27, ../sass/partials/_page.scss */
+h4 {
+  font-size: 110%;
+  color: #666666;
+  font-weight: bold;
+}
+
+/* line 28, ../sass/partials/_page.scss */
+h5 {
+  font-size: 100%;
+  color: #444444;
+}
+
+/* line 29, ../sass/partials/_page.scss */
+h6 {
+  font-size: 100%;
+  color: #666666;
+}
+
+/* line 31, ../sass/partials/_page.scss */
+a, a:link {
+  color: #029eee;
+  text-decoration: none;
+}
+/* line 34, ../sass/partials/_page.scss */
+a:hover, a:link:hover {
+  color: #2070b3;
+  text-decoration: underline;
+}
+/* line 38, ../sass/partials/_page.scss */
+a:active, a:link:active {
+  color: #2070b3;
+}
+/* line 41, ../sass/partials/_page.scss */
+a:visited, a:link:visited {
+  color: #029eee;
+}
+
+/* line 46, ../sass/partials/_page.scss */
+p {
+  font-weight: normal;
+  margin-bottom: 6px;
+}
+
+/* line 48, ../sass/partials/_page.scss */
+code {
+  font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  background: inherit;
+  color: #666;
+  font-size: 11px;
+}
+/* line 53, ../sass/partials/_page.scss */
+code strong {
+  color: #930;
+}
+
+/* line 58, ../sass/partials/_page.scss */
+pre {
+  font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  background: inherit;
+  color: #666;
+  font-size: 11px;
+}
+/* line 63, ../sass/partials/_page.scss */
+pre.literal-block {
+  background: #eee;
+}
+
+/* Rulers */
+/* line 69, ../sass/partials/_page.scss */
+div hr {
+  background: #dddddd;
+  margin: 20px 0;
+  border: none;
+}
+
+/* line 75, ../sass/partials/_page.scss */
+strong {
+  font-weight: bold;
+}
+
+/* line 76, ../sass/partials/_page.scss */
+.small, small {
+  font-size: 85%;
+  margin-top: 0;
+}
+
+/* line 78, ../sass/partials/_page.scss */
+.clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+/* line 86, ../sass/partials/_page.scss */
+::selection {
+  background: #AFD7FF;
+  color: #444;
+  text-shadow: none;
+}
+
+/* line 92, ../sass/partials/_page.scss */
+::-moz-selection {
+  background: #AFD7FF;
+  color: #444;
+  text-shadow: none;
+}
+
+/* Header */
+/* line 103, ../sass/partials/_page.scss */
+#header {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #595f65), color-stop(100%, #464b50));
+  background-image: -webkit-linear-gradient(#595f65, #464b50);
+  background-image: -moz-linear-gradient(#595f65, #464b50);
+  background-image: -o-linear-gradient(#595f65, #464b50);
+  background-image: -ms-linear-gradient(#595f65, #464b50);
+  background-image: linear-gradient(#595f65, #464b50);
+  background-color: #595f65;
+  color: white !important;
+  height: 46px;
+}
+
+/* line 112, ../sass/partials/_page.scss */
+#branding h1 {
+  color: white;
+  padding: 3px 25px;
+}
+
+/* line 118, ../sass/partials/_page.scss */
+div.breadcrumbs {
+  background: #595f65;
+  border-top: 1px solid #444444;
+  color: #cccccc;
+  padding-left: 25px;
+}
+/* line 123, ../sass/partials/_page.scss */
+div.breadcrumbs a {
+  color: #888888;
+}
+/* line 125, ../sass/partials/_page.scss */
+div.breadcrumbs a:hover {
+  color: #cccccc;
+  text-decoration: none;
+}
+
+/* line 132, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts {
+  box-shadow: none;
+  background: #595f65;
+  border-top: 1px solid #444444;
+  color: #cccccc;
+}
+/* line 137, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts h2 {
+  border-bottom: 1px solid #444444;
+}
+/* line 141, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a {
+  background: #464b50 10px 50% no-repeat;
+  border: 1px solid #444444;
+  padding: 20px 10px 20px 15px;
+}
+/* line 145, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a:hover {
+  background-color: #595f65;
+}
+/* line 148, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a .count {
+  color: #888888;
+}
+/* line 151, ../sass/partials/_page.scss */
+div.admin_shortcuts .shortcuts li a .count_new {
+  background: #029eee;
+  border-color: #5bbdee;
+}
+
+/* line 159, ../sass/partials/_page.scss */
+#user-tools {
+  padding: 20px 25px;
+}
+
+/* Box Mixin */
+/* Dashboard */
+/* line 181, ../sass/partials/_page.scss */
+.dashboard #content {
+  width: 740px;
+}
+/* line 184, ../sass/partials/_page.scss */
+.dashboard .module {
+  padding: 0 30px 10px 30px !important;
+}
+
+/* Module */
+/* line 191, ../sass/partials/_page.scss */
+#content-main .module {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: #dddddd 0 2px 3px 0px;
+  -webkit-box-shadow: #dddddd 0 2px 3px 0px;
+  -o-box-shadow: #dddddd 0 2px 3px 0px;
+  box-shadow: #dddddd 0 2px 3px 0px;
+  background: white;
+  border: 0;
+  border-top: 1px solid #F6F6F6;
+  margin-bottom: 5px;
+  padding: 0;
+  margin-bottom: 10px;
+}
+/* line 173, ../sass/partials/_page.scss */
+#content-main .module h2, #content-main .module h3, #content-main .module h4, #content-main .module h5, #content-main .module h6 {
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+/* line 194, ../sass/partials/_page.scss */
+#content-main .module h2 {
+  background: none;
+  border-bottom: 1px solid #dddddd;
+  color: #444444;
+  font-size: 100%;
+  margin-bottom: 2px;
+  margin-top: 0;
+  padding: 10px;
+}
+/* line 203, ../sass/partials/_page.scss */
+#content-main .module caption {
+  background: none;
+  color: #666666;
+  font-size: 130%;
+  font-weight: bold;
+  line-height: 1.75em;
+  margin-bottom: 10px;
+  padding: 0;
+}
+/* line 211, ../sass/partials/_page.scss */
+#content-main .module caption a.section:link, #content-main .module caption a.section:visited {
+  color: #666666;
+}
+/* line 217, ../sass/partials/_page.scss */
+#content-main .inline-group {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: white 0 0 2px inset !important;
+  -webkit-box-shadow: white 0 0 2px inset !important;
+  -o-box-shadow: white 0 0 2px inset !important;
+  box-shadow: white 0 0 2px inset !important;
+  border: 1px solid #dddddd;
+  background: rgba(255, 255, 255, 0.2) !important;
+  padding: 10px;
+}
+/* line 223, ../sass/partials/_page.scss */
+#content-main .inline-group h2 {
+  background: none !important;
+  color: #444444;
+  font-size: 100%;
+  margin-bottom: 10px;
+  padding: 0 10px 8px 0px;
+}
+/* line 230, ../sass/partials/_page.scss */
+#content-main .inline-group div.add-row {
+  background: none !important;
+  border-bottom: 0 !important;
+}
+/* line 234, ../sass/partials/_page.scss */
+#content-main .inline-group .form-row {
+  border-bottom: none !important;
+}
+/* line 240, ../sass/partials/_page.scss */
+#content-main .inline-related h3 {
+  background: none;
+  border-bottom: none;
+}
+/* line 246, ../sass/partials/_page.scss */
+#content-main .submit-row {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: white 0 0 2px inset !important;
+  -webkit-box-shadow: white 0 0 2px inset !important;
+  -o-box-shadow: white 0 0 2px inset !important;
+  box-shadow: white 0 0 2px inset !important;
+  border: 1px solid #dddddd;
+  background: rgba(255, 255, 255, 0.2) !important;
+  padding: 10px;
+}
+/* line 252, ../sass/partials/_page.scss */
+#content-main .submit-row .deletelink-box {
+  margin: 0.5em 0 !important;
+}
+/* line 257, ../sass/partials/_page.scss */
+#content-main .selector .selector-available, #content-main .selector .selector-chosen {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid #dddddd;
+}
+/* line 260, ../sass/partials/_page.scss */
+#content-main .selector .selector-available h2, #content-main .selector .selector-chosen h2 {
+  color: #444444 !important;
+  background: none !important;
+  border: none;
+  margin-bottom: 0;
+}
+/* line 266, ../sass/partials/_page.scss */
+#content-main .selector .selector-available input, #content-main .selector .selector-chosen input {
+  width: 252px;
+}
+/* line 270, ../sass/partials/_page.scss */
+#content-main .selector .selector-filter {
+  border: none;
+}
+/* line 273, ../sass/partials/_page.scss */
+#content-main .selector select[multiple] {
+  border: 1px solid #dddddd;
+  border-left: none;
+  border-right: none;
+  margin-bottom: 0;
+}
+
+/* line 283, ../sass/partials/_page.scss */
+#content-related .module {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: white 0 0 2px inset !important;
+  -webkit-box-shadow: white 0 0 2px inset !important;
+  -o-box-shadow: white 0 0 2px inset !important;
+  box-shadow: white 0 0 2px inset !important;
+  border: 1px solid #dddddd;
+  background: rgba(255, 255, 255, 0.2) !important;
+  margin-left: 10px;
+  padding: 10px 20px !important;
+}
+/* line 290, ../sass/partials/_page.scss */
+#content-related .module ul.actionlist {
+  padding: 0;
+}
+/* line 293, ../sass/partials/_page.scss */
+#content-related .module h2 {
+  background: none;
+  color: #888888;
+  padding: 0 0 5px 0;
+}
+/* line 298, ../sass/partials/_page.scss */
+#content-related .module h3 {
+  border-bottom: 1px solid #dddddd;
+  line-height: 20px;
+  margin: 0 0 5px 0;
+  padding: 0;
+}
+/* line 304, ../sass/partials/_page.scss */
+#content-related .module p {
+  padding: 0;
+}
+
+/* line 311, ../sass/partials/_page.scss */
+#changelist #toolbar {
+  background: none !important;
+  border: 0 !important;
+}
+/* line 315, ../sass/partials/_page.scss */
+#changelist #toolbar form #searchbar {
+  padding: 4px 5px 6px 5px !important;
+}
+/* line 321, ../sass/partials/_page.scss */
+#changelist #changelist-search div {
+  float: right;
+  margin-right: 2px;
+}
+/* line 325, ../sass/partials/_page.scss */
+#changelist #changelist-search label {
+  min-width: auto;
+  font-size: 150%;
+}
+/* line 330, ../sass/partials/_page.scss */
+#changelist #changelist-filter {
+  background: rgba(255, 255, 255, 0.2);
+}
+/* line 332, ../sass/partials/_page.scss */
+#changelist #changelist-filter h2 {
+  background: none;
+  color: #888888;
+  padding: 2px 9px;
+}
+/* line 337, ../sass/partials/_page.scss */
+#changelist #changelist-filter ul {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+/* line 340, ../sass/partials/_page.scss */
+#changelist #changelist-filter ul li.selected {
+  border-left: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+/* line 344, ../sass/partials/_page.scss */
+#changelist #changelist-filter ul li.selected a {
+  color: #029eee !important;
+}
+/* line 350, ../sass/partials/_page.scss */
+#changelist #result_list {
+  margin: 0 !important;
+}
+/* line 353, ../sass/partials/_page.scss */
+#changelist .actions {
+  background: none !important;
+  border: 0 !important;
+  padding: 0px 3px 6px 3px !important;
+}
+/* line 358, ../sass/partials/_page.scss */
+#changelist .paginator {
+  border-top: none !important;
+  border-bottom: none !important;
+  background: none !important;
+}
+
+/* Login */
+/* line 367, ../sass/partials/_page.scss */
+body.login {
+  background: url("../images/bg-pattern.jpg") #fcfcfc repeat !important;
+}
+/* line 369, ../sass/partials/_page.scss */
+body.login #container {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: #dddddd 0 2px 3px 0px;
+  -webkit-box-shadow: #dddddd 0 2px 3px 0px;
+  -o-box-shadow: #dddddd 0 2px 3px 0px;
+  box-shadow: #dddddd 0 2px 3px 0px;
+  background: white;
+  border: 0;
+  border-top: 1px solid #F6F6F6;
+  margin-bottom: 5px;
+  padding: 0;
+  -moz-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  -o-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, white 0px 1px 1px inset;
+  width: 350px;
+  border: none !important;
+}
+/* line 173, ../sass/partials/_page.scss */
+body.login #container h2, body.login #container h3, body.login #container h4, body.login #container h5, body.login #container h6 {
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+/* line 374, ../sass/partials/_page.scss */
+body.login #container #header {
+  background: none !important;
+}
+/* line 377, ../sass/partials/_page.scss */
+body.login #container #header #branding h1 {
+  color: #444444;
+  margin: 20px 0 !important;
+  text-align: center;
+}
+/* line 384, ../sass/partials/_page.scss */
+body.login #container #content {
+  margin: 0 !important;
+  padding: 25px 40px !important;
+}
+/* line 388, ../sass/partials/_page.scss */
+body.login #container #content #content-main .submit-row {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+/* line 392, ../sass/partials/_page.scss */
+body.login #container #content #content-main .submit-row input {
+  font-size: 15px !important;
+}
+/* line 398, ../sass/partials/_page.scss */
+body.login #container #footer {
+  display: none;
+}
+
+/* Tables */
+/* line 2, ../sass/partials/_table.scss */
+table {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  background: white;
+  border-bottom: 1px solid #dddddd;
+  margin: 20px 0;
+  padding: 5px;
+  width: 100%;
+}
+/* line 9, ../sass/partials/_table.scss */
+table th {
+  border-bottom: 1px solid #dddddd;
+}
+/* line 12, ../sass/partials/_table.scss */
+table th, table td {
+  padding: 5px 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Tables */
+/* line 21, ../sass/partials/_table.scss */
+table thead th, table tfoot td {
+  background: #fcfcfc;
+}
+/* line 24, ../sass/partials/_table.scss */
+table td, table th {
+  font-family: sans-serif;
+  padding: 5px !important;
+}
+/* line 29, ../sass/partials/_table.scss */
+table tr:first-child th, table tr:first-child td {
+  border-top: 1px solid #f3f3f3;
+}
+/* line 32, ../sass/partials/_table.scss */
+table tr th, table tr td {
+  border-bottom: 1px solid #f3f3f3;
+}
+/* line 38, ../sass/partials/_table.scss */
+table th a:link, table th a:visited, table th a:link:visited {
+  color: #444444;
+}
+/* line 42, ../sass/partials/_table.scss */
+table .row1 {
+  background: white;
+}
+/* line 45, ../sass/partials/_table.scss */
+table .row2 {
+  background: #fcfcfc;
+}
+
+/* line 54, ../sass/partials/_table.scss */
+.change-list table thead tr:first-child th, .change-list table thead tr:first-child td {
+  background: none;
+}
+/* line 61, ../sass/partials/_table.scss */
+.change-list table tbody th a:link, .change-list table tbody th a:visited, .change-list table tbody th a:link:visited {
+  color: #029eee;
+  padding-left: 5px;
+}
+/* line 66, ../sass/partials/_table.scss */
+.change-list table tbody tr.selected {
+  background: #f6fcff !important;
+}
+
+@media only screen and (max-width: 1024px) {
+  /* line 1, ../sass/devices/_pad.scss */
+  #quick-access {
+    display: none;
+  }
+}
