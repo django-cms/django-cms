@@ -85,7 +85,6 @@ def configure(**extra):
             'cms.plugins.video',
             'cms.plugins.twitter',
             'cms.plugins.inherit',
-            'djangocms_column',
             'cms.test_utils.project.sampleapp',
             'cms.test_utils.project.placeholderapp',
             'cms.test_utils.project.pluginapp',
