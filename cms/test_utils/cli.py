@@ -163,7 +163,7 @@ def configure(**extra):
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin', 'ColumnPlugin'),
+                            'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
 
