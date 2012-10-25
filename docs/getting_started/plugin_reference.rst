@@ -91,49 +91,6 @@ setting in your project's ``settings.py`` file::
         # ...
     )
 
-.. :module:: cms.plugins.link
-
-.. :class:: cms.plugins.link.cms_plugins.LinkPlugin
-
-
-.. :module:: cms.plugins.column
-
-.. :class:: cms.plugins.column.cms_plugins.MulitColumn
-
-.. versionadded:: 2.4
-
-***********
-MultiColumn
-***********
-
-Adds 2 plugins. MultiColumn and Column.
-Only add MultiColumn to your `PLACEHOLDER_CONF` because Column should only be added to MultiColumn as a child.
-
-MultiColumn only allows one plugin as a child: the Column plugin.
-The Column plugin has a parameter width. With this parameter you can control the width 
-of the column. 
-
-You can add a new setting to your settings.py called `COLUMN_WIDTH_CHOICES`
-
-the default is::
-
-	COLUMN_WIDTH_CHOICES = (
-	    ('1', gettext("normal")),
-	    ('2', gettext("2x")),
-	    ('3', gettext("3x")),
-	    ('4', gettext("4x"))
-	)
-
-but you can change that to fit your CSS grid framework or other purposes.
-
-For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
-setting in your project's ``settings.py`` file::
-
-    INSTALLED_APPS = (
-        # ...
-        'cms.plugins.column',
-        # ...
-    )
 
 .. :module:: cms.plugins.link
 

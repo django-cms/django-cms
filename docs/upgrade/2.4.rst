@@ -156,8 +156,12 @@ Plugins in Plugins
 ==================
 
 We added the ability to have plugins in plugins. Till now only the TextPlugin supportet this.
-For demonstration purposes we added a MultiColumn Plugin. The Possiblities for this are endless.
+For demonstration purposes we created a MultiColumn Plugin. The Possiblities for this are endless.
 Imagine: StylePlugin, TablePlugin, GalleryPlugin etc.
+
+The column plugin can be found here:
+
+https://github.com/divio/djangocms-column
 
 At the moment the limitation is that plugins in plugins is only editable in the frontend.
 
@@ -197,29 +201,6 @@ Here is an example of how the MultiColumn plugin uses it::
 	</div>
 
 As you can see the children are accessible via the plugins childrens attribute.
-
-
-Column Plugin Added
-===================
-
-There has been added a 2 new plugins in `cms.plugins.column`.
-The first is MultiColumn that should be added to your placeholder conf.
-MultiColumn only allows one plugin as a child: the Column plugin.
-The Column plugin has a parameter width. With this parameter you can control the width 
-of the column. 
-
-You can add a new setting to your settings.py called `COLUMN_WIDTH_CHOICES`
-
-the default is::
-
-	COLUMN_WIDTH_CHOICES = (
-	    ('1', _("normal")),
-	    ('2', _("2x")),
-	    ('3', _("3x")),
-	    ('4', _("4x"))
-	)
-
-but you can change that to fit your CSS grid framework or other purposes.
 
 
 ******************************
