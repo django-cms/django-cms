@@ -48,21 +48,16 @@ def assign_plugins(request, placeholders, lang=None):
 
 def build_plugin_tree(plugin_list):
     root = []
-    last = None
-    last_parent = None
+    cache = {}
     for plugin in plugin_list:
+        plugin.child_plugins = []
+        cache[plugin.pk] = plugin
         if not plugin.parent_id:
             root.append(plugin)
         else:
-            # find parent
-            for parent in plugin_list:
-                if parent.pk == plugin.parent_id:
-                    if parent.child_plugins is None:
-                        parent.child_plugins = []
-                    parent.child_plugins.append(plugin)
-                    parent.child_plugins.sort(key=lambda x: x.position)
-                    break
-        last = plugin
+            parent = cache[plugin.parent_id]
+            parent.child_plugins.append(plugin)
+            parent.child_plugins.sort(key=lambda x: x.position)
     root.sort(key=lambda x: x.position)
     return root
 

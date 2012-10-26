@@ -13,7 +13,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     child_plugin_classes = []
     if instance.get_plugin_class().allow_children:
         instance, plugin = instance.get_plugin_instance()
-        for child_class_name in plugin.get_child_classes(placeholder, original_context.get('request', {}).current_page):
+        for child_class_name in plugin.get_child_classes(placeholder, original_context['request'].current_page):
             cls = plugin_pool.get_plugin(child_class_name)
             child_plugin_classes.append((cls.__name__, unicode(cls.name)))
     data = {
