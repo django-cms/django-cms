@@ -6,10 +6,11 @@ from cms.models.pagemodel import Page
 from cms.forms.widgets import PageSelectWidget
 from cms.forms.utils import get_site_choices, get_page_choices
 
+
 class SuperLazyIterator(object):
     def __init__(self, func):
         self.func = func
-        
+
     def __iter__(self):
         return iter(self.func())
 
@@ -26,17 +27,17 @@ class PageSelectFormField(forms.MultiValueField):
             errors.update(kwargs['error_messages'])
         site_choices = SuperLazyIterator(get_site_choices)
         page_choices = SuperLazyIterator(get_page_choices)
-        kwargs['required']=required
+        kwargs['required'] = required
         fields = (
             forms.ChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
             forms.ChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
         super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
-    
+
     def compress(self, data_list):
         if data_list:
             page_id = data_list[1]
-            
+
             if page_id in EMPTY_VALUES:
                 if not self.required:
                     return None
@@ -46,4 +47,12 @@ class PageSelectFormField(forms.MultiValueField):
 
 
 class PlaceholderFormField(forms.Field):
+    pass
+
+try:
+    from django_select2.fields import AutoModelSelect2Field
+    
+    class PageSearchField(AutoModelSelect2Field):
+        search_fields = ['title_set__title']
+except:
     pass
