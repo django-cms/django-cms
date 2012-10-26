@@ -31,3 +31,4 @@ from cms.tests.management import *
 from cms.tests.menu_page_viewperm import *
 from cms.tests.menu_page_viewperm_staff import *
 from cms.tests.nested_plugins import *
+from cms.tests.signals import *

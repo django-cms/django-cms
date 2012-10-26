@@ -56,34 +56,34 @@ The get_nodes function should return a list of
 :class:`NavigationNode <menus.base.NavigationNode>` instances. A
 :class:`NavigationNode` takes the following arguments:
 
-- title
+- ``title``
 
   What the menu entry should read as
 
-- url,
+- ``url``,
 
   Link if menu entry is clicked.
 
-- id
+- ``id``
 
   A unique id for this menu.
 
-- parent_id=None
+- ``parent_id=None``
 
   If this is a child of another node supply the the id of the parent here.
 
-- parent_namespace=None
+- ``parent_namespace=None``
 
   If the parent node is not from this menu you can give it the parent
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-- attr=None
+- ``attr=None``
 
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
-- visible=True
+- ``visible=True``
 
   Whether or not this menu item should be visible.
 
@@ -177,10 +177,9 @@ under "Application". Save the page.
 
 .. warning::
 
-    If you are on a multi-threaded server (mostly all webservers,
-    except the dev-server): Restart the server because the URLs are cached by
-    Django and in a multi-threaded environment we don't know which caches are
-    cleared yet.
+    Whenever you add or remove an apphook, change the slug of a page containing
+    an apphook or the slug if a page which has a descendant with an apphook,
+    you have to restart your server to re-load the URL caches.
     
 .. note::
 
@@ -212,7 +211,7 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
 
 
 Apphook Menus
--------------
+=============
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
@@ -290,7 +289,7 @@ You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 
 
 Application and instance namespaces
------------------------------------
+===================================
 
 If you'd like to use application namespaces to reverse the URLs related to
 your app, you can assign a value to the `app_name` attribute of your app
@@ -310,7 +309,7 @@ As seen for Language Namespaces, you can reverse namespaced apps similarly:
     {% url myapp_namespace:app_main %}
 
 If you want to access the same url but in a different language use the language
-templatetag:
+template tag:
 
 .. code-block:: html+django
 
@@ -326,7 +325,7 @@ assigned to a page and uses it as instance namespace for the app hook.
 
 To reverse the URLs you now have two different ways: explicitly by defining
 the instance namespace, or implicitely by specifiyng the application namespace
-and letting the `url` templatetag resolving the correct application instance
+and letting the `url` template tag resolving the correct application instance
 by looking at the currently set `current_app` value.
 
 .. note::
@@ -340,19 +339,44 @@ as an argument. You can do so by looking up the `current_app` attribute of
 the request instance::
 
     def myviews(request):
-        ...
+        # ...
         reversed_url = reverse('myapp_namespace:app_main',
                 current_app=request.current_app)
-        ...
+        #...
 
 Or, if you are rendering a plugin, of the context instance::
 
     class MyPlugin(CMSPluginBase):
         def render(self, context, instance, placeholder):
-            ...
+            # ...
             reversed_url = reverse('myapp_namespace:app_main',
                     current_app=context.current_app)
-            ...
+            # ...
+
+
+Automatically restart server on apphook changes
+===============================================
+
+As mentioned above, whenever you add or remove an apphook, change the slug of a
+page containing an apphook or the slug if a page which has a descendant with an
+apphook, you have to restart your server to re-load the URL caches. To allow
+you to automate this process, the django CMS provides a signal
+:obj:`cms.signals.urls_need_reloading` which you can listen on to detect when
+your server needs restarting.
+
+.. warning::
+
+    This signal does not actually do anything. To get automated server
+    restarting you need to implement logic in your project that gets
+    executed whenever this signal is fired. Because there are many ways of
+    deploying Django applications, there is no way we can provide a generic
+    solution for this problem that will always work.
+
+.. warning::
+
+    The signal is fired **during** the request, that caused this change. If
+    you restart the server, you should delay the restart to not interrupt the
+    request currently being handled.
 
 
 ********************
@@ -366,7 +390,7 @@ menus.
 
 
 An example use-case
--------------------
+===================
 
 A simple example: you have a news application that publishes pages
 independently of django CMS. However, you would like to integrate the
@@ -377,7 +401,7 @@ In such a case, a Navigation Modifier is the solution.
 
 
 How it works
-------------
+============
 
 Normally, you'd want to place modifiers in your application's 
 ``menu.py``.
@@ -472,6 +496,8 @@ Here is an example of a built-in modifier that marks all node levels::
                 self.mark_levels(child, post_cut)
     
     menu_pool.register_modifier(Level)
+
+
 
 **************
 Custom Plugins
