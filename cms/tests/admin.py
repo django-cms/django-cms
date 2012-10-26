@@ -21,7 +21,6 @@ from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission, AnonymousUser
 from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, 
     HttpResponse)
@@ -276,6 +275,7 @@ class AdminTestCase(AdminTestsBase):
     def test_change_template(self):
         admin, staff = self._get_guys()
         request = self.get_request('/admin/cms/page/1/', 'en')
+        request.method = "POST"
         pageadmin = site._registry[Page]
         with self.login_user_context(staff):
             self.assertRaises(Http404, pageadmin.change_template, request, 1)
@@ -286,11 +286,9 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
             self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.content, "template not valid")
             response = self.client.post(url, {'template': settings.CMS_TEMPLATES[0][0]})
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, 'ok')
-            
+
     def test_get_permissions(self):
         page = create_page('test-page', 'nav_playground.html', 'en')
         url = reverse('admin:cms_page_get_permissions', args=(page.pk,))
@@ -631,6 +629,7 @@ class AdminTests(AdminTestsBase):
         permless = self.get_permless()
         with self.login_user_context(permless):
             request = self.get_request()
+            request.method = "POST"
             response = self.admin_class.publish_page(request, 1)
             self.assertEqual(response.status_code, 403)
 
@@ -638,6 +637,7 @@ class AdminTests(AdminTestsBase):
         permless = self.get_permless()
         with self.login_user_context(permless):
             request = self.get_request()
+            request.method = "POST"
             response = self.admin_class.revert_page(request, 1)
             self.assertEqual(response.status_code, 403)
 
@@ -654,8 +654,9 @@ class AdminTests(AdminTestsBase):
         admin = self.get_admin()
         with self.login_user_context(admin):
             request = self.get_request()
-            self.assertRaises(Http404, self.admin_class.remove_plugin, request)
-    
+            response = self.admin_class.remove_plugin(request)
+            self.assertEqual(response.status_code, 405)
+
     def test_move_plugin(self):
         ph = Placeholder.objects.create(slot='test')
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
@@ -667,8 +668,7 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             response = self.admin_class.move_plugin(request)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "error")
+            self.assertEqual(response.status_code, 405)
             request = self.get_request(post_data={'not_usable': '1'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
@@ -683,7 +683,7 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                                                   'placeholder': 'invalid-placeholder'})
             response = self.admin_class.move_plugin(request)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 400)
             self.assertEqual(response.content, "error")
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,

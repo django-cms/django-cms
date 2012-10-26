@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import PermissionDenied
-from cms.exceptions import NoHomeFound
+from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -388,15 +388,13 @@ class Page(MPTTModel):
         """
         # Publish can only be called on draft pages
         if not self.publisher_is_draft:
-            # TODO: Issue an error
-            return
+            raise PublicIsUnmodifiable('The public instance cannot be published. Use draft.')
 
         # publish, but only if all parents are published!!
         published = None
 
         if not self.pk:
             self.save()
-
         if self._publisher_can_publish():
             ########################################################################
             # Assign the existing public page in old_public and mark it as
@@ -411,8 +409,6 @@ class Page(MPTTModel):
                 # remove the one-to-one references between public and draft
                 old_public.publisher_public = None
                 old_public.save()
-                #self.publisher_public = None
-                #self.save()
 
             # we hook into the modified copy_page routing to do the heavy lifting of copying the draft page to a new public page
             new_public = self.copy_page(target=None, site=self.site,
@@ -428,10 +424,10 @@ class Page(MPTTModel):
                 self.tree_id = me.tree_id
 
             self.publisher_public = new_public
-            self.publisher_state = self.PUBLISHER_STATE_DEFAULT
             published = True
         else:
-            self.publisher_state = Page.PUBLISHER_STATE_PENDING
+            # Nothing left to do
+            pass
 
         if self.publisher_public and self.publisher_public.published:
             self.publisher_state = Page.PUBLISHER_STATE_DEFAULT
@@ -467,11 +463,9 @@ class Page(MPTTModel):
             # finally delete the old public page
             old_public.delete()
 
-        # page was published, check if there are some childs, which are waiting
-        # for publishing (because of the parent)
+        # Check if there are some children which are waiting for parents to
+        # become published.
         publish_set = self.get_descendants().filter(published=True)
-
-        #publish_set = self.children.filter(publisher_state = Page.PUBLISHER_STATE_PENDING)
         for page in publish_set:
             if page.publisher_public:
                if page.publisher_public.parent.published:
@@ -497,7 +491,7 @@ class Page(MPTTModel):
         """
         # Publish can only be called on draft pages
         if not self.publisher_is_draft:
-            raise RuntimeError('The public instance cannot be unpublished. Use draft.')
+            raise PublicIsUnmodifiable('The public instance cannot be unpublished. Use draft.')
 
         #First, make sure we are in the correct state
         self.published = False
@@ -526,8 +520,7 @@ class Page(MPTTModel):
         """
         # Revert can only be called on draft pages
         if not self.publisher_is_draft:
-            # TODO: Issue a warning
-            return
+            raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
         if not self.publisher_public:
             # TODO: Issue an error
             return
@@ -637,7 +630,6 @@ class Page(MPTTModel):
         """Helper function for accessing wanted / current title.
         If wanted title doesn't exists, EmptyTitle instance will be returned.
         """
-
         language = self._get_title_cache(language, fallback, version_id, force_reload)
         if language in self.title_cache:
             return self.title_cache[language]

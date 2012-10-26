@@ -47,7 +47,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
             md.append(('valid_children', False))
             md.append(('draggable', False))
         if md:
-            # just turn it into simple javasript object
+            # just turn it into simple javascript object
             metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
                 isinstance(e[1], bool) and str(e[1]) or e[1].lower() ), md)) + "}"
         
@@ -58,7 +58,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
 
-    if page.pagemoderatorstate_set.get_delete_actions().count():
+    if page.pagemoderatorstate_set.get_delete_actions().exists():
         css_class = "publisher_delete_requested"
     elif not page.published:
         css_class = "publisher_draft"

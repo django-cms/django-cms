@@ -375,7 +375,7 @@ def publish_page(page, user):
             self.user = user
     request = FakeRequest(user)
     if not page.has_publish_permission(request):
-        raise PermissionDenied
+        raise PermissionDenied()
     page.published = True
     page.save()
     page.publish()

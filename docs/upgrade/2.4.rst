@@ -152,7 +152,7 @@ Was marked deprecated in 2.3 and has now been removed.
 
 CMS_MODERATOR
 =============
-Has been deprecated since it is no longer in use. From 2.4 onwards, all pages
+Has been removed since it is no longer in use. From 2.4 onwards, all pages
 exist in a public and draft version. Users with the ``publish_page`` permission
 can publish changes to the public site.
 

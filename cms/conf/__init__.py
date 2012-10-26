@@ -16,9 +16,6 @@ def patch_settings():
         return
     patch_settings.ALREADY_PATCHED = True
     
-    if getattr(settings, 'CMS_MODERATOR', False):
-        warnings.warn("CMS_MODERATOR has no function in django CMS 2.4!", CMSDeprecationWarning)
-    
     from cms.conf import global_settings
     # patch settings
 

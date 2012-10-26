@@ -37,11 +37,9 @@ def get_visible_pages(request, pages, site=None):
 
     for page in pages:
         # taken from for_page as multiple at once version
-        page_q = Q(page__tree_id=page.tree_id) #& (
-            #Q(page=page)
-            #| (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
-            #| (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))
-        #)
+        page_q = Q(page__tree_id=page.tree_id) & (
+            Q(page__level__lte=page.level)
+        )
         pages_perms_q |= page_q
         
     pages_perms_q &= Q(can_view=True)
