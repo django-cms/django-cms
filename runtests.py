@@ -7,12 +7,12 @@ import sys
 
 
 def main(test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
-         time_tests=False, verbosity=1, failfast=False, test_labels=None):
+         time_tests=False, verbosity=1, failfast=False, test_labels=None,db_data={}):
     if not test_labels:
         test_labels = ['cms']
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
-            configure(TEST_RUNNER=test_runner, JUNIT_OUTPUT_DIR=junit_output_dir,
+            configure(db_data=db_data,TEST_RUNNER=test_runner, JUNIT_OUTPUT_DIR=junit_output_dir,
                 TIME_TESTS=time_tests, ROOT_URLCONF='cms.test_utils.project.urls',
                 STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT)
             from django.conf import settings
@@ -36,6 +36,10 @@ if __name__ == '__main__':
     parser.add_argument('--verbosity', default=1)
     parser.add_argument('--time-tests', action='store_true', default=False,
             dest='time_tests')
+    parser.add_argument('--db', default='sqlite', dest='db')
+    parser.add_argument('--db_user', default=None, dest='db_user')
+    parser.add_argument('--db_name', default=None, dest='db_name')
+    parser.add_argument('--db_password', default=None, dest='db_password')
     parser.add_argument('test_labels', nargs='*')
     args = parser.parse_args()
     if getattr(args, 'jenkins', False):
@@ -45,6 +49,14 @@ if __name__ == '__main__':
     junit_output_dir = getattr(args, 'jenkins_data_dir', '.')
     time_tests = getattr(args, 'time_tests', False)
     test_labels = ['cms.%s' % label for label in args.test_labels]
+    db_data = {'DB':args.db}
+    if args.db_user:
+        db_data['USER'] = args.db_user
+    if args.db_name:
+        db_data['NAME'] = args.db_name
+    if args.db_password:
+        db_data['PASSWORD'] = args.db_password
     main(test_runner=test_runner, junit_output_dir=junit_output_dir, time_tests=time_tests,
-         verbosity=args.verbosity, failfast=args.failfast, test_labels=test_labels)
+         verbosity=args.verbosity, failfast=args.failfast, test_labels=test_labels,
+         db_data=db_data)
     
