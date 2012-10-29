@@ -1,4 +1,28 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
+from distutils.version import LooseVersion
+from urllib2 import unquote
+
+import django
+from django.conf import settings
+from django.contrib import admin, messages
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import get_deleted_objects
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.urlresolvers import reverse
+from django.db import router, transaction, models
+from django.forms import CharField
+from django.http import (HttpResponseRedirect, HttpResponse, Http404,
+                         HttpResponseBadRequest, HttpResponseForbidden)
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template.context import RequestContext
+from django.template.defaultfilters import (title, escape, force_escape, escapejs)
+from django.utils.encoding import force_unicode
+from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
+
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageAddForm
@@ -20,31 +44,10 @@ from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins,
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
-from copy import deepcopy
-from distutils.version import LooseVersion
-from django.conf import settings
-from django.contrib import admin, messages
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import get_deleted_objects
-from urllib2 import unquote
-from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
-from django.core.urlresolvers import reverse
-from django.db import router, transaction, models
-from django.forms import CharField
-from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed)
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
-from django.template.defaultfilters import (title, escape, force_escape, 
-    escapejs)
-from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext as _
 from menus.menu_pool import menu_pool
-import django
 
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
-
+require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
@@ -135,21 +138,6 @@ def contribute_list_filter(cls):
     if settings.CMS_SOFTROOT:
         list_filter.append('soft_root')
     setattr(cls, 'list_filter', list_filter)
-
-
-def require_POST(func):
-    """Method version of django.views.decorators.http.require_POST"""
-    try:
-        from functools import wraps, WRAPPER_ASSIGNMENTS
-    except ImportError:
-        from django.utils.functional import wraps, WRAPPER_ASSIGNMENTS  # Python 2.4 fallback.
-
-    def inner(self, request, *args, **kwargs):
-        if request.method != 'POST':
-            return HttpResponseNotAllowed(['POST'])
-        return func(self, request, *args, **kwargs)
-    available_attrs = tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(func, a))
-    return wraps(func, assigned=available_attrs)(inner)
 
 
 class PageAdmin(ModelAdmin):
@@ -347,11 +335,7 @@ class PageAdmin(ModelAdmin):
             if "history" in request.path or 'recover' in request.path:
                 versioned = True
                 version_id = request.path.split("/")[-2]
-        else:
-            self.inlines = []
-            form = PageAddForm
 
-        if obj:
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
             except:
@@ -441,15 +425,19 @@ class PageAdmin(ModelAdmin):
                     'placeholder': placeholder
                 })
                 form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
+
+            if not obj.has_advanced_settings_permission(request):
+                for field in self.advanced_fields:
+                    del form.base_fields[field]
         else:
+            self.inlines = []
+            form = PageAddForm
             for name in ['slug','title']:
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
             form.base_fields['template'].initial = settings.CMS_TEMPLATES[0][0]
-        if obj and not obj.has_advanced_settings_permission(request):
-            for field in self.advanced_fields:
-                del form.base_fields[field]
+
         return form
 
     # remove permission inlines, if user isn't allowed to change them
@@ -1044,9 +1032,11 @@ class PageAdmin(ModelAdmin):
             page = page.publisher_public
         else:
             attrs += "&draft=1"
+        language = request.REQUEST.get('language', None)
+        if language:
+            attrs += "&language=" + language
 
-        url = page.get_absolute_url() + attrs
-
+        url = page.get_absolute_url(language) + attrs
         site = Site.objects.get_current()
 
         if not site == page.site:
@@ -1173,7 +1163,8 @@ class PageAdmin(ModelAdmin):
             helpers.make_revision_with_plugins(page)
             reversion.revision.user = request.user
             plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-            reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {'plugin_name':plugin_name, 'placeholder':placeholder}
+            reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
+                'plugin_name': plugin_name, 'placeholder': placeholder}
 
         return HttpResponse(str(plugin.pk))
 
@@ -1207,8 +1198,8 @@ class PageAdmin(ModelAdmin):
         if page and "reversion" in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(page)
             reversion.revision.user = request.user
-            reversion.revision.comment = _(u"Copied %(language)s plugins to %(placeholder)s") % {'language': _(dict(settings.LANGUAGES)[language]),
-                                                                                                 'placeholder': placeholder}
+            reversion.revision.comment = _(u"Copied %(language)s plugins to %(placeholder)s") % {
+                'language': _(dict(settings.LANGUAGES)[language]), 'placeholder': placeholder}
 
         plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by('position')
         return render_to_response('admin/cms/page/widgets/plugin_item.html', {'plugin_list':plugin_list}, RequestContext(request))

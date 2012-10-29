@@ -454,7 +454,7 @@ class PagePermissionsPermissionManager(models.Manager):
             # got superuser, or permissions aren't enabled? just return grant
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
-        # read from cache if posssible
+        # read from cache if possible
         cached = get_permission_cache(user, attr)
         if cached is not None:
             return cached
