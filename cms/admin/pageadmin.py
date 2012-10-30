@@ -584,7 +584,7 @@ class PageAdmin(ModelAdmin):
         if user.is_superuser:
             return True
         try:
-            if has_global_page_permission(request, can_recover=True):
+            if has_global_page_permission(request, can_recover_page=True):
                 return True
         except:
             pass
