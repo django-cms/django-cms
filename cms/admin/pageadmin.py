@@ -480,10 +480,6 @@ class PageAdmin(ModelAdmin):
         else:
             selected_template = get_template_from_request(request, obj)
 
-            # if there is a delete request for this page
-            delete_requested = obj.pagemoderatorstate_set.get_delete_actions().exists()
-
-
             #activate(user_lang_set)
             context = {
                 'placeholders': self.get_fieldset_placeholders(selected_template),
@@ -493,7 +489,7 @@ class PageAdmin(ModelAdmin):
                 'can_change': obj.has_change_permission(request),
                 'can_change_permissions': obj.has_change_permissions_permission(request),
                 'can_publish': obj.has_publish_permission(request),
-                'delete_requested': delete_requested,
+                'delete_requested': obj.delete_requested(),
                 'show_delete_translation': len(obj.get_languages()) > 1,
                 'current_site_id': settings.SITE_ID,
             }
@@ -831,8 +827,7 @@ class PageAdmin(ModelAdmin):
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
 
-        delete_requested = page.pagemoderatorstate_set.get_delete_actions().exists()
-        if delete_requested:
+        if page.delete_requested():
             messages.error(request, _('The page "%s" has a delete request. Delete or confirm the request first.') % page)
         else:
             page.publish()
@@ -884,8 +879,7 @@ class PageAdmin(ModelAdmin):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
 
         page_title = unicode(page)
-        delete_requested = page.pagemoderatorstate_set.get_delete_actions().exists()
-        if not delete_requested:
+        if not page.delete_requested():
             messages.error(request, _('The page "%s" has no delete request.') % page_title)
         else:
             try:

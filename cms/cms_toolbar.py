@@ -95,7 +95,7 @@ class CMSToolbar(Toolbar):
             
             if current_page:
                 states = current_page.last_page_states()
-                has_states = states.exists()
+                has_states = bool(len(states))
                 self.page_states = states
                 if has_states:
                     items.append(

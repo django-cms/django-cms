@@ -566,7 +566,7 @@ class Page(MPTTModel):
         descendants.reverse()
         #TODO: Use a better exception class - PermissionDenied is not quite right
         for page in descendants:
-            if not page.pagemoderatorstate_set.get_delete_actions().exists():
+            if not page.delete_requested():
                 raise PermissionDenied('There are descendant pages not marked for deletion')
         descendants.append(self)
 
@@ -917,15 +917,31 @@ class Page(MPTTModel):
         """Returns last five page states, if they exist, optimized, calls sql
         query only if some states available
         """
-        # TODO: optimize SQL... 1 query per page
-        has_moderator_state = getattr(self, '_has_moderator_state_cache', None)
-        if has_moderator_state == False:
-            return self.pagemoderatorstate_set.none()
-        return self.pagemoderatorstate_set.all().order_by('created',)[:5]
+        result = getattr(self, '_moderator_state_cache', None)
+        if result is None:
+            result = list(self.pagemoderatorstate_set.all().order_by('created'))
+            self._moderator_state_cache = result
+        return result[:5]
+
+    def delete_requested(self):
+        """ Checks whether there are any delete requests for this page.
+        Uses the same cache as last_page_states to minimize DB requests
+        """
+        from cms.models import PageModeratorState
+        result = getattr(self, '_moderator_state_cache', None)
+        if result is None:
+            return self.pagemoderatorstate_set.get_delete_actions().exists()
+        for state in result:
+            if state.action == PageModeratorState.ACTION_DELETE:
+                return True
+        return False
 
     def is_public_published(self):
         """Returns true if public model is published.
         """
+        if hasattr(self, '_public_published_cache'):
+            # if it was cached in change list, return cached value
+            return self._public_published_cache
         # If we have a public version it will be published as well.
         # If it isn't published, it should be deleted.
         return self.published and self.publisher_public_id and self.publisher_public.published

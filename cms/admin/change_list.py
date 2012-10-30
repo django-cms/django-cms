@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from cms.exceptions import NoHomeFound
-from cms.models import Title, Page
+from cms.models import Title, Page, PageModeratorState
 from cms.utils.permissions import get_user_sites_queryset
 from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
@@ -127,7 +128,16 @@ class CMSChangeList(ChangeList):
             home_pk = Page.objects.drafts().get_home(self.current_site()).pk
         except NoHomeFound:
             home_pk = 0
-            
+
+        # page moderator states
+        pm_qs = PageModeratorState.objects.filter(page__in=pages).order_by('page')
+        pm_states = defaultdict(list)
+        for state in pm_qs:
+            pm_states[state.page_id].append(state)
+
+        public_page_id_set = Page.objects.public().filter(
+            published=True, publisher_public__in=pages).values_list('id', flat=True)
+
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'
         # and otherwise complaints about 'invalid item order'
@@ -154,6 +164,8 @@ class CMSChangeList(ChangeList):
                 page.permission_advanced_settings_cache = perm_advanced_settings_ids == Page.permissions.GRANT_ALL or page.pk in perm_advanced_settings_ids
                 page.permission_user_cache = request.user
 
+            page._moderator_state_cache = pm_states[page.pk]
+            page._public_published_cache = page.publisher_public_id in public_page_id_set
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):

@@ -75,7 +75,7 @@ def has_any_page_change_permissions(request):
     from cms.utils.plugins import current_site
     if not request.user.is_authenticated():
         return False
-    return PagePermission.objects.filter(
+    return request.user.is_superuser or PagePermission.objects.filter(
             page__site=current_site(request)
         ).filter((
             Q(user=request.user) |
