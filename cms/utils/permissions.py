@@ -62,7 +62,6 @@ def has_page_add_permission(request):
         elif position in ("left", "right"):
             if page.parent_id:
                 return has_generic_permission(page.parent_id, request.user, "add", page.site)
-                return page.parent.has_add_permission(request)
     else:
         from cms.utils.plugins import current_site
         site = current_site(request)
@@ -100,7 +99,7 @@ def has_page_change_permission(request):
             has_any_page_change_permissions(request)))
 
 
-def has_global_page_permission(request, site, **filters):
+def has_global_page_permission(request, site=None, **filters):
     """
     A helper function to check for global page permissions for the current user
     and site. Caches the result on a request basis, so multiple calls to this
@@ -113,9 +112,14 @@ def has_global_page_permission(request, site, **filters):
     """
     if not hasattr(request, '_cms_global_perms'):
         request._cms_global_perms = {}
-    key = (site.pk if hasattr(site, 'pk') else int(site),) + tuple((k, v) for k, v in filters.iteritems())
+    key = tuple((k, v) for k, v in filters.iteritems())
+    if site:
+        key = (('site', site.pk if hasattr(site, 'pk') else int(site)),) + key
     if key not in request._cms_global_perms:
-        request._cms_global_perms[key] = GlobalPagePermission.objects.with_user(request.user).filter(sites__in=[site], **filters).exists()
+        qs = GlobalPagePermission.objects.with_user(request.user).filter(**filters)
+        if site:
+            qs = qs.filter(sites__in=[site])
+        request._cms_global_perms[key] = qs.exists()
     return request._cms_global_perms[key]
 
 
@@ -241,11 +245,12 @@ def get_subordinate_groups(user):
     )
     return qs
 
-def has_global_change_permissions_permission(user):
+def has_global_change_permissions_permission(request):
     opts = GlobalPagePermission._meta
+    user = request.user
     if user.is_superuser or (
         user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
-            GlobalPagePermission.objects.with_user(user).filter(can_change=True).exists()):
+        has_global_page_permission(request, can_change=True)):
         return True
     return False
 

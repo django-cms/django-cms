@@ -44,6 +44,8 @@ from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins,
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
+from cms.utils.permissions import has_global_page_permission
+from cms.utils.plugins import current_site
 from menus.menu_pool import menu_pool
 
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
@@ -582,8 +584,7 @@ class PageAdmin(ModelAdmin):
         if user.is_superuser:
             return True
         try:
-            perm = GlobalPagePermission.objects.get(user=user)
-            if perm.can_recover:
+            if has_global_page_permission(request, can_recover=True):
                 return True
         except:
             pass
@@ -616,7 +617,7 @@ class PageAdmin(ModelAdmin):
         
         site_id = request.GET.get('site__exact', None)
         if site_id is None:
-            site_id = Site.objects.get_current().pk
+            site_id = current_site(request).pk
         site_id = int(site_id)
         
         # languages
@@ -754,7 +755,7 @@ class PageAdmin(ModelAdmin):
         all_permissions = list(global_page_permissions) + list(page_permissions)
 
         # does he can change global permissions ?
-        has_global = permissions.has_global_change_permissions_permission(request.user)
+        has_global = permissions.has_global_change_permissions_permission(request)
 
         permission_set = []
         for permission in all_permissions:
@@ -1031,7 +1032,7 @@ class PageAdmin(ModelAdmin):
             attrs += "&language=" + language
 
         url = page.get_absolute_url(language) + attrs
-        site = Site.objects.get_current()
+        site = current_site(request)
 
         if not site == page.site:
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
