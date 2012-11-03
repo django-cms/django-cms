@@ -282,24 +282,37 @@ class PagesTestCase(CMSTestCase):
             page_data2 = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data2)
             page_data3 = self.get_new_page_data()
+            page_data3['in_navigation'] = True
             self.client.post(URL_CMS_PAGE_ADD, page_data3)
+            page_data4 = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data4)
             page1 = Page.objects.all()[0]
             page2 = Page.objects.all()[1]
             page3 = Page.objects.all()[2]
+            page4 = Page.objects.all()[3]
             # move pages
             response = self.client.post("/admin/cms/page/%s/move-page/" % page3.pk, {"target": page2.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
             response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
-            # check page2 path and url
+            # check page2 path and url and parent page not in navigation
             page2 = Page.objects.get(pk=page2.pk)
-            self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
-            self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/")
+            page2.parent.in_navigation = False
+            self.assertEqual(page2.get_path(), page_data2['slug'])
+            self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/")
             # check page3 path and url
             page3 = Page.objects.get(pk=page3.pk)
-            self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
-            self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+            #self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
+            self.assertEqual(page3.get_path(), page_data3['slug'])
+            # self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+            self.assertEqual(page3.get_absolute_url(), "/" + page_data3['slug']+"/")
             # publish page 1 (becomes home)
+            # check page2 path and url and parent page in navigation
+            page4 = Page.objects.get(pk=page4.pk)
+            #self.assertEqual(page2.get_path(), page_data1['slug']+"/"+page_data2['slug'])
+            self.assertEqual(page2.get_path(), page_data2['slug'])
+            #self.assertEqual(page2.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/")
+            self.assertEqual(page2.get_absolute_url(), "/"+page_data2['slug']+"/")
             page1 = Page.objects.get(pk=page1.pk)
             page1.publish()
             public_page1 = page1.publisher_public
@@ -312,7 +325,8 @@ class PagesTestCase(CMSTestCase):
             page3 = Page.objects.get(pk=page3.pk)
             page3.publish()
             public_page3 = page3.publisher_public
-            self.assertEqual(public_page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
+            #self.assertEqual(public_page3.get_absolute_url(), self.get_pages_root()+page_data2['slug']+"/"+page_data3['slug']+"/")
+            self.assertEqual(public_page3.get_absolute_url(), self.get_pages_root()+page_data3['slug']+"/")
             # move page2 back to root and check path of 2 and 3
             response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "right"})
             self.assertEqual(response.status_code, 200)
@@ -321,7 +335,8 @@ class PagesTestCase(CMSTestCase):
             page2 = Page.objects.get(pk=page2.pk)
             self.assertEqual(page2.get_path(), page_data2['slug'])
             page3 = Page.objects.get(pk=page3.pk)
-            self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
+            #self.assertEqual(page3.get_path(), page_data2['slug']+"/"+page_data3['slug'])
+            self.assertEqual(page3.get_path(), page_data3['slug'])
         
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
@@ -601,13 +616,13 @@ class PagesTestCase(CMSTestCase):
             published=True)
 
         page2 = create_page('test page 2', 'nav_playground.html', 'en',
-            published=True, parent=page1)
+            published=True, parent=page1, in_navigation=True)
 
         page3 = create_page('test page 3', 'nav_playground.html', 'en',
             published=True, parent=page2)
 
         page4 = create_page('test page 4', 'nav_playground.html', 'en',
-            published=True)
+            published=True, in_navigation=True)
 
         page5 = create_page('test page 5', 'nav_playground.html', 'en',
             published=True, parent=page4)

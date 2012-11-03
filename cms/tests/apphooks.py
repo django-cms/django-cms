@@ -198,9 +198,9 @@ class ApphooksTestCase(CMSTestCase):
             home = create_page("home", "nav_playground.html", "en", published=True)
             child = create_page("child", "nav_playground.html", "en", published=True, parent=home)
             # not-home is what breaks stuff, because it contains the slug of the home page
-            not_home = create_page("not-home", "nav_playground.html", "en", published=True, parent=child)
+            not_home = create_page("not-home", "nav_playground.html", "en", published=True, parent=child, in_navigation=True)
             create_page("subchild", "nav_playground.html", "en", published=True, parent=not_home, apphook='SampleApp')
             urlpatterns = get_app_patterns()
             resolver = urlpatterns[0]
             url = resolver.reverse('sample-root')
-            self.assertEqual(url, 'child/not-home/subchild/')
+            self.assertEqual(url, 'not-home/subchild/')

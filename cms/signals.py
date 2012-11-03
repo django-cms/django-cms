@@ -55,7 +55,8 @@ def update_title(title):
         if parent_page_id:
             parent_title = Title.objects.get_title(parent_page_id,
                 language=title.language, language_fallback=True)
-            if parent_title:
+            if parent_title and parent_title.page.in_navigation is True:
+            #if parent_title:
                 title.path = (u'%s/%s' % (parent_title.path, slug)).lstrip("/")
 
 def pre_save_title(instance, raw, **kwargs):

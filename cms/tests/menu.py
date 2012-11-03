@@ -305,6 +305,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'hello' %}")
         tpl.render(context) 
         nodes = context['children']
+        page3_url = self.get_page(3).get_absolute_url()
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), page3_url)
                     

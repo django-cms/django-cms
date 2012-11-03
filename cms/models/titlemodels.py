@@ -46,7 +46,8 @@ class Title(models.Model):
             self.path = u'%s' % slug
             if parent_page:
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
-                if parent_title:
+                if parent_title and parent_title.page.in_navigation is True:
+                #if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
 
     @property
