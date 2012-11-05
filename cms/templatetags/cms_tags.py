@@ -253,7 +253,7 @@ register.tag(Placeholder)
 
 class RenderPlugin(InclusionTag):
     template = 'cms/content.html'
-
+    name = 'render_plugin'
     options = Options(
         Argument('plugin')
     )
@@ -264,8 +264,7 @@ class RenderPlugin(InclusionTag):
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
         page = request.current_page
-        if (getattr(toolbar, 'edit_mode', False) and
-            (not page or page.has_change_permission(request))):
+        if toolbar.edit_mode and (not page or page.has_change_permission(request)):
             edit = True
         if edit:
             from cms.middleware.toolbar import toolbar_plugin_processor

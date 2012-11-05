@@ -346,9 +346,7 @@ CMS.$(document).ready(function ($) {
 
             var add_list = more.find('.add_child');
 
-            if(options.allow_children == "True"){
-                console.log('allow children')
-                console.log(options.child_classes)
+            if(options.allow_children){
                 add_list.show();
                 plugin_list = add_list.find('ul')
                 plugin_list.html('')
@@ -375,10 +373,7 @@ CMS.$(document).ready(function ($) {
                     };
 
                     // try to add a new plugin
-                    console.log(vals, options)
                     CMS.API.Placeholders.addPlugin(vals, options.urls.add_plugin, options.urls.change_list);
-
-
 
                 });
 
