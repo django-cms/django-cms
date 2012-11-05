@@ -23,6 +23,13 @@ from os.path import join
 import copy
 
 
+try:
+    from django.utils import timezone
+except ImportError:
+    timezone = None
+
+
+
 class Page(MPTTModel):
     """
     A simple hierarchical page model
@@ -344,7 +351,10 @@ class Page(MPTTModel):
 
         # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
-            self.publication_date = datetime.now()
+            if settings.USE_TZ and timezone:
+                self.publication_date = timezone.now()
+            else:
+                self.publication_date = datetime.now()
 
         if self.reverse_id == "":
             self.reverse_id = None
