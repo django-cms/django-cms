@@ -23,6 +23,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
@@ -596,7 +597,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertFalse(len(placeholder._en_plugins_cache))
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
-        now = datetime.datetime.now()
+        now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
         page.creation_date = one_day_ago
