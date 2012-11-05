@@ -35,6 +35,11 @@ from django.test.testcases import TestCase
 import os
 import datetime
 
+try:
+    from django.utils import timezone
+except ImportError:
+    timezone = None
+
 
 class DumbFixturePlugin(CMSPluginBase):
     model = CMSPlugin
@@ -653,7 +658,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertFalse(len(placeholder._en_plugins_cache))
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
-        now = datetime.datetime.now()
+        if timezone:
+            now = timezone.now()
+        else:
+            now = datetime.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
         page.creation_date = one_day_ago

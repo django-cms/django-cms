@@ -31,6 +31,11 @@ from cms.utils import moderator
 from cms.utils.permissions import _thread_locals
 
 
+try:
+    from django.utils import timezone
+except ImportError:
+    timezone = None
+
 #===============================================================================
 # Constants 
 #===============================================================================
@@ -236,6 +241,12 @@ def create_title(language, title, page, menu_title=None, slug=None,
     else:
         application_urls = None
     
+
+    if settings.USE_TZ and timezone:
+        now = timezone.now()
+    else:
+        now = datetime.now()
+
     title = Title.objects.create(
         language=language,
         title=title,
@@ -245,7 +256,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         meta_keywords=meta_keywords,
-        page=page
+        page=page,
+        creation_date=now
     )
 
     if overwrite_url:
