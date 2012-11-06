@@ -2,8 +2,10 @@
 from __future__ import with_statement
 from cms.test_utils.cli import configure
 from cms.test_utils.tmpdir import temp_dir
+from django import VERSION
 import argparse
 import sys
+import warnings
 
 
 def main(test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
@@ -12,9 +14,14 @@ def main(test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir
         test_labels = ['cms']
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
+            # Test with time zone support enabled when it's available
+            use_tz = VERSION[:2] >= (1, 4)
+            warnings.filterwarnings(
+                'error', r"DateTimeField received a naive datetime",
+                RuntimeWarning, r'django\.db\.models\.fields')
             configure(TEST_RUNNER=test_runner, JUNIT_OUTPUT_DIR=junit_output_dir,
                 TIME_TESTS=time_tests, ROOT_URLCONF='cms.test_utils.project.urls',
-                STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT)
+                STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT, USE_TZ=use_tz)
             from django.conf import settings
             from django.test.utils import get_runner
             TestRunner = get_runner(settings)
