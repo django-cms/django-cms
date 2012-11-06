@@ -2,18 +2,21 @@
 Template Tags
 #############
 
+****************
+CMS templatetags
+****************
+
 .. highlightlang:: html+django
 
 To use any of the following templatetags you first need to load them at the
 top of your template::
 
-    {% load cms_tags menu_tags %}
+    {% load cms_tags %}
 
 .. templatetag:: placeholder
 
-***********
 placeholder
-***********
+===========
 .. versionchanged:: 2.1
     The placeholder name became case sensitive.
 
@@ -63,9 +66,9 @@ context variables and change some other placeholder behavior.
 
 .. templatetag:: show_placeholder
 
-****************
+
 show_placeholder
-****************
+================
 
 Displays a specific placeholder from a given page. This is useful if you want
 to have some more or less static content that is shared among many pages, such
@@ -74,7 +77,7 @@ as a footer.
 Arguments:
 
 * ``placeholder_name``
-* ``page_lookup`` (see `Page Lookup`_ for more information)
+* ``page_lookup`` (see `page_lookup`_ for more information)
 * ``language`` (optional)
 * ``site`` (optional)
 
@@ -84,7 +87,7 @@ Examples::
     {% show_placeholder "content" request.current_page.parent_id %}
     {% show_placeholder "teaser" request.current_page.get_root %}
 
-Page Lookup
+page_lookup
 ===========
 
 The ``page_lookup`` argument, passed to several templatetags to retrieve a
@@ -126,9 +129,8 @@ inherit the content of its root-level ancestor::
 
 .. templatetag:: show_uncached_placeholder
 
-*************************
 show_uncached_placeholder
-*************************
+=========================
 
 The same as :ttag:`show_placeholder`, but the placeholder contents will not be
 cached.
@@ -136,7 +138,7 @@ cached.
 Arguments:
 
 - ``placeholder_name``
-- ``page_lookup`` (see `Page Lookup`_ for more information)
+- ``page_lookup`` (see `page_lookup`_ for more information)
 - ``language`` (optional)
 - ``site`` (optional)
 
@@ -146,15 +148,15 @@ Example::
 
 .. templatetag:: page_url
 
-********
+
 page_url
-********
+========
 
 Displays the URL of a page in the current language.
 
 Arguments:
 
-- ``page_lookup`` (see `Page Lookup`_ for more information)
+- ``page_lookup`` (see `page_lookup`_ for more information)
 
 Example::
 
@@ -163,9 +165,8 @@ Example::
 
 .. templatetag:: page_attribute
 
-**************
 page_attribute
-**************
+==============
 
 This templatetag is used to display an attribute of the current page in the
 current language.
@@ -173,7 +174,7 @@ current language.
 Arguments:
 
 - ``attribute_name``
-- ``page_lookup`` (optional; see `Page Lookup`_ for more
+- ``page_lookup`` (optional; see `page_lookup`_ for more
   information)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
@@ -210,11 +211,49 @@ Example::
         {% page_attribute "page_title" "my_page_reverse_id" as title %}
         <a href="/mypage/">{{ title }}</a>
 
+.. templatetag:: render_plugin
+.. versionadded:: 2.4
+
+render_plugin
+=============
+
+This templatetag is used to render child plugins of the current plugin and should be used inside plugin templates.
+
+Arguments:
+
+- ``plugin``
+
+Plugin needs to be an instance of a plugin model.
+
+Example::
+
+	{% load cms_tags %}
+	<div class="multicolumn">
+	{% for plugin in instance.child_plugins %}
+		<div style="width: {{ plugin.width }}00px;">
+     		{% render_plugin plugin %}
+		</div>
+	{% endfor %}
+	</div>
+	
+Normally the children of plugins can be accessed via the ``child_plugins`` atrribute of plugins.
+Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
+
+*****************
+Menu Templatetags
+*****************
+
+.. highlightlang:: html+django
+
+To use any of the following templatetags you first need to load them at the
+top of your template::
+
+    {% load menu_tags %}
+	
 .. templatetag:: show_menu
 
-*********
 show_menu
-*********
+=========
 
 The ``show_menu`` tag renders the navigation of the current page. You can
 overwrite the appearance and the HTML if you add a ``cms/menu.html`` template
@@ -234,8 +273,8 @@ descendant of the current active node.
 Finally, the fourth parameter, ``extra_active`` (default=100), specifies how
 many levels of descendants of the currently active node should be displayed.
 
-Some Examples
-=============
+show_menu Examples
+------------------
 
 Complete navigation (as a nested list)::
 
@@ -268,9 +307,8 @@ Navigation with a custom template::
 
 .. templatetag:: show_menu_below_id
 
-******************
 show_menu_below_id
-******************
+==================
 
 If you have set an id in the advanced settings of a page, you can display the
 submenu of this page with a template tag. For example, we have a page called
@@ -288,9 +326,8 @@ You can give it the same optional parameters as ``show_menu``::
 
 .. templatetag:: show_sub_menu
 
-*************
 show_sub_menu
-*************
+=============
 
 Displays the sub menu of the current page (as a nested list).
 Takes one argument that specifies how many levels deep the submenu should be
@@ -308,9 +345,8 @@ Or with a custom template::
 
 .. templatetag:: show_breadcrumb
 
-***************
 show_breadcrumb
-***************
+===============
 
 Renders the breadcrumb navigation of the current page.
 The template for the HTML can be found at ``cms/breadcrumb.html``::
@@ -349,9 +385,9 @@ And then in your app template::
 
 .. templatetag:: page_language_url
 
-*****************
+
 page_language_url
-*****************
+=================
 
 Returns the url of the current page in an other language::
 
@@ -367,9 +403,9 @@ For more information, see :doc:`i18n`.
 
 .. templatetag:: language_chooser
 
-****************
+
 language_chooser
-****************
+================
 
 The ``language_chooser`` template tag will display a language chooser for the
 current page. You can modify the template in ``menu/language_chooser.html`` or
@@ -399,11 +435,21 @@ function with the set_language_changer function in menus.utils.
 
 For more information, see :doc:`i18n`.
 
+********************
+Toolbar Templatetags
+********************
+
+.. highlightlang:: html+django
+
+To use any of the following templatetags you first need to load them at the
+top of your template::
+
+    {% load cms_toolbar %}
+	
 .. templatetag:: cms_toolbar
 
-***********
 cms_toolbar
-***********
+===========
 
 The ``cms_toolbar`` templatetag will add the required css and javascript to the
 sekizai blocks in the base template. The templatetag has to be placed after the

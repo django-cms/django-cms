@@ -251,7 +251,7 @@ CMS.$(document).ready(function ($) {
 			}
 		},
 
-		morePluginOptions: function (plugin, values, url) {
+		morePluginOptions: function (plugin, values, url, options) {
 			// save reference to this class
 			var that = this;
 
@@ -273,9 +273,9 @@ CMS.$(document).ready(function ($) {
 
 			// grab the element
 			var more = that.overlay.find('.cms_placeholder-options_more');
-				more.show();
+			more.show();
 
-			var list = more.find('ul');
+			var list = more.find('.move ul');
 
 			// we need to stop if the array is empty
 			if(array.length) list.html('');
@@ -341,6 +341,47 @@ CMS.$(document).ready(function ($) {
 					cls = cls.join('::');
 				plugin.attr('class', cls);
 			}
+
+            // If allow_children for plugins... fill up list.
+
+            var add_list = more.find('.add_child');
+
+            if(options.allow_children){
+                add_list.show();
+                plugin_list = add_list.find('ul')
+                plugin_list.html('')
+                for (var i=0; i< options.child_classes.length; i++){
+                    var class_name = options.child_classes[i].class_name
+                    var plugin_name = options.child_classes[i].plugin_name
+                    plugin_list.append($('<li><a href="" rel="type::'+class_name+'">' + plugin_name + '</a></li>').data({
+                        'class_name': class_name,
+                        'placeholder_id': values.placeholder,
+                        'plugin_id': values.plugin_id
+                    }));
+                }
+
+                plugin_list.find('a').bind('click', function (e) {
+                    e.preventDefault();
+                    // save slot var
+                    var slot = $(this).parent().data('slot');
+                    var placeholder_id = $(this).parent().data('placeholder_id');
+                    // now lets do the ajax request
+
+                    var vals = {
+                        'parent_id': values.plugin_id,
+                        'plugin_type': $(this).attr('rel').split('::')[1]
+                    };
+
+                    // try to add a new plugin
+                    CMS.API.Placeholders.addPlugin(vals, options.urls.add_plugin, options.urls.change_list);
+
+                });
+
+            }else{
+                add_list.hide();
+            }
+
+
 		},
 
 		showOverlay: function (holder) {
@@ -585,7 +626,7 @@ CMS.$(document).ready(function ($) {
 				// attach more event
 				buttons.find('a[rel^=more]').bind('click', function (e) {
 					e.preventDefault();
-					CMS.API.Placeholders.morePluginOptions(holder, values, that.options.urls.move_plugin);
+					CMS.API.Placeholders.morePluginOptions(holder, values, that.options.urls.move_plugin, that.options);
 				});
 		}
 

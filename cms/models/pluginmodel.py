@@ -87,6 +87,7 @@ class CMSPlugin(MPTTModel):
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    child_plugins_instances = None
 
     class Meta:
         app_label = 'cms'
