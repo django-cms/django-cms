@@ -40,7 +40,7 @@ def now():
     """
     Returns an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    if settings.USE_TZ:
+    if getattr(settings, 'USE_TZ', False):
         # timeit shows that datetime.now(tz=utc) is 24% slower
         return datetime.utcnow().replace(tzinfo=utc)
     else:
