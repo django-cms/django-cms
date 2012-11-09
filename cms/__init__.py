@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '2.3.4'
+__version__ = '2.3.4.post0'
 
 # patch settings 
 try:
