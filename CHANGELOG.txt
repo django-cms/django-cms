@@ -110,7 +110,10 @@
 
  - fixed an incompatibility with Python 2.5
 
+==== 2.3.4 (2012-11-09) ====
 
-
-
-
+- Fixed WymEditor
+- Fixed Norwegian translations
+- Fixed a bug that could lead to slug clashes
+- Fixed page change form (jQuery and permissions)
+- Fixed placeholder field permission checks
