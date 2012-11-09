@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: no\n"
+"Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -710,7 +710,7 @@ msgstr "endret av"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "Når sideb skal gjøres offentlig. Status må være \"Publisert\" for at siden skal vises."
+msgstr "Når siden skal gjøres offentlig. Status må være \"Publisert\" for at siden skal vises."
 
 #: models/pagemodel.py:62
 msgid "When to expire the page. Leave empty to never expire."
@@ -732,7 +732,7 @@ msgstr "tilknyttet meny"
 
 #: models/pagemodel.py:67
 msgid "is published"
-msgstr "er poblisert"
+msgstr "er publisert"
 
 #: models/pagemodel.py:69
 msgid "The template used to render the content."
