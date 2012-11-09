@@ -1,44 +1,21 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Deleting model 'PageModerator'
-        db.delete_table('cms_pagemoderator')
-
-        # Deleting field 'GlobalPagePermission.can_moderate'
-        db.delete_column('cms_globalpagepermission', 'can_moderate')
-
-        # Deleting field 'PagePermission.can_moderate'
-        db.delete_column('cms_pagepermission', 'can_moderate')
+        "Write your forwards methods here."
+        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
+        ct, created = orm['contenttypes.ContentType'].objects.get_or_create(
+            model='page', app_label='cms')
+        perm, created = orm['auth.permission'].objects.get_or_create(
+            content_type=ct, codename='publish_page', defaults=dict(name=u'Can publish Page'))
 
     def backwards(self, orm):
-        # Adding model 'PageModerator'
-        db.create_table('cms_pagemoderator', (
-            ('moderate_children', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('moderate_page', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('page', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cms.Page'])),
-            ('moderate_descendants', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-        ))
-        db.send_create_signal('cms', ['PageModerator'])
-
-        # Adding field 'GlobalPagePermission.can_moderate'
-        db.add_column('cms_globalpagepermission', 'can_moderate',
-                      self.gf('django.db.models.fields.BooleanField')(default=True),
-                      keep_default=False)
-
-        # Adding field 'PagePermission.can_moderate'
-        db.add_column('cms_pagepermission', 'can_moderate',
-                      self.gf('django.db.models.fields.BooleanField')(default=True),
-                      keep_default=False)
-
+        "Write your backwards methods here."
 
     models = {
         'auth.group': {
@@ -204,3 +181,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['cms']
+    symmetrical = True
