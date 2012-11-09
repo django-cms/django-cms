@@ -23,7 +23,7 @@ class ModeratorOnCommand(NoArgsCommand):
         """
         for page in Page.objects.public():
             if CMSPlugin.objects.filter(placeholder__page=page).count():
-                page.revert()
+                page.publisher_draft.revert()
         for page in Page.objects.drafts().filter(published=True):
             page.publish()
 
