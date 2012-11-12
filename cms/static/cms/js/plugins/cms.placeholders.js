@@ -218,7 +218,6 @@ CMS.$(document).ready(function ($) {
 			// add array to new position
 			if(dir === 'moveup') array.splice(index-1, 0, values.plugin_id);
 			if(dir === 'movedown') array.splice(index+1, 0, values.plugin_id);
-			console.log(plugin)
 			// now lets do the ajax request
 			$.ajax({
 				'type': 'POST',
