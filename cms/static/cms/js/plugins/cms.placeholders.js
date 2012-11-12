@@ -218,7 +218,6 @@ CMS.$(document).ready(function ($) {
 			// add array to new position
 			if(dir === 'moveup') array.splice(index-1, 0, values.plugin_id);
 			if(dir === 'movedown') array.splice(index+1, 0, values.plugin_id);
-
 			// now lets do the ajax request
 			$.ajax({
 				'type': 'POST',
@@ -232,12 +231,39 @@ CMS.$(document).ready(function ($) {
 
 			// lets refresh the elements in the dom as well
 			function refreshPluginPosition() {
-				if(dir === 'moveup' && index !== bound+1) plugin.insertBefore($(holders[index-1]));
-				if(dir === 'movedown' && index !== -1) plugin.insertAfter($(holders[index+1]));
+				var target;
+				var before = false;
+				if(dir === 'moveup' && index !== bound+1){
+					before = true;
+					target = $(holders[index-1]);
+				}
+				if(dir === 'movedown' && index !== -1){
+					target = $(holders[index+1]);
+				}
 				// move in or out of boundary
-				if(dir === 'moveup' && index === bound+1) plugin.insertAfter($(holders[index-2]));
-				if(dir === 'movedown' && index === -1) plugin.insertBefore($(holders[index+1]));
-
+				if(dir === 'moveup' && index === bound+1){
+					 target = $(holders[index-2]);
+				}
+				if(dir === 'movedown' && index === -1){
+					target = $(holders[index+1]);
+					before = true;
+				} 
+				var target_id = target.attr('id').split("-")[1];
+				if(before){
+					plugin.insertBefore(target);
+				}else{
+					var target_content = $("#cms_placeholdercontent-"+target_id);
+					if(target_content.length > 0){
+						plugin.insertAfter(target_content);
+					}else{
+						plugin.insertAfter(target);
+					}
+				}
+				var content = $("#cms_placeholdercontent-"+values.plugin_id);
+				if(content.length > 0){
+					content.insertAfter($("#cms_placeholder-"+values.plugin_id));
+				}
+				
 				// close overlay
 				that.hideOverlay();
 
