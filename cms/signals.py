@@ -20,6 +20,8 @@ application_post_changed = Signal(providing_args=["instance"])
 # fired after page gets published - copied to public model - there may be more
 # than one instances published before this signal gets called
 post_publish = Signal(providing_args=["instance"])
+
+urls_need_reloading = Signal(providing_args=[])
         
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
@@ -285,3 +287,33 @@ if settings.CMS_PERMISSION:
     
     signals.pre_save.connect(pre_save_delete_page, sender=Page)
     signals.pre_delete.connect(pre_save_delete_page, sender=Page)
+
+def apphook_pre_checker(instance, **kwargs):
+    """
+    Store the old application_urls and path on the instance
+    """
+    try:
+        instance._old_data = Title.objects.filter(pk=instance.pk).values_list('application_urls', 'path')[0]
+    except IndexError:
+        instance._old_data = (None, None)
+
+def apphook_post_checker(instance, **kwargs):
+    """
+    Check if applciation_urls and path changed on the instance
+    """
+    old_apps, old_path = getattr(instance, '_old_data', (None, None))
+    if old_apps != instance.application_urls:
+        urls_need_reloading.send(sender=instance)
+    elif old_path != instance.path and instance.application_urls:
+        urls_need_reloading.send(sender=instance)
+
+def apphook_post_delete_checker(instance, **kwargs):
+    """
+    Check if this was an apphook
+    """
+    if instance.application_urls:
+        urls_need_reloading.send(sender=instance)
+
+signals.pre_save.connect(apphook_pre_checker, sender=Title)
+signals.post_save.connect(apphook_post_checker, sender=Title)
+signals.post_delete.connect(apphook_post_delete_checker, sender=Title)
