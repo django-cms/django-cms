@@ -50,17 +50,17 @@ def build_plugin_tree(plugin_list):
     root = []
     cache = {}
     for plugin in plugin_list:
-        plugin.child_plugins_instances = []
+        plugin.child_plugin_instances = []
         cache[plugin.pk] = plugin
         if not plugin.parent_id:
             root.append(plugin)
         else:
             parent = cache[plugin.parent_id]
-            parent.child_plugins_instances.append(plugin)
+            parent.child_plugin_instances.append(plugin)
     root.sort(key=lambda x: x.position)
     for plugin in plugin_list:
-        if plugin.child_plugins_instances and len(plugin.child_plugins_instances) > 1:
-            plugin.child_plugins_instances.sort(key=lambda x: x.position)
+        if plugin.child_plugin_instances and len(plugin.child_plugin_instances) > 1:
+            plugin.child_plugin_instances.sort(key=lambda x: x.position)
     return root
 
 def downcast_plugins(queryset, select_placeholder=False):
