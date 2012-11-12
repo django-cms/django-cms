@@ -50,7 +50,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
             advanced_fields = []
             for f in new_plugin.model._meta.fields:
                 if not f.auto_created and f.editable:
-                    if hasattr(f,'advanced'): 
+                    if hasattr(f, 'advanced'):
                         advanced_fields.append(f.name)
                     else: basic_fields.append(f.name)
             if advanced_fields:
@@ -62,45 +62,51 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                         }
                     ),
                     (
-                        _('Advanced options'), 
+                        _('Advanced options'),
                         {
-                            'fields' : advanced_fields, 
+                            'fields' : advanced_fields,
                             'classes' : ('collapse',)
                         }
                     )
                 ]
         # Set default name
         if not new_plugin.name:
-            new_plugin.name = re.sub("([a-z])([A-Z])","\g<1> \g<2>", name)
+            new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
         return new_plugin
 
 
 class CMSPluginBase(admin.ModelAdmin):
     __metaclass__ = CMSPluginBaseMetaclass
-    
+
     name = ""
-    
+
     form = None
     change_form_template = "admin/cms/page/plugin_change_form.html"
+    frontend_edit_template = 'cms/toolbar/placeholder_wrapper.html'
     # Should the plugin be rendered in the admin?
     admin_preview = False
-    
+
     render_template = None
+
     # Should the plugin be rendered at all, or doesn't it have any output?
-    render_plugin = True 
+    render_plugin = True
+
     model = CMSPlugin
     text_enabled = False
     page_only = False
-    
+
+    allow_children = False
+    child_classes = None
+
     opts = {}
     module = None #track in which module/application belongs
-    
-    def __init__(self, model=None,  admin_site=None):
+
+    def __init__(self, model=None, admin_site=None):
         if admin_site:
             super(CMSPluginBase, self).__init__(self.model, admin_site)
-        
+
         self.object_successfully_changed = False
-        
+
         # variables will be overwritten in edit_view, so we got required
         self.cms_plugin_instance = None
         self.placeholder = None
@@ -111,11 +117,11 @@ class CMSPluginBase(admin.ModelAdmin):
         context['instance'] = instance
         context['placeholder'] = placeholder
         return context
-    
+
     @property
     def parent(self):
         return self.cms_plugin_instance.parent
-    
+
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         """
         We just need the popup interface here
@@ -126,9 +132,9 @@ class CMSPluginBase(admin.ModelAdmin):
             'plugin': self.cms_plugin_instance,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
         })
-        
+
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
-        
+
     def has_add_permission(self, request, *args, **kwargs):
         """Permission handling change - if user is allowed to change the page
         he must be also allowed to add/change/delete plugins..
@@ -138,7 +144,7 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         return self.cms_plugin_instance.has_change_permission(request)
     has_delete_permission = has_change_permission = has_add_permission
-    
+
     def save_model(self, request, obj, form, change):
         """
         Override original method, and add some attributes to obj
@@ -147,7 +153,7 @@ class CMSPluginBase(admin.ModelAdmin):
         Attributes from cms_plugin_instance have to be assigned to object, if
         is cms_plugin_instance attribute available.
         """
-        
+
         if getattr(self, "cms_plugin_instance"):
             # assign stuff to object
             fields = self.cms_plugin_instance._meta.fields
@@ -156,12 +162,12 @@ class CMSPluginBase(admin.ModelAdmin):
                 # subclassing cms_plugin_instance (one to one relation)
                 value = getattr(self.cms_plugin_instance, field.name)
                 setattr(obj, field.name, value)
-        
+
         # remember the saved object
         self.saved_object = obj
-        
+
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
-    
+
     def response_change(self, request, obj):
         """
         Just set a flag, so we know something was changed, and can make
@@ -170,7 +176,7 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         self.object_successfully_changed = True
         return super(CMSPluginBase, self).response_change(request, obj)
-    
+
     def response_add(self, request, obj):
         """
         Just set a flag, so we know something was changed, and can make
@@ -188,7 +194,7 @@ class CMSPluginBase(admin.ModelAdmin):
 
     def log_deletion(self, request, object, object_repr):
         pass
-                
+
     def icon_src(self, instance):
         """
         Overwrite this if text_enabled = True
@@ -197,7 +203,7 @@ class CMSPluginBase(admin.ModelAdmin):
         plugin instance in a text editor.
         """
         return ""
- 
+
     def icon_alt(self, instance):
         """
         Overwrite this if necessary if text_enabled = True
@@ -205,24 +211,32 @@ class CMSPluginBase(admin.ModelAdmin):
         the plugin object in a text editor.
         """
         return "%s - %s" % (unicode(self.name), unicode(instance))
-    
+
+    def get_child_classes(self, slot, page):
+        from cms.plugin_pool import plugin_pool
+        if self.child_classes:
+            return self.child_classes
+        else:
+            installed_plugins = plugin_pool.get_all_plugins(slot, page)
+            return [cls.__name__ for cls in installed_plugins]
+
     def __repr__(self):
         return smart_str(self.name)
-    
+
     def __unicode__(self):
         return self.name
-    
+
     #===========================================================================
     # Deprecated APIs
     #===========================================================================
-    
+
     @property
     def pluginmedia(self):
         raise Deprecated(
             "CMSPluginBase.pluginmedia is deprecated in favor of django-sekizai"
         )
-        
-    
+
+
     def get_plugin_media(self, request, context, plugin):
         raise Deprecated(
             "CMSPluginBase.get_plugin_media is deprecated in favor of django-sekizai"

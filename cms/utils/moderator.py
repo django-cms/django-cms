@@ -3,6 +3,7 @@ import datetime
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from cms.models import Page, PageModeratorState, PageModerator, CMSPlugin, Title
+from cms.utils import timezone
 
 I_APPROVE = 100 # current user should approve page
 I_APPROVE_DELETE = 200
@@ -53,7 +54,7 @@ def update_moderation_message(page, message):
 
     from cms.utils.permissions import get_current_user
     user = get_current_user()
-    created = datetime.datetime.now() - datetime.timedelta(seconds=UPDATE_TOLERANCE)
+    created = timezone.now() - datetime.timedelta(seconds=UPDATE_TOLERANCE)
     try:
         state = page.pagemoderatorstate_set.filter(user=user, created__gt=created).order_by('-created')[0]
         # just state without message!!

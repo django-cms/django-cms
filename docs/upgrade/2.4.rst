@@ -151,13 +151,56 @@ CMS_FLAT_URLS
 Was marked deprecated in 2.3 and has now been removed.
 
 
-..
-    Feature description
 
-Minor improvements
+Plugins in Plugins
 ==================
 
-.. * Some minor improvement.
+We added the ability to have plugins in plugins. Till now only the TextPlugin supportet this.
+For demonstration purposes we created a MultiColumn Plugin. The Possiblities for this are endless.
+Imagine: StylePlugin, TablePlugin, GalleryPlugin etc.
+
+The column plugin can be found here:
+
+https://github.com/divio/djangocms-column
+
+At the moment the limitation is that plugins in plugins is only editable in the frontend.
+
+Here is the MultiColumn Plugin as an example::
+	
+	class MultiColumnPlugin(CMSPluginBase):
+	    model = MultiColumns
+	    name = _("Multi Columns")
+	    render_template = "cms/plugins/multi_column.html"
+	    allow_children = True
+	    child_classes = ["ColumnPlugin"]
+	
+There are 2 new properties for plugins:
+
+**allow_children**
+
+Boolean
+If set to True it allows adding Plugins.
+
+**child_classes**
+
+List
+A List of Plugin Classes that can be added to this plugin.
+If not provided you can add all plugins that are available in this placeholder.
+
+How to render your child plugins in the template
+------------------------------------------------
+
+We introduce a new templatetag in the cms_tags called `{% render_plugin %}`
+Here is an example of how the MultiColumn plugin uses it::
+	
+	{% load cms_tags %}
+	<div class="multicolumn">
+	{% for plugin in instance.child_plugins %}
+    	{% render_plugin plugin %}
+	{% endfor %}
+	</div>
+
+As you can see the children are accessible via the plugins childrens attribute.
 
 
 ******************************

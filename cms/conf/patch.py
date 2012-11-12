@@ -122,7 +122,7 @@ def post_patch_check():
                                 tmp_language['public'] = True
                         if tmp_language['public']:
                             fallbacks.append(tmp_language['code'])
-                    if fallbacks:
+                    if fallbacks and language['code'] in fallbacks:
                         fallbacks.remove(language['code'])
                     if settings.CMS_LANGUAGES.has_key('default'):
                         language['fallbacks'] = settings.CMS_LANGUAGES['default'].get('fallbacks', fallbacks)
