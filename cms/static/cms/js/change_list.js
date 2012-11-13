@@ -418,10 +418,9 @@
 		}
 		
 		function onSuccess(response, textStatus) {
-			status = true;
+			var status = true;
 			if (callback) status = callback(response, textStatus);
-
-			if (status==true) {
+			if (status) {
 				if (/page_\d+/.test($(el).attr('id'))) {
 					// one level higher
 					target = $(el).find('div.cont:first');
