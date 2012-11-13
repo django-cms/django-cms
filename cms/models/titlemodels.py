@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
+from cms.utils import timezone
 
 
 class Title(models.Model):
@@ -20,7 +20,7 @@ class Title(models.Model):
     meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
     page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
-    creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
+    creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
 
     objects = TitleManager()
 

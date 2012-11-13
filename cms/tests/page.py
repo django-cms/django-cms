@@ -24,6 +24,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
+from cms.utils import timezone
 from cms.utils.page import is_valid_page_slug
 
 class PagesTestCase(CMSTestCase):
@@ -389,7 +390,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(CMSSitemap().items().count(),0)
 
     def test_sitemap_includes_last_modification_date(self):
-        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
+        one_day_ago = timezone.now() - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=one_day_ago)
         page.creation_date = one_day_ago
         page.save()
@@ -399,7 +400,7 @@ class PagesTestCase(CMSTestCase):
         self.assertTrue(actual_last_modification_time > one_day_ago)
 
     def test_sitemap_uses_publication_date_when_later_than_modification(self):
-        now = datetime.datetime.now()
+        now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
         page.creation_date = one_day_ago
@@ -577,7 +578,7 @@ class PagesTestCase(CMSTestCase):
         Test that a page which has a end date in the past gives a 404, not a
         500.
         """
-        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        yesterday = timezone.now() - datetime.timedelta(days=1)
         with SettingsOverride(CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en',
                                publication_end_date=yesterday, published=True)

@@ -25,6 +25,7 @@ Install
 
     getting_started/installation
     upgrade/2.4
+    upgrade/2.3.4
     upgrade/2.3.3
     upgrade/2.3.2
     upgrade/2.3

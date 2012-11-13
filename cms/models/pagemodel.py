@@ -7,9 +7,9 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, urlutils, page as page_utils
+from cms.utils import timezone
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
-from datetime import datetime
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -342,7 +342,7 @@ class Page(MPTTModel):
         # Published pages should always have a publication date
         # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
-            self.publication_date = datetime.now()
+            self.publication_date = timezone.now()
 
         if self.reverse_id == "":
             self.reverse_id = None

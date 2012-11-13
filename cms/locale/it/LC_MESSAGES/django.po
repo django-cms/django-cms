@@ -6,6 +6,7 @@
 # babu <marco.badan@gmail.com>, 2011.
 # Denis Darii <sinednx@gmail.com>, 2011.
 # Iacopo Spalletti <i.spalletti@nephila.it>, 2011.
+#   <i.spalletti@nephila.it>, 2012.
 # karim79 <karim@gorjux.net>, 2011.
 # Marco Barberis <mbarberis@gmail.com>, 2011.
 #   <sbrentegani@gmail.com>, 2011.
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
-"PO-Revision-Date: 2012-09-19 14:44+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"POT-Creation-Date: 2012-09-21 14:52+0200\n"
+"PO-Revision-Date: 2012-11-09 15:24+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -287,7 +288,7 @@ msgstr "Errore del database"
 #: admin/pageadmin.py:779
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
+msgstr "Errore! Non hai il permesso di spostare questa pagina. Ricarica la pagina"
 
 #: admin/pageadmin.py:880
 msgid "Page was successfully approved."
@@ -922,15 +923,15 @@ msgstr "Google Map"
 
 #: plugins/googlemap/cms_plugins.py:19
 msgid "Advanced"
-msgstr ""
+msgstr "Avanzato"
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
-msgstr ""
+msgstr "Deve essere un intero seguito da “px” o \"%\""
 
 #: plugins/googlemap/forms.py:26
 msgid "Must be a positive integer followed by “px”."
-msgstr ""
+msgstr "Deve essere un intero seguito da “px”."
 
 #: plugins/googlemap/models.py:10
 msgid "map title"
@@ -954,7 +955,7 @@ msgstr "contenuti aggiuntivi"
 
 #: plugins/googlemap/models.py:19
 msgid "Displayed under address in the bubble."
-msgstr ""
+msgstr "Mostrato sotto l'indirizzo nel fumetto."
 
 #: plugins/googlemap/models.py:21
 msgid "zoom level"
@@ -986,11 +987,11 @@ msgstr "route planer"
 
 #: plugins/googlemap/models.py:37
 msgid "Plugin width (in pixels or percent)."
-msgstr ""
+msgstr "Larghezza del plugin (in pixel o percentuale)."
 
 #: plugins/googlemap/models.py:39
 msgid "Plugin height (in pixels)."
-msgstr ""
+msgstr "Altezza del plugin (in pixel)."
 
 #: plugins/googlemap/models.py:47
 msgid "Map"
@@ -1053,23 +1054,23 @@ msgstr "Un indirizzo email ha priorità rispetto a un link testuale."
 
 #: plugins/link/models.py:14
 msgid "target"
-msgstr ""
+msgstr "target"
 
 #: plugins/link/models.py:15
 msgid "same window"
-msgstr ""
+msgstr "stessa finestra"
 
 #: plugins/link/models.py:16
 msgid "new window"
-msgstr ""
+msgstr "nuova finestra"
 
 #: plugins/link/models.py:17
 msgid "parent window"
-msgstr ""
+msgstr "finestra superiore"
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
-msgstr ""
+msgstr "finestra principale"
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
@@ -1730,7 +1731,7 @@ msgstr "Una versione precedente di un plugin non può essere salvata!"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Your changes to this plugin have not been saved."
-msgstr ""
+msgstr "Le tue modifiche al plugin non sono state salvate."
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1906,11 +1907,11 @@ msgstr "colonna a destra"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
 msgid "Test Plugin"
-msgstr ""
+msgstr "Plugin Test"
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
-msgstr ""
+msgstr "Context aggiuntivo"
 
 #: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
@@ -1976,8 +1977,8 @@ msgid ""
 msgid_plural ""
 "Pages %(pages)s have the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La pagina %(pages)s ha lo stesso url '%(url)s' della pagina corrente \"%(instance)s\"."
+msgstr[1] "Le pagine %(pages)s hanno lo stesso url '%(url)s' della pagina corrente \"%(instance)s\"."
 
 #~ msgid "move"
 #~ msgstr "move request"

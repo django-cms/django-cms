@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
-from django.utils.translation import ugettext as _
 from cms.models import Page, PageModeratorState, CMSPlugin, Title
+from cms.utils import timezone
 
 
 def page_changed(page, old_page=None, force_moderation_action=None):
@@ -39,7 +39,7 @@ def update_moderation_message(page, message):
 
     from cms.utils.permissions import get_current_user
     user = get_current_user()
-    created = datetime.datetime.now() - datetime.timedelta(seconds=UPDATE_TOLERANCE)
+    created = timezone.now() - datetime.timedelta(seconds=UPDATE_TOLERANCE)
     try:
         state = page.pagemoderatorstate_set.filter(user=user, created__gt=created).order_by('-created')[0]
     except IndexError:
