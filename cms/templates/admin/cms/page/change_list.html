@@ -58,6 +58,12 @@
 	moveSuccess = function(node){
 		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
 		node.append(msg);
+        node.parent().addClass('publisher_dirty');
+        if (!node.parent().find('.col-draft .publish').length) {
+            var page_id = node.parent().parent().attr('id').replace('page_', '');
+            node.parent().find('.col-draft').prepend(
+                    '<a href="./'+page_id+'/publish/" class="icon publish" title="{% trans 'Publish' %}"></a>');
+        }
 	    msg.fadeOut(3000);
 	}
 	moveError = function(node,message){
