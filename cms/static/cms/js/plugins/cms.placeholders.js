@@ -189,7 +189,14 @@ CMS.$(document).ready(function ($) {
 			// save reference to this class
 			var that = this;
 			// get all siblings within the placeholder
-			var holders = plugin.siblings('.cms_placeholder').andSelf();
+            var plugin_id = $(plugin).attr('id').split("-")[1];
+            var multi = $('#cms_placeholder_multi-'+plugin_id)
+            if(multi.length > 0) {
+                plugin = multi
+            }
+
+			var holders = plugin.siblings('.cms_moveable').andSelf();
+            console.log(holders)
 			// get selected index and bound
 			var index = holders.index(plugin);
 			var bound = holders.length;
@@ -204,6 +211,10 @@ CMS.$(document).ready(function ($) {
 			var array = [];
 
 			holders.each(function (index, item) {
+                if($(item).hasClass('cms_multi')) {
+                    var item_id = $(item).attr('id').split("-")[1];
+                    var item = $('#cms_placeholder-'+item_id)
+                }
 				array.push($(item).data('options').plugin_id);
 			});
 			// remove current array
@@ -218,6 +229,8 @@ CMS.$(document).ready(function ($) {
 			// add array to new position
 			if(dir === 'moveup') array.splice(index-1, 0, values.plugin_id);
 			if(dir === 'movedown') array.splice(index+1, 0, values.plugin_id);
+
+            console.log(array)
 			// now lets do the ajax request
 			$.ajax({
 				'type': 'POST',
@@ -252,18 +265,9 @@ CMS.$(document).ready(function ($) {
 				if(before){
 					plugin.insertBefore(target);
 				}else{
-					var target_content = $("#cms_placeholdercontent-"+target_id);
-					if(target_content.length > 0){
-						plugin.insertAfter(target_content);
-					}else{
-						plugin.insertAfter(target);
-					}
+					plugin.insertAfter(target);
 				}
-				var content = $("#cms_placeholdercontent-"+values.plugin_id);
-				if(content.length > 0){
-					content.insertAfter($("#cms_placeholder-"+values.plugin_id));
-				}
-				
+
 				// close overlay
 				that.hideOverlay();
 
