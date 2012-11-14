@@ -13,16 +13,25 @@ This document refers to version |release|
 Install
 *******
 
+.. warning::
+    In version 2.4 migrations have been completely rewritten to fix issues
+    with newer south releases.
+    If upgrading from prior 2.3.2 releases, please refer to
+    :ref:`migrations-upgrade`
+
+
 .. toctree::
     :maxdepth: 1
 
     getting_started/installation
     upgrade/2.4
+    upgrade/2.3.4
     upgrade/2.3.3
     upgrade/2.3.2
     upgrade/2.3
     upgrade/2.2
     upgrade/2.1
+
 
 ***************
 Getting Started
@@ -82,6 +91,7 @@ Concepts
 
     concepts/introduction
     concepts/menu_system
+    concepts/publishing
     concepts/multiple_languages
 
 

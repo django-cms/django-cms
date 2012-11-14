@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from cms.exceptions import NoHomeFound
-from cms.models import Title, Page, PageModerator
-from cms.models.moderatormodels import MASK_PAGE, MASK_CHILDREN, \
-    MASK_DESCENDANTS, PageModeratorState
+from cms.models import Title, Page, PageModeratorState
 from cms.utils.permissions import get_user_sites_queryset
 from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
@@ -120,27 +119,7 @@ class CMSChangeList(ChangeList):
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
             pages = pages.filter(pk__in=perm_edit_ids)
             #pages = pages.filter(pk__in=perm_change_list_ids)   
-        
-        if settings.CMS_MODERATOR:
-            # get all ids of public instances, so we can cache them
-            # TODO: add some filtering here, so the set is the same like page set...
-            published_public_page_id_set = Page.objects.public().filter(published=True).values_list('id', flat=True)
-            
-            # get all moderations for current user and all pages
-            pages_moderator_set = PageModerator.objects \
-                .filter(user=request.user, page__site=self._current_site) \
-                .values_list('page', 'moderate_page', 'moderate_children', 'moderate_descendants')
-            # put page / moderations into singe dictionary, where key is page.id 
-            # and value is sum of moderations, so if he can moderate page and descendants
-            # value will be MASK_PAGE + MASK_DESCENDANTS
-            page_moderator = map(lambda item: (item[0], item[1] * MASK_PAGE + item[2] * MASK_CHILDREN + item[3] * MASK_DESCENDANTS), pages_moderator_set)
-            page_moderator = dict(page_moderator)
-            
-            # page moderator states
-            pm_qs = PageModeratorState.objects.filter(page__site=self._current_site)
-            pm_qs.query.group_by = ['page_id']
-            pagemoderator_states_id_set = pm_qs.values_list('page', flat=True)
-            
+
         ids = []
         root_pages = []
         pages = list(pages)
@@ -149,14 +128,22 @@ class CMSChangeList(ChangeList):
             home_pk = Page.objects.drafts().get_home(self.current_site()).pk
         except NoHomeFound:
             home_pk = 0
-            
+
+        # page moderator states
+        pm_qs = PageModeratorState.objects.filter(page__in=pages).order_by('page')
+        pm_states = defaultdict(list)
+        for state in pm_qs:
+            pm_states[state.page_id].append(state)
+
+        public_page_id_set = Page.objects.public().filter(
+            published=True, publisher_public__in=pages).values_list('id', flat=True)
+
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'
         # and otherwise complaints about 'invalid item order'
         cache_tree_children(pages)
         
         for page in pages:
-           
 
             children = list(page.get_children())
 
@@ -176,23 +163,9 @@ class CMSChangeList(ChangeList):
                 page.permission_publish_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids
                 page.permission_advanced_settings_cache = perm_advanced_settings_ids == Page.permissions.GRANT_ALL or page.pk in perm_advanced_settings_ids
                 page.permission_user_cache = request.user
-            
-            if settings.CMS_MODERATOR:
-                # set public instance existence state
-                page.public_published_cache = page.publisher_public_id in published_public_page_id_set
-                
-                # moderation for current user
-                moderation_value = 0
-                try:
-                    moderation_value = page_moderator[page.pk]
-                except:
-                    pass
-                page._moderation_value_cache = moderation_value
-                page._moderation_value_cache_for_user_id = request.user.pk
-                
-                #moderation states
-                page._has_moderator_state_cache = page.pk in pagemoderator_states_id_set
-                
+
+            page._moderator_state_cache = pm_states[page.pk]
+            page._public_published_cache = page.publisher_public_id in public_page_id_set
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):
@@ -222,7 +195,7 @@ class CMSChangeList(ChangeList):
                 page.childrens = []
             else:
                 page.childrens = children
-        
+
         # TODO: OPTIMIZE!!
         titles = Title.objects.filter(page__in=ids)
         for page in all_pages:# add the title and slugs and some meta data

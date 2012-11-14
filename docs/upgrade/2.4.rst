@@ -123,21 +123,92 @@ The following settings are not needed any more and have been removed:
 Please remove them from your settings.py
 
 
+.. _migrations-upgrade:
+
+Migrations overhaul
+===================
+In version 2.4 migrations have been completely rewritten to fix issues with
+newer South releases.
+
+To ease upgrading process migration numbering and naming have not been changed,
+but only the first one for each application has actual migration code, so it's of
+utmost importance that you have an up to date migration history.
+
+To ensure this, when upgrading from 2.3.1 and older releases, please upgrate to
+2.3.3 first, execute all the migrations and then move to 2.4.
+
+For the two step upgrade process do the following in your project main directory ::
+
+    pip install django-cms==2.3.3
+    python manage.py syncdb
+    python manage.py migrate
+    pip install django-cms==2.4
+
+
 CMS_FLAT_URLS
 =============
 
 Was marked deprecated in 2.3 and has now been removed.
 
+CMS_MODERATOR
+=============
+Has been removed since it is no longer in use. From 2.4 onwards, all pages
+exist in a public and draft version. Users with the ``publish_page`` permission
+can publish changes to the public site.
+
+To ensure that a site that was set up using a previous version is up to date,
+run ``manage.py moderator on``.
 
 
-
-..
-    Feature description
-
-Minor improvements
+Plugins in Plugins
 ==================
 
-.. * Some minor improvement.
+We added the ability to have plugins in plugins. Till now only the TextPlugin supportet this.
+For demonstration purposes we created a MultiColumn Plugin. The Possiblities for this are endless.
+Imagine: StylePlugin, TablePlugin, GalleryPlugin etc.
+
+The column plugin can be found here:
+
+https://github.com/divio/djangocms-column
+
+At the moment the limitation is that plugins in plugins is only editable in the frontend.
+
+Here is the MultiColumn Plugin as an example::
+	
+	class MultiColumnPlugin(CMSPluginBase):
+	    model = MultiColumns
+	    name = _("Multi Columns")
+	    render_template = "cms/plugins/multi_column.html"
+	    allow_children = True
+	    child_classes = ["ColumnPlugin"]
+	
+There are 2 new properties for plugins:
+
+**allow_children**
+
+Boolean
+If set to True it allows adding Plugins.
+
+**child_classes**
+
+List
+A List of Plugin Classes that can be added to this plugin.
+If not provided you can add all plugins that are available in this placeholder.
+
+How to render your child plugins in the template
+------------------------------------------------
+
+We introduce a new templatetag in the cms_tags called `{% render_plugin %}`
+Here is an example of how the MultiColumn plugin uses it::
+	
+	{% load cms_tags %}
+	<div class="multicolumn">
+	{% for plugin in instance.child_plugins %}
+    	{% render_plugin plugin %}
+	{% endfor %}
+	</div>
+
+As you can see the children are accessible via the plugins childrens attribute.
 
 
 ******************************
@@ -149,7 +220,6 @@ New minimum requirements for dependencies
 
 If you are running django 1.3.X you need to install django-i18nurls, if you want
 multilingual features. The cms.urls needs to be in a i18n url pattern.
-
 
 
 ********************

@@ -125,7 +125,7 @@ signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title
 
 def post_save_user(instance, raw, created, **kwargs):
     """Signal called when new user is created, required only when CMS_PERMISSION.
-    Asignes creator of the user to PageUserInfo model, so we now who had created 
+    Assigns creator of the user to PageUserInfo model, so we know who had created
     this user account.
     
     requires: CurrentUserMiddleware
@@ -155,7 +155,7 @@ def post_save_user(instance, raw, created, **kwargs):
 def post_save_user_group(instance, raw, created, **kwargs):
     """The same like post_save_user, but for Group, required only when 
     CMS_PERMISSION.
-    Asignes creator of the group to PageUserGroupInfo model, so we now who had
+    Assigns creator of the group to PageUserGroupInfo model, so we know who had
     created this user account.
     
     requires: CurrentUserMiddleware
@@ -181,14 +181,13 @@ def post_save_user_group(instance, raw, created, **kwargs):
 if settings.CMS_PERMISSION:
     # only if permissions are in use
     from django.contrib.auth.models import User, Group
-    # regster signals to user related models
+    # register signals to user related models
     signals.post_save.connect(post_save_user, User)
     signals.post_save.connect(post_save_user_group, Group)
 
 
 def pre_save_page(instance, raw, **kwargs):
-    """Helper pre save signal, assigns old_page attribute, so we can still
-    compare changes. Currently used only if CMS_PUBLISHER
+    """Assigns old_page attribute, so we can compare changes.
     """
     instance.old_page = None
     try:
@@ -198,21 +197,21 @@ def pre_save_page(instance, raw, **kwargs):
 
 
 def post_save_page_moderator(instance, raw, created, **kwargs):   
-    """Helper post save signal, cleans old_page attribute.
+    """Helper post save signal.
     """
     old_page = instance.old_page
-    del(instance.old_page)
-    
-    if settings.CMS_MODERATOR:
-        # tell moderator something was happen with this page
-        from cms.utils.moderator import page_changed
+
+    # tell moderator something was happen with this page
+    from cms.utils.moderator import page_changed
+    if not old_page:
         page_changed(instance, old_page)
         
 def post_save_page(instance, **kwargs):
-    for page in instance.get_descendants():
-        for title in page.title_set.all():
-            update_title(title)
-            title.save()
+    if instance.old_page is None or instance.old_page.parent_id != instance.parent_id:
+        for page in instance.get_descendants():
+            for title in page.title_set.all():
+                update_title(title)
+                title.save()
 
 def update_placeholders(instance, **kwargs):
     instance.rescan_placeholders()
@@ -220,10 +219,9 @@ def update_placeholders(instance, **kwargs):
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
 
-if settings.CMS_MODERATOR:
-    # tell moderator, there is something happening with this page
-    signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
-    signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
+# tell moderator, there is something happening with this page
+signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
+signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
 signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)

@@ -3,7 +3,7 @@ from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import Page
 from cms.templatetags.cms_tags import Placeholder
 from cms.utils.placeholder import validate_placeholder_name
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
 from django.template import (NodeList, TextNode, VariableNode, 
     TemplateSyntaxError)
@@ -132,13 +132,16 @@ SITE_VAR = "site__exact"
 
 def current_site(request):
     if SITE_VAR in request.REQUEST:
-        return Site.objects.get(pk=request.REQUEST[SITE_VAR])
+        site_pk = request.REQUEST[SITE_VAR]
     else:
+        session = getattr(request, 'session')
         site_pk = request.session.get('cms_admin_site', None)
-        if site_pk:
-            try:
-                return Site.objects.get(pk=site_pk)
-            except Site.DoesNotExist:
-                return None
-        else:
-            return Site.objects.get_current()
+    if site_pk:
+        try:
+            site = SITE_CACHE.get(site_pk) or Site.objects.get(pk=site_pk)
+            SITE_CACHE[site_pk] = site
+            return site
+        except Site.DoesNotExist:
+            return None
+    else:
+        return Site.objects.get_current()

@@ -5,8 +5,7 @@ from django.contrib.sites.models import Site
 from cms.publisher.query import PublisherQuerySet
 from django.conf import settings
 from cms.exceptions import NoHomeFound
-
-#from cms.utils.urlutils import levelize_path
+from cms.utils import timezone
 
 
 class PageQuerySet(PublisherQuerySet):
@@ -53,13 +52,13 @@ class PageQuerySet(PublisherQuerySet):
 
         if settings.CMS_SHOW_START_DATE:
             pub = pub.filter(
-                Q(publication_date__lt=datetime.now()) |
+                Q(publication_date__lt=timezone.now()) |
                 Q(publication_date__isnull=True)
             )
 
         if settings.CMS_SHOW_END_DATE:
             pub = pub.filter(
-                Q(publication_end_date__gte=datetime.now()) |
+                Q(publication_end_date__gte=timezone.now()) |
                 Q(publication_end_date__isnull=True)
             )
 
@@ -67,7 +66,7 @@ class PageQuerySet(PublisherQuerySet):
 
     def expired(self):
         return self.on_site().filter(
-            publication_end_date__lte=datetime.now())
+            publication_end_date__lte=timezone.now())
 
 #    - seems this is not used anymore...
 #    def get_pages_with_application(self, path, language):

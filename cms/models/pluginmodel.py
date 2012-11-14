@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
 import warnings
-from datetime import datetime, date
+from datetime import date
 
 from django.conf import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import (model_unpickle, simple_class_factory)
+from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,6 +14,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
+from cms.utils import timezone
 
 from mptt.models import MPTTModel, MPTTModelBase
 
@@ -81,12 +82,13 @@ class CMSPlugin(MPTTModel):
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
     language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
-    creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
+    creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     changed_date = models.DateTimeField(auto_now=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    child_plugin_instances = None
 
     class Meta:
         app_label = 'cms'
@@ -125,7 +127,7 @@ class CMSPlugin(MPTTModel):
                         obj = self.__class__.__dict__[field.attname]
                         model = obj.model_ref()
         else:
-            factory = simple_class_factory
+            factory = lambda x, y: x
         return (model_unpickle, (model, defers, factory), data)
 
     def __unicode__(self):

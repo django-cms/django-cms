@@ -20,7 +20,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         mptt values are correctly showing a parent child relationship
         of a nested plugin
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                position=u"last-child", published=True, in_navigation=True)
@@ -77,14 +77,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         """
         Test to verify that page copy with a nested plugin works
         page one - 3 placeholder 
-                    col_sidebar: 
-                        1 text plugin
+                    col_sidebar: 1 text plugin
                     col_left: 1 text plugin with nested link plugin
                     col_right: no plugin
         page two (copy target)
         Verify copied page, placeholders, plugins and body text
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             templates = []
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
@@ -123,7 +122,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             text_plugin_two = self.reload(text_plugin_two)
             # the link is attached as a child?
             self.assertEquals(text_plugin_two.get_children().count(), 1)
-            post_add_plugin_count = CMSPlugin.objects.count()
+            post_add_plugin_count = CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count()
             self.assertEqual(post_add_plugin_count, 3)
             page_one.save()
             # get the plugins from the original page
@@ -131,7 +130,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             page_one_ph_one = page_one.placeholders.get(slot = u"col_sidebar")
             page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
             page_one_ph_three = page_one.placeholders.get(slot = u"col_right")
-            # verifiy the plugins got created
+            # verify that the plugins got created
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
             self.assertEquals(len(org_placeholder_one_plugins), 1)
             org_placeholder_two_plugins = page_one_ph_two.get_plugins()
@@ -139,33 +138,33 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             org_placeholder_three_plugins = page_one_ph_three.get_plugins()
             self.assertEquals(len(org_placeholder_three_plugins), 0)
             self.assertEquals(page_one.placeholders.count(), 3)
-            placeholder_count = Placeholder.objects.count()
+            placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEquals(placeholder_count, 3)
-            self.assertEquals(CMSPlugin.objects.count(), 3)
+            self.assertEquals(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 3)
             page_one_plugins = CMSPlugin.objects.all()
             ##
             # setup page_copy_target page
             ##
             page_copy_target = create_page("Three Placeholder - page copy target", "col_three.html", "en",
                                position="last-child", published=True, in_navigation=True)
-            all_page_count = Page.objects.all().count()
-            pre_copy_placeholder_count = Placeholder.objects.count()
+            all_page_count = Page.objects.drafts().count()
+            pre_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEquals(pre_copy_placeholder_count, 6)
             # copy the page
             superuser = self.get_superuser()
             with self.login_user_context(superuser):
                 page_two = self.copy_page(page_one, page_copy_target)
             # validate the expected pages,placeholders,plugins,pluginbodies
-            after_copy_page_plugin_count = CMSPlugin.objects.count()
+            after_copy_page_plugin_count = CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count()
             self.assertEquals(after_copy_page_plugin_count, 6)
             # check the amount of copied stuff
-            after_copy_page_count = Page.objects.all().count()
-            after_copy_placeholder_count = Placeholder.objects.count()
-            self.assertTrue((after_copy_page_count > all_page_count), msg = u"no new page after copy")
-            self.assertTrue((after_copy_page_plugin_count > post_add_plugin_count), msg = u"plugin count is not grown")
-            self.assertTrue((after_copy_placeholder_count > pre_copy_placeholder_count), msg = u"placeholder count is not grown")    
-            self.assertTrue((after_copy_page_count == 3), msg = u"no new page after copy")
-            # orginal placeholder
+            after_copy_page_count = Page.objects.drafts().count()
+            after_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
+            self.assertGreater(after_copy_page_count, all_page_count, u"no new page after copy")
+            self.assertGreater(after_copy_page_plugin_count, post_add_plugin_count, u"plugin count is not grown")
+            self.assertGreater(after_copy_placeholder_count, pre_copy_placeholder_count, u"placeholder count is not grown")
+            self.assertEqual(after_copy_page_count, 3, u"no new page after copy")
+            # original placeholder
             page_one = self.reload(page_one)
             page_one_ph_one = page_one.placeholders.get(slot = u"col_sidebar")
             page_one_ph_two = page_one.placeholders.get(slot = u"col_left")
@@ -292,7 +291,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                     col_right: 1 text plugin with nested link plugin
         verify the copied page structure
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             templates = []
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
@@ -346,15 +345,15 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             self.assertEquals(len(org_placeholder_three_plugins), 0)
             self.assertEquals(page_one.placeholders.count(), 3)
             
-            placeholder_count = Placeholder.objects.count()
+            placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEquals(placeholder_count, 3)
             self.assertEquals(CMSPlugin.objects.count(), 3)
             page_one_plugins = CMSPlugin.objects.all()
             # setup page_copy_target
             page_copy_target = create_page("Three Placeholder - page copy target", "col_three.html", "en",
                                position="last-child", published=True, in_navigation=True)
-            all_page_count = Page.objects.all().count()
-            pre_copy_placeholder_count = Placeholder.objects.count()
+            all_page_count = Page.objects.drafts().count()
+            pre_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEquals(pre_copy_placeholder_count, 6)
             superuser = self.get_superuser()
             with self.login_user_context(superuser):
@@ -388,12 +387,12 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # validate the expected pages,placeholders,plugins,pluginbodies
             after_copy_page_plugin_count = CMSPlugin.objects.count()
             self.assertEquals(after_copy_page_plugin_count, 6)
-            after_copy_page_count = Page.objects.all().count()
-            after_copy_placeholder_count = Placeholder.objects.count()
-            self.assertTrue((after_copy_page_count > all_page_count), msg = u"no new page after copy")
-            self.assertTrue((after_copy_page_plugin_count > post_add_plugin_count), msg = u"plugin count is not grown")
-            self.assertTrue((after_copy_placeholder_count > pre_copy_placeholder_count), msg = u"placeholder count is not grown")    
-            self.assertTrue((after_copy_page_count == 3), msg = u"no new page after copy")
+            after_copy_page_count = Page.objects.drafts().count()
+            after_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
+            self.assertGreater(after_copy_page_count, all_page_count, u"no new page after copy")
+            self.assertGreater(after_copy_page_plugin_count, post_add_plugin_count, u"plugin count is not grown")
+            self.assertGreater(after_copy_placeholder_count, pre_copy_placeholder_count, u"placeholder count is not grown")
+            self.assertEquals(after_copy_page_count, 3, u"no new page after copy")
             # validate the structure
             # orginal placeholder
             page_one = self.reload(page_one)
@@ -484,7 +483,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             copied_link_child_plugin = copied_nested_text_plugin.get_children()[0]
             # validate the textplugin body texts
             msg = u"org plugin and copied plugin are the same"
-            self.assertTrue(org_link_child_plugin.id != copied_link_child_plugin.id, msg)
+            self.assertNotEqual(org_link_child_plugin.id, copied_link_child_plugin.id, msg)
             needle = u"plugin_obj_%s"
             msg = u"child plugin id differs to parent in body plugin_obj_id"
             # linked child is in body
@@ -500,5 +499,4 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             org_placeholder = org_link_child_plugin.placeholder
             copied_placeholder = copied_link_child_plugin.placeholder
             msg = u"placeholder of the orginal plugin and copied plugin are the same"
-            ok = ((org_placeholder.id != copied_placeholder.id))
-            self.assertTrue(ok, msg)       
+            self.assertNotEqual(org_placeholder.id, copied_placeholder.id, msg)

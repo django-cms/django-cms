@@ -78,8 +78,6 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_change_advanced_settings')
             if not obj.has_move_page_permission(request):
                 exclude.append('can_move_page')
-            if not settings.CMS_MODERATOR or not obj.has_moderate_permission(request):
-                exclude.append('can_moderate')
         formset_cls = super(PagePermissionInlineAdmin, self
             ).get_formset(request, obj=None, exclude=exclude, *kwargs)
         qs = self.queryset(request)
@@ -96,7 +94,7 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
     exclude = [
         'can_add', 'can_change', 'can_delete', 'can_view',
         'can_publish', 'can_change_advanced_settings', 'can_move_page',
-        'can_moderate', 'can_change_permissions'
+        'can_change_permissions'
     ]
 
     def get_formset(self, request, obj=None, **kwargs):
@@ -133,12 +131,6 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     
     list_display.append('can_change_advanced_settings')
     list_filter.append('can_change_advanced_settings')
-    
-    if settings.CMS_MODERATOR:
-        list_display.append('can_moderate')
-        list_filter.append('can_moderate')
-    else:
-        exclude.append('can_moderate')
 
 
 class GenericCmsPermissionAdmin(object):
