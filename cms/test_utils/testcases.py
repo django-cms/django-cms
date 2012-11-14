@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.test import testcases
-from django.test.client import Client, RequestFactory
+from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 from urlparse import urljoin
@@ -75,7 +75,6 @@ class CMSTestCase(testcases.TestCase):
     def _fixture_setup(self):
         super(CMSTestCase, self)._fixture_setup()
         self.create_fixtures()
-        self.client = Client()
         activate("en")
 
     def create_fixtures(self):
@@ -149,14 +148,14 @@ class CMSTestCase(testcases.TestCase):
             return qs.get(**filter)
         except ObjectDoesNotExist:
             pass
-        raise self.failureException, "ObjectDoesNotExist raised"
+        raise self.failureException, "ObjectDoesNotExist raised for filter %s" % filter
 
     def assertObjectDoesNotExist(self, qs, **filter):
         try:
             qs.get(**filter)
         except ObjectDoesNotExist:
             return
-        raise self.failureException, "ObjectDoesNotExist not raised"
+        raise self.failureException, "ObjectDoesNotExist not raised for filter %s" % filter
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug
@@ -261,21 +260,6 @@ class CMSTestCase(testcases.TestCase):
                 continue
             self.assertEqual(sibling.id,
                 public_siblings[i - skip].publisher_draft.id)
-
-    def request_moderation(self, page, level):
-        """Assign current logged in user to the moderators / change moderation
-
-        Args:
-            page: Page on which moderation should be changed
-
-            level <0, 7>: Level of moderation,
-                1 - moderate page
-                2 - moderate children
-                4 - moderate descendants
-                + combinations
-        """
-        response = self.client.post("/en/admin/cms/page/%d/change-moderation/" % page.id, {'moderate': level})
-        self.assertEquals(response.status_code, 200)
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []

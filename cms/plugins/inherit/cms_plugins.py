@@ -32,15 +32,16 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
                 lang = get_language_from_request(request)
             else:
                 lang = settings.LANGUAGE_CODE
-        if instance.from_page:
-            page = instance.from_page
+        page = instance.placeholder.page
+        from_page = instance.from_page
+
+        if page.publisher_is_draft:
+            from_page = from_page.get_draft_object()
         else:
-            page = instance.page
-        if settings.CMS_MODERATOR and not instance.page.publisher_is_draft and page.publisher_is_draft:
-            page = page.publisher_public
-            
+            from_page = from_page.get_public_object()
+
         plugins = get_cmsplugin_queryset(request).filter(
-            placeholder__page=page,
+            placeholder__page=from_page,
             language=lang,
             placeholder__slot__iexact=placeholder,
             parent__isnull=True

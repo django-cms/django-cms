@@ -166,7 +166,7 @@ class PlaceholderTestCase(CMSTestCase):
         containing an hyphen, the hyphen is escaped by django escapejs resulting
         in a incorrect URL
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             ex = Example1(
                 char_1='one',
                 char_2='two',
@@ -191,7 +191,7 @@ class PlaceholderTestCase(CMSTestCase):
         Sibling test of the above, on a page.
         #1366 does not apply to placeholder defined in a page
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             page = create_page('page', 'col_two.html', 'en')
             ph1 = page.placeholders.get(slot='col_left')
             ###

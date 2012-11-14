@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from django.conf import settings
 from django.core.management.base import NoArgsCommand, CommandError
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
-        """Create published public version of all published drafts. Useful, 
-        when CMS_MODERATOR gets turned on after some time. 
+        """Create published public version of all published drafts.
         """
-        if not getattr(settings, 'CMS_MODERATOR', False):
-            raise CommandError("This command may be used only with settings.CMS_MODERATOR") 
-        
         self.publish_pages()
         
     def publish_pages(self):
@@ -27,7 +22,7 @@ class Command(NoArgsCommand):
             raise CommandError("No super user found, create one using `manage.py createsuperuser`.")
         
         set_current_user(user) # set him as current user
-        
+
         qs = Page.objects.drafts().filter(published=True)
         pages_total, pages_published = qs.count(), 0
         

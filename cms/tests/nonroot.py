@@ -17,12 +17,11 @@ class NonRootCase(CMSTestCase):
     urls = 'cms.test_utils.project.nonroot_urls'
 
     def setUp(self):
-        with SettingsOverride(CMS_MODERATOR = False):
-            u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
-            u.set_password("test")
-            u.save()
-            with self.login_user_context(u):
-                self.create_some_pages()
+        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u.set_password("test")
+        u.save()
+        with self.login_user_context(u):
+            self.create_some_pages()
 
     def create_some_pages(self):
         """
@@ -51,31 +50,28 @@ class NonRootCase(CMSTestCase):
         self.assertEqual(self.get_pages_root(), '/en/content/')
 
     def test_basic_cms_menu(self):
-        with SettingsOverride(CMS_MODERATOR = False):
-            response = self.client.get(self.get_pages_root())
-            self.assertEquals(response.status_code, 200)
-            self.assertEquals(self.get_pages_root(), "/en/content/")
+        response = self.client.get(self.get_pages_root())
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(self.get_pages_root(), "/en/content/")
 
     def test_show_menu(self):
-        with SettingsOverride(CMS_MODERATOR = False):
-            context = self.get_context()
-            tpl = Template("{% load menu_tags %}{% show_menu %}")
-            tpl.render(context) 
-            nodes = context['children']
-            self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
-            self.assertEqual(nodes[0].get_absolute_url(), "/en/content/")
+        context = self.get_context()
+        tpl = Template("{% load menu_tags %}{% show_menu %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
+        self.assertEqual(nodes[0].get_absolute_url(), "/en/content/")
 
     def test_show_breadcrumb(self):
-        with SettingsOverride(CMS_MODERATOR = False):    
-            page2 = Page.objects.get(pk=self.page2.pk)
-            context = self.get_context(path=self.page2.get_absolute_url())
-            tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
-            tpl.render(context) 
-            nodes = context['ancestors']
-            self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
-            self.assertEqual(nodes[0].get_absolute_url(), "/en/content/")
-            self.assertEqual(isinstance(nodes[0], NavigationNode), True)
-            self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
+        page2 = Page.objects.get(pk=self.page2.pk)
+        context = self.get_context(path=self.page2.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
+        tpl.render(context)
+        nodes = context['ancestors']
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
+        self.assertEqual(nodes[0].get_absolute_url(), "/en/content/")
+        self.assertEqual(isinstance(nodes[0], NavigationNode), True)
+        self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
 
     def test_form_multilingual_admin(self):
         """

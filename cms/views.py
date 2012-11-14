@@ -36,12 +36,18 @@ def details(request, slug):
 
     current_language = get_language_from_request(request)
     # Check that the current page is available in the desired (current) language
-
     available_languages = []
     page_languages = page.get_languages()
     for frontend_lang in get_public_languages():
         if frontend_lang in page_languages:
             available_languages.append(frontend_lang)
+    attrs = ''
+    if 'edit' in request.GET:
+        attrs = '?edit=1'
+    elif 'preview' in request.GET:
+        attrs = '?preview=1'
+        if 'draft' in request.GET:
+            attrs += '&draft=1'
     # Check that the language is in FRONTEND_LANGUAGES:
     if not current_language in get_public_languages():
         #are we on root?
@@ -56,7 +62,7 @@ def details(request, slug):
                     new_language = translation.get_language_from_request(request)
                     with force_language(new_language):
                         pages_root = reverse('pages-root')
-                        return HttpResponseRedirect(pages_root)
+                        return HttpResponseRedirect(pages_root + attrs)
             else:
                 _handle_no_page(request, slug)
         else:
@@ -73,7 +79,7 @@ def details(request, slug):
                         # In the case where the page is not available in the
                     # preferred language, *redirect* to the fallback page. This
                     # is a design decision (instead of rendering in place)).
-                    return HttpResponseRedirect(path)
+                    return HttpResponseRedirect(path + attrs)
                 else:
                     found = True
         if not found:
@@ -117,7 +123,7 @@ def details(request, slug):
             request.path,
         ]
         if redirect_url not in own_urls:
-            return HttpResponseRedirect(redirect_url)
+            return HttpResponseRedirect(redirect_url + attrs)
 
     # permission checks
     if page.login_required and not request.user.is_authenticated():

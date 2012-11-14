@@ -31,8 +31,7 @@ def is_valid_page_slug(page, parent, lang, slug, site, path=None):
 
     if page.pk:
         qs = qs.exclude(Q(language=lang) & Q(page=page))
-        if settings.CMS_MODERATOR:
-            qs = qs.exclude(page__publisher_public=page)
+        qs = qs.exclude(page__publisher_public=page)
         ## Check for slugs
     if qs.filter(slug=slug).count():
         return False

@@ -33,22 +33,20 @@ class FormsTestCase(CMSTestCase):
         self.assertEquals(result, [('', '----')])
         
     def test_get_site_choices_without_moderator(self):
-        with SettingsOverride(CMS_MODERATOR=False):
-            result = get_site_choices()
-            self.assertEquals(result, [])
+        result = get_site_choices()
+        self.assertEquals(result, [])
             
     def test_get_site_choices_without_moderator_with_superuser(self):
-        with SettingsOverride(CMS_MODERATOR=False):
-            # boilerplate (creating a page)
-            user_super = User(username="super", is_staff=True, is_active=True, 
-                is_superuser=True)
-            user_super.set_password("super")
-            user_super.save()
-            with self.login_user_context(user_super):
-                create_page("home", "nav_playground.html", "en", created_by=user_super)
-                # The proper test
-                result = get_site_choices()
-                self.assertEquals(result, [(1,'example.com')])
+        # boilerplate (creating a page)
+        user_super = User(username="super", is_staff=True, is_active=True,
+            is_superuser=True)
+        user_super.set_password("super")
+        user_super.save()
+        with self.login_user_context(user_super):
+            create_page("home", "nav_playground.html", "en", created_by=user_super)
+            # The proper test
+            result = get_site_choices()
+            self.assertEquals(result, [(1,'example.com')])
             
     def test_compress_function_raises_when_page_is_none(self):
         raised = False
@@ -88,24 +86,23 @@ class FormsTestCase(CMSTestCase):
             self.assertEquals(home_page,result)
             
     def test_update_site_and_page_choices(self):
-        with SettingsOverride(CMS_MODERATOR=False):
-            Site.objects.all().delete()
-            site = Site.objects.create(domain='http://www.django-cms.org', name='Django CMS')
-            page1 = create_page('Page 1', 'nav_playground.html', 'en', site=site)
-            page2 = create_page('Page 2', 'nav_playground.html', 'de', site=site)
-            page3 = create_page('Page 3', 'nav_playground.html', 'en',
-                         site=site, parent=page1)
-            # enfore the choices to be casted to a list
-            site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
-            self.assertEqual(page_choices, [
-                ('', '----'),
-                (site.name, [
-                    (page1.pk, 'Page 1'),
-                    (page3.pk, '&nbsp;&nbsp;Page 3'),
-                    (page2.pk, 'Page 2'),
-                ])
+        Site.objects.all().delete()
+        site = Site.objects.create(domain='http://www.django-cms.org', name='Django CMS')
+        page1 = create_page('Page 1', 'nav_playground.html', 'en', site=site)
+        page2 = create_page('Page 2', 'nav_playground.html', 'de', site=site)
+        page3 = create_page('Page 3', 'nav_playground.html', 'en',
+                     site=site, parent=page1)
+        # enforce the choices to be casted to a list
+        site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
+        self.assertEqual(page_choices, [
+            ('', '----'),
+            (site.name, [
+                (page1.pk, 'Page 1'),
+                (page3.pk, '&nbsp;&nbsp;Page 3'),
+                (page2.pk, 'Page 2'),
             ])
-            self.assertEqual(site_choices, [(site.pk, site.name)])
+        ])
+        self.assertEqual(site_choices, [(site.pk, site.name)])
 
         
     def test_superlazy_iterator_behaves_properly_for_sites(self):

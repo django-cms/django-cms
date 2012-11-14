@@ -2,7 +2,7 @@
 from __future__ import with_statement
 from cms.apphook_pool import apphook_pool
 from cms.utils.i18n import force_language, get_language_list
-from cms.utils.moderator import get_page_queryset
+from cms.utils.page_resolver import get_page_queryset
 
 from django.conf import settings
 from django.conf.urls.defaults import patterns
@@ -38,10 +38,7 @@ def applications_page_check(request, current_page=None, path=None):
         try:
             page_id = resolver.resolve_page_id(path)
             # yes, it is application page
-            if settings.CMS_MODERATOR:
-                page = get_page_queryset(request).get(Q(id=page_id) | Q(publisher_draft=page_id))
-            else:
-                page = get_page_queryset(request).get(id=page_id)
+            page = get_page_queryset(request).get(id=page_id)
             # If current page was matched, then we have some override for content
             # from cms, but keep current page. Otherwise return page to which was application assigned.
             return page
@@ -178,12 +175,10 @@ def get_app_patterns():
     included = []
 
     # we don't have a request here so get_page_queryset() can't be used,
-    # so, if CMS_MODERATOR, use, public() queryset, otherwise
-    # use draft(). This can be done, because url patterns are used just
-    # in frontend
-    is_draft = not settings.CMS_MODERATOR
+    # so use public() queryset.
+    # This can be done because url patterns are used just in frontend
 
-    title_qs = Title.objects.filter(page__publisher_is_draft=is_draft, page__site=current_site)
+    title_qs = Title.objects.public().filter(page__site=current_site)
 
     hooked_applications = {}
 
