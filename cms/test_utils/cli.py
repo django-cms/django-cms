@@ -20,7 +20,7 @@ def configure(db_data, **extra):
     elif db_type == 'postgres':
         DB = {
              'ENGINE': 'django.db.backends.postgresql_psycopg2',
-             'NAME': db_data.get('NAME', 'djangocms'),
+             'NAME': db_data.get('NAME', 'djangocms_test'),
              'USER': db_data.get('USER', 'postgres'),
              }
         if db_data.get('PASSWORD', None):
@@ -28,7 +28,7 @@ def configure(db_data, **extra):
     elif db_type == 'mysql':
         DB = {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': db_data.get('NAME', 'djangocms'),
+            'NAME': db_data.get('NAME', 'djangocms_test'),
             'USER': db_data.get('USER', 'root'),
             }
         if db_data.get('PASSWORD', None):

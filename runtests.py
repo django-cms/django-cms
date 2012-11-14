@@ -45,7 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('--db', default='sqlite', dest='db')
     parser.add_argument('--db_user', default=None, dest='db_user')
     parser.add_argument('--db_name', default=None, dest='db_name')
-    parser.add_argument('--db_password', default=None, dest='db_password')
+    parser.add_argument('--db_password', default="", dest='db_password')
     parser.add_argument('test_labels', nargs='*')
     args = parser.parse_args()
     if getattr(args, 'jenkins', False):
@@ -58,6 +58,11 @@ if __name__ == '__main__':
     db_data = {'DB':args.db}
     if args.db_user:
         db_data['USER'] = args.db_user
+    else:
+        if args.db == "mysql":
+            db_data['USER'] = "root"
+        elif args.db == 'postgres':
+            db_data['USER'] = 'postgres'
     if args.db_name:
         db_data['NAME'] = args.db_name
     if args.db_password:
