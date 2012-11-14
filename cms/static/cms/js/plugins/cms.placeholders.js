@@ -196,7 +196,6 @@ CMS.$(document).ready(function ($) {
             }
 
 			var holders = plugin.siblings('.cms_moveable').andSelf();
-            console.log(holders)
 			// get selected index and bound
 			var index = holders.index(plugin);
 			var bound = holders.length;
@@ -230,7 +229,6 @@ CMS.$(document).ready(function ($) {
 			if(dir === 'moveup') array.splice(index-1, 0, values.plugin_id);
 			if(dir === 'movedown') array.splice(index+1, 0, values.plugin_id);
 
-            console.log(array)
 			// now lets do the ajax request
 			$.ajax({
 				'type': 'POST',
