@@ -738,6 +738,9 @@ class PageAdmin(ModelAdmin):
             not target.has_add_permission(request):
             return jsonify_request(HttpResponseForbidden(_("Error! You don't have permissions to move this page. Please reload the page")))
 
+        if page.delete_requested():
+            return jsonify_request(HttpResponseBadRequest(_('The page "%s" has a delete request. Delete or confirm the request first.') % page))
+
         # move page
         page.move_page(target, position)
 
