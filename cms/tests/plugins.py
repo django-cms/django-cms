@@ -169,7 +169,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_plugin_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk)
         db_plugin_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk)
 
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             self.assertEqual(text_plugin_1.position, 1)
             self.assertEqual(db_plugin_1.position, 1)
             self.assertEqual(text_plugin_2.position, 2)
@@ -371,10 +371,12 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 1)
 
         # publish page
         response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1 :1})
         self.assertEqual(response.status_code, 200)
+        self.assertEquals(Page.objects.count(), 2)
 
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
@@ -388,7 +390,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
 
         # there should be no plugins
-        self.assertEquals(CMSPlugin.objects.all().count(), 0)
+        self.assertEquals(CMSPlugin.objects.all().count(), 1)
+        self.assertEquals(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=False).count(), 1)
 
     def test_remove_plugin_not_associated_to_page(self):
         """
@@ -460,41 +463,42 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test case for InheritPagePlaceholder
         """
-        with SettingsOverride(CMS_MODERATOR=False):
-            inheritfrompage = create_page('page to inherit from',
-                                          'nav_playground.html',
-                                          'en')
+        inheritfrompage = create_page('page to inherit from',
+                                      'nav_playground.html',
+                                      'en')
 
-            body = inheritfrompage.placeholders.get(slot="body")
+        body = inheritfrompage.placeholders.get(slot="body")
 
-            plugin = TwitterRecentEntries(
-                plugin_type='TwitterRecentEntriesPlugin',
-                placeholder=body,
-                position=1,
-                language=settings.LANGUAGE_CODE,
-                twitter_user='djangocms',
-            )
-            plugin.insert_at(None, position='last-child', save=True)
+        plugin = TwitterRecentEntries(
+            plugin_type='TwitterRecentEntriesPlugin',
+            placeholder=body,
+            position=1,
+            language=settings.LANGUAGE_CODE,
+            twitter_user='djangocms',
+        )
+        plugin.insert_at(None, position='last-child', save=True)
+        inheritfrompage.publish()
 
-            page = create_page('inherit from page',
-                               'nav_playground.html',
-                               'en',
-                               published=True)
+        page = create_page('inherit from page',
+                           'nav_playground.html',
+                           'en',
+                           published=True)
 
-            inherited_body = page.placeholders.get(slot="body")
+        inherited_body = page.placeholders.get(slot="body")
 
-            inherit_plugin = InheritPagePlaceholder(
-                plugin_type='InheritPagePlaceholderPlugin',
-                placeholder=inherited_body,
-                position=1,
-                language=settings.LANGUAGE_CODE,
-                from_page=inheritfrompage,
-                from_language=settings.LANGUAGE_CODE)
-            inherit_plugin.insert_at(None, position='last-child', save=True)
+        inherit_plugin = InheritPagePlaceholder(
+            plugin_type='InheritPagePlaceholderPlugin',
+            placeholder=inherited_body,
+            position=1,
+            language=settings.LANGUAGE_CODE,
+            from_page=inheritfrompage,
+            from_language=settings.LANGUAGE_CODE)
+        inherit_plugin.insert_at(None, position='last-child', save=True)
+        page.publish()
 
-            self.client.logout()
-            response = self.client.get(page.get_absolute_url())
-            self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
+        self.client.logout()
+        response = self.client.get(page.get_absolute_url())
+        self.assertTrue('%scms/js/libs/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = create_page('page to inherit from',
@@ -735,6 +739,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
     def test_add_plugin_with_m2m(self):
         # add a new text plugin
+        self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
@@ -762,8 +767,10 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(self.section_count, plugin.sections.count())
 
     def test_add_plugin_with_m2m_and_publisher(self):
+        self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertEqual(response.status_code, 302)
         page = Page.objects.all()[0]
         placeholder = page.placeholders.get(slot="body")
 
@@ -802,6 +809,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         page = publish_page(page, self.super_user)
 
         # there should now be two plugins - 1 draft, 1 public
+        self.assertEquals(2, CMSPlugin.objects.all().count())
         self.assertEquals(2, ArticlePluginModel.objects.all().count())
 
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]

@@ -11,7 +11,6 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
     Test CMS_PUBLIC_FOR=staff group access and menu nodes rendering
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'staff',
     }

@@ -7,8 +7,6 @@ from django.conf import settings
 from cms.exceptions import NoHomeFound
 from cms.utils import timezone
 
-#from cms.utils.urlutils import levelize_path
-
 
 class PageQuerySet(PublisherQuerySet):
     def on_site(self, site=None):

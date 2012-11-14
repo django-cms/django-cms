@@ -91,6 +91,7 @@ Concepts
 
     concepts/introduction
     concepts/menu_system
+    concepts/publishing
     concepts/multiple_languages
 
 

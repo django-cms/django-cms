@@ -14,7 +14,7 @@ class CMSSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        from cms.utils.moderator import get_page_queryset
+        from cms.utils.page_resolver import get_page_queryset
         page_queryset = get_page_queryset(None)
         all_pages = page_queryset.published().filter(login_required=False)
         return all_pages

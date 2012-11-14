@@ -1,6 +1,8 @@
 from __future__ import with_statement
+from django.contrib.auth.models import Permission
 from cms.api import create_page
 from cms.apphook_pool import apphook_pool
+from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.views import _handle_no_page, details
@@ -16,8 +18,9 @@ APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 class ViewTests(SettingsOverrideTestCase):
     urls = 'cms.test_utils.project.urls_for_apphook_tests'
-    settings_overrides = {'CMS_MODERATOR': False}
-    
+
+    settings_overrides = {'CMS_PERMISSION': True}
+
     def setUp(self):
         clear_url_caches()
     
@@ -33,9 +36,7 @@ class ViewTests(SettingsOverrideTestCase):
             slug = ''
             response = _handle_no_page(request, slug)
             self.assertEqual(response.status_code, 200)
-            
 
-    
     def test_apphook_not_hooked(self):
         """
         Test details view when apphook pool has apphooks, but they're not
@@ -120,3 +121,29 @@ class ViewTests(SettingsOverrideTestCase):
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'], '%s?next=/' % settings.LOGIN_URL)
+
+    def test_edit_permission(self):
+        page = create_page("page", "nav_playground.html", "en", published=True)
+
+        # Anon user
+        response = self.client.get("/en/?edit")
+        self.assertEqual(response.status_code, 404)
+
+        # Superuser
+        user = self.get_superuser()
+        self.client.login(username=user.username, password=user.username)
+        response = self.client.get("/en/?edit")
+        #response = details(request, '')
+        self.assertEqual(response.status_code, 200)
+
+        # Admin but with no permission
+        user = self.get_staff_user_with_no_permissions()
+        user.user_permissions.add(Permission.objects.get(codename='change_page'))
+
+        self.client.login(username=user.username, password=user.username)
+        response = self.client.get("/en/?edit")
+        self.assertEqual(response.status_code, 404)
+
+        PagePermission.objects.create(can_change=True, user=user, page=page)
+        response = self.client.get("/en/?edit")
+        self.assertEqual(response.status_code, 200)

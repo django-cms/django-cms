@@ -9,8 +9,7 @@ from django.template import Template
 from menus.menu_pool import menu_pool
 
 class NavExtenderTestCase(NavextendersFixture, SettingsOverrideTestCase):
-    settings_overrides = {'CMS_MODERATOR': False}
-    
+
     """
     Tree from fixture:
     

@@ -117,7 +117,7 @@ register.tag(CleanAdminListFilter)
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING[value], value))
+    return mark_safe(u'<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
 
 @register.filter
 def is_restricted(page, request):
@@ -137,26 +137,6 @@ def is_restricted(page, request):
                 'icon': icon,
             })
 
-@register.filter
-def moderator_choices(page, user):    
-    """Returns simple moderator choices used for checkbox rendering, as a value
-    is used mask value. Optimized, uses caching from change list.
-    """
-    moderation_value = page.get_moderation_value(user)
-    
-    moderate = (
-        (MASK_PAGE, _('Moderate page'), _('Unbind page moderation'), 'page'), 
-        (MASK_CHILDREN, _('Moderate children'), _('Unbind children moderation'), 'children'),
-        (MASK_DESCENDANTS, _('Moderate descendants'), _('Unbind descendants moderation'), 'descendants'),
-    )
-    
-    choices = []
-    for mask_value, title_yes, title_no, kind in moderate:
-        active = moderation_value and moderation_value & mask_value
-        title = active and title_no or title_yes
-        choices.append((mask_value, title, active, kind))
-    
-    return choices
 
 @register.filter
 def preview_link(page, language):

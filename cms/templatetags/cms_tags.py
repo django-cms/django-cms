@@ -4,10 +4,10 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from cms.models import Page, Placeholder as PlaceholderModel
-from cms.plugin_rendering import  render_placeholder
+from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request
-from cms.utils.moderator import  get_page_queryset
+from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from django import template
 from django.conf import settings

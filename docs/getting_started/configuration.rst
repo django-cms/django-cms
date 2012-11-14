@@ -477,27 +477,6 @@ Default: ``all``
 Decides if pages without any view restrictions are public by default or staff
 only. Possible values are ``all`` and ``staff``.
 
-.. setting:: CMS_MODERATOR
-
-CMS_MODERATOR
-=============
-
-Default: ``False``
-
-If set to ``True``, gives you a new "moderation" column in the tree view.
-
-You can select to moderate pages or whole trees. If a page is under moderation
-you will receive an email if somebody changes a page and you will be asked to
-approve the changes. Only after you approve the changes will they be updated
-on the "live" site. If you make changes to a page you moderate yourself, you
-will need to approve it anyway. This allows you to change a lot of pages for
-a new version of the site, for example, and go live with all the changes at the
-same time.
-
-.. note:: When switching this value to ``True`` on an existing site, you have
-          to run the ``cms moderator on`` command to make the required database
-          changes.
-
 .. setting:: CMS_SHOW_START_DATE
 .. setting:: CMS_SHOW_END_DATE
 

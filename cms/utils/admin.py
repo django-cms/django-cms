@@ -21,6 +21,11 @@ def jsonify_request(response):
     return HttpResponse(simplejson.dumps({'status':response.status_code,'content':response.content}),
                                 content_type="application/json")
 
+publisher_classes = {
+    Page.PUBLISHER_STATE_DIRTY: "publisher_dirty",
+    Page.PUBLISHER_STATE_PENDING: "publisher_pending",
+}
+
 def get_admin_menu_item_context(request, page, filtered=False):
     """
     Used for rendering the page tree, inserts into context everything what
@@ -42,18 +47,24 @@ def get_admin_menu_item_context(request, page, filtered=False):
             md.append(('valid_children', False))
             md.append(('draggable', False))
         if md:
-            # just turn it into simple javasript object
+            # just turn it into simple javascript object
             metadata = "{" + ", ".join(map(lambda e: "%s: %s" %(e[0], 
                 isinstance(e[1], bool) and str(e[1]) or e[1].lower() ), md)) + "}"
         
-    moderator_state = moderator.page_moderator_state(request, page)
     has_add_on_same_level_permission = False
     opts = Page._meta
     if settings.CMS_PERMISSION:
         perms = has_global_page_permission(request, page.site_id, can_add=True)
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
-        
+
+    if page.delete_requested():
+        css_class = "publisher_delete_requested"
+    elif not page.published:
+        css_class = "publisher_draft"
+    else:
+        css_class = publisher_classes.get(page.publisher_state, "")
+
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add", page.site)
     #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
@@ -63,18 +74,16 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'lang': lang,
         'filtered': filtered,
         'metadata': metadata,
+        'css_class': css_class,
         
         'has_change_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_page_permission,
-        'has_moderate_permission': page.has_moderate_permission(request),
-        'page_moderator_state': moderator_state,
-        'moderator_should_approve': moderator_state['state'] >= moderator.I_APPROVE,
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
         'CMS_PERMISSION': settings.CMS_PERMISSION,
-        'CMS_MODERATOR': settings.CMS_MODERATOR,
+        'CMS_SHOW_END_DATE': settings.CMS_SHOW_END_DATE,
     }
     return context
 
@@ -85,7 +94,7 @@ def render_admin_menu_item(request, page, template=None):
     must be reloaded over ajax.
     """
     if not template:
-        template = "admin/cms/page/menu_item.html"
+        template = "admin/cms/page/menu_fragment.html"
 
     if not page.pk:
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item

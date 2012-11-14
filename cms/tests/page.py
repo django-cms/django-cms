@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import datetime
+import os.path
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+
 from cms.admin.forms import PageForm
 from cms.api import create_page, add_plugin
 from cms.models import Page, Title
@@ -14,22 +23,9 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
                                       URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride)
-from cms.utils.page_resolver import get_page_from_request
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-    URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride, 
-    SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils import timezone
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
-import datetime
-import os.path
 from cms.utils.page import is_valid_page_slug
-
 
 class PagesTestCase(CMSTestCase):
     
@@ -42,7 +38,7 @@ class PagesTestCase(CMSTestCase):
             response = self.client.get(URL_CMS_PAGE_ADD)
             self.assertEqual(response.status_code, 200)
 
-    def test_create_page(self):
+    def test_create_page_admin(self):
         """
         Test that a page can be created via the admin
         """
@@ -50,21 +46,49 @@ class PagesTestCase(CMSTestCase):
 
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
+            self.assertEqual(Title.objects.all().count(), 0)
+            self.assertEqual(Page.objects.all().count(), 0)
+
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            title = Title.objects.get(slug=page_data['slug'])
-            self.assertNotEqual(title, None)
+
+            #self.assertEqual(Page.objects.all().count(), 2)
+            #self.assertEqual(Title.objects.all().count(), 2)
+
+            title = Title.objects.drafts().get(slug=page_data['slug'])
+            self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
+
             page = title.page
             page.published = True
             page.save()
+            page.publish()
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.placeholders.all().count(), 2)
             
-            # were public instanes created?
+            # were public instances created?
+            self.assertEqual(Title.objects.all().count(), 2)
             title = Title.objects.drafts().get(slug=page_data['slug'])
+            title = Title.objects.public().get(slug=page_data['slug'])
 
-        
+    def test_create_page_api(self):
+        page_data =  {
+            'title': 'root',
+            'slug': 'root',
+            'language': settings.LANGUAGES[0][0],
+            'template': 'nav_playground.html',
+            }
+        page = create_page(**page_data)
+
+        self.assertFalse(page.is_home(), "The page should not be marked as "
+                                         "home before being published")
+        page.publish()
+        assert page.is_home()
+        assert page.publisher_public.is_home()
+
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
+        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
+
     def test_slug_collision(self):
         """
         Test a slug collision
@@ -94,51 +118,48 @@ class PagesTestCase(CMSTestCase):
     def test_slug_collisions_api_1(self):
         """ Checks for slug collisions on sibling pages - uses API to create pages
         """
-        with SettingsOverride(CMS_MODERATOR=False):
-            page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                                published=True)
-            page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                                  published=True, parent=page1, slug="foo")
-            page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
-                                  published=True, parent=page1, slug="foo")
-            # both sibling pages has same slug, so both pages has an invalid slug
-            self.assertFalse(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
-            self.assertFalse(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+        page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                              published=True, parent=page1, slug="foo")
+        page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
+                              published=True, parent=page1, slug="foo")
+        # both sibling pages has same slug, so both pages has an invalid slug
+        self.assertFalse(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
+        self.assertFalse(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
 
     def test_slug_collisions_api_2(self):
         """ Checks for slug collisions on root (not home) page and a home page child - uses API to create pages
         """
-        with SettingsOverride(CMS_MODERATOR=False):
-            page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                                published=True)
-            page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                                  published=True, parent=page1, slug="foo")
-            page2 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                                  published=True, slug="foo")
-            # Home page child has an invalid slug, while root page is ok. Root wins!
-            self.assertFalse(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
-            self.assertTrue(is_valid_page_slug(page2,page2.parent,"en",page2.get_slug("en"),page2.site))
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+        page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                              published=True, parent=page1, slug="foo")
+        page2 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                              published=True, slug="foo")
+        # Home page child has an invalid slug, while root page is ok. Root wins!
+        self.assertFalse(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
+        self.assertTrue(is_valid_page_slug(page2,page2.parent,"en",page2.get_slug("en"),page2.site))
 
     def test_slug_collisions_api_3(self):
         """ Checks for slug collisions on children of a non root page - uses API to create pages
         """
-        with SettingsOverride(CMS_MODERATOR=False):
-            page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                                published=True)
-            page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                                  published=True, parent=page1, slug="foo")
-            page1_1_1 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
-                                  published=True, parent=page1_1, slug="bar")
-            page1_1_2 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
-                                  published=True, parent=page1_1, slug="bar")
-            page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
-                                  published=True, parent=page1, slug="bar")
-            # Direct children of home has different slug so it's ok.
-            self.assertTrue(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
-            self.assertTrue(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
-            # children of page1_1 has the same slug -> you lose!
-            self.assertFalse(is_valid_page_slug(page1_1_1,page1_1_1.parent,"en",page1_1_1.get_slug("en"),page1_1_1.site))
-            self.assertFalse(is_valid_page_slug(page1_1_2,page1_1_2.parent,"en",page1_1_2.get_slug("en"),page1_1_2.site))
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+        page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
+                              published=True, parent=page1, slug="foo")
+        page1_1_1 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
+                              published=True, parent=page1_1, slug="bar")
+        page1_1_2 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
+                              published=True, parent=page1_1, slug="bar")
+        page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
+                              published=True, parent=page1, slug="bar")
+        # Direct children of home has different slug so it's ok.
+        self.assertTrue(is_valid_page_slug(page1_1,page1_1.parent,"en",page1_1.get_slug("en"),page1_1.site))
+        self.assertTrue(is_valid_page_slug(page1_2,page1_2.parent,"en",page1_2.get_slug("en"),page1_2.site))
+        # children of page1_1 has the same slug -> you lose!
+        self.assertFalse(is_valid_page_slug(page1_1_1,page1_1_1.parent,"en",page1_1_1.get_slug("en"),page1_1_1.site))
+        self.assertFalse(is_valid_page_slug(page1_1_2,page1_1_2.parent,"en",page1_1_2.get_slug("en"),page1_1_2.site))
 
     def test_details_view(self):
         """
@@ -181,25 +202,24 @@ class PagesTestCase(CMSTestCase):
         """
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            with SettingsOverride(CMS_MODERATOR=True):
-                page_data = self.get_new_page_data()
-                response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-                self.assertEquals(response.status_code, 302)
-                page =  Page.objects.get(title_set__slug=page_data['slug'])
-                response = self.client.get('/en/admin/cms/page/%s/' %page.id)
-                self.assertEqual(response.status_code, 200)
-                page_data['overwrite_url'] = '/hello/'
-                page_data['has_url_overwrite'] = True
-                response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
-                self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertEqual(page.get_absolute_url(), '/en/hello/')
-                title = Title.objects.all()[0]
-                page.publish()
-                page_data['title'] = 'new title'
-                response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
-                page =  Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
-                self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertEqual(page.get_title(), 'new title')
+            page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertEquals(response.status_code, 302)
+            page =  Page.objects.get(title_set__slug=page_data['slug'])
+            response = self.client.get('/en/admin/cms/page/%s/' %page.id)
+            self.assertEqual(response.status_code, 200)
+            page_data['overwrite_url'] = '/hello/'
+            page_data['has_url_overwrite'] = True
+            response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            self.assertEqual(page.get_absolute_url(), '/en/hello/')
+            title = Title.objects.all()[0]
+            page.publish()
+            page_data['title'] = 'new title'
+            response = self.client.post('/en/admin/cms/page/%s/' %page.id, page_data)
+            page =  Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            self.assertEqual(page.get_title(), 'new title')
 
 
     def test_meta_description_and_keywords_fields_from_admin(self):
@@ -287,6 +307,7 @@ class PagesTestCase(CMSTestCase):
             page1 = Page.objects.all()[0]
             page2 = Page.objects.all()[1]
             page3 = Page.objects.all()[2]
+
             # move pages
             response = self.client.post("/en/admin/cms/page/%s/move-page/" % page3.pk, {"target": page2.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
@@ -300,10 +321,11 @@ class PagesTestCase(CMSTestCase):
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug'])
             self.assertEqual(page3.get_absolute_url(), self.get_pages_root()+page_data1['slug']+"/"+page_data2['slug']+"/"+page_data3['slug']+"/")
+
             # publish page 1 (becomes home)
-            page1 = Page.objects.get(pk=page1.pk)
             page1.publish()
             public_page1 = page1.publisher_public
+            self.assertEqual(page1.get_path(), '')
             self.assertEqual(public_page1.get_path(), '')
             # check that page2 and page3 url have changed
             page2 = Page.objects.get(pk=page2.pk)
@@ -318,7 +340,7 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post("/en/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "right"})
             self.assertEqual(response.status_code, 200)
             page1 = Page.objects.get(pk=page1.pk)
-            self.assertEqual(page1.get_path(), page_data1['slug'])
+            self.assertEqual(page1.get_path(), '')
             page2 = Page.objects.get(pk=page2.pk)
             self.assertEqual(page2.get_path(), page_data2['slug'])
             page3 = Page.objects.get(pk=page3.pk)
@@ -511,25 +533,28 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_without_final_slash(self):
         root = create_page("root", "nav_playground.html", "en", slug="root", 
                            published=True)
-        page = create_page("page", "nav_playground.html", "en", slug="page", 
+        page = create_page("page", "nav_playground.html", "en", slug="page",
                            published=True, parent=root)
         root.publish()
         page.publish()
         request = self.get_request('/en/page')
         found_page = get_page_from_request(request)
-        self.assertFalse(found_page is None)
+        self.assertIsNotNone(found_page)
+        self.assertFalse(found_page.publisher_is_draft)
     
     def test_get_page_from_request_with_page_preview(self):
-        page = create_page("page", "nav_playground.html", "en")
+        page = create_page("page", "nav_playground.html", "en", published=True)
         request = self.get_request('%s?preview' % page.get_absolute_url())
         request.user.is_staff = False
         found_page = get_page_from_request(request)
-        self.assertEqual(found_page, None)
+        self.assertIsNotNone(found_page)
+        self.assertFalse(found_page.publisher_is_draft)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             request = self.get_request('%s?preview&draft' % page.get_absolute_url())
             found_page = get_page_from_request(request)
             self.assertTrue(found_page)
+            self.assertTrue(found_page.publisher_is_draft)
             self.assertEqual(found_page.pk, page.pk)
         
     def test_get_page_from_request_on_cms_admin_with_editplugin(self):
@@ -554,14 +579,14 @@ class PagesTestCase(CMSTestCase):
         500.
         """
         yesterday = timezone.now() - datetime.timedelta(days=1)
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en',
                                publication_end_date=yesterday, published=True)
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.status_code, 404)
-    
+
     def test_existing_overwrite_url(self):
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             create_page('home', 'nav_playground.html', 'en', published=True)
             create_page('boo', 'nav_playground.html', 'en', published=True)
             data = {
@@ -651,7 +676,7 @@ class PagesTestCase(CMSTestCase):
     def test_slug_url_overwrite_clash(self):
         """ Tests if a URL-Override clashes with a normal page url
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             home = create_page('home', 'nav_playground.html', 'en', published=True)
             bar = create_page('bar', 'nav_playground.html', 'en', published=False)
             foo = create_page('foo', 'nav_playground.html', 'en', published=True)
@@ -664,6 +689,8 @@ class PagesTestCase(CMSTestCase):
             title.has_url_overwrite = True
             title.path = '/bar/'
             title.save()
+            foo.publish()
+
             try:
                 url = is_valid_url(bar.get_absolute_url('en'),bar)
             except ValidationError:
@@ -671,22 +698,22 @@ class PagesTestCase(CMSTestCase):
             if url:
                 bar.published = True
                 bar.save()
+                bar.publish()
             self.assertFalse(bar.published)
 
     def test_valid_url_multisite(self):
-        with SettingsOverride(CMS_MODERATOR=False):
-            site1 = Site.objects.get_current()
-            site3 = Site.objects.create(domain="sample3.com", name="sample3.com")
-            home = create_page('home', 'nav_playground.html', 'en', published=True, site=site1)
-            bar = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home, site=site1)
-            home_s3= create_page('home', 'nav_playground.html', 'en', published=True, site=site3)
-            bar_s3 = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home_s3, site=site3)
+        site1 = Site.objects.get_current()
+        site3 = Site.objects.create(domain="sample3.com", name="sample3.com")
+        home = create_page('home', 'nav_playground.html', 'en', published=True, site=site1)
+        bar = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home, site=site1)
+        home_s3= create_page('home', 'nav_playground.html', 'en', published=True, site=site3)
+        bar_s3 = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home_s3, site=site3)
 
-            self.assertTrue(is_valid_url(bar.get_absolute_url('en'), bar))
-            self.assertTrue(is_valid_url(bar_s3.get_absolute_url('en'), bar_s3))
+        self.assertTrue(is_valid_url(bar.get_absolute_url('en'), bar))
+        self.assertTrue(is_valid_url(bar_s3.get_absolute_url('en'), bar_s3))
 
     def test_home_slug_not_accessible(self):
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en', published=True)
             self.assertEqual(page.get_absolute_url('en'), '/en/')
             resp = self.client.get('/en/')
@@ -702,6 +729,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
         other = create_page('other', 'nav_playground.html', 'en', published = True, slug = 'other')
         other.publish()
+        self.assertEqual(Page.objects.drafts().get_home(), home)
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
         home = Page.objects.get(pk = home.id)

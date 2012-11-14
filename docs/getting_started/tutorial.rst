@@ -462,6 +462,11 @@ The right part of the plugin area displays a rich text editor (`TinyMCE`_).
 
 In the editor, type in some text and then press the "Save" button.
 
+The new text is only visible on the draft copy so far, but you can see it by using the
+top button "Preview draft". If you use the "View on site" button instead, you can see that the
+page is still blank to the normal users.
+
+To publish the changes you have made, click on the "Publish draft" button.
 Go back to your website using the top right-hand "View on site" button. That's it!
 
 |hello-cms-world|
