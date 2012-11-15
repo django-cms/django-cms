@@ -11,29 +11,36 @@ DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 def configure(db_data, **extra):
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
-    db_type = db_data.get('DB', 'sqlite')
-    if db_type == 'sqlite':
-        DB = {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-        }
-    elif db_type == 'postgres':
-        DB = {
-             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-             'NAME': db_data.get('NAME', 'djangocms_test'),
-             'USER': db_data.get('USER', 'postgres'),
-             }
-        if db_data.get('PASSWORD', None):
-            DB['PASSWORD'] = db_data['PASSWORD']
-    elif db_type == 'mysql':
-        DB = {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': db_data.get('NAME', 'djangocms_test'),
-            'USER': db_data.get('USER', 'root'),
+    if not 'DATABASES' in extra:
+        db_type = db_data.get('DB', 'sqlite')
+        if db_type == 'sqlite':
+            DB = {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',
             }
-        if db_data.get('PASSWORD', None):
-            DB['PASSWORD'] = db_data['PASSWORD']
-
+        elif db_type == 'postgres':
+            DB = {
+                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                 'NAME': db_data.get('NAME', 'djangocms_test'),
+                 'USER': db_data.get('USER', 'postgres'),
+                 }
+            if db_data.get('PASSWORD', None):
+                DB['PASSWORD'] = db_data['PASSWORD']
+        elif db_type == 'mysql':
+            DB = {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': db_data.get('NAME', 'djangocms_test'),
+                'USER': db_data.get('USER', 'root'),
+                'TEST_CHARSET':'utf8',
+                'TEST_COLLATION':'utf8_general_ci',
+                'OPTIONS': {
+                            "init_command": "SET storage_engine=INNODB",
+                            },
+                }
+            if db_data.get('PASSWORD', None):
+                DB['PASSWORD'] = db_data['PASSWORD']
+    else:
+        DB = {}
     defaults = dict(
         CACHE_BACKEND='locmem:///',
         DEBUG=True,
@@ -42,6 +49,7 @@ def configure(db_data, **extra):
         DATABASES={
             'default': DB
         },
+
         SITE_ID=1,
         USE_I18N=True,
         MEDIA_ROOT='/media/',
@@ -75,12 +83,14 @@ def configure(db_data, **extra):
         ],
         MIDDLEWARE_CLASSES=[
             'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
+            'django.middleware.transaction.TransactionMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext, 
+from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -15,6 +15,8 @@ from urlparse import urljoin
 import sys
 import urllib
 import warnings
+from cms.utils.permissions import set_current_user
+from cms.models.pluginmodel import CMSPlugin
 
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -84,6 +86,10 @@ class CMSTestCase(testcases.TestCase):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
         super(CMSTestCase, self)._post_teardown()
+        #Page.objects.all().delete()
+        #User.objects.all().delete()
+        #CMSPlugin.objects.all().delete()
+        set_current_user(None)
 
     def login_user_context(self, user):
         return UserLoginContext(self, user)
@@ -172,7 +178,7 @@ class CMSTestCase(testcases.TestCase):
         self.assertEquals(response.status_code, 200)
         # Altered to reflect the new django-js jsonified response messages
         self.assertEquals(response.content, '{"status": 200, "content": "ok"}')
-        
+
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
 

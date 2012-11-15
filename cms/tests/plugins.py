@@ -35,6 +35,7 @@ from django.forms.widgets import Media
 from django.test.testcases import TestCase
 import os
 import datetime
+from cms.utils.permissions import set_current_user
 
 
 class DumbFixturePlugin(CMSPluginBase):

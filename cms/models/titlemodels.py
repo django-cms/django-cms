@@ -40,7 +40,6 @@ class Title(models.Model):
         # Build path from parent page's path and slug
         current_path = self.path
         parent_page = self.page.parent
-
         slug = u'%s' % self.slug
         if not self.has_url_overwrite:
             self.path = u'%s' % slug
@@ -48,6 +47,7 @@ class Title(models.Model):
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
+        
 
     @property
     def overwrite_url(self):

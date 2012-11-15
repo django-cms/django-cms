@@ -68,21 +68,6 @@ class PageQuerySet(PublisherQuerySet):
         return self.on_site().filter(
             publication_end_date__lte=timezone.now())
 
-#    - seems this is not used anymore...
-#    def get_pages_with_application(self, path, language):
-#        """Returns all pages containing application for current path, or
-#        any parrent. Returned list is sorted by path length, longer path first.
-#        """
-#        paths = levelize_path(path)
-#        q = Q()
-#        for path in paths:
-#            # build q for all the paths
-#            q |= Q(title_set__path=path, title_set__language=language)
-#        app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
-#        # add proper ordering
-#        app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
-#        return app_pages
-
     def get_all_pages_with_application(self):
         """Returns all pages containing applications for all sites.
 
@@ -92,7 +77,7 @@ class PageQuerySet(PublisherQuerySet):
 
     def get_home(self, site=None):
         try:
-            home = self.published(site).all_root().order_by("tree_id")[0]
+            home = self.published().all_root().order_by("tree_id")[0]
         except IndexError:
             raise NoHomeFound('No Root page found. Publish at least one page!')
         return home

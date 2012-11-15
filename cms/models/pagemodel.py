@@ -20,6 +20,7 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 from os.path import join
+from datetime import timedelta
 import copy
 
 
@@ -71,7 +72,7 @@ class Page(MPTTModel):
     moderator_state = models.SmallIntegerField(_('moderator state'), default=0, blank=True, editable=False)
     publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
     #This is misnamed - the one-to-one relation is populated on both ends
-    publisher_public = models.OneToOneField('self', related_name='publisher_draft',  null=True, editable=False)
+    publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
 
     # Managers
@@ -133,7 +134,7 @@ class Page(MPTTModel):
         import cms.signals as cms_signals
         cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
         self.save()  # always save the page after move, because of publisher
-        moderator.page_changed(self, force_moderation_action = PageModeratorState.ACTION_MOVE)
+        moderator.page_changed(self, force_moderation_action=PageModeratorState.ACTION_MOVE)
         # check the slugs
         page_utils.check_title_slugs(self)
 
@@ -342,7 +343,7 @@ class Page(MPTTModel):
         # Published pages should always have a publication date
         # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
-            self.publication_date = timezone.now()
+            self.publication_date = timezone.now() - timedelta(seconds=5)
 
         if self.reverse_id == "":
             self.reverse_id = None
@@ -428,7 +429,8 @@ class Page(MPTTModel):
         else:
             # Nothing left to do
             pass
-
+        if not self.parent_id:
+            self.clear_home_pk_cache()
         if self.publisher_public and self.publisher_public.published:
             self.publisher_state = Page.PUBLISHER_STATE_DEFAULT
         else:
@@ -891,7 +893,7 @@ class Page(MPTTModel):
 
     def get_home_pk_cache(self):
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        if not hasattr(self, attr):
+        if not hasattr(self, attr) or getattr(self, attr) is None:
             setattr(self, attr, self.get_object_queryset().get_home(self.site).pk)
         return getattr(self, attr)
 
@@ -899,6 +901,9 @@ class Page(MPTTModel):
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
         setattr(self, attr, value)
     home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
+
+    def clear_home_pk_cache(self):
+        self.home_pk_cache = None
 
     def get_media_path(self, filename):
         """
@@ -956,7 +961,7 @@ class Page(MPTTModel):
         """Returns smart queryset depending on object type - draft / public
         """
         qs = self.__class__.objects
-        return self.publisher_is_draft and qs.drafts() or qs.public().published()
+        return self.publisher_is_draft and qs.drafts() or qs.public()
 
     def _publisher_can_publish(self):
         """Is parent of this object already published?

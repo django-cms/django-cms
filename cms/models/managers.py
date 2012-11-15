@@ -92,7 +92,7 @@ class PageManager(PublisherManager):
         return self.get_query_set().filter(title_set__application_urls__gt='').distinct()
 
     def get_home(self, site=None):
-        return self.get_query_set().get_home(site)
+        return self.get_query_set().public().get_home(site)
 
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
@@ -340,7 +340,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         """
         # permissions should be managed on the draft page only
         page = page.get_draft_object()
-        from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN,\
+        from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, \
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
         # code taken from
         # https://github.com/divio/django-cms/issues/1113#issuecomment-3376790
