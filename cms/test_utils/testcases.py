@@ -10,14 +10,12 @@ from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
-from django.contrib.sites.models import Site
 from menus.menu_pool import menu_pool
 from urlparse import urljoin
 import sys
 import urllib
 import warnings
 from cms.utils.permissions import set_current_user
-from cms.models.pluginmodel import CMSPlugin
 
 
 URL_CMS_PAGE = "/en/admin/cms/page/"

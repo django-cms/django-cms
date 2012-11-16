@@ -26,7 +26,6 @@ from cms.test_utils.util.context_managers import (LanguageOverride,
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils import timezone
 from cms.utils.page import is_valid_page_slug
-import time
 
 class PagesTestCase(CMSTestCase):
 
@@ -546,7 +545,6 @@ class PagesTestCase(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en", slug="page",
                            published=True, parent=root)
         root.publish()
-        time.sleep(1)
         page.publish()
         request = self.get_request('/en/page')
         found_page = get_page_from_request(request)
