@@ -10,6 +10,7 @@ from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
+from django.contrib.sites.models import Site
 from menus.menu_pool import menu_pool
 from urlparse import urljoin
 import sys
@@ -75,9 +76,14 @@ class CMSTestCase(testcases.TestCase):
     counter = 1
 
     def _fixture_setup(self):
+        Page.objects.all().delete()
+        User.objects.all().delete()
+        CMSPlugin.objects.all().delete()
+        Site.objects.exclude(pk=1).delete()
         super(CMSTestCase, self)._fixture_setup()
         self.create_fixtures()
         activate("en")
+        
 
     def create_fixtures(self):
         pass
@@ -85,10 +91,7 @@ class CMSTestCase(testcases.TestCase):
     def _post_teardown(self):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
-        super(CMSTestCase, self)._post_teardown()
-        #Page.objects.all().delete()
-        #User.objects.all().delete()
-        #CMSPlugin.objects.all().delete()
+        super(CMSTestCase, self)._post_teardown()        
         set_current_user(None)
 
     def login_user_context(self, user):

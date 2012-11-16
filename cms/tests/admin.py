@@ -732,6 +732,8 @@ class AdminTests(AdminTestsBase):
             site = Site.objects.create(domain='django-cms.org', name='django-cms')
             page.site = site
             page.save()
+            page.publish()
+            self.assertTrue(page.is_home())
             response = self.admin_class.preview_page(request, page.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'],

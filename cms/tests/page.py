@@ -169,19 +169,22 @@ class PagesTestCase(CMSTestCase):
         Test the details view
         """
         superuser = self.get_superuser()
+        self.assertEqual(Page.objects.all().count(), 0)
         with self.login_user_context(superuser):
             response = self.client.get(self.get_pages_root())
             self.assertEqual(response.status_code, 404)
             page = create_page('test page 1', "nav_playground.html", "en")
             page.publish()
             response = self.client.get(self.get_pages_root())
-            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.status_code, 200)
             self.assertTrue(page.publish())
-            create_page("test page 2", "nav_playground.html", "en",
+            page2 = create_page("test page 2", "nav_playground.html", "en",
                                            parent=page, published=True)
             homepage = Page.objects.get_home()
             self.assertTrue(homepage.get_slug(), 'test-page-1')
-            response = self.client.get(self.get_pages_root())
+
+            self.assertEqual(page2.get_absolute_url(), '/en/test-page-2/')
+            response = self.client.get(page2.get_absolute_url())
             self.assertEqual(response.status_code, 200)
 
     def test_edit_page(self):
@@ -420,11 +423,13 @@ class PagesTestCase(CMSTestCase):
         different from the site you are editing and the language isn't available
         for the current site.
         """
-        site = Site.objects.create(domain='otherlang', name='otherlang')
+        self.assertEqual(Site.objects.all().count(), 1)
+        site = Site.objects.create(domain='otherlang', name='otherlang', pk=2)
         # Change site for this session
         page_data = self.get_new_page_data()
         page_data['site'] = site.pk
         page_data['title'] = 'changed title'
+        self.assertEqual(site.pk, 2)
         TESTLANG = settings.CMS_LANGUAGES[site.pk][0]['code']
         page_data['language'] = TESTLANG
         superuser = self.get_superuser()
@@ -541,6 +546,7 @@ class PagesTestCase(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en", slug="page",
                            published=True, parent=root)
         root.publish()
+        time.sleep(1)
         page.publish()
         request = self.get_request('/en/page')
         found_page = get_page_from_request(request)

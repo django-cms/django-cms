@@ -393,9 +393,10 @@ class Page(MPTTModel):
 
         # publish, but only if all parents are published!!
         published = None
-
         if not self.pk:
             self.save()
+        if not self.parent_id:
+            self.clear_home_pk_cache()
         if self._publisher_can_publish():
             ########################################################################
             # Assign the existing public page in old_public and mark it as
@@ -409,6 +410,7 @@ class Page(MPTTModel):
                 self.old_public = old_public
                 # remove the one-to-one references between public and draft
                 old_public.publisher_public = None
+                old_public.parent = None #unique constraint
                 old_public.save()
 
             # we hook into the modified copy_page routing to do the heavy lifting of copying the draft page to a new public page
@@ -429,8 +431,7 @@ class Page(MPTTModel):
         else:
             # Nothing left to do
             pass
-        if not self.parent_id:
-            self.clear_home_pk_cache()
+
         if self.publisher_public and self.publisher_public.published:
             self.publisher_state = Page.PUBLISHER_STATE_DEFAULT
         else:
@@ -898,6 +899,7 @@ class Page(MPTTModel):
         return getattr(self, attr)
 
     def set_home_pk_cache(self, value):
+
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
         setattr(self, attr, value)
     home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
