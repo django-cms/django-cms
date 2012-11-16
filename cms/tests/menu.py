@@ -116,20 +116,18 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # test standard show_menu 
 
         num_query = 5
-        db_engine = settings.DATABASES['default']['ENGINE']
-        if db_engine == 'django.db.backends.mysql':
-            return #save CacheKey produces save point queries
-        with self.assertNumQueries(num_query):
-            """
-            The queries should be:
-                get all pages
-                get all page permissions
-                get all titles
-                get the menu cache key
-                set the menu cache key
-            """
-            tpl = Template("{% load menu_tags %}{% show_menu %}")
-            tpl.render(context)
+        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
+            with self.assertNumQueries(num_query):
+                """
+                The queries should be:
+                    get all pages
+                    get all page permissions
+                    get all titles
+                    get the menu cache key
+                    set the menu cache key
+                """
+                tpl = Template("{% load menu_tags %}{% show_menu %}")
+                tpl.render(context)
 
     def test_show_menu_cache_key_leak(self):
         context = self.get_context()
@@ -702,20 +700,18 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
         num_query = 5
-        db_engine = settings.DATABASES['default']['ENGINE']
-        if db_engine == 'django.db.backends.mysql':
-            return #save CacheKey produces save point queries
-        with self.assertNumQueries(num_query):
-            """
-            The queries should be:
-                get all pages
-                get all page permissions
-                get all titles
-                get the menu cache key
-                set the menu cache key
-            """
-            tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
-            tpl.render(context)
+        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
+            with self.assertNumQueries(num_query):
+                """
+                The queries should be:
+                    get all pages
+                    get all page permissions
+                    get all titles
+                    get the menu cache key
+                    set the menu cache key
+                """
+                tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
+                tpl.render(context)
 
 class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation(self):
@@ -768,24 +764,22 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
-        with LanguageOverride('en'):
-            context = self.get_context(a.get_absolute_url())
-            num_query = 5
-            db_engine = settings.DATABASES['default']['ENGINE']
-            if db_engine == 'django.db.backends.mysql':
-                return #save CacheKey produces save point queries
-            with self.assertNumQueries(num_query):
-                """
-                The queries should be:
-                    get all pages
-                    get all page permissions
-                    get all titles
-                    get the menu cache key
-                    set the menu cache key
-                """
-                # Actually seems to run:
-                tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
-                tpl.render(context)
+        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
+            with LanguageOverride('en'):
+                context = self.get_context(a.get_absolute_url())
+                num_query = 5
+                with self.assertNumQueries(num_query):
+                    """
+                    The queries should be:
+                        get all pages
+                        get all page permissions
+                        get all titles
+                        get the menu cache key
+                        set the menu cache key
+                    """
+                    # Actually seems to run:
+                    tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+                    tpl.render(context)
 
 
 class ViewPermissionMenuTests(SettingsOverrideTestCase):
