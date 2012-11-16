@@ -76,10 +76,6 @@ class CMSTestCase(testcases.TestCase):
     counter = 1
 
     def _fixture_setup(self):
-#        Page.objects.all().delete()
-#        User.objects.all().delete()
-#        CMSPlugin.objects.all().delete()
-#        Site.objects.exclude(pk=1).delete()
         super(CMSTestCase, self)._fixture_setup()
         self.create_fixtures()
         activate("en")

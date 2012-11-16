@@ -114,10 +114,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu 
-
-        num_query = 5
         if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
-            with self.assertNumQueries(num_query):
+            with self.assertNumQueries(5):
                 """
                 The queries should be:
                     get all pages
@@ -699,9 +697,8 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         page = self.get_page(6)
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
-        num_query = 5
         if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
-            with self.assertNumQueries(num_query):
+            with self.assertNumQueries(5):
                 """
                 The queries should be:
                     get all pages
@@ -767,8 +764,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
             with LanguageOverride('en'):
                 context = self.get_context(a.get_absolute_url())
-                num_query = 5
-                with self.assertNumQueries(num_query):
+                with self.assertNumQueries(5):
                     """
                     The queries should be:
                         get all pages

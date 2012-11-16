@@ -963,7 +963,7 @@ class Page(MPTTModel):
         """Returns smart queryset depending on object type - draft / public
         """
         qs = self.__class__.objects
-        return self.publisher_is_draft and qs.drafts() or qs.public()
+        return self.publisher_is_draft and qs.drafts() or qs.public().published()
 
     def _publisher_can_publish(self):
         """Is parent of this object already published?

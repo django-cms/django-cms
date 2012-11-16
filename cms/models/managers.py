@@ -92,7 +92,7 @@ class PageManager(PublisherManager):
         return self.get_query_set().filter(title_set__application_urls__gt='').distinct()
 
     def get_home(self, site=None):
-        return self.get_query_set().public().get_home(site)
+        return self.get_query_set().get_home(site)
 
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
