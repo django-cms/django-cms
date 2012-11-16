@@ -23,7 +23,7 @@ def configure(db_data, **extra):
                  'ENGINE': 'django.db.backends.postgresql_psycopg2',
                  'NAME': db_data.get('NAME', 'djangocms_test'),
                  'USER': db_data.get('USER', 'postgres'),
-                 'HOST':'/var/pgsql_socket',
+                 'HOST':'127.0.0.1',
                  }
             if db_data.get('PASSWORD', None):
                 DB['PASSWORD'] = db_data['PASSWORD']
