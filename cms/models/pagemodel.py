@@ -299,8 +299,6 @@ class Page(MPTTModel):
             # copy titles of this page
             for title in titles:
                 title.pk = None  # setting pk = None creates a new instance
-                title.publisher_public_id = None
-                title.published = False
                 title.page = page
 
                 # create slug-copy for standard copy
@@ -463,6 +461,8 @@ class Page(MPTTModel):
             # finally delete the old public page
             old_public.delete()
 
+            for title in new_public.title_set.all():
+                title.save()
         # Check if there are some children which are waiting for parents to
         # become published.
         publish_set = self.get_descendants().filter(published=True)

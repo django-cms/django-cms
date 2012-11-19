@@ -14,10 +14,9 @@ Install
 *******
 
 .. warning::
-    In version 2.4 migrations have been completely rewritten to fix issues
-    with newer south releases.
-    If upgrading from prior 2.3.2 releases, please refer to
-    :ref:`migrations-upgrade`
+    Version 2.4 introduces some significant changes that **require** action if
+    you are upgrading from a previous version. Please refer to
+    :ref:`Upgrading from previous versions <upgrade-to-2.4>`
 
 
 .. toctree::
