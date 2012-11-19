@@ -67,7 +67,7 @@ def pre_save_title(instance, raw, **kwargs):
     instance.tmp_path = None
     instance.tmp_application_urls = None
     
-    if instance.id:
+    if instance.id and not hasattr(instance, "tmp_path"):
         try:
             tmp_title = Title.objects.get(pk=instance.id)
             instance.tmp_path = tmp_title.path
