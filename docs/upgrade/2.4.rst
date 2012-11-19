@@ -6,6 +6,17 @@
 What's new in 2.4
 *****************
 
+
+Added Fix MPTTT Management command
+==================================
+
+Added a management command for fixing MPTT tree data.
+
+The command can be run with:
+
+	manage.py cms fix-mptt
+	
+
 Removed the MultilingualMiddleware
 ==================================
 
