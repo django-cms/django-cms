@@ -127,17 +127,35 @@ Please remove them from your settings.py
 
 Migrations overhaul
 ===================
-In version 2.4 migrations have been completely rewritten to fix issues with
+In version 2.4 migrations have been completely rewritten to address issues with
 newer South releases.
 
-To ease upgrading process migration numbering and naming have not been changed,
-but only the first one for each application has actual migration code, so it's of
-utmost importance that you have an up to date migration history.
+To ease the upgrading process, all the migrations for the `cms` application have
+been consolidated into a single migration file, `0001_initial.py`.
 
-To ensure this, when upgrading from 2.3.1 and older releases, please upgrate to
-2.3.3 first, execute all the migrations and then move to 2.4.
+*   the migrations 0002 to 0036 inclusive still exist, but are now all *dummy*
+    migrations
 
-For the two step upgrade process do the following in your project main directory ::
+*   migrations 0037 and later are *new* migrations
+
+How this affects you
+--------------------
+
+If you're starting with *a new installation*, you don't need to worry about
+this. Don't even bother reading this section; it's for upgraders.
+
+If you're using version *2.3.2 or newer*, you don't need to worry about this
+either.
+
+If you're using version *2.3.1 or older*, you will need to run a two-step
+process.
+
+First, you'll need to upgrade to 2.3.3, to bring your migration history
+up-to-date with the new scheme. Then you'll need to perform the migrations for
+2.4.
+
+For the two-step upgrade process do the following in your project main directory
+::
 
     pip install django-cms==2.3.3
     python manage.py syncdb
