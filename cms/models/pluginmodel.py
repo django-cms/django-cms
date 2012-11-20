@@ -331,6 +331,10 @@ class CMSPlugin(MPTTModel):
         """
         return self.position + 1
 
+    def num_children(self):
+        if self.child_plugin_instances:
+            return len(self.child_plugin_instances)
+
 reversion_register(CMSPlugin)
 
 
