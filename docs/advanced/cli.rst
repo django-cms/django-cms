@@ -79,7 +79,7 @@ MPTT repair command
 *******************
 
 ``cms mptt-repair``
-=================
+===================
 
 Occasionally, the MPTT structure in which pages and plugins are held can
 accumulate small errors. These are typically the result of failed operations or
