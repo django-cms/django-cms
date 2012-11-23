@@ -304,6 +304,28 @@ class ApphooksTestCase(CMSTestCase):
                 url = resolver.reverse('sample-root')
                 self.assertEqual(url, 'child/not-home/subchild/')
 
+    def test_apphook_urlpattern_order(self):
+        # this one includes the actual cms.urls, so it can be tested if
+        # they are loaded in the correct order (the cms page pattern must be last)
+        # (the other testcases replicate the inclusion code and thus don't test this)
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls'):
+            self.create_base_structure(APP_NAME, 'en')
+            path = reverse('extra_second')
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/extra.html')
+            self.assertContains(response, "test included urlconf")
+
+    def test_apphooks_receive_url_params(self):
+        # make sure that urlparams actually reach the apphook views
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls'):
+            self.create_base_structure(APP_NAME, 'en')
+            path = reverse('sample-params', kwargs=dict(my_params='is-my-param-really-in-the-context-QUESTIONMARK'))
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/home.html')
+            self.assertContains(response, 'my_params: is-my-param-really-in-the-context-QUESTIONMARK')
+
 
 class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
 
