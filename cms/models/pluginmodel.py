@@ -228,7 +228,7 @@ class CMSPlugin(MPTTModel):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, plugin_tree):
+    def copy_plugin(self, target_placeholder, target_language, plugin_trail):
         """
         Copy this plugin and return the new plugin.
         """
@@ -236,21 +236,52 @@ class CMSPlugin(MPTTModel):
             plugin_instance, cls = self.get_plugin_instance()
         except KeyError:  # plugin type not found anymore
             return
+
+        # set up some basic attributes on the new_plugin
         new_plugin = CMSPlugin()
         new_plugin.placeholder = target_placeholder
         new_plugin.tree_id = None
         new_plugin.lft = None
         new_plugin.rght = None
         new_plugin.level = None
-        if self.parent:
-            pdif = self.level - plugin_tree[-1].level
-            if pdif < 0:
-                plugin_tree[:] = plugin_tree[:pdif - 1]
-            new_plugin.parent = plugin_tree[-1]
-            if pdif != 0:
-                plugin_tree.append(new_plugin)
+
+        # In the block belowe, we use plugin_trail as a kind of breadcrumb trail 
+        # through the tree. 
+        #
+        # we assign a parent to our new plugin, trickier than you'd think.
+        if not self.parent:
+            # We're lucky; we don't need to find a parent. We'll just put 
+            # new_plugin into the plugin_trail for potential children to use,
+            # and move on.
+            plugin_trail[:] = [new_plugin]
         else:
-            plugin_tree[:] = [new_plugin]
+            # We will need to find a parent for our new_plugin.
+            #
+            # What level is our plugin at, relative to where we were in the tree 
+            # we are building? We express this as level_difference: 
+            #   0 = SAME level 
+            # +ve = going UP 
+            # -ve = going DOWN 
+            level_difference = self.level - plugin_trail[-1].level
+            if level_difference == 0:
+                # we'll have the same parent as the last item in the 
+                # plugin_trail
+                new_plugin.parent = plugin_trail[-1].parent  
+            else:
+                # we've changed levels, so we will need to:
+                # a) adjust the plugin_trail
+                # b) assign the plugin_trail's *new* last item as our parent
+                if level_difference < 0:
+                    # we have come DOWN one or more levels, so remove that many 
+                    # levels plus one from the plugin_trail
+                    plugin_trail[:] = plugin_trail[:level_difference -1]
+                # whether we are moving up or down in the levels of the tree, 
+                # we assign new_plugin.parent 
+                new_plugin.parent = plugin_trail[-1]
+                # and new_plugin becomes the last item in the tree for the next 
+                # round
+                plugin_trail.append(new_plugin)
+
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
@@ -270,7 +301,8 @@ class CMSPlugin(MPTTModel):
             plugin_instance.position = new_plugin.position  # added to retain the position when creating a public copy of a plugin
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
-            plugin_instance.copy_relations(old_instance)
+            plugin_instance.copy_relations(old_instance)   
+
         return new_plugin
 
     def post_copy(self, old_instance, new_old_ziplist):
