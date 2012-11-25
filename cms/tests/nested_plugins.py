@@ -129,7 +129,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             plugin_2.parent = plugin_1
             plugin_2.save()
             
-            # plugin_2 should be plugin_1's only child
+            # plugin_2 should be plugin_1's only child 
+            # for a single item we use assertItemsEqual
             self.assertItemsEqual(
                 CMSPlugin.objects.get(id=1).get_children(), 
                 [CMSPlugin.objects.get(id=2)])
@@ -143,7 +144,9 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             plugin_3.save()
             
             # plugin_2 & plugin_3 should be plugin_1's children
-            self.assertItemsEqual(
+            # for multiple items we use assertSequenceEqual, because
+            # assertItemsEqual may re-order the list without warning
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=1).get_children(), 
                 [
                     CMSPlugin.objects.get(id=2),
@@ -164,14 +167,16 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 [CMSPlugin.objects.get(id=4)])
             
             # 2,3 & 4 should be descendants of 1
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=1).get_descendants(), 
                 [
+                    # note tree_id ordering of MPTT reflected here:
                     CMSPlugin.objects.get(id=2),
-                    CMSPlugin.objects.get(id=3),
                     CMSPlugin.objects.get(id=4),
-                ])
-            
+                    CMSPlugin.objects.get(id=3),
+                ],
+                )
+
             # create a second root plugin
             plugin_5 = add_plugin(placeholder, u"TextPlugin", u"en",
                 body=u"The second root plugin",
@@ -200,7 +205,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             plugin_7.save()
                 
             # plugin_7 should be plugin_5's child
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=5).get_children(), 
                 [
                     CMSPlugin.objects.get(id=6),
@@ -208,7 +213,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 ])    
             
             # 6 & 7 should be descendants of 5
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=5).get_descendants(), 
                 [
                     CMSPlugin.objects.get(id=6),
@@ -224,7 +229,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             plugin_8.save()
             
             # plugin_4 should be plugin_2's child
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=2).get_children(), 
                 [
                     CMSPlugin.objects.get(id=4),
@@ -293,14 +298,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                  original_plugins.count(),
                  copied_plugins.count()
                  )
-                 
-            # create a placeholder
-            # new_placeholder = Placeholder(slot=u"some_slot")
-            # new_placeholder = page.placeholders.get(slot=u"col_left")
-             
-            # copy_plugins_to(original_plugins, new_placeholder)
-            # copied_plugins = new_placeholder.get_plugins()
-                        
+                                    
             # check the two querysets match:
             for original, copy in zip(original_plugins, copied_plugins): 
                 self.assertEquals(
