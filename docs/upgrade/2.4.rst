@@ -27,9 +27,9 @@ newer South releases.
 To ease the upgrading process, all the migrations for the `cms` application have
 been consolidated into a single migration file, `0001_initial.py`.
 
+*   migration 0001 is a *real* migration, that gets you to the same point migrations 0001-0036 used to 
 *   the migrations 0002 to 0036 inclusive still exist, but are now all *dummy*
     migrations
-
 *   migrations 0037 and later are *new* migrations
 
 How this affects you
@@ -70,7 +70,7 @@ can publish changes to the public site.
 .. admonition:: Management command required
 
     To bring a previous version of your site's database up-to-date, you'll need
-    to run ``manage.py moderator on``.
+    to run ``manage.py cms moderator on``.
 
 Removed the MultilingualMiddleware
 ==================================
