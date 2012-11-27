@@ -6,6 +6,7 @@
 What's new in 2.4
 *****************
 
+
 .. _upgrade-to-2.4:
 
 .. warning:: Upgrading from previous versions
@@ -71,6 +72,17 @@ can publish changes to the public site.
 
     To bring a previous version of your site's database up-to-date, you'll need
     to run ``manage.py moderator on``.
+
+
+Added Fix MPTTT Management command
+==================================
+
+Added a management command for fixing MPTT tree data.
+
+The command can be run with:
+
+	manage.py cms fix-mptt
+	
 
 Removed the MultilingualMiddleware
 ==================================
