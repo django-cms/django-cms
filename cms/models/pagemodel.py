@@ -161,7 +161,7 @@ class Page(MPTTModel):
         # copy the placeholders (and plugins on those placeholders!)
         CMSPlugin.objects.filter(placeholder__page=target).delete()
         for ph in self.placeholders.all():
-            plugins = list(ph.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            plugins = ph.get_plugins_list()
             try:
                 ph = target.placeholders.get(slot=ph.slot)
             except Placeholder.DoesNotExist:
@@ -311,7 +311,7 @@ class Page(MPTTModel):
 
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
-                plugins = list(ph.cmsplugin_set.all())
+                plugins = ph.get_plugins_list()
                 try:
                     ph = page.placeholders.get(slot=ph.slot)
                 except Placeholder.DoesNotExist:

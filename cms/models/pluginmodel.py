@@ -228,7 +228,7 @@ class CMSPlugin(MPTTModel):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, plugin_trail):
+    def copy_plugin(self, target_placeholder, target_language, plugin_trail):        
         """
         Copy this plugin and return the new plugin.
         """
@@ -245,10 +245,10 @@ class CMSPlugin(MPTTModel):
         new_plugin.rght = None
         new_plugin.level = None
 
-        # In the block belowe, we use plugin_trail as a kind of breadcrumb trail 
+        # In the block below, we use plugin_trail as a kind of breadcrumb trail 
         # through the tree. 
         #
-        # we assign a parent to our new plugin, trickier than you'd think.
+        # we assign a parent to our new plugin
         if not self.parent:
             # We're lucky; we don't need to find a parent. We'll just put 
             # new_plugin into the plugin_trail for potential children to use,
@@ -256,32 +256,20 @@ class CMSPlugin(MPTTModel):
             plugin_trail[:] = [new_plugin]
         else:
             # We will need to find a parent for our new_plugin.
-            #
-            # What level is our plugin at, relative to where we were in the tree 
-            # we are building? We express this as level_difference: 
-            #   0 = SAME level 
-            # +ve = going UP 
-            # -ve = going DOWN 
-            level_difference = self.level - plugin_trail[-1].level
-            if level_difference == 0:
-                # we'll have the same parent as the last item in the 
-                # plugin_trail
-                new_plugin.parent = plugin_trail[-1].parent  
+            marker = plugin_trail.pop()
+            # are we going up or down?
+            level_difference = self.level - marker.level
+            if level_difference == 1: 
+                # going up; put the marker back
+                plugin_trail.append(marker)
             else:
-                # we've changed levels, so we will need to:
-                # a) adjust the plugin_trail
-                # b) assign the plugin_trail's *new* last item as our parent
+                # going down; remove more items from plugin_trail
                 if level_difference < 0:
-                    # we have come DOWN one or more levels, so remove that many 
-                    # levels plus one from the plugin_trail
-                    plugin_trail[:] = plugin_trail[:level_difference -1]
-                # whether we are moving up or down in the levels of the tree, 
-                # we assign new_plugin.parent 
-                new_plugin.parent = plugin_trail[-1]
-                # and new_plugin becomes the last item in the tree for the next 
-                # round
-                plugin_trail.append(new_plugin)
-
+                    plugin_trail[:] = plugin_trail[:level_difference]
+            # assign new_plugin.parent 
+            new_plugin.parent = plugin_trail[-1]
+            # new_plugin becomes the last item in the tree for the next round
+            plugin_trail.append(new_plugin)
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
