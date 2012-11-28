@@ -391,7 +391,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 )                                                
             plugin_11.save()
             
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=1).get_children(), 
                 [
                     CMSPlugin.objects.get(id=2),
@@ -435,7 +435,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # new sibling of plugin_5
             plugin_5 = self.reload(plugin_5)
             plugin_14 = add_plugin(placeholder, u"TextPlugin", u"en",
-                body=u"14",                
+                body=u"14"                
                 )                                                
             plugin_14.save()
             
