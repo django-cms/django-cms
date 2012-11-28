@@ -407,7 +407,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 )                                                
             plugin_12.save()
             
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=2).get_children(), 
                 [
                     CMSPlugin.objects.get(id=12),
@@ -424,7 +424,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 )                                                
             plugin_13.save()
             
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.get(id=5).get_children(), 
                 [
                     CMSPlugin.objects.get(id=6),
@@ -439,7 +439,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 )                                                
             plugin_14.save()
             
-            self.assertItemsEqual(
+            self.assertSequenceEqual(
                 CMSPlugin.objects.filter(level=0), 
                 [
                     CMSPlugin.objects.get(id=11),
@@ -456,7 +456,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             plugin_2 = self.reload(plugin_2)
             plugin_2.move_to(target=plugin_1, position="left")               
             plugin_2.save()
-
             self.assertEquals(CMSPlugin.objects.get(id=2).tree_id, 1)
             self.copy_page_and_check_results(page_one)
             
