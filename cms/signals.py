@@ -66,8 +66,8 @@ def pre_save_title(instance, raw, **kwargs):
 
     instance.tmp_path = None
     instance.tmp_application_urls = None
-
-    if instance.id:
+    
+    if instance.id and not hasattr(instance, "tmp_path"):
         try:
             tmp_title = Title.objects.get(pk=instance.id)
             instance.tmp_path = tmp_title.path
@@ -154,17 +154,9 @@ def post_save_user_group(instance, raw, created, **kwargs):
     if not creator or not created or creator.is_anonymous():
         return
     from django.db import connection
-
-    # TODO: same as in post_save_user - raw sql is just not nice - workaround...?
-
-    cursor = connection.cursor()
-    query = "INSERT INTO %s (group_ptr_id, created_by_id) VALUES (%d, %d)" % (
-        PageUserGroup._meta.db_table,
-        instance.pk,
-        creator.pk
-    )
-    cursor.execute(query)
-    cursor.close()
+	page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
+    page_user.__dict__.update(instance.__dict__)
+    page_user.save()
 
 if settings.CMS_PERMISSION:
     # only if permissions are in use

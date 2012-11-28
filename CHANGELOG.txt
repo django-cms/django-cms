@@ -118,7 +118,9 @@
 - Fixed page change form (jQuery and permissions)
 - Fixed placeholder field permission checks
 
-==== 2.4.0 ===-
+==== 2.4.0 ===
+
+Please see Install/2.4 release notes *before* attempting to upgrade to version 2.4.
 
 - CMS_LANGUAGE setting has changed
 - CMS_HIDE_UNTRANSLATED setting removed

@@ -5,6 +5,7 @@
 {% block content %}
 	<h2>Sample application home page - on page {% page_attribute page_title %}</h2>
 	<h3>{{ message }}</h3>
+	{% if my_params %}<p>my_params: {{ my_params }}</p>{% endif %}
 	{{ block.super }}
 	<ul>
 		<li>

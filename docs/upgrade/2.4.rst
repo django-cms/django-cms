@@ -6,6 +6,84 @@
 What's new in 2.4
 *****************
 
+
+.. _upgrade-to-2.4:
+
+.. warning:: Upgrading from previous versions
+
+    2.4 introduces some changes that **require** action if you are upgrading
+    from a previous version.
+    
+    You will need to read the sections :ref:`migrations-upgrade` and
+    :ref:`cms-moderator-upgrade` below.
+
+
+.. _migrations-upgrade:
+
+Migrations overhaul
+===================
+In version 2.4 migrations have been completely rewritten to address issues with
+newer South releases.
+
+To ease the upgrading process, all the migrations for the `cms` application have
+been consolidated into a single migration file, `0001_initial.py`.
+
+*   migration 0001 is a *real* migration, that gets you to the same point migrations 0001-0036 used to 
+*   the migrations 0002 to 0036 inclusive still exist, but are now all *dummy*
+    migrations
+*   migrations 0037 and later are *new* migrations
+
+How this affects you
+--------------------
+
+If you're starting with *a new installation*, you don't need to worry about
+this. Don't even bother reading this section; it's for upgraders.
+
+If you're using version *2.3.2 or newer*, you don't need to worry about this
+either.
+
+If you're using version *2.3.1 or older*, you will need to run a two-step
+process.
+
+First, you'll need to upgrade to 2.3.3, to bring your migration history
+up-to-date with the new scheme. Then you'll need to perform the migrations for
+2.4.
+
+For the two-step upgrade process do the following in your project main directory
+::
+
+    pip install django-cms==2.3.3
+    python manage.py syncdb
+    python manage.py migrate
+    pip install django-cms==2.4
+    python manage.py migrate
+
+
+.. _cms-moderator-upgrade:
+
+
+CMS_MODERATOR
+=============
+Has been removed since it is no longer in use. From 2.4 onwards, all pages
+exist in a public and draft version. Users with the ``publish_page`` permission
+can publish changes to the public site.
+
+.. admonition:: Management command required
+
+    To bring a previous version of your site's database up-to-date, you'll need
+    to run ``manage.py cms moderator on``.
+
+
+Added Fix MPTTT Management command
+==================================
+
+Added a management command for fixing MPTT tree data.
+
+The command can be run with:
+
+	manage.py cms fix-mptt
+	
+
 Removed the MultilingualMiddleware
 ==================================
 
@@ -122,42 +200,11 @@ The following settings are not needed any more and have been removed:
 
 Please remove them from your settings.py
 
-
-.. _migrations-upgrade:
-
-Migrations overhaul
-===================
-In version 2.4 migrations have been completely rewritten to fix issues with
-newer South releases.
-
-To ease upgrading process migration numbering and naming have not been changed,
-but only the first one for each application has actual migration code, so it's of
-utmost importance that you have an up to date migration history.
-
-To ensure this, when upgrading from 2.3.1 and older releases, please upgrate to
-2.3.3 first, execute all the migrations and then move to 2.4.
-
-For the two step upgrade process do the following in your project main directory ::
-
-    pip install django-cms==2.3.3
-    python manage.py syncdb
-    python manage.py migrate
-    pip install django-cms==2.4
-
-
 CMS_FLAT_URLS
 =============
 
 Was marked deprecated in 2.3 and has now been removed.
 
-CMS_MODERATOR
-=============
-Has been removed since it is no longer in use. From 2.4 onwards, all pages
-exist in a public and draft version. Users with the ``publish_page`` permission
-can publish changes to the public site.
-
-To ensure that a site that was set up using a previous version is up to date,
-run ``manage.py moderator on``.
 
 
 Plugins in Plugins

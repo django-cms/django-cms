@@ -28,7 +28,7 @@ from cms.utils import timezone
 from cms.utils.page import is_valid_page_slug
 
 class PagesTestCase(CMSTestCase):
-
+    
     def test_add_page(self):
         """
         Test that the add admin page could be displayed via the admin
@@ -65,7 +65,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.placeholders.all().count(), 2)
-
+            
             # were public instances created?
             self.assertEqual(Title.objects.all().count(), 2)
             title = Title.objects.drafts().get(slug=page_data['slug'])
@@ -811,4 +811,41 @@ class PreviousFilteredSiblingsTests(CMSTestCase):
         home = Page.objects.get(pk=home.pk)
         self.assertEqual(other.get_previous_filtered_sibling(), None)
         self.assertEqual(home.get_previous_filtered_sibling(), None)
+        
 
+class PageTreeTests(CMSTestCase):
+
+    def test_rename_node(self):
+        home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
+        home.publish()
+        parent = create_page('parent', 'nav_playground.html', 'en', slug='parent', published=True)
+        parent.publish()
+        child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=parent)
+        child.publish()
+
+        page_title = Title.objects.get(page=parent)
+        page_title.slug = "father"
+        page_title.save()
+
+        parent = Page.objects.get(pk=parent.pk)
+        parent.publish()
+        child = Page.objects.get(pk=child.pk)
+
+        self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
+        self.assertEqual(child.publisher_public.get_absolute_url(language='en'), '/en/father/child/')
+
+
+    def test_move_node(self):
+        home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
+        home.publish()
+        parent = create_page('parent', 'nav_playground.html', 'en', slug='parent', published=True)
+        parent.publish()
+        child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=home)
+        child.publish()
+
+        child.move_page(parent)
+        child.publish()
+        child.reload()
+
+        self.assertEqual(child.get_absolute_url(language='en'), '/en/parent/child/')
+        self.assertEqual(child.publisher_public.get_absolute_url(language='en'), '/en/parent/child/')
