@@ -2,9 +2,11 @@
 """
 Edit Toolbar middleware
 """
+from django.contrib.auth import authenticate, login, logout
 from cms.plugin_pool import plugin_pool
 from cms.cms_toolbar import CMSToolbar
-from django.http import HttpResponse
+from django import forms
+from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 
 
@@ -26,6 +28,12 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     original_context.pop()
     return output
 
+
+class CMSToolbarLoginForm(forms.Form):
+    cms_username = forms.CharField()
+    cms_password = forms.CharField()
+
+
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
@@ -41,7 +49,24 @@ class ToolbarMiddleware(object):
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):
-        response = request.toolbar.request_hook()
-        if isinstance(response, HttpResponse):
-            return response
+        if request.method != 'POST':
+            return self._request_hook_get(request)
+        else:
+            return self._request_hook_post(request)
+
+    def _request_hook_get(self, request):
+        if 'cms-toolbar-logout' in request.GET:
+            logout(request)
+            return HttpResponseRedirect(request.path)
+
+    def _request_hook_post(self, request):
+        # login hook
+        if 'cms-toolbar-login' in request.GET:
+            login_form = CMSToolbarLoginForm(request.POST)
+            if login_form.is_valid():
+                username = login_form.cleaned_data['cms_username']
+                password = login_form.cleaned_data['cms_password']
+                user = authenticate(username=username, password=password)
+                if user:
+                    login(request, user)
 
