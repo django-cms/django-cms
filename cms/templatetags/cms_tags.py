@@ -3,6 +3,7 @@ from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from cms import cms_toolbar
 from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
@@ -460,14 +461,12 @@ class CMSToolbar(InclusionTag):
         request = context.get('request', None)
         if not request:
             return ''
-        toolbar = getattr(request, 'toolbar', None)
-        if not toolbar:
-            return ''
+        toolbar = cms_toolbar.CMSToolbar(request)
         if not toolbar.show_toolbar:
             return ''
         return super(CMSToolbar, self).render(context)
 
-    def get_context(self, context):
+    def get_context(self, context, **kwargs):
         context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
         return context
 
