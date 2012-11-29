@@ -5,10 +5,13 @@ from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List, 
     GetButton)
 from cms.utils import cms_static_url
+from cms.utils.permissions import has_page_change_permission
+from django import forms
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from utils.permissions import has_page_change_permission
 
 
 def _get_draft_page_id(toolbar):
@@ -55,6 +58,11 @@ def _page_is_dirty(request):
     return page and page.published and page.get_draft_object().is_dirty()
 
 
+class CMSToolbarLoginForm(forms.Form):
+    cms_username = forms.CharField()
+    cms_password = forms.CharField()
+
+
 class CMSToolbar(Toolbar):
     """
     The default CMS Toolbar
@@ -95,6 +103,7 @@ class CMSToolbar(Toolbar):
 
         self.page_states = []
 
+        # Store access property values to avoid having to recompute them
         is_staff = self.is_staff
         can_change = self.can_change
         edit_mode = self.edit_mode
@@ -144,7 +153,7 @@ class CMSToolbar(Toolbar):
         else:
             items.append(
                 GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                    cms_static_url('images/toolbar/icons/icon_lock.png'))
+                          cms_static_url('images/toolbar/icons/icon_lock.png'))
             )
         return items
 
@@ -217,3 +226,26 @@ class CMSToolbar(Toolbar):
                     cms_static_url('images/toolbar/icons/icon_admin.png'),
                     items=admin_items)
 
+    def request_hook(self):
+        if self.request.method != 'POST':
+            return self._request_hook_get()
+        else:
+            return self._request_hook_post()
+
+    def _request_hook_get(self):
+        request = self.request
+        if 'cms-toolbar-logout' in request.GET:
+            logout(request)
+            return HttpResponseRedirect(request.path)
+
+    def _request_hook_post(self):
+        request = self.request
+        # login hook
+        if 'cms-toolbar-login' in request.GET:
+            login_form = CMSToolbarLoginForm(request.POST)
+            if login_form.is_valid():
+                username = login_form.cleaned_data['cms_username']
+                password = login_form.cleaned_data['cms_password']
+                user = authenticate(username=username, password=password)
+                if user:
+                    login(request, user)
