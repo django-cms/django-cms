@@ -128,7 +128,7 @@ def post_patch_check():
                 if not language.has_key('redirect_on_fallback'):
                     language['redirect_on_fallback'] = defaults.get('redirect_on_fallback', True)
                 if not language.has_key('hide_untranslated'):
-                    defaults.get('hide_untranslated', True)
+                    language['hide_untranslated'] = defaults.get('hide_untranslated', True)
 
 
 def get_old_language_conf(code, name, template):
