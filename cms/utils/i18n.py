@@ -3,6 +3,8 @@ from contextlib import contextmanager
 from cms.exceptions import LanguageError
 from django.conf import settings
 from django.utils import translation
+from django.utils.translation import ugettext_lazy  as _
+
 
 @contextmanager
 def force_language(new_lang):
@@ -13,13 +15,36 @@ def force_language(new_lang):
     translation.activate(old_lang)
 
 
+def get_languages(site_id=None):
+    site_id = get_site(site_id)
+    result = settings.CMS_LANGUAGES.get(site_id)
+    if not result:
+        result = []
+        defaults = settings.CMS_LANGUAGES.get('default', {})
+        for code, name in settings.LANGUAGES:
+            lang = {'code': code, 'name': _(name)}
+            lang.update(defaults)
+            result.append(lang)
+        settings.CMS_LANGUAGES[site_id] = result
+    return result
+
+
+def get_site(site):
+    if site is None:
+        return settings.SITE_ID
+    else:
+        try:
+            return int(site)
+        except TypeError:
+            return site.pk
+
+
 def get_language_list(site_id=None):
     """
     :return: returns a list of iso2codes for this site
     """
-    site_id = get_site(site_id)
     languages = []
-    for language in settings.CMS_LANGUAGES[site_id]:
+    for language in get_languages(site_id):
         languages.append(language['code'])
     return languages
 
@@ -28,9 +53,8 @@ def get_language_tuple(site_id=None):
     """
     :return: returns an list of tuples like the old CMS_LANGUAGES or the LANGUAGES for this site
     """
-    site_id = get_site(site_id)
     languages = []
-    for language in settings.CMS_LANGUAGES[site_id]:
+    for language in get_languages(site_id):
         languages.append((language['code'], language['name']))
     return languages
 
@@ -39,9 +63,8 @@ def get_language_dict(site_id=None):
     """
     :return: returns an dict of cms languages
     """
-    site_id = get_site(site_id)
     languages = {}
-    for language in settings.CMS_LANGUAGES[site_id]:
+    for language in get_languages(site_id):
         languages[language['code']] = language['name']
     return languages
 
@@ -63,7 +86,7 @@ def get_language_object(language_code, site_id=None):
     :return: the language object filled up by defaults
     """
     site_id = get_site(site_id)
-    for language in settings.CMS_LANGUAGES[site_id]:
+    for language in get_languages(site_id):
         if language['code'] == language_code:
             return language
     raise LanguageError('Language not found: %s' % language_code)
@@ -75,7 +98,7 @@ def get_language_objects(site_id=None):
     """
     site_id = get_site(site_id)
     languages = []
-    for language in settings.CMS_LANGUAGES[site_id]:
+    for language in get_languages(site_id):
         languages.append(get_language_object(language['code'], site_id))
     return languages
 
@@ -135,12 +158,3 @@ def hide_untranslated(language, site_id=None):
     site_id = get_site(site_id)
     language = get_language_object(language, site_id)
     return language.get('hide_untranslated', True)
-
-def get_site(site):
-    if site is None:
-        return settings.SITE_ID
-    else:
-        try:
-            return int(site)
-        except TypeError:
-            return site.pk

@@ -111,41 +111,24 @@ def post_patch_check():
                                                    "language %(language)s: %(property)s" %
                                                    {'site': site, 'language': language['code'], 'property': key})
                         # Fill up the defaults
+                defaults = settings.CMS_LANGUAGES.get('default', {})
                 if not language.has_key('fallbacks'):
                     fallbacks = []
                     for tmp_language in settings.CMS_LANGUAGES[site]:
                         tmp_language = tmp_language.copy()
                         if not tmp_language.has_key('public'):
-                            if settings.CMS_LANGUAGES.has_key('default'):
-                                tmp_language['public'] = settings.CMS_LANGUAGES['default'].get('public', True)
-                            else:
-                                tmp_language['public'] = True
+                            tmp_language['public'] = defaults.get('public', True)
                         if tmp_language['public']:
                             fallbacks.append(tmp_language['code'])
                     if fallbacks and language['code'] in fallbacks:
                         fallbacks.remove(language['code'])
-                    if settings.CMS_LANGUAGES.has_key('default'):
-                        language['fallbacks'] = settings.CMS_LANGUAGES['default'].get('fallbacks', fallbacks)
-                    else:
-                        language['fallbacks'] = fallbacks
+                    language['fallbacks'] = defaults.get('fallbacks', fallbacks)
                 if not language.has_key('public'):
-                    if settings.CMS_LANGUAGES.has_key('default'):
-                        language['public'] = settings.CMS_LANGUAGES['default'].get('public', True)
-                    else:
-                        language['public'] = True
+                    language['public'] = defaults.get('public', True)
                 if not language.has_key('redirect_on_fallback'):
-                    if settings.CMS_LANGUAGES.has_key('default'):
-                        language['redirect_on_fallback'] = settings.CMS_LANGUAGES['default'].get(
-                            'redirect_on_fallback',
-                            True)
-                    else:
-                        language['redirect_on_fallback'] = True
+                    language['redirect_on_fallback'] = defaults.get('redirect_on_fallback', True)
                 if not language.has_key('hide_untranslated'):
-                    if settings.CMS_LANGUAGES.has_key('default'):
-                        language['hide_untranslated'] = settings.CMS_LANGUAGES['default'].get('hide_untranslated',
-                            True)
-                    else:
-                        language['hide_untranslated'] = True
+                    defaults.get('hide_untranslated', True)
 
 
 def get_old_language_conf(code, name, template):
