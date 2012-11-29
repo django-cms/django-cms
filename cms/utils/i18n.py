@@ -85,7 +85,6 @@ def get_language_object(language_code, site_id=None):
     :param language_code: RFC5646 language code
     :return: the language object filled up by defaults
     """
-    site_id = get_site(site_id)
     for language in get_languages(site_id):
         if language['code'] == language_code:
             return language
@@ -96,11 +95,7 @@ def get_language_objects(site_id=None):
     """
     returns list of all language objects filled up by default values
     """
-    site_id = get_site(site_id)
-    languages = []
-    for language in get_languages(site_id):
-        languages.append(get_language_object(language['code'], site_id))
-    return languages
+    return list(get_languages(site_id))
 
 
 def get_default_language(language_code=None):
@@ -133,7 +128,6 @@ def get_fallback_languages(language, site_id=None):
     """
     returns a list of fallback languages for the given language
     """
-    site_id = get_site(site_id)
     language = get_language_object(language, site_id)
     return language.get('fallbacks', [])
 
@@ -144,7 +138,6 @@ def get_redirect_on_fallback(language, site_id=None):
     :param site_id:
     :return: Boolean
     """
-    site_id = get_site(site_id)
     language = get_language_object(language, site_id)
     return language.get('redirect_on_fallback', True)
 
@@ -155,6 +148,5 @@ def hide_untranslated(language, site_id=None):
     :param site_id:
     :return: A Boolean
     """
-    site_id = get_site(site_id)
-    language = get_language_object(language, site_id)
-    return language.get('hide_untranslated', True)
+    obj = get_language_object(language, site_id)
+    return obj.get('hide_untranslated', True)
