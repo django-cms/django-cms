@@ -125,6 +125,12 @@ class MenuPool(object):
         key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
         if request.user.is_authenticated():
             key += "_%s_user" % request.user.pk
+
+        # because of the amendments to cms/menu.py, we need to cache for each request_path, so instead of:
+        # key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id) 
+        # we do:
+        key = "%smenu_nodes_%s_%s_%s" % (prefix, lang, site_id, hash(request.path)) 
+
         cached_nodes = cache.get(key, None)
         if cached_nodes:
             return cached_nodes

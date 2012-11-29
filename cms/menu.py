@@ -237,6 +237,59 @@ class CMSMenu(Menu):
             
         pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
         
+        # ------------- additional code to speed up menus -----------
+
+        # pages now contains every single page in the site
+        # it was quick to get, but some other operations are slow, 
+        # especially get_visible_pages() and titles
+        
+        # so why not be smarter? Instead of getting every page in the site, let's
+        # just get relevant ones, instead of ones that will never appear in the menu
+        # such as pages related only through distant ancestors. We'll get: 
+        #
+        #   *   the current page 
+        #   *   all of its ancestors
+        #   *   all of their children
+        #         
+        # in order to do this we'll also need an amendment to menus/menu_pool - it's now longer 
+        # enough to do:
+        #
+        # key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
+        #
+        # we also need to cache each request_path:
+        #
+        # key = "%smenu_nodes_%s_%s_%s" % (prefix, lang, site_id, hash(request.path)) 
+        
+        current_page = request.current_page
+        
+        # get the current page as a queryset and make sure it's unique
+        current_page_queryset = pages.filter(id=current_page.id).distinct()
+        
+        # get all the ancestors - a chain of ancestry back to the root
+        ancestry = current_page.get_ancestors(ascending = True)
+
+        # create a queryset of relevant pages - we use the intersection of 
+        # pages & ancestry to eliminate unpublished ancestors
+        relevant_pages = pages & ancestry
+                
+        # get all of:
+        # pages whose parents are in relevant pages
+        # relevant pages
+        # pages whose parents are the current page
+        # current page    
+        
+        pages = \
+            pages.filter(parent__in=relevant_pages).distinct() | \
+            relevant_pages.distinct() | \
+            pages.filter(parent__in=current_page_queryset).distinct() | \
+            current_page_queryset | \
+            pages.filter(level=0).distinct()
+        
+        # do they need to be ordered here? I am not sure this is necessary 
+        pages = pages.order_by("tree_id", "lft")
+        
+        # ------------- end of additional code to speed up menus -----------
+
         ids = []
         nodes = []
         first = True
