@@ -10,6 +10,7 @@ from cms.models import (Page, Title, CMSPlugin, PagePermission,
     GlobalPagePermission, PageUser, PageUserGroup)
 
 from menus.menu_pool import menu_pool
+from cms.models.permissionmodels import PageUserGroup
 
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
@@ -66,7 +67,7 @@ def pre_save_title(instance, raw, **kwargs):
 
     instance.tmp_path = None
     instance.tmp_application_urls = None
-    
+
     if instance.id and not hasattr(instance, "tmp_path"):
         try:
             tmp_title = Title.objects.get(pk=instance.id)
@@ -153,8 +154,7 @@ def post_save_user_group(instance, raw, created, **kwargs):
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous():
         return
-    from django.db import connection
-	page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
+    page_user = PageUserGroup(user_ptr_id=instance.pk, created_by=creator)
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
