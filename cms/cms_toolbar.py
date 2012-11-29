@@ -89,41 +89,66 @@ class CMSToolbar(Toolbar):
         """
         Get the CMS items on the toolbar
         """
-        items = []
-        for item in self.items:
-            if type(item) not in (list, tuple):
-                item = [item]
-            for subitem in item:
-                result = subitem(self, context)
-                if result:
-                    items.append(result)
+        items = [
+            Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
+        ]
+
+        self.page_states = []
+
+        is_staff = self.is_staff
+        can_change = self.can_change
+        edit_mode = self.edit_mode
+
+        if can_change:
+            items.append(
+                self.edit_mode_switcher
+            )
+
+        if is_staff:
+
+            current_page = self.request.current_page
+
+            if current_page:
+                states = current_page.last_page_states()
+                has_states = bool(len(states))
+                self.page_states = states
+                if has_states:
+                    items.append(
+                        TemplateHTML(LEFT, 'status',
+                                     'cms/toolbar/items/status.html')
+                    )
+
+                # publish button
+                if edit_mode:
+                    if current_page.has_publish_permission(self.request):
+                        items.append(
+                            GetButton(RIGHT, 'moderator', _("Publish"), _get_publish_url)
+                        )
+                    if self.revert_button.is_enabled_for(self.request):
+                        items.append(self.revert_button)
+
+                # The 'templates' Menu
+                if can_change:
+                    items.append(self.get_template_menu(context, can_change, is_staff))
+
+                # The 'page' Menu
+                items.append(self.get_page_menu(context, can_change, is_staff))
+
+            # The 'Admin' Menu
+            items.append(self.get_admin_menu(context, can_change, is_staff))
+
+        if not self.request.user.is_authenticated():
+            items.append(
+                TemplateHTML(LEFT, 'login', 'cms/toolbar/items/login.html')
+            )
+        else:
+            items.append(
+                GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
+                    cms_static_url('images/toolbar/icons/icon_lock.png'))
+            )
         return items
 
-
-    def get_edit_mode_switcher(self, context):
-        if self.can_change:
-            return self.edit_mode_switcher
-
-    def get_page_status(self, context):
-        if self.is_staff and self.current_page and self.current_page.publisher_is_draft:
-            page_states = list(self.request.current_page.last_page_states())
-            if page_states:
-                return TemplateHTML(LEFT, 'status', 'cms/toolbar/items/status.html')
-
-    def get_publish_button(self, context):
-        current_page = self.request.current_page
-        if self.is_staff and current_page and current_page.publisher_is_draft:
-            if self.edit_mode and current_page.has_publish_permission(self.request):
-                return GetButton(RIGHT, 'moderator', _("Publish"), _get_publish_url)
-
-    def get_revert_button(self, context):
-        if self.revert_button.is_enabled_for(self.request):
-            return self.revert_button
-
-    def get_template_menu(self, context):
-        if not self.is_staff or not self.current_page or not self.can_change:
-            return
-
+    def get_template_menu(self, context, can_change, is_staff):
         menu_items = []
         page = self.request.current_page.get_draft_object()
         url = reverse('admin:cms_page_change_template', args=(page.pk,))
@@ -138,13 +163,10 @@ class CMSToolbar(Toolbar):
         return List(RIGHT, 'templates', _('Template'),
                     '', items=menu_items)
     
-    def get_page_menu(self, context):
+    def get_page_menu(self, context, can_change, is_staff):
         """
         Builds the 'page menu'
         """
-        if not self.request.current_page or not self.is_staff:
-            return
-
         menu_items = [
             ListItem('overview', _('Move/add Pages'),
                      reverse('admin:cms_page_changelist'),
@@ -170,19 +192,16 @@ class CMSToolbar(Toolbar):
                     cms_static_url('images/toolbar/icons/icon_page.png'),
                     items=menu_items)
     
-    def get_admin_menu(self, context):
+    def get_admin_menu(self, context, can_change, is_staff):
         """
         Builds the 'admin menu' (the one with the cogwheel)
         """
-        if not self.is_staff:
-            return
-
         admin_items = [
             ListItem('admin', _('Site Administration'),
                      reverse('admin:index'),
                      icon=cms_static_url('images/toolbar/icons/icon_admin.png')),
         ]
-        if self.can_change and self.request.current_page:
+        if can_change and self.request.current_page:
             admin_items.append(
                 ListItem('settings', _('Page Settings'),
                          _get_page_admin_url,
@@ -197,42 +216,4 @@ class CMSToolbar(Toolbar):
         return List(RIGHT, 'admin', _('Admin'),
                     cms_static_url('images/toolbar/icons/icon_admin.png'),
                     items=admin_items)
-
-    def get_login_form(self, context):
-        if not self.request.user.is_authenticated():
-            return TemplateHTML(LEFT, 'login', 'cms/toolbar/items/login.html')
-
-    def get_logout_form(self, context):
-        if self.request.user.is_authenticated():
-            return GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                    cms_static_url('images/toolbar/icons/icon_lock.png'))
-
-
-    logo = [
-        lambda *x: Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
-    ]
-    switcher = [
-        get_edit_mode_switcher,
-        get_page_status,
-    ]
-    buttons = [
-        get_publish_button,
-        get_revert_button,
-    ]
-    menus = [
-        get_template_menu,
-        get_page_menu,
-        get_admin_menu,
-    ]
-    login = [
-        get_login_form,
-        get_logout_form,
-    ]
-    items = [
-        logo,
-        switcher,
-        buttons,
-        menus,
-        login
-    ]
 
