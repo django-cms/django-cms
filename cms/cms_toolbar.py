@@ -78,7 +78,7 @@ class CMSToolbar(Toolbar):
         self.init()
 
     def init(self):
-        """ Hook called whenever the user is reinitialised """
+        """ Hook called when the toolbar is reinitialised """
 
     @property
     def is_staff(self):
