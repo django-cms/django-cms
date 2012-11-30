@@ -73,6 +73,13 @@ class CMSToolbar(Toolbar):
     edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
                                   _('Edit mode'))
 
+    def __init__(self, request):
+        super(CMSToolbar, self).__init__(request)
+        self.init()
+
+    def init(self):
+        """ Hook called whenever the user is reinitialised """
+
     @property
     def is_staff(self):
         return self.request.user.is_staff
@@ -249,3 +256,4 @@ class CMSToolbar(Toolbar):
                 user = authenticate(username=username, password=password)
                 if user:
                     login(request, user)
+                    self.init()
