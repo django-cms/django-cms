@@ -131,4 +131,5 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - MultilingualMiddleware has been removed
 - CMS_FLAT_URLS has been removed
 
-
+==== NEXT ====
+- Fixed #1543: Nasty empty line in cms/plugins/link.html
