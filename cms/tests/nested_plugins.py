@@ -29,13 +29,11 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         for original_placeholder in placeholders:
             
-            copied_placeholder = Placeholder()
-            copied_placeholder.save() # it is necessary to save
-
-            # and get the plugins
+            # get the plugins
             original_plugins = original_placeholder.get_plugins()
             
-            # copy them to the new placeholder
+            # copy them to a new placeholder
+            copied_placeholder = Placeholder.objects.create(slot="Some_slot")
             copy_plugins_to(
                 original_placeholder.get_plugins(), 
                 copied_placeholder
