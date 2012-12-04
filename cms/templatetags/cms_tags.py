@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 from itertools import chain
@@ -341,8 +342,8 @@ class PageAttribute(AsTag):
         if page == "dummy":
             return ''
         if page and name in self.valid_attributes:
-            f = getattr(page, "get_%s" % name)
-            return f(language=lang, fallback=True)
+            func = getattr(page, "get_%s" % name)
+            return escape(func(language=lang, fallback=True))
         return ''
 
 register.tag(PageAttribute)
