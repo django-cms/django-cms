@@ -79,7 +79,7 @@ class Placeholder(models.Model):
 
     def get_media(self, request, context):
         from cms.plugins.utils import get_plugin_media
-        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.cmsplugin_set.all()]
+        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
         if media_classes:
             return reduce(operator.add, media_classes)
         return Media()
@@ -144,7 +144,7 @@ class Placeholder(models.Model):
         return list(self.get_plugins())
 
     def get_plugins(self):
-        return self.cmsplugin_set.all().order_by('tree_id', '-rght')
+        return self.cmsplugin_set.all().order_by('tree_id', 'lft')
 
     @property
     def actions(self):
