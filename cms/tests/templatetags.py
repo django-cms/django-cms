@@ -12,9 +12,10 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
-from django.template import RequestContext
+from django.template import RequestContext, Context
 from unittest import TestCase
 from django.template.base import Template
+from django.utils.html import escape
 
 
 class TemplatetagTests(TestCase):
@@ -39,6 +40,21 @@ class TemplatetagTests(TestCase):
 
     def test_unicode_placeholder_name_fails_fast(self):
         self.assertRaises(ImproperlyConfigured, get_placeholders, 'unicode_placeholder.html')
+
+    def test_page_attribute_tag_escapes_content(self):
+        script = '<script>alert("XSS");</script>'
+        class FakePage(object):
+            def get_page_title(self, *args, **kwargs):
+                return script
+        class FakeRequest(object):
+            current_page = FakePage()
+            REQUEST = {'language': 'en'}
+        request = FakeRequest()
+        template = Template('{% load cms_tags %}{% page_attribute page_title %}')
+        context = Context({'request': request})
+        output = template.render(context)
+        self.assertNotEqual(script, output)
+        self.assertEqual(escape(script), output)
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
