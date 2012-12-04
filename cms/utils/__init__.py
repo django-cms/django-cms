@@ -40,18 +40,18 @@ def get_template_from_request(request, obj=None, no_current_page=False):
 
 
 def get_language_from_request(request, current_page=None):
-    from cms.models import Page
     """
     Return the most obvious language according the request
     """
     language = request.REQUEST.get('language', None)
+    site_id = current_page and current_page.site_id
     if language:
-        if not language in get_language_list():
+        if not language in get_language_list(site_id):
             language = None
     if language is None:
         language = getattr(request, 'LANGUAGE_CODE', None)
     if language:
-        if not language in get_language_list():
+        if not language in get_language_list(site_id):
             language = None
 
     if language is None and current_page:
@@ -65,7 +65,7 @@ def get_language_from_request(request, current_page=None):
         # language must be defined in CMS_LANGUAGES, so check first if there
         # is any language with LANGUAGE_CODE, otherwise try to split it and find
         # best match
-        language = get_default_language()
+        language = get_default_language(site_id=site_id)
 
     return language
 

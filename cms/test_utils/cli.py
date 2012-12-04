@@ -151,6 +151,12 @@ def configure(**extra):
                     'fallbacks':['fr', 'en'],
                     'public':True,
                 },
+                {
+                    'code':'de',
+                    'name':gettext('German'),
+                    'fallbacks':['fr', 'en'],
+                    'public':False,
+                },
             ],
             'default': {
                 'hide_untranslated':False,
