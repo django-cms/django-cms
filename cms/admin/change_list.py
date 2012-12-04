@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import bisect
 from collections import defaultdict
 from cms.exceptions import NoHomeFound
 from cms.models import Title, Page, PageModeratorState
@@ -70,7 +71,7 @@ class CMSChangeList(ChangeList):
         else:
             qs = super(CMSChangeList, self).get_query_set().drafts()
         if request:
-            site = self._current_site
+            site = self.current_site()
             permissions = Page.permissions.get_change_id_list(request.user, site)
             
             if permissions != Page.permissions.GRANT_ALL:
@@ -147,7 +148,7 @@ class CMSChangeList(ChangeList):
             # display also pages which user must not edit, but he haves a 
             # permission for adding a child under this page. Otherwise he would
             # not be able to add anything under page which he can't change. 
-            page.root_node = (page.parent_id not in ids)
+            page.root_node = page.parent_id not in ids
 
             if settings.CMS_PERMISSION:
                 # caching the permissions
@@ -193,12 +194,12 @@ class CMSChangeList(ChangeList):
             page.all_languages = []
 
         titles = Title.objects.filter(page__in=ids)
+        insort = bisect.insort # local copy to avoid globals lookup in the loop
         for title in titles:
             page = ids[title.page_id]
             page.title_cache[title.language] = title
             if not title.language in page.all_languages:
-                page.all_languages.append(title.language)
-                page.all_languages.sort()
+                insort(page.all_languages, title.language)
         self.root_pages = root_pages
         
     def get_items(self):

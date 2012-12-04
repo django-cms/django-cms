@@ -772,7 +772,8 @@ class Page(MPTTModel):
         return _("default")
 
     def has_view_permission(self, request):
-        from cms.models.permissionmodels import PagePermission, GlobalPagePermission
+        from cms.models.permissionmodels import PagePermission
+        from cms.utils.permissions import has_global_page_permission
         from cms.utils.plugins import current_site
 
         if not self.publisher_is_draft:
@@ -785,8 +786,8 @@ class Page(MPTTModel):
             global_perms_q = Q(can_view=True) & Q(
                 Q(sites__in=[site]) | Q(sites__isnull=True)
             )
-            global_view_perms = GlobalPagePermission.objects.with_user(
-                request.user).filter(global_perms_q).exists()
+            global_view_perms = has_global_page_permission(
+                request, self.site_id, can_view=True)
 
             # a global permission was given to the request's user
             if global_view_perms:

@@ -3,13 +3,14 @@ from collections import defaultdict
 from cms.apphook_pool import apphook_pool
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
-from cms.models.permissionmodels import PagePermission, GlobalPagePermission
+from cms.models.permissionmodels import PagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset
 from cms.utils.plugins import current_site
+from cms.utils.permissions import has_global_page_permission
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
@@ -30,7 +31,7 @@ def get_visible_pages(request, pages, site=None):
     is_setting_public_all = settings.CMS_PUBLIC_FOR == 'all'
     is_setting_public_staff = settings.CMS_PUBLIC_FOR == 'staff'
     is_auth_user = request.user.is_authenticated()
-    
+
     visible_page_ids = []
     restricted_pages = defaultdict(list)
     pages_perms_q = Q()
@@ -73,16 +74,15 @@ def get_visible_pages(request, pages, site=None):
         is_setting_public_all and 
         not restricted_pages):
         return [page.pk for page in pages]
-    
-   
+
+
     if site is None:
         site = current_site(request)
-    
+
     # authenticated user and global permission
     if is_auth_user:
-        global_page_perm_q = Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
-        global_view_perms = GlobalPagePermission.objects.with_user(request.user).filter(global_page_perm_q).exists()
- 
+        global_view_perms = has_global_page_permission(request, site.pk, can_view=True)
+
         #no page perms edge case - all visible
         if ((is_setting_public_all or (
             is_setting_public_staff and request.user.is_staff))and 
@@ -95,14 +95,14 @@ def get_visible_pages(request, pages, site=None):
             not restricted_pages and
             not global_view_perms):
             return []
-           
-        
+
+
     def has_global_perm():
         if has_global_perm.cache < 0:
             has_global_perm.cache = 1 if request.user.has_perm('cms.view_page') else 0
         return bool(has_global_perm.cache)
     has_global_perm.cache = -1
-    
+
     def has_permission_membership(page):
         """
         PagePermission user group membership tests
@@ -194,9 +194,9 @@ def page_to_node(page, home, cut):
         extenders.append(page.navigation_extenders)
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     lang = get_language()
-    # Only run this if we have a title for this object. Normally, the title
-    # cache should have been preloaded, so if it's missing there's no point
-    # in re-running the query
+    # Only run this if we have a translation in the requested language for this
+    # object. The title cache should have been prepopulated in CMSMenu.get_nodes
+    # but otherwise, just request the title normally
     if not hasattr(page, 'title_cache') or lang in page.title_cache:
         try:
             app_name = page.get_application_urls(fallback=False)
