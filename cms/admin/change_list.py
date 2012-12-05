@@ -144,10 +144,9 @@ class CMSChangeList(ChangeList):
 
             children = list(page.get_children())
 
-            # note: We are using change_list permission here, because we must
-            # display also pages which user must not edit, but he haves a 
-            # permission for adding a child under this page. Otherwise he would
-            # not be able to add anything under page which he can't change. 
+            # If the parent page is not among the nodes shown, this node should
+            # be a "root node". The filtering for this has already been made, so
+            # using the ids dictionary means this check is constant time
             page.root_node = page.parent_id not in ids
 
             if settings.CMS_PERMISSION:

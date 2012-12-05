@@ -3,14 +3,13 @@ from collections import defaultdict
 from cms.apphook_pool import apphook_pool
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
-from cms.models.permissionmodels import PagePermission
+from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset
 from cms.utils.plugins import current_site
-from cms.utils.permissions import has_global_page_permission
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
@@ -81,7 +80,10 @@ def get_visible_pages(request, pages, site=None):
 
     # authenticated user and global permission
     if is_auth_user:
-        global_view_perms = has_global_page_permission(request, site.pk, can_view=True)
+        global_page_perm_q = Q(
+            Q(user=request.user) | Q(group__user=request.user)
+        ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
+        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
 
         #no page perms edge case - all visible
         if ((is_setting_public_all or (

@@ -121,8 +121,6 @@ def has_global_page_permission(request, site=None, **filters):
         qs = GlobalPagePermission.objects.with_user(request.user).filter(**filters)
         if site:
             qs = qs.filter(Q(sites__in=[site]) | Q(sites__isnull=True))
-        else:
-            qs = qs.filter(sites__isnull=True)
         request._cms_global_perms[key] = qs.exists()
     return request._cms_global_perms[key]
 
