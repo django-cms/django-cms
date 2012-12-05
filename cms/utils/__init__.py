@@ -44,7 +44,7 @@ def get_language_from_request(request, current_page=None):
     Return the most obvious language according the request
     """
     language = request.REQUEST.get('language', None)
-    site_id = current_page and current_page.site_id
+    site_id = current_page.site_id if current_page else None
     if language:
         if not language in get_language_list(site_id):
             language = None

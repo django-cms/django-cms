@@ -34,10 +34,6 @@ def cache_tree_children(queryset):
         parent = parents_dict.get(obj.parent_id)
         if parent:
             parent._cached_children.append(obj)
-        else:
-            # if there is no parent, we ignore the issue since it might not be
-            # visible to the current user
-            pass
 
 
 class CMSChangeList(ChangeList):
