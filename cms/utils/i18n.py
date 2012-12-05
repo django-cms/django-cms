@@ -75,7 +75,7 @@ def get_public_languages(site_id=None):
     """
     languages = []
     for language in get_language_objects(site_id):
-        if language["public"]:
+        if language.get("public", True):
             languages.append(language['code'])
     return languages
 
