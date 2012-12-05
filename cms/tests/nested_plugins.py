@@ -5,8 +5,10 @@ from cms.api import create_page, add_plugin
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugins.text.models import Text
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.copy_plugins import copy_plugins_to
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
@@ -14,6 +16,410 @@ URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
 
 class NestedPluginsTestCase(PluginsTestBaseCase):
     
+                        
+    def copy_placeholders_and_check_results(self, placeholders):
+        """
+        This function is not itself a test; rather, it can be used by any test
+        that has created placeholders. It will check that whatever the plugin
+        structure in the placeholder, it will be copied accurately when they are
+        copied.
+        
+        placeholders is a list of placeholders
+        """
+
+        for original_placeholder in placeholders:
+            
+            # get the plugins
+            original_plugins = original_placeholder.get_plugins()
+            
+            # copy them to a new placeholder
+            copied_placeholder = Placeholder.objects.create(slot=original_placeholder.slot)
+            copy_plugins_to(
+                original_placeholder.get_plugins(), 
+                copied_placeholder
+                )
+
+            copied_plugins = copied_placeholder.get_plugins()
+            
+            # we should find the same number of plugins in both placeholders
+            self.assertEquals(
+                 original_plugins.count(),
+                 copied_plugins.count()
+                 )
+                                
+            # quick check: make sure the two querysets match:
+            for original, copy in zip(original_plugins, copied_plugins):
+                self.assertEquals(
+                    Text.objects.get(id=original.id).body, 
+                    Text.objects.get(id=copy.id).body
+                    )     
+            
+            # Now build a *tree* of the plugins, and match those - it's not 
+            # enough just to compare querysets as above; we should *also* check 
+            # that when we build a tree, the various nodes are assembled as we 
+            # would expect. We will pump the trees into a pair of lists:
+            original_plugins_list = []
+            copied_plugins_list = []
+
+            # This function builds the tree of plugins, starting from its roots. 
+            # In that respect it's like many of the plugin tree-building 
+            # routines elsewhere in the system.
+            def plugin_list_from_tree(roots, plugin_list):
+                for plugin in roots:
+                    plugin_list.append(plugin)
+                    # recurse over the set of nodes
+                    plugin_list_from_tree(plugin.get_children(), plugin_list)
+        
+            # build the tree for each set of plugins
+            plugin_list_from_tree(original_plugins.filter(level=0), original_plugins_list)
+            plugin_list_from_tree(copied_plugins.filter(level=0), copied_plugins_list)
+        
+            # Check that each pair of items in the two lists match, in lots of 
+            # different ways
+            for original, copy in zip(original_plugins_list, copied_plugins_list): 
+                original_text_plugin = Text.objects.get(id=original.id)
+                copied_text_plugin = Text.objects.get(id=copy.id)
+
+                # This first one is a sanity test, just to prove that we aren't 
+                # simply comparing *exactly the same items* in all these tests. 
+                # It could happen...
+                self.assertNotEquals(original.id, copy.id)     
+                self.assertEquals(
+                    original_text_plugin.body, 
+                    copied_text_plugin.body
+                    )     
+                self.assertEquals(
+                    original_text_plugin.level, 
+                    copied_text_plugin.level
+                    )     
+                self.assertEquals(
+                    original_text_plugin.position, 
+                    copied_text_plugin.position
+                    )     
+                self.assertEquals(
+                    original_text_plugin.rght, 
+                    copied_text_plugin.rght
+                    )     
+                self.assertEquals(
+                    original_text_plugin.lft, 
+                    copied_text_plugin.lft
+                    )     
+                self.assertEquals(
+                    original_text_plugin.get_descendant_count(), 
+                    copied_text_plugin.get_descendant_count()
+                    )     
+                self.assertEquals(
+                    original_text_plugin.get_ancestors().count(), 
+                    copied_text_plugin.get_ancestors().count()
+                    )                                          
+                    
+        # just in case the test method that called us wants it:
+        return copied_placeholder  
+        
+
+    def test_plugin_deep_nesting_and_copying(self):
+        """
+        Create a deeply-nested plugin structure, tests its properties, and tests
+        that it is copied accurately when the placeholder containing them is
+        copied.
+        
+        The structure below isn't arbitrary, but has been designed to test
+        various conditions, including:
+        
+        * nodes four levels deep
+        * multiple successive level increases 
+        * multiple successive level decreases
+        * successive nodes on the same level followed by level changes
+        * multiple level decreases between successive nodes
+        * siblings with and without children
+        * nodes and branches added to the tree out of sequence  
+   
+        First we create the structure:
+        
+             11
+             1 
+                 2 
+                     12
+                     4 
+                          10  
+                     8 
+                 3 
+                     9 
+              5 
+                 6 
+                 7 
+                 13
+              14
+        
+        and then we move it all around.     
+        """
+
+        placeholder = Placeholder(slot=u"some_slot") 
+        placeholder.save() # a good idea, if not strictly necessary
+        
+
+        # plugin in placeholder
+        plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"01",
+            )                                                    
+        plugin_1.save()
+        
+        # IMPORTANT: plugins must be reloaded, before they can be assigned 
+        # as a parent. Otherwise, the MPTT structure doesn't seem to rebuild 
+        # properly.
+
+        # child of plugin_1
+        plugin_2 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"02",
+            )                                                
+        plugin_1 = self.reload(plugin_1)
+        plugin_2.parent = plugin_1
+        plugin_2.save()
+        
+        # plugin_2 should be plugin_1's only child 
+        # for a single item we use assertItemsEqual
+        self.assertItemsEqual(
+            CMSPlugin.objects.get(id=1).get_children(), 
+            [CMSPlugin.objects.get(id=2)])
+            
+        # create a second child of plugin_1
+        plugin_3 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"03",
+            )                                                
+        plugin_1 = self.reload(plugin_1)
+        plugin_3.parent = plugin_1
+        plugin_3.save()
+        
+        # plugin_2 & plugin_3 should be plugin_1's children
+        # for multiple items we use assertSequenceEqual, because
+        # assertItemsEqual may re-order the list without warning
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=1).get_children(), 
+            [
+                CMSPlugin.objects.get(id=2),
+                CMSPlugin.objects.get(id=3),
+            ])
+        
+        # child of plugin_2
+        plugin_4 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"04",
+            )                                                 
+        plugin_2 = self.reload(plugin_2)
+        plugin_4.parent = plugin_2
+        plugin_4.save()
+        
+        # plugin_4 should be plugin_2's child
+        self.assertItemsEqual(
+            CMSPlugin.objects.get(id=2).get_children(), 
+            [CMSPlugin.objects.get(id=4)])
+        
+        # 2,3 & 4 should be descendants of 1
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=1).get_descendants(), 
+            [
+                # note tree_id ordering of MPTT reflected here:
+                CMSPlugin.objects.get(id=2),
+                CMSPlugin.objects.get(id=4),
+                CMSPlugin.objects.get(id=3),
+            ],
+            )
+
+        # create a second root plugin
+        plugin_5 = add_plugin(placeholder, u"TextPlugin", u"en",
+            # force this to first-child, to make the tree more challenging
+            position='first-child',   
+            body=u"05",
+            )                                                    
+        plugin_5.save()
+        
+        # child of plugin_5
+        plugin_6 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"06",
+            )                                                
+        plugin_5 = self.reload(plugin_5)
+        plugin_6.parent = plugin_5
+        plugin_6.save()
+        
+        # plugin_6 should be plugin_5's child
+        self.assertItemsEqual(
+            CMSPlugin.objects.get(id=5).get_children(), 
+            [CMSPlugin.objects.get(id=6)]) 
+            
+        # child of plugin_6
+        plugin_7 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"07",
+            )                                                 
+        plugin_5 = self.reload(plugin_5)
+        plugin_7.parent = plugin_5
+        plugin_7.save()
+            
+        # plugin_7 should be plugin_5's child
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=5).get_children(), 
+            [
+                CMSPlugin.objects.get(id=6),
+                CMSPlugin.objects.get(id=7)
+            ])    
+        
+        # 6 & 7 should be descendants of 5
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=5).get_descendants(), 
+            [
+                CMSPlugin.objects.get(id=6),
+                CMSPlugin.objects.get(id=7),
+            ])
+            
+        # another child of plugin_2
+        plugin_8 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"08",
+            )                                                 
+        plugin_2 = self.reload(plugin_2)
+        plugin_8.parent = plugin_2
+        plugin_8.save()
+        
+        # plugin_4 should be plugin_2's child
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=2).get_children(), 
+            [
+                CMSPlugin.objects.get(id=4),
+                CMSPlugin.objects.get(id=8),
+            ])
+        
+        # child of plugin_3
+        plugin_9 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"09",
+            )                                                
+        plugin_3 = self.reload(plugin_3)
+        plugin_9.parent = plugin_3
+        plugin_9.save()
+        
+        # plugin_9 should be plugin_3's child
+        self.assertItemsEqual(
+            CMSPlugin.objects.get(id=3).get_children(), 
+            [CMSPlugin.objects.get(id=9)]) 
+            
+        # child of plugin_4
+        plugin_10 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"10",
+            )                                                
+        plugin_4 = self.reload(plugin_4)
+        plugin_10.parent = plugin_4
+        plugin_10.save()
+        
+        # plugin_10 should be plugin_4's child
+        self.assertItemsEqual(
+            CMSPlugin.objects.get(id=4).get_children(), 
+            [CMSPlugin.objects.get(id=10)])               
+            
+        original_plugins = placeholder.get_plugins()
+        self.assertEquals(original_plugins.count(), 10)
+            
+        # elder sibling of plugin_1
+        plugin_1 = self.reload(plugin_1)
+        plugin_11 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"11",
+            target=plugin_1,
+            position="left"
+            )                                                
+        plugin_11.save()
+        
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=1).get_children(), 
+            [
+                CMSPlugin.objects.get(id=2),
+                CMSPlugin.objects.get(id=3)
+            ])    
+        
+        # elder sibling of plugin_4
+        plugin_4 = self.reload(plugin_4)
+        plugin_12 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"12",
+            target=plugin_4,
+            position="left"
+            )                                                
+        plugin_12.save()
+        
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=2).get_children(), 
+            [
+                CMSPlugin.objects.get(id=12),
+                CMSPlugin.objects.get(id=4),
+                CMSPlugin.objects.get(id=8)
+            ])    
+
+        # younger sibling of plugin_7
+        plugin_7 = self.reload(plugin_7)
+        plugin_13 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"13",
+            target=plugin_7,
+            position="right"
+            )                                                
+        plugin_13.save()
+        
+        self.assertSequenceEqual(
+            CMSPlugin.objects.get(id=5).get_children(), 
+            [
+                CMSPlugin.objects.get(id=6),
+                CMSPlugin.objects.get(id=7),
+                CMSPlugin.objects.get(id=13)
+            ])                
+        
+        # new sibling of plugin_5
+        plugin_5 = self.reload(plugin_5)
+        plugin_14 = add_plugin(placeholder, u"TextPlugin", u"en",
+            body=u"14"                
+            )                                                
+        plugin_14.save()
+        
+        self.assertSequenceEqual(
+            CMSPlugin.objects.filter(level=0), 
+            [
+                CMSPlugin.objects.get(id=11),
+                CMSPlugin.objects.get(id=1),
+                CMSPlugin.objects.get(id=5),
+                CMSPlugin.objects.get(id=14)
+            ])                
+        self.assertEquals(CMSPlugin.objects.get(id=11).tree_id, 1)
+        self.copy_placeholders_and_check_results([placeholder])
+
+        # now let's move plugins around in the tree
+        
+        # move plugin_2 before plugin_11
+        plugin_2 = self.reload(plugin_2)
+        plugin_2.move_to(target=plugin_1, position="left")               
+        plugin_2.save()
+        self.assertEquals(CMSPlugin.objects.get(id=2).tree_id, 1)
+        self.copy_placeholders_and_check_results([placeholder])
+        
+        # move plugin_6 after plugin_7
+        plugin_6 = self.reload(plugin_6)
+        plugin_7 = self.reload(plugin_7)
+        plugin_6.move_to(target=plugin_7, position="right")   
+        plugin_6.save()
+        self.copy_placeholders_and_check_results([placeholder])
+                       
+        # move plugin_3 before plugin_2
+        plugin_2 = self.reload(plugin_2)
+        plugin_3 = self.reload(plugin_3)
+        plugin_3.move_to(target=plugin_2, position="left")   
+        plugin_3.save()
+        self.copy_placeholders_and_check_results([placeholder])
+            
+        # make plugin_3 plugin_2's first-child
+        plugin_2 = self.reload(plugin_2)
+        plugin_3 = self.reload(plugin_3)
+        plugin_3.move_to(target=plugin_2, position="first-child")   
+        plugin_3.save()
+        self.copy_placeholders_and_check_results([placeholder])
+            
+        # make plugin_7 plugin_2's first-child
+        plugin_2 = self.reload(plugin_2)
+        plugin_7 = self.reload(plugin_7)
+        plugin_7.move_to(target=plugin_3, position="right")   
+        plugin_7.save()
+        self.copy_placeholders_and_check_results([placeholder,])
+
+
     def test_nested_plugin_on_page(self):
         """
         Validate a textplugin with a nested link plugin
@@ -26,9 +432,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                                position=u"last-child", published=True, in_navigation=True)
             page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
             
-            ###
             # add a plugin
-            ###
             pre_nesting_body = u"<p>the nested text plugin with a link inside</p>"
             text_plugin = add_plugin(page_one_ph_two, u"TextPlugin", u"en", body=pre_nesting_body)
             # prepare nestin plugin
@@ -69,9 +473,11 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # none of the descendants should have a placeholder other then my own one
             self.assertEquals(text_plugin.get_descendants().exclude(placeholder=text_plugin.placeholder).count(), 0)
             post_add_plugin_count = CMSPlugin.objects.count()
-            self.assertEqual(post_add_plugin_count, 2)
+            self.assertEqual(post_add_plugin_count, 2)  
+
+
             
-    
+            
     
     def test_copy_page_nested_plugin(self):
         """
@@ -87,7 +493,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             templates = []
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
-                               position=u"last-child", published=True, in_navigation=True)
+                position=u"last-child", published=True, in_navigation=True)
             page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
             page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
             page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
@@ -273,7 +679,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             ok = ((org_placeholder.id != copied_placeholder.id))
             self.assertTrue(ok, msg)
 
-     
+
     def test_copy_page_nested_plugin_moved_parent_plugin(self):
         """
         Test to verify that page copy with a nested plugin works
