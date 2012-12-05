@@ -75,7 +75,7 @@ def get_public_languages(site_id=None):
     """
     languages = []
     for language in get_language_objects(site_id):
-        if language["public"]:
+        if language.get("public", True):
             languages.append(language['code'])
     return languages
 
@@ -98,7 +98,7 @@ def get_language_objects(site_id=None):
     return list(get_languages(site_id))
 
 
-def get_default_language(language_code=None):
+def get_default_language(language_code=None, site_id=None):
     """
     Returns default language depending on settings.LANGUAGE_CODE merged with
     best match from settings.CMS_LANGUAGES
@@ -109,7 +109,7 @@ def get_default_language(language_code=None):
     if not language_code:
         language_code = settings.LANGUAGE_CODE
 
-    languages = get_language_list()
+    languages = get_language_list(site_id)
 
     # first try if there is an exact language
     if language_code in languages:

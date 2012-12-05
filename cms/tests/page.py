@@ -536,6 +536,7 @@ class PagesTestCase(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en", slug="page",
                            published=True, parent=root)
         root.publish()
+        page = page.reload()
         page.publish()
         request = self.get_request('/en/page')
         found_page = get_page_from_request(request)
@@ -704,13 +705,13 @@ class PagesTestCase(CMSTestCase):
     def test_valid_url_multisite(self):
         site1 = Site.objects.get_current()
         site3 = Site.objects.create(domain="sample3.com", name="sample3.com")
-        home = create_page('home', 'nav_playground.html', 'en', published=True, site=site1)
-        bar = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home, site=site1)
-        home_s3= create_page('home', 'nav_playground.html', 'en', published=True, site=site3)
-        bar_s3 = create_page('bar', 'nav_playground.html', 'en', slug="bar", published=True, parent=home_s3, site=site3)
+        home = create_page('home', 'nav_playground.html', 'de', published=True, site=site1)
+        bar = create_page('bar', 'nav_playground.html', 'de', slug="bar", published=True, parent=home, site=site1)
+        home_s3= create_page('home', 'nav_playground.html', 'de', published=True, site=site3)
+        bar_s3 = create_page('bar', 'nav_playground.html', 'de', slug="bar", published=True, parent=home_s3, site=site3)
 
-        self.assertTrue(is_valid_url(bar.get_absolute_url('en'), bar))
-        self.assertTrue(is_valid_url(bar_s3.get_absolute_url('en'), bar_s3))
+        self.assertTrue(is_valid_url(bar.get_absolute_url('de'), bar))
+        self.assertTrue(is_valid_url(bar_s3.get_absolute_url('de'), bar_s3))
 
     def test_home_slug_not_accessible(self):
         with SettingsOverride(CMS_PERMISSION=False):
@@ -794,9 +795,9 @@ class PreviousFilteredSiblingsTests(CMSTestCase):
     def test_multisite(self):
         firstsite = Site.objects.create(name='first', domain='first.com')
         secondsite = Site.objects.create(name='second', domain='second.com')
-        home = create_page('home', 'nav_playground.html', 'en', published=True, site=firstsite)
+        home = create_page('home', 'nav_playground.html', 'de', site=firstsite)
         home.publish()
-        other = create_page('other', 'nav_playground.html', 'en', published=True, site=secondsite)
+        other = create_page('other', 'nav_playground.html', 'de', site=secondsite)
         other.publish()
         other = Page.objects.get(pk=other.pk)
         home = Page.objects.get(pk=home.pk)
