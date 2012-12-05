@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
-from cms.conf.patch import post_patch, post_patch_check
+from cms import constants
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.core.exceptions import ImproperlyConfigured
@@ -18,7 +17,7 @@ class SettingsTests(CMSTestCase):
             (),
 
             # don't allow length of 1 if the only value is the magic inheritance
-            ((CMS_TEMPLATE_INHERITANCE_MAGIC, None),),
+            ((constants.TEMPLATE_INHERITANCE_MAGIC, None),),
         )
         for value_to_test in improperly_configured_template_tests:
             with SettingsOverride(DEBUG=True, CMS_TEMPLATES=value_to_test):
@@ -68,11 +67,11 @@ class SettingsTests(CMSTestCase):
             (('col_two.html', 'two columns'),
              ('col_three.html', 'three columns'),
              ('nav_playground.html', 'navigation examples'),
-             (CMS_TEMPLATE_INHERITANCE_MAGIC, None),),
+             (constants.TEMPLATE_INHERITANCE_MAGIC, None),),
 
             # same valid templates as above, ensuring we don't short circuit when inheritance
             # magic comes first.
-            ((CMS_TEMPLATE_INHERITANCE_MAGIC, None),
+            ((constants.TEMPLATE_INHERITANCE_MAGIC, None),
              ('col_two.html', 'two columns'),
              ('col_three.html', 'three columns'),
              ('nav_playground.html', 'navigation examples'),),

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.api import create_page, publish_page, add_plugin
-from cms.conf.patch import post_patch_check
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
@@ -935,14 +934,6 @@ class PluginsMetaOptionsTests(TestCase):
         plugin = TestPlugin5()
         self.assertEqual(plugin._meta.db_table, 'or_another')
         self.assertEqual(plugin._meta.app_label, 'one_thing')
-
-class SekizaiTests(TestCase):
-    def test_post_patch_check(self):
-        post_patch_check()
-
-    def test_fail(self):
-        with SettingsOverride(CMS_TEMPLATES=[('fail.html', 'fail')]):
-            self.assertRaises(ImproperlyConfigured, post_patch_check)
 
 
 class LinkPluginTestCase(PluginsTestBaseCase):

@@ -7,6 +7,7 @@ from cms.templatetags.cms_tags import (get_site_id, _get_page_by_untyped_arg,
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils import get_setting
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -161,7 +162,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         page_3 = create_page('Page 3', 'nav_playground.html', 'en',  page_2, published=True,
                              in_navigation=True, reverse_id='page3')
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
-        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings = copy.deepcopy(get_setting('LANGUAGES'))
         lang_settings[1][1]['hide_untranslated'] = False
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())

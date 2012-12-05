@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from cms import constants
 import os.path
 
 from django.conf import settings
@@ -24,7 +25,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
-from cms.utils import timezone
+from cms.utils import timezone, get_setting
 from cms.utils.page import is_valid_page_slug
 
 class PagesTestCase(CMSTestCase):
@@ -348,7 +349,7 @@ class PagesTestCase(CMSTestCase):
         
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
-        child = create_page("Child", settings.CMS_TEMPLATE_INHERITANCE_MAGIC,
+        child = create_page("Child", constants.TEMPLATE_INHERITANCE_MAGIC,
                             "en", parent=parent)
         self.assertEqual(child.get_template(), parent.get_template())
         child.move_page(parent, 'left')
@@ -420,7 +421,7 @@ class PagesTestCase(CMSTestCase):
         page_data = self.get_new_page_data()
         page_data['site'] = site.pk
         page_data['title'] = 'changed title'
-        TESTLANG = settings.CMS_LANGUAGES[site.pk][0]['code']
+        TESTLANG = get_setting('LANGUAGES')[site.pk][0]['code']
         page_data['language'] = TESTLANG
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -438,26 +439,26 @@ class PagesTestCase(CMSTestCase):
         parent = create_page("parent", "nav_playground.html", "en")
         child = create_page("child", "nav_playground.html", "en", parent=parent)
         grand_child = create_page("child", "nav_playground.html", "en", parent=child)
-        child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
-        grand_child.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        child.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child.template = constants.TEMPLATE_INHERITANCE_MAGIC
         child.save()
         grand_child.save()
 
         # kill template cache
         delattr(grand_child, '_template_cache')
         with self.assertNumQueries(1):
-            self.assertEqual(child.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
+            self.assertEqual(child.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child.get_template()
 
-        parent.template = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+        parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
         parent.save()
-        self.assertEqual(parent.template, settings.CMS_TEMPLATE_INHERITANCE_MAGIC)
-        self.assertEqual(parent.get_template(), settings.CMS_TEMPLATES[0][0])
-        self.assertEqual(parent.get_template_name(), settings.CMS_TEMPLATES[0][1])
+        self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        self.assertEqual(parent.get_template(), get_setting('TEMPLATES')[0][0])
+        self.assertEqual(parent.get_template_name(), get_setting('TEMPLATES')[0][1])
         
     def test_delete_with_plugins(self):
         """

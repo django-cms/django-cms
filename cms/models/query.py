@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from cms.utils.conf import get_setting
 from django.db.models import Q
 from django.contrib.sites.models import Site
 from cms.publisher.query import PublisherQuerySet
@@ -50,13 +51,13 @@ class PageQuerySet(PublisherQuerySet):
     def published(self, site=None):
         pub = self.on_site(site).filter(published=True)
 
-        if settings.CMS_SHOW_START_DATE:
+        if get_setting('SHOW_START_DATE'):
             pub = pub.filter(
                 Q(publication_date__lt=timezone.now()) |
                 Q(publication_date__isnull=True)
             )
 
-        if settings.CMS_SHOW_END_DATE:
+        if get_setting('SHOW_END_DATE'):
             pub = pub.filter(
                 Q(publication_end_date__gte=timezone.now()) |
                 Q(publication_end_date__isnull=True)

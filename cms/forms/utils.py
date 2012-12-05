@@ -3,6 +3,7 @@ from cms.models import Page
 from cms.models.titlemodels import Title
 from cms.utils import i18n
 from collections import defaultdict
+from cms.utils.conf import get_setting
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -74,10 +75,10 @@ def _get_key(prefix, lang):
     return "%s-%s" % (prefix, lang)
 
 def get_site_cache_key(lang):
-    return _get_key(settings.CMS_SITE_CHOICES_CACHE_KEY, lang)
+    return _get_key(get_setting('SITE_CHOICES_CACHE_KEY'), lang)
 
 def get_page_cache_key(lang):
-    return _get_key(settings.CMS_PAGE_CHOICES_CACHE_KEY, lang)
+    return _get_key(get_setting('PAGE_CHOICES_CACHE_KEY'), lang)
 
 def _clean_many(prefix):
     keys = []
@@ -86,10 +87,10 @@ def _clean_many(prefix):
     cache.delete_many(keys)
 
 def clean_site_choices_cache(sender, **kwargs):
-    _clean_many(settings.CMS_SITE_CHOICES_CACHE_KEY)
+    _clean_many(get_setting('SITE_CHOICES_CACHE_KEY'))
 
 def clean_page_choices_cache(sender, **kwargs):
-    _clean_many(settings.CMS_PAGE_CHOICES_CACHE_KEY)
+    _clean_many(get_setting('PAGE_CHOICES_CACHE_KEY'))
 
 post_save.connect(clean_page_choices_cache, sender=Page)
 post_save.connect(clean_site_choices_cache, sender=Site)

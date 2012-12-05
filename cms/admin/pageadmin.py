@@ -2,6 +2,7 @@
 from copy import deepcopy
 from distutils.version import LooseVersion
 from urllib2 import unquote
+from cms.utils.conf import get_setting
 
 import django
 from django.conf import settings
@@ -73,7 +74,7 @@ if DJANGO_1_3:
 
 
 def contribute_fieldsets(cls):
-    if settings.CMS_MENU_TITLE_OVERWRITE:
+    if get_setting('MENU_TITLE_OVERWRITE'):
         general_fields = [('title', 'menu_title')]
     else:
         general_fields = ['title']
@@ -83,19 +84,19 @@ def contribute_fieldsets(cls):
     template_fields = ['template']
     hidden_fields = ['site', 'parent']
     seo_fields = []
-    if settings.CMS_SOFTROOT:
+    if get_setting('SOFTROOT'):
         advanced_fields.append('soft_root')
-    if settings.CMS_SHOW_START_DATE and settings.CMS_SHOW_END_DATE:
+    if get_setting('SHOW_START_DATE') and get_setting('SHOW_END_DATE'):
         general_fields.append(('publication_date', 'publication_end_date'))
-    elif settings.CMS_SHOW_START_DATE:
+    elif get_setting('SHOW_START_DATE'):
         general_fields.append('publication_date')
-    elif settings.CMS_SHOW_END_DATE:
+    elif get_setting('SHOW_END_DATE'):
         general_fields.append('publication_end_date')
-    if settings.CMS_SEO_FIELDS:
+    if get_setting('SEO_FIELDS'):
         seo_fields = ['page_title', 'meta_description', 'meta_keywords']
-    if not settings.CMS_URL_OVERWRITE:
+    if not get_setting('URL_OVERWRITE'):
         advanced_fields.remove("overwrite_url")
-    if not settings.CMS_REDIRECTS:
+    if not get_setting('REDIRECTS'):
         advanced_fields.remove('redirect')
     if menu_pool.get_menus_by_attribute("cms_enabled", True):
         advanced_fields.append("navigation_extenders")
@@ -122,7 +123,7 @@ def contribute_fieldsets(cls):
         }),
     ]
 
-    if settings.CMS_SEO_FIELDS:
+    if get_setting('SEO_FIELDS'):
         fieldsets.append((_("SEO Settings"), {
                           'fields': seo_fields,
                           'classes': ('collapse',),
@@ -138,7 +139,7 @@ def contribute_fieldsets(cls):
 
 def contribute_list_filter(cls):
     list_filter = ['published', 'in_navigation', 'template', 'changed_by']
-    if settings.CMS_SOFTROOT:
+    if get_setting('SOFTROOT'):
         list_filter.append('soft_root')
     setattr(cls, 'list_filter', list_filter)
 
@@ -303,7 +304,7 @@ class PageAdmin(ModelAdmin):
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
                 given_fieldsets.append(advanced)
-            if settings.CMS_SEO_FIELDS:
+            if get_setting('SEO_FIELDS'):
                 seo = given_fieldsets.pop(3)
                 given_fieldsets.append(seo)
         else: # new page
@@ -329,7 +330,7 @@ class PageAdmin(ModelAdmin):
             elif 'published' in self.exclude:
                 self.exclude.remove('published')
 
-            if not settings.CMS_SOFTROOT and 'soft_root' in self.exclude:
+            if not get_setting('SOFTROOT') and 'soft_root' in self.exclude:
                 self.exclude.remove('soft_root')
 
             form = super(PageAdmin, self).get_form(request, obj, **kwargs)
@@ -358,9 +359,9 @@ class PageAdmin(ModelAdmin):
                 form.base_fields['overwrite_url'].initial = title_obj.path
             else:
                 form.base_fields['overwrite_url'].initial = ""
-            if settings.CMS_TEMPLATES:
+            if get_setting('TEMPLATES'):
                 selected_template = get_template_from_request(request, obj)
-                template_choices = list(settings.CMS_TEMPLATES)
+                template_choices = list(get_setting('TEMPLATES'))
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(selected_template)
 
@@ -439,7 +440,7 @@ class PageAdmin(ModelAdmin):
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
-            form.base_fields['template'].initial = settings.CMS_TEMPLATES[0][0]
+            form.base_fields['template'].initial = get_setting('TEMPLATES')[0][0]
 
         return form
 
@@ -449,7 +450,7 @@ class PageAdmin(ModelAdmin):
             inlines = self.get_inline_instances(request) if hasattr(self, 'get_inline_instances') \
                       else self.inline_instances
             for inline in inlines:
-                if settings.CMS_PERMISSION and isinstance(inline, PagePermissionInlineAdmin) and not isinstance(inline, ViewRestrictionInlineAdmin):
+                if get_setting('PERMISSION') and isinstance(inline, PagePermissionInlineAdmin) and not isinstance(inline, ViewRestrictionInlineAdmin):
                     if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
                         continue
                     if obj and not obj.has_change_permissions_permission(request):
@@ -487,7 +488,7 @@ class PageAdmin(ModelAdmin):
             context = {
                 'placeholders': self.get_fieldset_placeholders(selected_template),
                 'page': obj,
-                'CMS_PERMISSION': settings.CMS_PERMISSION,
+                'CMS_PERMISSION': get_setting('PERMISSION'),
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'can_change': obj.has_change_permission(request),
                 'can_change_permissions': obj.has_change_permissions_permission(request),
@@ -549,7 +550,7 @@ class PageAdmin(ModelAdmin):
         """
         Return true if the current user has permission to add a new page.
         """
-        if settings.CMS_PERMISSION:
+        if get_setting('PERMISSION'):
             return permissions.has_page_add_permission(request)
         return super(PageAdmin, self).has_add_permission(request)
 
@@ -558,7 +559,7 @@ class PageAdmin(ModelAdmin):
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        if settings.CMS_PERMISSION:
+        if get_setting('PERMISSION'):
             if obj:
                 return obj.has_change_permission(request)
             else:
@@ -571,7 +572,7 @@ class PageAdmin(ModelAdmin):
         Django model instance. If CMS_PERMISSION are in use also takes look to
         object permissions.
         """
-        if settings.CMS_PERMISSION and obj is not None:
+        if get_setting('PERMISSION') and obj is not None:
             return obj.has_delete_permission(request)
         return super(PageAdmin, self).has_delete_permission(request, obj)
 
@@ -640,10 +641,10 @@ class PageAdmin(ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': reverse('admin:index'),
             'app_label': app_label,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
-            'CMS_SHOW_END_DATE': settings.CMS_SHOW_END_DATE,
-            'softroot': settings.CMS_SOFTROOT,
-            'CMS_PERMISSION': settings.CMS_PERMISSION,
+            'CMS_MEDIA_URL': get_setting('MEDIA_URL'),
+            'CMS_SHOW_END_DATE': get_setting('SHOW_END_DATE'),
+            'softroot': get_setting('SOFTROOT'),
+            'CMS_PERMISSION': get_setting('PERMISSION'),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
             'open_menu_trees': open_menu_trees,
@@ -708,7 +709,7 @@ class PageAdmin(ModelAdmin):
             return HttpResponseForbidden(_("You do not have permission to change the template"))
 
         to_template = request.POST.get("template", None)
-        if to_template not in dict(settings.CMS_TEMPLATES):
+        if to_template not in dict(get_setting('TEMPLATES')):
             return HttpResponseBadRequest(_("Template not valid"))
 
         page.template = to_template
@@ -1266,7 +1267,7 @@ class PageAdmin(ModelAdmin):
         if request.POST.get("_cancel", False):
             # cancel button was clicked
             context = {
-                'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+                'CMS_MEDIA_URL': get_setting('MEDIA_URL'),
                 'plugin': cms_plugin,
                 'is_popup': True,
                 'name': unicode(cms_plugin),
@@ -1313,7 +1314,7 @@ class PageAdmin(ModelAdmin):
             saved_object = plugin_admin.saved_object
 
             context = {
-                'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+                'CMS_MEDIA_URL': get_setting('MEDIA_URL'),
                 'plugin': saved_object,
                 'is_popup': True,
                 'name': unicode(saved_object),

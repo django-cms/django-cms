@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from cms import constants
+from cms.utils.conf import get_setting
 from django.core.exceptions import PermissionDenied
 from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
@@ -38,7 +40,7 @@ class Page(MPTTModel):
     # Page was marked published, but some of page parents are not.
     PUBLISHER_STATE_PENDING = 4
 
-    template_choices = [(x, _(y)) for x, y in settings.CMS_TEMPLATES]
+    template_choices = [(x, _(y)) for x, y in get_setting('TEMPLATES')]
 
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
     changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
@@ -123,7 +125,7 @@ class Page(MPTTModel):
         # and moving to a top level position
         if (position in ('left', 'right')
             and not target.parent
-            and self.template == settings.CMS_TEMPLATE_INHERITANCE_MAGIC):
+            and self.template == constants.TEMPLATE_INHERITANCE_MAGIC):
             self.template = self.get_template()
         self.move_to(target, position)
 
@@ -286,7 +288,7 @@ class Page(MPTTModel):
                 page.save()
 
             # copy permissions if necessary
-            if settings.CMS_PERMISSION and copy_permissions:
+            if get_setting('PERMISSION') and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
                 for permission in PagePermission.objects.filter(page__id=origin_id):
                     permission.pk = None
@@ -747,27 +749,27 @@ class Page(MPTTModel):
             return self._template_cache
         template = None
         if self.template:
-            if self.template != settings.CMS_TEMPLATE_INHERITANCE_MAGIC:
+            if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
                 template = self.template
             else:
                 try:
                     template = self.get_ancestors(ascending=True).exclude(
-                        template=settings.CMS_TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
+                        template=constants.TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
                 except IndexError:
                     pass
         if not template:
-            template = settings.CMS_TEMPLATES[0][0]
+            template = get_setting('TEMPLATES')[0][0]
         self._template_cache = template
         return template
 
     def get_template_name(self):
         """
-        get the textual name (2nd parameter in settings.CMS_TEMPLATES)
+        get the textual name (2nd parameter in get_setting('TEMPLATES'))
         of the template of this page or of the nearest
         ancestor. failing to find that, return the name of the default template.
         """
         template = self.get_template()
-        for t in settings.CMS_TEMPLATES:
+        for t in get_setting('TEMPLATES'):
             if t[0] == template:
                 return t[1]
         return _("default")
@@ -794,8 +796,8 @@ class Page(MPTTModel):
                 return True
 
             elif not is_restricted:
-                if ((settings.CMS_PUBLIC_FOR == 'all') or
-                    (settings.CMS_PUBLIC_FOR == 'staff' and
+                if ((get_setting('PUBLIC_FOR') == 'all') or
+                    (get_setting('PUBLIC_FOR') == 'staff' and
                      request.user.is_staff)):
                     return True
 
@@ -809,7 +811,7 @@ class Page(MPTTModel):
 
         else:
             #anonymous user
-            if is_restricted or not settings.CMS_PUBLIC_FOR == 'all':
+            if is_restricted or not get_setting('PUBLIC_FOR') == 'all':
                 # anyonymous user, page has restriction and global access is permitted
                 return False
             else:
@@ -912,7 +914,7 @@ class Page(MPTTModel):
 
         This location can be customised using the CMS_PAGE_MEDIA_PATH setting
         """
-        return join(settings.CMS_PAGE_MEDIA_PATH, "%d" % self.id, filename)
+        return join(get_setting('PAGE_MEDIA_PATH'), "%d" % self.id, filename)
 
     def last_page_states(self):
         """Returns last five page states, if they exist, optimized, calls sql

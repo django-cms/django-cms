@@ -22,7 +22,7 @@ class TinyMCEEditor(TinyMCE):
         context = {
             'name': name,
             'language': language,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'CMS_MEDIA_URL': get_setting('MEDIA_URL'),
             'installed_plugins': self.installed_plugins,
         }
         return mark_safe(render_to_string(

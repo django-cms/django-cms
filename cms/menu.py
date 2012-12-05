@@ -6,6 +6,7 @@ from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
+from cms.utils.conf import get_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset
@@ -27,8 +28,9 @@ def get_visible_pages(request, pages, site=None):
      check if there is ANY restriction
      that needs a permission page visibility calculation
     """
-    is_setting_public_all = settings.CMS_PUBLIC_FOR == 'all'
-    is_setting_public_staff = settings.CMS_PUBLIC_FOR == 'staff'
+    public_for = get_setting('PUBLIC_FOR')
+    is_setting_public_all = public_for == 'all'
+    is_setting_public_staff = public_for == 'staff'
     is_auth_user = request.user.is_authenticated()
     
     visible_page_ids = []
@@ -410,7 +412,7 @@ class SoftRootCutter(Modifier):
     """
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
-        if post_cut or not settings.CMS_SOFTROOT:
+        if post_cut or not get_setting('SOFTROOT'):
             return nodes
         selected = None
         root_nodes = []

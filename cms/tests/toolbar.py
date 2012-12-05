@@ -5,6 +5,7 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
     GetButton)
+from cms.utils import get_setting
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission
 from django.core.urlresolvers import reverse
@@ -197,9 +198,9 @@ class ToolbarTests(ToolbarTestBase):
         # check templates
         templates = items[2]
         self.assertIsInstance(templates, List)
-        self.assertEqual(len(templates.raw_items), len(settings.CMS_TEMPLATES))
+        self.assertEqual(len(templates.raw_items), len(get_setting('TEMPLATES')))
         base = reverse('admin:cms_page_change_template', args=(page.pk,))
-        for item, template in zip(templates.raw_items, settings.CMS_TEMPLATES):
+        for item, template in zip(templates.raw_items, get_setting('TEMPLATES')):
             self.assertEqual(item.url, '%s?template=%s' % (base, template[0]))
 
         # check page menu
