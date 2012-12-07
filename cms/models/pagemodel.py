@@ -413,7 +413,7 @@ class Page(MPTTModel):
             new_public = self.copy_page(target=None, site=self.site,
                                         position=None,
                                         copy_permissions=False, public_copy=True)
-
+            new_public = new_public
             # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
             # insert_at() was maybe calling _create_tree_space() method, in this
             # case may tree_id change, so we must update tree_id from db first
@@ -453,7 +453,7 @@ class Page(MPTTModel):
         if old_public:
             # reparent public child pages before delete so they don't get purged as well
             for child_page in old_public.children.order_by('lft'):
-                child_page.move_to(new_public, 'last-child')
+                child_page.move_to(new_public.reload(), 'last-child')
                 child_page.save()
             # reload old_public to get correct tree attrs
             old_public = Page.objects.get(pk=old_public.pk)
