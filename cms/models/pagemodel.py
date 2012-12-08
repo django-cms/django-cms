@@ -161,7 +161,7 @@ class Page(MPTTModel):
         # copy the placeholders (and plugins on those placeholders!)
         CMSPlugin.objects.filter(placeholder__page=target).delete()
         for ph in self.placeholders.all():
-            plugins = list(ph.cmsplugin_set.all().order_by('tree_id', '-rght'))
+            plugins = ph.get_plugins_list()
             try:
                 ph = target.placeholders.get(slot=ph.slot)
             except Placeholder.DoesNotExist:
@@ -193,11 +193,12 @@ class Page(MPTTModel):
         Copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
 
-        Note: public_copy was added in order to enable the creation of a copy for creating the public page during
-        the publish operation as it sets the publisher_is_draft=False.
+        Note: public_copy was added in order to enable the creation of a copy
+        for creating the public page during the publish operation as it sets the
+        publisher_is_draft=False.
 
-        Note for issue #1166: when copying pages there is no need to check for conflicting
-        URLs as pages are copied unpublished.
+        Note for issue #1166: when copying pages there is no need to check for
+        conflicting URLs as pages are copied unpublished.
         """
         from cms.utils.moderator import update_moderation_message
 
@@ -310,7 +311,7 @@ class Page(MPTTModel):
 
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
-                plugins = list(ph.cmsplugin_set.all().order_by('tree_id', '-rght'))
+                plugins = ph.get_plugins_list()
                 try:
                     ph = page.placeholders.get(slot=ph.slot)
                 except Placeholder.DoesNotExist:

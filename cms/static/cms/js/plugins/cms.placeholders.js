@@ -110,7 +110,7 @@ CMS.$(document).ready(function ($) {
 			// for that we create an iframe with the specific url
 			var iframe = $('<iframe />', {
 				'id': 'cms_placeholder-iframe',
-				'src': url + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
+				'src': url + placeholder_id + '/edit-plugin/' + plugin_id + '/?popup=true&no_preview',
 				'style': 'width:100%; height:0; border:none; overflow:auto;',
 				'allowtransparency': true,
 				'scrollbars': 'no',

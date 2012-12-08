@@ -322,7 +322,7 @@ class LanguageChooser(InclusionTag):
         site = Site.objects.get_current()
         languages = []
         for lang in get_language_objects(site.pk):
-            if lang['public']:
+            if lang.get('public', True):
                 languages.append((lang['code'], marker(lang['name'], lang['code'])))
         context.update({
             'languages':languages,
