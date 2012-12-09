@@ -111,7 +111,7 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
             hooks = apphook_pool.get_apphooks()
             app_names = [hook[0] for hook in hooks]
-            self.assertEqual(len(hooks), 2)
+            self.assertEqual(len(hooks), 3)
             self.assertIn(NS_APP_NAME, app_names)
             self.assertIn(APP_NAME, app_names)
             apphook_pool.clear()
@@ -325,6 +325,22 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/home.html')
             self.assertContains(response, 'my_params: is-my-param-really-in-the-context-QUESTIONMARK')
+
+    def test_multiple_apphooks(self):
+        # test for #1538
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.third_urls_for_apphook_tests'):
+            apphook_pool.clear()
+            superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+            home_page = create_page("home", "nav_playground.html", "en", created_by=superuser, published=True,)
+            apphook1_page = create_page("apphook1-page", "nav_playground.html", "en",
+                created_by=superuser, published=True, apphook="SampleApp")
+            apphook2_page = create_page("apphook2-page", "nav_playground.html", "en",
+                created_by=superuser, published=True, apphook="SampleApp2")
+
+            reverse('sample-root')
+            reverse('sample2-root')
+
+            apphook_pool.clear()
 
 
 class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
