@@ -48,8 +48,11 @@ def applications_page_check(request, current_page=None, path=None):
     return None
 
 class AppRegexURLResolver(RegexURLResolver):
-    page_id = None
-    url_patterns_dict = {}
+
+    def __init__(self, *args, **kwargs):
+        self.page_id = None
+        self.url_patterns_dict = {}
+        super(AppRegexURLResolver, self).__init__(*args, **kwargs)
 
     @property
     def url_patterns(self):
