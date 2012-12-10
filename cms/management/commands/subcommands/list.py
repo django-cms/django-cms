@@ -17,9 +17,12 @@ class ListPluginsCommand(NoArgsCommand):
 
     help = 'Lists all plugins in CMSPlugin'
     def handle_noargs(self, **options):
-        plugins = CMSPlugin.objects.distinct().values_list("plugin_type", flat=True)
+        plugins = set(CMSPlugin.objects.order_by("-plugin_type").values_list(
+            "plugin_type", flat=True)
+            )
         for plugin in plugins:
             self.stdout.write(plugin+'\n')            
+        return plugins
     
 class ListCommand(SubcommandsCommand):
     help = 'List commands'
