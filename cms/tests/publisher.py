@@ -227,15 +227,15 @@ class PublishingTests(TestCase):
         self.assertEqual(len(Page.objects.public().published()), 3)
 
     def test_publish_ordering(self):
-        page = self.create_page('parent', published=True).reload()
-        # All the reloading here is to make sure mptt properties get set up correctly
-        pageA = self.create_page('pageA', parent=page.reload(), published=True)
-        pageC = self.create_page('pageC', parent=page.reload(), published=True)
-        pageB = self.create_page('pageB', parent=page.reload(), published=True)
-        pageB.move_page(pageA.reload(), 'right')
-        pageB.reload().publish()
+        page = self.create_page('parent', published=True)
+        pageA = self.create_page('pageA', parent=page, published=True)
+        pageC = self.create_page('pageC', parent=page, published=True)
+        pageB = self.create_page('pageB', parent=page, published=True)
+        pageB.move_page(pageA, 'right')
+        pageB.publish()
+        # pageC needs reload since B has swapped places with it
         pageC.reload().publish()
-        pageA.reload().publish()
+        pageA.publish()
 
         drafts = Page.objects.drafts().order_by('tree_id', 'lft')
         draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
@@ -250,7 +250,7 @@ class PublishingTests(TestCase):
                            ('pageB', 4, 5),
                            ('pageC', 6, 7)], public_titles)
 
-        page.reload().publish()
+        page.publish()
 
         drafts = Page.objects.drafts().order_by('tree_id', 'lft')
         draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
