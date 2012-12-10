@@ -419,8 +419,10 @@ class Page(MPTTModel):
         self.save()
         # If we are publishing, this page might have become a "home" which
         # would change the path
-        for title in self.title_set.all():
-            title.save()
+        if self.is_home():
+            for title in self.title_set.all():
+                if title.path != '':
+                    title.save()
 
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
