@@ -106,6 +106,8 @@ And at any point in that process, you can add: *discuss discuss discuss*,
 because it's always useful for everyone to pass ideas around and look at thngs
 together.
 
+:ref:`testing` is really important.
+
 We have an IRC channel, our `django-cms-developers`_ email list,
 and of course the code reviews mechanism on GitHub - do use them.
 
