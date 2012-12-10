@@ -433,12 +433,13 @@ class Page(MPTTModel):
 
         # Check if there are some children which are waiting for parents to
         # become published.
-        publish_set = self.get_descendants().filter(published=True)
+        publish_set = self.get_descendants().filter(published=True).select_related('publisher_public')
         for page in publish_set:
             if page.publisher_public:
                 if page.publisher_public.parent.published:
-                    page.publisher_public.published = True
-                    page.publisher_public.save()
+                    if not page.publisher_public.published:
+                        page.publisher_public.published = True
+                        page.publisher_public.save()
                     if page.publisher_state == Page.PUBLISHER_STATE_PENDING:
                         page.publisher_state = Page.PUBLISHER_STATE_DEFAULT
                         page._publisher_keep_state = True
