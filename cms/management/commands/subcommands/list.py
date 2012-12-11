@@ -22,7 +22,6 @@ class ListPluginsCommand(NoArgsCommand):
             )
         for plugin in plugins:
             self.stdout.write(plugin+'\n')            
-        return plugins
     
 class ListCommand(SubcommandsCommand):
     help = 'List commands'
