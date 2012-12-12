@@ -410,8 +410,10 @@ def get_visible_pages(request, pages, site=None):
             return pages
 
     def has_global_perm():
+        if not settings.CMS_PERMISSION:
+            return True
         if has_global_perm.cache < 0:
-            has_global_perm.cache = 1 if request.user.has_perm('cms.view_page') else 0
+            has_global_perm.cache = bool(request.user.has_perm('cms.view_page'))
         return bool(has_global_perm.cache)
     has_global_perm.cache = -1
 
