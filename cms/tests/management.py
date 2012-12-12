@@ -5,6 +5,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.api import create_page, add_plugin
 from cms.management.commands import cms
+from cms.management.commands.subcommands.list import plugin_report
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.models.placeholdermodel import Placeholder
@@ -51,12 +52,21 @@ class ManagementTestCase(CMSTestCase):
         with SettingsOverride(INSTALLED_APPS=apps):
             placeholder = Placeholder.objects.create(slot="test")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
-            self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 1)            
-            command = cms.Command()
-            command.stdout = out
-            command.handle("list", "plugins", interactive=False)
-            self.assertEqual(out.getvalue(), "TextPlugin\n")
-            
+            add_plugin(placeholder, TextPlugin, "en", body="en body")
+            add_plugin(placeholder, "LinkPlugin", "en",
+                name="A Link", url="https://www.django-cms.org")
+            self.assertEqual(
+                CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 
+                2)            
+            self.assertEqual(
+                CMSPlugin.objects.filter(plugin_type="LinkPlugin").count(), 
+                1)            
+            for plugin in plugin_report():                    
+                print plugin
+            # command.stdout = out
+            # command.handle("list", "plugins", interactive=False)
+            # self.assertEqual(out.getvalue(), "LinkPlugin\nTextPlugin\n")
+                        
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
         command = cms.Command()
