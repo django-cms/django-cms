@@ -114,10 +114,10 @@ def has_global_page_permission(request, site=None, **filters):
     :param filters: queryset filters, e.g. ``can_add = True``
     :return: ``True`` or ``False``
     """
-    if request.user.is_superuser:
-        return True
-    if not settings.CMS_PERMISSION or not request.user.is_authenticated():
+    if not request.user.is_authenticated():
         return False
+    if not settings.CMS_PERMISSION or request.user.is_superuser:
+        return True
     if not hasattr(request, '_cms_global_perms'):
         request._cms_global_perms = {}
     key = tuple((k, v) for k, v in filters.iteritems())
@@ -327,15 +327,20 @@ def has_view_permission(request, page):
     elif not request.user.is_authenticated():
         return False
 
-    # a global permission was given to the request's user
-    if has_global_page_permission(request, current_site(request), can_view=True):
-        return True
-
     # Django wide auth perms "can_view" or cms auth perms "can_view"
     opts = page._meta
     codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-    return (request.user.has_perm(codename) or
-            page.get_draft_object().has_generic_permission(request, "view"))
+    if not is_restricted:
+        # a global permission was given to the request's user
+        if has_global_page_permission(request, page.site_id, can_view=True):
+            return True
+    else:
+        # a specific permission was granted to the request's user
+        if page.get_draft_object().has_generic_permission(request, "view"):
+            return True
+
+    # The user has a normal django permission to view pages globally
+    return request.user.has_perm(codename)
 
 
 def load_view_restrictions(request, pages):
