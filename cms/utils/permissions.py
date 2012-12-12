@@ -403,26 +403,23 @@ def get_visible_pages(request, pages, site=None):
         elif not is_auth_user:
             return [] # Unauth user can't acquire global or user perm to see pages
 
-    if is_auth_user and settings.CMS_PERMISSION:
-        if not site:
-            site = current_site(request)
-        if has_global_page_permission(request, site, can_view=True):
-            return pages
+    if settings.CMS_PERMISSION and not site:
+        site = current_site(request) # avoid one extra query when possible
+    if has_global_page_permission(request, site, can_view=True):
+        return pages
 
     def has_global_perm():
-        if not settings.CMS_PERMISSION:
-            return True
         if has_global_perm.cache < 0:
             has_global_perm.cache = bool(request.user.has_perm('cms.view_page'))
         return bool(has_global_perm.cache)
     has_global_perm.cache = -1
 
-    def has_permission_membership(page):
+    def has_permission_membership(page_id):
         """
         PagePermission user group membership tests
         """
         user_pk = request.user.pk
-        for perm in restricted_pages[page.pk]:
+        for perm in restricted_pages[page_id]:
             if perm.user_id == user_pk:
                 return True
             if not perm.group_id:
@@ -437,7 +434,8 @@ def get_visible_pages(request, pages, site=None):
     visible_pages = []
     for page in pages:
         to_add = False
-        is_restricted = page.pk in restricted_pages
+        page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
+        is_restricted = page_id in restricted_pages
         # restricted_pages contains as key any page.pk that is
         # affected by a permission grant_on
         if not is_restricted and can_see_unrestricted:
@@ -445,7 +443,7 @@ def get_visible_pages(request, pages, site=None):
         elif is_auth_user:
             # setting based handling of unrestricted pages
             # check group and user memberships to restricted pages
-            if is_restricted and has_permission_membership(page):
+            if is_restricted and has_permission_membership(page_id):
                 to_add = True
             elif has_global_perm():
                 to_add = True
