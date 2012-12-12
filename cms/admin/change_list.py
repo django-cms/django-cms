@@ -3,7 +3,7 @@ import bisect
 from collections import defaultdict
 from cms.exceptions import NoHomeFound
 from cms.models import Title, Page, PageModeratorState
-from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.permissions import get_user_sites_queryset, load_view_restrictions
 from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
@@ -101,8 +101,7 @@ class CMSChangeList(ChangeList):
         # tree using a stack now)
         pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
         
-        
-        # Get lists of page IDs for which the current user has 
+        # Get lists of page IDs for which the current user has
         # "permission to..." on the current site. 
         perm_edit_ids = Page.permissions.get_change_id_list(request.user, site)
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
@@ -114,6 +113,8 @@ class CMSChangeList(ChangeList):
             #pages = pages.filter(pk__in=perm_change_list_ids)   
 
         root_pages = []
+        # Cache view restrictions for the is_restricted template tag
+        load_view_restrictions(request, pages)
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
         try:

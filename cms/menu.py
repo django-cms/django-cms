@@ -1,160 +1,24 @@
 # -*- coding: utf-8 -*-
-from collections import defaultdict
 from cms.apphook_pool import apphook_pool
-from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
-    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
-from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset
+from cms.utils import permissions
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
 from django.conf import settings
-from django.contrib.sites.models import Site
-from django.db.models.query_utils import Q
 from django.utils.translation import get_language
 
 
 def get_visible_pages(request, pages, site=None):
-    """
-     This code is basically a many-pages-at-once version of
-     Page.has_view_permission.
-     pages contains all published pages
-     check if there is ANY restriction
-     that needs a permission page visibility calculation
-    """
-    is_setting_public_all = settings.CMS_PUBLIC_FOR == 'all'
-    is_setting_public_staff = settings.CMS_PUBLIC_FOR == 'staff'
-    is_auth_user = request.user.is_authenticated()
+    """Returns the IDs of all visible pages"""
+    pages = permissions.get_visible_pages(request, pages, site)
+    return [page.pk for page in pages]
 
-    visible_page_ids = []
-    restricted_pages = defaultdict(list)
-    pages_perms_q = Q()
-
-    for page in pages:
-        # taken from for_page as multiple at once version
-        page_q = Q(page__tree_id=page.tree_id) & (
-            Q(page__level__lte=page.level)
-        )
-        pages_perms_q |= page_q
-        
-    pages_perms_q &= Q(can_view=True)
-    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
-
-    for perm in page_permissions:
-        # collect the pages that are affected by permissions
-        if perm is not None and perm not in restricted_pages[perm.page.pk]:
-            # affective restricted pages gathering
-            # using mptt functions 
-            # add the page with the perm itself
-            if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN ,ACCESS_PAGE_AND_DESCENDANTS]:
-                restricted_pages[perm.page.pk].append(perm)
-                restricted_pages[perm.page.publisher_public_id].append(perm)
-            # add children
-            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]:
-                child_ids = perm.page.get_children().values_list('id', 'publisher_public_id')
-                for id, public_id in child_ids:
-                    restricted_pages[id].append(perm)
-                    restricted_pages[public_id].append(perm)
-            # add descendants
-            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]:
-                child_ids = perm.page.get_descendants().values_list('id', 'publisher_public_id')
-                for id, public_id in child_ids:
-                    restricted_pages[id].append(perm)
-                    restricted_pages[public_id].append(perm)
-
-    # anonymous
-    # no restriction applied at all
-    if (not is_auth_user and
-        is_setting_public_all and 
-        not restricted_pages):
-        return [page.pk for page in pages]
-
-
-    if site is None:
-        site = current_site(request)
-
-    # authenticated user and global permission
-    if is_auth_user:
-        global_page_perm_q = Q(
-            Q(user=request.user) | Q(group__user=request.user)
-        ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
-        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
-
-        #no page perms edge case - all visible
-        if ((is_setting_public_all or (
-            is_setting_public_staff and request.user.is_staff))and 
-            not restricted_pages and
-            not global_view_perms):
-            return [page.pk for page in pages]
-        #no page perms edge case - none visible
-        elif (is_setting_public_staff and 
-            not request.user.is_staff and 
-            not restricted_pages and
-            not global_view_perms):
-            return []
-
-
-    def has_global_perm():
-        if has_global_perm.cache < 0:
-            has_global_perm.cache = 1 if request.user.has_perm('cms.view_page') else 0
-        return bool(has_global_perm.cache)
-    has_global_perm.cache = -1
-
-    def has_permission_membership(page):
-        """
-        PagePermission user group membership tests
-        """
-        user_pk = request.user.pk
-        page_pk = page.pk
-        has_perm = False
-        for perm in restricted_pages[page_pk]:
-            if perm.user_id == user_pk:
-                has_perm = True
-            if not perm.group_id:
-                continue
-            group_user_ids = perm.group.user_set.values_list('pk', flat=True)
-            if user_pk in group_user_ids:
-                has_perm = True
-        return has_perm
-
-    for page in pages:
-        to_add = False
-        # default to false, showing a restricted page is bad
-        # explicitly check all the conditions
-        # of settings and permissions
-        is_restricted = page.pk in restricted_pages
-        # restricted_pages contains as key any page.pk that is
-        # affected by a permission grant_on
-        if is_auth_user:
-            # a global permission was given to the request's user
-            if global_view_perms:
-                to_add = True
-            # setting based handling of unrestricted pages
-            elif not is_restricted and (
-                     is_setting_public_all or (
-                       is_setting_public_staff and request.user.is_staff)
-                     ): 
-                # authenticated user, no restriction and public for all
-                # or 
-                # authenticated staff user, no restriction and public for staff
-                to_add = True
-            # check group and user memberships to restricted pages
-            elif is_restricted and has_permission_membership(page):
-                to_add = True
-            elif has_global_perm():
-                to_add = True
-        # anonymous user, no restriction  
-        elif not is_restricted and is_setting_public_all:
-            to_add = True
-        # store it
-        if to_add:
-            visible_page_ids.append(page.pk)
-    return visible_page_ids
 
 def page_to_node(page, home, cut):
     """
@@ -230,7 +94,7 @@ class CMSMenu(Menu):
     
     def get_nodes(self, request):
         page_queryset = get_page_queryset(request)
-        site = Site.objects.get_current()
+        site = current_site(request)
         lang = get_language_from_request(request)
         
         filters = {
