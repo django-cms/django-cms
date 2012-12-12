@@ -102,7 +102,8 @@ Contributing to django CMS
     :maxdepth: 2
     :numbered:
 
-    contribution
+    contributing/contributing
+    contributing/testing
 
 
 
