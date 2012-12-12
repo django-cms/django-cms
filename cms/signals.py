@@ -244,22 +244,25 @@ def pre_delete_group(instance, **kwargs):
     for user in instance.user_set.all():
         clear_user_permission_cache(user)
 
-def pre_save_pagepermission(instance, raw, **kwargs):
+def _clear_users_permissions(instance):
     if instance.user:
         clear_user_permission_cache(instance.user)
+    if instance.group:
+        for user in instance.group.user_set.all():
+            clear_user_permission_cache(user)
+
+def pre_save_pagepermission(instance, raw, **kwargs):
+    _clear_users_permissions(instance)
 
 def pre_delete_pagepermission(instance, **kwargs):
-    if instance.user:
-        clear_user_permission_cache(instance.user)
+    _clear_users_permissions(instance)
 
 def pre_save_globalpagepermission(instance, raw, **kwargs):
-    if instance.user:
-        clear_user_permission_cache(instance.user)
+    _clear_users_permissions(instance)
     menu_pool.clear(all=True)
 
 def pre_delete_globalpagepermission(instance, **kwargs):
-    if instance.user:
-        clear_user_permission_cache(instance.user)
+    _clear_users_permissions(instance)
 
 def pre_save_delete_page(instance, **kwargs):
     clear_permission_cache()
@@ -270,18 +273,18 @@ if settings.CMS_PERMISSION:
 
     signals.pre_save.connect(pre_save_user, sender=PageUser)
     signals.pre_delete.connect(pre_delete_user, sender=PageUser)
-    
+
     signals.pre_save.connect(pre_save_group, sender=Group)
     signals.pre_delete.connect(pre_delete_group, sender=Group)
 
     signals.pre_save.connect(pre_save_group, sender=PageUserGroup)
     signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup)
-    
+
     signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission)
     signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission)
-    
+
     signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission)
     signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission)
-    
+
     signals.pre_save.connect(pre_save_delete_page, sender=Page)
     signals.pre_delete.connect(pre_save_delete_page, sender=Page)
