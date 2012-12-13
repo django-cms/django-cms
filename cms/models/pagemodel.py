@@ -779,8 +779,31 @@ class Page(MPTTModel):
         return _("default")
 
     def has_view_permission(self, request):
-        from cms.utils.permissions import has_view_permission
-        return has_view_permission(request, self)
+        from cms.utils.permissions import get_any_page_view_permissions, has_global_page_permission
+        can_see_unrestricted = settings.CMS_PUBLIC_FOR == 'all' or (
+            settings.CMS_PUBLIC_FOR == 'staff' and request.user.is_staff)
+
+        # inherited and direct view permissions
+        is_restricted = bool(get_any_page_view_permissions(request, self))
+
+        if not is_restricted and can_see_unrestricted:
+            return True
+        elif not request.user.is_authenticated():
+            return False
+
+        if not is_restricted:
+            # a global permission was given to the request's user
+            if has_global_page_permission(request, self.site_id, can_view=True):
+                return True
+        else:
+            # a specific permission was granted to the request's user
+            if self.get_draft_object().has_generic_permission(request, "view"):
+                return True
+
+        # The user has a normal django permission to view pages globally
+        opts = self._meta
+        codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
+        return request.user.has_perm(codename)
 
     def has_change_permission(self, request):
         opts = self._meta

@@ -8,7 +8,6 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from cms.utils.plugins import current_site
 
 
 try:
@@ -315,34 +314,6 @@ def get_any_page_view_permissions(request, page):
     return request._cms_view_perms.get(page_id, [])
 
 
-def has_view_permission(request, page):
-    can_see_unrestricted = settings.CMS_PUBLIC_FOR == 'all' or (
-        settings.CMS_PUBLIC_FOR == 'staff' and request.user.is_staff)
-
-    # inherited and direct view permissions
-    is_restricted = bool(get_any_page_view_permissions(request, page))
-
-    if not is_restricted and can_see_unrestricted:
-        return True
-    elif not request.user.is_authenticated():
-        return False
-
-    # Django wide auth perms "can_view" or cms auth perms "can_view"
-    opts = page._meta
-    codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-    if not is_restricted:
-        # a global permission was given to the request's user
-        if has_global_page_permission(request, page.site_id, can_view=True):
-            return True
-    else:
-        # a specific permission was granted to the request's user
-        if page.get_draft_object().has_generic_permission(request, "view"):
-            return True
-
-    # The user has a normal django permission to view pages globally
-    return request.user.has_perm(codename)
-
-
 def load_view_restrictions(request, pages):
     """ Load all view restrictions for the pages and update the cache in the request
     The request cache will receive values for all the pages, but the returned
@@ -381,76 +352,6 @@ def load_view_restrictions(request, pages):
         cache.update(restricted_pages)
 
     return restricted_pages
-
-
-def get_visible_pages(request, pages, site=None):
-    """
-     This code is basically a many-pages-at-once version of
-     Page.has_view_permission.
-     pages contains all published pages
-     check if there is ANY restriction
-     that needs a permission page visibility calculation
-    """
-    can_see_unrestricted = settings.CMS_PUBLIC_FOR == 'all' or (
-        settings.CMS_PUBLIC_FOR == 'staff' and request.user.is_staff)
-    is_auth_user = request.user.is_authenticated()
-
-    restricted_pages = load_view_restrictions(request, pages)
-    if not restricted_pages:
-        if can_see_unrestricted:
-            return pages
-        elif not is_auth_user:
-            return [] # Unauth user can't acquire global or user perm to see pages
-
-    if settings.CMS_PERMISSION and not site:
-        site = current_site(request) # avoid one extra query when possible
-    if has_global_page_permission(request, site, can_view=True):
-        return pages
-
-    def has_global_perm():
-        if has_global_perm.cache < 0:
-            has_global_perm.cache = bool(request.user.has_perm('cms.view_page'))
-        return bool(has_global_perm.cache)
-    has_global_perm.cache = -1
-
-    def has_permission_membership(page_id):
-        """
-        PagePermission user group membership tests
-        """
-        user_pk = request.user.pk
-        for perm in restricted_pages[page_id]:
-            if perm.user_id == user_pk:
-                return True
-            if not perm.group_id:
-                continue
-            if has_permission_membership.user_groups is None:
-                has_permission_membership.user_groups = request.user.groups.all().values_list('pk', flat=True)
-            if perm.group_id in has_permission_membership.user_groups:
-                return True
-        return False
-    has_permission_membership.user_groups = None
-
-    visible_pages = []
-    for page in pages:
-        to_add = False
-        page_id = page.pk
-        is_restricted = page_id in restricted_pages
-        # restricted_pages contains as key any page.pk that is
-        # affected by a permission grant_on
-        if not is_restricted and can_see_unrestricted:
-            to_add = True
-        elif is_auth_user:
-            # setting based handling of unrestricted pages
-            # check group and user memberships to restricted pages
-            if is_restricted and has_permission_membership(page_id):
-                to_add = True
-            elif has_global_perm():
-                to_add = True
-
-        if to_add:
-            visible_pages.append(page)
-
-    return visible_pages
 
 
 def get_user_sites_queryset(user):
