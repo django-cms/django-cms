@@ -396,7 +396,6 @@ def get_visible_pages(request, pages, site=None):
     is_auth_user = request.user.is_authenticated()
 
     restricted_pages = load_view_restrictions(request, pages)
-
     if not restricted_pages:
         if can_see_unrestricted:
             return pages
@@ -434,7 +433,7 @@ def get_visible_pages(request, pages, site=None):
     visible_pages = []
     for page in pages:
         to_add = False
-        page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
+        page_id = page.pk
         is_restricted = page_id in restricted_pages
         # restricted_pages contains as key any page.pk that is
         # affected by a permission grant_on

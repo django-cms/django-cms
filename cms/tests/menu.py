@@ -5,6 +5,7 @@ from cms.api import create_page
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
     SoftrootFixture)
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -739,9 +740,14 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 class ViewPermissionMenuTests(SettingsOverrideTestCase):
     settings_overrides = {
         'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'all',
+        'CMS_PUBLIC_FOR': 'staff',
     }
-    
+
+    def setUp(self):
+        self.page = create_page('page', 'nav_playground.html', 'en')
+        self.pages = [self.page]
+        self.user = User.objects.create_user('user', 'user@domain.com', 'user')
+
     def get_request(self, user=None):
         attrs = {
             'user': user or AnonymousUser(),
@@ -751,165 +757,168 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         return type('Request', (object,), attrs)
 
     def test_public_for_all_staff(self):
-        request = self.get_request()
+        request = self.get_request(self.user)
         request.user.is_staff = True
-        page = Page()
-        page.pk = 1
-        page.level = 0
-        page.tree_id = 1
-        pages = [page]
         with self.assertNumQueries(1):
             """
                 The queries are:
                 PagePermission count query
             """
-            result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
         
     def test_public_for_all(self):
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
-        request = self.get_request(user)
-        page = Page()
-        page.pk = 1
-        page.level = 0
-        page.tree_id = 1
-        pages = [page]
+        with SettingsOverride(CMS_PUBLIC_FOR='all'):
+            request = self.get_request(self.user)
+            with self.assertNumQueries(1):
+                """
+                The queries are:
+                PagePermission query for affected pages
+                """
+                result = get_visible_pages(request, self.pages)
+                self.assertEqual(result, [self.page.pk])
+
+    def test_unauthed(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='all'):
+            request = self.get_request()
+            with self.assertNumQueries(1):
+                """
+                The query is:
+                PagePermission query for affected pages
+                """
+                result = get_visible_pages(request, self.pages)
+                self.assertEqual(result, [self.page.pk])
+
+    def test_authed_basic_perm(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='view_page'))
+        request = self.get_request(self.user)
+        with self.assertNumQueries(4):
+            """
+            The queries are:
+            PagePermission count query
+            GlobalpagePermission count query
+            User permissions
+            Content type
+            """
+            result = get_visible_pages(request, self.pages, self.page.site)
+            self.assertEqual(result, [self.page.pk])
+
+    def test_authed_no_access(self):
+        request = self.get_request(self.user)
+        with self.assertNumQueries(4):
+            """
+            The queries are:
+            View Permission Calculation Query
+            GlobalpagePermission query for user
+            User permissions
+            Content type
+            """
+            result = get_visible_pages(request, self.pages, self.page.site)
+            self.assertEqual(result, [])
+
+    def test_unauthed_no_access(self):
+        request = self.get_request()
         with self.assertNumQueries(1):
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [])
+
+    def test_page_permissions(self):
+        request = self.get_request(self.user)
+        PagePermission.objects.create(can_view=True, user=self.user, page=self.page)
+        with self.assertNumQueries(2):
             """
             The queries are:
             PagePermission query for affected pages
+            GlobalpagePermission query for user
             """
-            result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
-
-    def test_unauthed(self):
-        request = self.get_request()
-        page = Page()
-        page.pk = 1
-        page.level = 0
-        page.tree_id = 1
-        pages = [page]
-        with self.assertNumQueries(1):
-            """
-            The query is:
-            PagePermission query for affected pages
-
-            global is not executed because it's lazy
-            """
-            result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
-
-    def test_authed_basic_perm(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User()
-            user.username="test"
-            user.save()
-            user.user_permissions.add(Permission.objects.get(codename='view_page'))
-            request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            page.level = 0
-            page.tree_id = 1
-            pages = [page]
-            site = Site()
-            site.pk = 1
-            with self.assertNumQueries(4):
-                """
-                The queries are:
-                PagePermission count query
-                GlobalpagePermission count query
-                User permissions
-                Content type
-                """
-                result = get_visible_pages(request, pages, site)
-                self.assertEqual(result, [1])
-
-    def test_authed_no_access(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
-            request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            page.level = 0
-            page.tree_id = 1
-            pages = [page]
-            site = Site()
-            site.pk = 1
-            with self.assertNumQueries(4):
-                """
-                The queries are:
-                View Permission Calculation Query
-                GlobalpagePermission query for user
-                User permissions
-                Content type
-                """
-                result = get_visible_pages(request, pages, site)
-                self.assertEqual(result, [])
-
-    def test_unauthed_no_access(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            request = self.get_request()
-            page = Page()
-            page.pk = 1
-            page.level = 0
-            page.tree_id = 1
-            pages = [page]
-            with self.assertNumQueries(1):
-                result = get_visible_pages(request, pages)
-                self.assertEqual(result, [])
-
-    def test_page_permissions(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
-            request = self.get_request(user)
-            page = create_page('A', 'nav_playground.html', 'en')
-            PagePermission.objects.create(can_view=True, user=user, page=page)
-            pages = [page]
-            with self.assertNumQueries(2):
-                """
-                The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                """
-                result = get_visible_pages(request, pages)
-                self.assertEqual(result, [1])
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
 
     def test_page_permissions_view_groups(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
-            group = Group.objects.create(name='testgroup')
-            group.user_set.add(user)
-            request = self.get_request(user)
-            page = create_page('A', 'nav_playground.html', 'en')
-            PagePermission.objects.create(can_view=True, group=group, page=page)
-            pages = [page]
-            with self.assertNumQueries(3):
-                """
-                The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                Group query via PagePermission
-                """
-                result = get_visible_pages(request, pages)
-                self.assertEqual(result, [1])
+        group = Group.objects.create(name='testgroup')
+        self.user.groups.add(group)
+        request = self.get_request(self.user)
+        PagePermission.objects.create(can_view=True, group=group, page=self.page)
+        with self.assertNumQueries(3):
+            """
+            The queries are:
+            PagePermission query for affected pages
+            GlobalpagePermission query for user
+            Group query via PagePermission
+            """
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
 
     def test_global_permission(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
-            GlobalPagePermission.objects.create(can_view=True, user=user)
-            request = self.get_request(user)
-            page = create_page('A', 'nav_playground.html', 'en')
-            pages = [page]
-            group = Group.objects.create(name='testgroup')
-            PagePermission.objects.create(can_view=True, group=group, page=page)
-            with self.assertNumQueries(2):
-                """
-                The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                """
-                result = get_visible_pages(request, pages)
-                self.assertEqual(result, [1])
+        GlobalPagePermission.objects.create(can_view=True, user=self.user)
+        request = self.get_request(self.user)
+        group = Group.objects.create(name='testgroup')
+        PagePermission.objects.create(can_view=True, group=group, page=self.page)
+        with self.assertNumQueries(2):
+            """
+            The queries are:
+            PagePermission query for affected pages
+            GlobalpagePermission query for user
+            """
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
+
+class PublicViewPermissionMenuTests(SettingsOverrideTestCase):
+    settings_overrides = {
+        'CMS_PERMISSION': True,
+        'CMS_PUBLIC_FOR': 'all',
+        }
+
+    def setUp(self):
+        """
+        Create this published hierarchy:
+        A
+        B1     B2
+        C1 C2  C3 C4
+        """
+        l = 'nav_playground.html'
+        kw = dict(published=True, in_navigation=True)
+        a = create_page('a', l, 'en', **kw)
+        b1 = create_page('b1', l, 'en', parent=a, **kw)
+        b2 = create_page('b2', l, 'en', parent=a, **kw)
+        c1 = create_page('c1', l, 'en', parent=b1, **kw)
+        c2 = create_page('c2', l, 'en', parent=b1, **kw)
+        c3 = create_page('c3', l, 'en', parent=b2, **kw)
+        c4 = create_page('c4', l, 'en', parent=b2, **kw)
+        self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
+        self.site = a.site
+
+        self.user = User.objects.create_user('user', 'user@domain.com', 'user')
+        self.other = User.objects.create_user('other', 'other@domain.com', 'other')
+        PagePermission.objects.create(page=b1, user=self.user, can_view=True,
+            grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        PagePermission.objects.create(page=b2, user=self.other, can_view=True,
+            grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        attrs = {
+            'user': self.user,
+            'REQUEST': {},
+            'session': {},
+        }
+        self.request = type('Request', (object,), attrs)
+
+    def test_draft_list_access(self):
+        result = get_visible_pages(self.request, self.pages, self.site)
+        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
+        pages = list(pages)
+        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
+
+    def test_draft_qs_access(self):
+        result = get_visible_pages(self.request, Page.objects.drafts(), self.site)
+        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
+        pages = list(pages)
+        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
+
+    def test_public_qs_access(self):
+        result = get_visible_pages(self.request, Page.objects.public(), self.site)
+        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
+        pages = list(pages)
+        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
+
 
 class SoftrootTests(SettingsOverrideTestCase):
     """

@@ -919,6 +919,8 @@ class RestrictedViewPermissionTests(SettingsOverrideTestCase):
     def setUp(self):
         self.group = Group.objects.create(name='testgroup')
         self.page = create_page('testpage', 'nav_playground.html', 'en')
+        self.pages = [self.page]
+        self.expected = [self.page.pk]
         PagePermission.objects.create(page=self.page, group=self.group, can_view=True, grant_on=ACCESS_PAGE)
 
     def get_request(self, user=None):
@@ -940,7 +942,7 @@ class RestrictedViewPermissionTests(SettingsOverrideTestCase):
         with self.assertNumQueries(0):
             self.assertFalse(self.page.has_view_permission(request)) # test cache
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
+        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
                          [])
 
     def test_page_permissions(self):
@@ -959,8 +961,8 @@ class RestrictedViewPermissionTests(SettingsOverrideTestCase):
         with self.assertNumQueries(0):
             self.assertTrue(self.page.has_view_permission(request)) # test cache
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
+                         self.expected)
 
     def test_page_group_permissions(self):
         user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -972,8 +974,8 @@ class RestrictedViewPermissionTests(SettingsOverrideTestCase):
         with self.assertNumQueries(0):
             self.assertTrue(self.page.has_view_permission(request)) # test cache
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
+                         self.expected)
 
     def test_global_permission(self):
         user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -990,8 +992,8 @@ class RestrictedViewPermissionTests(SettingsOverrideTestCase):
         with self.assertNumQueries(0):
             self.assertTrue(self.page.has_view_permission(request)) # test cache
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
+                         self.expected)
 
     def test_basic_perm_denied(self):
         request = self.get_request(self.get_staff_user_with_no_permissions())
@@ -1009,7 +1011,7 @@ class RestrictedViewPermissionTests(SettingsOverrideTestCase):
         with self.assertNumQueries(0):
             self.assertFalse(self.page.has_view_permission(request)) # test cache
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
+        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
                          [])
 
     def test_basic_perm(self):
@@ -1030,5 +1032,14 @@ class RestrictedViewPermissionTests(SettingsOverrideTestCase):
         with self.assertNumQueries(0):
             self.assertTrue(self.page.has_view_permission(request)) # test cache
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
+                         self.expected)
+
+class PublicViewPermissionTests(RestrictedViewPermissionTests):
+    """ Run the same tests as before, but on the public page instead. """
+
+    def setUp(self):
+        super(PublicViewPermissionTests, self).setUp()
+        self.page.publish()
+        self.pages = [self.page.publisher_public]
+        self.expected = [self.page.publisher_public_id]
