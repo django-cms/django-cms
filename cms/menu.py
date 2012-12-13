@@ -40,7 +40,7 @@ def get_visible_page_objects(request, pages, site=None):
 
     def has_global_perm():
         if has_global_perm.cache < 0:
-            has_global_perm.cache = bool(request.user.has_perm('cms.view_page'))
+            has_global_perm.cache = 1 if request.user.has_perm('cms.view_page') else 0
         return bool(has_global_perm.cache)
     has_global_perm.cache = -1
 
