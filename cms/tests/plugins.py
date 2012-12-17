@@ -696,6 +696,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         from cms.plugins.utils import build_plugin_tree
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
+        plugin_pool.unregister_plugin(DumbFixturePlugin)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):
