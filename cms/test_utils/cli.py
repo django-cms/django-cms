@@ -2,46 +2,53 @@
 from distutils.version import LooseVersion
 import django
 import os
+from urlparse import urlparse
 
 gettext = lambda s: s
 
 urlpatterns = []
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
-def configure(db_data, **extra):
+def configure(db_url, **extra):
+    db_splits = urlparse(db_url)
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
     if not 'DATABASES' in extra:
-        db_type = db_data.get('DB', 'sqlite')
+        db_type = db_splits.scheme
         if db_type == 'sqlite':
             DB = {
                 'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
+                'NAME': db_splits.netloc,
             }
         elif db_type == 'postgres':
             DB = {
                  'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                 'NAME': db_data.get('NAME', 'djangocms_test'),
-                 'USER': db_data.get('USER', 'postgres'),
-                 'HOST':'127.0.0.1',
-                 }
-            if db_data.get('PASSWORD', None):
-                DB['PASSWORD'] = db_data['PASSWORD']
+                 'NAME': db_splits.path[1:],
+            }
         elif db_type == 'mysql':
             DB = {
                 'ENGINE': 'django.db.backends.mysql',
-                'NAME': db_data.get('NAME', 'djangocms_test'),
-                'USER': db_data.get('USER', 'root'),
+                'NAME': db_splits.path[1:],
                 'TEST_CHARSET':'utf8',
                 'TEST_COLLATION':'utf8_general_ci',
                 'OPTIONS': {
-                            "init_command": "SET storage_engine=INNODB",
-                            },
-                }
-            if db_data.get('PASSWORD', None):
-                DB['PASSWORD'] = db_data['PASSWORD']
+                    "init_command": "SET storage_engine=INNODB",
+                },
+            }
+        if db_splits.username:
+            DB['USER'] = db_splits.username
+        if db_splits.password:
+            DB['PASSWORD'] = db_splits.password
+        if db_splits.hostname:
+            DB['HOST'] = db_splits.hostname
+        try:
+            if db_splits.port:
+                DB['PORT'] = db_splits.port
+        except ValueError:
+            pass
     else:
         DB = {}
+    print DB
     defaults = dict(
         CACHE_BACKEND='locmem:///',
         DEBUG=True,
