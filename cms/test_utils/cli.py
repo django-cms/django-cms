@@ -10,11 +10,15 @@ urlpatterns = []
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(db_url, **extra):
+    splits = db_url.split("://")
+    scheme = splits[0]
+    splits[0] = "http"
+    db_url = "://".join(splits)
     db_splits = urlparse(db_url)
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
     if not 'DATABASES' in extra:
-        db_type = db_splits.scheme
+        db_type = scheme
         if db_type == 'sqlite':
             DB = {
                 'ENGINE': 'django.db.backends.sqlite3',
