@@ -23,6 +23,7 @@ URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
 URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE_CHANGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE_CHANGE, "edit-plugin/")
+URL_CMS_PLUGIN_MOVE = urljoin(URL_CMS_PAGE_CHANGE, "move-plugin/")
 URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE_CHANGE, "remove-plugin/")
 URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
 
