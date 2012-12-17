@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import bisect
 from collections import defaultdict
 from cms.exceptions import NoHomeFound
 from cms.models import Title, Page, PageModeratorState
@@ -18,38 +19,30 @@ def cache_tree_children(queryset):
     list. This attribute is in turn used by the 'get_children' method on the
     item, which would otherwise (if '_cached_children' is not set) cause a 
     database query.
-    
-    The queryset MUST BE ORDERED BY 'lft', 'tree_id'! Otherwise this function
-    will raise a ValueError.
+
+    The queryset must be ordered by 'lft', or the function will put the children
+    in the wrong order.
     """
     parents_dict = {}
-    lastleft = -1 # integrity check
-    lasttree = -1 # integrity check
+    # Loop through the queryset twice, so that the function works even if the
+    # mptt tree is broken. Since django caches querysets internally, the extra
+    # computation time is minimal.
     for obj in queryset:
         parents_dict[obj.pk] = obj
-        if obj.tree_id == lasttree and obj.lft < lastleft: # integrity check
-                raise ValueError('Objects passed in the wrong order, must be ordered by the mptt left attribute and tree id')
-        lastleft = obj.lft # integrity check
-        lasttree = obj.tree_id # integrity check
-        # set the '_cached_children' attribute
         obj._cached_children = []
-        # get the parent of this object (if available) via parent_id
-        parent = parents_dict.get(obj.parent_id, None)
+    for obj in queryset:
+        parent = parents_dict.get(obj.parent_id)
         if parent:
-            # if there is a parent, append the current object to the _cached_children
-            # list of the parent. Since the objects are ordered by lft, tree_id
-            # the _cached_children attribute will always have been set by this
-            # function already.
             parent._cached_children.append(obj)
 
 
 class CMSChangeList(ChangeList):
-    '''
+    """
     Renders a Changelist - In our case it looks like a tree - it's the list of
     *instances* in the Admin.
-    It is usually responsible for pagination (not here though, we have a 
+    It is usually responsible for pagination (not here though, we have a
     treeview)
-    '''
+    """
     real_queryset = False
     
     def __init__(self, request, *args, **kwargs):
@@ -74,7 +67,7 @@ class CMSChangeList(ChangeList):
         else:
             qs = super(CMSChangeList, self).get_query_set().drafts()
         if request:
-            site = self._current_site
+            site = self.current_site()
             permissions = Page.permissions.get_change_id_list(request.user, site)
             
             if permissions != Page.permissions.GRANT_ALL:
@@ -103,7 +96,7 @@ class CMSChangeList(ChangeList):
                 self.full_result_count = self.root_query_set.count()
     
     def set_items(self, request):
-        site = self._current_site
+        site = self.current_site()
         # Get all the pages, ordered by tree ID (it's convenient to build the 
         # tree using a stack now)
         pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
@@ -120,12 +113,11 @@ class CMSChangeList(ChangeList):
             pages = pages.filter(pk__in=perm_edit_ids)
             #pages = pages.filter(pk__in=perm_change_list_ids)   
 
-        ids = []
         root_pages = []
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
         try:
-            home_pk = Page.objects.drafts().get_home(self.current_site()).pk
+            home_pk = Page.objects.drafts().get_home(site).pk
         except NoHomeFound:
             home_pk = 0
 
@@ -142,21 +134,17 @@ class CMSChangeList(ChangeList):
         # the children here, because MPTT expects the tree to be 'complete'
         # and otherwise complaints about 'invalid item order'
         cache_tree_children(pages)
-        
+        ids = dict((page.id, page) for page in pages)
+
         for page in pages:
 
             children = list(page.get_children())
 
-            # note: We are using change_list permission here, because we must
-            # display also pages which user must not edit, but he haves a 
-            # permission for adding a child under this page. Otherwise he would
-            # not be able to add anything under page which he can't change. 
-            if not page.parent_id or (perm_change_list_ids != Page.permissions.GRANT_ALL and not int(page.parent_id) in perm_change_list_ids):
-                page.root_node = True
-            else:
-                page.root_node = False
-            ids.append(page.pk)
-            
+            # If the parent page is not among the nodes shown, this node should
+            # be a "root node". The filtering for this has already been made, so
+            # using the ids dictionary means this check is constant time
+            page.root_node = page.parent_id not in ids
+
             if settings.CMS_PERMISSION:
                 # caching the permissions
                 page.permission_edit_cache = perm_edit_ids == Page.permissions.GRANT_ALL or page.pk in perm_edit_ids
@@ -196,17 +184,17 @@ class CMSChangeList(ChangeList):
             else:
                 page.childrens = children
 
-        # TODO: OPTIMIZE!!
-        titles = Title.objects.filter(page__in=ids)
-        for page in all_pages:# add the title and slugs and some meta data
+        for page in all_pages:
             page.title_cache = {}
             page.all_languages = []
-            for title in titles:
-                if title.page_id == page.pk:
-                    page.title_cache[title.language] = title
-                    if not title.language in page.all_languages:
-                        page.all_languages.append(title.language)
-            page.all_languages.sort()
+
+        titles = Title.objects.filter(page__in=ids)
+        insort = bisect.insort # local copy to avoid globals lookup in the loop
+        for title in titles:
+            page = ids[title.page_id]
+            page.title_cache[title.language] = title
+            if not title.language in page.all_languages:
+                insort(page.all_languages, title.language)
         self.root_pages = root_pages
         
     def get_items(self):

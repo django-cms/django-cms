@@ -3,9 +3,23 @@ Contributing to django CMS
 ##########################
 
 Like every open-source project, django CMS is always looking for motivated
-individuals to contribute to its source code.
-However, to ensure the highest code quality and keep the repository nice and
-tidy, everybody has to follow a few rules (nothing major, I promise :) )
+individuals to contribute to its source code. However, to ensure the highest
+code quality and keep the repository nice and tidy, everybody has to follow a
+few rules (nothing major, I promise :) )
+
+
+.. ATTENTION::
+
+    If you think you have discovered a security issue in our code, please report
+    it **privately**, by emailing us at `security@django-cms.org`_.
+    
+        Please don't raise it on:
+    
+        * IRC
+        * GitHub
+        * either of our email lists
+
+        or in any other public forum until we have had a chance to deal with it. 
 
 
 *********
@@ -84,39 +98,18 @@ This is how you fix a bug or add a feature:
 
 #. `fork`_ us on GitHub.
 #. Checkout your fork.
-#. Hack hack hack, test test test, commit commit commit, test again.
+#. *Hack hack hack*, *test test test*, *commit commit commit*, test again.
 #. Push to your fork.
 #. Open a pull request.
 
+And at any point in that process, you can add: *discuss discuss discuss*,
+because it's always useful for everyone to pass ideas around and look at thngs
+together.
 
-Tests
-=====
+:ref:`testing` is really important.
 
-Having a wide and comprehensive library of unit-tests and integration tests is
-of exceeding importance. Contributing tests is widely regarded as a very
-prestigious contribution (you're making everybody's future work much easier by
-doing so). Good karma for you. Cookie points. Maybe even a beer if we meet in
-person :)
-
-Generally tests should be:
-
-- Unitary (as much as possible). I.E. should test as much as possible only one
-  function/method/class. That's the 
-  very definition of unit tests. Integration tests are interesting too
-  obviously, but require more time to maintain since they have a higher
-  probability of breaking.
-- Short running. No hard numbers here, but if your one test doubles the time it
-  takes for everybody to run them, it's probably an indication that you're doing
-  it wrong.
-
-In a similar way to code, pull requests will be reviewed before pulling
-(obviously), and we encourage discussion via code review (everybody learns
-something this way) or IRC discussions.
-
-Running the tests
------------------
-
-To run the tests simply execute ``python setup.py test`` from your shell.
+We have an IRC channel, our `django-cms-developers`_ email list,
+and of course the code reviews mechanism on GitHub - do use them.
 
 
 **************************
@@ -184,6 +177,7 @@ contribute. All changes there will be automatically sent to the project.
 
 
 
+.. _security@django-cms.org: mailto:security@django-cms.org
 .. _fork: http://github.com/divio/django-cms
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/

@@ -293,7 +293,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(CMSPlugin.objects.count(), 2)
 
         # copy the plugins to the german placeholder
-        copy_plugins_to(ph_en.cmsplugin_set.all(), ph_de, 'de')
+        copy_plugins_to(ph_en.get_plugins(), ph_de, 'de')
 
         self.assertEqual(ph_de.cmsplugin_set.filter(parent=None).count(), 1)
         text_plugin_de = ph_de.cmsplugin_set.get(parent=None).get_plugin_instance()[0]

@@ -5,25 +5,32 @@ from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List, 
     GetButton)
 from cms.utils import cms_static_url
+from cms.utils.permissions import has_page_change_permission
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from utils.permissions import has_page_change_permission
 
+
+def _get_draft_page_id(toolbar):
+    page = toolbar.request.current_page
+    if page.publisher_is_draft:
+        return page.pk
+    else:
+        return page.publisher_public_id
 
 def _get_page_admin_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_change', args=(toolbar.request.current_page.get_draft_object().pk,))
+    return reverse('admin:cms_page_change', args=(_get_draft_page_id(toolbar),))
 
 def _get_page_history_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_history', args=(toolbar.request.current_page.get_draft_object().pk,))
+    return reverse('admin:cms_page_history', args=(_get_draft_page_id(toolbar),))
 
 def _get_add_child_url(context, toolbar, **kwargs):
     data = {
         'position': 'last-child',
-        'target': toolbar.request.current_page.get_draft_object().pk,
+        'target': _get_draft_page_id(toolbar),
     }
     args = urllib.urlencode(data)
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
@@ -38,17 +45,18 @@ def _get_add_sibling_url(context, toolbar, **kwargs):
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
 
 def _get_delete_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_delete', args=(toolbar.request.current_page.get_draft_object().pk,))
+    return reverse('admin:cms_page_delete', args=(_get_draft_page_id(toolbar),))
 
 def _get_publish_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.get_draft_object().pk,))
+    return reverse('admin:cms_page_publish_page', args=(_get_draft_page_id(toolbar),))
 
 def _get_revert_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_revert_page', args=(toolbar.request.current_page.get_draft_object().pk,))
+    return reverse('admin:cms_page_revert_page', args=(_get_draft_page_id(toolbar),))
 
 def _page_is_dirty(request):
     page = request.current_page
     return page and page.published and page.get_draft_object().is_dirty()
+
 
 class CMSToolbarLoginForm(forms.Form):
     cms_username = forms.CharField()
@@ -62,18 +70,36 @@ class CMSToolbar(Toolbar):
     revert_button = GetButton(RIGHT, 'revert', _("Revert"),
                               url=_get_revert_url, enable=_page_is_dirty)
 
+    edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
+                                  _('Edit mode'))
+
     def __init__(self, request):
         super(CMSToolbar, self).__init__(request)
         self.init()
-        
+
     def init(self):
-        self.is_staff = self.request.user.is_staff
-        self.can_change = has_page_change_permission(self.request)
-        self.edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
-                                           _('Edit mode'))
-        self.edit_mode = self.is_staff and self.edit_mode_switcher.get_state(self.request)
-        self.show_toolbar = self.is_staff or self.edit_mode_switcher.get_state(self.request)
-    
+        """ Hook called when the toolbar is reinitialised """
+
+    @property
+    def is_staff(self):
+        return self.request.user.is_staff
+
+    @property
+    def can_change(self):
+        return has_page_change_permission(self.request)
+
+    @property
+    def edit_mode(self):
+        return self.is_staff and self.edit_mode_switcher.get_state(self.request)
+
+    @property
+    def show_toolbar(self):
+        return self.is_staff or self.edit_mode_switcher.get_state(self.request)
+
+    @property
+    def current_page(self):
+        return self.request.current_page
+
     def get_items(self, context, **kwargs):
         """
         Get the CMS items on the toolbar
@@ -81,18 +107,23 @@ class CMSToolbar(Toolbar):
         items = [
             Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
         ]
-        
+
         self.page_states = []
-        
-        if self.can_change:
+
+        # Store access property values to avoid having to recompute them
+        is_staff = self.is_staff
+        can_change = self.can_change
+        edit_mode = self.edit_mode
+
+        if can_change:
             items.append(
                 self.edit_mode_switcher
             )
 
-        if self.is_staff:
+        if is_staff:
 
             current_page = self.request.current_page
-            
+
             if current_page:
                 states = current_page.last_page_states()
                 has_states = bool(len(states))
@@ -102,9 +133,9 @@ class CMSToolbar(Toolbar):
                         TemplateHTML(LEFT, 'status',
                                      'cms/toolbar/items/status.html')
                     )
-                
+
                 # publish button
-                if self.edit_mode:
+                if edit_mode:
                     if current_page.has_publish_permission(self.request):
                         items.append(
                             GetButton(RIGHT, 'moderator', _("Publish"), _get_publish_url)
@@ -113,15 +144,15 @@ class CMSToolbar(Toolbar):
                         items.append(self.revert_button)
 
                 # The 'templates' Menu
-                if self.can_change:
-                    items.append(self.get_template_menu(context, self.can_change, self.is_staff))
-                
+                if can_change:
+                    items.append(self.get_template_menu(context, can_change, is_staff))
+
                 # The 'page' Menu
-                items.append(self.get_page_menu(context, self.can_change, self.is_staff))
-            
+                items.append(self.get_page_menu(context, can_change, is_staff))
+
             # The 'Admin' Menu
-            items.append(self.get_admin_menu(context, self.can_change, self.is_staff))
-            
+            items.append(self.get_admin_menu(context, can_change, is_staff))
+
         if not self.request.user.is_authenticated():
             items.append(
                 TemplateHTML(LEFT, 'login', 'cms/toolbar/items/login.html')
@@ -132,14 +163,15 @@ class CMSToolbar(Toolbar):
                           cms_static_url('images/toolbar/icons/icon_lock.png'))
             )
         return items
-    
+
     def get_template_menu(self, context, can_change, is_staff):
         menu_items = []
-        url = reverse('admin:cms_page_change_template', args=(self.request.current_page.get_draft_object().pk,))
+        page = self.request.current_page.get_draft_object()
+        url = reverse('admin:cms_page_change_template', args=(page.pk,))
         for path, name in settings.CMS_TEMPLATES:
             args = urllib.urlencode({'template': path})
             css = 'template'
-            if self.request.current_page.get_draft_object().get_template() == path:
+            if page.get_template() == path:
                 css += ' active'
             menu_items.append(
                 ListItem(css, name, '%s?%s' % (url, args), 'POST'),
@@ -200,26 +232,28 @@ class CMSToolbar(Toolbar):
         return List(RIGHT, 'admin', _('Admin'),
                     cms_static_url('images/toolbar/icons/icon_admin.png'),
                     items=admin_items)
-    
+
     def request_hook(self):
         if self.request.method != 'POST':
             return self._request_hook_get()
         else:
             return self._request_hook_post()
-        
+
     def _request_hook_get(self):
-        if 'cms-toolbar-logout' in self.request.GET:
-            logout(self.request)
-            return HttpResponseRedirect(self.request.path)
-        
+        request = self.request
+        if 'cms-toolbar-logout' in request.GET:
+            logout(request)
+            return HttpResponseRedirect(request.path)
+
     def _request_hook_post(self):
+        request = self.request
         # login hook
-        if 'cms-toolbar-login' in self.request.GET:
-            login_form = CMSToolbarLoginForm(self.request.POST)
+        if 'cms-toolbar-login' in request.GET:
+            login_form = CMSToolbarLoginForm(request.POST)
             if login_form.is_valid():
                 username = login_form.cleaned_data['cms_username']
                 password = login_form.cleaned_data['cms_password']
                 user = authenticate(username=username, password=password)
                 if user:
-                    login(self.request, user)
+                    login(request, user)
                     self.init()

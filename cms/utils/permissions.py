@@ -110,6 +110,8 @@ def has_global_page_permission(request, site=None, **filters):
     :param filters: queryset filters, e.g. ``can_add = True``
     :return: ``True`` or ``False``
     """
+    if request.user.is_superuser:
+        return True
     if not hasattr(request, '_cms_global_perms'):
         request._cms_global_perms = {}
     key = tuple((k, v) for k, v in filters.iteritems())
@@ -118,7 +120,7 @@ def has_global_page_permission(request, site=None, **filters):
     if key not in request._cms_global_perms:
         qs = GlobalPagePermission.objects.with_user(request.user).filter(**filters)
         if site:
-            qs = qs.filter(sites__in=[site])
+            qs = qs.filter(Q(sites__in=[site]) | Q(sites__isnull=True))
         request._cms_global_perms[key] = qs.exists()
     return request._cms_global_perms[key]
 
