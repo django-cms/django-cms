@@ -61,7 +61,6 @@ def configure(db_url, **extra):
         DATABASES={
             'default': DB
         },
-
         SITE_ID=1,
         USE_I18N=True,
         MEDIA_ROOT='/media/',
@@ -277,6 +276,4 @@ def configure(db_url, **extra):
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
     from django.contrib import admin
-
-
     admin.autodiscover()
