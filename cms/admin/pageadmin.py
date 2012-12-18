@@ -1356,6 +1356,8 @@ class PageAdmin(ModelAdmin):
             for child in plugin.get_descendants():
                 child.placeholder = placeholder
                 child.save()
+            # make sure the plugin has no parent
+            plugin.parent = None
             plugin.save()
             success = True
         if 'ids' in request.POST:
