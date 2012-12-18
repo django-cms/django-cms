@@ -763,13 +763,13 @@ class ModeratorSwitchCommandTest(CMSTestCase):
             self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
 
 
-class ViewPermissionTests(SettingsOverrideTestCase):
+class PermissionTestsBase(SettingsOverrideTestCase):
+
     settings_overrides = {
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }
 
-    
     def get_request(self, user=None):
         attrs = {
             'user': user or AnonymousUser(),
@@ -777,6 +777,9 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             'session': {},
         }
         return type('Request', (object,), attrs)
+
+
+class ViewPermissionTests(PermissionTestsBase):
     
     def test_public_for_all_staff(self):
         request = self.get_request()
@@ -934,3 +937,37 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             page.level = 0
             page.tree_id = 1
             self.assertTrue(page.has_view_permission(request))
+
+
+class PagePermissionTests(PermissionTestsBase):
+
+    PermissionTestsBase.settings_overrides['CMS_CACHE_DURATIONS'] = {
+        'permissions': 360
+        }
+
+    def test_page_permission_cache_invalidation(self):
+        """user belongs to group which is given page_permission over page.
+        Test the fact that if page_permission changes then
+        page is rendered with with respect to the new page_permisison.
+        This is to assert that the permissions cache is properly
+        invalidated.
+        """
+        user = User(username='user', email='user@domain.com', password='user',
+                    is_staff=True)
+        user.save()
+        group = Group.objects.create(name='testgroup')
+        group.user_set.add(user)
+        page = create_page('A', 'nav_playground.html', 'en')
+        page_permission = PagePermission.objects.create(
+            can_change_permissions=True, group=group, page=page)
+        request = self.get_request(user)
+        self.assertTrue(page.has_change_permissions_permission(request))
+        page_permission.can_change_permissions = False
+        page_permission.save()
+        request = self.get_request(user)
+        # re-fetch the page from the db to so that the page doesn't have
+        # the permission_user_cache attribute set
+        page = Page.objects.get(pk=page.pk)
+        self.assertFalse(page.has_change_permissions_permission(request))
+        
+        
