@@ -4,10 +4,10 @@ python:
     - "2.6"
     - "2.7"
 env:
-    - DJANGO=test_requirements/django-1.3.txt DB="sqlite://test.db/:memory:"
+    - DJANGO=test_requirements/django-1.3.txt DB="sqlite://:memory:"
     - DJANGO=test_requirements/django-1.3.txt DB="mysql://root@127.0.0.1/djangocms_test"
     - DJANGO=test_requirements/django-1.3.txt DB="postgres://postgres@127.0.0.1/djangocms_test"
-    - DJANGO=test_requirements/django-1.4.txt DB="sqlite://test.db/:memory:"
+    - DJANGO=test_requirements/django-1.4.txt DB="sqlite://:memory:"
     - DJANGO=test_requirements/django-1.4.txt DB="mysql://root@127.0.0.1/djangocms_test"
     - DJANGO=test_requirements/django-1.4.txt DB="postgres://postgres@127.0.0.1/djangocms_test"
 
