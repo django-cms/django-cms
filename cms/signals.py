@@ -66,7 +66,7 @@ def pre_save_title(instance, raw, **kwargs):
     if not instance.page.publisher_is_draft:
 
         menu_pool.clear(instance.page.site_id)
-    
+
 
     if instance.id and not hasattr(instance, "tmp_path"):
         instance.tmp_path = None
@@ -75,7 +75,7 @@ def pre_save_title(instance, raw, **kwargs):
             instance.tmp_path, instance.tmp_application_urls = \
                 Title.objects.filter(pk=instance.id).values_list('path', 'application_urls')[0]
         except IndexError:
-            pass # no Titles exist for this page yet
+            pass  # no Titles exist for this page yet
 
     # Build path from parent page's path and slug
     if instance.has_url_overwrite and instance.path:
@@ -90,7 +90,7 @@ def post_save_title(instance, raw, created, **kwargs):
     # Update descendants only if path changed
     application_changed = False
     prevent_descendants = hasattr(instance, 'tmp_prevent_descendant_update')
-    if instance.path != getattr(instance,'tmp_path',None) and not prevent_descendants:
+    if instance.path != getattr(instance, 'tmp_path', None) and not prevent_descendants:
         descendant_titles = Title.objects.filter(
             page__lft__gt=instance.page.lft,
             page__rght__lt=instance.page.rght,
@@ -100,12 +100,12 @@ def post_save_title(instance, raw, created, **kwargs):
         ).order_by('page__tree_id', 'page__parent', 'page__lft')
 
         for descendant_title in descendant_titles:
-            descendant_title.path = '' # just reset path
+            descendant_title.path = ''  # just reset path
             descendant_title.tmp_prevent_descendant_update = True
             if descendant_title.application_urls:
                 application_changed = True
             descendant_title.save()
-        
+
     if not prevent_descendants and \
         (instance.application_urls != getattr(instance, 'tmp_application_urls', None) or application_changed):
         # fire it if we have some application linked to this page or some descendant
@@ -135,19 +135,8 @@ def post_save_user(instance, raw, created, **kwargs):
     if not creator or not created or not hasattr(creator, 'pk'):
         return
     from django.db import connection
-    
-    # i'm not sure if there is a workaround for this, somebody any ideas? What
-    # we are doing here is creating PageUser on Top of existing user, i'll do it 
-    # through plain SQL, its not nice, but...
-    
-    # TODO: find a better way than an raw sql !!
-    
-    cursor = connection.cursor()
+
     page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
-        PageUser._meta.db_table,
-        instance.pk, 
-        creator.pk
-    )
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
@@ -165,16 +154,8 @@ def post_save_user_group(instance, raw, created, **kwargs):
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous():
         return
-    from django.db import connection
-    
-    # TODO: same as in post_save_user - raw sql is just not nice - workaround...?
-    
-    cursor = connection.cursor()
-    query = "INSERT INTO %s (group_ptr_id, created_by_id) VALUES (%d, %d)" % (
-        PageUserGroup._meta.db_table,
+
     page_user = PageUserGroup(user_ptr_id=instance.pk, created_by=creator)
-        creator.pk
-    )
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
