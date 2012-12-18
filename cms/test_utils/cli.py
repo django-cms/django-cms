@@ -2,7 +2,7 @@
 from distutils.version import LooseVersion
 import django
 import os
-from urlparse import urlparse
+import dj_database_url
 
 gettext = lambda s: s
 
@@ -10,49 +10,12 @@ urlpatterns = []
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(db_url, **extra):
-    splits = db_url.split("://")
-    scheme = splits[0]
-    splits[0] = "http"
-    db_url = "://".join(splits)
-    db_splits = urlparse(db_url)
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
     if not 'DATABASES' in extra:
-        db_type = scheme
-        if db_type == 'sqlite':
-            DB = {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': db_splits.netloc,
-            }
-        elif db_type == 'postgres':
-            DB = {
-                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                 'NAME': db_splits.path[1:],
-            }
-        elif db_type == 'mysql':
-            DB = {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': db_splits.path[1:],
-                'TEST_CHARSET':'utf8',
-                'TEST_COLLATION':'utf8_general_ci',
-                'OPTIONS': {
-                    "init_command": "SET storage_engine=INNODB",
-                },
-            }
-        if db_splits.username:
-            DB['USER'] = db_splits.username
-        if db_splits.password:
-            DB['PASSWORD'] = db_splits.password
-        if db_splits.hostname:
-            DB['HOST'] = db_splits.hostname
-        try:
-            if db_splits.port:
-                DB['PORT'] = db_splits.port
-        except ValueError:
-            pass
+        DB = dj_database_url.parse(db_url)
     else:
         DB = {}
-    print DB
     defaults = dict(
         CACHE_BACKEND='locmem:///',
         DEBUG=True,

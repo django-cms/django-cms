@@ -72,7 +72,7 @@ class Page(MPTTModel):
     # Publisher fields
     moderator_state = models.SmallIntegerField(_('moderator state'), default=0, blank=True, editable=False)
     publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
-    #This is misnamed - the one-to-one relation is populated on both ends
+    # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
 
@@ -303,7 +303,7 @@ class Page(MPTTModel):
 
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return page_copy   # return the page_copy or None
+        return page_copy  # return the page_copy or None
 
     def save(self, no_signals=False, commit=True, **kwargs):
         """
@@ -465,7 +465,7 @@ class Page(MPTTModel):
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be unpublished. Use draft.')
 
-        #First, make sure we are in the correct state
+        # First, make sure we are in the correct state
         self.published = False
         self.save()
         public_page = self.get_public_object()
@@ -536,7 +536,7 @@ class Page(MPTTModel):
         """
         descendants = list(self.get_descendants().order_by('level'))
         descendants.reverse()
-        #TODO: Use a better exception class - PermissionDenied is not quite right
+        # TODO: Use a better exception class - PermissionDenied is not quite right
         for page in descendants:
             if not page.delete_requested():
                 raise PermissionDenied('There are descendant pages not marked for deletion')
@@ -596,7 +596,7 @@ class Page(MPTTModel):
                 self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
 
-    ### Title object access
+    # ## Title object access
 
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
         """Helper function for accessing wanted / current title.
@@ -779,7 +779,7 @@ class Page(MPTTModel):
                 return (user_perm or generic_perm)
 
         else:
-            #anonymous user
+            # anonymous user
             if is_restricted or not settings.CMS_PUBLIC_FOR == 'all':
                 # anyonymous user, page has restriction and global access is permitted
                 return False
@@ -863,7 +863,7 @@ class Page(MPTTModel):
 
     def get_home_pk_cache(self):
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        if not hasattr(self, attr) or getattr(self, attr) is None:
+        if getattr(self, attr, None) is None:
             setattr(self, attr, self.get_object_queryset().get_home(self.site).pk)
         return getattr(self, attr)
 
@@ -1029,7 +1029,7 @@ class Page(MPTTModel):
         prev_sibling = self.get_previous_filtered_sibling(**filters)
         public_prev_sib = prev_sibling.publisher_public if prev_sibling else None
 
-        if not self.publisher_public_id: # first time published
+        if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
             if public_prev_sib:
                 obj.insert_at(public_prev_sib, position='right', save=False)

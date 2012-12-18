@@ -7,10 +7,11 @@ import argparse
 import sys
 import warnings
 from urlparse import urlparse
+import os
 
 
-def main(test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
-         time_tests=False, verbosity=1, failfast=False, test_labels=None, db_url="sqlite://:memory:"):
+def main(db_url, test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
+         time_tests=False, verbosity=1, failfast=False, test_labels=None):
     if not test_labels:
         test_labels = ['cms']
     with temp_dir() as STATIC_ROOT:
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     parser.add_argument('--verbosity', default=1)
     parser.add_argument('--time-tests', action='store_true', default=False,
             dest='time_tests')
-    parser.add_argument('--db', default='sqlite://:memory:', dest='db')
+    parser.add_argument('--db', default='sqlite://localhost/:memory:', dest='db')
     parser.add_argument('test_labels', nargs='*')
     args = parser.parse_args()
     if getattr(args, 'jenkins', False):
@@ -53,8 +54,7 @@ if __name__ == '__main__':
     junit_output_dir = getattr(args, 'jenkins_data_dir', '.')
     time_tests = getattr(args, 'time_tests', False)
     test_labels = ['cms.%s' % label for label in args.test_labels]
-    db_url = args.db
-    main(test_runner=test_runner, junit_output_dir=junit_output_dir, time_tests=time_tests,
-         verbosity=args.verbosity, failfast=args.failfast, test_labels=test_labels,
-         db_url=db_url)
+    db_url = os.environ.get('DATABASE_URL', args.db)
+    main(db_url, test_runner=test_runner, junit_output_dir=junit_output_dir, time_tests=time_tests,
+         verbosity=args.verbosity, failfast=args.failfast, test_labels=test_labels)
 
