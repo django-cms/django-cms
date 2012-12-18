@@ -34,7 +34,7 @@ def patch_settings():
     
     post_patch()
     
-    if settings.DEBUG:
+    #if settings.DEBUG:
         # check if settings are correct, call this only if debugging is enabled
-        post_patch_check()
+    #    post_patch_check()
 patch_settings.ALREADY_PATCHED = False

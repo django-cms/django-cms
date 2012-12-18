@@ -73,7 +73,7 @@ def contribute_fieldsets(cls):
         general_fields = [('title', 'menu_title')]
     else:
         general_fields = ['title']
-    general_fields += ['slug', ('published', 'in_navigation')]
+    general_fields += ['slug', ('published', 'in_navigation', )]
     additional_hidden_fields = []
     advanced_fields = ['reverse_id',  'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
     template_fields = ['template']
