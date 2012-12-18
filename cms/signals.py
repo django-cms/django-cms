@@ -45,13 +45,13 @@ page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.upda
 
 
 def update_title(title):
-    parent_page_id = title.page.parent_id
     slug = u'%s' % title.slug
 
     if title.page.is_home():
         title.path = ''
     elif not title.has_url_overwrite:
         title.path = u'%s' % slug
+        parent_page_id = title.page.parent_id
 
         if parent_page_id:
             parent_title = Title.objects.get_title(parent_page_id,
@@ -63,17 +63,18 @@ def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
 
-    menu_pool.clear(instance.page.site_id)
+    if not instance.page.publisher_is_draft:
 
-    instance.tmp_path = None
-    instance.tmp_application_urls = None
+        menu_pool.clear(instance.page.site_id)
+    
 
     if instance.id and not hasattr(instance, "tmp_path"):
+        instance.tmp_path = None
+        instance.tmp_application_urls = None
         try:
-            tmp_title = Title.objects.get(pk=instance.id)
-            instance.tmp_path = tmp_title.path
-            instance.tmp_application_urls = tmp_title.application_urls
-        except:
+            instance.tmp_path, instance.tmp_application_urls = \
+                Title.objects.filter(pk=instance.id).values_list('path', 'application_urls')[0]
+        except IndexError:
             pass # no Titles exist for this page yet
 
     # Build path from parent page's path and slug
@@ -88,8 +89,8 @@ signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.p
 def post_save_title(instance, raw, created, **kwargs):
     # Update descendants only if path changed
     application_changed = False
-
-    if instance.path != getattr(instance, 'tmp_path', None) and not hasattr(instance, 'tmp_prevent_descendant_update'):
+    prevent_descendants = hasattr(instance, 'tmp_prevent_descendant_update')
+    if instance.path != getattr(instance,'tmp_path',None) and not prevent_descendants:
         descendant_titles = Title.objects.filter(
             page__lft__gt=instance.page.lft,
             page__rght__lt=instance.page.rght,
@@ -104,22 +105,19 @@ def post_save_title(instance, raw, created, **kwargs):
             if descendant_title.application_urls:
                 application_changed = True
             descendant_title.save()
-
-    if not hasattr(instance, 'tmp_prevent_descendant_update') and \
+        
+    if not prevent_descendants and \
         (instance.application_urls != getattr(instance, 'tmp_application_urls', None) or application_changed):
         # fire it if we have some application linked to this page or some descendant
         application_post_changed.send(sender=Title, instance=instance)
 
     # remove temporary attributes
-    if getattr(instance, 'tmp_path', None):
-        del(instance.tmp_path)
-    if getattr(instance, 'tmp_application_urls' , None):
-        del(instance.tmp_application_urls)
-
-    try:
-        del(instance.tmp_prevent_descendant_update)
-    except AttributeError:
-        pass
+    if hasattr(instance, 'tmp_path'):
+        del instance.tmp_path
+    if hasattr(instance, 'tmp_application_urls'):
+        del instance.tmp_application_urls
+    if prevent_descendants:
+        del instance.tmp_prevent_descendant_update
 
 signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title.postsave")
 
@@ -136,7 +134,20 @@ def post_save_user(instance, raw, created, **kwargs):
     creator = get_current_user()
     if not creator or not created or not hasattr(creator, 'pk'):
         return
+    from django.db import connection
+    
+    # i'm not sure if there is a workaround for this, somebody any ideas? What
+    # we are doing here is creating PageUser on Top of existing user, i'll do it 
+    # through plain SQL, its not nice, but...
+    
+    # TODO: find a better way than an raw sql !!
+    
+    cursor = connection.cursor()
     page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
+        PageUser._meta.db_table,
+        instance.pk, 
+        creator.pk
+    )
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
@@ -154,7 +165,16 @@ def post_save_user_group(instance, raw, created, **kwargs):
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous():
         return
+    from django.db import connection
+    
+    # TODO: same as in post_save_user - raw sql is just not nice - workaround...?
+    
+    cursor = connection.cursor()
+    query = "INSERT INTO %s (group_ptr_id, created_by_id) VALUES (%d, %d)" % (
+        PageUserGroup._meta.db_table,
     page_user = PageUserGroup(user_ptr_id=instance.pk, created_by=creator)
+        creator.pk
+    )
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
