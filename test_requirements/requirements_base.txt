@@ -9,3 +9,4 @@ django-mptt==0.5.2
 django-sekizai>=0.6.1
 argparse
 mysql-python
+dj-database-url
