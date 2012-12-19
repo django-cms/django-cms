@@ -54,7 +54,7 @@ class ListPluginsCommand(NoArgsCommand):
         self.stdout.write("==== Plugin report ==== \n\n")
         self.stdout.write("There are %s plugin types in your database \n" % len(plugin_report()))
         for plugin in plugin_report():   
-            self.stdout.write("\n%s \n" % plugin["type"] )
+            self.stdout.write("\n%s \n" % plugin["type"])
 
             plugin_model = plugin["model"]
             instances = len(plugin["instances"])
