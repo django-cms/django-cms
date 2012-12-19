@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from StringIO import StringIO
+from django.core import management
+
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.api import create_page, add_plugin
@@ -53,7 +55,7 @@ class ManagementTestCase(CMSTestCase):
             placeholder = Placeholder.objects.create(slot="test")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
-            add_plugin(placeholder, "LinkPlugin", "en",
+            link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
                 name="A Link", url="https://www.django-cms.org")
             self.assertEqual(
                 CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 
@@ -61,12 +63,147 @@ class ManagementTestCase(CMSTestCase):
             self.assertEqual(
                 CMSPlugin.objects.filter(plugin_type="LinkPlugin").count(), 
                 1)            
-            for plugin in plugin_report():                    
-                print plugin
-            # command.stdout = out
-            # command.handle("list", "plugins", interactive=False)
-            # self.assertEqual(out.getvalue(), "LinkPlugin\nTextPlugin\n")
+
+            # create a CMSPlugin with an unsaved instance
+            instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")
+            instanceless_plugin.save()
+
+            # create a bogus CMSPlugin to simulate one which used to exist but 
+            # is no longer installed
+            bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
+            bogus_plugin.save()
+
+            report = plugin_report()
+
+            # there should be reports for three plugin types
+            self.assertEqual(
+                len(report), 
+                3)
+                
+            # check the bogus plugin 
+            bogus_plugins_report = report[0]
+            self.assertEqual(
+                bogus_plugins_report["model"], 
+                None)            
+
+            self.assertEqual(
+                bogus_plugins_report["type"], 
+                u'BogusPlugin')            
+            
+            self.assertEqual(
+                bogus_plugins_report["instances"][0], 
+                bogus_plugin)            
+
+            # check the link plugin 
+            link_plugins_report = report[1]
+            self.assertEqual(
+                link_plugins_report["model"], 
+                link_plugin.__class__)            
+
+            self.assertEqual(
+                link_plugins_report["type"], 
+                u'LinkPlugin')            
+            
+            self.assertEqual(
+                link_plugins_report["instances"][0].get_plugin_instance()[0], 
+                link_plugin)            
+
+            # check the text plugins 
+            text_plugins_report = report[2]
+            self.assertEqual(
+                text_plugins_report["model"], 
+                TextPlugin.model)            
+
+            self.assertEqual(
+                text_plugins_report["type"], 
+                u'TextPlugin')            
+            
+            self.assertEqual(
+                len(text_plugins_report["instances"]), 
+                3)
+                
+            self.assertEqual(
+                text_plugins_report["instances"][2], 
+                instanceless_plugin)
+                            
+            self.assertEqual(
+                text_plugins_report["unsaved_instances"], 
+                [instanceless_plugin])
+        
                         
+    def test_delete_orphaned_plugins(self):
+        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
+        with SettingsOverride(INSTALLED_APPS=apps):
+            placeholder = Placeholder.objects.create(slot="test")
+            add_plugin(placeholder, TextPlugin, "en", body="en body")
+            add_plugin(placeholder, TextPlugin, "en", body="en body")
+            link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
+                name="A Link", url="https://www.django-cms.org")
+
+            instanceless_plugin = CMSPlugin(
+                language="en", plugin_type="TextPlugin")
+            instanceless_plugin.save()
+
+            # create a bogus CMSPlugin to simulate one which used to exist but 
+            # is no longer installed
+            bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
+            bogus_plugin.save()
+
+            report = plugin_report()
+
+            # there should be reports for three plugin types
+            self.assertEqual(
+                len(report), 
+                3)
+                
+            # check the bogus plugin 
+            bogus_plugins_report = report[0]
+            self.assertEqual(
+                len(bogus_plugins_report["instances"]), 
+                1)            
+
+            # check the link plugin 
+            link_plugins_report = report[1]
+            self.assertEqual(
+                len(link_plugins_report["instances"]), 
+                1)                      
+
+            # check the text plugins 
+            text_plugins_report = report[2]
+            self.assertEqual(
+                len(text_plugins_report["instances"]), 
+                3)            
+
+            self.assertEqual(
+                len(text_plugins_report["unsaved_instances"]), 
+                1)
+                
+
+            management.call_command('cms', 'delete_orphaned_plugins')
+            report = plugin_report()
+
+            # there should be reports for two plugin types (one should have been deleted)
+            self.assertEqual(
+                len(report), 
+                2)
+                
+            # check the link plugin 
+            link_plugins_report = report[0]
+            self.assertEqual(
+                len(link_plugins_report["instances"]), 
+                1)                      
+
+            # check the text plugins 
+            text_plugins_report = report[1]
+            self.assertEqual(
+                len(text_plugins_report["instances"]), 
+                2)            
+
+            self.assertEqual(
+                len(text_plugins_report["unsaved_instances"]), 
+                0)
+                
+            
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
         command = cms.Command()
