@@ -1024,7 +1024,6 @@ class AdminFormsTests(AdminTestsBase):
             'site': site.pk,
             'template': settings.CMS_TEMPLATES[0][0],
             'reverse_id': dupe_id,
-            'parent': None,
         }
         form = PageForm(data=page2_data, files=None)
         self.assertFalse(form.is_valid())
