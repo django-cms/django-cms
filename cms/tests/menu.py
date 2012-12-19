@@ -21,6 +21,7 @@ from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
+from django.utils.unittest.case import skipUnless
 
 
 
@@ -85,7 +86,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
         with force_language("en"):
-            response = self.client.get(self.get_pages_root()) # path = '/'
+            response = self.client.get(self.get_pages_root())  # path = '/'
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
 
@@ -96,7 +97,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_show_menu(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
         nodes = context['children']
@@ -111,21 +112,22 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[1].sibling, True)
         self.assertEqual(nodes[1].selected, False)
 
+    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_show_menu_num_queries(self):
+        print settings.DATABASES['default']['ENGINE']
         context = self.get_context()
-        # test standard show_menu 
-        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
-            with self.assertNumQueries(5):
-                """
-                The queries should be:
-                    get all pages
-                    get all page permissions
-                    get all titles
-                    get the menu cache key
-                    set the menu cache key
-                """
-                tpl = Template("{% load menu_tags %}{% show_menu %}")
-                tpl.render(context)
+        # test standard show_menu
+        with self.assertNumQueries(5):
+            """
+            The queries should be:
+                get all pages
+                get all page permissions
+                get all titles
+                get the menu cache key
+                set the menu cache key
+            """
+            tpl = Template("{% load menu_tags %}{% show_menu %}")
+            tpl.render(context)
 
     def test_show_menu_cache_key_leak(self):
         context = self.get_context()
@@ -167,7 +169,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_only_one_active_level(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
@@ -177,7 +179,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_only_level_zero(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 %}")
         tpl.render(context)
         nodes = context['children']
@@ -187,7 +189,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_only_level_one(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -198,7 +200,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_only_level_one_active(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 0 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -208,7 +210,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_level_zero_and_one(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 1 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -218,7 +220,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_show_submenu(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
         tpl.render(context)
         nodes = context['children']
@@ -693,22 +695,22 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].id, subpage.pk)
 
+    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_show_submenu_num_queries(self):
         page = self.get_page(6)
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
-        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
-            with self.assertNumQueries(5):
-                """
-                The queries should be:
-                    get all pages
-                    get all page permissions
-                    get all titles
-                    get the menu cache key
-                    set the menu cache key
-                """
-                tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
-                tpl.render(context)
+        with self.assertNumQueries(5):
+            """
+            The queries should be:
+                get all pages
+                get all page permissions
+                get all titles
+                get the menu cache key
+                set the menu cache key
+            """
+            tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
+            tpl.render(context)
 
 class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation(self):
@@ -742,6 +744,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         child = children[0]
         self.assertEqual(child.id, c.publisher_public.id)
 
+    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_not_in_navigation_num_queries(self):
         """
         Test for issue 521
@@ -761,21 +764,21 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
-        if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite':
-            with LanguageOverride('en'):
-                context = self.get_context(a.get_absolute_url())
-                with self.assertNumQueries(5):
-                    """
-                    The queries should be:
-                        get all pages
-                        get all page permissions
-                        get all titles
-                        get the menu cache key
-                        set the menu cache key
-                    """
-                    # Actually seems to run:
-                    tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
-                    tpl.render(context)
+
+        with LanguageOverride('en'):
+            context = self.get_context(a.get_absolute_url())
+            with self.assertNumQueries(5):
+                """
+                The queries should be:
+                    get all pages
+                    get all page permissions
+                    get all titles
+                    get the menu cache key
+                    set the menu cache key
+                """
+                # Actually seems to run:
+                tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+                tpl.render(context)
 
 
 class ViewPermissionMenuTests(SettingsOverrideTestCase):
