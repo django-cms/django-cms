@@ -25,10 +25,35 @@ It has two subcommands:
 * ``cms list plugins`` lists all plugins that are used in your project.
 * ``cms list apphooks`` lists all apphooks that are used in your project.
 
+``cms list plugins`` will issue warnings when it finds orphaned plugins (see
+``cms delete_orphaned_plugins`` below).
+
 
 **************************************
 Plugin and apphook management commands
 **************************************
+
+``cms delete_orphaned_plugins``
+===============================
+
+.. warning::
+
+    The delete_orphaned_plugins command **permanently deletes** data from your
+    database. You should make a backup of your database before using it!
+    
+Identifies and deletes orphaned plugins.
+
+Orphaned plugins are ones that exist in the CMSPlugins table, but:
+
+* have a plugin_type that is no longer even installed
+* have no corresponding saved instance in that particular plugin type's table  
+
+Such plugins will cause problems when trying to use operations that need to copy
+pages (and thefore plugins), which includes ``cms moderator on`` as well as page
+copy operations in the admin.
+
+It is advised to run ``cms list plugins`` periodically, and `` cms
+delete_orphaned_plugins`` when required.
 
 ``cms uninstall``
 =================
@@ -51,7 +76,7 @@ It has two subcommands:
 
 .. warning::
 
-    The uninstall command **permanently deletes** data from your database.
+    The uninstall commands **permanently delete** data from your database.
     You should make a backup of your database before using them!
     
 
