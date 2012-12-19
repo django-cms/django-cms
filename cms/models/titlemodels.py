@@ -31,12 +31,6 @@ class Title(models.Model):
     def __unicode__(self):
         return u"%s (%s, %s)" % (self.title, self.slug, self.language)
 
-    def save(self, *args, **kwargs):
-        # Update the path attribute before saving
-        # No longer needed since this is done in signals
-        #self.update_path()
-        super(Title, self).save(*args, **kwargs)
-
     def update_path(self):
         # Build path from parent page's path and slug
         slug = u'%s' % self.slug
@@ -48,6 +42,7 @@ class Title(models.Model):
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
+        
 
     @property
     def overwrite_url(self):

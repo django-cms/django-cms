@@ -11,6 +11,7 @@ from cms.utils.i18n import force_language
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches, reverse
 import sys
+from cms.models.pagemodel import Page
 
 
 
@@ -394,6 +395,7 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
 
         output = tag.get_context(fake_context, 'en')
         url = output['content']
+
         self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
 
         output = tag.get_context(fake_context, 'de')

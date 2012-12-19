@@ -35,6 +35,7 @@ from django.forms.widgets import Media
 from django.test.testcases import TestCase
 import os
 import datetime
+from cms.utils.permissions import set_current_user
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -607,7 +608,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         plugin.body = plugin_tags_to_admin_html(' {{ plugin_object %s }} {{ plugin_object %s }} ' % (str(plugin_ref_1.pk), str(plugin_ref_2.pk)))
         plugin.save()
-        self.assertEquals(plugin.pk, 1)
+
         page_data = self.get_new_page_data()
 
         #create 2nd language page
@@ -635,10 +636,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.count(), 6)
-
-        new_plugin = Text.objects.get(pk=6)
+        plugins = list(Text.objects.all())
+        new_plugin = plugins[-1]
         idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
-        expected = sorted([4, 5])
+        expected = sorted([plugins[3].pk, plugins[4].pk])
         self.assertEquals(idlist, expected)
 
     def test_empty_plugin_is_ignored(self):
@@ -669,7 +670,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin = self._edit_text_plugin(plugin_id, "fnord")
 
         actual_last_modification_time = CMSSitemap().lastmod(page)
-        self.assertEqual(plugin.changed_date, actual_last_modification_time)
+        self.assertEqual(plugin.changed_date - datetime.timedelta(microseconds=plugin.changed_date.microsecond), actual_last_modification_time - datetime.timedelta(microseconds=actual_last_modification_time.microsecond))
 
     def test_moving_plugin_to_different_placeholder(self):
         plugin_pool.register_plugin(DumbFixturePlugin)
