@@ -989,6 +989,26 @@ class AdminFormsTests(AdminTestsBase):
             form = PageForm(data, instance=instance)
             self.assertTrue(form.is_valid(), form.errors.as_text())
 
+    def test_missmatching_site_parent_dotsite(self):
+        site0 = Site.objects.create(domain='foo.com', name='foo.com')
+        site1 = Site.objects.create(domain='foo.com', name='foo.com')
+        parent_page = Page.objects.create(
+            template='nav_playground.html',
+            site=site0)
+        new_page_data = {
+            'title': 'Title',
+            'slug': 'slug',
+            'language': 'en',
+            'site': site1.pk,
+            'template': settings.CMS_TEMPLATES[0][0],
+            'reverse_id': '',
+            'parent': parent_page.pk,
+        }
+        form = PageForm(data=new_page_data, files=None)
+        self.assertFalse(form.is_valid())
+        self.assertIn(u"Site doesn't match the parent's page site",
+                      form.errors['__all__'])
+
     def test_reverse_id_error_location(self):
         ''' Test moving the reverse_id validation error to a field specific one '''
 

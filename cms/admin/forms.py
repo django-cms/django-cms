@@ -104,6 +104,9 @@ class PageAddForm(forms.ModelForm):
         except Site.DoesNotExist:
             site = None
             raise ValidationError("No site found for current settings.")
+
+        if parent and parent.site != site:
+            raise ValidationError("Site doesn't match the parent's page site")
         
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
