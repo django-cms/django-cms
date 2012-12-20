@@ -21,12 +21,12 @@ class ManagementTestCase(CMSTestCase):
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
-            self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 1)            
+            self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 1)
             command = cms.Command()
             command.stdout = out
             command.handle("list", "apphooks", interactive=False)
             self.assertEqual(out.getvalue(), "SampleApp\n")
-            
+
     def test_uninstall_apphooks_without_apphook(self):
         out = StringIO()
         command = cms.Command()
@@ -56,17 +56,13 @@ class ManagementTestCase(CMSTestCase):
             add_plugin(placeholder, "LinkPlugin", "en",
                 name="A Link", url="https://www.django-cms.org")
             self.assertEqual(
-                CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 
-                2)            
+                CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
+                2)
             self.assertEqual(
-                CMSPlugin.objects.filter(plugin_type="LinkPlugin").count(), 
-                1)            
-            for plugin in plugin_report():                    
-                print plugin
-            # command.stdout = out
-            # command.handle("list", "plugins", interactive=False)
-            # self.assertEqual(out.getvalue(), "LinkPlugin\nTextPlugin\n")
-                        
+                CMSPlugin.objects.filter(plugin_type="LinkPlugin").count(),
+                1)
+
+
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
         command = cms.Command()

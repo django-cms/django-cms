@@ -19,6 +19,7 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 from os.path import join
+from datetime import timedelta
 import copy
 
 
@@ -70,8 +71,8 @@ class Page(MPTTModel):
     # Publisher fields
     moderator_state = models.SmallIntegerField(_('moderator state'), default=0, blank=True, editable=False)
     publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
-    #This is misnamed - the one-to-one relation is populated on both ends
-    publisher_public = models.OneToOneField('self', related_name='publisher_draft',  null=True, editable=False)
+    # This is misnamed - the one-to-one relation is populated on both ends
+    publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
 
     # Managers
@@ -133,7 +134,7 @@ class Page(MPTTModel):
         import cms.signals as cms_signals
         cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
         self.save()  # always save the page after move, because of publisher
-        moderator.page_changed(self, force_moderation_action = PageModeratorState.ACTION_MOVE)
+        moderator.page_changed(self, force_moderation_action=PageModeratorState.ACTION_MOVE)
         # check the slugs
         page_utils.check_title_slugs(self)
 
@@ -301,7 +302,7 @@ class Page(MPTTModel):
 
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return page_copy   # return the page_copy or None
+        return page_copy  # return the page_copy or None
 
     def save(self, no_signals=False, commit=True, **kwargs):
         """
@@ -317,7 +318,7 @@ class Page(MPTTModel):
         # Published pages should always have a publication date
         # if the page is published we set the publish date if not set yet.
         if self.publication_date is None and self.published:
-            self.publication_date = timezone.now()
+            self.publication_date = timezone.now() - timedelta(seconds=5)
 
         if self.reverse_id == "":
             self.reverse_id = None
@@ -370,6 +371,8 @@ class Page(MPTTModel):
 
         if not self.pk:
             self.save()
+        if not self.parent_id:
+            self.clear_home_pk_cache()
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -461,7 +464,7 @@ class Page(MPTTModel):
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be unpublished. Use draft.')
 
-        #First, make sure we are in the correct state
+        # First, make sure we are in the correct state
         self.published = False
         self.save()
         public_page = self.get_public_object()
@@ -532,7 +535,7 @@ class Page(MPTTModel):
         """
         descendants = list(self.get_descendants().order_by('level'))
         descendants.reverse()
-        #TODO: Use a better exception class - PermissionDenied is not quite right
+        # TODO: Use a better exception class - PermissionDenied is not quite right
         for page in descendants:
             if not page.delete_requested():
                 raise PermissionDenied('There are descendant pages not marked for deletion')
@@ -843,14 +846,18 @@ class Page(MPTTModel):
 
     def get_home_pk_cache(self):
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        if not hasattr(self, attr):
+        if getattr(self, attr, None) is None:
             setattr(self, attr, self.get_object_queryset().get_home(self.site).pk)
         return getattr(self, attr)
 
     def set_home_pk_cache(self, value):
+
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
         setattr(self, attr, value)
     home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
+
+    def clear_home_pk_cache(self):
+        self.home_pk_cache = None
 
     def get_media_path(self, filename):
         """
@@ -1005,7 +1012,7 @@ class Page(MPTTModel):
         prev_sibling = self.get_previous_filtered_sibling(**filters)
         public_prev_sib = prev_sibling.publisher_public if prev_sibling else None
 
-        if not self.publisher_public_id: # first time published
+        if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
             if public_prev_sib:
                 obj.insert_at(public_prev_sib, position='right', save=False)
