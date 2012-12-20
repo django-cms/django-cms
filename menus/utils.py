@@ -34,8 +34,8 @@ def find_selected(nodes):
             result = find_selected(node.children)
             if result:
                 return result
-            
-            
+
+
 def set_language_changer(request, func):
     """
     
@@ -74,7 +74,7 @@ class DefaultLanguageChanger(object):
     def __init__(self, request):
         self.request = request
         self._app_path = None
-        
+
     @property
     def app_path(self):
         if self._app_path is None:
@@ -84,10 +84,10 @@ class DefaultLanguageChanger(object):
             else:
                 self._app_path = self.request.path
         return self._app_path
-        
+
     def __call__(self, lang):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
-    
+
     def get_page_path(self, lang):
         page = getattr(self.request, 'current_page', None)
         if page:
