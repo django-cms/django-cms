@@ -709,6 +709,18 @@ class PluginsTestCase(PluginsTestBaseCase):
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
         plugin_pool.unregister_plugin(DumbFixturePlugin)
 
+    def test_empty_plugin_cleanup(self):
+        # check if plugin gets deleted during publish
+        page = create_page('page', 'nav_playground.html', 'en', published=False)
+        self._create_text_plugin_on_page(page)
+        page.publish()
+        self.assertEquals(CMSPlugin.objects.all().count(), 0)
+        # check if a filled plugin is left alone
+        pid = self._create_text_plugin_on_page(page)
+        self._edit_text_plugin(pid, '<p>So long, and thanks for all the fish.</p>')
+        page.publish()
+        self.assertEquals(CMSPlugin.objects.all().count(), 2)
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):
