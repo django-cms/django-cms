@@ -114,7 +114,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_show_menu_num_queries(self):
-        print settings.DATABASES['default']['ENGINE']
         context = self.get_context()
         # test standard show_menu
         with self.assertNumQueries(5):

@@ -10,7 +10,7 @@ from urlparse import urlparse
 import os
 
 
-def main(db_url, test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
+def main(db_url="sqlite://localhost/:memory:", test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
          time_tests=False, verbosity=1, failfast=False, test_labels=None):
     if not test_labels:
         test_labels = ['cms']
