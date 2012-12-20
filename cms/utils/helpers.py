@@ -67,3 +67,24 @@ def make_revision_with_plugins(obj, user=None, message=None):
                 
 def find_placeholder_relation(obj):
     return 'page'
+
+
+def cleanup_plugins(page=None, placeholder=None, pluginlist=[]):
+    '''
+    Delete all <Empty> plugins in the given placeholder/page/list of plugins.
+    '''
+    plugins = pluginlist
+
+    if placeholder:
+        plugins = placeholder.get_plugins_list()
+
+    if page:
+        collection = []
+        placeholders = page.placeholders
+        for placeholder in placeholders.all():
+            collection += placeholder.get_plugins_list()
+        plugins = collection
+
+    for plugin in plugins:
+        if not plugin.get_plugin_instance()[0]:
+            plugin.delete_with_public()

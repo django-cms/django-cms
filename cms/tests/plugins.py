@@ -364,11 +364,22 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_type':"TextPlugin",
             'language':settings.LANGUAGES[0][0],
             'placeholder':page.placeholders.get(slot="body").pk,
+            'body': '<p>text</p>'
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         plugin_id = int(response.content)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+
+        # add some stuff to the plugin, so it won't get cleaned up on publish
+        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            "body":'<p>We\'re all going to die!</p>'
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
 
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
