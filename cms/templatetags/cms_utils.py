@@ -41,7 +41,7 @@ def loadpage(context, reverse_id):
     Loaded page with current reverse_id
     """
     page = Page.objects.get(reverse_id=reverse_id)
-    context.__setattr__(menu_id, page)
+    context.__setattr__(reverse_id, page)
     return ''
 register.simple_tag(takes_context=True)(loadpage)
 
@@ -58,6 +58,9 @@ class GetChilderns(InclusionTag):
     def get_context(self, context, page, template, imgsize):
         if page is None:
             page = context['request'].current_page
+        elif isinstance(page, basestring):
+            page = Page.objects.get(reverse_id = page)
+
 
         if template:
             self.template = template
