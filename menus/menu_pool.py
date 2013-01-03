@@ -102,7 +102,7 @@ class MenuPool(object):
         if not modifier_class in self.modifiers:
             self.modifiers.append(modifier_class)
 
-    def _build_nodes(self, request, site_id):
+    def _build_nodes(self, request, site_id, truncate):
         """
         This is slow. Caching must be used. 
         One menu is built per language and per site.
@@ -122,7 +122,15 @@ class MenuPool(object):
         # Cache key management
         lang = get_language()
         prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
-        key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
+
+        # when using the truncate option of {% show_menu %} templatetag, we
+        # can't cache just a single set of nodes for the whole site, we have
+        # to cache the nodes for each request_path
+        if truncate:
+            key = "%smenu_nodes_%s_%s_%s" % (prefix, lang, site_id, request.path)
+        else:    
+            key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
+
         if request.user.is_authenticated():
             key += "_%s_user" % request.user.pk
         cached_nodes = cache.get(key, None)
@@ -131,7 +139,7 @@ class MenuPool(object):
         
         final_nodes = []
         for menu_class_name in self.menus:
-            nodes = self.menus[menu_class_name].get_nodes(request)
+            nodes = self.menus[menu_class_name].get_nodes(request, truncate)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
         cache.set(key, final_nodes, settings.CMS_CACHE_DURATIONS['menus'])
@@ -151,13 +159,13 @@ class MenuPool(object):
             nodes = inst.modify(request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
 
-    def get_nodes(self, request, namespace=None, root_id=None, site_id=None, breadcrumb=False):
+    def get_nodes(self, request, namespace=None, root_id=None, site_id=None, breadcrumb=False, truncate=False):
         self.discover_menus()
         if not site_id:
             site_id = Site.objects.get_current().pk
-        nodes = self._build_nodes(request, site_id)
+        nodes = self._build_nodes(request, site_id, truncate)
         nodes = copy.deepcopy(nodes)
-        nodes = self.apply_modifiers(nodes, request, namespace, root_id, post_cut=False, breadcrumb=breadcrumb)
+        nodes = self.apply_modifiers(nodes, request, namespace, root_id, post_cut=False, breadcrumb=False)
         return nodes 
 
     def _mark_selected(self, request, nodes):

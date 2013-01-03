@@ -228,7 +228,7 @@ def page_to_node(page, home, cut):
 
 class CMSMenu(Menu):
     
-    def get_nodes(self, request):
+    def get_nodes(self, request, truncate=False):
         page_queryset = get_page_queryset(request)
         site = Site.objects.get_current()
         lang = get_language_from_request(request)
@@ -241,6 +241,61 @@ class CMSMenu(Menu):
             filters['title_set__language'] = lang
             
         pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
+
+        if truncate:
+            # ------------- additional code to speed up menus -----------
+
+            # pages now contains every single page in the site
+            # it was quick to get, but some other operations are slow, 
+            # especially get_visible_pages() and titles
+        
+            # so why not be smarter? Instead of getting every page in the site, let's
+            # just get relevant ones, instead of ones that will never appear in the menu
+            # such as pages related only through distant ancestors. We'll get: 
+            #
+            #   *   the current page 
+            #   *   all of its ancestors
+            #   *   all of their children
+            #         
+            # in order to do this we'll also need an amendment to menus/menu_pool - it's now longer 
+            # enough to do:
+            #
+            # key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
+            #
+            # we also need to cache each request_path:
+            #
+            # key = "%smenu_nodes_%s_%s_%s" % (prefix, lang, site_id, request.path)
+        
+            current_page = request.current_page
+        
+            # get the current page as a queryset and make sure it's unique
+            current_page_queryset = pages.filter(id=current_page.id).distinct()
+        
+            # get all the ancestors - a chain of ancestry back to the root
+            ancestry = current_page.get_ancestors(ascending = True)
+
+            # create a queryset of relevant pages - we use the intersection of 
+            # pages & ancestry to eliminate unpublished ancestors
+            relevant_pages = pages & ancestry
+                
+            # get all of:
+            # pages whose parents are in relevant pages
+            # relevant pages
+            # pages whose parents are the current page
+            # current page    
+        
+            pages = \
+                pages.filter(parent__in=relevant_pages).distinct() | \
+                relevant_pages.distinct() | \
+                pages.filter(parent__in=current_page_queryset).distinct() | \
+                current_page_queryset | \
+                pages.filter(level=0).distinct()
+        
+            # do they need to be ordered this way here? I am not sure 
+            pages = pages.order_by("tree_id", "lft")
+        
+            # ------------- end of additional code to speed up menus -----------
+
         ids = {}
         nodes = []
         first = True
@@ -287,7 +342,7 @@ menu_pool.register_menu(CMSMenu)
 
 
 class NavExtender(Modifier):
-    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb, ):
         if post_cut:
             return nodes
         exts = []
@@ -401,7 +456,7 @@ class SoftRootCutter(Modifier):
                 Techniques
                 Instruments
     """
-    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb, ):
         # only apply this modifier if we're pre-cut (since what we do is cut)
         if post_cut or not settings.CMS_SOFTROOT:
             return nodes
