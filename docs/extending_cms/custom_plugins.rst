@@ -248,39 +248,71 @@ else clause.
 Handling Relations
 ==================
 
-If your custom plugin has foreign key or many-to-many relations you are
-responsible for copying those if necessary whenever the CMS copies the plugin.
+If your custom plugin has foreign key (to it, or from it) or many-to-many
+relations you are responsible for copying those related objects, if required,
+whenever the CMS copies the plugin - **it won't do it for you automatically**.
 
-To do this you can implement a method called
-:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` on your plugin
-model which gets the **old** instance of the plugin as an argument.
+To do this you should create a method called
+:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` on your plugin model,
+that receives the **old** instance of the plugin as an argument.
 
-Let's assume this is your plugin::
+Every plugin model inherits the empty ``copy_relations()`` method from the base
+class, and it's called when your plugin is copied. So, it's there for you to
+adapt to your purposes as required.
+
+You'll need to use it in two slightly different ways, depending on whether your
+plugin has relations *to* or *from* other objects that need to be copied too:
+
+For foreign key relations *from* other objects
+----------------------------------------------
+
+Your plugin may have items with foreign keys to it, which will typically be the
+case if you set it up so that they are inlines in its admin. So you might have a
+two models, one for the plugin and one for those items::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
-        sections =  models.ManyToManyField(Section)
 
-        def __unicode__(self):
-            return self.title
+    class AssociatedItem(models.Model):
+        plugin = models.ForeignKey(
+            ArticlePluginModel, 
+            related_name="associated_item"
+            )
 
-Now when the plugin gets copied, you want to make sure the sections stay::
+You'll then need the ``copy_relations()`` method on your plugin model to loop
+over the associated items and copy them, giving the copies foreign keys to the
+new plugin::
+      
+    class ArticlePluginModel(CMSPlugin):
+        title = models.CharField(max_length=50)
+
+        def copy_relations(self, oldinstance):
+            for associated_item in oldinstance.associated_item.all():
+                associated_item.pk = None
+                associated_item.plugin = self
+                associated_item.save()
+
+For many-to-many or foreign key relations *to* other objects
+------------------------------------------------------------
+
+Let's assume these are the relevant bits of your plugin::
+
+    class ArticlePluginModel(CMSPlugin):
+        title = models.CharField(max_length=50)
+        sections = models.ManyToManyField(Section)
+
+Now when the plugin gets copied, you want to make sure the sections stay, so
+it becomes::
+
+    class ArticlePluginModel(CMSPlugin):
+        title = models.CharField(max_length=50)
+        sections = models.ManyToManyField(Section)
 
         def copy_relations(self, oldinstance):
             self.sections = oldinstance.sections.all()
 
-Your full model now::
-
-    class ArticlePluginModel(CMSPlugin):
-        title = models.CharField(max_length=50)
-        sections =  models.ManyToManyField(Section)
-
-        def __unicode__(self):
-            return self.title
-
-        def copy_relations(self, oldinstance):
-            self.sections = oldinstance.sections.all()
-
+If your plugins have relational fields of both kinds, you may of course need to
+use both the copying techniques described above.
 
 ********
 Advanced
