@@ -243,28 +243,18 @@ class CMSMenu(Menu):
         pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
 
         if truncate:
-            # ------------- additional code to speed up menus -----------
-
-            # pages now contains every single page in the site
-            # it was quick to get, but some other operations are slow, 
-            # especially get_visible_pages() and titles
-        
-            # so why not be smarter? Instead of getting every page in the site, let's
-            # just get relevant ones, instead of ones that will never appear in the menu
-            # such as pages related only through distant ancestors. We'll get: 
+            # We now have every page in the site, but the truncate option of
+            # the {% show_menu %} template tag builds a menu containing
+            # only relevant ones, instead of ones that will never appear 
+            # in the menu such as pages related only through distant 
+            # ancestors. We'll get only: 
             #
             #   *   the current page 
             #   *   all of its ancestors
-            #   *   all of their children
-            #         
-            # in order to do this we'll also need an amendment to menus/menu_pool - it's now longer 
-            # enough to do:
+            #   *   all of their children  
             #
-            # key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
-            #
-            # we also need to cache each request_path:
-            #
-            # key = "%smenu_nodes_%s_%s_%s" % (prefix, lang, site_id, request.path)
+            # but we won't get any aunts or uncles, or their descendants or 
+            # ancestors that are not included in the list above
         
             current_page = request.current_page
         
@@ -279,11 +269,10 @@ class CMSMenu(Menu):
             relevant_pages = pages & ancestry
                 
             # get all of:
-            # pages whose parents are in relevant pages
-            # relevant pages
-            # pages whose parents are the current page
-            # current page    
-        
+            # * pages whose parents are in relevant pages
+            # * relevant pages
+            # * pages whose parents are the current page
+            # *current page            
             pages = \
                 pages.filter(parent__in=relevant_pages).distinct() | \
                 relevant_pages.distinct() | \
@@ -291,10 +280,8 @@ class CMSMenu(Menu):
                 current_page_queryset | \
                 pages.filter(level=0).distinct()
         
-            # do they need to be ordered this way here? I am not sure 
             pages = pages.order_by("tree_id", "lft")
         
-            # ------------- end of additional code to speed up menus -----------
 
         ids = {}
         nodes = []
@@ -342,7 +329,7 @@ menu_pool.register_menu(CMSMenu)
 
 
 class NavExtender(Modifier):
-    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb, ):
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             return nodes
         exts = []
@@ -456,7 +443,7 @@ class SoftRootCutter(Modifier):
                 Techniques
                 Instruments
     """
-    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb, ):
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
         if post_cut or not settings.CMS_SOFTROOT:
             return nodes

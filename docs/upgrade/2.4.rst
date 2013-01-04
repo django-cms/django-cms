@@ -84,6 +84,23 @@ The command can be run with:
 	manage.py cms fix-mptt
 	
 
+Changes to menus
+================
+
+The ``get_nodes()`` method of each menu class is now called with an optional
+``truncate`` argument (to speed up ``{% show_menu %}`` with a ``truncate``
+option).
+
+If you don't have custom menu classes in your applications, you don't need to
+worry about this. If you do, you will need to make a small amendment to each
+class's ``get_nodes()`` so it can handle the ``truncate`` argument::
+
+    def get_nodes(self, request, truncate=False):
+        # menu code
+	                  
+You may want to try the ``truncate`` option if you already use ``{% show_menu
+%}`` in your templates - it may be useful for your site.
+
 Removed the MultilingualMiddleware
 ==================================
 

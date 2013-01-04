@@ -258,20 +258,38 @@ show_menu
 The ``show_menu`` tag renders the navigation of the current page. You can
 overwrite the appearance and the HTML if you add a ``cms/menu.html`` template
 to your project or edit the one provided with django-cms. ``show_menu`` takes
-four optional parameters: ``start_level``, ``end_level``, ``extra_inactive``,
-and ``extra_active``.
+several optional parameters:
 
-The first two parameters, ``start_level`` (default=0) and ``end_level``
-(default=100) specify from which level the navigation shoud be rendered
-and at which level it should stop. If you have home as a root node and don't
-want to display home you can render the navigation only after level 1.
+* ``start_level``
+* ``end_level``
+* ``extra_inactive``
+* ``extra_active``
+* ``template``
+* ``namespace``
+* ``root_id``
+* ``next_page``
+* ``truncate``
 
-The third parameter, ``extra_inactive`` (default=0), specifies how many levels
-of navigation should be displayed if a node is not a direct ancestor or
-descendant of the current active node.
+``start_level`` (default=0) and ``end_level`` (default=100) specify from which
+level the navigation shoud be rendered and at which level it should stop. If
+you have home as a root node and don't want to display home you can render the
+navigation only after level 1.
 
-Finally, the fourth parameter, ``extra_active`` (default=100), specifies how
-many levels of descendants of the currently active node should be displayed.
+``extra_inactive`` (default=0) specifies how many levels of navigation should
+be displayed if a node is not a direct ancestor or descendant of the current
+active node.
+
+``extra_active`` (default=100), specifies how many levels of descendants of
+the currently active node should be displayed.  
+
+``template`` (default="") allows you to specify a custom template; it will use
+``menus/templates/menu/menu.html`` if you don't.
+
+``truncate`` (default="") strips the generated menu of nodes that are not
+considered relevant. This can vastly speed up the building of the menu for
+sites with many CMS pages, and make cacheing unnecessary. If your site's
+navigation menus *don't* require that you show siblings of all your page's
+ancestors, then this may be useful.
 
 show_menu Examples
 ------------------
@@ -304,6 +322,9 @@ Navigation with a custom template::
 
     {% show_menu 0 100 100 100 "myapp/menu.html" %}
 
+Truncated navigation, five levels ::
+
+    {% show_menu 0 100 0 1 "" "" "" "" "truncate" %}
 
 .. templatetag:: show_menu_below_id
 
