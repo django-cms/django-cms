@@ -252,16 +252,23 @@ If your custom plugin has foreign key (to it, or from it) or many-to-many
 relations you are responsible for copying those related objects, if required,
 whenever the CMS copies the plugin - **it won't do it for you automatically**.
 
-To do this you should create a method called
-:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` on your plugin model,
-that receives the **old** instance of the plugin as an argument.
-
-Every plugin model inherits the empty ``copy_relations()`` method from the base
+Every plugin model inherits the empty
+:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` method from the base
 class, and it's called when your plugin is copied. So, it's there for you to
 adapt to your purposes as required.
 
-You'll need to use it in two slightly different ways, depending on whether your
-plugin has relations *to* or *from* other objects that need to be copied too:
+Typically, you will want it to copy related objects. To do this you should
+create a method called ``copy_relations`` on your plugin model, that receives
+the **old** instance of the plugin as an argument.
+
+You may however decide that the related objects shouldn't be copied - you may
+want to leave them alone, for example. Or, you might even want to choose some
+altogether different relations for it, or to create new ones when it's copied...
+it depends on your plugin and the way you want it to work.
+
+If you do want to copy related objects, you'll need to do this in two slightly
+different ways, depending on whether your plugin has relations *to* or *from*
+other objects that need to be copied too:
 
 For foreign key relations *from* other objects
 ----------------------------------------------
@@ -288,6 +295,8 @@ new plugin::
 
         def copy_relations(self, oldinstance):
             for associated_item in oldinstance.associated_item.all():
+                # instance.pk = None; instance.pk.save() is the slightly odd but
+                # standard Django way of copying a saved model instance
                 associated_item.pk = None
                 associated_item.plugin = self
                 associated_item.save()
@@ -312,7 +321,7 @@ it becomes::
             self.sections = oldinstance.sections.all()
 
 If your plugins have relational fields of both kinds, you may of course need to
-use both the copying techniques described above.
+use *both* the copying techniques described above.
 
 ********
 Advanced
