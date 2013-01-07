@@ -15,7 +15,7 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
         model_less_instances = []
         unsaved_instances = []
         self.stdout.write("... deleting orphaned plugins\n")        
-        for plugin in plugin_report():
+        for plugin in report:
             # delete items with no model
             if not plugin["model"]:
                 for instance in plugin["instances"]:
