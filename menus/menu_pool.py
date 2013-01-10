@@ -8,6 +8,8 @@ from menus.exceptions import NamespaceAllreadyRegistered
 from menus.models import CacheKey
 import copy
 
+import warnings
+
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
     '''
     This is an easier to test "inner loop" building the menu tree structure
@@ -139,7 +141,14 @@ class MenuPool(object):
         
         final_nodes = []
         for menu_class_name in self.menus:
-            nodes = self.menus[menu_class_name].get_nodes(request, truncate)
+            try:
+                nodes = self.menus[menu_class_name].get_nodes(request, truncate)
+            except TypeError:
+                warnings.warn(
+                    "Menu.get_nodes() methods now take a 'truncate' argument. See the {% show_menu %} docs. In django CMS 3.0, you will need to amend any Menu sub-classes in your own code to take this argument.",
+                    DeprecationWarning
+                    )
+                nodes = self.menus[menu_class_name].get_nodes(request)                
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
         cache.set(key, final_nodes, settings.CMS_CACHE_DURATIONS['menus'])
