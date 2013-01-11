@@ -76,7 +76,7 @@ var editPluginPopupCallbacks = {};
 					return;
 				}
 				// First create db instance using AJAX post back
-				add_plugin(pluginvalue, parent_id, language)
+				add_plugin(pluginvalue, parent_id, language);
 				
 			}).css("cursor", "pointer").css("margin", "5px");
 			
@@ -104,12 +104,12 @@ var editPluginPopupCallbacks = {};
 
 	function get_plugin_html(){
 		html = '<li class="wym_tools_plugins">'
-			+ '<select name="plugins">'
+			+ '<select name="plugins" unselectable="on">'
 			+ '<option value="" selected="selected">{% filter escapejs %}{% trans "Available Plugins" %}{% endfilter %}</option>'{% for p in installed_plugins %}
 			+ '<option value="{{ p.value }}">{{ p.name }}</option>'{% endfor %}
 			+ '</select>'
-			+ '<span class="insert-object addlink">{% filter escapejs %}{% trans "Insert plugin" %}{% endfilter %}</span>'
-			+ '<span class="edit-object changelink">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
+			+ '<span class="insert-object addlink" unselectable="on">{% filter escapejs %}{% trans "Insert plugin" %}{% endfilter %}</span>'
+			+ '<span class="edit-object changelink" unselectable="on">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
 			+ '</li>';
 	return html;
 	}
