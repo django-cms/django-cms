@@ -10,6 +10,7 @@ from cms.models.moderatormodels import PageModeratorState
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugins.text.models import Text
 from cms.test_utils import testcases as base
@@ -962,6 +963,22 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertFalse(
             any(type(inline) is PagePermissionInlineAdmin
                 for inline in page_admin.get_inline_instances(request)))
+
+    def test_plugin_add_returns_valid_pk_for_plugin(self):
+        admin = self._get_admin()
+        self._give_cms_permissions(admin)
+        self._give_permission(admin, Text, 'add')
+        self.client.login(username='admin', password='admin')
+        url = reverse('admin:cms_page_add_plugin')
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': self._placeholder.pk,
+            'language': 'en',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response['content-type'], 'text/plain')
+        self.assertTrue(CMSPlugin.objects.filter(pk=int(response.content)).exists())
 
 
 class AdminFormsTests(AdminTestsBase):
