@@ -161,6 +161,21 @@ method.
 
 
 
+***************
+Troubleshooting
+***************
+
+Since plugin modules are found and loaded by django's importlib, you might
+experience errors because the path environment is different at runtime. If
+your `cms_plugins` isn't loaded or accessible, try the following::
+
+    $ python manage.py shell
+    >>> from django.utils.importlib import import_module
+    >>> m = import_module("myapp.cms_plugins")
+    >>> m.some_test_function()
+
+
+
 *********************
 Storing configuration
 *********************
