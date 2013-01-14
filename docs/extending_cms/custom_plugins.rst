@@ -131,8 +131,10 @@ There are three required attributes on those classes:
 * ``model``: The model you wish to use for storing information about this plugin.
   If you do not require any special information, for example configuration, to
   be stored for your plugins, you can simply use
-  :class:`cms.models.pluginmodel.CMSPlugin` (We'll look at that model more
-  closely in a bit).
+  :class:`cms.models.pluginmodel.CMSPlugin` (we'll look at that model more
+  closely in a bit). In a normal admin class, you don't need to supply this 
+  information because ``admin.site.register(Model, Admin)`` takes care of it,
+  but a plugin is not registered in that way.
 * ``name``: The name of your plugin as displayed in the admin. It is generally
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
