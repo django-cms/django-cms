@@ -167,7 +167,7 @@ def _translate_legacy_languages_settings(languages):
 
     pp = pprint.PrettyPrinter(indent=4)
     warnings.warn("CMS_LANGUAGES has changed in django-cms 2.4\n"
-        "You may replace CMS_LANGUAGES with the following:\n%s" % pp.pformat(settings.CMS_LANGUAGES),
+        "You may replace CMS_LANGUAGES with the following:\n%s" % pp.pformat(new_languages),
         CMSDeprecationWarning)
     new_languages['default'] = lang_template.copy()
     return new_languages
