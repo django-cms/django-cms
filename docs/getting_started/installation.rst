@@ -17,6 +17,7 @@ Requirements
 * `django-mptt`_ 0.5.2 (strict due to API compatibility issues)
 * `django-sekizai`_ 0.6.1 or higher
 * `html5lib`_ 0.90 or higher
+* `django-i18nurls`_ (if using django 1.3.X)
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
 
@@ -32,6 +33,7 @@ Requirements
 .. _django-mptt: https://github.com/django-mptt/django-mptt
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: http://code.google.com/p/html5lib/
+.. _django-i18nurls: https://github.com/brocaar/django-i18nurls
 
 Recommended
 ===========

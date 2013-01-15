@@ -131,7 +131,7 @@
 		}
 
 		function refreshIfChildren(pageId){
-			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){};
+			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){ return true; };
 		}
 
 		/**
@@ -219,45 +219,14 @@
 			// grab base url to construct full absolute URLs
 			admin_base_url = document.URL.split("/cms/page/")[0] + "/";
 			
-			// publish
+			// published checkbox
 			if(jtarget.hasClass("publish-checkbox")) {
 				pageId = jtarget.attr("name").split("status-")[1];
-				// if I don't put data in the post, django doesn't get it
-				reloadItem(
-						jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/",
-						{ 1:1 },
-						// on success
-						function(decoded,textStatus){
-							response = decoded.content;
-							status = decoded.status;
-							if(status==200) {
-								if (/page_\d+/.test($(jtarget).attr('id'))) {
-									// one level higher
-									target = $(jtarget).find('div.cont:first');
-								} else {
-									target = $(jtarget).parents('div.cont:first');
-								}
-
-								var parent = target.parent();
-								if (response == "NotFound") {
-									return parent.remove();
-								}
-								target.replace(response);
-								parent.find('div.cont:first').yft();
-
-								return false;
-							}
-							else {
-								$(jtarget).attr("checked",false)
-								alert(response);
-								return false;
-							}
-						}
-				);
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", {1:1}, refreshIfChildren(pageId));
 				e.stopPropagation();
-				return true;
+				return false;
 			}
-			
+
 			// in navigation
 			if(jtarget.hasClass("navigation-checkbox")) {
 				pageId = jtarget.attr("name").split("navigation-")[1];
@@ -266,33 +235,11 @@
 				e.stopPropagation();
 				return true;
 			}
-			
-			// moderation
-			if(jtarget.hasClass("moderator-checkbox")) {
+
+			// quick publish
+			if(jtarget.hasClass("publish")) {
 				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-				parent = jtarget.parents('div.col-moderator');
-				
-				value = 0;
-				parent.find('input[type=checkbox]').each(function(i, el){
-					value += $(el).attr("checked") ? parseInt($(el).val()) : 0;
-				});
-				
-				// just reload the page for now in callback... 
-				// TODO: this must be changed sometimes to reloading just the portion
-				// of the tree = current node + descendants
-				
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-moderation/", { moderate: value }, refreshIfChildren(pageId));
-				e.stopPropagation();
-				return true;
-			}
-			
-			// quick approve
-			if(jtarget.hasClass("approve")) {
-				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-				// just reload the page for now in callback... 
-				// TODO: this must be changed sometimes to reloading just the portion
-				// of the tree = current node + descendants 
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/publish/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
 				return false;
 			}
@@ -467,14 +414,13 @@
 			// probably some filter here, tell backend, we need a filtered
 			// version of item	
 			
-			data['fitlered'] = 1;
+			data['filtered'] = 1;
 		}
 		
 		function onSuccess(response, textStatus) {
-			status = true;
+			var status = true;
 			if (callback) status = callback(response, textStatus);
-
-			if(status==true) {
+			if (status) {
 				if (/page_\d+/.test($(el).attr('id'))) {
 					// one level higher
 					target = $(el).find('div.cont:first');
@@ -486,7 +432,13 @@
 				if (response == "NotFound") {
 					return parent.remove();
 				}
+				var origin = $('.messagelist');
 				target.replace(response);
+				var messages = $(parent).find('.messagelist');
+				if (messages.length) {
+					origin.remove();
+					messages.insertAfter('.breadcrumbs');
+				}
 				parent.find('div.cont:first').yft();
 			}
 

@@ -57,16 +57,38 @@ It has two subcommands:
 
 
 
-******************
-Moderator commands
-******************
+*******************
+Moderation commands
+*******************
 
 ``cms moderator``
 =================
 
-If you turn :setting:`CMS_MODERATOR` to ``True`` on an existing project, you
-should use the ``cms moderator on`` command to make the required changes in the
-database, otherwise you will have problems with invisible pages.
+If you migrate from an earlier version, you should use the ``cms moderator on``
+command to ensure that your published pages are up to date, whether or not you
+used moderation in the past.
+
+.. warning::
+
+    This command **alters data** in your database. You should make a backup of
+    your database before using it!
+
+
+*******************
+MPTT repair command
+*******************
+
+``cms mptt-repair``
+===================
+
+Occasionally, the MPTT structure in which pages and plugins are held can
+accumulate small errors. These are typically the result of failed operations or
+large and complex restructurings of the tree (perhaps even cosmic rays,
+planetary alignment or other mysterious conditions).
+
+Usually you won't even notice them, and they won't affect the operation of the
+system, but when you run into trouble it's useful to be able to rebuild the tree
+- it's also useful to rebuild it as part of preventative maintenance.
 
 .. warning::
 

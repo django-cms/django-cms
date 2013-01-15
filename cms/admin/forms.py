@@ -3,6 +3,7 @@ from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, 
     PageUserGroup)
+from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import get_page_from_path, is_valid_url
@@ -60,7 +61,7 @@ class PageAddForm(forms.ModelForm):
         help_text=_('The default title'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the URL'))
-    language = forms.ChoiceField(label=_("Language"), choices=settings.CMS_LANGUAGES,
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
         help_text=_('The current language of the content fields.'))
     
     class Meta:
@@ -74,13 +75,7 @@ class PageAddForm(forms.ModelForm):
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
         site_id = self.fields['site'].initial
-        languages = []
-        language_mappings = dict(settings.LANGUAGES)
-        if site_id in settings.CMS_SITE_LANGUAGES:
-            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
-                languages.append((lang, language_mappings.get(lang, lang)))
-        else:
-            languages = settings.CMS_LANGUAGES
+        languages = get_language_tuple(site_id)
         self.fields['language'].choices = languages
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
@@ -109,6 +104,9 @@ class PageAddForm(forms.ModelForm):
         except Site.DoesNotExist:
             site = None
             raise ValidationError("No site found for current settings.")
+
+        if parent and parent.site != site:
+            raise ValidationError("Site doesn't match the parent's page site")
         
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
@@ -140,7 +138,7 @@ class PageAddForm(forms.ModelForm):
     
     def clean_language(self):
         language = self.cleaned_data['language']
-        if not language in dict(settings.CMS_LANGUAGES).keys():
+        if not language in get_language_list():
             raise ValidationError("Given language does not match language settings.")
         return language
         
@@ -155,11 +153,7 @@ class PageForm(PageAddForm):
         help_text=_('Hook application to this page.'))
     overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
-    # moderation state
-    moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
-    # moderation - message is a fake field
-    moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
-    
+
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
         help_text=_('Redirects to this URL.'))
     meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-21 14:54+0200\n"
+"POT-Creation-Date: 2013-01-14 18:20+0100\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -25,63 +25,65 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: cms_toolbar.py:70
+msgid "Revert"
+msgstr ""
+
+#: cms_toolbar.py:74
 msgid "Edit mode"
 msgstr "Redigeringsläge"
 
-#: cms_toolbar.py:79
+#: cms_toolbar.py:108
 msgid "django CMS"
 msgstr "django CMS"
 
-#: cms_toolbar.py:110 templates/admin/cms/page/menu_item.html:69
+#: cms_toolbar.py:132 templates/admin/cms/page/change_form.html:91
+#: templates/admin/cms/page/change_list.html:68
+#: templates/admin/cms/page/menu_item.html:56
+#: templates/admin/cms/page/menu_item.html:64
 msgid "Publish"
 msgstr "Publicera"
 
-#: cms_toolbar.py:114
-msgid "Request Approval"
-msgstr "Begär godkännande"
-
-#: cms_toolbar.py:135 cms_toolbar.py:144
+#: cms_toolbar.py:153
 msgid "Logout"
 msgstr "Logga ut"
 
-#: cms_toolbar.py:160
+#: cms_toolbar.py:170
 msgid "Template"
 msgstr "Mall"
 
-#: cms_toolbar.py:168
+#: cms_toolbar.py:178
 msgid "Move/add Pages"
 msgstr "Flytta/lägg till sidor"
 
-#: cms_toolbar.py:173
+#: cms_toolbar.py:183
 msgid "Add child page"
 msgstr "Lägg till undersida"
 
-#: cms_toolbar.py:179
+#: cms_toolbar.py:189
 msgid "Add sibling page"
 msgstr "Lägg till syskon-sida"
 
-#: cms_toolbar.py:185
+#: cms_toolbar.py:195
 msgid "Delete Page"
 msgstr "Radera sida"
 
-#: cms_toolbar.py:188 models/moderatormodels.py:45
-#: templates/admin/cms/page/permissions.html:5
+#: cms_toolbar.py:198 templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "Sida"
 
-#: cms_toolbar.py:197
+#: cms_toolbar.py:207
 msgid "Site Administration"
 msgstr "Sajtadministration"
 
-#: cms_toolbar.py:203
+#: cms_toolbar.py:213
 msgid "Page Settings"
 msgstr "Sidinställningar"
 
-#: cms_toolbar.py:209
+#: cms_toolbar.py:219
 msgid "View History"
 msgstr "Visa historik"
 
-#: cms_toolbar.py:213
+#: cms_toolbar.py:223
 msgid "Admin"
 msgstr "Admin"
 
@@ -89,92 +91,91 @@ msgstr "Admin"
 msgid "Advanced options"
 msgstr "Avancerade inställningar"
 
-#: admin/forms.py:59
+#: admin/forms.py:60
 msgid "Title"
 msgstr "Namn"
 
-#: admin/forms.py:60
+#: admin/forms.py:61
 msgid "The default title"
 msgstr "Sidans namn"
 
-#: admin/forms.py:61
+#: admin/forms.py:62
 msgid "Slug"
 msgstr "URL-namn"
 
-#: admin/forms.py:62
+#: admin/forms.py:63
 msgid "The part of the title that is used in the URL"
 msgstr "Den del av namnet som används i webbadressen"
 
-#: admin/forms.py:63
+#: admin/forms.py:64
 msgid "Language"
 msgstr "Språk"
 
-#: admin/forms.py:64
+#: admin/forms.py:65
 msgid "The current language of the content fields."
 msgstr "Det aktiva språket för innehållsfälten."
 
-#: admin/forms.py:117
+#: admin/forms.py:112
 msgid "Another page with this slug already exists"
 msgstr "En annan sida med samma URL-namn finns redan"
 
-#: admin/forms.py:151
+#: admin/forms.py:147
 msgid "Menu Title"
 msgstr "Menyrubrik"
 
-#: admin/forms.py:152
+#: admin/forms.py:148
 msgid "Overwrite what is displayed in the menu"
 msgstr "Ange för att visa annan text än sidans namn i menyn"
 
-#: admin/forms.py:153
+#: admin/forms.py:149
 msgid "Page Title"
 msgstr "Sidrubrik"
 
-#: admin/forms.py:154
+#: admin/forms.py:150
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Anger vad som visas i webbläsarens topp eller i bokmärken"
 
-#: admin/forms.py:155
+#: admin/forms.py:151
 msgid "Application"
 msgstr "Applikation"
 
-#: admin/forms.py:157
+#: admin/forms.py:153
 msgid "Hook application to this page."
 msgstr "Koppla applikation till denna sida."
 
-#: admin/forms.py:158
+#: admin/forms.py:154
 msgid "Overwrite URL"
 msgstr "Ändra URL"
 
-#: admin/forms.py:159
+#: admin/forms.py:155
 msgid "Keep this field empty if standard path should be used."
 msgstr "Lämna tomt om den vanliga sökvägen ska användas."
 
-#: admin/forms.py:165
+#: admin/forms.py:157
 msgid "Redirect"
 msgstr "Omdirigera"
 
-#: admin/forms.py:166
+#: admin/forms.py:158
 msgid "Redirects to this URL."
 msgstr "Omdirigerar till denna URL"
 
-#: admin/forms.py:168
+#: admin/forms.py:160
 msgid "A description of the page sometimes used by search engines."
 msgstr "En beskrivning som ibland används av sökmotorer."
 
-#: admin/forms.py:170
+#: admin/forms.py:162
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr "En kommaseparerad lista med sökord som ibland används av sökmotorer."
 
-#: admin/forms.py:186
+#: admin/forms.py:178
 msgid "A page with this reverse URL id exists already."
 msgstr "En sida med detta URL-id finns redan."
 
-#: admin/forms.py:203 admin/forms.py:204 migrations/0001_initial.py:41
-#: models/permissionmodels.py:17
+#: admin/forms.py:195 admin/forms.py:196 models/permissionmodels.py:39
 msgid "user"
 msgstr "användare"
 
-#: admin/forms.py:228
+#: admin/forms.py:220
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
@@ -182,44 +183,44 @@ msgstr ""
 "Tillåtelse att lägga till sida kräver också tillgång till barn eller "
 "efterkommande annars kan inte tillagd sida redigeras av den som skapat den."
 
-#: admin/forms.py:233
+#: admin/forms.py:225
 msgid "Add page permission also requires edit page permission."
 msgstr "Tillåtelse att lägga till sida kräver tillåtelse att redigera sidor."
 
-#: admin/forms.py:260
+#: admin/forms.py:252
 msgid "can_view"
 msgstr ""
 
-#: admin/forms.py:272
+#: admin/forms.py:264
 msgid "Please select user or group first."
 msgstr "Ange användare eller grupp först."
 
-#: admin/forms.py:279 admin/forms.py:286 admin/forms.py:290
+#: admin/forms.py:271 admin/forms.py:278 admin/forms.py:282
 #: templates/admin/cms/page/change_form.html:68
 #: templates/admin/cms/page/plugin_change_form.html:76
 #: templates/cms/toolbar/placeholder.html:26
 msgid "Add"
 msgstr "Lägg till"
 
-#: admin/forms.py:280 admin/forms.py:287 admin/forms.py:291
+#: admin/forms.py:272 admin/forms.py:279 admin/forms.py:283
 msgid "Change"
 msgstr "Ändra"
 
-#: admin/forms.py:281 admin/forms.py:288 admin/forms.py:292
+#: admin/forms.py:273 admin/forms.py:280 admin/forms.py:284
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
 msgstr "Radera"
 
-#: admin/forms.py:282
+#: admin/forms.py:274
 msgid "Recover (any) pages"
 msgstr "Återskapa sidor"
 
-#: admin/forms.py:309
+#: admin/forms.py:301
 msgid "Notify user"
 msgstr "Meddela användare"
 
-#: admin/forms.py:310
+#: admin/forms.py:302
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
@@ -227,137 +228,199 @@ msgstr ""
 "Skicka e-postmeddelande till användare om användarnamn eller "
 "lösenordsförändring. E-postadress på användare krävs."
 
-#: admin/forms.py:330
+#: admin/forms.py:322
 msgid "New password"
 msgstr "Nytt lösenord"
 
-#: admin/forms.py:332
+#: admin/forms.py:324
 msgid "New password confirmation"
 msgstr "Nytt lösenord (bekräfta)"
 
-#: admin/forms.py:351
+#: admin/forms.py:343
 msgid "Email notification requires valid email address."
 msgstr "E-postmeddelande kräver en giltig e-postadress."
 
-#: admin/forms.py:353
+#: admin/forms.py:345
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "Tillåtelse att lägga till sidor kräver tillåtelse att redigera sidor!"
 
-#: admin/forms.py:355
+#: admin/forms.py:347
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
 "Tillåtelse att lägga till användare kröver tillåtelse att redigera användare!"
 
-#: admin/forms.py:357
+#: admin/forms.py:349
 msgid "To add permissions you also need to edit them!"
 msgstr "För att lägga till rättigheter måste du också redigera dem."
 
-#: admin/pageadmin.py:108
+#: admin/pageadmin.py:110
 msgid "Basic Settings"
 msgstr "Grundinställningar"
 
-#: admin/pageadmin.py:111
+#: admin/pageadmin.py:113
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr "Notera: Sidan laddas på nytt om du ändrar detta. Spara först."
 
-#: admin/pageadmin.py:113 admin/pageadmin.py:165
+#: admin/pageadmin.py:115 admin/pageadmin.py:165
 msgid "Hidden"
 msgstr "Dold"
 
-#: admin/pageadmin.py:117
+#: admin/pageadmin.py:119
 msgid "Advanced Settings"
 msgstr "Avancerade inställningar"
 
-#: admin/pageadmin.py:124
+#: admin/pageadmin.py:126
 msgid "SEO Settings"
 msgstr "SEO-inställningar"
 
-#: admin/pageadmin.py:311
-msgid "You have no permission to change the template"
-msgstr "Du har ingen behörighet att ändra mallen"
+#: admin/pageadmin.py:604
+#, fuzzy
+msgid "You do not have permission to change pages."
+msgstr "Du har inte tillåtelse att redigera denna sida"
 
-#: admin/pageadmin.py:498
-msgid "higher"
-msgstr "högre"
-
-#: admin/pageadmin.py:668
+#: admin/pageadmin.py:619
 msgid "Database error"
 msgstr "Databaserror"
 
-#: admin/pageadmin.py:779
+#: admin/pageadmin.py:712
+#, fuzzy
+msgid "You do not have permission to change the template"
+msgstr "Du har inte tillåtelse att redigera denna sida"
+
+#: admin/pageadmin.py:716
+#, fuzzy
+msgid "Template not valid"
+msgstr "Mall"
+
+#: admin/pageadmin.py:722
+#, fuzzy
+msgid "The template was successfully changed"
+msgstr "Sidan godkändes."
+
+#: admin/pageadmin.py:743
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:880
-msgid "Page was successfully approved."
+#: admin/pageadmin.py:746 admin/pageadmin.py:840
+#, python-format
+msgid ""
+"The page \"%s\" has a delete request. Delete or confirm the request first."
+msgstr ""
+
+#: admin/pageadmin.py:837 admin/pageadmin.py:888 admin/pageadmin.py:1057
+msgid "You do not have permission to publish this page"
+msgstr "Du har inte tillåtelse att publicera denna sida"
+
+#: admin/pageadmin.py:844
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully published."
 msgstr "Sidan godkändes."
 
-#: admin/pageadmin.py:952
+#: admin/pageadmin.py:864 admin/pageadmin.py:909 admin/pageadmin.py:949
+#: admin/pageadmin.py:1188 admin/pageadmin.py:1219 admin/pageadmin.py:1348
+#: admin/pageadmin.py:1376
+msgid "You do not have permission to change this page"
+msgstr "Du har inte tillåtelse att redigera denna sida"
+
+#: admin/pageadmin.py:868
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully reverted."
+msgstr "Sidan godkändes."
+
+#: admin/pageadmin.py:892
+#, python-format
+msgid "The page \"%s\" has no delete request."
+msgstr ""
+
+#: admin/pageadmin.py:896
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully deleted."
+msgstr "Sidan godkändes."
+
+#: admin/pageadmin.py:921
+#, fuzzy
+msgid "You do not have permission to delete this page"
+msgstr "Du har inte tillåtelse att redigera denna sida"
+
+#: admin/pageadmin.py:953
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekt med primär nycket %(key)r existerar inte."
 
-#: admin/pageadmin.py:958
+#: admin/pageadmin.py:959
 msgid "There only exists one translation for this page"
 msgstr "Det finns endast en språkversion av denna sida"
 
-#: admin/pageadmin.py:987
+#: admin/pageadmin.py:988
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Rubrik och plugins för språket %(language)s raderades"
 
-#: admin/pageadmin.py:1009
+#: admin/pageadmin.py:1010
 msgid "Are you sure?"
 msgstr "Är du säker?"
 
-#: admin/pageadmin.py:1074
-msgid "You do not have permission to publish this page"
-msgstr "Du har inte tillåtelse att publicera denna sida"
+#: admin/pageadmin.py:1066
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully unpublished"
+msgstr "Sidan godkändes."
 
-#: admin/pageadmin.py:1088
+#: admin/pageadmin.py:1068
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully published"
+msgstr "Sidan godkändes."
+
+#: admin/pageadmin.py:1086
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Du har inte tillåtelse att ändra denna sidas 'i navigation'-status"
 
-#: admin/pageadmin.py:1113
-msgid "You have no permission to add a plugin"
-msgstr "Du har ingen behörighet att lägga till en plugin"
+#: admin/pageadmin.py:1110
+#, fuzzy
+msgid "You do not have permission to add a plugin"
+msgstr "Du har inte behörighet att lägga till plugins"
 
-#: admin/pageadmin.py:1160 admin/pageadmin.py:1192
+#: admin/pageadmin.py:1129
+msgid "This placeholder already has the maximum number of plugins"
+msgstr ""
+
+#: admin/pageadmin.py:1134
+#, python-format
+msgid "This placeholder already has the maximum number allowed of %s plugins."
+msgstr ""
+
+#: admin/pageadmin.py:1157 admin/pageadmin.py:1190
 msgid "Language must be set to a supported language!"
 msgstr "Språket måste vara ett av de som stödjs"
 
-#: admin/pageadmin.py:1172
+#: admin/pageadmin.py:1170
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plugin har lagts till %(placeholder)s"
 
-#: admin/pageadmin.py:1190
-msgid "You do not have permission to change this page"
-msgstr "Du har inte tillåtelse att redigera denna sida"
-
-#: admin/pageadmin.py:1194
+#: admin/pageadmin.py:1192
 msgid "Language must be different than the copied language!"
 msgstr "Språket måste vara ett annat än det som kopieras!"
 
-#: admin/pageadmin.py:1200
+#: admin/pageadmin.py:1198
 msgid "You do not have permission to add plugins"
 msgstr "Du har inte behörighet att lägga till plugins"
 
-#: admin/pageadmin.py:1207
+#: admin/pageadmin.py:1205
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "%(language)s plugin har kopierats till %(placeholder)s"
 
-#: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
-msgid "You have no permission to change this page"
-msgstr "Du har ingen behörighet att ändra denna sida"
+#: admin/pageadmin.py:1250
+msgid "This plugin is not saved in a revision"
+msgstr ""
 
-#: admin/pageadmin.py:1255
-msgid "You have no permission to edit a plugin"
-msgstr "Du har ingen behörighet att redigera plugins"
+#: admin/pageadmin.py:1253 admin/pageadmin.py:1344
+#, fuzzy
+msgid "You do not have permission to edit a plugin"
+msgstr "Du har inte behörighet att lägga till plugins"
 
 #: admin/pageadmin.py:1311
 #, python-format
@@ -366,19 +429,22 @@ msgid ""
 msgstr ""
 "%(plugin_name)s plugin har redigerats på plats %(position)s i %(placeholder)s"
 
-#: admin/pageadmin.py:1370
-msgid "You have no permission to move a plugin"
-msgstr "Du har ingen behörighet att flytta plugins"
+#: admin/pageadmin.py:1371
+#, fuzzy
+msgid "You do not have permission to move a plugin"
+msgstr "Du har inte behörighet att lägga till plugins"
 
-#: admin/pageadmin.py:1388
-msgid "Plugins where moved"
+#: admin/pageadmin.py:1392
+#, fuzzy
+msgid "Plugins were moved"
 msgstr "Plugins har flyttats"
 
-#: admin/pageadmin.py:1402
-msgid "You have no permission to remove a plugin"
-msgstr "Du har ingen behörighet att ta bort plugins"
+#: admin/pageadmin.py:1405 admin/pageadmin.py:1414
+#, fuzzy
+msgid "You do not have permission to remove a plugin"
+msgstr "Du har inte behörighet att lägga till plugins"
 
-#: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
+#: admin/pageadmin.py:1424 admin/placeholderadmin.py:315
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -387,23 +453,23 @@ msgstr ""
 "%(plugin_name)s plugin på position %(position)s i %(placeholder)s har "
 "raderats."
 
-#: admin/permissionadmin.py:94
+#: admin/permissionadmin.py:92
 msgid "View restriction"
 msgstr "Vy-restriktion"
 
-#: admin/permissionadmin.py:95
+#: admin/permissionadmin.py:93
 msgid "View restrictions"
 msgstr "Vy-restriktioner"
 
-#: admin/permissionadmin.py:155 models/permissionmodels.py:76
+#: admin/permissionadmin.py:147 models/permissionmodels.py:97
 msgid "Page permissions"
 msgstr "Rättigheter för sida"
 
-#: admin/permissionadmin.py:156
+#: admin/permissionadmin.py:148
 msgid "User & Group permissions"
 msgstr "Användar- och grupprättigheter"
 
-#: admin/permissionadmin.py:157
+#: admin/permissionadmin.py:149
 msgid "Page permissions management"
 msgstr "Administrera rättigheter för sida"
 
@@ -415,7 +481,7 @@ msgstr "Du har inte behörighet att lägga till innehåll här."
 msgid "You don't have permission to add plugins"
 msgstr "Du har inte behörighet att lägga till plugins"
 
-#: admin/placeholderadmin.py:289
+#: admin/placeholderadmin.py:311
 msgid "You don't have permission to delete a plugin"
 msgstr "Du har inte behörighet att ta bort plugins"
 
@@ -435,11 +501,7 @@ msgstr "Lösenord"
 msgid "Copy permissions"
 msgstr "Kopieringsrättigheter"
 
-#: admin/dialog/forms.py:16
-msgid "Copy moderation"
-msgstr "Kopieringsbegränsningar"
-
-#: conf/patch.py:28
+#: conf/patch.py:24
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Ärv mall"
 
@@ -455,267 +517,51 @@ msgstr "Välj en giltig sida"
 msgid "Add Another"
 msgstr "Lägg till en till"
 
-#: migrations/0001_initial.py:12 migrations/0001_initial.py:24
-#: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
-#: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
-#: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:82 models/titlemodels.py:11
-#: plugins/inherit/models.py:11
-msgid "language"
-msgstr "språk"
-
-#: migrations/0001_initial.py:13 migrations/0001_initial.py:26
-#: migrations/0001_initial.py:40 migrations/0001_initial.py:78
-#: migrations/0003_remove_placeholder.py:21 models/pagemodel.py:99
-#: models/permissionmodels.py:70 models/titlemodels.py:22
-#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
-#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:19
-#: plugins/picture/models.py:22 plugins/teaser/models.py:13
-msgid "page"
-msgstr "sida"
-
-#: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:81
-msgid "position"
-msgstr "position"
-
-#: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:84 models/titlemodels.py:23
-msgid "creation date"
-msgstr "skapat datum"
-
-#: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:12
-msgid "slot"
-msgstr "plats"
-
-#: migrations/0001_initial.py:18 models/pluginmodel.py:83
-msgid "plugin_name"
-msgstr "plugin-namn"
-
-#: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
-#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
-#: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:25
-#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:9
-#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
-#: templates/admin/cms/page/change_list_tree.html:6
-msgid "title"
-msgstr "rubrik"
-
-#: migrations/0001_initial.py:28
-msgid "path"
-msgstr "sökväg"
-
-#: migrations/0001_initial.py:30 models/titlemodels.py:14
-msgid "slug"
-msgstr "slug"
-
-#: migrations/0001_initial.py:36
-msgid "everybody"
-msgstr "alla"
-
-#: migrations/0001_initial.py:37 models/permissionmodels.py:21
-msgid "can edit"
-msgstr "kan redigera"
-
-#: migrations/0001_initial.py:38 models/permissionmodels.py:18
-msgid "group"
-msgstr "grupp"
-
-#: migrations/0001_initial.py:39 models/permissionmodels.py:25
-msgid "can publish"
-msgstr "kan publicera"
-
-#: migrations/0001_initial.py:42
-msgid "type"
-msgstr "typ"
-
-#: migrations/0001_initial.py:44
-msgid "can change soft-root"
-msgstr "kan ändra rot"
-
-#: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
-#: migrations/0006_apphook.py:62
-msgid "status"
-msgstr "status"
-
-#: migrations/0001_initial.py:53
-msgid "navigation extenders"
-msgstr "navigationsanslutningar"
-
-#: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
-#: migrations/0006_apphook.py:46 models/titlemodels.py:16
-msgid "has url overwrite"
-msgstr "har ändrad url"
-
-#: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
-msgid "url overwrite"
-msgstr "ändrad url"
-
-#: migrations/0001_initial.py:57
-msgid "author"
-msgstr "författare"
-
-#: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
-msgid "reverse url id"
-msgstr "omvänd url id"
-
-#: migrations/0001_initial.py:59 models/pagemodel.py:79
-msgid "login required"
-msgstr "login krävs"
-
-#: migrations/0001_initial.py:60 models/pagemodel.py:64
-msgid "soft root"
-msgstr "rot"
-
-#: migrations/0001_initial.py:63 models/pagemodel.py:62
-msgid "publication end date"
-msgstr "slutdatum för publicering"
-
-#: migrations/0001_initial.py:64 models/pagemodel.py:69
-#: plugins/snippet/models.py:14
-msgid "template"
-msgstr "mall"
-
-#: migrations/0001_initial.py:66 models/pagemodel.py:61
-msgid "publication date"
-msgstr "publiceringsdatum"
-
-#: migrations/0001_initial.py:67 models/pagemodel.py:63
-#: templates/admin/cms/page/change_list_tree.html:9
-msgid "in navigation"
-msgstr "i navigation"
-
-#: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
-#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
-msgid "application"
-msgstr "applikation"
-
-#: migrations/0006_apphook.py:65 models/pagemodel.py:65
-msgid "id"
-msgstr "id"
-
-#: migrations/0008_redirects.py:11 models/titlemodels.py:18
-msgid "redirect"
-msgstr "omdirigera"
-
-#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
-msgid "keywords"
-msgstr "nyckelord"
-
-#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
-#: plugins/teaser/models.py:20
-msgid "description"
-msgstr "beskrivning"
-
-#: models/moderatormodels.py:25
-msgid "Current page"
-msgstr "Denna sida"
-
-#: models/moderatormodels.py:26
-msgid "Page children (immediate)"
-msgstr "Sidans undernivå"
-
 #: models/moderatormodels.py:27
-msgid "Page and children (immediate)"
-msgstr "Sida och närmaste undernivå"
-
-#: models/moderatormodels.py:28
-msgid "Page descendants"
-msgstr "Sidans undernivåer"
-
-#: models/moderatormodels.py:29
-msgid "Page and descendants"
-msgstr "Sida och undernivåer"
-
-#: models/moderatormodels.py:46
-#: templates/admin/cms/page/moderation_messages.html:6
-#: templates/admin/cms/page/permissions.html:6
-msgid "User"
-msgstr "Användare"
-
-#: models/moderatormodels.py:50 templatetags/cms_admin.py:147
-msgid "Moderate page"
-msgstr "Moderera sida"
-
-#: models/moderatormodels.py:51 templatetags/cms_admin.py:148
-msgid "Moderate children"
-msgstr "Moderera närmsta undernivå"
-
-#: models/moderatormodels.py:52 templatetags/cms_admin.py:149
-msgid "Moderate descendants"
-msgstr "Moderera alla undernivåer"
-
-#: models/moderatormodels.py:55 models/moderatormodels.py:56
-msgid "PageModerator"
-msgstr "Sidmoderator"
-
-#: models/moderatormodels.py:99
 msgid "created"
 msgstr "skapade"
 
-#: models/moderatormodels.py:100 models/pagemodel.py:39
+#: models/moderatormodels.py:28
 msgid "changed"
 msgstr "ändrad"
 
-#: models/moderatormodels.py:101
+#: models/moderatormodels.py:29
 msgid "delete req."
 msgstr "förfrågan om borttagning"
 
-#: models/moderatormodels.py:102
+#: models/moderatormodels.py:30
 msgid "move req."
 msgstr "flyttförfrågan"
 
-#: models/moderatormodels.py:103
-msgid "publish req."
-msgstr "publiceringsförfrågan"
-
-#: models/moderatormodels.py:104
-msgid "unpublish req."
-msgstr "förfrågan om avpublicering"
-
-#: models/moderatormodels.py:105 models/pagemodel.py:42
-msgid "approved"
-msgstr "godkänd"
-
-#: models/moderatormodels.py:117
+#: models/moderatormodels.py:42
 msgid "Page moderator state"
 msgstr "Sidmodereringsläge"
 
-#: models/moderatormodels.py:118
+#: models/moderatormodels.py:43
 msgid "Page moderator states"
 msgstr "Sidmodereringslägen"
 
-#: models/pagemodel.py:40
-msgid "req. app."
-msgstr "behöver godkännande"
-
-#: models/pagemodel.py:41 templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:66 utils/moderator.py:90
-msgid "delete"
-msgstr "radera"
-
-#: models/pagemodel.py:43
-msgid "app. par."
-msgstr "godkänd, inv. överstående"
-
-#: models/pagemodel.py:47
+#: models/pagemodel.py:33
 msgid "for logged in users only"
 msgstr "endast för inloggade användare"
 
-#: models/pagemodel.py:48
+#: models/pagemodel.py:34
 msgid "for anonymous users only"
 msgstr "endast för anonyma användare"
 
-#: models/pagemodel.py:56
+#: models/pagemodel.py:44
 msgid "created by"
 msgstr "skapad av"
 
-#: models/pagemodel.py:57 templates/admin/cms/page/change_list_tree.html:20
+#: models/pagemodel.py:45 templates/admin/cms/page/change_list_tree.html:19
 msgid "changed by"
 msgstr "ändrad av"
 
-#: models/pagemodel.py:61
+#: models/pagemodel.py:50
+msgid "publication date"
+msgstr "publiceringsdatum"
+
+#: models/pagemodel.py:50
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
@@ -723,15 +569,31 @@ msgstr ""
 "När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå "
 "live."
 
-#: models/pagemodel.py:62
+#: models/pagemodel.py:51
+msgid "publication end date"
+msgstr "slutdatum för publicering"
+
+#: models/pagemodel.py:51
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "När sidan ska utgå. Lämna blank för att inaktivera funktionen."
 
-#: models/pagemodel.py:64
+#: models/pagemodel.py:52 templates/admin/cms/page/change_list_tree.html:9
+msgid "in navigation"
+msgstr "i navigation"
+
+#: models/pagemodel.py:53
+msgid "soft root"
+msgstr "rot"
+
+#: models/pagemodel.py:53
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Alla ovanstående sidor kommer inte att visas i navigeringen"
 
-#: models/pagemodel.py:65
+#: models/pagemodel.py:54
+msgid "id"
+msgstr "id"
+
+#: models/pagemodel.py:54
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
@@ -739,151 +601,245 @@ msgstr ""
 "Ett unikt id som används med mallkommandot page_url för att länka till denna "
 "sida"
 
-#: models/pagemodel.py:66
+#: models/pagemodel.py:55
 msgid "attached menu"
 msgstr "bifogad meny"
 
-#: models/pagemodel.py:67
+#: models/pagemodel.py:56
 msgid "is published"
 msgstr "är publicerad"
 
-#: models/pagemodel.py:69
+#: models/pagemodel.py:58 plugins/snippet/models.py:14
+msgid "template"
+msgstr "mall"
+
+#: models/pagemodel.py:58
 msgid "The template used to render the content."
 msgstr "Mallen som används för att visa innehållet."
 
-#: models/pagemodel.py:70
+#: models/pagemodel.py:59
 msgid "The site the page is accessible at."
 msgstr "Sajten som sidan är tillgänglig på."
 
-#: models/pagemodel.py:70
+#: models/pagemodel.py:59
 msgid "site"
 msgstr "sajt"
 
-#: models/pagemodel.py:72
-msgid "moderator state"
-msgstr "modereringsläge"
+#: models/pagemodel.py:61
+msgid "login required"
+msgstr "login krävs"
 
-#: models/pagemodel.py:80
+#: models/pagemodel.py:62
 msgid "menu visibility"
 msgstr "menysynlighet"
 
-#: models/pagemodel.py:80
+#: models/pagemodel.py:62
 msgid "limit when this page is visible in the menu"
 msgstr "begränsa när denna sida ska vara synlig i menyn"
 
-#: models/pagemodel.py:100
+#: models/pagemodel.py:73
+msgid "moderator state"
+msgstr "modereringsläge"
+
+#: models/pagemodel.py:88 models/permissionmodels.py:91
+#: models/titlemodels.py:22 plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: plugins/link/models.py:12 plugins/picture/models.py:23
+#: plugins/teaser/models.py:13
+msgid "page"
+msgstr "sida"
+
+#: models/pagemodel.py:89
 msgid "pages"
 msgstr "sidor"
 
-#: models/pagemodel.py:268
+#: models/pagemodel.py:279
 msgid "Page was copied."
 msgstr "Sidan har kopierats"
 
-#: models/pagemodel.py:690
+#: models/pagemodel.py:744
 msgid "default"
 msgstr "standard"
 
-#: models/permissionmodels.py:22
+#: models/permissionmodels.py:27
+msgid "Current page"
+msgstr "Denna sida"
+
+#: models/permissionmodels.py:28
+msgid "Page children (immediate)"
+msgstr "Sidans undernivå"
+
+#: models/permissionmodels.py:29
+msgid "Page and children (immediate)"
+msgstr "Sida och närmaste undernivå"
+
+#: models/permissionmodels.py:30
+msgid "Page descendants"
+msgstr "Sidans undernivåer"
+
+#: models/permissionmodels.py:31
+msgid "Page and descendants"
+msgstr "Sida och undernivåer"
+
+#: models/permissionmodels.py:40
+msgid "group"
+msgstr "grupp"
+
+#: models/permissionmodels.py:43
+msgid "can edit"
+msgstr "kan redigera"
+
+#: models/permissionmodels.py:44
 msgid "can add"
 msgstr "kan lägga till"
 
-#: models/permissionmodels.py:23
+#: models/permissionmodels.py:45
 msgid "can delete"
 msgstr "kan ta bort"
 
-#: models/permissionmodels.py:24
+#: models/permissionmodels.py:46
 msgid "can change advanced settings"
 msgstr "kan ändra avancerade inställningar"
 
-#: models/permissionmodels.py:26
+#: models/permissionmodels.py:47
+msgid "can publish"
+msgstr "kan publicera"
+
+#: models/permissionmodels.py:48
 msgid "can change permissions"
 msgstr "kan ändra rättigheter"
 
-#: models/permissionmodels.py:26
+#: models/permissionmodels.py:48
 msgid "on page level"
 msgstr "på sidnivå"
 
-#: models/permissionmodels.py:27
+#: models/permissionmodels.py:49
 msgid "can move"
 msgstr "kan flytta"
 
-#: models/permissionmodels.py:28
-msgid "can moderate"
-msgstr "kan moderera"
-
-#: models/permissionmodels.py:29
+#: models/permissionmodels.py:50
 msgid "view restricted"
 msgstr "vyn är begränsad"
 
-#: models/permissionmodels.py:29
+#: models/permissionmodels.py:50
 msgid "frontend view restriction"
 msgstr "frontend-vy begränsning"
 
-#: models/permissionmodels.py:52
+#: models/permissionmodels.py:73
 msgid "can recover pages"
 msgstr "kan återskapa sidor"
 
-#: models/permissionmodels.py:52
+#: models/permissionmodels.py:73
 msgid "can recover any deleted page"
 msgstr "kan återskapa alla sidor"
 
-#: models/permissionmodels.py:53
+#: models/permissionmodels.py:74
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr "Om ingen är vald har användaren rättigheter till alla sajter."
 
-#: models/permissionmodels.py:53
+#: models/permissionmodels.py:74
 msgid "sites"
 msgstr "sajter"
 
-#: models/permissionmodels.py:58
+#: models/permissionmodels.py:79
 msgid "Page global permission"
 msgstr "Global rättighet för sidan"
 
-#: models/permissionmodels.py:59
+#: models/permissionmodels.py:80
 msgid "Pages global permissions"
 msgstr "Globala rättigheter för sidor"
 
-#: models/permissionmodels.py:69 templates/admin/cms/page/permissions.html:15
+#: models/permissionmodels.py:90 templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "Tillåtelse gäller"
 
-#: models/permissionmodels.py:75
+#: models/permissionmodels.py:96
 msgid "Page permission"
 msgstr "Sidrättighet"
 
-#: models/permissionmodels.py:90
+#: models/permissionmodels.py:111
 msgid "User (page)"
 msgstr "Användare (grupp)"
 
-#: models/permissionmodels.py:91
+#: models/permissionmodels.py:112
 msgid "Users (page)"
 msgstr "Användare (sida)"
 
-#: models/permissionmodels.py:101
+#: models/permissionmodels.py:122
 msgid "User group (page)"
 msgstr "Användare grupp (sida)"
 
-#: models/permissionmodels.py:102
+#: models/permissionmodels.py:123
 msgid "User groups (page)"
 msgstr "Användare grupper (sida)"
 
+#: models/placeholdermodel.py:12
+msgid "slot"
+msgstr "plats"
+
 #: models/placeholdermodel.py:13 plugins/flash/models.py:9
-#: plugins/flash/migrations/0001_initial.py:16 plugins/googlemap/models.py:36
-#: plugins/video/models.py:13
+#: plugins/googlemap/models.py:36 plugins/video/models.py:13
 msgid "width"
 msgstr "bredd"
 
-#: models/pluginmodel.py:142
+#: models/pluginmodel.py:82
+msgid "position"
+msgstr "position"
+
+#: models/pluginmodel.py:83 models/titlemodels.py:11
+#: plugins/inherit/models.py:11
+msgid "language"
+msgstr "språk"
+
+#: models/pluginmodel.py:84
+msgid "plugin_name"
+msgstr "plugin-namn"
+
+#: models/pluginmodel.py:85 models/titlemodels.py:23
+msgid "creation date"
+msgstr "skapat datum"
+
+#: models/pluginmodel.py:144
 msgid "<Empty>"
 msgstr ""
+
+#: models/titlemodels.py:12 models/titlemodels.py:13 models/titlemodels.py:21
+#: plugins/file/models.py:25 plugins/teaser/models.py:9
+#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
+#: templates/admin/cms/page/change_list_tree.html:6
+msgid "title"
+msgstr "rubrik"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
 msgstr "ändra rubriken i menyn"
 
+#: models/titlemodels.py:14
+msgid "slug"
+msgstr "slug"
+
 #: models/titlemodels.py:15
 msgid "Path"
 msgstr "Sökväg"
+
+#: models/titlemodels.py:16
+msgid "has url overwrite"
+msgstr "har ändrad url"
+
+#: models/titlemodels.py:17
+msgid "application"
+msgstr "applikation"
+
+#: models/titlemodels.py:18
+msgid "redirect"
+msgstr "omdirigera"
+
+#: models/titlemodels.py:19 plugins/teaser/models.py:20
+msgid "description"
+msgstr "beskrivning"
+
+#: models/titlemodels.py:20
+msgid "keywords"
+msgstr "nyckelord"
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
@@ -893,8 +849,7 @@ msgstr "ändra sidrubriken (title-taggen i html)"
 msgid "File"
 msgstr "Fil"
 
-#: plugins/file/models.py:24 plugins/file/migrations/0001_initial.py:17
-#: plugins/flash/models.py:8 plugins/flash/migrations/0001_initial.py:18
+#: plugins/file/models.py:24 plugins/flash/models.py:8
 msgid "file"
 msgstr "fil"
 
@@ -910,8 +865,8 @@ msgstr "Flash"
 msgid "use swf file"
 msgstr "använd swf-fil"
 
-#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:19
-#: plugins/googlemap/models.py:38 plugins/video/models.py:14
+#: plugins/flash/models.py:10 plugins/googlemap/models.py:38
+#: plugins/video/models.py:14
 msgid "height"
 msgstr "höjd"
 
@@ -1037,15 +992,11 @@ msgstr "Valfritt: språk på de plugins du vill ha"
 msgid "Link"
 msgstr "Länk"
 
-#: plugins/link/models.py:10 plugins/link/migrations/0001_initial.py:18
-#: plugins/link/migrations/0004_larger_link_names.py:11
-#: plugins/link/migrations/0004_larger_link_names.py:17
-#: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
+#: plugins/link/models.py:10 plugins/snippet/models.py:12
 msgid "name"
 msgstr "namn"
 
-#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:16
-#: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
+#: plugins/link/models.py:11 plugins/picture/models.py:21
 #: plugins/teaser/models.py:19
 msgid "link"
 msgstr "länk"
@@ -1086,10 +1037,6 @@ msgstr ""
 msgid "Picture"
 msgstr "Bild"
 
-#: plugins/picture/models.py:14
-msgid "center"
-msgstr ""
-
 #: plugins/picture/models.py:15
 msgid "left"
 msgstr "vänster"
@@ -1098,34 +1045,54 @@ msgstr "vänster"
 msgid "right"
 msgstr "höger"
 
-#: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:10 plugins/video/models.py:11
+#: plugins/picture/models.py:17
+msgid "center"
+msgstr ""
+
+#: plugins/picture/models.py:20 plugins/teaser/models.py:10
+#: plugins/video/models.py:11
 msgid "image"
 msgstr "bild"
 
-#: plugins/picture/models.py:21 plugins/picture/models.py:22
-msgid "if present image will be clickable"
-msgstr "om angiven blir bilden klickbar"
+#: plugins/picture/models.py:22
+#, fuzzy
+msgid "If present, clicking on image will take user to link."
+msgstr "Värde gör bilden klickbar."
 
-#: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
+#: plugins/picture/models.py:24
+msgid "If present, clicking on image will take user         to specified page."
+msgstr ""
+
+#: plugins/picture/models.py:26
 msgid "alternate text"
 msgstr "alternativ text"
 
-#: plugins/picture/models.py:23
-msgid "textual description of the image"
-msgstr "beskrivning av bilden"
+#: plugins/picture/models.py:27
+msgid ""
+"Specifies an alternate text for an image, if         the image cannot be "
+"displayed.<br />Is also used by search engines to         classify the image."
+msgstr ""
 
-#: plugins/picture/models.py:24
+#: plugins/picture/models.py:30
 msgid "long description"
 msgstr "lång beskrivning"
 
-#: plugins/picture/models.py:24
-msgid "additional description of the image"
-msgstr "ytterligare beskrivning av bilden"
+#: plugins/picture/models.py:31
+msgid ""
+"When user hovers above picture,        this text will appear in a popup."
+msgstr ""
 
-#: plugins/picture/models.py:25
+#: plugins/picture/models.py:33
 msgid "side"
 msgstr "sida"
+
+#: plugins/picture/models.py:34
+msgid "Move image left, right or center."
+msgstr ""
+
+#: plugins/picture/models.py:51
+msgid "You can enter a Link or a Page, but not both."
+msgstr ""
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
@@ -1137,7 +1104,7 @@ msgstr "Kodstycke"
 msgid "Template %(template)s does not exist."
 msgstr "Mallen %(template)s finns inte"
 
-#: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
+#: plugins/snippet/models.py:13
 msgid "HTML"
 msgstr "HTML"
 
@@ -1172,7 +1139,7 @@ msgstr "mer"
 msgid "Text"
 msgstr "Text"
 
-#: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
+#: plugins/text/models.py:14
 msgid "body"
 msgstr "innehåll"
 
@@ -1377,7 +1344,7 @@ msgid "button highlight color"
 msgstr "knappfärg aktiv"
 
 #: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:277
+#: templates/admin/cms/page/change_form.html:185
 #: templates/admin/cms/page/plugin_change_form.html:119
 msgid "Save"
 msgstr "Spara"
@@ -1396,7 +1363,7 @@ msgid "Save and add another"
 msgstr "Spara och lägg till"
 
 #: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:278
+#: templates/admin/cms/page/change_form.html:186
 msgid "Save and continue editing"
 msgstr "Spara och fortsätt redigera"
 
@@ -1448,82 +1415,62 @@ msgid "Home"
 msgstr "Hem"
 
 #: templates/admin/cms/page/change_form.html:74
-msgid "Approve page deletion"
+#, fuzzy
+msgid "Confirm page deletion"
 msgstr "Godkänn borttagning av sida"
 
-#: templates/admin/cms/page/change_form.html:80
-#, python-format
-msgid "(requires approvement at %(moderation_level)s level)"
-msgstr "(kräver godkännande på nivå %(moderation_level)s)"
-
-#: templates/admin/cms/page/change_form.html:81
-msgid "(you can perform actions on this page directly)"
-msgstr "(du kan utföra ändringar på denna sida direkt)"
-
-#: templates/admin/cms/page/change_form.html:94
+#: templates/admin/cms/page/change_form.html:88
 msgid "Remove delete request"
 msgstr "Ta bort raderingsförfrågan"
 
-#: templates/admin/cms/page/change_form.html:96
-msgid "Approve delete"
-msgstr "Godkänn radering"
+#: templates/admin/cms/page/change_form.html:90
+#, fuzzy
+msgid "Confirm delete"
+msgstr "Kan ta bort"
 
-#: templates/admin/cms/page/change_form.html:96
-msgid "Approve"
-msgstr "Godkänn"
-
-#: templates/admin/cms/page/change_form.html:96
-#: templates/admin/cms/page/change_form.html:97
-#: templates/admin/cms/page/change_list_tree.html:12
+#: templates/admin/cms/page/change_form.html:91
+#: templates/admin/cms/page/change_form.html:92
+#: templates/admin/cms/page/change_list_tree.html:11
 msgid "draft"
 msgstr "utkast"
 
-#: templates/admin/cms/page/change_form.html:97
+#: templates/admin/cms/page/change_form.html:92
 msgid "Preview"
 msgstr "Förhandsgranska"
 
-#: templates/admin/cms/page/change_form.html:100
+#: templates/admin/cms/page/change_form.html:94
+msgid "Revert to public"
+msgstr ""
+
+#: templates/admin/cms/page/change_form.html:95
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
 msgstr "Historik"
 
-#: templates/admin/cms/page/change_form.html:101
+#: templates/admin/cms/page/change_form.html:96
 msgid "View on site"
 msgstr "Visa på sajt"
 
-#: templates/admin/cms/page/change_form.html:131
+#: templates/admin/cms/page/change_form.html:126
 #: templates/admin/cms/page/plugin_change_form.html:90
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Rätta till nedanstående fel."
 msgstr[1] "Rätta till nedanstående fel."
 
-#: templates/admin/cms/page/change_form.html:151
+#: templates/admin/cms/page/change_form.html:146
 msgid "All permissions"
 msgstr "Alla rättigheter"
 
-#: templates/admin/cms/page/change_form.html:152
-#: templates/admin/cms/page/change_form.html:164
+#: templates/admin/cms/page/change_form.html:147
+#: templates/admin/cms/page/change_form.html:158
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
 msgstr "Laddar..."
 
-#: templates/admin/cms/page/change_form.html:163
+#: templates/admin/cms/page/change_form.html:157
 msgid "Page states"
 msgstr "Sidstatus"
-
-#: templates/admin/cms/page/change_form.html:188
-#, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
-msgstr ""
-"Denna sida måste godkännas på nivå %(moderation_level)s, skicka ett "
-"meddelande till moderatorn."
-
-#: templates/admin/cms/page/change_form.html:190
-msgid "Request approvemet"
-msgstr "Efterfråga godkännande"
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
@@ -1533,37 +1480,37 @@ msgstr "Lista över sidor"
 msgid "Successfully moved"
 msgstr "Flytt genomförd"
 
-#: templates/admin/cms/page/change_list.html:68
+#: templates/admin/cms/page/change_list.html:77
 msgid "An error occured. Please reload the page"
 msgstr "Ett fel uppstod. Var vänlig ladda om sidan"
 
-#: templates/admin/cms/page/change_list.html:90
+#: templates/admin/cms/page/change_list.html:98
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "Återskapa borttagen %(name)s"
 
-#: templates/admin/cms/page/change_list.html:93
+#: templates/admin/cms/page/change_list.html:101
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lägg till %(name)s"
 
-#: templates/admin/cms/page/change_list.html:105
+#: templates/admin/cms/page/change_list.html:113
 msgid "Pages on:"
 msgstr "Sidor på:"
 
-#: templates/admin/cms/page/change_list.html:122
+#: templates/admin/cms/page/change_list.html:130
 msgid "Filter:"
 msgstr "Filter:"
 
-#: templates/admin/cms/page/change_list.html:122
+#: templates/admin/cms/page/change_list.html:130
 msgid "on"
 msgstr "på"
 
-#: templates/admin/cms/page/change_list.html:122
+#: templates/admin/cms/page/change_list.html:130
 msgid "off"
 msgstr "av"
 
-#: templates/admin/cms/page/change_list.html:124
+#: templates/admin/cms/page/change_list.html:132
 msgid "Filter"
 msgstr "Filter"
 
@@ -1571,27 +1518,23 @@ msgstr "Filter"
 msgid "actions"
 msgstr "åtgärder"
 
-#: templates/admin/cms/page/change_list_tree.html:10
-msgid "moderate"
-msgstr "moderering"
-
-#: templates/admin/cms/page/change_list_tree.html:13
+#: templates/admin/cms/page/change_list_tree.html:12
 msgid "published"
 msgstr "publicera"
 
-#: templates/admin/cms/page/change_list_tree.html:15
+#: templates/admin/cms/page/change_list_tree.html:14
 msgid "start"
 msgstr "start"
 
-#: templates/admin/cms/page/change_list_tree.html:16
+#: templates/admin/cms/page/change_list_tree.html:15
 msgid "end"
 msgstr "slut"
 
-#: templates/admin/cms/page/change_list_tree.html:17
+#: templates/admin/cms/page/change_list_tree.html:16
 msgid "restricted"
 msgstr "begränsad"
 
-#: templates/admin/cms/page/change_list_tree.html:19
+#: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
 msgstr "senaste ändringar"
 
@@ -1660,21 +1603,21 @@ msgstr "Lägg till undersida"
 msgid "add"
 msgstr "lägg till"
 
-#: templates/admin/cms/page/menu_item.html:61
-msgid "Approve directly"
-msgstr "Godkänn direkt"
+#: templates/admin/cms/page/menu_item.html:44
+#: templates/cms/toolbar/toolbar.html:66
+msgid "delete"
+msgstr "radera"
 
-#: templates/admin/cms/page/menu_item.html:63
-#: templates/admin/cms/page/menu_item.html:75
-#: templates/admin/cms/page/menu_item.html:77
+#: templates/admin/cms/page/menu_item.html:57
+#: templates/admin/cms/page/menu_item.html:68
 msgid "view"
 msgstr "vy"
 
-#: templates/admin/cms/page/menu_item.html:68
+#: templates/admin/cms/page/menu_item.html:63
 msgid "Unpublish"
 msgstr "Avpublicera"
 
-#: templates/admin/cms/page/menu_item.html:75
+#: templates/admin/cms/page/menu_item.html:68
 msgid "View on page"
 msgstr "Visa på sida"
 
@@ -1685,6 +1628,11 @@ msgstr "Åtgärd"
 #: templates/admin/cms/page/moderation_messages.html:5
 msgid "Created"
 msgstr "Skapad"
+
+#: templates/admin/cms/page/moderation_messages.html:6
+#: templates/admin/cms/page/permissions.html:6
+msgid "User"
+msgstr "Användare"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
@@ -1832,6 +1780,11 @@ msgid "down"
 msgstr "ner"
 
 #: templates/cms/toolbar/toolbar.html:70
+#, fuzzy
+msgid "Add child plugin"
+msgstr "Lägg till undersida"
+
+#: templates/cms/toolbar/toolbar.html:73
 msgid "Move to placeholder"
 msgstr "Flytta till platshållare"
 
@@ -1844,37 +1797,21 @@ msgstr "Användarnamn"
 msgid "Login"
 msgstr "Inloggning"
 
-#: templates/cms/toolbar/items/status.html:2
-msgid "Status"
-msgstr "Status"
-
 #: templates/cms/toolbar/items/switcher.html:4
 msgid "Switch on/off"
 msgstr "Slå på / av"
 
-#: templatetags/cms_admin.py:127 templatetags/cms_admin.py:134
+#: templatetags/cms_admin.py:128 templatetags/cms_admin.py:135
 #, python-format
 msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
 msgstr "<span title=\"Begränsningar: %(title)s \"> %(icon)s </span>"
 
-#: templatetags/cms_admin.py:147
-msgid "Unbind page moderation"
-msgstr "Frigör från sidmoderering"
-
-#: templatetags/cms_admin.py:148
-msgid "Unbind children moderation"
-msgstr "Frigör undersidor från moderering"
-
-#: templatetags/cms_admin.py:149
-msgid "Unbind descendants moderation"
-msgstr "Frigör undernivåer från moderering"
-
-#: templatetags/cms_tags.py:79
+#: templatetags/cms_tags.py:84
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr "Sidan hittades inte på %(domain)s "
 
-#: templatetags/cms_tags.py:80
+#: templatetags/cms_tags.py:85
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `"
@@ -1885,47 +1822,48 @@ msgstr ""
 "%(page_lookup)s\n"
 "`. Webbadressen för begäran var: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:107 test_utils/cli.py:117
 msgid "English"
 msgstr ""
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:108 test_utils/cli.py:129 test_utils/cli.py:147
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:109 test_utils/cli.py:123 test_utils/cli.py:141
+#: test_utils/cli.py:160
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
+#: test_utils/cli.py:110 test_utils/cli.py:134
+msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:111 test_utils/cli.py:154
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:170
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:171
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:172
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:178
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:184
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:190
 msgid "right column"
 msgstr "background color"
 
@@ -1943,6 +1881,14 @@ msgstr ""
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:15
+msgid "Sample App 2"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:22
+msgid "Namespaced App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1969,6 +1915,11 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
+#: test_utils/project/sampleapp/urls.py:12
+#, fuzzy
+msgid "^account/$"
+msgstr "antal"
+
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - ditt användarkonto har skapats."
@@ -1977,24 +1928,11 @@ msgstr "CMS - ditt användarkonto har skapats."
 msgid "CMS - your user account was changed."
 msgstr "CMS - ditt användarkonto har ändrats."
 
-#: utils/moderator.py:83
-msgid "parent first"
-msgstr "förälder först"
-
-#: utils/moderator.py:90
-msgid "approve"
-msgstr "godkänn"
-
-#: utils/moderator.py:251
-#, python-format
-msgid "CMS - Page %s requires approvement."
-msgstr "CMS - Sida %s behöver godkännande."
-
-#: utils/page_resolver.py:146
+#: utils/page_resolver.py:170
 msgid "Invalid URL, use /my/url format."
 msgstr "Felaktig URL, använd följande format: /min/url."
 
-#: utils/page_resolver.py:176
+#: utils/page_resolver.py:202
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
@@ -2002,6 +1940,148 @@ msgid_plural ""
 "Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
+
+#~ msgid "Request Approval"
+#~ msgstr "Begär godkännande"
+
+#~ msgid "You have no permission to change the template"
+#~ msgstr "Du har ingen behörighet att ändra mallen"
+
+#~ msgid "higher"
+#~ msgstr "högre"
+
+#~ msgid "You have no permission to add a plugin"
+#~ msgstr "Du har ingen behörighet att lägga till en plugin"
+
+#~ msgid "You have no permission to change this page"
+#~ msgstr "Du har ingen behörighet att ändra denna sida"
+
+#~ msgid "You have no permission to edit a plugin"
+#~ msgstr "Du har ingen behörighet att redigera plugins"
+
+#~ msgid "You have no permission to move a plugin"
+#~ msgstr "Du har ingen behörighet att flytta plugins"
+
+#~ msgid "You have no permission to remove a plugin"
+#~ msgstr "Du har ingen behörighet att ta bort plugins"
+
+#~ msgid "Copy moderation"
+#~ msgstr "Kopieringsbegränsningar"
+
+#~ msgid "path"
+#~ msgstr "sökväg"
+
+#~ msgid "everybody"
+#~ msgstr "alla"
+
+#~ msgid "type"
+#~ msgstr "typ"
+
+#~ msgid "can change soft-root"
+#~ msgstr "kan ändra rot"
+
+#~ msgid "status"
+#~ msgstr "status"
+
+#~ msgid "navigation extenders"
+#~ msgstr "navigationsanslutningar"
+
+#~ msgid "url overwrite"
+#~ msgstr "ändrad url"
+
+#~ msgid "author"
+#~ msgstr "författare"
+
+#~ msgid "reverse url id"
+#~ msgstr "omvänd url id"
+
+#~ msgid "Moderate page"
+#~ msgstr "Moderera sida"
+
+#~ msgid "Moderate children"
+#~ msgstr "Moderera närmsta undernivå"
+
+#~ msgid "Moderate descendants"
+#~ msgstr "Moderera alla undernivåer"
+
+#~ msgid "PageModerator"
+#~ msgstr "Sidmoderator"
+
+#~ msgid "publish req."
+#~ msgstr "publiceringsförfrågan"
+
+#~ msgid "unpublish req."
+#~ msgstr "förfrågan om avpublicering"
+
+#~ msgid "approved"
+#~ msgstr "godkänd"
+
+#~ msgid "req. app."
+#~ msgstr "behöver godkännande"
+
+#~ msgid "app. par."
+#~ msgstr "godkänd, inv. överstående"
+
+#~ msgid "can moderate"
+#~ msgstr "kan moderera"
+
+#~ msgid "if present image will be clickable"
+#~ msgstr "om angiven blir bilden klickbar"
+
+#~ msgid "textual description of the image"
+#~ msgstr "beskrivning av bilden"
+
+#~ msgid "additional description of the image"
+#~ msgstr "ytterligare beskrivning av bilden"
+
+#~ msgid "(requires approvement at %(moderation_level)s level)"
+#~ msgstr "(kräver godkännande på nivå %(moderation_level)s)"
+
+#~ msgid "(you can perform actions on this page directly)"
+#~ msgstr "(du kan utföra ändringar på denna sida direkt)"
+
+#~ msgid "Approve delete"
+#~ msgstr "Godkänn radering"
+
+#~ msgid "Approve"
+#~ msgstr "Godkänn"
+
+#~ msgid ""
+#~ "This page must be moderated at level %(moderation_level)s, post a message "
+#~ "for moderator."
+#~ msgstr ""
+#~ "Denna sida måste godkännas på nivå %(moderation_level)s, skicka ett "
+#~ "meddelande till moderatorn."
+
+#~ msgid "Request approvemet"
+#~ msgstr "Efterfråga godkännande"
+
+#~ msgid "moderate"
+#~ msgstr "moderering"
+
+#~ msgid "Approve directly"
+#~ msgstr "Godkänn direkt"
+
+#~ msgid "Status"
+#~ msgstr "Status"
+
+#~ msgid "Unbind page moderation"
+#~ msgstr "Frigör från sidmoderering"
+
+#~ msgid "Unbind children moderation"
+#~ msgstr "Frigör undersidor från moderering"
+
+#~ msgid "Unbind descendants moderation"
+#~ msgstr "Frigör undernivåer från moderering"
+
+#~ msgid "parent first"
+#~ msgstr "förälder först"
+
+#~ msgid "approve"
+#~ msgstr "godkänn"
+
+#~ msgid "CMS - Page %s requires approvement."
+#~ msgstr "CMS - Sida %s behöver godkännande."
 
 #~ msgid "move"
 #~ msgstr "move request"

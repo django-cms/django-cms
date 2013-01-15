@@ -3,36 +3,37 @@ Internationalization
 ####################
 
 
-***************************
-Multilingual URL Middleware
-***************************
+*****************
+Multilingual URLs
+*****************
 
-The multilingual URL middleware adds a language prefix to every URL. 
+If you use more than one language, django CMS urls need
+to be referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see the
+official django `documentation`_.
 
-Example::
+Main `urls.py` example::
 
-    /de/account/login/
-    /fr/account/login/
+    from django.conf import settings
+    from django.conf.urls.defaults import patterns, include, url
+    from django.contrib import admin
+    from django.conf.urls.i18n import i18n_patterns
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-It also adds this prefix automatically to every ``href`` and ``form`` tag.
-To install it, include
-``'cms.middleware.multilingual.MultilingualURLMiddleware'`` in your project's
-:setting:`django:MIDDLEWARE_CLASSES` setting.
+    admin.autodiscover()
 
-.. note::
+    urlpatterns = patterns('',
+        url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
+    )
 
-    This middleware must be put before ``cms.middleware.page.CurrentPageMiddleware``
+    urlpatterns += staticfiles_urlpatterns()
 
-    Example::
+    urlpatterns += i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^', include('cms.urls')), # <--------- include the django cms urls via i18n_patterns
+    )
 
-        MIDDLEWARE_CLASSES = (
-            ...
-            'cms.middleware.multilingual.MultilingualURLMiddleware',
-            'cms.middleware.user.CurrentUserMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware'
-            ...
-        )
+
+.. _documentation: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
 
 ****************
 Language Chooser
@@ -49,67 +50,6 @@ Example:
     {% load menu_tags %}
     {% language_chooser "myapp/language_chooser.html" %}
 
-If the current URL is not handled by the CMS and you have some i18n slugs in the
-URL you may use the :func:`menus.utils.set_language_changer` function in the
-view that handles the current URL.
-
-In the models of the current object add an optional language parameter to the
-:meth:`~django.db.models.Model.get_absolute_url` method::
-
-    from django.utils.translation import get_language
-
-    def get_absolute_url(self, language=None):
-        if not language:
-            language = get_language()
-        return reverse("product_view", args=[self.get_slug(language=language)])
-
-
-In the view pass the :meth:`get_absolute_url` method to the
-:func:`~menus.utils.set_language_changer` function::
-
-    from menus.utils import set_language_changer
-
-    def get_product(request, slug):
-        item = get_object_or_404(Product, slug=slug, published=True)
-        set_language_changer(request, item.get_absolute_url)
-        # ...
-
-This allows the language chooser to have another URL than the current one.
-If the current URL is not handled by the CMS and no
-:func:`~menus.utils.set_language_changer` function is provided it will take the
-exact same URL as the current one and will only change the language prefix.
-
-For class-based generic views :func:`~menus.utils.set_language_changer` can be
-used as follows::
-
-    from menus.utils import set_language_changer
-
-    class ProductDetailView(DetailView):
-        model = Product
-
-        def get_context_data(self, **kwargs):
-            context = super(ProductDetailView, self).get_context_data(**kwargs)
-            set_language_changer(self.request, self.object.get_absolute_url)
-            return context
-
-For the language chooser to work the
-:class:`cms.middleware.multilingual.MultilingualURLMiddleware` must be enabled.
-
-
-simple_language_changer
-=======================
-
-If the URLs of your views don't actually change besides the language prefix,
-you can use the :func:`menus.utils.simple_language_changer` view decorator,
-instead of manually using :func:`~menus.utils.set_language_changer`::
-
-
-    from menus.utils import simple_language_changer
-
-    @simple_language_changer
-    def get_prodcut(request, slug):
-        # ...
-
 
 *****************
 page_language_url
@@ -124,15 +64,16 @@ Example:
     {% page_language_url "de" %}
 
 
-*********************
-CMS_HIDE_UNTRANSLATED
-*********************
+******************
+hide_unstranslated
+******************
 
-If you put :setting:`CMS_HIDE_UNTRANSLATED` to ``False`` in your
-``settings.py`` all pages will be displayed in all languages even if they are
+If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_unstranslated` to ``False``
+all pages will be displayed in all languages even if they are
 not translated yet.
 
-If :setting:`CMS_HIDE_UNTRANSLATED`  is ``True`` in your ``settings.py``
-and you are on a page that doesn't yet have an English translation and you view the
-German version then the language chooser will redirect to ``/``. The same goes
-for URLs that are not handled by the CMS and display a language chooser.
+If `hide_untranslated`  is ``True`` in your :setting:`CMS_LANGUAGES`
+and you are on a page that doesn't yet have an English translation and you view
+the German version then the language chooser will redirect to ``/``. The same
+goes for urls that are not handled by the cms and display a language chooser.
+

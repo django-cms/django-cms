@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.models import Page
+from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.test_utils.project.fileapp.models import FileModel
@@ -58,9 +58,9 @@ class ReversionTestCase(CMSTestCase):
             txt = Text.objects.all()[0]
             self.assertEquals("Bye Bye World", txt.body)
             p_data = self.page_data.copy()
-            p_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
+            page.publish()
 
     def test_revert(self):
         """
@@ -68,6 +68,7 @@ class ReversionTestCase(CMSTestCase):
         """
         with self.login_user_context(User.objects.get(username="test")):
             self.assertEquals(Page.objects.all().count(), 2)
+            self.assertEquals(Title.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)
             self.assertEquals(Revision.objects.all().count(), 7)
 
@@ -83,8 +84,9 @@ class ReversionTestCase(CMSTestCase):
             revert_url = history_url + "%s/" % version.pk
             response = self.client.get(revert_url)
             self.assertEquals(response.status_code, 200)
-
-            response = self.client.post(revert_url, self.page_data)
+            data = self.page_data
+            response = self.client.post("%s?language=en&" % revert_url, self.page_data)
+            #print response
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
 
             # test for publisher_is_draft, published is set for both draft and

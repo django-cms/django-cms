@@ -14,14 +14,14 @@ class CMSSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        from cms.utils.moderator import get_page_queryset
+        from cms.utils.page_resolver import get_page_queryset
         page_queryset = get_page_queryset(None)
         all_pages = page_queryset.published().filter(login_required=False)
         return all_pages
 
     def lastmod(self, page):
         modification_dates = [page.changed_date, page.publication_date]
-        plugins_for_placeholder = lambda placeholder: placeholder.cmsplugin_set.all()
+        plugins_for_placeholder = lambda placeholder: placeholder.get_plugins()
         plugins = from_iterable(map(plugins_for_placeholder, page.placeholders.all()))
         plugin_modification_dates = map(lambda plugin: plugin.changed_date, plugins)
         modification_dates.extend(plugin_modification_dates)

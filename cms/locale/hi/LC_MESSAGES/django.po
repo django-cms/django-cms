@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-21 14:53+0200\n"
+"POT-Creation-Date: 2013-01-14 18:18+0100\n"
 "PO-Revision-Date: 2012-09-19 14:44+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/django-cms/"
@@ -22,63 +22,65 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: cms_toolbar.py:70
+msgid "Revert"
+msgstr ""
+
+#: cms_toolbar.py:74
 msgid "Edit mode"
 msgstr "संपादित करें मोड"
 
-#: cms_toolbar.py:79
+#: cms_toolbar.py:108
 msgid "django CMS"
 msgstr ""
 
-#: cms_toolbar.py:110 templates/admin/cms/page/menu_item.html:69
+#: cms_toolbar.py:132 templates/admin/cms/page/change_form.html:91
+#: templates/admin/cms/page/change_list.html:68
+#: templates/admin/cms/page/menu_item.html:56
+#: templates/admin/cms/page/menu_item.html:64
 msgid "Publish"
 msgstr "प्रकाशित"
 
-#: cms_toolbar.py:114
-msgid "Request Approval"
-msgstr ""
-
-#: cms_toolbar.py:135 cms_toolbar.py:144
+#: cms_toolbar.py:153
 msgid "Logout"
 msgstr "लॉगआउट"
 
-#: cms_toolbar.py:160
+#: cms_toolbar.py:170
 msgid "Template"
 msgstr "टेम्पलेट"
 
-#: cms_toolbar.py:168
+#: cms_toolbar.py:178
 msgid "Move/add Pages"
 msgstr "स्थानांतरित / पेज जोड़ें"
 
-#: cms_toolbar.py:173
+#: cms_toolbar.py:183
 msgid "Add child page"
 msgstr "child पृष्ठ जोड़ें"
 
-#: cms_toolbar.py:179
+#: cms_toolbar.py:189
 msgid "Add sibling page"
 msgstr "sibling पृष्ठ जोड़ें"
 
-#: cms_toolbar.py:185
+#: cms_toolbar.py:195
 msgid "Delete Page"
 msgstr "हटाएँ पृष्ठ"
 
-#: cms_toolbar.py:188 models/moderatormodels.py:45
-#: templates/admin/cms/page/permissions.html:5
+#: cms_toolbar.py:198 templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "पृष्ठ"
 
-#: cms_toolbar.py:197
+#: cms_toolbar.py:207
 msgid "Site Administration"
 msgstr "साइट प्रशासन"
 
-#: cms_toolbar.py:203
+#: cms_toolbar.py:213
 msgid "Page Settings"
 msgstr "पेज सेटिंग्स"
 
-#: cms_toolbar.py:209
+#: cms_toolbar.py:219
 msgid "View History"
 msgstr "इतिहास देखें"
 
-#: cms_toolbar.py:213
+#: cms_toolbar.py:223
 msgid "Admin"
 msgstr ""
 
@@ -86,92 +88,91 @@ msgstr ""
 msgid "Advanced options"
 msgstr "उन्नत विकल्प"
 
-#: admin/forms.py:59
+#: admin/forms.py:60
 msgid "Title"
 msgstr "शीर्षक"
 
-#: admin/forms.py:60
+#: admin/forms.py:61
 msgid "The default title"
 msgstr "डिफ़ॉल्ट शीर्षक"
 
-#: admin/forms.py:61
+#: admin/forms.py:62
 msgid "Slug"
 msgstr "स्लग"
 
-#: admin/forms.py:62
+#: admin/forms.py:63
 msgid "The part of the title that is used in the URL"
 msgstr "शीर्षक है कि URL में प्रयोग किया जाता है का हिस्सा"
 
-#: admin/forms.py:63
+#: admin/forms.py:64
 msgid "Language"
 msgstr "भाषा"
 
-#: admin/forms.py:64
+#: admin/forms.py:65
 msgid "The current language of the content fields."
 msgstr "मौजूदा भाषा की क्षेत्र "
 
-#: admin/forms.py:117
+#: admin/forms.py:112
 msgid "Another page with this slug already exists"
 msgstr "इस काउंटर के साथ एक पृष्ठ पहले से मौजूद है"
 
-#: admin/forms.py:151
+#: admin/forms.py:147
 msgid "Menu Title"
 msgstr "मेनू का शीर्षक"
 
-#: admin/forms.py:152
+#: admin/forms.py:148
 msgid "Overwrite what is displayed in the menu"
 msgstr "अधिलेखित मेनू में क्या प्रदर्शित होता है"
 
-#: admin/forms.py:153
+#: admin/forms.py:149
 msgid "Page Title"
 msgstr "पृष्ठ शीर्षक"
 
-#: admin/forms.py:154
+#: admin/forms.py:150
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Overwrites आपके ब्राउज़र या बुकमार्क में के शीर्ष पर प्रदर्शित होता है क्या"
 
-#: admin/forms.py:155
+#: admin/forms.py:151
 msgid "Application"
 msgstr "आवेदन"
 
-#: admin/forms.py:157
+#: admin/forms.py:153
 msgid "Hook application to this page."
 msgstr "हुक इस पृष्ठ पर आवेदन."
 
-#: admin/forms.py:158
+#: admin/forms.py:154
 msgid "Overwrite URL"
 msgstr "अधिलेखित यूआरएल"
 
-#: admin/forms.py:159
+#: admin/forms.py:155
 msgid "Keep this field empty if standard path should be used."
 msgstr "इस क्षेत्र खाली रखें अगर मानक पथ प्रयोग किया जाना चाहिए."
 
-#: admin/forms.py:165
+#: admin/forms.py:157
 msgid "Redirect"
 msgstr "पुनर्निर्देशन"
 
-#: admin/forms.py:166
+#: admin/forms.py:158
 msgid "Redirects to this URL."
 msgstr "इस URL के लिए पुनर्निर्देश."
 
-#: admin/forms.py:168
+#: admin/forms.py:160
 msgid "A description of the page sometimes used by search engines."
 msgstr "खोज इंजन द्वारा उपयोग पृष्ठ का वर्णन."
 
-#: admin/forms.py:170
+#: admin/forms.py:162
 msgid "A list of comma seperated keywords sometimes used by search engines."
 msgstr "अल्पविराम से अलग कभी कभी खोज इंजन द्वारा उपयोग खोजशब्दों की एक सूची."
 
-#: admin/forms.py:186
+#: admin/forms.py:178
 msgid "A page with this reverse URL id exists already."
 msgstr "इस रिवर्स यूआरएल आईडी के साथ एक पृष्ठ पहले से ही मौजूद है."
 
-#: admin/forms.py:203 admin/forms.py:204 migrations/0001_initial.py:41
-#: models/permissionmodels.py:17
+#: admin/forms.py:195 admin/forms.py:196 models/permissionmodels.py:39
 msgid "user"
 msgstr "उपयोगकर्ता"
 
-#: admin/forms.py:228
+#: admin/forms.py:220
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
@@ -179,44 +180,44 @@ msgstr ""
 "पृष्ठ अनुमति जोड़ें भी बच्चों, या वंश का उपयोग करने की आवश्यकता है, अन्यथा पृष्ठ जोड़े अपने "
 "निर्माता से नहीं बदला जा सकता है."
 
-#: admin/forms.py:233
+#: admin/forms.py:225
 msgid "Add page permission also requires edit page permission."
 msgstr "पृष्ठ जोड़ें अनुमति भी पृष्ठ को संपादित करने की अनुमति की आवश्यकता है."
 
-#: admin/forms.py:260
+#: admin/forms.py:252
 msgid "can_view"
 msgstr ""
 
-#: admin/forms.py:272
+#: admin/forms.py:264
 msgid "Please select user or group first."
 msgstr "कृपया चुनें उपयोगकर्ता या समूह में पहले."
 
-#: admin/forms.py:279 admin/forms.py:286 admin/forms.py:290
+#: admin/forms.py:271 admin/forms.py:278 admin/forms.py:282
 #: templates/admin/cms/page/change_form.html:68
 #: templates/admin/cms/page/plugin_change_form.html:76
 #: templates/cms/toolbar/placeholder.html:26
 msgid "Add"
 msgstr "जोड़ना"
 
-#: admin/forms.py:280 admin/forms.py:287 admin/forms.py:291
+#: admin/forms.py:272 admin/forms.py:279 admin/forms.py:283
 msgid "Change"
 msgstr "बदलना"
 
-#: admin/forms.py:281 admin/forms.py:288 admin/forms.py:292
+#: admin/forms.py:273 admin/forms.py:280 admin/forms.py:284
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
 msgstr "मिटाना"
 
-#: admin/forms.py:282
+#: admin/forms.py:274
 msgid "Recover (any) pages"
 msgstr "स्वस्थ (किसी भी पन्ने)"
 
-#: admin/forms.py:309
+#: admin/forms.py:301
 msgid "Notify user"
 msgstr "सूचित उपयोगकर्ता"
 
-#: admin/forms.py:310
+#: admin/forms.py:302
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
@@ -224,137 +225,199 @@ msgstr ""
 "उपयोगकर्ता नाम या पासवर्ड को बदलने के बारे में उपयोगकर्ता के लिए ईमेल सूचना भेजें. "
 "उपयोगकर्ता ईमेल आवश्यक है."
 
-#: admin/forms.py:330
+#: admin/forms.py:322
 msgid "New password"
 msgstr "नया कूटशब्द"
 
-#: admin/forms.py:332
+#: admin/forms.py:324
 msgid "New password confirmation"
 msgstr "नए पासवर्ड की पुष्टि"
 
-#: admin/forms.py:351
+#: admin/forms.py:343
 msgid "Email notification requires valid email address."
 msgstr "ईमेल अधिसूचना मान्य ईमेल पते की आवश्यकता है."
 
-#: admin/forms.py:353
+#: admin/forms.py:345
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "नए पृष्ठ जोड़ने की अनुमति के पन्नों को बदलने की अनुमति की आवश्यकता है!"
 
-#: admin/forms.py:355
+#: admin/forms.py:347
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr ""
 "नए उपयोगकर्ताओं को जोड़ने की अनुमति उपयोगकर्ताओं को बदलने की अनुमति की आवश्यकता है!"
 
-#: admin/forms.py:357
+#: admin/forms.py:349
 msgid "To add permissions you also need to edit them!"
 msgstr "के लिए अनुमति आप भी उन्हें संपादित करने की आवश्यकता जोड़ें!"
 
-#: admin/pageadmin.py:108
+#: admin/pageadmin.py:110
 msgid "Basic Settings"
 msgstr "मूल सेटिंग्स"
 
-#: admin/pageadmin.py:111
+#: admin/pageadmin.py:113
 msgid "Note: This page reloads if you change the selection. Save it first."
 msgstr "नोट: यह पृष्ठ अगर आप चयन बदल reloads. सहेजें पहले."
 
-#: admin/pageadmin.py:113 admin/pageadmin.py:165
+#: admin/pageadmin.py:115 admin/pageadmin.py:165
 msgid "Hidden"
 msgstr "छिपा हुआ"
 
-#: admin/pageadmin.py:117
+#: admin/pageadmin.py:119
 msgid "Advanced Settings"
 msgstr "उन्नत सेटिंग्स"
 
-#: admin/pageadmin.py:124
+#: admin/pageadmin.py:126
 msgid "SEO Settings"
 msgstr "एसईओ सेटिंग्स"
 
-#: admin/pageadmin.py:311
-msgid "You have no permission to change the template"
-msgstr ""
+#: admin/pageadmin.py:604
+#, fuzzy
+msgid "You do not have permission to change pages."
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
-#: admin/pageadmin.py:498
-msgid "higher"
-msgstr "उच्च"
-
-#: admin/pageadmin.py:668
+#: admin/pageadmin.py:619
 msgid "Database error"
 msgstr "डेटाबेस त्रुटि"
 
-#: admin/pageadmin.py:779
+#: admin/pageadmin.py:712
+#, fuzzy
+msgid "You do not have permission to change the template"
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+
+#: admin/pageadmin.py:716
+#, fuzzy
+msgid "Template not valid"
+msgstr "टेम्पलेट"
+
+#: admin/pageadmin.py:722
+#, fuzzy
+msgid "The template was successfully changed"
+msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
+
+#: admin/pageadmin.py:743
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:880
-msgid "Page was successfully approved."
+#: admin/pageadmin.py:746 admin/pageadmin.py:840
+#, python-format
+msgid ""
+"The page \"%s\" has a delete request. Delete or confirm the request first."
+msgstr ""
+
+#: admin/pageadmin.py:837 admin/pageadmin.py:888 admin/pageadmin.py:1057
+msgid "You do not have permission to publish this page"
+msgstr "आप इस पृष्ठ पर प्रकाशित की अनुमति नहीं है"
+
+#: admin/pageadmin.py:844
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully published."
 msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
 
-#: admin/pageadmin.py:952
+#: admin/pageadmin.py:864 admin/pageadmin.py:909 admin/pageadmin.py:949
+#: admin/pageadmin.py:1188 admin/pageadmin.py:1219 admin/pageadmin.py:1348
+#: admin/pageadmin.py:1376
+msgid "You do not have permission to change this page"
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+
+#: admin/pageadmin.py:868
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully reverted."
+msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
+
+#: admin/pageadmin.py:892
+#, python-format
+msgid "The page \"%s\" has no delete request."
+msgstr ""
+
+#: admin/pageadmin.py:896
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully deleted."
+msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
+
+#: admin/pageadmin.py:921
+#, fuzzy
+msgid "You do not have permission to delete this page"
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+
+#: admin/pageadmin.py:953
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr " %(name)s प्राथमिक कुंजी वस्तु के साथ एस %(key)r आर मौजूद नहीं है."
 
-#: admin/pageadmin.py:958
+#: admin/pageadmin.py:959
 msgid "There only exists one translation for this page"
 msgstr "सिर्फ इस पृष्ठ के लिए एक अनुवाद से मौजूद है"
 
-#: admin/pageadmin.py:987
+#: admin/pageadmin.py:988
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "शीर्षक और plugins भाषा %(language)s के साथ नष्ट कर दिया गया"
 
-#: admin/pageadmin.py:1009
+#: admin/pageadmin.py:1010
 msgid "Are you sure?"
 msgstr "क्या आप सुनिश्चित हैं?"
 
-#: admin/pageadmin.py:1074
-msgid "You do not have permission to publish this page"
-msgstr "आप इस पृष्ठ पर प्रकाशित की अनुमति नहीं है"
+#: admin/pageadmin.py:1066
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully unpublished"
+msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
 
-#: admin/pageadmin.py:1088
+#: admin/pageadmin.py:1068
+#, fuzzy, python-format
+msgid "The page \"%s\" was successfully published"
+msgstr "पेज सफलतापूर्वक मंजूरी दे दी थी."
+
+#: admin/pageadmin.py:1086
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "आप इस पृष्ठ की in_navigation स्थिति को बदलने की अनुमति नहीं है"
 
-#: admin/pageadmin.py:1113
-msgid "You have no permission to add a plugin"
+#: admin/pageadmin.py:1110
+#, fuzzy
+msgid "You do not have permission to add a plugin"
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
+
+#: admin/pageadmin.py:1129
+msgid "This placeholder already has the maximum number of plugins"
 msgstr ""
 
-#: admin/pageadmin.py:1160 admin/pageadmin.py:1192
+#: admin/pageadmin.py:1134
+#, python-format
+msgid "This placeholder already has the maximum number allowed of %s plugins."
+msgstr ""
+
+#: admin/pageadmin.py:1157 admin/pageadmin.py:1190
 msgid "Language must be set to a supported language!"
 msgstr "भाषा एक समर्थित भाषा के लिए सेट किया जाना चाहिए!"
 
-#: admin/pageadmin.py:1172
+#: admin/pageadmin.py:1170
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s प्लगइन %(placeholder)s जोड़ा "
 
-#: admin/pageadmin.py:1190
-msgid "You do not have permission to change this page"
-msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
-
-#: admin/pageadmin.py:1194
+#: admin/pageadmin.py:1192
 msgid "Language must be different than the copied language!"
 msgstr "भाषा की नकल की भाषा से अलग किया जाना चाहिए!"
 
-#: admin/pageadmin.py:1200
+#: admin/pageadmin.py:1198
 msgid "You do not have permission to add plugins"
 msgstr ""
 
-#: admin/pageadmin.py:1207
+#: admin/pageadmin.py:1205
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "नकल %(language)s के लिए plugins %(placeholder)s"
 
-#: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
-msgid "You have no permission to change this page"
+#: admin/pageadmin.py:1250
+msgid "This plugin is not saved in a revision"
 msgstr ""
 
-#: admin/pageadmin.py:1255
-msgid "You have no permission to edit a plugin"
-msgstr ""
+#: admin/pageadmin.py:1253 admin/pageadmin.py:1344
+#, fuzzy
+msgid "You do not have permission to edit a plugin"
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
 #: admin/pageadmin.py:1311
 #, python-format
@@ -362,19 +425,22 @@ msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s  स्थिति %(position)s में संपादित प्लगइन (%(placeholder)s में "
 
-#: admin/pageadmin.py:1370
-msgid "You have no permission to move a plugin"
-msgstr ""
+#: admin/pageadmin.py:1371
+#, fuzzy
+msgid "You do not have permission to move a plugin"
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
-#: admin/pageadmin.py:1388
-msgid "Plugins where moved"
+#: admin/pageadmin.py:1392
+#, fuzzy
+msgid "Plugins were moved"
 msgstr "कहाँ चला गया प्लगइन्स"
 
-#: admin/pageadmin.py:1402
-msgid "You have no permission to remove a plugin"
-msgstr ""
+#: admin/pageadmin.py:1405 admin/pageadmin.py:1414
+#, fuzzy
+msgid "You do not have permission to remove a plugin"
+msgstr "आप इस पृष्ठ को बदलने की अनुमति नहीं है"
 
-#: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
+#: admin/pageadmin.py:1424 admin/placeholderadmin.py:315
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -383,23 +449,23 @@ msgstr ""
 "%(plugin_name)s की स्थिति %(position)s  में प्लगइन में %(placeholder)s नष्ट किया "
 "गया."
 
-#: admin/permissionadmin.py:94
+#: admin/permissionadmin.py:92
 msgid "View restriction"
 msgstr ""
 
-#: admin/permissionadmin.py:95
+#: admin/permissionadmin.py:93
 msgid "View restrictions"
 msgstr ""
 
-#: admin/permissionadmin.py:155 models/permissionmodels.py:76
+#: admin/permissionadmin.py:147 models/permissionmodels.py:97
 msgid "Page permissions"
 msgstr "पृष्ठ अनुमति"
 
-#: admin/permissionadmin.py:156
+#: admin/permissionadmin.py:148
 msgid "User & Group permissions"
 msgstr "उपयोगकर्ता और समूह की अनुमति"
 
-#: admin/permissionadmin.py:157
+#: admin/permissionadmin.py:149
 msgid "Page permissions management"
 msgstr "पृष्ठ अनुमति प्रबंधन"
 
@@ -411,7 +477,7 @@ msgstr ""
 msgid "You don't have permission to add plugins"
 msgstr ""
 
-#: admin/placeholderadmin.py:289
+#: admin/placeholderadmin.py:311
 msgid "You don't have permission to delete a plugin"
 msgstr ""
 
@@ -431,11 +497,7 @@ msgstr "पासवर्ड"
 msgid "Copy permissions"
 msgstr "Copy permissions"
 
-#: admin/dialog/forms.py:16
-msgid "Copy moderation"
-msgstr "कॉपी मॉडरेशन"
-
-#: conf/patch.py:28
+#: conf/patch.py:24
 msgid "Inherit the template of the nearest ancestor"
 msgstr "विरासत में निकटतम पूर्वज का खाका"
 
@@ -451,281 +513,81 @@ msgstr ""
 msgid "Add Another"
 msgstr "एक और जोड़ें"
 
-#: migrations/0001_initial.py:12 migrations/0001_initial.py:24
-#: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
-#: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
-#: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:82 models/titlemodels.py:11
-#: plugins/inherit/models.py:11
-msgid "language"
-msgstr "भाषा"
-
-#: migrations/0001_initial.py:13 migrations/0001_initial.py:26
-#: migrations/0001_initial.py:40 migrations/0001_initial.py:78
-#: migrations/0003_remove_placeholder.py:21 models/pagemodel.py:99
-#: models/permissionmodels.py:70 models/titlemodels.py:22
-#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
-#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:19
-#: plugins/picture/models.py:22 plugins/teaser/models.py:13
-msgid "page"
-msgstr "पृष्ठ"
-
-#: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:81
-msgid "position"
-msgstr "स्थिति"
-
-#: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:84 models/titlemodels.py:23
-msgid "creation date"
-msgstr "निर्माण तिथि"
-
-#: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:12
-msgid "slot"
-msgstr "स्थान"
-
-#: migrations/0001_initial.py:18 models/pluginmodel.py:83
-msgid "plugin_name"
-msgstr "plugin_name"
-
-#: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
-#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
-#: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:25
-#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:9
-#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
-#: templates/admin/cms/page/change_list_tree.html:6
-msgid "title"
-msgstr "शीर्षक"
-
-#: migrations/0001_initial.py:28
-msgid "path"
-msgstr "रास्ता"
-
-#: migrations/0001_initial.py:30 models/titlemodels.py:14
-msgid "slug"
-msgstr "slug"
-
-#: migrations/0001_initial.py:36
-msgid "everybody"
-msgstr "सब"
-
-#: migrations/0001_initial.py:37 models/permissionmodels.py:21
-msgid "can edit"
-msgstr "संपादित कर सकते हैं"
-
-#: migrations/0001_initial.py:38 models/permissionmodels.py:18
-msgid "group"
-msgstr "समूह"
-
-#: migrations/0001_initial.py:39 models/permissionmodels.py:25
-msgid "can publish"
-msgstr "प्रकाशित कर सकते हैं"
-
-#: migrations/0001_initial.py:42
-msgid "type"
-msgstr "प्रकार"
-
-#: migrations/0001_initial.py:44
-msgid "can change soft-root"
-msgstr "soft-root परिवर्तित कर सकते हैं"
-
-#: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
-#: migrations/0006_apphook.py:62
-msgid "status"
-msgstr "स्थिति"
-
-#: migrations/0001_initial.py:53
-msgid "navigation extenders"
-msgstr "नेविगेशन extenders"
-
-#: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
-#: migrations/0006_apphook.py:46 models/titlemodels.py:16
-msgid "has url overwrite"
-msgstr "url अधिलेखित है"
-
-#: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
-msgid "url overwrite"
-msgstr "url अधिलेखित"
-
-#: migrations/0001_initial.py:57
-msgid "author"
-msgstr "लेखक"
-
-#: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
-msgid "reverse url id"
-msgstr "रिवर्स url आईडी"
-
-#: migrations/0001_initial.py:59 models/pagemodel.py:79
-msgid "login required"
-msgstr "लॉगिन आवश्यक"
-
-#: migrations/0001_initial.py:60 models/pagemodel.py:64
-msgid "soft root"
-msgstr "नरम जड़"
-
-#: migrations/0001_initial.py:63 models/pagemodel.py:62
-msgid "publication end date"
-msgstr "प्रकाशन समाप्ति तिथि"
-
-#: migrations/0001_initial.py:64 models/pagemodel.py:69
-#: plugins/snippet/models.py:14
-msgid "template"
-msgstr "टेम्पलेट"
-
-#: migrations/0001_initial.py:66 models/pagemodel.py:61
-msgid "publication date"
-msgstr "प्रकाशन तिथि"
-
-#: migrations/0001_initial.py:67 models/pagemodel.py:63
-#: templates/admin/cms/page/change_list_tree.html:9
-msgid "in navigation"
-msgstr "नेविगेशन में"
-
-#: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
-#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
-msgid "application"
-msgstr "आवेदन"
-
-#: migrations/0006_apphook.py:65 models/pagemodel.py:65
-msgid "id"
-msgstr "आईडी"
-
-#: migrations/0008_redirects.py:11 models/titlemodels.py:18
-msgid "redirect"
-msgstr "पुनर्निर्देशित"
-
-#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
-msgid "keywords"
-msgstr "खोजशब्दों"
-
-#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
-#: plugins/teaser/models.py:20
-msgid "description"
-msgstr "वर्णन"
-
-#: models/moderatormodels.py:25
-msgid "Current page"
-msgstr "वर्तमान पृष्ठ"
-
-#: models/moderatormodels.py:26
-msgid "Page children (immediate)"
-msgstr "पृष्ठ बच्चों (तत्काल)"
-
 #: models/moderatormodels.py:27
-msgid "Page and children (immediate)"
-msgstr "पृष्ठ और बच्चों (तत्काल)"
-
-#: models/moderatormodels.py:28
-msgid "Page descendants"
-msgstr "वंश पृष्ठ"
-
-#: models/moderatormodels.py:29
-msgid "Page and descendants"
-msgstr "पृष्ठ और वंश"
-
-#: models/moderatormodels.py:46
-#: templates/admin/cms/page/moderation_messages.html:6
-#: templates/admin/cms/page/permissions.html:6
-msgid "User"
-msgstr "उपयोगकर्ता"
-
-#: models/moderatormodels.py:50 templatetags/cms_admin.py:147
-msgid "Moderate page"
-msgstr "मध्यम पृष्ठ"
-
-#: models/moderatormodels.py:51 templatetags/cms_admin.py:148
-msgid "Moderate children"
-msgstr "Moderate बच्चों"
-
-#: models/moderatormodels.py:52 templatetags/cms_admin.py:149
-msgid "Moderate descendants"
-msgstr "Moderate वंश"
-
-#: models/moderatormodels.py:55 models/moderatormodels.py:56
-msgid "PageModerator"
-msgstr "PageModerator"
-
-#: models/moderatormodels.py:99
 msgid "created"
 msgstr "निर्मित"
 
-#: models/moderatormodels.py:100 models/pagemodel.py:39
+#: models/moderatormodels.py:28
 msgid "changed"
 msgstr "बदला"
 
-#: models/moderatormodels.py:101
+#: models/moderatormodels.py:29
 msgid "delete req."
 msgstr "अनुरोध हटा दें"
 
-#: models/moderatormodels.py:102
+#: models/moderatormodels.py:30
 msgid "move req."
 msgstr "अनुरोध बदल दे"
 
-#: models/moderatormodels.py:103
-msgid "publish req."
-msgstr "अनुरोध प्रकाशित."
-
-#: models/moderatormodels.py:104
-msgid "unpublish req."
-msgstr "अप्रकाशित अनुरोध."
-
-#: models/moderatormodels.py:105 models/pagemodel.py:42
-msgid "approved"
-msgstr "अनुमोदित"
-
-#: models/moderatormodels.py:117
+#: models/moderatormodels.py:42
 msgid "Page moderator state"
 msgstr "पृष्ठ moderator state"
 
-#: models/moderatormodels.py:118
+#: models/moderatormodels.py:43
 msgid "Page moderator states"
 msgstr "पृष्ठ moderator states"
 
-#: models/pagemodel.py:40
-msgid "req. app."
-msgstr "अनुरोध. app."
-
-#: models/pagemodel.py:41 templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:66 utils/moderator.py:90
-msgid "delete"
-msgstr "मिटाना"
-
-#: models/pagemodel.py:43
-msgid "app. par."
-msgstr "app. par."
-
-#: models/pagemodel.py:47
+#: models/pagemodel.py:33
 msgid "for logged in users only"
 msgstr ""
 
-#: models/pagemodel.py:48
+#: models/pagemodel.py:34
 msgid "for anonymous users only"
 msgstr ""
 
-#: models/pagemodel.py:56
+#: models/pagemodel.py:44
 msgid "created by"
 msgstr "द्वारा निर्मित"
 
-#: models/pagemodel.py:57 templates/admin/cms/page/change_list_tree.html:20
+#: models/pagemodel.py:45 templates/admin/cms/page/change_list_tree.html:19
 msgid "changed by"
 msgstr "बदल द्वारा"
 
-#: models/pagemodel.py:61
+#: models/pagemodel.py:50
+msgid "publication date"
+msgstr "प्रकाशन तिथि"
+
+#: models/pagemodel.py:50
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "जब पृष्ठ रह जाना चाहिए. दर्जा \\ \"प्रकाशन चाहिए \" पेज के लिए जीना जाओ."
 
-#: models/pagemodel.py:62
+#: models/pagemodel.py:51
+msgid "publication end date"
+msgstr "प्रकाशन समाप्ति तिथि"
+
+#: models/pagemodel.py:51
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "जब पृष्ठ समाप्त होने के लिए. खाली छोड़ना कभी नहीं समाप्त होने के लिए."
 
-#: models/pagemodel.py:64
+#: models/pagemodel.py:52 templates/admin/cms/page/change_list_tree.html:9
+msgid "in navigation"
+msgstr "नेविगेशन में"
+
+#: models/pagemodel.py:53
+msgid "soft root"
+msgstr "नरम जड़"
+
+#: models/pagemodel.py:53
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "सभी पूर्वजों नेविगेशन में प्रदर्शित नहीं किया जाएगा"
 
-#: models/pagemodel.py:65
+#: models/pagemodel.py:54
+msgid "id"
+msgstr "आईडी"
+
+#: models/pagemodel.py:54
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
@@ -733,151 +595,245 @@ msgstr ""
 "एक अद्वितीय पहचानकर्ता है कि इस पृष्ठ पर जोड़ने के लिए page_url templatetag के साथ "
 "प्रयोग किया जाता है"
 
-#: models/pagemodel.py:66
+#: models/pagemodel.py:55
 msgid "attached menu"
 msgstr ""
 
-#: models/pagemodel.py:67
+#: models/pagemodel.py:56
 msgid "is published"
 msgstr "प्रकाशित है"
 
-#: models/pagemodel.py:69
+#: models/pagemodel.py:58 plugins/snippet/models.py:14
+msgid "template"
+msgstr "टेम्पलेट"
+
+#: models/pagemodel.py:58
 msgid "The template used to render the content."
 msgstr "के लिए सामग्री प्रदान करते थे खाके."
 
-#: models/pagemodel.py:70
+#: models/pagemodel.py:59
 msgid "The site the page is accessible at."
 msgstr "साइट पृष्ठ पर पहुँचा जा सकता है."
 
-#: models/pagemodel.py:70
+#: models/pagemodel.py:59
 msgid "site"
 msgstr "साइट"
 
-#: models/pagemodel.py:72
-msgid "moderator state"
-msgstr "मॉडरेटर state"
+#: models/pagemodel.py:61
+msgid "login required"
+msgstr "लॉगिन आवश्यक"
 
-#: models/pagemodel.py:80
+#: models/pagemodel.py:62
 msgid "menu visibility"
 msgstr ""
 
-#: models/pagemodel.py:80
+#: models/pagemodel.py:62
 msgid "limit when this page is visible in the menu"
 msgstr ""
 
-#: models/pagemodel.py:100
+#: models/pagemodel.py:73
+msgid "moderator state"
+msgstr "मॉडरेटर state"
+
+#: models/pagemodel.py:88 models/permissionmodels.py:91
+#: models/titlemodels.py:22 plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: plugins/link/models.py:12 plugins/picture/models.py:23
+#: plugins/teaser/models.py:13
+msgid "page"
+msgstr "पृष्ठ"
+
+#: models/pagemodel.py:89
 msgid "pages"
 msgstr "पन्ने"
 
-#: models/pagemodel.py:268
+#: models/pagemodel.py:279
 msgid "Page was copied."
 msgstr "पृष्ठ नकल की थी."
 
-#: models/pagemodel.py:690
+#: models/pagemodel.py:744
 msgid "default"
 msgstr "default"
 
-#: models/permissionmodels.py:22
+#: models/permissionmodels.py:27
+msgid "Current page"
+msgstr "वर्तमान पृष्ठ"
+
+#: models/permissionmodels.py:28
+msgid "Page children (immediate)"
+msgstr "पृष्ठ बच्चों (तत्काल)"
+
+#: models/permissionmodels.py:29
+msgid "Page and children (immediate)"
+msgstr "पृष्ठ और बच्चों (तत्काल)"
+
+#: models/permissionmodels.py:30
+msgid "Page descendants"
+msgstr "वंश पृष्ठ"
+
+#: models/permissionmodels.py:31
+msgid "Page and descendants"
+msgstr "पृष्ठ और वंश"
+
+#: models/permissionmodels.py:40
+msgid "group"
+msgstr "समूह"
+
+#: models/permissionmodels.py:43
+msgid "can edit"
+msgstr "संपादित कर सकते हैं"
+
+#: models/permissionmodels.py:44
 msgid "can add"
 msgstr "जोड़ सकते हैं"
 
-#: models/permissionmodels.py:23
+#: models/permissionmodels.py:45
 msgid "can delete"
 msgstr "नष्ट कर सकते हैं"
 
-#: models/permissionmodels.py:24
+#: models/permissionmodels.py:46
 msgid "can change advanced settings"
 msgstr "उन्नत सेटिंग्स बदल सकते हैं"
 
-#: models/permissionmodels.py:26
+#: models/permissionmodels.py:47
+msgid "can publish"
+msgstr "प्रकाशित कर सकते हैं"
+
+#: models/permissionmodels.py:48
 msgid "can change permissions"
 msgstr "अनुमति को बदल सकते हैं"
 
-#: models/permissionmodels.py:26
+#: models/permissionmodels.py:48
 msgid "on page level"
 msgstr "पृष्ठ स्तर पर"
 
-#: models/permissionmodels.py:27
+#: models/permissionmodels.py:49
 msgid "can move"
 msgstr "कर सकते हैं हिलना"
 
-#: models/permissionmodels.py:28
-msgid "can moderate"
-msgstr "मॉडरेट कर सकते हैं"
-
-#: models/permissionmodels.py:29
+#: models/permissionmodels.py:50
 msgid "view restricted"
 msgstr ""
 
-#: models/permissionmodels.py:29
+#: models/permissionmodels.py:50
 msgid "frontend view restriction"
 msgstr ""
 
-#: models/permissionmodels.py:52
+#: models/permissionmodels.py:73
 msgid "can recover pages"
 msgstr "पृष्ठों को ठीक कर सकते हैं"
 
-#: models/permissionmodels.py:52
+#: models/permissionmodels.py:73
 msgid "can recover any deleted page"
 msgstr "किसी भी नष्ट पृष्ठ की वसूली कर सकते हैं"
 
-#: models/permissionmodels.py:53
+#: models/permissionmodels.py:74
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr "अगर नहीं चुना, उपयोगकर्ता के सभी साइटों के लिए अनुमति दी गई अमीर."
 
-#: models/permissionmodels.py:53
+#: models/permissionmodels.py:74
 msgid "sites"
 msgstr "साइटें"
 
-#: models/permissionmodels.py:58
+#: models/permissionmodels.py:79
 msgid "Page global permission"
 msgstr "पृष्ठ वैश्विक अनुमति"
 
-#: models/permissionmodels.py:59
+#: models/permissionmodels.py:80
 msgid "Pages global permissions"
 msgstr "पेज वैश्विक अनुमति"
 
-#: models/permissionmodels.py:69 templates/admin/cms/page/permissions.html:15
+#: models/permissionmodels.py:90 templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "अनुदान पर"
 
-#: models/permissionmodels.py:75
+#: models/permissionmodels.py:96
 msgid "Page permission"
 msgstr "पृष्ठ अनुमति"
 
-#: models/permissionmodels.py:90
+#: models/permissionmodels.py:111
 msgid "User (page)"
 msgstr "उपयोगकर्ता (पृष्ठ)"
 
-#: models/permissionmodels.py:91
+#: models/permissionmodels.py:112
 msgid "Users (page)"
 msgstr "पृष्ठ (उपयोगकर्ता)"
 
-#: models/permissionmodels.py:101
+#: models/permissionmodels.py:122
 msgid "User group (page)"
 msgstr "उपयोगकर्ता समूह (पेज)"
 
-#: models/permissionmodels.py:102
+#: models/permissionmodels.py:123
 msgid "User groups (page)"
 msgstr "उपयोगकर्ता समूहों (पृष्ठ)"
 
+#: models/placeholdermodel.py:12
+msgid "slot"
+msgstr "स्थान"
+
 #: models/placeholdermodel.py:13 plugins/flash/models.py:9
-#: plugins/flash/migrations/0001_initial.py:16 plugins/googlemap/models.py:36
-#: plugins/video/models.py:13
+#: plugins/googlemap/models.py:36 plugins/video/models.py:13
 msgid "width"
 msgstr "चौड़ाई"
 
-#: models/pluginmodel.py:142
+#: models/pluginmodel.py:82
+msgid "position"
+msgstr "स्थिति"
+
+#: models/pluginmodel.py:83 models/titlemodels.py:11
+#: plugins/inherit/models.py:11
+msgid "language"
+msgstr "भाषा"
+
+#: models/pluginmodel.py:84
+msgid "plugin_name"
+msgstr "plugin_name"
+
+#: models/pluginmodel.py:85 models/titlemodels.py:23
+msgid "creation date"
+msgstr "निर्माण तिथि"
+
+#: models/pluginmodel.py:144
 msgid "<Empty>"
 msgstr ""
+
+#: models/titlemodels.py:12 models/titlemodels.py:13 models/titlemodels.py:21
+#: plugins/file/models.py:25 plugins/teaser/models.py:9
+#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
+#: templates/admin/cms/page/change_list_tree.html:6
+msgid "title"
+msgstr "शीर्षक"
 
 #: models/titlemodels.py:13
 msgid "overwrite the title in the menu"
 msgstr "मेनू में शीर्षक अधिलेखित"
 
+#: models/titlemodels.py:14
+msgid "slug"
+msgstr "slug"
+
 #: models/titlemodels.py:15
 msgid "Path"
 msgstr "रास्ता"
+
+#: models/titlemodels.py:16
+msgid "has url overwrite"
+msgstr "url अधिलेखित है"
+
+#: models/titlemodels.py:17
+msgid "application"
+msgstr "आवेदन"
+
+#: models/titlemodels.py:18
+msgid "redirect"
+msgstr "पुनर्निर्देशित"
+
+#: models/titlemodels.py:19 plugins/teaser/models.py:20
+msgid "description"
+msgstr "वर्णन"
+
+#: models/titlemodels.py:20
+msgid "keywords"
+msgstr "खोजशब्दों"
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
@@ -887,8 +843,7 @@ msgstr "शीर्षक अधिलेखित(HTML शीर्षक ट�
 msgid "File"
 msgstr "फ़ाइल"
 
-#: plugins/file/models.py:24 plugins/file/migrations/0001_initial.py:17
-#: plugins/flash/models.py:8 plugins/flash/migrations/0001_initial.py:18
+#: plugins/file/models.py:24 plugins/flash/models.py:8
 msgid "file"
 msgstr "फ़ाइल"
 
@@ -904,8 +859,8 @@ msgstr "फ्लैश"
 msgid "use swf file"
 msgstr "उपयोग swf फ़ाइल"
 
-#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:19
-#: plugins/googlemap/models.py:38 plugins/video/models.py:14
+#: plugins/flash/models.py:10 plugins/googlemap/models.py:38
+#: plugins/video/models.py:14
 msgid "height"
 msgstr "ऊँचाई"
 
@@ -1031,15 +986,11 @@ msgstr "वैकल्पिक: plugins तुम चाहते हो क�
 msgid "Link"
 msgstr " लिंक"
 
-#: plugins/link/models.py:10 plugins/link/migrations/0001_initial.py:18
-#: plugins/link/migrations/0004_larger_link_names.py:11
-#: plugins/link/migrations/0004_larger_link_names.py:17
-#: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
+#: plugins/link/models.py:10 plugins/snippet/models.py:12
 msgid "name"
 msgstr "नाम"
 
-#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:16
-#: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
+#: plugins/link/models.py:11 plugins/picture/models.py:21
 #: plugins/teaser/models.py:19
 msgid "link"
 msgstr "जोड़ना"
@@ -1080,10 +1031,6 @@ msgstr ""
 msgid "Picture"
 msgstr "चित्र"
 
-#: plugins/picture/models.py:14
-msgid "center"
-msgstr ""
-
 #: plugins/picture/models.py:15
 msgid "left"
 msgstr "छोड़ा"
@@ -1092,34 +1039,54 @@ msgstr "छोड़ा"
 msgid "right"
 msgstr "सही"
 
-#: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:10 plugins/video/models.py:11
+#: plugins/picture/models.py:17
+msgid "center"
+msgstr ""
+
+#: plugins/picture/models.py:20 plugins/teaser/models.py:10
+#: plugins/video/models.py:11
 msgid "image"
 msgstr "छवि"
 
-#: plugins/picture/models.py:21 plugins/picture/models.py:22
-msgid "if present image will be clickable"
-msgstr "यदि वर्तमान छवि क्लिक करने योग्य हो जाएगा"
+#: plugins/picture/models.py:22
+#, fuzzy
+msgid "If present, clicking on image will take user to link."
+msgstr "यदि वर्तमान छवि क्लिक करने योग्य हो जाएगा."
 
-#: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
+#: plugins/picture/models.py:24
+msgid "If present, clicking on image will take user         to specified page."
+msgstr ""
+
+#: plugins/picture/models.py:26
 msgid "alternate text"
 msgstr "वैकल्पिक पाठ"
 
-#: plugins/picture/models.py:23
-msgid "textual description of the image"
-msgstr "छवि का पाठ्य विवरण"
+#: plugins/picture/models.py:27
+msgid ""
+"Specifies an alternate text for an image, if         the image cannot be "
+"displayed.<br />Is also used by search engines to         classify the image."
+msgstr ""
 
-#: plugins/picture/models.py:24
+#: plugins/picture/models.py:30
 msgid "long description"
 msgstr "लंबे विवरण"
 
-#: plugins/picture/models.py:24
-msgid "additional description of the image"
-msgstr "छवि का अतिरिक्त विवरण"
+#: plugins/picture/models.py:31
+msgid ""
+"When user hovers above picture,        this text will appear in a popup."
+msgstr ""
 
-#: plugins/picture/models.py:25
+#: plugins/picture/models.py:33
 msgid "side"
 msgstr "पार्श्व"
+
+#: plugins/picture/models.py:34
+msgid "Move image left, right or center."
+msgstr ""
+
+#: plugins/picture/models.py:51
+msgid "You can enter a Link or a Page, but not both."
+msgstr ""
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
@@ -1131,7 +1098,7 @@ msgstr "टुकड़ा"
 msgid "Template %(template)s does not exist."
 msgstr "टेम्पलेट %(template)s मौजूद नहीं है."
 
-#: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
+#: plugins/snippet/models.py:13
 msgid "HTML"
 msgstr "HTML"
 
@@ -1166,7 +1133,7 @@ msgstr "अधिक"
 msgid "Text"
 msgstr "पाठ"
 
-#: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
+#: plugins/text/models.py:14
 msgid "body"
 msgstr "शरीर"
 
@@ -1366,7 +1333,7 @@ msgid "button highlight color"
 msgstr " button highlight color"
 
 #: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:277
+#: templates/admin/cms/page/change_form.html:185
 #: templates/admin/cms/page/plugin_change_form.html:119
 msgid "Save"
 msgstr "बचाना"
@@ -1385,7 +1352,7 @@ msgid "Save and add another"
 msgstr "Save और दूसरा जोड़ें"
 
 #: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:278
+#: templates/admin/cms/page/change_form.html:186
 msgid "Save and continue editing"
 msgstr "Save और संपादन जारी"
 
@@ -1438,81 +1405,62 @@ msgid "Home"
 msgstr "घर"
 
 #: templates/admin/cms/page/change_form.html:74
-msgid "Approve page deletion"
+#, fuzzy
+msgid "Confirm page deletion"
 msgstr "स्वीकृत पृष्ठ विलोपन"
 
-#: templates/admin/cms/page/change_form.html:80
-#, python-format
-msgid "(requires approvement at %(moderation_level)s level)"
-msgstr "( %(moderation_level)s  स्तर में approvement की आवश्यकता है)"
-
-#: templates/admin/cms/page/change_form.html:81
-msgid "(you can perform actions on this page directly)"
-msgstr "(आप इस पेज पर कार्रवाई सीधे प्रदर्शन कर सकते हैं)"
-
-#: templates/admin/cms/page/change_form.html:94
+#: templates/admin/cms/page/change_form.html:88
 msgid "Remove delete request"
 msgstr "हटाने के अनुरोध को हटाना"
 
-#: templates/admin/cms/page/change_form.html:96
-msgid "Approve delete"
-msgstr "स्वीकृत हटाना"
+#: templates/admin/cms/page/change_form.html:90
+#, fuzzy
+msgid "Confirm delete"
+msgstr "नष्ट कर सकते हैं"
 
-#: templates/admin/cms/page/change_form.html:96
-msgid "Approve"
-msgstr "स्वीकृत"
-
-#: templates/admin/cms/page/change_form.html:96
-#: templates/admin/cms/page/change_form.html:97
-#: templates/admin/cms/page/change_list_tree.html:12
+#: templates/admin/cms/page/change_form.html:91
+#: templates/admin/cms/page/change_form.html:92
+#: templates/admin/cms/page/change_list_tree.html:11
 msgid "draft"
 msgstr "प्रारूप"
 
-#: templates/admin/cms/page/change_form.html:97
+#: templates/admin/cms/page/change_form.html:92
 msgid "Preview"
 msgstr "पूर्वावलोकन"
 
-#: templates/admin/cms/page/change_form.html:100
+#: templates/admin/cms/page/change_form.html:94
+msgid "Revert to public"
+msgstr ""
+
+#: templates/admin/cms/page/change_form.html:95
 #: templates/admin/cms/page/revision_form.html:10
 msgid "History"
 msgstr "इतिहास"
 
-#: templates/admin/cms/page/change_form.html:101
+#: templates/admin/cms/page/change_form.html:96
 msgid "View on site"
 msgstr "देखें साइट पर"
 
-#: templates/admin/cms/page/change_form.html:131
+#: templates/admin/cms/page/change_form.html:126
 #: templates/admin/cms/page/plugin_change_form.html:90
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/cms/page/change_form.html:151
+#: templates/admin/cms/page/change_form.html:146
 msgid "All permissions"
 msgstr "सभी अनुमतियाँ"
 
-#: templates/admin/cms/page/change_form.html:152
-#: templates/admin/cms/page/change_form.html:164
+#: templates/admin/cms/page/change_form.html:147
+#: templates/admin/cms/page/change_form.html:158
 #: templates/admin/cms/page/loading.html:2
 msgid "Loading..."
 msgstr "लोड हो रहा है ..."
 
-#: templates/admin/cms/page/change_form.html:163
+#: templates/admin/cms/page/change_form.html:157
 msgid "Page states"
 msgstr "पृष्ठ राज्यों"
-
-#: templates/admin/cms/page/change_form.html:188
-#, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
-msgstr ""
-"इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
-
-#: templates/admin/cms/page/change_form.html:190
-msgid "Request approvemet"
-msgstr "अनुरोध approvemet"
 
 #: templates/admin/cms/page/change_list.html:3
 msgid "List of pages"
@@ -1522,37 +1470,37 @@ msgstr "पृष्ठों की सूची"
 msgid "Successfully moved"
 msgstr "सफलतापूर्वक चला गया"
 
-#: templates/admin/cms/page/change_list.html:68
+#: templates/admin/cms/page/change_list.html:77
 msgid "An error occured. Please reload the page"
 msgstr "एक त्रुटि हो गई. कृपया पृष्ठ पुनः लोड"
 
-#: templates/admin/cms/page/change_list.html:90
+#: templates/admin/cms/page/change_list.html:98
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "ठीक नष्ट %(name)s"
 
-#: templates/admin/cms/page/change_list.html:93
+#: templates/admin/cms/page/change_list.html:101
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s जोड़ें"
 
-#: templates/admin/cms/page/change_list.html:105
+#: templates/admin/cms/page/change_list.html:113
 msgid "Pages on:"
 msgstr "पन्नों पर:"
 
-#: templates/admin/cms/page/change_list.html:122
+#: templates/admin/cms/page/change_list.html:130
 msgid "Filter:"
 msgstr "फ़िल्टर करें:"
 
-#: templates/admin/cms/page/change_list.html:122
+#: templates/admin/cms/page/change_list.html:130
 msgid "on"
 msgstr " on"
 
-#: templates/admin/cms/page/change_list.html:122
+#: templates/admin/cms/page/change_list.html:130
 msgid "off"
 msgstr " off"
 
-#: templates/admin/cms/page/change_list.html:124
+#: templates/admin/cms/page/change_list.html:132
 msgid "Filter"
 msgstr "फ़िल्टर"
 
@@ -1560,27 +1508,23 @@ msgstr "फ़िल्टर"
 msgid "actions"
 msgstr "कार्रवाई"
 
-#: templates/admin/cms/page/change_list_tree.html:10
-msgid "moderate"
-msgstr "मध्यम"
-
-#: templates/admin/cms/page/change_list_tree.html:13
+#: templates/admin/cms/page/change_list_tree.html:12
 msgid "published"
 msgstr "प्रकाशित"
 
-#: templates/admin/cms/page/change_list_tree.html:15
+#: templates/admin/cms/page/change_list_tree.html:14
 msgid "start"
 msgstr "प्रारंभ करना"
 
-#: templates/admin/cms/page/change_list_tree.html:16
+#: templates/admin/cms/page/change_list_tree.html:15
 msgid "end"
 msgstr "अंत"
 
-#: templates/admin/cms/page/change_list_tree.html:17
+#: templates/admin/cms/page/change_list_tree.html:16
 msgid "restricted"
 msgstr ""
 
-#: templates/admin/cms/page/change_list_tree.html:19
+#: templates/admin/cms/page/change_list_tree.html:18
 msgid "last changes"
 msgstr "पिछले परिवर्तन"
 
@@ -1649,21 +1593,21 @@ msgstr "Child जोड़ें"
 msgid "add"
 msgstr "जोड़ना"
 
-#: templates/admin/cms/page/menu_item.html:61
-msgid "Approve directly"
-msgstr "सीधे स्वीकृत"
+#: templates/admin/cms/page/menu_item.html:44
+#: templates/cms/toolbar/toolbar.html:66
+msgid "delete"
+msgstr "मिटाना"
 
-#: templates/admin/cms/page/menu_item.html:63
-#: templates/admin/cms/page/menu_item.html:75
-#: templates/admin/cms/page/menu_item.html:77
+#: templates/admin/cms/page/menu_item.html:57
+#: templates/admin/cms/page/menu_item.html:68
 msgid "view"
 msgstr "दृश्य"
 
-#: templates/admin/cms/page/menu_item.html:68
+#: templates/admin/cms/page/menu_item.html:63
 msgid "Unpublish"
 msgstr "अप्रकाशित"
 
-#: templates/admin/cms/page/menu_item.html:75
+#: templates/admin/cms/page/menu_item.html:68
 msgid "View on page"
 msgstr "देखें पृष्ठ पर"
 
@@ -1674,6 +1618,11 @@ msgstr "कार्रवाई"
 #: templates/admin/cms/page/moderation_messages.html:5
 msgid "Created"
 msgstr "निर्मित"
+
+#: templates/admin/cms/page/moderation_messages.html:6
+#: templates/admin/cms/page/permissions.html:6
+msgid "User"
+msgstr "उपयोगकर्ता"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
@@ -1820,6 +1769,11 @@ msgid "down"
 msgstr "नीचे"
 
 #: templates/cms/toolbar/toolbar.html:70
+#, fuzzy
+msgid "Add child plugin"
+msgstr "child पृष्ठ जोड़ें"
+
+#: templates/cms/toolbar/toolbar.html:73
 msgid "Move to placeholder"
 msgstr ""
 
@@ -1832,37 +1786,21 @@ msgstr "उपयोगकर्ता नाम"
 msgid "Login"
 msgstr ""
 
-#: templates/cms/toolbar/items/status.html:2
-msgid "Status"
-msgstr "स्थिति"
-
 #: templates/cms/toolbar/items/switcher.html:4
 msgid "Switch on/off"
 msgstr ""
 
-#: templatetags/cms_admin.py:127 templatetags/cms_admin.py:134
+#: templatetags/cms_admin.py:128 templatetags/cms_admin.py:135
 #, python-format
 msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
 msgstr ""
 
-#: templatetags/cms_admin.py:147
-msgid "Unbind page moderation"
-msgstr "छुड़ाना पृष्ठ मॉडरेशन"
-
-#: templatetags/cms_admin.py:148
-msgid "Unbind children moderation"
-msgstr "छुड़ाना बच्चों मॉडरेशन"
-
-#: templatetags/cms_admin.py:149
-msgid "Unbind descendants moderation"
-msgstr "छुड़ाना वंश मॉडरेशन"
-
-#: templatetags/cms_tags.py:79
+#: templatetags/cms_tags.py:84
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:80
+#: templatetags/cms_tags.py:85
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `"
@@ -1870,47 +1808,48 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:107 test_utils/cli.py:117
 msgid "English"
 msgstr ""
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:108 test_utils/cli.py:129 test_utils/cli.py:147
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:109 test_utils/cli.py:123 test_utils/cli.py:141
+#: test_utils/cli.py:160
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
+#: test_utils/cli.py:110 test_utils/cli.py:134
+msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:111 test_utils/cli.py:154
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:170
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:171
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:172
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:178
 msgid "sidebar column"
 msgstr "seekbar bg color"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:184
 msgid "left column"
 msgstr "seekbar bg color"
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:190
 msgid "right column"
 msgstr "seekbar bg color"
 
@@ -1928,6 +1867,14 @@ msgstr ""
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:15
+msgid "Sample App 2"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_app.py:22
+msgid "Namespaced App"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1954,6 +1901,11 @@ msgstr ""
 msgid "Static Menu2"
 msgstr ""
 
+#: test_utils/project/sampleapp/urls.py:12
+#, fuzzy
+msgid "^account/$"
+msgstr "गिनती"
+
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "सीएमएस - आपके उपयोगकर्ता खाते में बनाया गया था."
@@ -1962,24 +1914,11 @@ msgstr "सीएमएस - आपके उपयोगकर्ता खा�
 msgid "CMS - your user account was changed."
 msgstr "सीएमएस - आपके उपयोगकर्ता खाते में बदल गया था."
 
-#: utils/moderator.py:83
-msgid "parent first"
-msgstr "parent के पहले"
-
-#: utils/moderator.py:90
-msgid "approve"
-msgstr "अनुमोदन"
-
-#: utils/moderator.py:251
-#, python-format
-msgid "CMS - Page %s requires approvement."
-msgstr "सीएमएस -%s पेज approvement की आवश्यकता है."
-
-#: utils/page_resolver.py:146
+#: utils/page_resolver.py:170
 msgid "Invalid URL, use /my/url format."
 msgstr "अवैध यूआरएल का प्रयोग करते हैं / मेरी / url प्रारूप."
 
-#: utils/page_resolver.py:176
+#: utils/page_resolver.py:202
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
@@ -1987,6 +1926,126 @@ msgid_plural ""
 "Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
+
+#~ msgid "higher"
+#~ msgstr "उच्च"
+
+#~ msgid "Copy moderation"
+#~ msgstr "कॉपी मॉडरेशन"
+
+#~ msgid "path"
+#~ msgstr "रास्ता"
+
+#~ msgid "everybody"
+#~ msgstr "सब"
+
+#~ msgid "type"
+#~ msgstr "प्रकार"
+
+#~ msgid "can change soft-root"
+#~ msgstr "soft-root परिवर्तित कर सकते हैं"
+
+#~ msgid "status"
+#~ msgstr "स्थिति"
+
+#~ msgid "navigation extenders"
+#~ msgstr "नेविगेशन extenders"
+
+#~ msgid "url overwrite"
+#~ msgstr "url अधिलेखित"
+
+#~ msgid "author"
+#~ msgstr "लेखक"
+
+#~ msgid "reverse url id"
+#~ msgstr "रिवर्स url आईडी"
+
+#~ msgid "Moderate page"
+#~ msgstr "मध्यम पृष्ठ"
+
+#~ msgid "Moderate children"
+#~ msgstr "Moderate बच्चों"
+
+#~ msgid "Moderate descendants"
+#~ msgstr "Moderate वंश"
+
+#~ msgid "PageModerator"
+#~ msgstr "PageModerator"
+
+#~ msgid "publish req."
+#~ msgstr "अनुरोध प्रकाशित."
+
+#~ msgid "unpublish req."
+#~ msgstr "अप्रकाशित अनुरोध."
+
+#~ msgid "approved"
+#~ msgstr "अनुमोदित"
+
+#~ msgid "req. app."
+#~ msgstr "अनुरोध. app."
+
+#~ msgid "app. par."
+#~ msgstr "app. par."
+
+#~ msgid "can moderate"
+#~ msgstr "मॉडरेट कर सकते हैं"
+
+#~ msgid "if present image will be clickable"
+#~ msgstr "यदि वर्तमान छवि क्लिक करने योग्य हो जाएगा"
+
+#~ msgid "textual description of the image"
+#~ msgstr "छवि का पाठ्य विवरण"
+
+#~ msgid "additional description of the image"
+#~ msgstr "छवि का अतिरिक्त विवरण"
+
+#~ msgid "(requires approvement at %(moderation_level)s level)"
+#~ msgstr "( %(moderation_level)s  स्तर में approvement की आवश्यकता है)"
+
+#~ msgid "(you can perform actions on this page directly)"
+#~ msgstr "(आप इस पेज पर कार्रवाई सीधे प्रदर्शन कर सकते हैं)"
+
+#~ msgid "Approve delete"
+#~ msgstr "स्वीकृत हटाना"
+
+#~ msgid "Approve"
+#~ msgstr "स्वीकृत"
+
+#~ msgid ""
+#~ "This page must be moderated at level %(moderation_level)s, post a message "
+#~ "for moderator."
+#~ msgstr ""
+#~ "इस पृष्ठ स्तर%(moderation_level)s में संचालित होगा , मध्यस्थ के लिए एक संदेश पोस्ट."
+
+#~ msgid "Request approvemet"
+#~ msgstr "अनुरोध approvemet"
+
+#~ msgid "moderate"
+#~ msgstr "मध्यम"
+
+#~ msgid "Approve directly"
+#~ msgstr "सीधे स्वीकृत"
+
+#~ msgid "Status"
+#~ msgstr "स्थिति"
+
+#~ msgid "Unbind page moderation"
+#~ msgstr "छुड़ाना पृष्ठ मॉडरेशन"
+
+#~ msgid "Unbind children moderation"
+#~ msgstr "छुड़ाना बच्चों मॉडरेशन"
+
+#~ msgid "Unbind descendants moderation"
+#~ msgstr "छुड़ाना वंश मॉडरेशन"
+
+#~ msgid "parent first"
+#~ msgstr "parent के पहले"
+
+#~ msgid "approve"
+#~ msgstr "अनुमोदन"
+
+#~ msgid "CMS - Page %s requires approvement."
+#~ msgstr "सीएमएस -%s पेज approvement की आवश्यकता है."
 
 #~ msgid "move"
 #~ msgstr "move request"

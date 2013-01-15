@@ -4,10 +4,10 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from cms.models import Page, Placeholder as PlaceholderModel
-from cms.plugin_rendering import render_plugins, render_placeholder
+from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request
-from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from django import template
 from django.conf import settings
@@ -35,8 +35,10 @@ def get_site_id(site):
         site_id = settings.SITE_ID
     return site_id
 
+
 def has_permission(page, request):
     return page.has_change_permission(request)
+
 register.filter(has_permission)
 
 CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
@@ -44,13 +46,15 @@ CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
 def _clean_key(key):
     return CLEAN_KEY_PATTERN.sub('-', key)
 
+
 def _get_cache_key(name, page_lookup, lang, site_id):
     if isinstance(page_lookup, Page):
         page_key = str(page_lookup.pk)
     else:
         page_key = str(page_lookup)
     page_key = _clean_key(page_key)
-    return name+'__page_lookup:'+page_key+'_site:'+str(site_id)+'_lang:'+str(lang)
+    return name + '__page_lookup:' + page_key + '_site:' + str(site_id) + '_lang:' + str(lang)
+
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
     """
@@ -77,16 +81,17 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         return get_page_queryset(request).get(**page_lookup)
     except Page.DoesNotExist:
         site = Site.objects.get_current()
-        subject = _('Page not found on %(domain)s') % {'domain':site.domain}
+        subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
-            "The URL of the request was: http://%(host)s%(path)s") \
-            % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
+                 "The URL of the request was: http://%(host)s%(path)s")\
+               % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
             if settings.SEND_BROKEN_LINK_EMAILS:
                 mail_managers(subject, body, fail_silently=True)
             return None
+
 
 class PageUrl(InclusionTag):
     template = 'cms/content.html'
@@ -108,7 +113,7 @@ class PageUrl(InclusionTag):
             return {'content': ''}
         if lang is None:
             lang = get_language_from_request(request)
-        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id)+'_type:absolute_url'
+        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
         url = cache.get(cache_key)
         if not url:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
@@ -118,6 +123,7 @@ class PageUrl(InclusionTag):
         if url:
             return {'content': url}
         return {'content': ''}
+
 register.tag(PageUrl)
 
 register.tag('page_id_url', PageUrl)
@@ -125,6 +131,7 @@ register.tag('page_id_url', PageUrl)
 
 def _get_placeholder(current_page, page, context, name):
     from cms.utils.plugins import get_placeholders
+
     placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
     if page.pk in placeholder_cache:
         return placeholder_cache[page.pk].get(name, None)
@@ -137,6 +144,7 @@ def _get_placeholder(current_page, page, context, name):
         placeholder.page = page
     current_page._tmp_placeholders_cache = placeholder_cache
     return placeholder_cache[page.pk].get(name, None)
+
 
 def get_placeholder_content(context, request, current_page, name, inherit):
     edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
@@ -155,7 +163,7 @@ def get_placeholder_content(context, request, current_page, name, inherit):
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
-    # if we reach this point, we have an empty or non-existant placeholder
+        # if we reach this point, we have an empty or non-existant placeholder
     # call _get_placeholder again to get the placeholder properly rendered
     # in frontend editing
     placeholder = _get_placeholder(current_page, current_page, context, name)
@@ -216,6 +224,7 @@ class Placeholder(Tag):
             elif bit.isdigit():
                 width = int(bit)
                 import warnings
+
                 warnings.warn(
                     "The width parameter for the placeholder tag is deprecated.",
                     DeprecationWarning
@@ -240,7 +249,33 @@ class Placeholder(Tag):
 
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
+
 register.tag(Placeholder)
+
+class RenderPlugin(InclusionTag):
+    template = 'cms/content.html'
+    name = 'render_plugin'
+    options = Options(
+        Argument('plugin')
+    )
+
+    def get_context(self, context, plugin):
+        # Prepend frontedit toolbar output if applicable
+        edit = False
+        request = context['request']
+        toolbar = getattr(request, 'toolbar', None)
+        page = request.current_page
+        if toolbar.edit_mode and (not page or page.has_change_permission(request)):
+            edit = True
+        if edit:
+            from cms.middleware.toolbar import toolbar_plugin_processor
+            processors = (toolbar_plugin_processor,)
+        else:
+            processors = None
+
+        return {'content': plugin.render_plugin(context, processors=processors)}
+
+register.tag(RenderPlugin)
 
 
 class PageAttribute(AsTag):
@@ -310,6 +345,7 @@ class PageAttribute(AsTag):
             func = getattr(page, "get_%s" % name)
             return escape(func(language=lang, fallback=True))
         return ''
+
 register.tag(PageAttribute)
 
 class CleanAdminListFilter(InclusionTag):
@@ -329,7 +365,7 @@ class CleanAdminListFilter(InclusionTag):
             if choice['query_string'] != query_string:
                 unique_choices.append(choice)
                 query_string = choice['query_string']
-        return {'title': spec.title(), 'choices' : unique_choices}
+        return {'title': spec.title(), 'choices': unique_choices}
 
 
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
@@ -378,6 +414,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         return {'content': mark_safe(content)}
     return {'content': ''}
 
+
 class ShowPlaceholderById(InclusionTag):
     template = 'cms/content.html'
     name = 'show_placeholder_by_id'
@@ -400,18 +437,20 @@ class ShowPlaceholderById(InclusionTag):
             'lang': lang,
             'site': site
         }
+
 register.tag(ShowPlaceholderById)
 register.tag('show_placeholder', ShowPlaceholderById)
 
 class ShowUncachedPlaceholderById(ShowPlaceholderById):
     name = 'show_uncached_placeholder_by_id'
+
     def get_kwargs(self, *args, **kwargs):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
         kwargs['cache_result'] = False
         return kwargs
+
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
-
 
 
 class CMSToolbar(InclusionTag):
@@ -432,4 +471,5 @@ class CMSToolbar(InclusionTag):
     def get_context(self, context):
         context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
         return context
+
 register.tag(CMSToolbar)

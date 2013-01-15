@@ -4,12 +4,23 @@ python:
     - "2.6"
     - "2.7"
 env:
-    - DJANGO="django>=1.3,<1.4"
-    - DJANGO="django>=1.4,<1.5"
+    - DJANGO=test_requirements/django-1.3.txt DB='sqlite://localhost/:memory:'
+    - DJANGO=test_requirements/django-1.3.txt DB='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=test_requirements/django-1.3.txt DB='postgres://postgres@127.0.0.1/djangocms_test'
+    - DJANGO=test_requirements/django-1.4.txt DB='sqlite://localhost/:memory:'
+    - DJANGO=test_requirements/django-1.4.txt DB='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=test_requirements/django-1.4.txt DB='postgres://postgres@127.0.0.1/djangocms_test'
+
+before_script:
+  - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'create database djangocms_test;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi"
+  
 install:
-    - pip install -q $DJANGO django-mptt==0.5.1 django-reversion==1.6 django-classy-tags==0.3.4.1 django-sekizai==0.6.1 html5lib==0.95 jinja2==2.6 PIL==1.1.7 pygments==1.5 south==0.7.5 sphinx==1.1.3 argparse
+    - pip install -q -r $DJANGO --use-mirrors
+    - pip install -q mysql-python --use-mirrors
 script:
-    python runtests.py
+    python runtests.py --db $DB
 notifications:
     email:
         recipients:

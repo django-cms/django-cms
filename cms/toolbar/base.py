@@ -100,12 +100,14 @@ class BaseItem(Serializable):
     alignment = 'left'
     
     
-    def __init__(self, alignment, css_class_suffix):
+    def __init__(self, alignment, css_class_suffix, enable=None):
         """
         alignment: either cms.toolbar.constants.LEFT or 
             cms.toolbar.constants.RIGHT
         css_class_suffix: suffix for the cms class to put on this item, prefix
             is always 'cms_toolbar-item'
+        enable: callable that can check if this toolbar item should be enabled
+            for a specific request
         """
         if alignment not in ALIGNMENTS:
             raise ImproperlyConfigured("Item alignment %r is not valid, must "
@@ -114,6 +116,7 @@ class BaseItem(Serializable):
         self.alignment = alignment
         self.css_class_suffix = css_class_suffix
         self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
+        self.enable_function = enable
     
     def serialize(self, context, toolbar, **kwargs):
         counter_attr = 'counter_%s' % self.alignment
@@ -122,3 +125,6 @@ class BaseItem(Serializable):
         self.order = this * 10
         setattr(toolbar, counter_attr, this)
         return super(BaseItem, self).serialize(context, toolbar=toolbar, **kwargs)
+
+    def is_enabled_for(self, request):
+        return not callable(self.enable_function) or self.enable_function(request)

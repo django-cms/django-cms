@@ -31,46 +31,5 @@ def validate_dependencies():
         if not hasattr(VersionAdmin, 'get_urls'):
             raise ImproperlyConfigured('django-cms requires never version of reversion (VersionAdmin must contain get_urls method)')
 
-
-def remove_current_root(url):
-    current_root = "/%s/" % get_language()
-    if url[:len(current_root)] == current_root:
-        url = url[len(current_root) - 1:]
-    return url
-
-
-def monkeypatch_reverse():
-    if hasattr(django.core.urlresolvers.reverse, 'cms_monkeypatched'):
-        return
-    django.core.urlresolvers.old_reverse = django.core.urlresolvers.reverse
-
-    def new_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
-        url = ''
-        i18n = 'cms.middleware.multilingual.MultilingualURLMiddleware' in settings.MIDDLEWARE_CLASSES
-        lang = None
-        if isinstance(viewname, basestring) and viewname.split(":")[0] in dict(settings.LANGUAGES).keys():
-            lang = viewname.split(":")[0]
-        try:
-            url = django.core.urlresolvers.old_reverse(viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
-            if lang:
-                url = "/%s%s" % (lang, url)
-        except NoReverseMatch, e:
-            if i18n:
-                if not lang:
-                    try:
-                        lang = get_language()
-                        ml_viewname = "%s:%s" % (lang, viewname)
-                        url = django.core.urlresolvers.old_reverse(ml_viewname, urlconf=urlconf, args=args, kwargs=kwargs, prefix=prefix, current_app=current_app)
-                        return url
-                    except NoReverseMatch:
-                        pass
-            raise e
-        url = remove_current_root(url)
-        return url
-
-    new_reverse.cms_monkeypatched = True
-    django.core.urlresolvers.reverse = new_reverse
-
 validate_dependencies()
 validate_settings()
-monkeypatch_reverse()

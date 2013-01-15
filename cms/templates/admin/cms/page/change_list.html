@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load adminmedia admin_list i18n cms_admin cms_js_tags %}
+{% load admin_list i18n cms_admin cms_js_tags %}
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
@@ -58,6 +58,15 @@
 	moveSuccess = function(node){
 		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
 		node.append(msg);
+        // This should not happen
+        if (node.parent().hasClass('publisher_delete_requested'))
+            return;
+        node.parent().addClass('publisher_dirty');
+        if (!node.parent().find('.col-draft .publish').length) {
+            var page_id = node.parent().parent().attr('id').replace('page_', '');
+            node.parent().find('.col-draft').prepend(
+                    '<a href="./'+page_id+'/publish/" class="icon publish" title="{% trans 'Publish' %}"></a>');
+        }
 	    msg.fadeOut(3000);
 	}
 	moveError = function(node,message){
@@ -73,7 +82,6 @@
 
 	cmsSettings = {
 		cmsPermission: {{ CMS_PERMISSION|js }},
-		cmsModerator: {{ CMS_MODERATOR|js }},
 		debug: {{ DEBUG|js }}
 	};
 })(window.CMS.$);

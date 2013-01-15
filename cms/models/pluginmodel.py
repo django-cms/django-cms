@@ -6,7 +6,7 @@ from datetime import date
 from django.conf import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import (model_unpickle, simple_class_factory)
+from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import ugettext_lazy as _
 
@@ -88,6 +88,7 @@ class CMSPlugin(MPTTModel):
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
+    child_plugin_instances = None
 
     class Meta:
         app_label = 'cms'
@@ -126,7 +127,7 @@ class CMSPlugin(MPTTModel):
                         obj = self.__class__.__dict__[field.attname]
                         model = obj.model_ref()
         else:
-            factory = simple_class_factory
+            factory = lambda x, y: x
         return (model_unpickle, (model, defers, factory), data)
 
     def __unicode__(self):
@@ -168,7 +169,8 @@ class CMSPlugin(MPTTModel):
             if not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
-            context = PluginContext(context, instance, placeholder)
+            current_app = context.current_app if context else None
+            context = PluginContext(context, instance, placeholder, current_app=current_app)
             context = plugin.render(context, instance, placeholder_slot)
             if plugin.render_plugin:
                 template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
@@ -176,7 +178,7 @@ class CMSPlugin(MPTTModel):
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
                 template = None
-            return render_plugin(context, instance, placeholder, template, processors)
+            return render_plugin(context, instance, placeholder, template, processors, context.current_app)
         return ""
 
     def get_media_path(self, filename):
@@ -226,7 +228,7 @@ class CMSPlugin(MPTTModel):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, plugin_tree):
+    def copy_plugin(self, target_placeholder, target_language, plugin_trail):        
         """
         Copy this plugin and return the new plugin.
         """
@@ -234,21 +236,40 @@ class CMSPlugin(MPTTModel):
             plugin_instance, cls = self.get_plugin_instance()
         except KeyError:  # plugin type not found anymore
             return
+
+        # set up some basic attributes on the new_plugin
         new_plugin = CMSPlugin()
         new_plugin.placeholder = target_placeholder
         new_plugin.tree_id = None
         new_plugin.lft = None
         new_plugin.rght = None
         new_plugin.level = None
-        if self.parent:
-            pdif = self.level - plugin_tree[-1].level
-            if pdif < 0:
-                plugin_tree[:] = plugin_tree[:pdif - 1]
-            new_plugin.parent = plugin_tree[-1]
-            if pdif != 0:
-                plugin_tree.append(new_plugin)
+
+        # In the block below, we use plugin_trail as a kind of breadcrumb trail 
+        # through the tree. 
+        #
+        # we assign a parent to our new plugin
+        if not self.parent:
+            # We're lucky; we don't need to find a parent. We'll just put 
+            # new_plugin into the plugin_trail for potential children to use,
+            # and move on.
+            plugin_trail[:] = [new_plugin]
         else:
-            plugin_tree[:] = [new_plugin]
+            # We will need to find a parent for our new_plugin.
+            marker = plugin_trail.pop()
+            # are we going up or down?
+            level_difference = self.level - marker.level
+            if level_difference == 1: 
+                # going up; put the marker back
+                plugin_trail.append(marker)
+            else:
+                # going down; remove more items from plugin_trail
+                if level_difference < 0:
+                    plugin_trail[:] = plugin_trail[:level_difference]
+            # assign new_plugin.parent 
+            new_plugin.parent = plugin_trail[-1]
+            # new_plugin becomes the last item in the tree for the next round
+            plugin_trail.append(new_plugin)
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
@@ -268,7 +289,8 @@ class CMSPlugin(MPTTModel):
             plugin_instance.position = new_plugin.position  # added to retain the position when creating a public copy of a plugin
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
-            plugin_instance.copy_relations(old_instance)
+            plugin_instance.copy_relations(old_instance)   
+
         return new_plugin
 
     def post_copy(self, old_instance, new_old_ziplist):
@@ -328,6 +350,10 @@ class CMSPlugin(MPTTModel):
         1 based position!
         """
         return self.position + 1
+
+    def num_children(self):
+        if self.child_plugin_instances:
+            return len(self.child_plugin_instances)
 
 reversion_register(CMSPlugin)
 

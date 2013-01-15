@@ -1,4 +1,5 @@
 from __future__ import with_statement
+import copy
 from cms.api import create_page, create_title
 from cms.models.pagemodel import Page, Placeholder
 from cms.templatetags.cms_tags import (get_site_id, _get_page_by_untyped_arg,
@@ -58,7 +59,6 @@ class TemplatetagTests(TestCase):
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
-    settings_overrides = {'CMS_MODERATOR': False}
 
     def setUp(self):
         self._prev_DEBUG = settings.DEBUG
@@ -67,10 +67,10 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         settings.DEBUG = self._prev_DEBUG
 
     def _getfirst(self):
-        return Page.objects.get(title_set__title='first')
+        return Page.objects.public().get(title_set__title='first')
 
     def _getsecond(self):
-        return Page.objects.get(title_set__title='second')
+        return Page.objects.public().get(title_set__title='second')
 
     def test_get_page_by_untyped_arg_none(self):
         control = self._getfirst()
@@ -101,21 +101,21 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         with SettingsOverride(DEBUG=True):
             request = self.get_request('/')
             self.assertRaises(Page.DoesNotExist,
-                _get_page_by_untyped_arg, {'pk': 3}, request, 1
+                _get_page_by_untyped_arg, {'pk': 1003}, request, 1
             )
             self.assertEqual(len(mail.outbox), 0)
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_do_email(self):
         with SettingsOverride(SEND_BROKEN_LINK_EMAILS=True, DEBUG=False, MANAGERS=[("Jenkins", "tests@django-cms.org")]):
             request = self.get_request('/')
-            page = _get_page_by_untyped_arg({'pk': 3}, request, 1)
+            page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
             self.assertEqual(page, None)
             self.assertEqual(len(mail.outbox), 1)
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_no_email(self):
         with SettingsOverride(SEND_BROKEN_LINK_EMAILS=False, DEBUG=False, MANAGERS=[("Jenkins", "tests@django-cms.org")]):
             request = self.get_request('/')
-            page = _get_page_by_untyped_arg({'pk': 3}, request, 1)
+            page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
             self.assertEqual(page, None)
             self.assertEqual(len(mail.outbox), 0)
 
@@ -131,6 +131,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         settings.DEBUG = True # So we can see the real exception raised
         request = HttpRequest()
         request.REQUEST = {}
+        request.session = {}
         self.assertRaises(Placeholder.DoesNotExist,
                           _show_placeholder_for_page,
                           RequestContext(request),
@@ -152,31 +153,41 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         page_1 = create_page('Page 1', 'nav_playground.html', 'en', published=True,
                              in_navigation=True, reverse_id='page1')
         create_title("de", "Seite 1", page_1, slug="seite-1")
+        page_1.publish()
         page_2 = create_page('Page 2', 'nav_playground.html', 'en',  page_1, published=True,
                              in_navigation=True, reverse_id='page2')
         create_title("de", "Seite 2", page_2, slug="seite-2")
+        page_2.publish()
         page_3 = create_page('Page 3', 'nav_playground.html', 'en',  page_2, published=True,
                              in_navigation=True, reverse_id='page3')
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
-
-        # Default configuration has CMS_HIDE_UNTRANSLATED=False
-        context = self.get_context(page_2.get_absolute_url())
-        context['request'].current_page = page_2
-        res = tpl.render(context)
-        self.assertEqual(res,"/de/seite-2/")
-
-        context = self.get_context(page_3.get_absolute_url())
-        context['request'].current_page = page_3
-        res = tpl.render(context)
-        self.assertEqual(res,"")
-
-        with SettingsOverride(CMS_HIDE_UNTRANSLATED=True):
+        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings[1][1]['hide_untranslated'] = False
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2
             res = tpl.render(context)
             self.assertEqual(res,"/de/seite-2/")
 
+            # Default configuration has CMS_HIDE_UNTRANSLATED=False
+            context = self.get_context(page_2.get_absolute_url())
+            context['request'].current_page = page_2.publisher_public
+            res = tpl.render(context)
+            self.assertEqual(res,"/de/seite-2/")
+
             context = self.get_context(page_3.get_absolute_url())
-            context['request'].current_page = page_3
+            context['request'].current_page = page_3.publisher_public
+            res = tpl.render(context)
+            self.assertEqual(res,"/de/page-3/")
+        lang_settings[1][1]['hide_untranslated'] = True
+
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+            context = self.get_context(page_2.get_absolute_url())
+            context['request'].current_page = page_2.publisher_public
+            res = tpl.render(context)
+            self.assertEqual(res,"/de/seite-2/")
+
+            context = self.get_context(page_3.get_absolute_url())
+            context['request'].current_page = page_3.publisher_public
             res = tpl.render(context)
             self.assertEqual(res,"/de/")

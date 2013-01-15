@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db.models import Q
-from django.core.exceptions import ValidationError
 import re
 
 APPEND_TO_SLUG = "-copy"
@@ -18,28 +17,29 @@ def is_valid_page_slug(page, parent, lang, slug, site, path=None):
         Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
     )
 
-    if settings.i18n_installed:
+    if settings.USE_I18N:
         qs = qs.filter(language=lang)
 
-    if not settings.CMS_FLAT_URLS:
-        if parent:
-            if parent.is_home():
-                qs = qs.filter(Q(page__parent=parent) |
-                               Q(page__parent__isnull=True))
-            else:
-                qs = qs.filter(page__parent=parent)
+    if parent:
+        if parent.is_home():
+            qs = qs.filter(Q(page__parent=parent) |
+                           Q(page__parent__isnull=True))
         else:
-            qs = qs.filter(page__parent__isnull=True)
+            qs = qs.filter(page__parent=parent)
+    else:
+        qs = qs.filter(page__parent__isnull=True)
 
     if page.pk:
-        qs = qs.exclude(language=lang, page=page)
-    ## Check for slugs
+        qs = qs.exclude(Q(language=lang) & Q(page=page))
+        qs = qs.exclude(page__publisher_public=page)
+        ## Check for slugs
     if qs.filter(slug=slug).count():
         return False
-    ## Check for path
+        ## Check for path
     if path and qs.filter(path=path).count():
         return False
     return True
+
 
 def get_available_slug(title, new_slug=None):
     """Smart function generates slug for title if current title slug cannot be
@@ -57,7 +57,7 @@ def get_available_slug(title, new_slug=None):
     path = title.path
     # This checks for conflicting slugs/overwrite_url, for both published and unpublished pages
     # This is a simpler check than in page_resolver.is_valid_url which
-    # takes into account actualy page URL
+    # takes into account actually page URL
     if not is_valid_page_slug(title.page, title.page.parent, title.language, slug, title.page.site, path):
         # add nice copy attribute, first is -copy, then -copy-2, -copy-3, ....
         match = COPY_SLUG_REGEX.match(slug)
@@ -66,10 +66,10 @@ def get_available_slug(title, new_slug=None):
                 next = int(match.groups()[0]) + 1
                 slug = "-".join(slug.split('-')[:-1]) + "-%d" % next
             except TypeError:
-                slug = slug + "-2"
+                slug += "-2"
 
         else:
-            slug = slug + APPEND_TO_SLUG
+            slug += APPEND_TO_SLUG
         return get_available_slug(title, slug)
     else:
         return slug

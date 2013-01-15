@@ -1,71 +1,45 @@
-
+# -*- coding: utf-8 -*-
 from south.db import db
 from django.db import models
 from cms.plugins.text.models import *
 
 class Migration:
     
-    depends_on = (
-        ("cms", "0012_publisher"),
-    )
-    
-    needed_by = (
-        ("cms", "0019_public_table_renames"),
-    )
-
     def forwards(self, orm):
-        
-        # Adding field 'Text.public'
-        db.add_column('text_text', 'public', orm['text.text:public'])
-        # Adding model 'PublicText'
-        db.create_table('text_publictext', (
-            ('body', orm['text.publictext:body']),
-            ('mark_delete', orm['text.publictext:mark_delete']),
-            ('publiccmsplugin_ptr', orm['text.publictext:publiccmsplugin_ptr']),
-        ))
-        db.send_create_signal('text', ['PublicText'])
-        
-        
-        
+        "Write your forwards migration here"
     
     
     def backwards(self, orm):
-        
-        # Deleting model 'PublicText'
-        db.delete_table('text_publictext')
-        
-        # Deleting field 'Text.public'
-        db.delete_column('text_text', 'public_id')
-        
+        "Write your backwards migration here"
     
     
     models = {
-        'cms.publiccmsplugin': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
-        },
-        'cms.publicpage': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
-        },
         'cms.cmsplugin': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'Meta': {'object_name': 'CMSPlugin'},
+            'changed_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'language': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
+            'level': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.CMSPlugin']", 'null': 'True', 'blank': 'True'}),
+            'placeholder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
+            'plugin_type': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
+            'position': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
         },
-        'cms.page': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
-        },
-        'text.publictext': {
-            'body': ('models.TextField', [], {}),
-            'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'})
+        'cms.placeholder': {
+            'Meta': {'object_name': 'Placeholder'},
+            'default_width': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'slot': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'})
         },
         'text.text': {
-            'body': ('models.TextField', [], {}),
-            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['text.PublicText']"})
+            'Meta': {'object_name': 'Text', 'db_table': "'cmsplugin_text'"},
+            'body': ('django.db.models.fields.TextField', [], {}),
+            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'})
         }
     }
-    
+
     complete_apps = ['text']

@@ -7,16 +7,15 @@
 			<div class="col2">
 				<div class="col-actions">{% trans "actions" %}</div>	
 				<div class="col-navigation">{% trans "in navigation" %}</div>
-				{% if CMS_MODERATOR %}<div class="col-moderator">{% trans "moderate" %}</div>{% endif %}
-				
-				{% if CMS_MODERATOR %}<div class="col-draft">{% trans "draft" %}</div>{% endif %}
+
+				<div class="col-draft">{% trans "draft" %}</div>
 				<div class="col-published">{% trans "published" %}</div>
 				
 				<div class="col-published">{% trans "start" %}</div>
-				<div class="col-published">{% trans "end" %}</div>
+				{% if CMS_SHOW_END_DATE %}<div class="col-published">{% trans "end" %}</div>{% endif %}
                 <div class="col-view-perms">{% trans "restricted" %}</div>
 				
-				{% if CMS_MODERATOR %}<div class="col-lastchange">{% trans "last changes" %}</div>{% endif %}
+				<div class="col-lastchange">{% trans "last changes" %}</div>
 				<div class="col-creator">{% trans "changed by" %}</div>
 			</div>
 		</div>

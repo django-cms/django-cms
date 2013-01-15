@@ -131,7 +131,7 @@ a.collapsed span.collapsed{
 }
 
 .ac_loading {
-    background: white url('../indicator.gif') right center no-repeat;
+    background: white url('../images/indicator.gif') right center no-repeat;
 }
 
 .ac_odd {
@@ -293,7 +293,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	background-position: -20px 0px;
 }
 
-#sitemap li .col-draft a.approve {
+#sitemap li .col-draft a.publish {
 	margin-left:4px;
 	background-position: -60px -80px;
 	margin-top:-4px;
@@ -464,22 +464,22 @@ div#sitemap ul.header li{
 #sitemap li .col-lastchange .state-icon.app { background-position: -600px -60px; } 
 
 /* moderation - changed */
-#sitemap li .cont.moderatorstate0 { background-position: 0px -500px; } 
+#sitemap li .cont.publisher_pending { background-position: 0px -500px; }
 
-/* moderation - requires approvement */
-#sitemap li .cont.moderatorstate1 { background-position: 0px -300px; } 
-#sitemap li .cont.moderatorstate1 .col-draft span.state { color: #ff6600; }
+/* moderation - requires deletion approval */
+#sitemap li .cont.publisher_delete_requested { background-position: 0px -600px; }
+#sitemap li .cont.publisher_delete_requested .col-draft span.state { color: #cc0000; }
 
-/* moderation - requires deletion approvement */
-#sitemap li .cont.moderatorstate200 { background-position: 0px -600px; } 
-#sitemap li .cont.moderatorstate200 .col-draft span.state { color: #cc0000; }
+/* moderation - requires approval */
+#sitemap li .cont.publisher_dirty { background-position: 0px -300px; }
+#sitemap li .cont.publisher_dirty .col-draft span.state { color: #ff6600; }
 
 /* moderation - approved */
 #sitemap li .cont.moderatorstate10 {} 
 
 /* moderation - you should approve */
-#sitemap li .cont.moderatorstate11 { background-position: 0px -400px; } 
-#sitemap li .cont.moderatorstate11 .col-draft span.state { color: #44ad41; }
+#sitemap li .cont.publisher_draft { background-position: 0px -400px; }
+#sitemap li .cont.publisher_draft .col-draft span.state { color: #44ad41; }
  
 
 /* softroot icon */

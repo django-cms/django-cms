@@ -117,3 +117,19 @@
 - Fixed a bug that could lead to slug clashes
 - Fixed page change form (jQuery and permissions)
 - Fixed placeholder field permission checks
+
+==== 2.4.0 ===
+
+Please see Install/2.4 release notes *before* attempting to upgrade to version 2.4.
+
+- CMS_LANGUAGE setting has changed
+- CMS_HIDE_UNTRANSLATED setting removed
+- CMS_LANGUAGE_FALLBACK setting removed
+- CMS_LANGUAGE_CONF setting removed
+- CMS_SITE_LANGUAGES setting removed
+- CMS_FRONTEND_LANGUAGES setting removed
+- MultilingualMiddleware has been removed
+- CMS_FLAT_URLS has been removed
+
+==== NEXT ====
+- Fixed #1543: Nasty empty line in cms/plugins/link.html

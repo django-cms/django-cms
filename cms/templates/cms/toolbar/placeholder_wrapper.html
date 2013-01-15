@@ -8,13 +8,25 @@ CMS.$(document).ready(function () {
 		'plugin_type': '{{ instance.plugin_type }}',
 		'placeholder_id': '{{ instance.placeholder.id }}',
 		'placeholder_slot': '{{ instance.placeholder.slot }}',
+        'allow_children': {{ instance.get_plugin_class.allow_children|yesno:"true,false" }},
+        'page_language': '{{ language }}',{% if child_plugin_classes %}
+        'child_classes' : [
+            {% for class, name in child_plugin_classes %}
+                {'class_name':'{{ class  }}', 'plugin_name':'{{ name }}'}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],{% endif %}
 		'urls': {
 			'remove_plugin': '{{ instance.placeholder.get_remove_url }}',
 			'move_plugin': '{{ instance.placeholder.get_move_url }}',
-			'change_list': '{{ instance.placeholder.get_changelist_url }}'
+			'change_list': '{{ instance.placeholder.get_changelist_url }}',
+            'add_plugin': '{{ instance.placeholder.get_add_url }}',
+            'change_list': '{{ instance.placeholder.get_changelist_url }}'
 		}
 	});
 });
 </script>
 {% endaddtoblock %}
-<div id="cms_placeholder-{{ instance.pk }}" class="cms_placeholder cms_placeholder_slot::{{ instance.placeholder.slot }}">{{ rendered_content }}</div>
+{% if instance.get_plugin_class.allow_children %}<div class="cms_moveable cms_multi" id="cms_placeholder_multi-{{ instance.pk }}">{% endif %}
+<div id="cms_placeholder-{{ instance.pk }}" class="{% if not instance.get_plugin_class.allow_children %}cms_moveable{% endif %} cms_placeholder cms_placeholder_slot::{{ instance.placeholder.slot }}">{% if instance.get_plugin_class.allow_children %}{{ instance.get_plugin_class.name }}{% else %}{{ rendered_content }}{% endif %}</div>
+{% if instance.get_plugin_class.allow_children %}{{ rendered_content }}{% endif %}
+{% if instance.get_plugin_class.allow_children %}</div>{% endif %}

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.models.placeholdermodel import Placeholder
-from cms.plugin_processors import (plugin_meta_context_processor, 
+from cms.plugin_processors import (plugin_meta_context_processor,
     mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
 from cms.utils.django_load import iterload_objects
@@ -39,7 +39,7 @@ class PluginContext(Context):
             self.update(processor(instance, placeholder))
         for processor in processors:
             self.update(processor(instance, placeholder))
-            
+
 def render_plugin(context, instance, placeholder, template, processors=None,
                   current_app=None):
     """
@@ -49,7 +49,7 @@ def render_plugin(context, instance, placeholder, template, processors=None,
     if not processors:
         processors = []
     if isinstance(template, basestring):
-        content = render_to_string(template, context)
+        content = render_to_string(template, context_instance=context)
     elif isinstance(template, Template):
         content = template.render(context)
     else:
@@ -74,7 +74,7 @@ def render_plugins(plugins, context, placeholder, processors=None):
     out = []
     total = len(plugins)
     for index, plugin in enumerate(plugins):
-        plugin._render_meta.total = total 
+        plugin._render_meta.total = total
         plugin._render_meta.index = index
         context.push()
         out.append(plugin.render_plugin(context, placeholder, processors=processors))
@@ -87,7 +87,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
-    context = context_to_copy 
+    context = context_to_copy
     context.push()
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
@@ -113,7 +113,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     # Prepend frontedit toolbar output if applicable
     edit = False
     toolbar = getattr(request, 'toolbar', None)
-    
+
     if (getattr(toolbar, 'edit_mode', False) and
         (not page or page.has_change_permission(request))):
             edit = True
@@ -121,7 +121,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         from cms.middleware.toolbar import toolbar_plugin_processor
         processors = (toolbar_plugin_processor,)
     else:
-        processors = None 
+        processors = None
 
     content.extend(render_plugins(plugins, context, placeholder, processors))
     content = "".join(content)

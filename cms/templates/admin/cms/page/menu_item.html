@@ -1,5 +1,5 @@
-{% load cms_admin i18n adminmedia %}
-<div class="cont{% if CMS_MODERATOR %} moderatorstate{{ page_moderator_state.state }}{% endif %}">
+{% load cms_admin i18n %}
+<div class="cont {{ css_class }}">
 	<div class="col1">
 		{% if has_change_permission %}
 			<a href="{{ url }}{{ page.id }}/" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>
@@ -51,44 +51,34 @@
 			</label>
 		</div>
 
-		{% if CMS_MODERATOR %}<div class="col-moderator">
-			{% if has_moderate_permission %}{% for value, title, active, css_class in page|moderator_choices:user %}<input type="checkbox" class="moderator-checkbox hidden copy-{{ css_class }}"{% if active %} checked="checked"{% endif %} value="{{ value }}" title="{{ title }}"/>
-			{% endfor %}{% endif %}
-		</div>{% endif %}
 
-
-		{% if CMS_MODERATOR %}<div class="col-draft">
-			{% if moderator_should_approve %}<a href="./{{ page.id }}/approve/" class="icon approve" title="{% trans 'Approve directly' %}"></a>{% endif %}
-			<span class="state">{{ page_moderator_state.label }}</span>
+		<div class="col-draft">
+			{% if has_publish_permission and page.is_dirty %}<a href="./{{ page.id }}/publish/" class="icon publish" title="{% trans 'Publish' %}"></a>{% endif %}
 			<a href="./{{ page.id }}/preview/" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
-		</div>{% endif %}
+		</div>
 
 		<div class="col-published">
+            <label>{{ page.is_public_published|boolean_icon }}</label>
 			{% if has_publish_permission %}
 				{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
 				{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
 				{% endif %}
 			{% endif %}
 
-			{% if CMS_MODERATOR %}
-				<label>{{ page.is_public_published|boolean_icon }}</label>
-				{% if page.is_public_published %}<a href="./{{ page.id }}/preview/?public=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}
-			{% else %}
-				<a href="./{{ page.id }}/preview/" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
-			{% endif %}
+            {% if page.is_public_published %}<a href="./{{ page.id }}/preview/?public=1" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}
 		</div>
 
 		<div class="col-published">{{ page.publication_date|date:"Y-m-d" }}</div>
-		<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>
+        {% if CMS_SHOW_END_DATE %}<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>{% endif %}
 		<div class="col-view-perms">{{ page|is_restricted:request }}</div>
 
 
-		{% if CMS_MODERATOR %}<div class="col-lastchange">
+		<div class="col-lastchange">
 			{% for state in page.last_page_states %}<span class="icon state-icon {{ state.css_class }}" title="{{ state.get_action_display }}"></span>
 			{% endfor %}
 
 
-		</div>{% endif %}
+		</div>
 
 		<div class="col-creator">{{ page.changed_by }}</div>
 	</div>

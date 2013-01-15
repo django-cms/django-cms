@@ -166,7 +166,7 @@ class PlaceholderTestCase(CMSTestCase):
         containing an hyphen, the hyphen is escaped by django escapejs resulting
         in a incorrect URL
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             ex = Example1(
                 char_1='one',
                 char_2='two',
@@ -191,7 +191,7 @@ class PlaceholderTestCase(CMSTestCase):
         Sibling test of the above, on a page.
         #1366 does not apply to placeholder defined in a page
         """
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             page = create_page('page', 'col_two.html', 'en')
             ph1 = page.placeholders.get(slot='col_left')
             ###
@@ -396,14 +396,8 @@ class PlaceholderModelTests(CMSTestCase):
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
         
-class PlaceholderAdminTest(CMSTestCase):
-    placeholderconf = {'test': {
-            'limits': {
-                'global': 2,
-                'TextPlugin': 1,
-            }
-        }
-    }
+
+class PlaceholderAdminTestBase(CMSTestCase):
     def get_placeholder(self):
         return Placeholder.objects.create(slot='test')
     
@@ -414,6 +408,15 @@ class PlaceholderAdminTest(CMSTestCase):
     def get_post_request(self, data):
         return self.get_request(post_data=data)
     
+
+class PlaceholderAdminTest(PlaceholderAdminTestBase):
+    placeholderconf = {'test': {
+            'limits': {
+                'global': 2,
+                'TextPlugin': 1,
+            }
+        }
+    }
     def test_global_limit(self):
         placeholder = self.get_placeholder()
         admin = self.get_admin()
@@ -452,8 +455,44 @@ class PlaceholderAdminTest(CMSTestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, "This placeholder already has the maximum number (1) of TextPlugin plugins.")
 
+    def test_edit_plugin_and_cancel(self):
+        placeholder = self.get_placeholder()
+        admin = self.get_admin()
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': placeholder.pk,
+            'language': 'en',
+        }
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request(data)
+                response = admin.add_plugin(request)
+                self.assertEqual(response.status_code, 200)
+                plugin_id = int(response.content)
+                data = {
+                    'body': 'Hello World',
+                    }
+                request = self.get_post_request(data)
+                response = admin.edit_plugin(request, plugin_id)
+                self.assertEqual(response.status_code, 200)
+                text_plugin = Text.objects.get(pk=plugin_id)
+                self.assertEquals('Hello World', text_plugin.body)
 
-class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
+                # edit again, but this time press cancel
+                data = {
+                    'body': 'Hello World!!',
+                    '_cancel': True,
+                    }
+                request = self.get_post_request(data)
+                response = admin.edit_plugin(request, plugin_id)
+                self.assertEqual(response.status_code, 200)
+                text_plugin = Text.objects.get(pk=plugin_id)
+                self.assertEquals('Hello World', text_plugin.body)
+
+
+
+class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
 
     def _testuser(self):
         u = User(username="test", is_staff = True, is_active = True, is_superuser = False)

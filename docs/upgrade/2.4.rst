@@ -1,0 +1,277 @@
+##################################
+2.4 release notes (IN DEVELOPMENT)
+##################################
+
+*****************
+What's new in 2.4
+*****************
+
+
+.. _upgrade-to-2.4:
+
+.. warning:: Upgrading from previous versions
+
+    2.4 introduces some changes that **require** action if you are upgrading
+    from a previous version.
+    
+    You will need to read the sections :ref:`migrations-upgrade` and
+    :ref:`cms-moderator-upgrade` below.
+
+
+.. _migrations-upgrade:
+
+Migrations overhaul
+===================
+In version 2.4 migrations have been completely rewritten to address issues with
+newer South releases.
+
+To ease the upgrading process, all the migrations for the `cms` application have
+been consolidated into a single migration file, `0001_initial.py`.
+
+*   migration 0001 is a *real* migration, that gets you to the same point migrations 0001-0036 used to 
+*   the migrations 0002 to 0036 inclusive still exist, but are now all *dummy*
+    migrations
+*   migrations 0037 and later are *new* migrations
+
+How this affects you
+--------------------
+
+If you're starting with *a new installation*, you don't need to worry about
+this. Don't even bother reading this section; it's for upgraders.
+
+If you're using version *2.3.2 or newer*, you don't need to worry about this
+either.
+
+If you're using version *2.3.1 or older*, you will need to run a two-step
+process.
+
+First, you'll need to upgrade to 2.3.3, to bring your migration history
+up-to-date with the new scheme. Then you'll need to perform the migrations for
+2.4.
+
+For the two-step upgrade process do the following in your project main directory
+::
+
+    pip install django-cms==2.3.3
+    python manage.py syncdb
+    python manage.py migrate
+    pip install django-cms==2.4
+    python manage.py migrate
+
+
+.. _cms-moderator-upgrade:
+
+
+CMS_MODERATOR
+=============
+Has been removed since it is no longer in use. From 2.4 onwards, all pages
+exist in a public and draft version. Users with the ``publish_page`` permission
+can publish changes to the public site.
+
+.. admonition:: Management command required
+
+    To bring a previous version of your site's database up-to-date, you'll need
+    to run ``manage.py cms moderator on``.
+
+
+Added Fix MPTTT Management command
+==================================
+
+Added a management command for fixing MPTT tree data.
+
+The command can be run with:
+
+	manage.py cms fix-mptt
+	
+
+Removed the MultilingualMiddleware
+==================================
+
+We removed the MultilingualMiddleware. This removed the very ugly monkey patching of the
+reverse() function as well. As a benefit we now support localization of urls and Apphook urls with standard django helpers.
+
+
+For django 1.4 more infos can be found here:
+
+    https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
+
+If you are still running django 1.3 you are able to archieve the same functionality with django-i18nurl. It is a backport
+of the new functionality in django 1.4 and can be found here:
+
+    https://github.com/brocaar/django-i18nurls
+
+
+What you need to do:
+
+- Remove the MultilingualMiddleware from your settings.
+- Be sure the LocaleMiddleware is in your settings and that it comes after the SessionMiddleware.
+- Be sure that the cms.urls is included in a i18n_patterns::
+
+        from django.conf.urls.defaults import *
+        from django.conf.urls.i18n import i18n_patterns
+        from django.contrib import admin
+        from django.conf import settings
+
+        admin.autodiscover()
+
+        urlpatterns = i18n_patterns('',
+            url(r'^admin/', include(admin.site.urls)),
+            url(r'^', include('cms.urls')),
+        )
+
+        if settings.DEBUG:
+            urlpatterns = patterns('',
+            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+            url(r'', include('django.contrib.staticfiles.urls')),
+        ) + urlpatterns
+
+- Change your url and reverse calls to language namespaces. We now support the django way of
+  calling other language urls either via '{% language %}' templatetag or via 'activate("de")' function call in views.
+
+  Before ::
+
+        {% url "de:myview" %}
+
+  After::
+
+        {% load i18n %}{% language "de" %}
+        {% url "myview_name" %}
+        {% endlanguage %}
+
+- reverse urls now return the language prefix as well. So maybe there is some code that adds language prefixes. Remove
+  this code.
+
+CMS_LANGUAGES
+=============
+
+:setting:`CMS_LANGUAGES` has be overhauled. It is no longer a list of tuples like the ``LANGUAGES`` settings.
+
+An example explains more than thousand words::
+
+    CMS_LANGUAGES = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': gettext('English'),
+                    'fallbacks': ['de', 'fr'],
+                    'public': True,
+                    'hide_untranslated': True,
+                    'redirect_on_fallback':False,
+                },
+                {
+                    'code': 'de',
+                    'name': gettext('Deutsch'),
+                    'fallbacks': ['en', 'fr'],
+                    'public': True,
+                },
+                {
+                    'code': 'fr',
+                    'name': gettext('French'),
+                    'public': False,
+                },
+            ],
+            2: [
+                {
+                    'code': 'nl',
+                    'name': gettext('Dutch'),
+                    'public': True,
+                    'fallbacks': ['en'],
+                },
+            ],
+            'default': {
+                'fallbacks': ['en', 'de', 'fr'],
+                'redirect_on_fallback':True,
+                'public': False,
+                'hide_untranslated': False,
+            }
+        }
+
+
+For more details on what all the parameters mean please refer to the :setting:`CMS_LANGUAGES` docs.
+
+The following settings are not needed any more and have been removed:
+
+- `CMS_HIDE_UNTRANSLATED`
+- `CMS_LANGUAGE_FALLBACK`
+- `CMS_LANGUAGE_CONF`
+- `CMS_SITE_LANGUAGES`
+- `CMS_FRONTEND_LANGUAGES`
+
+Please remove them from your settings.py
+
+CMS_FLAT_URLS
+=============
+
+Was marked deprecated in 2.3 and has now been removed.
+
+
+
+Plugins in Plugins
+==================
+
+We added the ability to have plugins in plugins. Till now only the TextPlugin supportet this.
+For demonstration purposes we created a MultiColumn Plugin. The Possiblities for this are endless.
+Imagine: StylePlugin, TablePlugin, GalleryPlugin etc.
+
+The column plugin can be found here:
+
+https://github.com/divio/djangocms-column
+
+At the moment the limitation is that plugins in plugins is only editable in the frontend.
+
+Here is the MultiColumn Plugin as an example::
+	
+	class MultiColumnPlugin(CMSPluginBase):
+	    model = MultiColumns
+	    name = _("Multi Columns")
+	    render_template = "cms/plugins/multi_column.html"
+	    allow_children = True
+	    child_classes = ["ColumnPlugin"]
+	
+There are 2 new properties for plugins:
+
+**allow_children**
+
+Boolean
+If set to True it allows adding Plugins.
+
+**child_classes**
+
+List
+A List of Plugin Classes that can be added to this plugin.
+If not provided you can add all plugins that are available in this placeholder.
+
+How to render your child plugins in the template
+------------------------------------------------
+
+We introduce a new templatetag in the cms_tags called `{% render_plugin %}`
+Here is an example of how the MultiColumn plugin uses it::
+	
+	{% load cms_tags %}
+	<div class="multicolumn">
+	{% for plugin in instance.child_plugins %}
+    	{% render_plugin plugin %}
+	{% endfor %}
+	</div>
+
+As you can see the children are accessible via the plugins childrens attribute.
+
+
+******************************
+Backwards incompatible changes
+******************************
+
+New minimum requirements for dependencies
+=========================================
+
+If you are running django 1.3.X you need to install django-i18nurls, if you want
+multilingual features. The cms.urls needs to be in a i18n url pattern.
+
+
+********************
+Pending deprecations
+********************
+
+* ``simple_language_changer`` will be removed in version 2.5. A bugfix makes
+  this redundant as every non managed url will behave like this.
