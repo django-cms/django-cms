@@ -320,9 +320,10 @@ class LanguageChooser(InclusionTag):
         marker = MARKERS[i18n_mode]
         current_lang = get_language()
         site = Site.objects.get_current()
+        user_is_staff = context['request'].user.is_staff
         languages = []
         for lang in get_language_objects(site.pk):
-            if lang['public']:
+            if user_is_staff or lang.get('public', True):
                 languages.append((lang['code'], marker(lang['name'], lang['code'])))
         context.update({
             'languages':languages,

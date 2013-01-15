@@ -4,7 +4,7 @@ from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Title
 from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback
+from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, get_language_list
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
@@ -38,7 +38,10 @@ def details(request, slug):
     # Check that the current page is available in the desired (current) language
     available_languages = []
     page_languages = page.get_languages()
-    for frontend_lang in get_public_languages():
+    user_languages = get_public_languages()
+    if hasattr(request, 'user') and request.user.is_staff:
+        user_languages = get_language_list()
+    for frontend_lang in user_languages:
         if frontend_lang in page_languages:
             available_languages.append(frontend_lang)
     attrs = ''
@@ -49,7 +52,7 @@ def details(request, slug):
         if 'draft' in request.GET:
             attrs += '&draft=1'
     # Check that the language is in FRONTEND_LANGUAGES:
-    if not current_language in get_public_languages():
+    if not current_language in user_languages:
         #are we on root?
         if not slug:
             #redirect to supported language
@@ -60,9 +63,10 @@ def details(request, slug):
                 with SettingsOverride(LANGUAGES=languages, LANGUAGE_CODE=languages[0][0]):
                     #get supported language
                     new_language = translation.get_language_from_request(request)
-                    with force_language(new_language):
-                        pages_root = reverse('pages-root')
-                        return HttpResponseRedirect(pages_root + attrs)
+                    if new_language in get_public_languages():
+                        with force_language(new_language):
+                            pages_root = reverse('pages-root')
+                            return HttpResponseRedirect(pages_root + attrs)
             else:
                 _handle_no_page(request, slug)
         else:

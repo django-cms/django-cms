@@ -31,27 +31,22 @@ class Title(models.Model):
     def __unicode__(self):
         return u"%s (%s, %s)" % (self.title, self.slug, self.language)
 
-    def save(self, *args, **kwargs):
-        # Update the path attribute before saving
-        self.update_path()
-        super(Title, self).save(*args, **kwargs)
-
     def update_path(self):
         # Build path from parent page's path and slug
-        current_path = self.path
-        parent_page = self.page.parent
-
         slug = u'%s' % self.slug
         if not self.has_url_overwrite:
             self.path = u'%s' % slug
-            if parent_page:
+            if self.page.parent_id:
+                parent_page = self.page.parent_id
+
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
+        
 
     @property
     def overwrite_url(self):
-        """Return overrwriten url, or None
+        """Return overwritten url, or None
         """
         if self.has_url_overwrite:
             return self.path

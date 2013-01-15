@@ -17,7 +17,7 @@ APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
 class ViewTests(SettingsOverrideTestCase):
-    urls = 'cms.test_utils.project.urls_for_apphook_tests'
+    urls = 'cms.test_utils.project.urls'
 
     settings_overrides = {'CMS_PERMISSION': True}
 

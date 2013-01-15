@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext, 
+from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -15,6 +15,7 @@ from urlparse import urljoin
 import sys
 import urllib
 import warnings
+from cms.utils.permissions import set_current_user
 
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -23,6 +24,7 @@ URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
 URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE_CHANGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE_CHANGE, "edit-plugin/")
+URL_CMS_PLUGIN_MOVE = urljoin(URL_CMS_PAGE_CHANGE, "move-plugin/")
 URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE_CHANGE, "remove-plugin/")
 URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
 
@@ -77,6 +79,7 @@ class CMSTestCase(testcases.TestCase):
         self.create_fixtures()
         activate("en")
 
+
     def create_fixtures(self):
         pass
 
@@ -84,6 +87,7 @@ class CMSTestCase(testcases.TestCase):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
         super(CMSTestCase, self)._post_teardown()
+        set_current_user(None)
 
     def login_user_context(self, user):
         return UserLoginContext(self, user)
@@ -172,7 +176,7 @@ class CMSTestCase(testcases.TestCase):
         self.assertEquals(response.status_code, 200)
         # Altered to reflect the new django-js jsonified response messages
         self.assertEquals(response.content, '{"status": 200, "content": "ok"}')
-        
+
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
 

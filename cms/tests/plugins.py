@@ -18,7 +18,7 @@ from cms.plugins.twitter.models import TwitterRecentEntries
 from cms.test_utils.project.pluginapp.models import Article, Section
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel)
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE,
     URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, URL_CMS_PLUGIN_HISTORY_EDIT)
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -34,6 +34,7 @@ from django.forms.widgets import Media
 from django.test.testcases import TestCase
 import os
 import datetime
+from cms.utils.permissions import set_current_user
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -41,6 +42,7 @@ class DumbFixturePlugin(CMSPluginBase):
     name = "Dumb Test Plugin. It does nothing."
     render_template = ""
     admin_preview = False
+    allow_children = True
 
     def render(self, context, instance, placeholder):
         return context
@@ -605,7 +607,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         plugin.body = plugin_tags_to_admin_html(' {{ plugin_object %s }} {{ plugin_object %s }} ' % (str(plugin_ref_1.pk), str(plugin_ref_2.pk)))
         plugin.save()
-        self.assertEquals(plugin.pk, 1)
+
         page_data = self.get_new_page_data()
 
         #create 2nd language page
@@ -633,10 +635,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.count(), 6)
-
-        new_plugin = Text.objects.get(pk=6)
+        plugins = list(Text.objects.all())
+        new_plugin = plugins[-1]
         idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
-        expected = sorted([4, 5])
+        expected = sorted([plugins[3].pk, plugins[4].pk])
         self.assertEquals(idlist, expected)
 
     def test_empty_plugin_is_ignored(self):
@@ -667,7 +669,34 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin = self._edit_text_plugin(plugin_id, "fnord")
 
         actual_last_modification_time = CMSSitemap().lastmod(page)
-        self.assertEqual(plugin.changed_date, actual_last_modification_time)
+        self.assertEqual(plugin.changed_date - datetime.timedelta(microseconds=plugin.changed_date.microsecond), actual_last_modification_time - datetime.timedelta(microseconds=actual_last_modification_time.microsecond))
+
+    def test_moving_plugin_to_different_placeholder(self):
+        plugin_pool.register_plugin(DumbFixturePlugin)
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        plugin_data = {
+            'plugin_type': 'DumbFixturePlugin',
+            'language': settings.LANGUAGES[0][0],
+            'placeholder': page.placeholders.get(slot='body').pk,
+            }
+        response = self.client.post(URL_CMS_PLUGIN_ADD % page.pk, plugin_data)
+        self.assertEquals(response.status_code, 200)
+
+        plugin_data['parent_id'] = int(response.content)
+        del plugin_data['placeholder']
+        response = self.client.post(URL_CMS_PLUGIN_ADD % page.pk, plugin_data)
+        self.assertEquals(response.status_code, 200)
+
+        post = {
+            'plugin_id': int(response.content),
+            'placeholder': 'right-column',
+        }
+        response = self.client.post(URL_CMS_PLUGIN_MOVE % page.pk, post)
+        self.assertEquals(response.status_code, 200)
+
+        from cms.plugins.utils import build_plugin_tree
+        build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
+        plugin_pool.unregister_plugin(DumbFixturePlugin)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

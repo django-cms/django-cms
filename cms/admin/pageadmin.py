@@ -444,23 +444,22 @@ class PageAdmin(ModelAdmin):
 
         return form
 
-    # remove permission inlines, if user isn't allowed to change them
-    def get_formsets(self, request, obj=None):
-        if obj:
-            inlines = self.get_inline_instances(request) if hasattr(self, 'get_inline_instances') \
-                      else self.inline_instances
+    def get_inline_instances(self, request):
+        inlines = super(PageAdmin, self).get_inline_instances(request)
+        if get_setting('PERMISSION') and hasattr(self, '_current_page')\
+                and self._current_page:
+            filtered_inlines = []
             for inline in inlines:
-                if get_setting('PERMISSION') and isinstance(inline, PagePermissionInlineAdmin) and not isinstance(inline, ViewRestrictionInlineAdmin):
-                    if "recover" in request.path or "history" in request.path: #do not display permissions in recover mode
+                if (isinstance(inline, PagePermissionInlineAdmin)
+                        and not isinstance(inline, ViewRestrictionInlineAdmin)):
+                    if "recover" in request.path or "history" in request.path:
+                        # do not display permissions in recover mode
                         continue
-                    if obj and not obj.has_change_permissions_permission(request):
+                    if not self._current_page.has_change_permissions_permission(request):
                         continue
-                    elif not obj:
-                        try:
-                            permissions.get_user_permission_level(request.user)
-                        except NoPermissionsException:
-                            continue
-                yield inline.get_formset(request, obj)
+                filtered_inlines.append(inline)
+            inlines = filtered_inlines
+        return inlines
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -500,8 +499,13 @@ class PageAdmin(ModelAdmin):
             context.update(extra_context or {})
             extra_context = self.update_language_tab_context(request, obj, context)
         tab_language = request.GET.get("language", None)
-        response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
 
+        # get_inline_instances will need access to 'obj' so that it can
+        # determine if current user has enough rights to see PagePermissionInlineAdmin
+        # because get_inline_instances doesn't receive 'obj' as a parameter,
+        # the workaround is to set it as an attribute...
+        self._current_page = obj
+        response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
@@ -1357,6 +1361,8 @@ class PageAdmin(ModelAdmin):
             for child in plugin.get_descendants():
                 child.placeholder = placeholder
                 child.save()
+            # make sure the plugin has no parent
+            plugin.parent = None
             plugin.save()
             success = True
         if 'ids' in request.POST:

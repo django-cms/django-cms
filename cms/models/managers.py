@@ -341,7 +341,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         """
         # permissions should be managed on the draft page only
         page = page.get_draft_object()
-        from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN,\
+        from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, \
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
         # code taken from
         # https://github.com/divio/django-cms/issues/1113#issuecomment-3376790

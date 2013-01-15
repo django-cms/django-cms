@@ -2,25 +2,27 @@
 from distutils.version import LooseVersion
 import django
 import os
+import dj_database_url
 
 gettext = lambda s: s
 
 urlpatterns = []
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
-def configure(**extra):
+def configure(db_url, **extra):
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
+    if not 'DATABASES' in extra:
+        DB = dj_database_url.parse(db_url)
+    else:
+        DB = {}
     defaults = dict(
         CACHE_BACKEND='locmem:///',
         DEBUG=True,
         TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
         DATABASES={
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
-            }
+            'default': DB
         },
         SITE_ID=1,
         USE_I18N=True,
@@ -55,12 +57,14 @@ def configure(**extra):
         ],
         MIDDLEWARE_CLASSES=[
             'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
+            'django.middleware.transaction.TransactionMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
@@ -128,7 +132,7 @@ def configure(**extra):
                 {
                     'code':'pt-br',
                     'name':gettext('Brazilian Portuguese'),
-                    'public':True,
+                    'public':False,
                 },
             ],
             2: [
@@ -150,6 +154,12 @@ def configure(**extra):
                     'name':gettext('Dutch'),
                     'fallbacks':['fr', 'en'],
                     'public':True,
+                },
+                {
+                    'code':'de',
+                    'name':gettext('German'),
+                    'fallbacks':['fr', 'en'],
+                    'public':False,
                 },
             ],
             'default': {
@@ -185,10 +195,10 @@ def configure(**extra):
                 "name": "extra context"
             },
         },
-        CMS_SOFTROOT = True,
-        CMS_PERMISSION = True,
-        CMS_PUBLIC_FOR = 'all',
-        CMS_CACHE_DURATIONS = {
+        CMS_SOFTROOT=True,
+        CMS_PERMISSION=True,
+        CMS_PUBLIC_FOR='all',
+        CMS_CACHE_DURATIONS={
             'menus': 0,
             'content': 0,
             'permissions': 0,
@@ -223,11 +233,8 @@ def configure(**extra):
         from django.utils.functional import empty
         settings._wrapped = empty
     defaults.update(extra)
-
     settings.configure(**defaults)
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
     from django.contrib import admin
-
-
     admin.autodiscover()

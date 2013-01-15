@@ -48,9 +48,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             create_title("de", page2.get_title(), page2, slug=page2.get_slug())
             page3 = create_page("page2", "nav_playground.html", "en")
             create_title("de", page3.get_title(), page3, slug=page3.get_slug())
+            page4 = create_page("page4", "nav_playground.html", "de")
             page.publish()
             page2.publish()
             page3.publish()
+            page4.publish()
             response = self.client.get("/en/")
             self.assertRedirects(response, "/de/")
             response = self.client.get("/en/page2/")
@@ -59,6 +61,13 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             self.assertEqual(response.status_code, 200)
             response = self.client.get("/de/page2/")
             self.assertEqual(response.status_code, 200)
+            # check if the admin can see non-public langs
+            admin = self.get_superuser()
+            if self.client.login(username=admin.username, password="admin"):
+                response = self.client.get("/en/page2/")
+                self.assertEqual(response.status_code, 200)
+                response = self.client.get("/en/page4/")
+                self.assertEqual(response.status_code, 302)
 
     def test_detail_view_404_when_no_language_is_found(self):
         page = create_page("page1", "nav_playground.html", "en")
