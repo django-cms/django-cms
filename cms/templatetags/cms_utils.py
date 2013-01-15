@@ -53,9 +53,10 @@ class GetChilderns(InclusionTag):
         Argument('page', default=None, required=False),
         Argument('template', default=None, required=False),
         Argument('imgsize', default=None, required=False),
+        Argument('limit', default=4, required=False),
     )
 
-    def get_context(self, context, page, template, imgsize):
+    def get_context(self, context, page, template, imgsize, limit):
         if page is None:
             page = context['request'].current_page
         elif isinstance(page, basestring):
@@ -71,7 +72,7 @@ class GetChilderns(InclusionTag):
 
         # ToDo
         # Fix problems with permission
-        context['childrens'] = Page.objects.filter(parent=page,published=True) # .with_user(context['user']).filter(can_read_permissions=True)
+        context['childrens'] = Page.objects.filter(parent=page,published=True)[:limit] # .with_user(context['user']).filter(can_read_permissions=True)
         return context
 
 register.tag(GetChilderns)
