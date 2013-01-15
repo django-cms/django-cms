@@ -465,7 +465,7 @@ class PagesTestCase(CMSTestCase):
 
         parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
         parent.save()
-        self.assertEqual(parent.template, constants.CMS_TEMPLATE_INHERITANCE_MAGIC)
+        self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), get_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_setting('TEMPLATES')[0][1])
 
