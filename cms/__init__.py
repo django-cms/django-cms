@@ -1,2 +1,3 @@
 # -*- coding: utf-8 -*-
-__version__ = '2.3.5.post0'
+__version__ = '2.4.0.alpha'
+
