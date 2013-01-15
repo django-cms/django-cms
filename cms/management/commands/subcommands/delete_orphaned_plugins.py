@@ -8,7 +8,12 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
 
     def handle_noargs(self, **options):
         """
-        Repairs the MPTT tree
+        Obtains a plugin report -
+        cms.management.commands.subcommands.list.plugin_report - and uses it
+        to delete orphaned plugins from the database, i.e. ones that are no
+        longer installed, and ones that have no corresponding saved plugin
+        instances (as will happen if a plugin is inserted into a placeholder,
+        but not saved).
         """
         self.stdout.write("Obtaining plugin report\n")
         report = plugin_report()
