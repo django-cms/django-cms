@@ -20,6 +20,30 @@ CheckResult = namedtuple('CheckResult', 'name result info')
 
 
 class FileOutputWrapper(object):
+    """
+    Wraps two file-like objects (that support at the very least the 'write'
+    method) into an API to be used by the check function further down in
+    this module.
+
+    The following properties are public (and required) by alternative implementations:
+
+        errors: integer count of errors encountered
+        successes: integer count of successes encountered
+        warnings: integer count of warnings encountered
+        skips: integer count of skips encountered
+        successful: Whether the checks were successful (no errors)
+
+    They must also provide these methods:
+
+        write_line(message=''): writes a message to stdout
+        write_stderr_line(message=''): writes a message to stderr
+        success(message): reports and registers a successful check
+        error(message): reports and registers an error
+        warn(message); reports and registers a warning
+        skip(message): reports and registers a skipped check
+        section(title): A context manager that starts a new section. For the
+            Section API see FileSectionWrapper
+    """
     def __init__(self, stdout, stderr):
         self.stdout = stdout
         self.stderr = stderr
@@ -39,7 +63,7 @@ class FileOutputWrapper(object):
         self.stdout.write(message)
 
     def write_stderr_line(self, message=''):
-        self.stderr.write(u'%s\n' % message)
+        self.write_stderr(u'%s\n' % message)
 
     def write_stderr(self, message):
         self.stderr.write(message)
@@ -83,6 +107,19 @@ class FileOutputWrapper(object):
 
 
 class FileSectionWrapper(FileOutputWrapper):
+    """
+    Used from FileOutputWrapper to report checks in a section.
+
+    If you want to provide your own output class, you may want to subclass
+    this class for the section reporting too. If you want to use your own,
+    you must defined at least the same API as FileOutputWrapper, as well
+    as these four additional methods:
+
+        finish_success(message): End the section (successfully)
+        finish_error(message): End the section with errors
+        finish_warning(message): End this section with a warning
+        finish_skip(message): End this (skipped) section
+    """
     def __init__(self, wrapper):
         super(FileSectionWrapper, self).__init__(wrapper.stdout, wrapper.stderr)
         self.wrapper = wrapper
@@ -91,7 +128,7 @@ class FileSectionWrapper(FileOutputWrapper):
         self.write(u'  - %s\n' % message)
 
     def write_stderr_line(self, message=''):
-        self.stderr.write(u'  - %s\n' % message)
+        self.write_stderr(u'  - %s\n' % message)
 
     def finish_success(self, message):
         self.wrapper.write_line()
@@ -111,6 +148,9 @@ class FileSectionWrapper(FileOutputWrapper):
 
 
 def define_check(func):
+    """
+    Helper decorator to register a check function.
+    """
     CHECKERS.append(func)
     return func
 
@@ -134,7 +174,10 @@ def check_sekizai(output):
                 section.success("Sekizai namespaces 'js' and 'css' found in %r" % template)
             else:
                 section.error("Sekizai namespaces 'js' and 'css' not found in %r" % template)
-        section.finish_success("Sekizai configuration okay")
+        if section.successful:
+            section.finish_success("Sekizai configuration okay")
+        else:
+            section.finish_error("Sekizai configuration has errors")
 
 @define_check
 def check_i18n(output):
@@ -160,6 +203,13 @@ def check_deprecated_settings(output):
 
 
 def check(output):
+    """
+    Checks the configuration/environment of this django CMS installation.
+
+    'output' should be an object that provides the same API as FileOutputWrapper.
+
+    Returns whether the configuration/environment are okay (has no errors)
+    """
     title = "Checking django CMS installation"
     border = '*' * len(title)
     output.write_line(output.colorize(border, opts=['bold']))
