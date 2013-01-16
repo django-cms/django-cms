@@ -1,5 +1,5 @@
 from cms.utils import cms_static_url
-from django.conf import settings
+from cms.utils.conf import get_cms_setting
 from django.forms.widgets import flatatt
 from django.template.defaultfilters import escape
 from django.template.loader import render_to_string
@@ -22,7 +22,7 @@ class TinyMCEEditor(TinyMCE):
         context = {
             'name': name,
             'language': language,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'installed_plugins': self.installed_plugins,
         }
         return mark_safe(render_to_string(

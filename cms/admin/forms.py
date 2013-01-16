@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, 
     PageUserGroup)
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
@@ -11,7 +13,6 @@ from cms.utils.permissions import (get_current_user, get_subordinate_users,
     get_subordinate_groups)
 from cms.utils.urlutils import any_path_re
 from django import forms
-from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -79,11 +80,11 @@ class PageAddForm(forms.ModelForm):
         self.fields['language'].choices = languages
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
-        if self.fields['parent'].initial and \
-            settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
-            [name for name, value in settings.CMS_TEMPLATES]:
+        if (self.fields['parent'].initial and
+            get_cms_setting('TEMPLATE_INHERITANCE') in
+            [name for name, value in get_cms_setting('TEMPLATES')]):
             # non-root pages default to inheriting their template
-            self.fields['template'].initial = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+            self.fields['template'].initial = constants.TEMPLATE_INHERITANCE_MAGIC
         
     def clean(self):
         cleaned_data = self.cleaned_data

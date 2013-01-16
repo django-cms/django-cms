@@ -14,7 +14,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
-from cms.utils import timezone
+from cms.utils import timezone, get_cms_setting
 
 from mptt.models import MPTTModel, MPTTModelBase
 
@@ -187,7 +187,7 @@ class CMSPlugin(MPTTModel):
             return pages[0].get_media_path(filename)
         else:  # django 1.0.2 compatibility
             today = date.today()
-            return os.path.join(settings.CMS_PAGE_MEDIA_PATH,
+            return os.path.join(get_cms_setting('PAGE_MEDIA_PATH'),
                 str(today.year), str(today.month), str(today.day), filename)
 
     @property

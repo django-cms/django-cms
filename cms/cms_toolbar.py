@@ -5,6 +5,7 @@ from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List,
     GetButton)
 from cms.utils import cms_static_url
+from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_page_change_permission
 from django import forms
 from django.conf import settings
@@ -159,7 +160,7 @@ class CMSToolbar(Toolbar):
         menu_items = []
         page = self.request.current_page.get_draft_object()
         url = reverse('admin:cms_page_change_template', args=(page.pk,))
-        for path, name in settings.CMS_TEMPLATES:
+        for path, name in get_cms_setting('TEMPLATES'):
             args = urllib.urlencode({'template': path})
             css = 'template'
             if page.get_template() == path:

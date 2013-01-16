@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from cms.management.commands.subcommands.base import SubcommandsCommand
+from cms.management.commands.subcommands.check import CheckInstallation
 from cms.management.commands.subcommands.list import ListCommand
 from cms.management.commands.subcommands.moderator import ModeratorCommand
 from cms.management.commands.subcommands.uninstall import UninstallCommand
@@ -27,6 +28,7 @@ class Command(SubcommandsCommand):
         'moderator': ModeratorCommand,
         'fix-mptt': FixMPTTCommand,
         'delete_orphaned_plugins': DeleteOrphanedPluginsCommand,
+        'check': CheckInstallation,
     }
 
     @property
