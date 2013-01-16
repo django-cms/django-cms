@@ -359,6 +359,14 @@ Run::
     python manage.py migrate
 
 
+Check you did everything right
+==============================
+
+Now, use the following command to check if you did everything correctly::
+
+    python manage.py cms check
+
+
 Up and running!
 ===============
 

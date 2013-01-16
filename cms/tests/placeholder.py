@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms import constants
 from cms.api import add_plugin, create_page
-from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
@@ -606,7 +606,7 @@ class PlaceholderConfTests(TestCase):
 
     def test_get_all_plugins_inherit(self):
         parent = create_page('parent', 'col_two.html', 'en')
-        page = create_page('page', CMS_TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
+        page = create_page('page', constants.TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
         placeholder = page.placeholders.get(slot='col_left')
         conf = {
             'col_two': {

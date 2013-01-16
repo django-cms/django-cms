@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils import get_cms_setting
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned, ImproperlyConfigured
 from django.db.models.query_utils import Q
@@ -19,7 +20,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
             keys.append("%s %s" % (template, placeholder))
         keys.append(placeholder)
         for key in keys:
-            conf = settings.CMS_PLACEHOLDER_CONF.get(key)
+            conf = get_cms_setting('PLACEHOLDER_CONF').get(key)
             if not conf:
                 continue
             value = conf.get(setting)
