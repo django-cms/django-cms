@@ -107,6 +107,17 @@ class GetChilderns(InclusionTag):
 
 register.tag(GetChilderns)
 
+class PageParentList(BuilderListView):
+    model = Page
+    paginate_by = getattr(settings, 'PAGINATION_DEFAULT_PAGINATION', 12)
+    template_name = 'cms/snippet/list.html'
+
+    def get_queryset(self):
+        return Page.objects.filter(parent__parent=self.kwargs['parent_page'], published=True).order_by('-creation_date')[
+               :self.kwargs['limit']] # .with_user(context['user']).filter(can_read_permissions=True)
+
+
+
 class GetSubChilderns(InclusionTag):
     name = 'get_subchildrens'
     template = 'cms/snippet/list.html'
@@ -140,9 +151,18 @@ class GetSubChilderns(InclusionTag):
         else:
             context['as_empty'] = False
 
-        # ToDo
-        # Fix problems with permission
-        context[varname] = Page.objects.filter(parent__parent=page, published=True).order_by('-creation_date')[:limit] # .with_user(context['user']).filter(can_read_permissions=True)
+        pl = PageParentList(**{'request': context['request']})
+        pl.template_name = self.template
+        pl.kwargs = context['request'].GET.copy()
+        pl.kwargs['limit'] = limit
+        pl.kwargs['parent_page'] = page
+        objects = pl.get(request=context['request']).context_data
+        context[varname] = objects['object_list']
+        context['object_list'] = objects['object_list']
+        context['paginator'] = objects['paginator']
+        context['page_obj'] = objects['page_obj']
+        context['is_paginated'] = objects['is_paginated']
+
         return context
 
 register.tag(GetSubChilderns)
