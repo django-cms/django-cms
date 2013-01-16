@@ -186,8 +186,7 @@ def get_languages():
     })
     if VERIFIED in languages:
         return languages
-    _ensure_languages_settings(languages)
-    return languages
+    return _ensure_languages_settings(languages)
 
 COMPLEX = {
     'CACHE_DURATIONS': get_cache_durations,
