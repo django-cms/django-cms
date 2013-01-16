@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from cms import constants
-from cms.utils.conf import get_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_default_language, get_language_list
 from distutils.version import LooseVersion
 from django.conf import settings
@@ -22,8 +22,8 @@ def get_template_from_request(request, obj=None, no_current_page=False):
     template.
     """
     template = None
-    if len(get_setting('TEMPLATES')) == 1:
-        return get_setting('TEMPLATES')[0][0]
+    if len(get_cms_setting('TEMPLATES')) == 1:
+        return get_cms_setting('TEMPLATES')[0][0]
     if "template" in request.REQUEST:
         template = request.REQUEST['template']
     if not template and obj is not None:
@@ -32,13 +32,13 @@ def get_template_from_request(request, obj=None, no_current_page=False):
         current_page = request.current_page
         if hasattr(current_page, "get_template"):
             template = current_page.get_template()
-    if template is not None and template in dict(get_setting('TEMPLATES')).keys():
+    if template is not None and template in dict(get_cms_setting('TEMPLATES')).keys():
         if template == constants.TEMPLATE_INHERITANCE_MAGIC and obj:
             # Happens on admin's request when changing the template for a page
             # to "inherit".
             return obj.get_template()
         return template    
-    return get_setting('TEMPLATES')[0][0]
+    return get_cms_setting('TEMPLATES')[0][0]
 
 
 def get_language_from_request(request, current_page=None):

@@ -11,7 +11,7 @@ import os
 import warnings
 
 
-__all__ = ['get_setting']
+__all__ = ['get_cms_setting']
 
 
 class VERIFIED: pass # need a unique identifier for CMS_LANGUAGES
@@ -55,17 +55,17 @@ DEFAULTS = {
 def get_cache_durations():
     return {
         'menus': getattr(settings, 'MENU_CACHE_DURATION', 60 * 60),
-        'content': get_setting('CONTENT_CACHE_DURATION'),
+        'content': get_cms_setting('CONTENT_CACHE_DURATION'),
         'permissions': 60 * 60,
     }
 
 @default('CMS_MEDIA_ROOT')
 def get_media_root():
-    return os.path.join(settings.MEDIA_ROOT, get_setting('MEDIA_PATH'))
+    return os.path.join(settings.MEDIA_ROOT, get_cms_setting('MEDIA_PATH'))
 
 @default('CMS_MEDIA_ROOT')
 def get_media_url():
-    return urlparse.urljoin(settings.MEDIA_URL, get_setting('MEDIA_PATH'))
+    return urlparse.urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
 
 @default('PLACEHOLDER_FRONTEND_EDITING')
 def get_placeholder_frontend_editing():
@@ -73,7 +73,7 @@ def get_placeholder_frontend_editing():
 
 def get_templates():
     templates = list(getattr(settings, 'CMS_TEMPLATES', []))
-    if get_setting('TEMPLATE_INHERITANCE'):
+    if get_cms_setting('TEMPLATE_INHERITANCE'):
         templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
 
@@ -198,7 +198,7 @@ COMPLEX = {
     'LANGUAGES': get_languages,
 }
 
-def get_setting(name):
+def get_cms_setting(name):
     if name in COMPLEX:
         return COMPLEX[name]()
     else:

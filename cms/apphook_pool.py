@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import AppAlreadyRegistered
-from cms.utils.conf import get_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -16,7 +16,7 @@ class ApphookPool(object):
         if self.discovered:
             return
         #import all the modules
-        apphooks = get_setting('APPHOOKS')
+        apphooks = get_cms_setting('APPHOOKS')
         if apphooks:
             self.block_register = True
             for cls in iterload_objects(apphooks):

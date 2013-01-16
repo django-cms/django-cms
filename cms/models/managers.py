@@ -3,7 +3,7 @@ from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet
 from cms.publisher import PublisherManager
-from cms.utils import get_setting
+from cms.utils import get_cms_setting
 from cms.utils.i18n import get_fallback_languages
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -451,7 +451,7 @@ class PagePermissionsPermissionManager(models.Manager):
         if attr != "can_view":
             if not user.is_authenticated() or not user.is_staff:
                 return []
-        if user.is_superuser or not get_setting('PERMISSION'):
+        if user.is_superuser or not get_cms_setting('PERMISSION'):
             # got superuser, or permissions aren't enabled? just return grant
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL

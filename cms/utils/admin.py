@@ -7,7 +7,7 @@ from django.utils import simplejson
 from django.contrib.sites.models import Site
 
 from cms.models import Page
-from cms.utils import permissions, moderator, get_language_from_request, get_language_list, get_setting
+from cms.utils import permissions, moderator, get_language_from_request, get_language_list, get_cms_setting
 from cms.utils.permissions import has_global_page_permission
 
 NOT_FOUND_RESPONSE = "NotFound"
@@ -38,7 +38,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     lang = get_language_from_request(request)
     #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
-    if get_setting('PERMISSION'):
+    if get_cms_setting('PERMISSION'):
         # jstree metadata generator 
         md = []
         
@@ -53,7 +53,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         
     has_add_on_same_level_permission = False
     opts = Page._meta
-    if get_setting('PERMISSION'):
+    if get_cms_setting('PERMISSION'):
         perms = has_global_page_permission(request, page.site_id, can_add=True)
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
@@ -82,8 +82,8 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_page_permission,
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
-        'CMS_PERMISSION': get_setting('PERMISSION'),
-        'CMS_SHOW_END_DATE': get_setting('SHOW_END_DATE'),
+        'CMS_PERMISSION': get_cms_setting('PERMISSION'),
+        'CMS_SHOW_END_DATE': get_cms_setting('SHOW_END_DATE'),
     }
     return context
 

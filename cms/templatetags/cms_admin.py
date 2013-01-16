@@ -3,7 +3,7 @@ from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.models import MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
-from cms.utils import get_setting
+from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.i18n import get_language_object
 from cms.utils.permissions import get_any_page_view_permissions
@@ -122,7 +122,7 @@ def boolean_icon(value):
 
 @register.filter
 def is_restricted(page, request):
-    if get_setting('PERMISSION'):
+    if get_cms_setting('PERMISSION'):
         all_perms = list(get_any_page_view_permissions(request, page))
         icon = boolean_icon(bool(all_perms))
         return mark_safe(

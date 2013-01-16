@@ -2,7 +2,7 @@
 from __future__ import with_statement
 from contextlib import contextmanager
 from cms import constants
-from cms.utils import get_setting
+from cms.utils import get_cms_setting
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
@@ -163,7 +163,7 @@ def check_sekizai(output):
         else:
             section.error("Sekizai template context processor is not install, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
 
-        for template, _ in get_setting('TEMPLATES'):
+        for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
                 continue
             if validate_template(template, ['js', 'css']):

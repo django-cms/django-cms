@@ -2,7 +2,7 @@
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_setting
+from cms.utils import get_cms_setting
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.sites.models import Site
@@ -94,7 +94,7 @@ def has_page_change_permission(request):
     return request.user.is_superuser or (
         request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
         and (
-            not get_setting('PERMISSION') or
+            not get_cms_setting('PERMISSION') or
             has_global_page_permission(request, current_site(request),
                                        can_change=True) or
             has_any_page_change_permissions(request)))

@@ -11,7 +11,7 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride,
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils import get_setting
+from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
@@ -269,7 +269,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_language_chooser(self):
         # test simple language chooser with default args
-        lang_settings = copy.deepcopy(get_setting('LANGUAGES'))
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['public'] = False
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(path=self.get_page(3).get_absolute_url())

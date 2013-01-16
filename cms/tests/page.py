@@ -25,7 +25,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
-from cms.utils import timezone, get_setting
+from cms.utils import timezone, get_cms_setting
 from cms.utils.page import is_valid_page_slug
 
 class PagesTestCase(CMSTestCase):
@@ -430,7 +430,7 @@ class PagesTestCase(CMSTestCase):
         page_data['site'] = site.pk
         page_data['title'] = 'changed title'
         self.assertEqual(site.pk, 2)
-        TESTLANG = get_setting('LANGUAGES')[site.pk][0]['code']
+        TESTLANG = get_cms_setting('LANGUAGES')[site.pk][0]['code']
         page_data['language'] = TESTLANG
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -466,8 +466,8 @@ class PagesTestCase(CMSTestCase):
         parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
         parent.save()
         self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
-        self.assertEqual(parent.get_template(), get_setting('TEMPLATES')[0][0])
-        self.assertEqual(parent.get_template_name(), get_setting('TEMPLATES')[0][1])
+        self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
+        self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
 
     def test_delete_with_plugins(self):
         """

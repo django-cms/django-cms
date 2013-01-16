@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.utils.conf import get_setting
+from cms.utils.conf import get_cms_setting
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
@@ -160,7 +160,7 @@ def post_save_user_group(instance, raw, created, **kwargs):
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
     
-if get_setting('PERMISSION'):
+if get_cms_setting('PERMISSION'):
     # only if permissions are in use
     from django.contrib.auth.models import User, Group
     # register signals to user related models
@@ -247,7 +247,7 @@ def pre_delete_globalpagepermission(instance, **kwargs):
 def pre_save_delete_page(instance, **kwargs):
     clear_permission_cache()
 
-if get_setting('PERMISSION'):
+if get_cms_setting('PERMISSION'):
     signals.pre_save.connect(pre_save_user, sender=User)
     signals.pre_delete.connect(pre_delete_user, sender=User)
 

@@ -290,7 +290,7 @@ If you have code that needs to access django CMS settings (settings prefixed
 with ``CMS_`` or ``PLACEHOLDER_``) you would have used for example
 ``from django.conf import settings; settings.CMS_TEMPLATES``. This will no
 longer guarantee to return sane values, instead you should use
-``django.utils.conf.get_setting`` which takes the name of the setting
+``django.utils.conf.get_cms_setting`` which takes the name of the setting
 **without** the ``CMS_`` prefix as argument and returns the setting.
 
 Example of old, now deprecated style::
@@ -302,10 +302,10 @@ Example of old, now deprecated style::
 
 Should be replaced with the new API::
 
-    from cms.utils.conf import get_setting
+    from cms.utils.conf import get_cms_setting
 
-    get_setting('TEMPLATES')
-    get_setting('PLACEHOLDER_FRONTEND_EDITING')
+    get_cms_setting('TEMPLATES')
+    get_cms_setting('PLACEHOLDER_FRONTEND_EDITING')
 
 
 ******************************
