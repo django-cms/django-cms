@@ -443,8 +443,8 @@ class PageAdmin(ModelAdmin):
 
         return form
 
-    def get_inline_instances(self, request):
-        inlines = super(PageAdmin, self).get_inline_instances(request)
+    def get_inline_instances(self, request, obj=None):
+        inlines = super(PageAdmin, self).get_inline_instances(request, obj)
         if settings.CMS_PERMISSION and hasattr(self, '_current_page')\
                 and self._current_page:
             filtered_inlines = []
