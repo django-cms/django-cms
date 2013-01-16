@@ -12,7 +12,7 @@ from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 import copy
-from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
+from cms.templatetags.cms_admin import admin_static_url
 
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then

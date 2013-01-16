@@ -3,6 +3,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor,
     mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
+from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import get_placeholder_conf
 from django.conf import settings
@@ -35,7 +36,7 @@ class PluginContext(Context):
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
             self.update(processor(instance, placeholder))
-        for processor in iterload_objects(settings.CMS_PLUGIN_CONTEXT_PROCESSORS):
+        for processor in iterload_objects(get_cms_setting('PLUGIN_CONTEXT_PROCESSORS')):
             self.update(processor(instance, placeholder))
         for processor in processors:
             self.update(processor(instance, placeholder))
@@ -54,7 +55,7 @@ def render_plugin(context, instance, placeholder, template, processors=None,
         content = template.render(context)
     else:
         content = ''
-    for processor in iterload_objects(settings.CMS_PLUGIN_PROCESSORS):
+    for processor in iterload_objects(get_cms_setting('PLUGIN_PROCESSORS')):
         content = processor(instance, placeholder, content, context)
     for processor in processors:
         content = processor(instance, placeholder, content, context)

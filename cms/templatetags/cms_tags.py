@@ -6,7 +6,7 @@ from classytags.parser import Parser
 from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, get_cms_setting
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from django import template
@@ -119,7 +119,7 @@ class PageUrl(InclusionTag):
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, settings.CMS_CACHE_DURATIONS['content'])
+                cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
             return {'content': url}
         return {'content': ''}
@@ -408,7 +408,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
             return {'content': ''}
         content = render_placeholder(placeholder, context, placeholder_name)
     if cache_result:
-        cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
+        cache.set(cache_key, content, get_cms_setting('CACHE_DURATIONS')['content'])
 
     if content:
         return {'content': mark_safe(content)}

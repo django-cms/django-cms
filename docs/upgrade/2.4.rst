@@ -58,9 +58,29 @@ For the two-step upgrade process do the following in your project main directory
     pip install django-cms==2.4
     python manage.py migrate
 
+Added delete orphaned plugins command
+=====================================
+
+Added a management command for deleting orphaned plugins from the database.
+
+The command can be run with:
+
+	manage.py cms delete_orphaned_plugins
+
+Please read :ref:`cms-delete-orphaned-plugins-command` before using.
 
 .. _cms-moderator-upgrade:
 
+Addded a check command
+======================
+
+Added a management command to check your configuration and environment.
+
+To use th command, simply run:
+
+    manage.py cms check
+
+This replaces the old at-runtime checks.
 
 CMS_MODERATOR
 =============
@@ -71,7 +91,12 @@ can publish changes to the public site.
 .. admonition:: Management command required
 
     To bring a previous version of your site's database up-to-date, you'll need
-    to run ``manage.py cms moderator on``.
+    to run ``manage.py cms moderator on``. **Never run this command without
+    first checking for orphaned plugins**, using the ``cms list plugins``
+    command, and if necessary ``delete_orphaned_plugins``. Running ``cms
+    moderator`` with orphaned plugins will fail and leave bad data in your
+    database. See :ref:`cms-list-command` and
+    :ref:`cms-delete-orphaned-plugins-command`.
 
 
 Added Fix MPTTT Management command
@@ -256,6 +281,31 @@ Here is an example of how the MultiColumn plugin uses it::
 	</div>
 
 As you can see the children are accessible via the plugins childrens attribute.
+
+
+New way to handle django CMS settings
+=====================================
+
+If you have code that needs to access django CMS settings (settings prefixed
+with ``CMS_`` or ``PLACEHOLDER_``) you would have used for example
+``from django.conf import settings; settings.CMS_TEMPLATES``. This will no
+longer guarantee to return sane values, instead you should use
+``django.utils.conf.get_cms_setting`` which takes the name of the setting
+**without** the ``CMS_`` prefix as argument and returns the setting.
+
+Example of old, now deprecated style::
+
+    from django.conf import settings
+
+    settings.CMS_TEMPLATES
+    settings.PLACEHOLDER_FRONTEND_EDITING
+
+Should be replaced with the new API::
+
+    from cms.utils.conf import get_cms_setting
+
+    get_cms_setting('TEMPLATES')
+    get_cms_setting('PLACEHOLDER_FRONTEND_EDITING')
 
 
 ******************************

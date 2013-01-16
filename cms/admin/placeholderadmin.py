@@ -4,7 +4,7 @@ from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request, cms_static_url
+from cms.utils import get_language_from_request, cms_static_url, get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from copy import deepcopy
 from django.conf import settings
@@ -151,7 +151,7 @@ class PlaceholderAdmin(ModelAdmin):
             return HttpResponseForbidden(_("You don't have permission to add content here."))
         
         # check the limits defined in CMS_PLACEHOLDER_CONF for this placeholder
-        limits = settings.CMS_PLACEHOLDER_CONF.get(placeholder.slot, {}).get('limits', None)
+        limits = get_cms_setting('PLACEHOLDER_CONF').get(placeholder.slot, {}).get('limits', None)
         if limits:
             count = placeholder.cmsplugin_set.count()
             global_limit = limits.get("global", None)
@@ -206,7 +206,7 @@ class PlaceholderAdmin(ModelAdmin):
         if request.POST.get("_cancel", False):
             # cancel button was clicked
             context = {
-                'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
                 'plugin': cms_plugin,
                 'is_popup': True,
                 'name': unicode(cms_plugin),
@@ -241,7 +241,7 @@ class PlaceholderAdmin(ModelAdmin):
             saved_object = plugin_admin.saved_object
             
             context = {
-                'CMS_MEDIA_URL': settings.CMS_MEDIA_URL, 
+                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
                 'plugin': saved_object, 
                 'is_popup': True, 
                 'name': unicode(saved_object), 

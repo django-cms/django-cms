@@ -10,6 +10,7 @@ from cms.models.moderatormodels import PageModeratorState
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugins.text.models import Text
 from cms.test_utils import testcases as base
@@ -17,6 +18,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE,
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
+from cms.utils import get_cms_setting
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import site
@@ -287,7 +289,7 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
             self.assertEqual(response.status_code, 400)
-            response = self.client.post(url, {'template': settings.CMS_TEMPLATES[0][0]})
+            response = self.client.post(url, {'template': get_cms_setting('TEMPLATES')[0][0]})
             self.assertEqual(response.status_code, 200)
 
     def test_get_permissions(self):
@@ -963,6 +965,22 @@ class PluginPermissionTests(AdminTestsBase):
             any(type(inline) is PagePermissionInlineAdmin
                 for inline in page_admin.get_inline_instances(request)))
 
+    def test_plugin_add_returns_valid_pk_for_plugin(self):
+        admin = self._get_admin()
+        self._give_cms_permissions(admin)
+        self._give_permission(admin, Text, 'add')
+        self.client.login(username='admin', password='admin')
+        url = reverse('admin:cms_page_add_plugin')
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': self._placeholder.pk,
+            'language': 'en',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response['content-type'], 'text/plain')
+        self.assertTrue(CMSPlugin.objects.filter(pk=int(response.content)).exists())
+
 
 class AdminFormsTests(AdminTestsBase):
     def test_clean_overwrite_url(self):
@@ -976,8 +994,8 @@ class AdminFormsTests(AdminTestsBase):
                 'slug': 'test-page',
                 'language': 'en',
                 'overwrite_url': '/overwrite/url/',
-                'site': Site.objects.get_current().pk,
-                'template': settings.CMS_TEMPLATES[0][0],
+                'site': Site.objects.get_current().pk,  
+                'template': get_cms_setting('TEMPLATES')[0][0],
                 'published': True
             }
 
@@ -1002,7 +1020,7 @@ class AdminFormsTests(AdminTestsBase):
             'slug': 'slug',
             'language': 'en',
             'site': site1.pk,
-            'template': settings.CMS_TEMPLATES[0][0],
+            'template': get_cms_setting('TEMPLATES')[0][0],
             'reverse_id': '',
             'parent': parent_page.pk,
         }
@@ -1024,7 +1042,7 @@ class AdminFormsTests(AdminTestsBase):
             'slug': 'page-2',
             'language': 'en',
             'site': site.pk,
-            'template': settings.CMS_TEMPLATES[0][0],
+            'template': get_cms_setting('TEMPLATES')[0][0],
             'reverse_id': dupe_id,
         }
         form = PageForm(data=page2_data, files=None)
