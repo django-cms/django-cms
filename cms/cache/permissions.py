@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils import get_cms_setting
 from django.conf import settings
 from django.core.cache import cache
 
@@ -13,7 +14,7 @@ PERMISSION_KEYS = [
 
 def get_cache_key(user, key):
     return "%s:permission:%s:%s" % (
-        settings.CMS_CACHE_PREFIX, user.username, key)
+        get_cms_setting('CACHE_PREFIX'), user.username, key)
 
 
 def get_permission_cache(user, key):
@@ -30,7 +31,7 @@ def set_permission_cache(user, key, value):
     """
     # store this key, so we can clean it when required
     cache_key = get_cache_key(user, key)
-    cache.set(cache_key, value, settings.CMS_CACHE_DURATIONS['permissions'])
+    cache.set(cache_key, value, get_cms_setting('CACHE_DURATIONS')['permissions'])
 
 
 def clear_user_permission_cache(user):

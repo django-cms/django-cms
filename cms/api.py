@@ -7,6 +7,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
 from cms.utils.i18n import get_language_list
 
@@ -124,7 +125,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
     
     # validate template
-    assert template in [tpl[0] for tpl in settings.CMS_TEMPLATES]
+    assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
 
     # validate site
     if not site:
@@ -133,7 +134,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         assert isinstance(site, Site)
 
     # validate language:
-    assert language in get_language_list(site), settings.CMS_LANGUAGES.get(site.pk)
+    assert language in get_language_list(site), get_cms_setting('LANGUAGES').get(site.pk)
     
     # set default slug:
     if not slug:
@@ -158,7 +159,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         assert isinstance(publication_end_date, datetime.date)
         
     # validate softroot
-    assert settings.CMS_SOFTROOT or not soft_root
+    assert get_cms_setting('SOFTROOT') or not soft_root
     
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)

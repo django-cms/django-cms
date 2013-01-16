@@ -29,6 +29,14 @@ It has two subcommands:
 ``cms delete_orphaned_plugins`` below).
 
 
+.. _cms-check-command:
+
+``cms check``
+=============
+
+Checks your configuration and environment.
+
+
 **************************************
 Plugin and apphook management commands
 **************************************

@@ -234,8 +234,6 @@ def configure(db_url, **extra):
         settings._wrapped = empty
     defaults.update(extra)
     settings.configure(**defaults)
-    from cms.conf import patch_settings
-    patch_settings()
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
     from django.contrib import admin
