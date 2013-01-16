@@ -687,6 +687,18 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         subpage = self.get_page(8)
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
+        tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].id, subpage.pk)
+
+    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
+    def test_show_submenu_num_queries(self):
+        page = self.get_page(6)
+        subpage = self.get_page(8)
+        context = self.get_context(page.get_absolute_url())
+        # test standard show_menu
         with self.assertNumQueries(5):
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
@@ -694,19 +706,42 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
             self.assertEqual(len(nodes), 1)
             self.assertEqual(nodes[0].id, subpage.pk)
 
-
 class ShowMenuBelowIdTests(BaseMenuTest):
+    """
+    Test for issue 521
+
+    Build the following tree:
+
+        A
+        |-B
+          |-C
+          \-D (not in nav)
+    """
+
     def test_not_in_navigation(self):
-        """
-        Test for issue 521
-        
-        Build the following tree:
-        
-            A
-            |-B
-              |-C
-              \-D (not in nav)
-        """
+        a = create_page('A', 'nav_playground.html', 'en', published=True,
+            in_navigation=True, reverse_id='a')
+        b = create_page('B', 'nav_playground.html', 'en', parent=a,
+            published=True, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', parent=b,
+            published=True, in_navigation=True)
+        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
+            published=True, in_navigation=False)
+        context = self.get_context(a.get_absolute_url())
+
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1, nodes)
+        node = nodes[0]
+        self.assertEqual(node.id, b.publisher_public.id)
+        children = node.children
+        self.assertEqual(len(children), 1, repr(children))
+        child = children[0]
+        self.assertEqual(child.id, c.publisher_public.id)
+
+    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
+    def test_not_in_navigation_num_queries(self):
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
         b = create_page('B', 'nav_playground.html', 'en', parent=a,
