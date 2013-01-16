@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from collections import namedtuple
 from contextlib import contextmanager
+from cms import constants
+from cms.utils import get_setting
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
+from sekizai.helpers import validate_template
 
 SUCCESS = 1
 WARNING = 2
@@ -49,7 +52,7 @@ class FileOutputWrapper(object):
         self.errors += 1
         self.write_stderr_line(u'%s %s' % (message, self.colorize('[ERROR]', fg='red', opts=['bold'])))
 
-    def warning(self, message):
+    def warn(self, message):
         self.warnings += 1
         self.write_stderr_line(u'%s %s' % (message, self.colorize('[WARNING]', fg='yellow', opts=['bold'])))
 
@@ -87,6 +90,9 @@ class FileSectionWrapper(FileOutputWrapper):
     def write_line(self, message=''):
         self.write(u'  - %s\n' % message)
 
+    def write_stderr_line(self, message=''):
+        self.stderr.write(u'  - %s\n' % message)
+
     def finish_success(self, message):
         self.wrapper.write_line()
         self.wrapper.success(message)
@@ -120,7 +126,38 @@ def check_sekizai(output):
             section.success("Sekizai template context processor is installed")
         else:
             section.error("Sekizai template context processor is not install, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+
+        for template, _ in get_setting('TEMPLATES'):
+            if template == constants.TEMPLATE_INHERITANCE_MAGIC:
+                continue
+            if validate_template(template, ['js', 'css']):
+                section.success("Sekizai namespaces 'js' and 'css' found in %r" % template)
+            else:
+                section.error("Sekizai namespaces 'js' and 'css' not found in %r" % template)
         section.finish_success("Sekizai configuration okay")
+
+@define_check
+def check_i18n(output):
+    with output.section("Internationalization") as section:
+        if isinstance(getattr(settings, 'CMS_LANGUAGES', {}), dict):
+            section.success("New style CMS_LANGUAGES")
+        else:
+            section.warn("Old style (tuple based) CMS_LANGUAGES, please switch to the new (dictionary based) style")
+        for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
+            if hasattr(settings, deprecated):
+                section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
+
+@define_check
+def check_deprecated_settings(output):
+    with output.section("Deprecated settings") as section:
+        found = False
+        for deprecated in ['CMS_FLAT_URLS', 'CMS_MODERATOR']:
+            if hasattr(settings, deprecated):
+                section.warn("Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated)
+                found = True
+        if not found:
+            section.skip("No deprecated settings found")
+
 
 def check(output):
     title = "Checking django CMS installation"
