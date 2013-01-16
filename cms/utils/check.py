@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from collections import namedtuple
+from __future__ import with_statement
 from contextlib import contextmanager
 from cms import constants
 from cms.utils import get_setting
@@ -14,10 +14,6 @@ ERROR = 3
 SKIPPED = 4
 
 CHECKERS = []
-
-CheckSection = namedtuple('CheckSection', 'title result subchecks')
-CheckResult = namedtuple('CheckResult', 'name result info')
-
 
 class FileOutputWrapper(object):
     """
