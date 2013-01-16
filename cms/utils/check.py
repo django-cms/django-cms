@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from collections import namedtuple, defaultdict
+from collections import namedtuple
 from contextlib import contextmanager
 from django.conf import settings
 from django.utils.decorators import method_decorator
@@ -62,11 +62,16 @@ class FileOutputWrapper(object):
         self.write_line(self.colorize(title, opts=['bold']))
         self.write_line(self.colorize('=' * len(title), opts=['bold']))
         self.write_line()
+        wrapper = self.section_wrapper(self)
         try:
-            yield self.section_wrapper(self)
+            yield wrapper
         except:
             self.error('Checker failed, see traceback')
             raise
+        self.errors += wrapper.errors
+        self.successes += wrapper.successes
+        self.warnings += wrapper.warnings
+        self.skips += wrapper.skips
         self.write_line('')
 
     @property
@@ -111,6 +116,10 @@ def check_sekizai(output):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
+        if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
+            section.success("Sekizai template context processor is installed")
+        else:
+            section.error("Sekizai template context processor is not install, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
         section.finish_success("Sekizai configuration okay")
 
 def check(output):
@@ -138,4 +147,4 @@ def check(output):
             output.write_stderr_line(output.colorize('Installation okay, but please check warnings above', opts=['bold'], fg='yellow'))
         else:
             output.write_line(output.colorize('Installation okay', opts=['bold'], fg='green'))
-    return not output.errors
+    return output.successful
