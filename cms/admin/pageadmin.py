@@ -1170,7 +1170,7 @@ class PageAdmin(ModelAdmin):
             reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
                 'plugin_name': plugin_name, 'placeholder': placeholder}
 
-        return HttpResponse(str(plugin.pk))
+        return HttpResponse(str(plugin.pk), content_type='text/plain')
 
     @require_POST
     @create_on_success
