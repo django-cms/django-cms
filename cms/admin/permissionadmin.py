@@ -3,6 +3,7 @@ from cms.admin.forms import (GlobalPagePermissionAdminForm,
     PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm)
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
+from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_permission_level
 from copy import deepcopy
 from distutils.version import LooseVersion
@@ -180,7 +181,7 @@ class GenericCmsPermissionAdmin(object):
             super(self.__class__, self).has_change_permission(request, obj)
 
 
-if settings.CMS_PERMISSION:
+if get_cms_setting('PERMISSION'):
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
     PAGE_ADMIN_INLINES.extend([
         ViewRestrictionInlineAdmin,

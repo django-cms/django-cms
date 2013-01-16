@@ -18,6 +18,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE,
     URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
+from cms.utils import get_cms_setting
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import site
@@ -288,7 +289,7 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
             self.assertEqual(response.status_code, 400)
-            response = self.client.post(url, {'template': settings.CMS_TEMPLATES[0][0]})
+            response = self.client.post(url, {'template': get_cms_setting('TEMPLATES')[0][0]})
             self.assertEqual(response.status_code, 200)
 
     def test_get_permissions(self):
@@ -993,8 +994,8 @@ class AdminFormsTests(AdminTestsBase):
                 'slug': 'test-page',
                 'language': 'en',
                 'overwrite_url': '/overwrite/url/',
-                'site': Site.objects.get_current().pk,
-                'template': settings.CMS_TEMPLATES[0][0],
+                'site': Site.objects.get_current().pk,  
+                'template': get_cms_setting('TEMPLATES')[0][0],
                 'published': True
             }
 
@@ -1019,7 +1020,7 @@ class AdminFormsTests(AdminTestsBase):
             'slug': 'slug',
             'language': 'en',
             'site': site1.pk,
-            'template': settings.CMS_TEMPLATES[0][0],
+            'template': get_cms_setting('TEMPLATES')[0][0],
             'reverse_id': '',
             'parent': parent_page.pk,
         }
@@ -1041,7 +1042,7 @@ class AdminFormsTests(AdminTestsBase):
             'slug': 'page-2',
             'language': 'en',
             'site': site.pk,
-            'template': settings.CMS_TEMPLATES[0][0],
+            'template': get_cms_setting('TEMPLATES')[0][0],
             'reverse_id': dupe_id,
         }
         form = PageForm(data=page2_data, files=None)

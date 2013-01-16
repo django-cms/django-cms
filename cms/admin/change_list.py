@@ -3,6 +3,7 @@ import bisect
 from collections import defaultdict
 from cms.exceptions import NoHomeFound
 from cms.models import Title, Page, PageModeratorState
+from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset
 from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
@@ -145,7 +146,7 @@ class CMSChangeList(ChangeList):
             # using the ids dictionary means this check is constant time
             page.root_node = page.parent_id not in ids
 
-            if settings.CMS_PERMISSION:
+            if get_cms_setting('PERMISSION'):
                 # caching the permissions
                 page.permission_edit_cache = perm_edit_ids == Page.permissions.GRANT_ALL or page.pk in perm_edit_ids
                 page.permission_publish_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids
@@ -204,7 +205,7 @@ class CMSChangeList(ChangeList):
         """Sets sites property to current instance - used in tree view for
         sites combo.
         """
-        if settings.CMS_PERMISSION:
+        if get_cms_setting('PERMISSION'):
             self.sites = get_user_sites_queryset(request.user)   
         else:
             self.sites = Site.objects.all()
