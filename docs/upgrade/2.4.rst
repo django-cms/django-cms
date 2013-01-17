@@ -308,6 +308,15 @@ Should be replaced with the new API::
     get_cms_setting('PLACEHOLDER_FRONTEND_EDITING')
 
 
+Added ``cms.constants`` module
+==============================
+
+This release adds the ``cms.constants`` module which will hold generic django
+CMS constant values. Currently it only contains ``TEMPLATE_INHERITANCE_MAGIC``
+which used to live in ``cms.conf.global_settings`` but was moved to the new
+``cms.constants`` module in the settings overhaul mentioned above.
+
+
 ******************************
 Backwards incompatible changes
 ******************************

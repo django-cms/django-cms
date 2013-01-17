@@ -171,6 +171,19 @@ add a text plugin with the content ``'hello world'``. This is done in English::
     add_plugin(placeholder, 'TextPlugin', 'en', body='hello world')
 
 
+*************
+cms.constants
+*************
+
+.. module:: cms.constants
+
+.. data:: TEMPLATE_INHERITANCE_MAGIC
+
+    The token used to identify when a user selects "inherit" as template for a
+    page.
+
+
+
 ***************
 cms.plugin_base
 ***************
