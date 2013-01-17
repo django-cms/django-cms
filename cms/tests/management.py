@@ -179,7 +179,7 @@ class ManagementTestCase(CMSTestCase):
                 1)
                 
 
-            management.call_command('cms', 'delete_orphaned_plugins')
+            management.call_command('cms', 'delete_orphaned_plugins', stdout=StringIO())
             report = plugin_report()
 
             # there should be reports for two plugin types (one should have been deleted)
