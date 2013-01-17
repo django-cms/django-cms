@@ -395,6 +395,9 @@ therefore those should be used to include the respective files. For more
 information about django-sekizai, please refer to the
 `django-sekizai documentation`_.
 
+Note that sekizai *can't* help you with the *admin-side* plugin templates -
+what follows is for your plugins' *output* templates.
+
 Sekizai style
 -------------
 
