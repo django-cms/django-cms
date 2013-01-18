@@ -118,7 +118,7 @@ class PageAddForm(forms.ModelForm):
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
             title = page.get_title_obj(lang)
-            if title and slug:
+            if title and slug and lang and lang in page.title_cache:
                 oldslug = title.slug
                 title.slug = slug
                 title.save()
