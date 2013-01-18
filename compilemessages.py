@@ -14,7 +14,7 @@ def main():
             )
             from django.core.management import call_command
             os.chdir('cms')
-            call_command('makemessages', all=True)
+            call_command('compilemessages', all=True)
 
 if __name__ == '__main__':
     main()
