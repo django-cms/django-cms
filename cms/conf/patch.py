@@ -58,7 +58,7 @@ def post_patch_check():
             )
     VALID_LANG_PROPS = ['code', 'name', 'fallbacks', 'hide_untranslated', 'redirect_on_fallback', 'public']
 
-    if isinstance(settings.CMS_LANGUAGES, tuple):
+    if isinstance(settings.CMS_LANGUAGES, tuple) or isinstance(settings.CMS_LANGUAGES, list):
         new_languages = {}
         lang_template = {'code': '', 'name': '', 'fallbacks': [], 'public': True, 'redirect_on_fallback': True,
                          'hide_untranslated': getattr(settings, 'CMS_HIDE_UNTRANSLATED', False)}
@@ -89,11 +89,11 @@ def post_patch_check():
         for site in settings.CMS_LANGUAGES:
             try:
                 int(site)
-            except ValueError:
+            except (TypeError, ValueError):
                 if not site == "default":
                     raise ImproperlyConfigured(
                         "CMS_LANGUAGES can only be filled with integers (site ids) and 'default'"
-                        " for default values. %s is not a valid key." % site)
+                        " for default values. %s is not a valid key." % str(site))
             for language in settings.CMS_LANGUAGES[site]:
                 if site == "default":
                     if language not in VALID_LANG_PROPS:
