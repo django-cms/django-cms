@@ -371,9 +371,11 @@ class CleanAdminListFilter(InclusionTag):
 
 def _restore_sekizai(context, changes):
     varname = get_varname()
+    sekizai_container = context[varname]
     for key, values in changes.items():
+        sekizai_namespace = sekizai_container[key]
         for value in values:
-            context[varname][key].append(value)
+            sekizai_namespace.append(value)
 
 
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
