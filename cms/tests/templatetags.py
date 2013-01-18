@@ -1,6 +1,6 @@
 from __future__ import with_statement
 import copy
-from django.test import RequestFactory
+from django.test import RequestFactory, TestCase
 import os
 from cms.api import create_page, create_title, add_plugin
 from cms.models.pagemodel import Page, Placeholder
@@ -17,7 +17,6 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.template import RequestContext, Context
-from unittest import TestCase
 from django.template.base import Template
 from django.utils.html import escape
 
