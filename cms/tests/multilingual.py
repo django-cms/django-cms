@@ -141,12 +141,9 @@ class MultilingualTestCase(CMSTestCase):
             
             # Ensure that the language version is not returned
             # since it does not exist
-            try:
-                title_obj = page.get_title_obj(language=TESTLANG2, fallback=False)
-                does_not_exist_raised = False
-            except Title.DoesNotExist:
-                does_not_exist_raised = True
-            self.assertTrue(does_not_exist_raised, "DoesNotExist should have been raised")
+            self.assertRaises(Title.DoesNotExist,
+                              page.get_title_obj,
+                              language=TESTLANG2, fallback=False)
             
             # Now create it
             response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2),
