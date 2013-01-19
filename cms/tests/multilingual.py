@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.middleware.multilingual import patch_response
 from cms.models import Title
