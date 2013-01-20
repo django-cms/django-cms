@@ -333,6 +333,30 @@ Type: Boolean
 Default:``True``
 
 
+.. setting:: CMS_UNIHANDECODE_URL
+
+CMS_UNIHANDECODE_URL
+====================
+
+default: ``None``
+
+To enable automatic slugs in the page add form in the admin for Japanese,
+Chinese, Korean or Vietnamese, or to improve the existing slug generation
+for other languages that use diacritics, you may set this setting to a URL
+where `unihandecode.js`_ is hosted.
+
+Due to conflicting licenses, unihandecode.js is not included in the django CMS
+and you must optain a copy of it yourself.
+
+If set to ``None``, the default, unihandecode.js is not used.
+
+.. note::
+
+    Unihandecode.js is a rather large library, especially when loading support
+    for Japanese. It is therefore very important that you serve it from a
+    server that supports gzip compression. Further, make sure that those files
+    can be cached by the browser for a very long period.
+
 **************
 Media Settings
 **************
@@ -569,3 +593,6 @@ Example::
 
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
     :ref:`cache key prefixing <django:cache_key_prefixing>`
+
+
+.. _unihandecode.js: https://github.com/ojii/unihandecode.js

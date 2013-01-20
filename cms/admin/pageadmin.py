@@ -464,8 +464,14 @@ class PageAdmin(ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         language = get_language_from_request(request)
+        if language[:2] in ['ja', 'zh', 'vn', 'kr']:
+            unihandecodelang = language[:2]
+        else:
+            unihandecodelang = 'diacritic'
         extra_context.update({
             'language': language,
+            'unihandecode_lang': unihandecodelang,
+            'unihandecode_url': get_cms_setting('UNIHANDECODE_URL')
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 

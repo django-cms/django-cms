@@ -49,7 +49,8 @@ DEFAULTS = {
     'TITLE_CHARACTER': '+',
     'CACHE_PREFIX': 'cms-',
     'PLUGIN_PROCESSORS': [],
-    'PLUGIN_CONTEXT_PROCESSORS': []
+    'PLUGIN_CONTEXT_PROCESSORS': [],
+    'UNIHANDECODE_URL': None,
 }
 
 def get_cache_durations():

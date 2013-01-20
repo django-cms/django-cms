@@ -14,6 +14,10 @@
 <script type="text/javascript" src="{% admin_static_url %}js/urlify.js"></script>
 
 {% if add %}
+{% if unihandecode_url %}
+<script type="text/javascript" src="{{ unihandecode_url }}unihandecode.core.min.js"></script>
+<script type="text/javascript" src="{{ unihandecode_url }}unihandecode.{{ unihandecode_lang }}.min.js"></script>
+{% endif %}
 <script type="text/javascript">
 //<![CDATA[	
 
@@ -21,7 +25,9 @@
 		jQuery("#id_title").keyup(function () {
 			var e = jQuery("#id_slug")[0];
 			if(!e._changed) {
-				e.value = URLify(this.value, 64);
+                var value = this.value;
+                {% if unihandecode_url %}value = Unihandecoder('{{ unihandecode_lang }}').decode(value);{% endif %}
+                e.value = URLify(value, 64);
 			}
 	    });
 	});
