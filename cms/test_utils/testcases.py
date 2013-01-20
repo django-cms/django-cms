@@ -102,7 +102,7 @@ class CMSTestCase(testcases.TestCase):
         staff.set_password("staff")
         staff.save()
         return staff
-
+    
     def get_new_page_data(self, parent_id=''):
         page_data = {
             'title': 'test page %d' % self.counter,
@@ -121,7 +121,36 @@ class CMSTestCase(testcases.TestCase):
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         self.counter = self.counter + 1
         return page_data
-
+    
+    def get_new_page_data_dbfields(self, parent=None, site=None,
+                                   language=None,
+                                   template='nav_playground.html',):
+        page_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': settings.LANGUAGES[0][0] if not language else language,
+            'template': template,
+            'parent': parent if parent else None,
+            'site': site if site else Site.objects.get_current(),
+        }
+        self.counter = self.counter + 1
+        return page_data
+    
+    def get_pagedata_from_dbfields(self, page_data):
+        """Converts data created by get_new_page_data_dbfields to data
+        created from get_new_page_data so you can switch between test cases
+        in api.create_page and client.post"""
+        page_data['site'] = page_data['site'].id
+        page_data['parent'] = page_data['parent'].id if page_data['parent'] else ''
+        # required only if user haves can_change_permission
+        page_data['pagepermission_set-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
+        return page_data
+    
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """

@@ -12,6 +12,7 @@ from django.test.client import Client
 from django.contrib.sites.models import Site
 from django.conf import settings
 import urllib
+from cms import api
 
 
 class MultilingualTestCase(CMSTestCase):
@@ -96,43 +97,55 @@ class MultilingualTestCase(CMSTestCase):
         """
 
         site = Site.objects.get_current()
-        # Change site for this session
-        page_data = self.get_new_page_data()
 
         # Create a new page, default language
-        page_data = self.get_new_page_data()
-        page_data['site'] = site.pk
-        page_data['title'] = 'changed title'
         TESTLANG = settings.CMS_SITE_LANGUAGES[site.pk][0]
-        page_data['language'] = TESTLANG
+        page_data = self.get_new_page_data_dbfields(
+            site=site, 
+            language=TESTLANG
+        )
 
+        page = api.create_page(**page_data)
+        title = page.get_title_obj()
+        
+        # A title is set?
+        self.assertNotEqual(title, None)
+        
+        # Publish and unpublish the page
+        page.published = True
+        page.save()
+        page.published = False
+        page.save()
+        
+        # Has correct title and slug after calling save()?
+        self.assertEqual(page.get_title(), page_data['title'])
+        self.assertEqual(page.get_slug(), page_data['slug'])
+        self.assertEqual(page.placeholders.all().count(), 2)
+        
+        # Were public instances created?
+        title = Title.objects.drafts().get(slug=page_data['slug'])
+    
+        # Test that it's the default language
+        self.assertEqual(title.language, TESTLANG,
+                         "not the same language as specified in settings.CMS_LANGUAGES")
+            
+        # Do stuff using admin pages
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
-            title = Title.objects.get(slug=page_data['slug'])
-            self.assertNotEqual(title, None)
-            page = title.page
-            page.published = True
-            page.save()
-            self.assertEqual(page.get_title(), page_data['title'])
-            self.assertEqual(page.get_slug(), page_data['slug'])
-            self.assertEqual(page.placeholders.all().count(), 2)
             
-            # were public instances created?
-            title = Title.objects.drafts().get(slug=page_data['slug'])
-        
-            # Test that it's the default language
-            self.assertEqual(title.language, TESTLANG,
-                             "not the same language as specified in settings.CMS_LANGUAGES")
+            page_data = self.get_pagedata_from_dbfields(page_data)
             
-            # Publish the old page version
+            # Publish page using the admin
             page_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
                                         page_data)
+            
             page = page.reload()
+            self.assertTrue(page.published)
             
             # Create a different language using the edit admin page
+            # This test case is bound in actual experience...
+            # pull#1604
             page_data2 = page_data.copy()
             page_data2['title'] = 'ein Titel'
             page_data2['slug'] = 'ein-slug'
