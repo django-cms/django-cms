@@ -61,7 +61,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.placeholders.all().count(), 2)
             
-            # were public instanes created?
+            # were public instances created?
             title = Title.objects.drafts().get(slug=page_data['slug'])
 
         
@@ -404,7 +404,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page =  Page.objects.get(title_set__slug=page_data['slug'])
+            page = Page.objects.get(title_set__slug=page_data['slug'])
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
         
