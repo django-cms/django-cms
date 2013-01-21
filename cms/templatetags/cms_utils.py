@@ -6,6 +6,7 @@ from django.template.defaultfilters import safe
 from cms.models import Page
 from cms.plugins.snippet.models import Snippet
 from cms.plugins.snippet.cms_plugins import SnippetPlugin
+from pure_pagination.mixins import PaginationMixin
 from builder.views import BuilderListView
 import settings
 
@@ -47,7 +48,7 @@ def loadpage(context, reverse_id):
 register.simple_tag(takes_context=True)(loadpage)
 
 
-class PageList(BuilderListView):
+class PageList(PaginationMixin, BuilderListView):
     model = Page
     paginate_by = getattr(settings, 'PAGINATION_DEFAULT_PAGINATION', 5)
     template_name = 'cms/snippet/list.html'
@@ -122,7 +123,7 @@ class GetChilderns(InclusionTag):
 
 register.tag(GetChilderns)
 
-class PageParentList(BuilderListView):
+class PageParentList(PaginationMixin, BuilderListView):
     model = Page
     paginate_by = getattr(settings, 'PAGINATION_DEFAULT_PAGINATION', 12)
     template_name = 'cms/snippet/list.html'
