@@ -49,12 +49,16 @@ register.simple_tag(takes_context=True)(loadpage)
 
 class PageList(BuilderListView):
     model = Page
-    paginate_by = getattr(settings, 'PAGINATION_DEFAULT_PAGINATION', 12)
+    paginate_by = getattr(settings, 'PAGINATION_DEFAULT_PAGINATION', 5)
     template_name = 'cms/snippet/list.html'
 
     def get_queryset(self):
-        return Page.objects.filter(parent=self.kwargs['parent_page'], published=True).order_by('-creation_date')[:self.kwargs['limit']] # .with_user(context['user']).filter(can_read_permissions=True)
+        q = Page.objects.filter(parent=self.kwargs['parent_page'], published=True).order_by('-creation_date') # .with_user(context['user']).filter(can_read_permissions=True)
 
+        if self.kwargs.get('limit'):
+            return q[:self.kwargs['limit']]
+
+        return q
 
 
 class GetChilderns(InclusionTag):
@@ -64,13 +68,21 @@ class GetChilderns(InclusionTag):
         Argument('page', default=None, required=False),
         Argument('template', default=None, required=False),
         Argument('imgsize', default=None, required=False),
-        Argument('limit', default=4, required=False),
+        Argument('limit', default=None, required=False),
         'as',
         Argument('varname', resolve=False, default='childrens', required=False),
     )
 
     def get_value(self, context):
         return 'dummy'
+
+    def get_template(self, context, **kwargs):
+        """
+        Returns the template to be used for the current context and arguments.
+        """
+        if kwargs.get('template'):
+            return kwargs['template']
+        return self.template
 
     def get_context(self, context, page, template, imgsize, limit, varname):
         if page is None:
@@ -94,7 +106,10 @@ class GetChilderns(InclusionTag):
         pl = PageList(**{'request' : context['request']})
         pl.template_name = self.template
         pl.kwargs = context['request'].GET.copy()
-        pl.kwargs['limit'] = limit
+
+        if limit:
+            pl.kwargs['limit'] = limit
+
         pl.kwargs['parent_page'] = page
         objects = pl.get(request = context['request']).context_data
         context[varname] = objects['object_list']
@@ -113,9 +128,12 @@ class PageParentList(BuilderListView):
     template_name = 'cms/snippet/list.html'
 
     def get_queryset(self):
-        return Page.objects.filter(parent__parent=self.kwargs['parent_page'], published=True).order_by('-creation_date')[
-               :self.kwargs['limit']] # .with_user(context['user']).filter(can_read_permissions=True)
+        q = Page.objects.filter(parent__parent=self.kwargs['parent_page'], published=True) # .with_user(context['user']).filter(can_read_permissions=True)
 
+        if self.kwargs.get('limit'):
+            return q[:self.kwargs['limit']]
+
+        return q
 
 
 class GetSubChilderns(InclusionTag):
@@ -125,7 +143,7 @@ class GetSubChilderns(InclusionTag):
         Argument('page', default=None, required=False),
         Argument('template', default=None, required=False),
         Argument('imgsize', default=None, required=False),
-        Argument('limit', default=4, required=False),
+        Argument('limit', default=None, required=False),
         'as',
         Argument('varname', resolve=False, default='childrens', required=False),
     )
@@ -154,7 +172,10 @@ class GetSubChilderns(InclusionTag):
         pl = PageParentList(**{'request': context['request']})
         pl.template_name = self.template
         pl.kwargs = context['request'].GET.copy()
-        pl.kwargs['limit'] = limit
+
+        if limit:
+            pl.kwargs['limit'] = limit
+
         pl.kwargs['parent_page'] = page
         objects = pl.get(request=context['request']).context_data
         context[varname] = objects['object_list']
