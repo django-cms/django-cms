@@ -128,9 +128,11 @@ of the new functionality in django 1.4 and can be found here:
 
 What you need to do:
 
-- Remove the MultilingualMiddleware from your settings.
-- Be sure the LocaleMiddleware is in your settings and that it comes after the SessionMiddleware.
-- Be sure that the cms.urls is included in a i18n_patterns::
+- Remove ``cms.middleware.multilingual.MultilingualURLMiddleware`` from your
+  settings.
+- Be sure ``django.middleware.locale.LocaleMiddleware`` is in your settings,
+  and that it comes after the SessionMiddleware.
+- Be sure that the cms.urls is included in a ``i18n_patterns``::
 
         from django.conf.urls.defaults import *
         from django.conf.urls.i18n import i18n_patterns
