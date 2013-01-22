@@ -95,7 +95,7 @@ class GetChilderns(InclusionTag):
         if template:
             self.template = template
 
-        if imgsize is None:
+        if imgsize is None or imgsize == '':
             imgsize = settings.CMS_PAGE_IMGSIZE
         context['imgsize'] = imgsize
 
