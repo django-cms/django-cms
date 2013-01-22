@@ -12,6 +12,7 @@ import os
 
 def main(db_url="sqlite://localhost/:memory:", test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
          time_tests=False, verbosity=1, failfast=False, test_labels=None):
+    verbosity = int(verbosity)
     if not test_labels:
         test_labels = ['cms']
     with temp_dir() as STATIC_ROOT:
