@@ -23,6 +23,11 @@ from os.path import join
 import copy
 
 
+def set_imagename(instance, filename):
+    import os
+    original, ext = os.path.splitext(filename)
+    return 'pages/' + instance.get_slug() + ext
+
 class Page(MPTTModel):
     """
     A simple hierarchical page model
@@ -91,6 +96,8 @@ class Page(MPTTModel):
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
+
+    image = models.ImageField(verbose_name=_('Image'), upload_to=set_imagename, blank=True, default='')
 
     class Meta:
         permissions = (
