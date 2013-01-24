@@ -9,7 +9,7 @@ from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
 from cms.forms.widgets import PluginEditor
 from cms.models import (Page, Title, CMSPlugin, PagePermission, 
-    PageModeratorState, EmptyTitle, GlobalPagePermission)
+    PageModeratorState, EmptyTitle, GlobalPagePermission, titlemodels)
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
@@ -371,7 +371,7 @@ class PageAdmin(ModelAdmin):
         if obj:
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
-            except:
+            except titlemodels.Title.DoesNotExist:
                 title_obj = EmptyTitle()
             if form.base_fields['site'].initial is None:
                 form.base_fields['site'].initial = obj.site
