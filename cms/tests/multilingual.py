@@ -2,11 +2,17 @@
 from __future__ import with_statement
 import copy
 from cms.api import create_page, create_title, publish_page, add_plugin
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.models import Title
+from cms.test_utils.testcases import (CMSTestCase, SettingsOverrideTestCase,
+                                      URL_CMS_PAGE_ADD, 
+                                      URL_CMS_PAGE, URL_CMS_PAGE_CHANGE,
+                                      URL_CMS_PAGE_CHANGE_LANGUAGE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
+from cms.utils.conf import get_languages
 from django.conf import settings
+from django.contrib.sites.models import Site
 
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
@@ -21,6 +27,96 @@ class MultilingualTestCase(SettingsOverrideTestCase):
     }
 
 
+    def test_create_page(self):
+        """
+        Test that a page can be created
+        and that a new language can be created afterwards in the admin pages
+        
+        TODO: Use get_languages as done in test_create_page in the other 
+        methods of MultilingualTestCase ?
+        """
+        
+        site = Site.objects.get_current()
+        
+        # Create a new page
+        
+        # Use the very first language in the list of languages
+        # for the current site
+        TESTLANG = get_languages()[site.pk][0]['code']
+        page_data = self.get_new_page_data_dbfields(
+            site=site, 
+            language=TESTLANG
+        )
+
+        page = create_page(**page_data)
+        title = page.get_title_obj()
+        
+        # A title is set?
+        self.assertNotEqual(title, None)
+        
+        # Publish and unpublish the page
+        page.published = True
+        page.save()
+        page.published = False
+        page.save()
+        
+        # Has correct title and slug after calling save()?
+        self.assertEqual(page.get_title(), page_data['title'])
+        self.assertEqual(page.get_slug(), page_data['slug'])
+        self.assertEqual(page.placeholders.all().count(), 2)
+        
+        # Were public instances created?
+        title = Title.objects.drafts().get(slug=page_data['slug'])
+    
+        # Test that it's the default language
+        self.assertEqual(title.language, TESTLANG)
+            
+        # Do stuff using admin pages
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            
+            page_data = self.get_pagedata_from_dbfields(page_data)
+            
+            # Publish page using the admin
+            page_data['published'] = True
+            response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
+                                        page_data)
+            
+            page = page.reload()
+            self.assertTrue(page.published)
+            
+            # Create a different language using the edit admin page
+            # This test case is bound in actual experience...
+            # pull#1604
+            page_data2 = page_data.copy()
+            page_data2['title'] = 'ein Titel'
+            page_data2['slug'] = 'ein-slug'
+            TESTLANG2 = 'de'
+            page_data2['language'] = TESTLANG2
+            
+            # Ensure that the language version is not returned
+            # since it does not exist
+            self.assertRaises(Title.DoesNotExist,
+                              page.get_title_obj,
+                              language=TESTLANG2, fallback=False)
+            
+            # Now create it
+            response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2),
+                                        page_data2)
+            
+            page = page.reload()
+            
+            # Test the new language version
+            self.assertEqual(page.get_title(language=TESTLANG2), page_data2['title'])
+            self.assertEqual(page.get_slug(language=TESTLANG2), page_data2['slug'])
+            
+            # Test the default language version (TESTLANG)
+            self.assertEqual(page.get_slug(language=TESTLANG, fallback=False), page_data['slug'])
+            self.assertEqual(page.get_title(language=TESTLANG, fallback=False), page_data['title'])
+            self.assertEqual(page.get_slug(fallback=False), page_data['slug'])
+            self.assertEqual(page.get_title(fallback=False), page_data['title'])
+    
+    
     def test_multilingual_page(self):
         page = create_page("mlpage", "nav_playground.html", "en")
         create_title("de", page.get_title(), page, slug=page.get_slug())

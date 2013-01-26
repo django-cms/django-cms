@@ -603,6 +603,8 @@ class Page(MPTTModel):
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
         """Helper function for accessing wanted / current title.
         If wanted title doesn't exists, EmptyTitle instance will be returned.
+        If fallback=False is used, titlemodels.Title.DoesNotExist will be raised
+        when a language does not exist.
         """
         language = self._get_title_cache(language, fallback, version_id, force_reload)
         if language in self.title_cache:
