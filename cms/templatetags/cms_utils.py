@@ -245,9 +245,12 @@ def get_plugin_content(context, plugin_name, page, slot, plugin_type):
 register.simple_tag(takes_context=True)(get_plugin_content)
 
 
-def standart_form(form, save_button = 'Save', cancel_button = None):
-    return {'form' : form, 'save_button' : save_button, 'cancel_button' : cancel_button}
-register.inclusion_tag('snippet/standart_form.html')(standart_form)
+def standart_form(context, form, save_button = 'Save', cancel_button = None):
+    context['form'] = form
+    context['save_button'] = save_button
+    context['cancel_button'] =  cancel_button
+    return context
+register.inclusion_tag('snippet/standart_form.html', takes_context=True)(standart_form)
 
 def get_contact_form(context, data = False):
     from contact_form.forms import ContactForm
