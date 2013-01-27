@@ -19,6 +19,15 @@ from django.http import Http404, HttpResponseRedirect
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
+def get_primary_lanaguage(current_site=None):
+    """Fetch the first language of the current site settings."""
+    current_site = current_site or Site.objects.get_current()
+    return get_languages()[current_site.id][0]['code']    
+    
+def get_secondary_lanaguage(current_site=None):
+    """Fetch the other language of the current site settings."""
+    current_site = current_site or Site.objects.get_current()
+    return get_languages()[current_site.id][1]['code']    
 
 class MultilingualTestCase(SettingsOverrideTestCase):
     settings_overrides = {
@@ -31,20 +40,16 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         """
         Test that a page can be created
         and that a new language can be created afterwards in the admin pages
-        
-        TODO: Use get_languages as done in test_create_page in the other 
-        methods of MultilingualTestCase ?
         """
-        
-        site = Site.objects.get_current()
         
         # Create a new page
         
         # Use the very first language in the list of languages
         # for the current site
-        TESTLANG = get_languages()[site.pk][0]['code']
+        current_site = Site.objects.get_current()
+        TESTLANG = get_primary_lanaguage(current_site=current_site)
         page_data = self.get_new_page_data_dbfields(
-            site=site, 
+            site=current_site, 
             language=TESTLANG
         )
 
@@ -91,7 +96,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page_data2 = page_data.copy()
             page_data2['title'] = 'ein Titel'
             page_data2['slug'] = 'ein-slug'
-            TESTLANG2 = 'de'
+            TESTLANG2 = get_secondary_lanaguage(current_site=current_site)
             page_data2['language'] = TESTLANG2
             
             # Ensure that the language version is not returned
@@ -118,21 +123,23 @@ class MultilingualTestCase(SettingsOverrideTestCase):
     
     
     def test_multilingual_page(self):
-        page = create_page("mlpage", "nav_playground.html", "en")
-        create_title("de", page.get_title(), page, slug=page.get_slug())
+        TESTLANG = get_primary_lanaguage()
+        TESTLANG2 = get_secondary_lanaguage()
+        page = create_page("mlpage", "nav_playground.html", TESTLANG)
+        create_title(TESTLANG2, page.get_title(), page, slug=page.get_slug())
         page.rescan_placeholders()
         page = self.reload(page)
         placeholder = page.placeholders.all()[0]
-        add_plugin(placeholder, "TextPlugin", 'de', body="test")
-        add_plugin(placeholder, "TextPlugin", 'en', body="test")
-        self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
-        self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
+        add_plugin(placeholder, "TextPlugin", TESTLANG2, body="test")
+        add_plugin(placeholder, "TextPlugin", TESTLANG, body="test")
+        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
+        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
         user = User.objects.create_superuser('super', 'super@django-cms.org', 'super')
         page = publish_page(page, user)
         public = page.publisher_public
         placeholder = public.placeholders.all()[0]
-        self.assertEqual(placeholder.cmsplugin_set.filter(language='de').count(), 1)
-        self.assertEqual(placeholder.cmsplugin_set.filter(language='en').count(), 1)
+        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
+        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
 
     def test_frontend_lang(self):
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
