@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-20 14:57+0900\n"
-"PO-Revision-Date: 2012-09-21 09:40+0000\n"
+"POT-Creation-Date: 2013-01-27 16:59+0900\n"
+"PO-Revision-Date: 2013-01-27 07:55+0000\n"
 "Last-Translator: Jonas Obrist <ojiidotch@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "Language: ja\n"
@@ -273,28 +273,24 @@ msgid "SEO Settings"
 msgstr "SEO設定"
 
 #: admin/pageadmin.py:605
-#, fuzzy
 msgid "You do not have permission to change pages."
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:620
 msgid "Database error"
 msgstr "データベースエラー"
 
 #: admin/pageadmin.py:713
-#, fuzzy
 msgid "You do not have permission to change the template"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:717
-#, fuzzy
 msgid "Template not valid"
-msgstr "テンプレート"
+msgstr ""
 
 #: admin/pageadmin.py:723
-#, fuzzy
 msgid "The template was successfully changed"
-msgstr "ページを承認しました。"
+msgstr ""
 
 #: admin/pageadmin.py:744
 msgid ""
@@ -312,9 +308,9 @@ msgid "You do not have permission to publish this page"
 msgstr "このページを発表する権限がありません。"
 
 #: admin/pageadmin.py:845
-#, fuzzy, python-format
+#, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr "ページを承認しました。"
+msgstr ""
 
 #: admin/pageadmin.py:865 admin/pageadmin.py:910 admin/pageadmin.py:950
 #: admin/pageadmin.py:1189 admin/pageadmin.py:1220 admin/pageadmin.py:1349
@@ -323,9 +319,9 @@ msgid "You do not have permission to change this page"
 msgstr "このページを変更する権限がありません。"
 
 #: admin/pageadmin.py:869
-#, fuzzy, python-format
+#, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr "ページを承認しました。"
+msgstr ""
 
 #: admin/pageadmin.py:893
 #, python-format
@@ -333,14 +329,13 @@ msgid "The page \"%s\" has no delete request."
 msgstr ""
 
 #: admin/pageadmin.py:897
-#, fuzzy, python-format
+#, python-format
 msgid "The page \"%s\" was successfully deleted."
-msgstr "ページを承認しました。"
+msgstr ""
 
 #: admin/pageadmin.py:922
-#, fuzzy
 msgid "You do not have permission to delete this page"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:954
 #, python-format
@@ -362,23 +357,22 @@ msgid "Are you sure?"
 msgstr "続けてもよろしいですか？"
 
 #: admin/pageadmin.py:1067
-#, fuzzy, python-format
+#, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr "ページを承認しました。"
+msgstr ""
 
 #: admin/pageadmin.py:1069
-#, fuzzy, python-format
+#, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr "ページを承認しました。"
+msgstr ""
 
 #: admin/pageadmin.py:1087
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "メニューステータスを変更する権限がありません。"
 
 #: admin/pageadmin.py:1111
-#, fuzzy
 msgid "You do not have permission to add a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1130
 msgid "This placeholder already has the maximum number of plugins"
@@ -416,9 +410,8 @@ msgid "This plugin is not saved in a revision"
 msgstr ""
 
 #: admin/pageadmin.py:1254 admin/pageadmin.py:1345
-#, fuzzy
 msgid "You do not have permission to edit a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1312
 #, python-format
@@ -427,19 +420,16 @@ msgid ""
 msgstr ""
 
 #: admin/pageadmin.py:1372
-#, fuzzy
 msgid "You do not have permission to move a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1393
-#, fuzzy
 msgid "Plugins were moved"
-msgstr "プラグインは動かしました。"
+msgstr ""
 
 #: admin/pageadmin.py:1406 admin/pageadmin.py:1415
-#, fuzzy
 msgid "You do not have permission to remove a plugin"
-msgstr "このページを変更する権限がありません。"
+msgstr ""
 
 #: admin/pageadmin.py:1425 admin/placeholderadmin.py:315
 #, python-format
@@ -1400,9 +1390,8 @@ msgid "Remove delete request"
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:90
-#, fuzzy
 msgid "Confirm delete"
-msgstr "削除可能"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:91
 #: templates/admin/cms/page/change_form.html:92
@@ -1754,9 +1743,8 @@ msgid "down"
 msgstr "下へ"
 
 #: templates/cms/toolbar/toolbar.html:70
-#, fuzzy
 msgid "Add child plugin"
-msgstr "子ページを追加"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:73
 msgid "Move to placeholder"
@@ -1887,9 +1875,8 @@ msgid "Static Menu2"
 msgstr ""
 
 #: test_utils/project/sampleapp/urls.py:12
-#, fuzzy
 msgid "^account/$"
-msgstr "数"
+msgstr ""
 
 #: utils/conf.py:77
 msgid "Inherit the template of the nearest ancestor"
@@ -1915,32 +1902,26 @@ msgid_plural ""
 "Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] ""
 
-#~ msgid "path"
-#~ msgstr "パス"
+#~ msgid "url overwrite"
+#~ msgstr "URL overwrite"
 
-#~ msgid "everybody"
-#~ msgstr "全員"
+#~ msgid "publish req."
+#~ msgstr "publish request"
 
-#~ msgid "type"
-#~ msgstr "タイプ"
+#~ msgid "unpublish req."
+#~ msgstr "unpublish request"
 
-#~ msgid "status"
-#~ msgstr "ステータス"
+#~ msgid "req. app."
+#~ msgstr "approval required"
 
-#~ msgid "author"
-#~ msgstr "作者"
+#~ msgid "(requires approvement at %(moderation_level)s level)"
+#~ msgstr "(requires approval at %(moderation_level)s level)"
 
-#~ msgid "approved"
-#~ msgstr "承認"
-
-#~ msgid "Status"
-#~ msgstr "状態"
-
-#~ msgid "approve"
-#~ msgstr "承認"
+#~ msgid "Request approvemet"
+#~ msgstr "Request approval"
 
 #~ msgid "CMS - Page %s requires approvement."
-#~ msgstr "CMS - Page %s は承認が必要です。"
+#~ msgstr "CMS - Page %s requires approval."
 
 #~ msgid "move"
 #~ msgstr "move request"
