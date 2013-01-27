@@ -3,7 +3,7 @@ from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, 
-    PageUserGroup)
+    PageUserGroup, titlemodels)
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change
@@ -116,8 +116,11 @@ class PageAddForm(forms.ModelForm):
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
-            title = page.get_title_obj(lang)
-            if title and slug:
+            try:
+                title = page.get_title_obj(lang, fallback=False)
+            except titlemodels.Title.DoesNotExist:
+                title = None
+            if title and not isinstance(title, titlemodels.EmptyTitle) and slug:
                 oldslug = title.slug
                 title.slug = slug
                 title.save()
