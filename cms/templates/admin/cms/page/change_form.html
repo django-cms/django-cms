@@ -14,22 +14,21 @@
 <script type="text/javascript" src="{% admin_static_url %}js/urlify.js"></script>
 
 {% if add %}
-{% if unihandecode_url %}
-<script type="text/javascript" src="{{ unihandecode_url }}unihandecode.core.min.js"></script>
-<script type="text/javascript" src="{{ unihandecode_url }}unihandecode.{{ unihandecode_lang }}.min.js"></script>
-{% endif %}
 <script type="text/javascript">
 //<![CDATA[	
 
 	jQuery(document).ready(function (){
-		jQuery("#id_title").keyup(function () {
-			var e = jQuery("#id_slug")[0];
-			if(!e._changed) {
-                var value = this.value;
-                {% if unihandecode_url %}value = Unihandecoder('{{ unihandecode_lang }}').decode(value);{% endif %}
-                e.value = URLify(value, 64);
-			}
-	    });
+        var title= jQuery('#id_title');
+        var slug = jQuery('#id_slug');
+        var update = function(){
+            var value = title.val();
+            if (window.UNIHANDECODER){
+                value = UNIHANDECODER.decode(value);
+            }
+            slug.val(URLify(value, 64));
+        };
+		title.keyup(update);
+        update();
 	});
 
 //]]>
@@ -197,6 +196,15 @@
 
 {% if add %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
+
+{% endif %}
+{% for url in unihandecode_urls %}
+<script type="text/javascript" src="{{ url }}"></script>
+{% endfor %}
+{% if unihandecode_urls %}
+<script type="text/javascript">
+    var UNIHANDECODER = unihandecode.Unihan('{{ unihandecode_lang }}');
+</script>
 {% endif %}
 
 {# JavaScript for prepopulated fields #}

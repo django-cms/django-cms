@@ -77,10 +77,10 @@ and you are on a page that doesn't yet have an English translation and you view
 the German version then the language chooser will redirect to ``/``. The same
 goes for urls that are not handled by the cms and display a language chooser.
 
-*************************************************
-Automated slug generation for non-ASCII languages
-*************************************************
+********************************************
+Automated slug generation unicode characters
+********************************************
 
 If your site has languages which use non-ASCII character sets, you might want
-to enable :setting:`CMS_UNIHANDECODE_URL` to get automated slugs for those
-languages too.
+to enable :setting:`CMS_UNIHANDECODE_HOST` and :setting:`CMS_UNIHANDECODE_VERSION`
+to get automated slugs for those languages too.
