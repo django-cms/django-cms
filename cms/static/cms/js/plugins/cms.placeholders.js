@@ -74,8 +74,39 @@ CMS.$(document).ready(function ($) {
 		},
 
 		addPlugin: function (values, addUrl, editUrl) {
+
+			var that = this;
+			var frame = this.frame.find('.cms_placeholder-content_inner');
+			var needs_collapsing = false;
+
+			// If the toolbar is hidden, editPlugin does not work properly,
+			// therefore we show toggle it and save the old state.
+			if (CMS.API.Toolbar.isToolbarHidden()){
+				CMS.API.Toolbar.toggleToolbar();
+				needs_collapsing = true;
+			}
+
+			// show framebox
+			this.toggleFrame();
+			this.toggleDim();
+
+			// load the template through the data id
+			// for that we create an iframe with the specific url
+			var iframe = $('<iframe />', {
+				'id': 'cms_placeholder-iframe',
+				'src': addUrl + '?popup=true&no_preview&plugin_type=' + values.plugin_type + '&language=' + values.language + '&placeholder=' + values.placeholder,
+				'style': 'width:100%; height:0; border:none; overflow:auto;',
+				'allowtransparency': true,
+				'scrollbars': 'no',
+				'frameborder': 0
+			});
+
+			// inject to element
+			frame.html(iframe);
+			/*
 			var that = this;
 			// do ajax thingy
+
 			$.ajax({
 				'type': 'POST',
 				'url': addUrl,
@@ -87,7 +118,7 @@ CMS.$(document).ready(function ($) {
 				'error': function () {
 					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
 				}
-			});
+			});*/
 		},
 		
 		editPlugin: function (placeholder_id, plugin_id, url) {

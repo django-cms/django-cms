@@ -143,7 +143,10 @@ class CMSPluginBase(admin.ModelAdmin):
         Not sure if there will be plugin permission requirement in future, but
         if, then this must be changed.
         """
-        return self.cms_plugin_instance.has_change_permission(request)
+        if self.cms_plugin_instance:
+            return self.cms_plugin_instance.has_change_permission(request)
+        else:
+            return super(CMSPluginBase, self).has_add_permission(request)
     has_delete_permission = has_change_permission = has_add_permission
 
     def save_model(self, request, obj, form, change):

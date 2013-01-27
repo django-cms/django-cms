@@ -1098,7 +1098,6 @@ class PageAdmin(ModelAdmin):
         return admin_utils.render_admin_menu_item(request, page,
                 template="admin/cms/page/lazy_menu.html")
 
-    @require_POST
     @create_on_success
     def add_plugin(self, request):
         """
@@ -1106,11 +1105,11 @@ class PageAdmin(ModelAdmin):
         """
         if 'history' in request.path or 'recover' in request.path:
             return HttpResponseBadRequest(str("error"))
-        plugin_type = request.POST['plugin_type']
+        plugin_type = request.GET['plugin_type']
         if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
             return HttpResponseForbidden(_('You do not have permission to add a plugin'))
-        placeholder_id = request.POST.get('placeholder', None)
-        parent_id = request.POST.get('parent_id', None)
+        placeholder_id = request.GET.get('placeholder', None)
+        parent_id = request.GET.get('parent_id', None)
         if placeholder_id:
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
             page = placeholder.page
@@ -1120,7 +1119,7 @@ class PageAdmin(ModelAdmin):
         parent = None
         # page add-plugin
         if page:
-            language = request.POST['language'] or get_language_from_request(request)
+            language = request.GET['language'] or get_language_from_request(request)
             position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
             limits = placeholder_utils.get_placeholder_conf("limits", placeholder.slot, page.get_template())
             if limits:
@@ -1157,21 +1156,31 @@ class PageAdmin(ModelAdmin):
         if not language or not language in [ lang[0] for lang in settings.LANGUAGES ]:
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
-        plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
+        admin_class = plugin_pool.get_plugin(plugin_type)
+        plugin_admin = admin_class(admin_class.model, self.admin_site)
 
-        if parent:
-            plugin.parent = parent
-            plugin.position = CMSPlugin.objects.filter(parent=parent).count()
-        plugin.save()
+        plugin_admin.cms_plugin_instance = None
+        try:
+            plugin_admin.placeholder = placeholder # TODO: what for reversion..? should it be inst ...?
+        except Placeholder.DoesNotExist:
+            pass
+        return plugin_admin.add_view(request)
 
-        if 'reversion' in settings.INSTALLED_APPS and page:
-            helpers.make_revision_with_plugins(page)
-            reversion.revision.user = request.user
-            plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-            reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
-                'plugin_name': plugin_name, 'placeholder': placeholder}
-
-        return HttpResponse(str(plugin.pk), content_type='text/plain')
+#        plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
+#
+#        if parent:
+#            plugin.parent = parent
+#            plugin.position = CMSPlugin.objects.filter(parent=parent).count()
+#        plugin.save()
+#
+#        if 'reversion' in settings.INSTALLED_APPS and page:
+#            helpers.make_revision_with_plugins(page)
+#            reversion.revision.user = request.user
+#            plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
+#            reversion.revision.comment = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
+#                'plugin_name': plugin_name, 'placeholder': placeholder}
+#
+#        return HttpResponse(str(plugin.pk), content_type='text/plain')
 
     @require_POST
     @create_on_success

@@ -44,8 +44,10 @@
 		window.onload = runOnLoad.run;
 	}
 	runOnLoad(function(){
+        {% if plugin.pk %}
 		parent.setiframeheight($('body').height()+20, {{ plugin.pk }});
-	});
+        {% endif %}
+    });
 	$(document).ready(function(){
 		$("a.add-another,a.related-lookup").each(function(i, sign){
 			var href = $(sign).attr("href");
