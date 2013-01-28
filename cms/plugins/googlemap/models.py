@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, StatusModel
 
 
-class GoogleMap(CMSPlugin):
+class GoogleMap(CMSPlugin, StatusModel):
     """
     A google maps integration
     """

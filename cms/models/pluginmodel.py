@@ -35,6 +35,8 @@ class StatusModel(models.Model):
        default=True,
        help_text=_('Active'),
     )
+    class Meta:
+        abstract = True
 
 
 class PluginModelBase(MPTTModelBase):
