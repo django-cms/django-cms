@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin, StatusModel
 
 
 class GoogleMap(CMSPlugin):
@@ -39,7 +39,11 @@ class GoogleMap(CMSPlugin):
                               help_text=_('Plugin height (in pixels).'))
 
     def __unicode__(self):
-        return u"%s (%s, %s %s)" % (self.get_title(), self.address,
+        if self.status:
+            status = "On - "
+        else:
+            status = "Off - "
+        return u"%s%s (%s, %s %s)" % (status, self.get_title(), self.address,
                                     self.zipcode, self.city,)
 
     def get_title(self):

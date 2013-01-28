@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin, StatusModel
 from cms.utils.helpers import reversion_register
 
 
@@ -25,7 +25,7 @@ class Snippet(models.Model):
         verbose_name_plural = _("Snippets")
 
 # Plugin model - just a pointer to Snippet
-class SnippetPtr(CMSPlugin):
+class SnippetPtr(CMSPlugin, StatusModel):
     snippet = models.ForeignKey(Snippet)
 
     class Meta:
@@ -35,7 +35,10 @@ class SnippetPtr(CMSPlugin):
 
     def __unicode__(self):
         # Return the referenced snippet's name rather than the default (ID #)
-        return self.snippet.name
+        if self.status:
+            return u"On - "+self.snippet.name
+        else:
+            return u"Off - "+self.snippet.name
 
 
 # We don't both with SnippetPtr, since all the data is actually in Snippet

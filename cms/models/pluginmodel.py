@@ -25,6 +25,17 @@ class BoundRenderMeta(object):
         self.total = 1
         self.text_enabled = getattr(meta, 'text_enabled', False)
 
+class StatusModel(models.Model):
+    """
+    Metaclass that add a status field to CMSPlugin subclasses. To be inherited 
+    while subclassing CMSPlugin 
+    """
+    status = models.IntegerField(
+       _('Status'), 
+       default=True,
+       help_text=_('Active'),
+    )
+
 
 class PluginModelBase(MPTTModelBase):
     """
