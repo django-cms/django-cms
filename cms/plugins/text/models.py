@@ -1,4 +1,4 @@
-from cms.models import CMSPlugin, StatusModel
+from cms.models import CMSPlugin,StatusModel, WrapModel
 from cms.plugins.text.utils import (plugin_admin_html_to_tags, 
     plugin_tags_to_admin_html, plugin_tags_to_id_list, replace_plugin_tags)
 from cms.utils.html import clean_html
@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 _old_tree_cache = {}
 
-class AbstractText(CMSPlugin, StatusModel):
+class AbstractText(CMSPlugin, StatusModel, WrapModel):
     """Abstract Text Plugin Class"""
     body = models.TextField(_("body"))
     
