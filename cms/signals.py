@@ -196,7 +196,8 @@ def post_save_page(instance, **kwargs):
                 title.save()
 
 def update_placeholders(instance, **kwargs):
-    instance.rescan_placeholders()
+    if not kwargs.get('raw'):
+        instance.rescan_placeholders()
 
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
