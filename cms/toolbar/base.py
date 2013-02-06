@@ -2,7 +2,7 @@
 from cms.toolbar.constants import ALIGNMENTS
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import simplejson
+import json
 from django.utils.encoding import force_unicode
 from django.utils.functional import Promise
 
@@ -22,7 +22,7 @@ class Serializable(object):
         Converts the (serialized) data to JSON
         """
         data = self.serialize(context, **kwargs)
-        return simplejson.dumps(data)
+        return json.dumps(data)
         
     def serialize(self, context, **kwargs):
         """

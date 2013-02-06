@@ -2,14 +2,14 @@
 from classytags.core import Tag, Options
 from django import template
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils import simplejson
+import json
 from django.utils.text import javascript_quote
 
 register = template.Library()
 
 @register.filter
 def js(value):
-    return simplejson.dumps(value, cls=DjangoJSONEncoder)
+    return json.dumps(value, cls=DjangoJSONEncoder)
 
 @register.filter
 def bool(value):
