@@ -5,7 +5,6 @@ import argparse
 from django.utils import autoreload
 import os
 import sys
-import urlparse
 
 
 def main():

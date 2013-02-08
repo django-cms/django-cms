@@ -49,7 +49,10 @@ DEFAULTS = {
     'TITLE_CHARACTER': '+',
     'CACHE_PREFIX': 'cms-',
     'PLUGIN_PROCESSORS': [],
-    'PLUGIN_CONTEXT_PROCESSORS': []
+    'PLUGIN_CONTEXT_PROCESSORS': [],
+    'UNIHANDECODE_VERSION': None,
+    'UNIHANDECODE_DECODERS': ['ja', 'zh', 'kr', 'vn', 'diacritic'],
+    'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
 }
 
 def get_cache_durations():
@@ -188,6 +191,15 @@ def get_languages():
         return languages
     return _ensure_languages_settings(languages)
 
+def get_unihandecode_host():
+    host = getattr(settings, 'CMS_UNIHANDECODE_HOST', None)
+    if not host:
+        return host
+    if host.endswith('/'):
+        return host
+    else:
+        return host + '/'
+
 COMPLEX = {
     'CACHE_DURATIONS': get_cache_durations,
     'MEDIA_ROOT': get_media_root,
@@ -196,6 +208,7 @@ COMPLEX = {
     'PLACEHOLDER_FRONTEND_EDITING': get_placeholder_frontend_editing,
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
+    'UNIHANDECODE_HOST': get_unihandecode_host,
 }
 
 def get_cms_setting(name):

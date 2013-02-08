@@ -57,7 +57,11 @@
 		$("#id_title").keyup(function() {
 			var e = $("#id_slug")[0];
 			if (!e._changed && new_slug) {
-				e.value = URLify(this.value, 64);
+				var value = this.value;
+				if (window.UNIHANDECODER){
+					value = UNIHANDECODER.decode(value);
+				}
+				e.value = URLify(value, 64);
 			}
 		});
 		// saveform event handler
