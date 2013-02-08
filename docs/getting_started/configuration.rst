@@ -333,6 +333,69 @@ Type: Boolean
 Default:``True``
 
 
+Unicode support for automated slugs
+===================================
+
+The django CMS supports automated slug generation from page titles that contain unicode characters via the
+unihandecode.js project. To enable support for unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
+:setting:`CMS_UNIHANDECODE_VERSION` must be set.
+
+
+.. setting:: CMS_UNIHANDECODE_HOST
+
+CMS_UNIHANDECODE_HOST
+---------------------
+
+default: ``None``
+
+Must be set to the URL where you host your unihandecode.js files. For licensing reasons, the django CMS does not include
+unihandecode.js.
+
+If set to ``None``, the default, unihandecode.js is not used.
+
+
+.. note::
+
+    Unihandecode.js is a rather large library, especially when loading support
+    for Japanese. It is therefore very important that you serve it from a
+    server that supports gzip compression. Further, make sure that those files
+    can be cached by the browser for a very long period.
+
+
+.. setting:: CMS_UNIHANDECODE_VERSION
+
+CMS_UNIHANDECODE_VERSION
+------------------------
+
+default: ``None``
+
+Must be set to the version number (eg ``'1.0.0'``) you want to use. Together with :setting:`CMS_UNIHANDECODE_HOST` this
+setting is used to build the full URLs for the javascript files. URLs are built like this:
+``<CMS_UNIHANDECODE_HOST>-<CMS_UNIHANDECODE_VERSION>.<DECODER>.min.js``.
+
+
+.. setting:: CMS_UNIHANDECODE_DECODERS
+
+CMS_UNIHANDECODE_DECODERS
+-------------------------
+
+default: ``['ja', 'zh', 'vn', 'kr', 'diacritic']``
+
+If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST``, you can add them to this setting.
+
+
+.. setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
+
+CMS_UNIHANDECODE_DEFAULT_DECODER
+--------------------------------
+
+default: ``'diacritic'``
+
+The default decoder to use when unihandecode.js support is enabled, but the current language does not provide a specific
+decoder in :setting:`CMS_UNIHANDECODE_DECODERS`. If set to ``None``, failing to find a specific decoder will disable
+unihandecode.js for this language.
+
+
 **************
 Media Settings
 **************
@@ -569,3 +632,6 @@ Example::
 
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
     :ref:`cache key prefixing <django:cache_key_prefixing>`
+
+
+.. _unihandecode.js: https://github.com/ojii/unihandecode.js
