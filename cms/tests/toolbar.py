@@ -6,8 +6,9 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
     GetButton)
 from cms.utils import get_cms_setting
+from cms.compat import User
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User, Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 

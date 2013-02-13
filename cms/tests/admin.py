@@ -21,7 +21,8 @@ from cms.utils import get_cms_setting
 import django
 from django.contrib import admin
 from django.contrib.admin.sites import site
-from django.contrib.auth.models import User, Permission, AnonymousUser
+from django.contrib.auth.models import Permission, AnonymousUser
+from cms.compat import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden,

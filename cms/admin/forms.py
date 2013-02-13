@@ -14,7 +14,7 @@ from cms.utils.permissions import (get_current_user, get_subordinate_users,
 from cms.utils.urlutils import any_path_re
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -24,6 +24,8 @@ from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
+
+from cms.compat import User
 
 
 

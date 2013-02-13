@@ -10,7 +10,8 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.apphooks import APP_MODULE, APP_NAME
-from django.contrib.auth.models import User, Permission
+from cms.compat import User
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test.testcases import TestCase
 from menus.menu_pool import menu_pool

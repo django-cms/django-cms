@@ -8,7 +8,7 @@ from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
 from cms.utils.i18n import force_language
-from django.contrib.auth.models import User
+from cms.compat import User
 from django.core.urlresolvers import clear_url_caches, reverse
 import sys
 from cms.models.pagemodel import Page
