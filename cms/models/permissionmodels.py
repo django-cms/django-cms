@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 
+from cms.compat import User
 from cms.models import Page
 from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
 from cms.utils.helpers import reversion_register
 
+AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
@@ -36,7 +39,7 @@ class AbstractPagePermission(models.Model):
     """Abstract page permissions
     """
     # who:
-    user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
+    user = models.ForeignKey(AUTH_USER_MODEL, verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
 
     # what:
@@ -105,7 +108,7 @@ class PagePermission(AbstractPagePermission):
 class PageUser(User):
     """Cms specific user data, required for permission system
     """
-    created_by = models.ForeignKey(User, related_name="created_users")
+    created_by = models.ForeignKey(AUTH_USER_MODEL, related_name="created_users")
 
     class Meta:
         verbose_name = _('User (page)')
@@ -116,7 +119,7 @@ class PageUser(User):
 class PageUserGroup(Group):
     """Cms specific group data, required for permission system
     """
-    created_by = models.ForeignKey(User, related_name="created_usergroups")
+    created_by = models.ForeignKey(AUTH_USER_MODEL, related_name="created_usergroups")
 
     class Meta:
         verbose_name = _('User group (page)')

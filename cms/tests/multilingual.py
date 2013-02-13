@@ -14,7 +14,7 @@ from cms.utils.conf import get_languages
 from django.conf import settings
 from django.contrib.sites.models import Site
 
-from django.contrib.auth.models import User
+from cms.compat import User
 from django.http import Http404, HttpResponseRedirect
 
 TEMPLATE_NAME = 'tests/rendering/base.html'

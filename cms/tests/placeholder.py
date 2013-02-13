@@ -20,9 +20,10 @@ from cms.test_utils.util.context_managers import (SettingsOverride,
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
+from cms.compat import User
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponse

@@ -4,7 +4,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.utils.mail import mail_page_user_change
 from django.core import mail
 
-from django.contrib.auth.models import User
+from cms.compat import User
 
 
 class MailTestCase(CMSTestCase):

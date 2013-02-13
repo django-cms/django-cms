@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.contrib.auth.models import User
+from cms.compat import User
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
 

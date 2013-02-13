@@ -9,7 +9,7 @@ from cms.plugin_rendering import (render_plugins, PluginContext,
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
-from django.contrib.auth.models import User
+from cms.compat import User
 from django.http import Http404, HttpResponseRedirect
 from django.template import Template, RequestContext
 from sekizai.context import SekizaiContext

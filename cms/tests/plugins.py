@@ -26,7 +26,7 @@ from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils import timezone
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User
+from cms.compat import User
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
