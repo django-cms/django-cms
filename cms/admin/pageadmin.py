@@ -143,6 +143,23 @@ def contribute_list_filter(cls):
     setattr(cls, 'list_filter', list_filter)
 
 
+def mutually_exclusive(func):
+
+    @transaction.commit_manually
+    def wrap(*args, **kwargs):
+        transaction.commit()
+        Page.objects.all().order_by('pk').select_for_update()[:1].exists()
+        try:
+            ret_value = func(*args, **kwargs)
+            transaction.commit()
+            return ret_value
+        except:
+            transaction.rollback()
+            raise
+
+    return wrap
+
+
 class PageAdmin(ModelAdmin):
     form = PageForm
     # TODO: add the new equivalent of 'cmsplugin__text__body' to search_fields'
@@ -487,6 +504,8 @@ class PageAdmin(ModelAdmin):
                             continue
                 yield inline.get_formset(request, obj)
 
+    # @transaction.commit_on_success
+    @mutually_exclusive
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
@@ -757,7 +776,8 @@ class PageAdmin(ModelAdmin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    @transaction.commit_on_success
+    # @transaction.commit_on_success
+    @mutually_exclusive
     def move_page(self, request, page_id, extra_context=None):
         """
         Move the page to the requested target, at the given position
