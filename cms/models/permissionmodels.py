@@ -3,8 +3,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
+try:
+    from django.contrib.auth.models import AbstractUser as User
+except ImportError:
+    from django.contrib.auth.models import User
 
 from cms.models import Page
 from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
