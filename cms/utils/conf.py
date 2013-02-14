@@ -32,6 +32,7 @@ DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
+    'VIEW_PERMISSION': True,
     'PUBLIC_FOR': 'all',
     'CONTENT_CACHE_DURATION': 60,
     'SHOW_START_DATE': False,
