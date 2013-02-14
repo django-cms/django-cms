@@ -148,8 +148,8 @@ def mutually_exclusive(func):
     @transaction.commit_manually
     def wrap(*args, **kwargs):
         transaction.commit()
-        Page.objects.all().order_by('pk').select_for_update()[:1].exists()
         try:
+            Page.objects.all().select_for_update().exists()
             ret_value = func(*args, **kwargs)
             transaction.commit()
             return ret_value
@@ -838,7 +838,7 @@ class PageAdmin(ModelAdmin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
 
-    @transaction.commit_on_success
+    @mutually_exclusive
     def copy_page(self, request, page_id, extra_context=None):
         """
         Copy the page and all its plugins and descendants to the requested target, at the given position
