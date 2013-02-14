@@ -504,7 +504,6 @@ class PageAdmin(ModelAdmin):
                             continue
                 yield inline.get_formset(request, obj)
 
-    # @transaction.commit_on_success
     @mutually_exclusive
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -776,7 +775,6 @@ class PageAdmin(ModelAdmin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    # @transaction.commit_on_success
     @mutually_exclusive
     def move_page(self, request, page_id, extra_context=None):
         """
