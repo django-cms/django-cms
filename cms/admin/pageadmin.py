@@ -42,7 +42,7 @@ from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import (copy_plugins, helpers, moderator, permissions, plugins,
     get_template_from_request, get_language_from_request,
     placeholder as placeholder_utils, admin as admin_utils, cms_static_url)
-from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
+from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object, get_default_language
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
@@ -520,7 +520,7 @@ class PageAdmin(ModelAdmin):
             context.update(extra_context or {})
             extra_context = self.update_language_tab_context(request, obj, context)
 
-        tab_language = request.GET.get("language", None)
+        tab_language = request.GET.get("language", get_default_language(site_id=obj.site_id))
 
         extra_context.update(self.get_unihandecode_context(tab_language))
 
