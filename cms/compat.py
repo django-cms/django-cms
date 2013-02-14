@@ -7,3 +7,4 @@ if django.VERSION >= (1, 5):
     User = get_user_model()
 else:
     from django.contrib.auth.models import User
+    get_user_model = lambda:User

@@ -3,8 +3,6 @@ from cms.utils import get_cms_setting
 from django.conf import settings
 from django.core.cache import cache
 
-from cms.compat import User
-
 PERMISSION_KEYS = [
     'can_change', 'can_add', 'can_delete',
     'can_change_advanced_settings', 'can_publish',
@@ -43,6 +41,7 @@ def clear_user_permission_cache(user):
 
 
 def clear_permission_cache():
+    from cms.compat import User
     users = User.objects.filter(is_active=True)
     for user in users:
         for key in PERMISSION_KEYS:
