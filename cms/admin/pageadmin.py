@@ -43,6 +43,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 import django
+import functools
 
 
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
@@ -157,6 +158,7 @@ def mutually_exclusive(func):
             transaction.rollback()
             raise
 
+    functools.update_wrapper(wrap, func)
     return wrap
 
 
