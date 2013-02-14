@@ -43,6 +43,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 import django
+import functools
 
 
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
@@ -141,6 +142,24 @@ def contribute_list_filter(cls):
     if settings.CMS_SOFTROOT:
         list_filter.append('soft_root')
     setattr(cls, 'list_filter', list_filter)
+
+
+def mutually_exclusive(func):
+
+    @transaction.commit_manually
+    def wrap(*args, **kwargs):
+        transaction.commit()
+        try:
+            Page.objects.all().select_for_update().exists()
+            ret_value = func(*args, **kwargs)
+            transaction.commit()
+            return ret_value
+        except:
+            transaction.rollback()
+            raise
+
+    functools.update_wrapper(wrap, func)
+    return wrap
 
 
 class PageAdmin(ModelAdmin):
@@ -487,6 +506,7 @@ class PageAdmin(ModelAdmin):
                             continue
                 yield inline.get_formset(request, obj)
 
+    @mutually_exclusive
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
@@ -757,7 +777,7 @@ class PageAdmin(ModelAdmin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    @transaction.commit_on_success
+    @mutually_exclusive
     def move_page(self, request, page_id, extra_context=None):
         """
         Move the page to the requested target, at the given position
@@ -818,7 +838,7 @@ class PageAdmin(ModelAdmin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
 
-    @transaction.commit_on_success
+    @mutually_exclusive
     def copy_page(self, request, page_id, extra_context=None):
         """
         Copy the page and all its plugins and descendants to the requested target, at the given position
