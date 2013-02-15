@@ -19,7 +19,7 @@ CLASSIFIERS = [
 setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
-    name='pbs-django-cms',
+    name='django-cms-pbs',
     version=cms.__version__,
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
