@@ -43,6 +43,7 @@ setup(
         'Pygments==1.5',
         
     ],
+    setup_requires = ['s3sourceuploader',],
     packages=find_packages(exclude=["project","project.*"]),
     include_package_data=True,
     zip_safe = False,
