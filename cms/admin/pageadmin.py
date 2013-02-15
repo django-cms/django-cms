@@ -462,7 +462,7 @@ class PageAdmin(ModelAdmin):
         return inlines
 
     def get_unihandecode_context(self, language):
-        if language[:2] in get_cms_setting('UNIHANDECODE_DECODERS'):
+        if language and language[:2] in get_cms_setting('UNIHANDECODE_DECODERS'):
             uhd_lang = language[:2]
         else:
             uhd_lang = get_cms_setting('UNIHANDECODE_DEFAULT_DECODER')
