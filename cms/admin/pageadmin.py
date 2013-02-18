@@ -150,7 +150,8 @@ def mutually_exclusive(func):
     def wrap(*args, **kwargs):
         transaction.commit()
         try:
-            Page.objects.all().select_for_update().exists()
+            Page.objects.select_for_update().using(router.db_for_write(Page))\
+                .all().exists()
             ret_value = func(*args, **kwargs)
             transaction.commit()
             return ret_value
