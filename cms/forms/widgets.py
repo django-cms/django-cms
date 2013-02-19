@@ -90,7 +90,7 @@ class PageSelectWidget(MultiWidget):
 (function($) {
     var handleSiteChange = function(site_name, selected_id) {
         $("#id_%(name)s_1 optgroup").remove();
-        var myOptions = $("#id_%(name)s_2 optgroup[label=" + site_name + "]").clone();
+        var myOptions = $("#id_%(name)s_2 optgroup[label='" + site_name + "']").clone();
         $("#id_%(name)s_1").append(myOptions);
         $("#id_%(name)s_1").change();
     };
