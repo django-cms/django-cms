@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy  as _
 
 @contextmanager
 def force_language(new_lang):
-    old_lang = translation.get_language()
+    old_lang = get_current_language()
     if old_lang != new_lang:
         translation.activate(new_lang)
     yield
@@ -28,6 +28,23 @@ def get_languages(site_id=None):
             result.append(lang)
         get_cms_setting('LANGUAGES')[site_id] = result
     return result
+
+
+def get_current_language():
+    """
+    Returns the currently active language
+
+    It's a replacement for Django's translation.get_language() to make sure the LANGUAGE_CODE will be found in LANGUAGES.
+    Overcomes this issue: https://code.djangoproject.com/ticket/9340
+    """
+    lang = translation.get_language()
+    languages = get_language_list()
+    if lang in languages: # direct hit
+        return lang
+    for code in languages:
+        if lang.split('-')[0] == code: # base language hit
+            return code
+    return lang # no hit
 
 
 def get_site(site):
