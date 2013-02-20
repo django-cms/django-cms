@@ -30,6 +30,21 @@ def get_languages(site_id=None):
     return result
 
 
+def get_language_code(language_code=None):
+    """
+    Returns language code while making sure it's in LANGUAGES
+    """
+    if not language_code:
+        return get_current_language()
+    languages = get_language_list()
+    if language_code in languages: # direct hit
+        return language_code
+    for lang in languages:
+        if language_code.split('-')[0] == lang: # base language hit
+            return lang
+    return language_code
+
+
 def get_current_language():
     """
     Returns the currently active language
@@ -37,14 +52,8 @@ def get_current_language():
     It's a replacement for Django's translation.get_language() to make sure the LANGUAGE_CODE will be found in LANGUAGES.
     Overcomes this issue: https://code.djangoproject.com/ticket/9340
     """
-    lang = translation.get_language()
-    languages = get_language_list()
-    if lang in languages: # direct hit
-        return lang
-    for code in languages:
-        if lang.split('-')[0] == code: # base language hit
-            return code
-    return lang # no hit
+    language_code = translation.get_language()
+    return get_language_code(language_code)
 
 
 def get_site(site):
@@ -125,7 +134,7 @@ def get_default_language(language_code=None, site_id=None):
     """
 
     if not language_code:
-        language_code = settings.LANGUAGE_CODE
+        language_code = get_language_code(settings.LANGUAGE_CODE)
 
     languages = get_language_list(site_id)
 
