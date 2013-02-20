@@ -103,6 +103,8 @@ class Page(MPTTModel):
         if title is None:
             title = u""
         return unicode(title)
+    def __repr__(self):
+        return u"Page"
 
     def is_dirty(self):
         return self.publisher_state == self.PUBLISHER_STATE_DIRTY
@@ -753,20 +755,24 @@ class Page(MPTTModel):
 
         if not self.publisher_is_draft:
             return self.publisher_draft.has_view_permission(request)
+        
+        if not get_cms_setting('VIEW_PERMISSION'):
+            return True
         # does any restriction exist?
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
         if request.user.is_authenticated():
-            site = current_site(request)
-            global_perms_q = Q(can_view=True) & Q(
-                Q(sites__in=[site]) | Q(sites__isnull=True)
-            )
-            global_view_perms = GlobalPagePermission.objects.with_user(
-                request.user).filter(global_perms_q).exists()
-
-            # a global permission was given to the request's user
-            if global_view_perms:
-                return True
+            if get_cms_setting('VIEW_PERMISSION'):
+                site = current_site(request)
+                global_perms_q = Q(can_view=True) & Q(
+                    Q(sites__in=[site]) | Q(sites__isnull=True)
+                )
+                global_view_perms = GlobalPagePermission.objects.with_user(
+                    request.user).filter(global_perms_q).exists()
+    
+                # a global permission was given to the request's user
+                if global_view_perms:
+                    return True
 
             elif not is_restricted:
                 if ((get_cms_setting('PUBLIC_FOR') == 'all') or
