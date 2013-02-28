@@ -446,7 +446,6 @@ class PageAdmin(ModelAdmin):
         return form
 
     def get_inline_instances(self, request, obj=None):
-        import ipdb; ipdb.set_trace()
         if DJANGO_1_4:
             inlines = super(PageAdmin, self).get_inline_instances(request)
             if hasattr(self, '_current_page'):
