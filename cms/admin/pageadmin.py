@@ -446,7 +446,7 @@ class PageAdmin(ModelAdmin):
         return form
 
     def get_inline_instances(self, request, obj=None):
-        if DJANGO_1_4:
+        if DJANGO_1_4 or DJANGO_1_3:
             inlines = super(PageAdmin, self).get_inline_instances(request)
             if hasattr(self, '_current_page'):
                 obj = self._current_page
