@@ -530,7 +530,7 @@ class PageAdmin(ModelAdmin):
         # determine if current user has enough rights to see PagePermissionInlineAdmin
         # because in django versions <1.5 get_inline_instances doesn't receive 'obj'
         # as a parameter, the workaround is to set it as an attribute...
-        if DJANGO_1_4:
+        if DJANGO_1_4 or DJANGO_1_3:
             self._current_page = obj
         response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
