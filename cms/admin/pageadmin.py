@@ -51,6 +51,7 @@ from cms.utils.plugins import current_site
 from menus.menu_pool import menu_pool
 
 DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
+DJANGO_1_4 = LooseVersion('1.4') <= LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -444,10 +445,15 @@ class PageAdmin(ModelAdmin):
 
         return form
 
-    def get_inline_instances(self, request):
-        inlines = super(PageAdmin, self).get_inline_instances(request)
-        if get_cms_setting('PERMISSION') and hasattr(self, '_current_page')\
-                and self._current_page:
+    def get_inline_instances(self, request, obj=None):
+        import ipdb; ipdb.set_trace()
+        if DJANGO_1_4:
+            inlines = super(PageAdmin, self).get_inline_instances(request)
+            if hasattr(self, '_current_page'):
+                obj = self._current_page
+        else:
+            inlines = super(PageAdmin, self).get_inline_instances(request, obj)
+        if get_cms_setting('PERMISSION') and obj:
             filtered_inlines = []
             for inline in inlines:
                 if (isinstance(inline, PagePermissionInlineAdmin)
@@ -455,7 +461,7 @@ class PageAdmin(ModelAdmin):
                     if "recover" in request.path or "history" in request.path:
                         # do not display permissions in recover mode
                         continue
-                    if not self._current_page.has_change_permissions_permission(request):
+                    if not obj.has_change_permissions_permission(request):
                         continue
                 filtered_inlines.append(inline)
             inlines = filtered_inlines
@@ -523,9 +529,10 @@ class PageAdmin(ModelAdmin):
 
         # get_inline_instances will need access to 'obj' so that it can
         # determine if current user has enough rights to see PagePermissionInlineAdmin
-        # because get_inline_instances doesn't receive 'obj' as a parameter,
-        # the workaround is to set it as an attribute...
-        self._current_page = obj
+        # because in django versions <1.5 get_inline_instances doesn't receive 'obj'
+        # as a parameter, the workaround is to set it as an attribute...
+        if DJANGO_1_4:
+            self._current_page = obj
         response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
             location = response._headers['location']
