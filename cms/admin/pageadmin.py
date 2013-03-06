@@ -24,7 +24,7 @@ from copy import deepcopy
 from distutils.version import LooseVersion
 from django import template
 from django.conf import settings
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_deleted_objects
 from urllib2 import unquote
