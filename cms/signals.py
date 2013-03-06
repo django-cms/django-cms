@@ -236,14 +236,15 @@ def update_placeholders(instance, **kwargs):
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
 
-def check_if_page_is_home(instance, **kwargs):
-    instance.is_current_home_page = instance.is_home()
+def check_if_deleted_page_was_home(instance, **kwargs):
+    instance.is_home_page_at_deletion = instance.is_home()
 
-def reset_home_page_paths(instance, **kwargs):
+def adjust_path_of_new_home_page(instance, **kwargs):
     """If the page that got deleted was the home page, we need to reset 
     the paths of the page which became the new home page.
     """
-    if instance.is_current_home_page:
+    # the attribute name now translates to 'was_home_page_at_deletion'
+    if instance.is_home_page_at_deletion:
         try:
             new_home = instance.get_object_queryset().get_home()
         except NoHomeFound:
@@ -260,8 +261,8 @@ signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
-signals.pre_delete.connect(check_if_page_is_home, sender=Page)
-signals.post_delete.connect(reset_home_page_paths, sender=Page)
+signals.pre_delete.connect(check_if_deleted_page_was_home, sender=Page)
+signals.post_delete.connect(adjust_path_of_new_home_page, sender=Page)
 
 def pre_save_user(instance, raw, **kwargs):
     clear_user_permission_cache(instance)
