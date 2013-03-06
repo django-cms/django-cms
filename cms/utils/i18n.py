@@ -111,7 +111,7 @@ def get_language_object(language_code, site_id=None):
     :return: the language object filled up by defaults
     """
     for language in get_languages(site_id):
-        if language['code'] == language_code:
+        if language['code'] == get_language_code(language_code):
             return language
     raise LanguageError('Language not found: %s' % language_code)
 
