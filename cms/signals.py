@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import itertools
-
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
@@ -216,18 +214,18 @@ def post_save_page(instance, **kwargs):
     except NoHomeFound:
         pass
     else:
+        instance_titles = instance.title_set.all()
         if home_page.pk == instance.pk:
             for title in Title.objects.filter(path=''):
-                if title not in instance.title_set.all():
+                if title not in instance_titles:
                     title.save()
         else:
-            if any(title.path == '' for title in instance.title_set.all()):
+            if any(title.path == '' for title in instance_titles):
                 for title in home_page.title_set.all():
                     title.save()
-    for page in itertools.chain([instance], instance.get_descendants()):
-        for title in page.title_set.all():
-            update_title(title)
-            title.save()
+    for title in Title.objects.filter(page__in=instance.get_descendants(include_self=True)):
+        update_title(title)
+        title.save()
 
 
 def update_placeholders(instance, **kwargs):
@@ -236,15 +234,19 @@ def update_placeholders(instance, **kwargs):
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
 
-def check_if_deleted_page_was_home(instance, **kwargs):
-    instance.is_home_page_at_deletion = instance.is_home()
+def attach_home_page_deletion_attr(instance, **kwargs):
+    """Pre-delete signal handler that attaches  a magic attribute that shows
+    whether the currently deleted page is the home page.
+    This attribute is later used by adjust_path_of_new_home_page for adjusting
+    the path of the new home page.
+    """
+    instance._home_page_deletion = instance.is_home()
 
 def adjust_path_of_new_home_page(instance, **kwargs):
-    """If the page that got deleted was the home page, we need to reset 
-    the paths of the page which became the new home page.
+    """Post-delete signal handler. If the page that got deleted was the home page,
+    then we need to reset the paths of the page that became the new home page.
     """
-    # the attribute name now translates to 'was_home_page_at_deletion'
-    if instance.is_home_page_at_deletion:
+    if instance._home_page_deletion:
         try:
             new_home = instance.get_object_queryset().get_home()
         except NoHomeFound:
@@ -261,7 +263,7 @@ signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
-signals.pre_delete.connect(check_if_deleted_page_was_home, sender=Page)
+signals.pre_delete.connect(attach_home_page_deletion_attr, sender=Page)
 signals.post_delete.connect(adjust_path_of_new_home_page, sender=Page)
 
 def pre_save_user(instance, raw, **kwargs):
