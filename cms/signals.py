@@ -6,6 +6,7 @@ from django.dispatch import Signal
 
 from cms.cache.permissions import (
     clear_user_permission_cache, clear_permission_cache)
+from cms.exceptions import NoHomeFound
 from cms.models import (Page, Title, CMSPlugin, PagePermission, 
     GlobalPagePermission, PageUser, PageUserGroup)
 
@@ -46,12 +47,10 @@ page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.upda
 def update_title(title):
     parent_page_id = title.page.parent_id
     slug = u'%s' % title.slug
-    
     if title.page.is_home():
         title.path = ''
     elif not title.has_url_overwrite:
         title.path = u'%s' % slug
-
         if parent_page_id:
             parent_title = Title.objects.get_title(parent_page_id,
                 language=title.language, language_fallback=True)
@@ -207,18 +206,54 @@ def post_save_page_moderator(instance, raw, created, **kwargs):
         # tell moderator something was happen with this page
         from cms.utils.moderator import page_changed
         page_changed(instance, old_page)
-        
+
+
 def post_save_page(instance, **kwargs):
-    for page in instance.get_descendants():
-        for title in page.title_set.all():
-            update_title(title)
-            title.save()
+    try:
+        home_page = instance.get_object_queryset().get_home()
+    except NoHomeFound:
+        pass
+    else:
+        instance_titles = instance.title_set.all()
+        if home_page.pk == instance.pk:
+            for title in Title.objects.filter(path=''):
+                if title not in instance_titles:
+                    title.save()
+        else:
+            if any(title.path == '' for title in instance_titles):
+                for title in home_page.title_set.all():
+                    title.save()
+    for title in Title.objects.filter(page__in=instance.get_descendants(include_self=True)):
+        update_title(title)
+        title.save()
+
 
 def update_placeholders(instance, **kwargs):
     instance.rescan_placeholders()
 
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
+
+def attach_home_page_deletion_attr(instance, **kwargs):
+    """Pre-delete signal handler that attaches  a magic attribute that shows
+    whether the currently deleted page is the home page.
+    This attribute is later used by adjust_path_of_new_home_page for adjusting
+    the path of the new home page.
+    """
+    instance._home_page_deletion = instance.is_home()
+
+def adjust_path_of_new_home_page(instance, **kwargs):
+    """Post-delete signal handler. If the page that got deleted was the home page,
+    then we need to reset the paths of the page that became the new home page.
+    """
+    if instance._home_page_deletion:
+        try:
+            new_home = instance.get_object_queryset().get_home()
+        except NoHomeFound:
+            pass
+        else:
+            for title in new_home.title_set.all():
+                title.save()
 
 if settings.CMS_MODERATOR:
     # tell moderator, there is something happening with this page
@@ -228,6 +263,8 @@ signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
+signals.pre_delete.connect(attach_home_page_deletion_attr, sender=Page)
+signals.post_delete.connect(adjust_path_of_new_home_page, sender=Page)
 
 def pre_save_user(instance, raw, **kwargs):
     clear_user_permission_cache(instance)

@@ -11,12 +11,12 @@ from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-                                      URL_CMS_PAGE_ADD)
+                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE_STATUS)
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-    URL_CMS_PAGE_ADD)
+    URL_CMS_PAGE_ADD, URL_CMS_PAGE_DELETE)
 from cms.test_utils.util.context_managers import (LanguageOverride, 
     SettingsOverride)
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
@@ -318,7 +318,7 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post("/admin/cms/page/%s/move-page/" % page2.pk, {"target": page1.pk, "position": "right"})
             self.assertEqual(response.status_code, 200)
             page1 = Page.objects.get(pk=page1.pk)
-            self.assertEqual(page1.get_path(), page_data1['slug'])
+            self.assertEqual(page1.get_path(), '')
             page2 = Page.objects.get(pk=page2.pk)
             self.assertEqual(page2.get_path(), page_data2['slug'])
             page3 = Page.objects.get(pk=page3.pk)
@@ -731,6 +731,193 @@ class PagesTestCase(CMSTestCase):
         home.publish()
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
+
+    def _create_page(self, slug, parent_pk=None):
+        page_data = self.get_new_page_data()
+        page_data['slug'] = slug
+        if parent_pk:
+            page_data['parent'] = parent_pk
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertEqual(302, response.status_code)
+        # since we:
+        #  * didn't expliclty provide the id 
+        #  * since id is auto_increment
+        #  * page_data['published'] = False (a single page object is created)
+        # => the newly added page has the biggest pk
+        new_page = Page.objects.order_by('-id')[0]
+        return new_page
+
+    def _refresh_page_from_db(self, page):
+        return Page.objects.get(pk=page.pk)
+
+    def _create_simple_page_hierarchy(self):
+        """ creates the following hierarchy:
+
+        +-- root1 (published)
+        |     |
+        |     |-- child1 (published)
+        |
+        |-- root2 (not published)
+              |
+              |-- child2 (not published)
+        
+        """
+        root1 = self._create_page('root1', parent_pk=None)
+        self.assertEqual('root1', root1.get_path())
+        self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root1.pk, {1: 1})
+        root1 = self._refresh_page_from_db(root1)
+        self.assertEqual('', root1.get_path())
+        child1 = self._create_page('child1', parent_pk=root1.pk)
+        self.client.post(URL_CMS_PAGE_CHANGE_STATUS % child1.pk, {1: 1})
+        child1 = self._refresh_page_from_db(child1)
+        self.assertEqual('child1', child1.get_path())
+
+        root2 = self._create_page('root2', parent_pk=None)
+        self.assertEqual('root2', root2.get_path())
+        child2 = self._create_page('child2', parent_pk=root2.pk)
+        self.assertEqual('root2/child2', child2.get_path())
+        return root1, child1, root2, child2
+
+    def _test_paths(self, moderated, change_states, expected_paths):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            with SettingsOverride(CMS_MODERATOR=moderated):
+                root1, child1, root2, child2 = self._create_simple_page_hierarchy()
+                change_states(root1, child1, root2, child2)
+
+                root1 = self._refresh_page_from_db(root1)
+                root2 = self._refresh_page_from_db(root2)
+                child1 = self._refresh_page_from_db(child1)
+                child2 = self._refresh_page_from_db(child2)
+                expected_root1, expected_child1, expected_root2, expected_child2 = expected_paths
+
+                self.assertEqual(expected_root1, root1.get_path())
+                self.assertEqual(expected_child1, child1.get_path())
+                self.assertEqual(expected_root2, root2.get_path())
+                self.assertEqual(expected_child2, child2.get_path())
+                if settings.CMS_MODERATOR:
+                    self.assertEqual(expected_root1, root1.publisher_public.get_path())
+                    self.assertEqual(expected_child1, child1.publisher_public.get_path())
+                    self.assertEqual(expected_root2, root2.publisher_public.get_path())
+                    self.assertEqual(expected_child2, child2.publisher_public.get_path())
+            
+
+    def _create_pages_and_switch_status_1(self, moderated):
+
+        def change_states(root1, child1, root2, child2):
+            # unpublish the first root page
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root1.pk, {1: 1})
+            # publish the second root page and it's child
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root2.pk, {1: 1})
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % child2.pk, {1: 1})
+
+        self._test_paths(moderated, change_states, (
+                'root1',
+                'root1/child1',
+                '',
+                'child2'))
+
+    def _create_pages_and_switch_status_2(self, moderated):
+        """same as _create_pages_and_switch_status_1 but with inverted publishing order """
+
+        def change_states(root1, child1, root2, child2):
+            # publish the second root page and it's child
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root2.pk, {1: 1})
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % child2.pk, {1: 1})
+            # unpublish the first root page
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root1.pk, {1: 1})
+
+        self._test_paths(moderated, change_states, (
+                'root1',
+                'root1/child1',
+                '',
+                'child2'
+                ))
+
+    def _create_pages_and_switch_status_3(self, moderated):
+        """same as _create_pages_and_switch_status_1 but with inverted publishing order """
+
+        def change_states(root1, child1, root2, child2):
+            # publish the second root page and it's child
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root2.pk, {1: 1})
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % child2.pk, {1: 1})
+            # unpublish the first root page
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root1.pk, {1: 1})
+            # and publish it back
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root1.pk, {1: 1})
+
+        self._test_paths(moderated, change_states, (
+                '',
+                'child1',
+                'root2',
+                'root2/child2'
+                ))
+
+    def _create_and_move_pages(self, moderated):
+
+        def change_states(root1, child1, root2, child2):
+            # publish the second root page and it's child
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root2.pk, {1: 1})
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % child2.pk, {1: 1})
+            response = self.client.post('/admin/cms/page/%s/move-page/' % root2.pk, {'target': root1.pk, 'position': 'left'})
+            self.assertEqual(response.status_code, 200)
+
+        self._test_paths(moderated, change_states, (
+                'root1',
+                'root1/child1',
+                '',
+                'child2'
+                ))
+
+    def _create_and_delete_pages(self, moderated):
+
+        def change_states(root1, child1, root2, child2):
+            # publish the second root page and it's child
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % root2.pk, {1: 1})
+            self.client.post(URL_CMS_PAGE_CHANGE_STATUS % child2.pk, {1: 1})
+            # and delete the first root1
+            response = self.client.post(URL_CMS_PAGE_DELETE % root1.pk, {'post': 'yes'})
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            with SettingsOverride(CMS_MODERATOR=moderated):
+                root1, child1, root2, child2 = self._create_simple_page_hierarchy()
+                change_states(root1, child1, root2, child2)
+                root2 = self._refresh_page_from_db(root2)
+                child2 = self._refresh_page_from_db(child2)
+                self.assertEqual('', root2.get_path())
+                self.assertEqual('child2', child2.get_path())
+
+    def test_path_generation_1_no_moderation(self):
+        self._create_pages_and_switch_status_1(moderated=False)
+
+    def test_path_generation_1_with_moderation(self):
+        self._create_pages_and_switch_status_1(moderated=True)
+
+    def test_path_generation_2_no_moderation(self):
+        self._create_pages_and_switch_status_2(moderated=False)
+
+    def test_path_generation_2_with_moderation(self):
+        self._create_pages_and_switch_status_2(moderated=True)
+
+    def test_path_generation_3_no_moderation(self):
+        self._create_pages_and_switch_status_3(moderated=False)
+
+    def test_path_generation_3_with_moderation(self):
+        self._create_pages_and_switch_status_3(moderated=True)
+
+    def test_create_and_move_pages_no_moderation(self):
+        self._create_and_move_pages(moderated=False)
+
+    def test_create_and_move_pages_with_moderation(self):
+        self._create_and_move_pages(moderated=True)
+
+    def test_create_and_delete_pages_no_moderation(self):
+        self._create_and_delete_pages(moderated=False)
+
+    def test_create_and_delete_pages_with_moderation(self):
+        self._create_and_delete_pages(moderated=True)
 
     def test_plugin_loading_queries(self):
         with SettingsOverride(CMS_TEMPLATES = (('placeholder_tests/base.html', 'tpl'),)):
