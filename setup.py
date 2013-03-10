@@ -1,7 +1,5 @@
 from setuptools import setup, find_packages
 import os
-import cms
-
         
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
@@ -15,12 +13,15 @@ CLASSIFIERS = [
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
 ]
-
 setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
     name='django-cms',
-    version=cms.__version__,
+    version=[
+        line.split('=')[1].strip().strip("'")
+        for line in open(os.path.join(os.path.dirname(__file__), 'cms', '__init__.py'))
+        if line.startswith('__version__')
+    ][0],
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     url='https://www.django-cms.org/',
