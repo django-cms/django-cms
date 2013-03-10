@@ -34,7 +34,8 @@ from django.core.urlresolvers import reverse
 from django.db import router, transaction, models
 from django.forms import CharField
 from django.http import (HttpResponseRedirect, HttpResponse, Http404, 
-    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError)
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError,
+    HttpRequest)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import (title, escape, force_escape, 
@@ -144,14 +145,25 @@ def contribute_list_filter(cls):
     setattr(cls, 'list_filter', list_filter)
 
 
-def mutually_exclusive(func):
+def _get_request_from_varags(args, kwargs):
+    for arg in args:
+        if isinstance(arg, HttpRequest):
+            return arg
+    for k, v in kwargs.iteritems():
+        if k == 'request' and isinstance(v, HttpRequest):
+            return v
+    raise ValueError('This decorator should be used on views (=> at least one request obj)')
+
+def mutually_exclusive_on_post(func):
 
     @transaction.commit_manually
     def wrap(*args, **kwargs):
+        request = _get_request_from_varags(args, kwargs)
         transaction.commit()
         try:
-            Page.objects.select_for_update().using(router.db_for_write(Page))\
-                .all().exists()
+            if request.method == 'POST':
+                Page.objects.select_for_update().using(router.db_for_write(Page))\
+                    .all().exists()
             ret_value = func(*args, **kwargs)
             transaction.commit()
             return ret_value
@@ -506,7 +518,7 @@ class PageAdmin(ModelAdmin):
             inlines = filtered_inlines
         return inlines
 
-    @mutually_exclusive
+    @mutually_exclusive_on_post
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         if settings.CMS_MODERATOR and 'target' in request.GET and 'position' in request.GET:
@@ -524,6 +536,7 @@ class PageAdmin(ModelAdmin):
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
+    @mutually_exclusive_on_post
     def change_view(self, request, object_id, extra_context=None):
         """
         The 'change' admin view for the Page model.
@@ -782,7 +795,7 @@ class PageAdmin(ModelAdmin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    @mutually_exclusive
+    @mutually_exclusive_on_post
     def move_page(self, request, page_id, extra_context=None):
         """
         Move the page to the requested target, at the given position
@@ -843,7 +856,7 @@ class PageAdmin(ModelAdmin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
 
-    @mutually_exclusive
+    @mutually_exclusive_on_post
     def copy_page(self, request, page_id, extra_context=None):
         """
         Copy the page and all its plugins and descendants to the requested target, at the given position
@@ -928,7 +941,7 @@ class PageAdmin(ModelAdmin):
             path = '%s?edit-off' % referer.split('?')[0]
         return HttpResponseRedirect( path )
 
-
+    @mutually_exclusive_on_post
     def delete_view(self, request, object_id, *args, **kwargs):
         """If page is under modaretion, just mark this page for deletion = add
         delete action to page states.
@@ -1080,6 +1093,7 @@ class PageAdmin(ModelAdmin):
                                      page.site.domain, url)
         return HttpResponseRedirect(url)
 
+    @mutually_exclusive_on_post
     def change_status(self, request, page_id):
         """
         Switch the status of a page
@@ -1098,6 +1112,7 @@ class PageAdmin(ModelAdmin):
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
+    @mutually_exclusive_on_post
     def change_innavigation(self, request, page_id):
         """
         Switch the in_navigation of a page
