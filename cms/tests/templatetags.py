@@ -208,14 +208,13 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
 
     def test_show_placeholder_for_page_marks_output_safe(self):
         from django.core.cache import cache;cache.clear()
-        from cms.test_utils import project
         page = create_page('Test', 'col_two.html', 'en')
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         request = RequestFactory().get('/')
         template = Template("{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
