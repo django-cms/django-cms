@@ -19,6 +19,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 from itertools import chain
 import re
+from sekizai.helpers import Watcher, get_varname
 
 
 register = template.Library()
@@ -368,6 +369,15 @@ class CleanAdminListFilter(InclusionTag):
         return {'title': spec.title(), 'choices': unique_choices}
 
 
+def _restore_sekizai(context, changes):
+    varname = get_varname()
+    sekizai_container = context[varname]
+    for key, values in changes.items():
+        sekizai_namespace = sekizai_container[key]
+        for value in values:
+            sekizai_namespace.append(value)
+
+
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
         site=None, cache_result=True):
     """
@@ -389,26 +399,30 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     if lang is None:
         lang = get_language_from_request(request)
 
-    content = None
-
     if cache_result:
         base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
         cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
-        content = cache.get(cache_key)
+        cached_value = cache.get(cache_key)
+        if isinstance(cached_value, dict): # new style
+            _restore_sekizai(context, cached_value['sekizai'])
+            return {'content': mark_safe(cached_value['content'])}
+        elif isinstance(cached_value, basestring): # old style
+            return {'content': mark_safe(cached_value)}
 
-    if not content:
-        page = _get_page_by_untyped_arg(page_lookup, request, site_id)
-        if not page:
-            return {'content': ''}
-        try:
-            placeholder = page.placeholders.get(slot=placeholder_name)
-        except PlaceholderModel.DoesNotExist:
-            if settings.DEBUG:
-                raise
-            return {'content': ''}
-        content = render_placeholder(placeholder, context, placeholder_name)
+    page = _get_page_by_untyped_arg(page_lookup, request, site_id)
+    if not page:
+        return {'content': ''}
+    try:
+        placeholder = page.placeholders.get(slot=placeholder_name)
+    except PlaceholderModel.DoesNotExist:
+        if settings.DEBUG:
+            raise
+        return {'content': ''}
+    watcher = Watcher(context)
+    content = render_placeholder(placeholder, context, placeholder_name)
+    changes = watcher.get_changes()
     if cache_result:
-        cache.set(cache_key, content, get_cms_setting('CACHE_DURATIONS')['content'])
+        cache.set(cache_key, {'content': content, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
 
     if content:
         return {'content': mark_safe(content)}

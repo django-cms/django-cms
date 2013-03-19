@@ -34,7 +34,7 @@ from cms.apphook_pool import apphook_pool
 from cms.exceptions import NoPermissionsException
 from cms.forms.widgets import PluginEditor
 from cms.models import (Page, Title, CMSPlugin, PagePermission,
-    PageModeratorState, EmptyTitle, GlobalPagePermission)
+    PageModeratorState, EmptyTitle, GlobalPagePermission, titlemodels)
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
@@ -342,7 +342,7 @@ class PageAdmin(ModelAdmin):
 
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
-            except:
+            except titlemodels.Title.DoesNotExist:
                 title_obj = EmptyTitle()
             if form.base_fields['site'].initial is None:
                 form.base_fields['site'].initial = obj.site
@@ -461,12 +461,30 @@ class PageAdmin(ModelAdmin):
             inlines = filtered_inlines
         return inlines
 
+    def get_unihandecode_context(self, language):
+        if language[:2] in get_cms_setting('UNIHANDECODE_DECODERS'):
+            uhd_lang = language[:2]
+        else:
+            uhd_lang = get_cms_setting('UNIHANDECODE_DEFAULT_DECODER')
+        uhd_host = get_cms_setting('UNIHANDECODE_HOST')
+        uhd_version = get_cms_setting('UNIHANDECODE_VERSION')
+        if uhd_lang and uhd_host and uhd_version:
+            uhd_urls = [
+                '%sunihandecode-%s.core.min.js' % (uhd_host, uhd_version),
+                '%sunihandecode-%s.%s.min.js' % (uhd_host, uhd_version, uhd_lang),
+                ]
+        else:
+            uhd_urls = []
+        return {'unihandecode_lang': uhd_lang, 'unihandecode_urls': uhd_urls}
+
+
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         language = get_language_from_request(request)
         extra_context.update({
             'language': language,
         })
+        extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
     def change_view(self, request, object_id, extra_context=None):
@@ -498,7 +516,10 @@ class PageAdmin(ModelAdmin):
             }
             context.update(extra_context or {})
             extra_context = self.update_language_tab_context(request, obj, context)
-        tab_language = request.GET.get("language", None)
+
+        tab_language = request.GET.get("language", getattr(request, 'LANGUAGE_CODE', settings.LANGUAGE_CODE))
+
+        extra_context.update(self.get_unihandecode_context(tab_language))
 
         # get_inline_instances will need access to 'obj' so that it can
         # determine if current user has enough rights to see PagePermissionInlineAdmin
