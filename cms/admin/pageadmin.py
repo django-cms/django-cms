@@ -517,7 +517,7 @@ class PageAdmin(ModelAdmin):
             context.update(extra_context or {})
             extra_context = self.update_language_tab_context(request, obj, context)
 
-        tab_language = request.GET.get("language", request.LANGUAGE_CODE)
+        tab_language = request.GET.get("language", getattr(request, 'LANGUAGE_CODE', settings.LANGUAGE_CODE))
 
         extra_context.update(self.get_unihandecode_context(tab_language))
 
