@@ -1295,7 +1295,6 @@ class PageAdmin(ModelAdmin):
                 'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
                 'plugin': cms_plugin,
                 'is_popup': True,
-                'name': unicode(cms_plugin),
                 "type": cms_plugin.get_plugin_name(),
                 'plugin_id': plugin_id,
                 'icon': force_escape(escapejs(cms_plugin.get_instance_icon_src())),
@@ -1303,11 +1302,14 @@ class PageAdmin(ModelAdmin):
                 'cancel': True,
             }
             instance = cms_plugin.get_plugin_instance()[0]
-            if not instance:
+            if instance:
+                context['name'] = unicode(instance)
+            else:
                 # cancelled before any content was added to plugin
                 cms_plugin.delete()
                 context.update({
-                    "deleted":True,
+                    "deleted": True,
+                    'name': unicode(cms_plugin),
                 })
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
