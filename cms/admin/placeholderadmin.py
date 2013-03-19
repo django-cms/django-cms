@@ -72,11 +72,12 @@ class PlaceholderAdmin(ModelAdmin):
             return fieldsets
         fieldsets = []
         fieldsets.append((None, {'fields': [f for f in form.base_fields.keys() if not f in placeholder_fields]}))
-        for placeholder in placeholder_fields:
-            fieldsets.append((self.get_label_for_placeholder(placeholder), {
-                'fields': (placeholder,),
-                'classes': ('plugin-holder', 'plugin-holder-nopage',),
-            }))
+        if obj:
+            for placeholder in placeholder_fields:
+                fieldsets.append((self.get_label_for_placeholder(placeholder), {
+                    'fields': (placeholder,),
+                    'classes': ('plugin-holder', 'plugin-holder-nopage',),
+                }))
         readonly_fields = self.get_readonly_fields(request, obj)
         if readonly_fields:
             fieldsets.append((None, {'fields': list(readonly_fields)}))
