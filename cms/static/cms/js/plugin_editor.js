@@ -173,7 +173,7 @@
 	};
 
 	hide_iframe = function (id, type, title, msg){
-		html = "<strong>"+type+"</strong>";
+		html = "<b>"+type+"</b>";
 		if( title != "" && title != null){
 			html += " [ "+title+ " ]"
 		}
