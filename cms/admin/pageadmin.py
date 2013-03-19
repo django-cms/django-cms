@@ -1305,7 +1305,7 @@ class PageAdmin(ModelAdmin):
             instance = cms_plugin.get_plugin_instance()[0]
             if not instance:
                 # cancelled before any content was added to plugin
-                cms_plugin.delete()
+                cms_plugin.delete_with_public()
                 context.update({
                     "deleted":True,
                 })

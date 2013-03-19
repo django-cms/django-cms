@@ -11,7 +11,7 @@ from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, urlutils, page as page_utils
 from cms.utils import timezone
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register
+from cms.utils.helpers import reversion_register, cleanup_plugins
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -451,6 +451,8 @@ class Page(MPTTModel):
                         page.save()
             elif page.publisher_state == Page.PUBLISHER_STATE_PENDING:
                 page.publish()
+
+        cleanup_plugins(page=self)
 
         # fire signal after publishing is done
         import cms.signals as cms_signals

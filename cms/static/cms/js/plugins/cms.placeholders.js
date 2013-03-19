@@ -144,10 +144,6 @@ CMS.$(document).ready(function ($) {
 					});
 				var cancel = $(this).contents().find('input[name^="_cancel"]');
 					cancel.bind('click', function (e) {
-						e.preventDefault();
-						// hide frame
-						that.toggleFrame();
-						that.toggleDim();
 						// If the toolbar was hidden before we started editing
 						// this plugin, and it is NOT hidden now, hide it
 						if (needs_collapsing && ! CMS.API.Toolbar.isToolbarHidden()){
