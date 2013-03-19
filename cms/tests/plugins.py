@@ -6,6 +6,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.plugins.utils import get_plugins_for_page
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
@@ -697,6 +698,19 @@ class PluginsTestCase(PluginsTestBaseCase):
         from cms.plugins.utils import build_plugin_tree
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
         plugin_pool.unregister_plugin(DumbFixturePlugin)
+
+    def test_get_plugins_for_page(self):
+        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+                              slug="page1", published=True, in_navigation=True)
+        ph_en = page_en.placeholders.get(slot="col_left")
+        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm inside an existing placeholder.")
+        # This placeholder is not in the template.
+        ph_en_not_used = page_en.placeholders.create(slot="not_used")
+        text_plugin_2 = add_plugin(ph_en_not_used, "TextPlugin", "en", body="I'm inside a non-existent placeholder.")
+        page_plugins = get_plugins_for_page(None, page_en, page_en.get_title_obj_attribute('language'))
+        db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
+        self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
+        self.assertEquals(db_text_plugin_1.pk, text_plugin_1.pk)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):
