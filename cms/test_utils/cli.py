@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 from distutils.version import LooseVersion
 import django
 import os
@@ -233,6 +234,15 @@ def configure(db_url, **extra):
         from django.utils.functional import empty
         settings._wrapped = empty
     defaults.update(extra)
+    # add data from env
+    extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
+    if extra_settings:
+        from django.utils.simplejson import load, loads
+        if os.path.exists(extra_settings):
+            with open(extra_settings) as fobj:
+                defaults.update(load(fobj))
+        else:
+            defaults.update(loads(extra_settings))
     settings.configure(**defaults)
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()
