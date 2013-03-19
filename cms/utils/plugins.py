@@ -57,6 +57,7 @@ def _extend_nodelist(extend_node):
     # we don't support variable extensions
     if is_variable_extend_node(extend_node):
         return []
+    # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
     blocks = extend_node.blocks
     _extend_blocks(extend_node, blocks)
     placeholders = []
@@ -72,6 +73,8 @@ def _extend_nodelist(extend_node):
 def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
     placeholders = []
     if ignore_blocks is None:
+        # List of BlockNode instances to ignore.
+        # This is important to avoid processing overriden block nodes.
         ignore_blocks = []
 
     for node in nodelist:
@@ -105,7 +108,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                     if isinstance(subnodelist, NodeList):
                         if isinstance(node, BlockNode):
                             current_block = node
-                        placeholders += _scan_placeholders(subnodelist, current_block)
+                        placeholders += _scan_placeholders(subnodelist, current_block, ignore_blocks)
         # else just scan the node for nodelist instance attributes
         else:
             for attr in dir(node):
@@ -113,7 +116,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                 if isinstance(obj, NodeList):
                     if isinstance(node, BlockNode):
                         current_block = node
-                    placeholders += _scan_placeholders(obj, current_block)
+                    placeholders += _scan_placeholders(obj, current_block, ignore_blocks)
     return placeholders
 
 def get_placeholders(template):
