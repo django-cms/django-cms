@@ -698,6 +698,19 @@ class PluginsTestCase(PluginsTestBaseCase):
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
         plugin_pool.unregister_plugin(DumbFixturePlugin)
 
+    def test_is_last_in_placeholder(self):
+        """
+        Tests that children plugins don't affect the is_last_in_placeholder plugin method.
+        """
+        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+                              slug="page1", published=True, in_navigation=True)
+        ph_en = page_en.placeholders.get(slot="col_left")
+        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
+        inner_text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1")
+        text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
+        self.assertEquals(text_plugin_2.is_last_in_placeholder(), True)
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):
