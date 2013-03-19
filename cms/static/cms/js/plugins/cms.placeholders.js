@@ -15,6 +15,10 @@ CMS.$(document).ready(function ($) {
 	 * @compatibility: IE >= 6, FF >= 2, Safari >= 4, Chrome > =4, Opera >= 10
 	 */
 
+	CMS.SetIframeHeight = function(height){
+		$('#cms_placeholder-iframe').height(height);
+	};
+
 	CMS.Placeholders = CMS.Class.$extend({
 
 		options: {

@@ -44,9 +44,7 @@
 		window.onload = runOnLoad.run;
 	}
 	runOnLoad(function(){
-        {% if plugin.pk %}
-		parent.setiframeheight($('body').height()+20, {{ plugin.pk }});
-        {% endif %}
+		parent.CMS.SetIframeHeight($('body').height()+20);
     });
 	$(document).ready(function(){
 		$("a.add-another,a.related-lookup").each(function(i, sign){

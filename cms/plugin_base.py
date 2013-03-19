@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from cms.utils import get_cms_setting
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.template.defaultfilters import force_escape
 import re
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
@@ -188,7 +191,17 @@ class CMSPluginBase(admin.ModelAdmin):
         New version will be created in admin.views.edit_plugin
         """
         self.object_successfully_changed = True
-        return super(CMSPluginBase, self).response_add(request, obj)
+        context = {
+            'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
+            'plugin': obj,
+            'is_popup': True,
+            'name': unicode(obj),
+            "type": obj.get_plugin_name(),
+            'plugin_id': obj.pk,
+            'icon': force_escape(obj.get_instance_icon_src()),
+            'alt': force_escape(obj.get_instance_icon_alt()),
+            }
+        return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
     def log_addition(self, request, object):
         pass
