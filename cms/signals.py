@@ -216,7 +216,7 @@ def post_save_page(instance, **kwargs):
     else:
         instance_titles = instance.title_set.all()
         if home_page.pk == instance.pk:
-            for title in Title.objects.filter(path=''):
+            for title in Title.objects.filter(path='', page__site=instance.site):
                 if title not in instance_titles:
                     title.save()
         else:
