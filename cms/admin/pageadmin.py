@@ -1376,9 +1376,20 @@ class PageAdmin(ModelAdmin):
             if not placeholder_slot in placeholders:
                 return HttpResponseBadRequest(str("error"))
             placeholder = page.placeholders.get(slot=placeholder_slot)
-            plugin.placeholder = placeholder
             # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
             position = CMSPlugin.objects.filter(placeholder=placeholder).count()
+            limits = placeholder_utils.get_placeholder_conf("limits", placeholder.slot, page.get_template())
+            if limits:
+                global_limit = limits.get("global")
+                type_limit = limits.get(plugin.plugin_type)
+                if global_limit and position >= global_limit:
+                    return HttpResponseBadRequest(_("This placeholder already has the maximum number of plugins"))
+                elif type_limit:
+                    type_count = CMSPlugin.objects.filter(language=language, placeholder=placeholder, plugin_type=plugin_type).count()
+                    if type_count >= type_limit:
+                        plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
+                        return HttpResponseBadRequest(_("This placeholder already has the maximum number allowed of %s plugins.") % plugin_name)
+            plugin.placeholder = placeholder
             plugin.position = position
             # update the placeholder on all descendant plugins as well
             for child in plugin.get_descendants():
