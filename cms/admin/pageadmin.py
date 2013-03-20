@@ -278,7 +278,6 @@ class PageAdmin(ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
-
         Title.objects.set_or_create(
             request,
             obj,
@@ -1067,6 +1066,9 @@ class PageAdmin(ModelAdmin):
                 if page.published or is_valid_url(page.get_absolute_url(),page,False):
                     page.published = not page.published
                     page.save()
+                    if page.publisher_public:
+                        page.publisher_public.published = page.published
+                        page.publisher_public.save()
                 return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
             except ValidationError,e:
                 return jsonify_request(HttpResponseBadRequest(e.messages))
