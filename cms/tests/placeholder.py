@@ -451,7 +451,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 200)
                 response = admin.add_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins.")
+                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit(self):
         placeholder = self.get_placeholder()
@@ -469,7 +469,55 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 200)
                 response = admin.add_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of TextPlugin plugins.")
+                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of allowed Text plugins.")
+
+    def test_global_limit_on_plugin_move(self):
+        admin = self.get_admin()
+        superuser = self.get_superuser()
+        source_placeholder = Placeholder.objects.create(slot='source')
+        target_placeholder = self.get_placeholder()
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        plugin_2 = add_plugin(**data)
+        plugin_3 = add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
+                response = admin.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
+                response = admin.move_plugin(request) # second
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
+                response = admin.move_plugin(request) # third
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+
+    def test_type_limit_on_plugin_move(self):
+        admin = self.get_admin()
+        superuser = self.get_superuser()
+        source_placeholder = Placeholder.objects.create(slot='source')
+        target_placeholder = self.get_placeholder()
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'TextPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        plugin_2 = add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
+                response = admin.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
+                response = admin.move_plugin(request) # second
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of allowed Text plugins.")
 
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
