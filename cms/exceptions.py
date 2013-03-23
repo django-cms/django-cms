@@ -9,7 +9,7 @@ class PluginNotRegistered(Exception):
 
 class PluginLimitReached(Exception):
     """
-    Get's triggered when a placeholder has reached it's plugin limit.
+    Gets triggered when a placeholder has reached it's plugin limit.
     """
     pass
 
