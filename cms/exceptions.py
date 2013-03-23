@@ -7,6 +7,13 @@ class PluginNotRegistered(Exception):
     pass
 
 
+class PluginLimitReached(Exception):
+    """
+    Get's triggered when a placeholder has reached it's plugin limit.
+    """
+    pass
+
+
 class AppAlreadyRegistered(Exception):
     pass
 
