@@ -461,9 +461,8 @@ class PagePermissionsPermissionManager(models.Manager):
             return cached
         # check global permissions
         global_permissions = GlobalPagePermission.objects.with_user(user)
-        if global_permissions.filter(**{
-                attr: True, 'sites__in': [site]
-            }).exists():
+        if global_permissions.filter(Q(sites__in=[site]) | Q(sites__isnull=True)
+                ).filter(**{attr: True}).exists():
             # user or his group are allowed to do `attr` action
             # !IMPORTANT: page permissions must not override global permissions
             return PagePermissionsPermissionManager.GRANT_ALL
@@ -478,7 +477,7 @@ class PagePermissionsPermissionManager(models.Manager):
 
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":
-                    page_id_allow_list.append(permission.page.id)
+                    page_id_allow_list.append(permission.page_id)
                 if permission.grant_on & MASK_CHILDREN and not attr is "can_add":
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:

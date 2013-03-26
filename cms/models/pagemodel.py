@@ -8,7 +8,7 @@ from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
-from cms.utils import i18n, urlutils, page as page_utils
+from cms.utils import i18n, page as page_utils
 from cms.utils import timezone
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
@@ -16,7 +16,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
@@ -588,6 +587,8 @@ class Page(MPTTModel):
             self.all_languages = map(str, self.all_languages)
         return self.all_languages
 
+    ### MPTT properties cache
+
     def get_cached_ancestors(self, ascending=True):
         if ascending:
             if not hasattr(self, "ancestors_ascending"):
@@ -598,7 +599,12 @@ class Page(MPTTModel):
                 self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
 
-    # ## Title object access
+    def get_cached_descendants(self):
+        if not hasattr(self, "_cached_descendants"):
+            self._cached_descendants = list(self.get_descendants())
+        return self._cached_descendants
+
+    ### Title object access
 
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
         """Helper function for accessing wanted / current title.
@@ -748,54 +754,31 @@ class Page(MPTTModel):
         return _("default")
 
     def has_view_permission(self, request):
-        from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-        from cms.utils.plugins import current_site
+        from cms.utils.permissions import get_any_page_view_permissions, has_global_page_permission
+        can_see_unrestricted = get_cms_setting('PUBLIC_FOR') == 'all' or (
+            get_cms_setting('PUBLIC_FOR') == 'staff' and request.user.is_staff)
 
-        if not self.publisher_is_draft:
-            return self.publisher_draft.has_view_permission(request)
-        # does any restriction exist?
-        # inherited and direct
-        is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
-        if request.user.is_authenticated():
-            site = current_site(request)
-            global_perms_q = Q(can_view=True) & Q(
-                Q(sites__in=[site]) | Q(sites__isnull=True)
-            )
-            global_view_perms = GlobalPagePermission.objects.with_user(
-                request.user).filter(global_perms_q).exists()
+        # inherited and direct view permissions
+        is_restricted = bool(get_any_page_view_permissions(request, self))
 
+        if not is_restricted and can_see_unrestricted:
+            return True
+        elif not request.user.is_authenticated():
+            return False
+
+        if not is_restricted:
             # a global permission was given to the request's user
-            if global_view_perms:
+            if has_global_page_permission(request, self.site_id, can_view=True):
                 return True
-
-            elif not is_restricted:
-                if ((get_cms_setting('PUBLIC_FOR') == 'all') or
-                    (get_cms_setting('PUBLIC_FOR') == 'staff' and
-                     request.user.is_staff)):
-                    return True
-
-            # a restricted page and an authenticated user
-            elif is_restricted:
-                opts = self._meta
-                codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-                user_perm = request.user.has_perm(codename)
-                generic_perm = self.has_generic_permission(request, "view")
-                return (user_perm or generic_perm)
-
         else:
-            #anonymous user
-            if is_restricted or not get_cms_setting('PUBLIC_FOR') == 'all':
-                # anyonymous user, page has restriction and global access is permitted
-                return False
-            else:
-                # anonymous user, no restriction saved in database
+            # a specific permission was granted to the request's user
+            if self.get_draft_object().has_generic_permission(request, "view"):
                 return True
-        # Authenticated user
-        # Django wide auth perms "can_view" or cms auth perms "can_view"
+
+        # The user has a normal django permission to view pages globally
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-        return (request.user.has_perm(codename) or
-                self.has_generic_permission(request, "view"))
+        return request.user.has_perm(codename)
 
     def has_change_permission(self, request):
         opts = self._meta

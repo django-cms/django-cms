@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from cms.exceptions import NoPermissionsException
-from cms.models import Page, PagePermission, GlobalPagePermission
+from cms.models import Page, PagePermission, GlobalPagePermission, MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from django.conf import settings
@@ -8,7 +9,6 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-
 
 
 try:
@@ -31,6 +31,7 @@ def get_current_user():
     Returns current user, or None
     """
     return getattr(_thread_locals, 'user', None)
+
 
 def has_page_add_permission(request):
     """
@@ -71,6 +72,7 @@ def has_page_add_permission(request):
             return True
     return False
 
+
 def has_any_page_change_permissions(request):
     from cms.utils.plugins import current_site
     if not request.user.is_authenticated():
@@ -81,6 +83,7 @@ def has_any_page_change_permissions(request):
             Q(user=request.user) |
             Q(group__in=request.user.groups.all())
         )).exists()
+
 
 def has_page_change_permission(request):
     """
@@ -111,7 +114,9 @@ def has_global_page_permission(request, site=None, **filters):
     :param filters: queryset filters, e.g. ``can_add = True``
     :return: ``True`` or ``False``
     """
-    if request.user.is_superuser:
+    if not request.user.is_authenticated():
+        return False
+    if not settings.CMS_PERMISSION or request.user.is_superuser:
         return True
     if not hasattr(request, '_cms_global_perms'):
         request._cms_global_perms = {}
@@ -124,13 +129,6 @@ def has_global_page_permission(request, site=None, **filters):
             qs = qs.filter(Q(sites__in=[site]) | Q(sites__isnull=True))
         request._cms_global_perms[key] = qs.exists()
     return request._cms_global_perms[key]
-
-
-def get_any_page_view_permissions(request, page):
-    """
-    Used by the admin template tag is_restricted
-    """
-    return PagePermission.objects.for_page(page=page).filter(can_view=True)
 
 
 def get_user_permission_level(user):
@@ -253,7 +251,7 @@ def has_global_change_permissions_permission(request):
     user = request.user
     if user.is_superuser or (
         user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
-        has_global_page_permission(request, can_change=True)):
+        has_global_page_permission(request, can_change_permissions=True)):
         return True
     return False
 
@@ -264,6 +262,97 @@ def has_generic_permission(page_id, user, attr, site):
     func = getattr(Page.permissions, "get_%s_id_list" % attr)
     permission = func(user, site)
     return permission == Page.permissions.GRANT_ALL or page_id in permission
+
+
+def load_ancestors(pages):
+    """
+    Loads the ancestors, children and descendants cache for a set of pages.
+    :param pages: A queryset of pages to examine
+    :return: The list of pages, including ancestors
+    """
+    pages_by_id = dict((page.pk, page) for page in pages)
+    pages_list = list(pages)
+    # Ensure that all parent pages are present so that inheritance will work
+    # For most use cases, this should not actually do any work
+    missing = list(pages)
+    while missing:
+        page = missing.pop()
+        page.ancestors_descending = []
+        page._cached_children = []
+        page._cached_descendants = []
+        if page.parent_id and page.parent_id not in pages_by_id:
+            pages_list.append(page.parent)
+            pages_by_id[page.parent_id] = page.parent
+            missing.append(page.parent)
+    pages_list.sort(key=lambda page: (page.tree_id, page.lft))
+    for page in pages_list:
+        if page.parent_id:
+            parent = pages_by_id[page.parent_id]
+            page.ancestors_descending = parent.ancestors_descending + [parent]
+            parent._cached_children.append(page)
+            for ancestor in page.ancestors_descending:
+                ancestor._cached_descendants.append(page)
+        else:
+            page.ancestors_descending = []
+        page.ancestors_ascending = list(reversed(page.ancestors_descending))
+    return pages_list
+
+
+def get_any_page_view_permissions(request, page):
+    """
+    Used by the admin template tag is_restricted
+    """
+    if not settings.CMS_PERMISSION:
+        return []  # Maybe None here, to indicate "not applicable"?
+    if not hasattr(request, '_cms_view_perms'):
+        request._cms_view_perms = {}
+    page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
+    if page_id not in request._cms_view_perms:
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
+        perms = list(PagePermission.objects.for_page(page=page).filter(can_view=True))
+        request._cms_view_perms[page_id] = perms
+    return request._cms_view_perms.get(page_id, [])
+
+
+def load_view_restrictions(request, pages):
+    """ Load all view restrictions for the pages and update the cache in the request
+    The request cache will receive values for all the pages, but the returned
+    dict will only have keys where restrictions actually exist
+    """
+    restricted_pages = defaultdict(list)
+    if settings.CMS_PERMISSION:
+        if hasattr(request, '_cms_view_perms'):
+            cache = request._cms_view_perms
+            # TODO: Check if we have anything that requires checking
+        else:
+            cache = request._cms_view_perms = {}
+        pages_list = load_ancestors(pages)
+        pages_by_id = {}
+        for page in pages_list:
+            page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
+            pages_by_id[page_id] = page
+            cache[page_id] = []
+        page_permissions = PagePermission.objects.filter(page__in=pages_by_id).select_related('group__users')
+        for perm in page_permissions:
+            perm_page = pages_by_id[perm.page_id]
+            # add the page itself
+            if perm.grant_on & MASK_PAGE:
+                restricted_pages[perm_page.pk].append(perm)
+            # add children
+            if perm.grant_on & MASK_CHILDREN:
+                children = perm_page.get_children()
+                for child in children:
+                    restricted_pages[child.pk].append(perm)
+            # add descendants
+            elif perm.grant_on & MASK_DESCENDANTS:
+                descendants = perm_page.get_cached_descendants()
+                for child in descendants:
+                    restricted_pages[child.pk].append(perm)
+        # Overwrite cache where we found restrictions
+        cache.update(restricted_pages)
+
+    return restricted_pages
 
 
 def get_user_sites_queryset(user):
@@ -277,7 +366,7 @@ def get_user_sites_queryset(user):
     """
     qs = Site.objects.all()
 
-    if user.is_superuser:
+    if user.is_superuser or not settings.CMS_PERMISSION:
         return qs
 
     global_ids = GlobalPagePermission.objects.with_user(user).filter(
