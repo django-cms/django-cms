@@ -153,9 +153,7 @@ class CMSPlugin(MPTTModel):
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
-                instance = getattr(self, plugin.model.__name__.lower())
-                # could alternatively be achieved with:
-                # instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
+                instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
                 instance._render_meta = self._render_meta
             except (AttributeError, ObjectDoesNotExist):
                 instance = None
