@@ -48,6 +48,39 @@ It can take a few minutes to run.
 When you run tests against your own new code, don't forget that it's useful to
 repeat them for different versions of Python and Django.
 
+multiple environments
+=====================
+
+There is a ```tox`` <http://tox.readthedocs.org/en/latest/>`_ configuration
+that allows running the testsuite in a number of combinations of python and
+django with just one command.::
+
+    # install tox and detox. It's up to you if you want to install this tool
+    # globally or inside a virtualenv. tox automatically creates
+    # virtualenvs.
+    pip install tox detox
+
+    # run the testsuite for all supported environments
+    tox
+    # OR run the testsuite for all supported environments simultaneously
+    # in multiple processes
+    detox
+
+    # OR run the testsuite in a specific environment (see tox.ini for all
+    # possibilities)
+    detox -e py26-django-dev,py27-django-dev
+
+``detox`` is just a wrapper around ``tox`` that runs each environment in a
+parallel process.
+
+It is also possible to only run specific test cases::
+
+    # run a specific testcase in the default environments
+    tox -- PluginsTestCase.test_add_edit_plugin
+    # run a specific testcase in specific environments
+    tox -e py27-django14,py27-django-dev -- PluginsTestCase.test_add_edit_plugin
+
+
 *************
 Writing tests
 *************
