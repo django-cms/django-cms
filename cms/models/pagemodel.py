@@ -104,6 +104,11 @@ class Page(MPTTModel):
             title = u""
         return unicode(title)
 
+    def __repr__(self):
+        # This is needed to solve the infinite recursion when
+        # adding new pages.
+        return object.__repr__(self)
+
     def is_dirty(self):
         return self.publisher_state == self.PUBLISHER_STATE_DIRTY
 
