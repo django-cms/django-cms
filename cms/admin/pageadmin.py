@@ -447,10 +447,11 @@ class PageAdmin(ModelAdmin):
     def get_inline_instances(self, request, obj=None):
         if django.VERSION[:2] < (1, 5):
             inlines = super(PageAdmin, self).get_inline_instances(request)
+            if hasattr(self, '_current_page'):
+                obj = self._current_page
         else:
             inlines = super(PageAdmin, self).get_inline_instances(request, obj)
-        if get_cms_setting('PERMISSION') and hasattr(self, '_current_page')\
-                and self._current_page:
+        if get_cms_setting('PERMISSION') and obj:
             filtered_inlines = []
             for inline in inlines:
                 if (isinstance(inline, PagePermissionInlineAdmin)
@@ -458,7 +459,7 @@ class PageAdmin(ModelAdmin):
                     if "recover" in request.path or "history" in request.path:
                         # do not display permissions in recover mode
                         continue
-                    if not self._current_page.has_change_permissions_permission(request):
+                    if not obj.has_change_permissions_permission(request):
                         continue
                 filtered_inlines.append(inline)
             inlines = filtered_inlines
