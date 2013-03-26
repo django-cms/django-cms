@@ -134,7 +134,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test plugin history view
         """
-        from reversion.models import Version
+        import reversion
         page_data = self.get_new_page_data()
         # two versions created by simply creating the page
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -148,7 +148,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # page version 5
         txt = self._edit_text_plugin(created_plugin_id, "Hello Bar")
         self.assertEquals("Hello Bar", txt.body)
-        versions = [v.pk for v in Version.objects.get_for_object(page)]
+        versions = [v.pk for v in reversed(reversion.get_for_object(page))]
         history_url = '%s%d/' % (
             URL_CMS_PLUGIN_HISTORY_EDIT % (page_id, versions[-2]),
             created_plugin_id)

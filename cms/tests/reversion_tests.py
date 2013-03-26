@@ -12,8 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from os.path import join
 from cms.test_utils.project.fileapp.models import FileModel
-from reversion import (revision as revision_manager, 
-    revision_context_manager as revision_context)
+import reversion
 from reversion.models import Revision, Version, VERSION_CHANGE
 import shutil
 
@@ -140,7 +139,7 @@ class ReversionFileFieldTests(CMSTestCase):
         shutil.rmtree(join(settings.MEDIA_ROOT, 'fileapp'))
 
     def test_file_persistence(self):
-        with revision_manager:
+        with reversion.create_revision():
             # add a file instance
             file1 = FileModel()
             file1.test_file.save('file1.txt',
@@ -148,8 +147,10 @@ class ReversionFileFieldTests(CMSTestCase):
             file1.save()
             # manually add a revision because we use the explicit way
             # django-cms uses too.
-            adapter = revision_manager.get_adapter(FileModel)
-            revision_context.add_to_context(revision_manager, file1, adapter.get_version_data(file1, VERSION_CHANGE))
+            adapter = reversion.get_adapter(FileModel)
+            reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1, VERSION_CHANGE))
 
         # reload the instance from db
         file2 = FileModel.objects.all()[0]
@@ -157,7 +158,7 @@ class ReversionFileFieldTests(CMSTestCase):
         file2.delete()
 
         # revert the old version
-        file_version = Version.objects.get_for_object(file1)[0]
+        file_version = reversion.get_for_object(file1)[0]
         file_version.revert()
 
         # reload the reverted instance and check for its content

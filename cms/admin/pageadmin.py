@@ -57,11 +57,12 @@ require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
+    import reversion.models
     from reversion.admin import VersionAdmin as ModelAdmin
-    create_on_success = reversion.revision.create_on_success
+    from reversion import create_revision
 else: # pragma: no cover
     from django.contrib.admin import ModelAdmin
-    create_on_success = lambda x: x
+    create_revision = lambda: lambda x: x
 
 if DJANGO_1_3:
     """
@@ -734,7 +735,7 @@ class PageAdmin(ModelAdmin):
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def change_template(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
         if not page.has_change_permission(request):
@@ -956,7 +957,7 @@ class PageAdmin(ModelAdmin):
             return HttpResponseRedirect("../../../../")
         return HttpResponseRedirect("../../")
 
-    @create_on_success
+    @create_revision()
     def delete_translation(self, request, object_id, extra_context=None):
 
         language = get_language_from_request(request)
@@ -1127,7 +1128,7 @@ class PageAdmin(ModelAdmin):
                 template="admin/cms/page/lazy_menu.html")
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def add_plugin(self, request):
         """
         Could be either a page or a parent - if it's a parent we get the page via parent.
@@ -1196,7 +1197,7 @@ class PageAdmin(ModelAdmin):
         return HttpResponse(str(plugin.pk), content_type='text/plain')
 
     @require_POST
-    @create_on_success
+    @create_revision()
     @transaction.commit_on_success
     def copy_plugins(self, request):
         if 'history' in request.path or 'recover' in request.path:
@@ -1231,7 +1232,7 @@ class PageAdmin(ModelAdmin):
         plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by('position')
         return render_to_response('admin/cms/page/widgets/plugin_item.html', {'plugin_list':plugin_list}, RequestContext(request))
 
-    @create_on_success
+    @create_revision()
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         if not 'history' in request.path and not 'recover' in request.path:
@@ -1356,7 +1357,7 @@ class PageAdmin(ModelAdmin):
         return response
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def move_plugin(self, request):
         if 'history' in request.path:
             return HttpResponseBadRequest(str("error"))
@@ -1423,7 +1424,7 @@ class PageAdmin(ModelAdmin):
         return HttpResponse(str("ok"))
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def remove_plugin(self, request):
         if 'history' in request.path:
             raise Http404()
