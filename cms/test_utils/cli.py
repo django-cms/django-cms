@@ -171,6 +171,7 @@ def configure(db_url, **extra):
             ('col_two.html', gettext('two columns')),
             ('col_three.html', gettext('three columns')),
             ('nav_playground.html', gettext('navigation examples')),
+            ('simple.html', 'simple'),
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
