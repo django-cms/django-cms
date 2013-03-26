@@ -25,6 +25,34 @@ class BoundRenderMeta(object):
         self.total = 1
         self.text_enabled = getattr(meta, 'text_enabled', False)
 
+class StatusModel(models.Model):
+    """
+    Metaclass that add a status field to CMSPlugin subclasses. To be inherited 
+    while subclassing CMSPlugin 
+    """
+    status = models.BooleanField(
+       _('Status'), 
+       default=True,
+       help_text=_('Active'),
+    )
+    class Meta:
+        abstract = True
+
+
+class WrapModel(models.Model):
+    """
+    Abstract class that add a wrap field to CMSPlugin subclasses. To be inherited
+    while subclassing CMSPlugin
+    """
+    wrap = models.BooleanField(
+        _('Wrap content'),
+        default=False,
+        help_text=_('if True, plugin content will be rendered inside a container div'),
+    )
+    class Meta:
+        abstract = True
+
+
 
 class PluginModelBase(MPTTModelBase):
     """

@@ -1,10 +1,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin, StatusModel
 from cms.plugins.video import settings
 from os.path import basename
 
-class Video(CMSPlugin):
+class Video(CMSPlugin, StatusModel):
     # player settings
     movie = models.FileField(_('movie file'), upload_to=CMSPlugin.get_media_path, help_text=_('use .flv file or h264 encoded video file'), blank=True, null=True)
     movie_url = models.CharField(_('movie url'), max_length=255, help_text=_('vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-iJ7bs4mTUY'), blank=True, null=True)
@@ -30,11 +30,15 @@ class Video(CMSPlugin):
     
         
     def __unicode__(self):
+        if self.status:
+            status = "On - "
+        else:
+            status = "Off - "
         if self.movie:
-            name = self.movie.path
+            name = status+self.movie.path
         else:
             name = self.movie_url
-        return u"%s" % basename(name)
+        return u"%s%s" % (status, basename(name))
 
     def get_height(self):
         return "%s" % (self.height)

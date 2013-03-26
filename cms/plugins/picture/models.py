@@ -2,10 +2,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from cms.models import CMSPlugin, Page
+from cms.models import CMSPlugin, Page, StatusModel
 from os.path import basename
 
-class Picture(CMSPlugin):
+class Picture(CMSPlugin, StatusModel):
     """
     A Picture with or without a link.
     """
@@ -34,13 +34,17 @@ class Picture(CMSPlugin):
         choices=FLOAT_CHOICES, help_text=_("Move image left, right or center."))
 
     def __unicode__(self):
+        if self.status:
+            status = "On - "
+        else:
+            status = "Off - "
         if self.alt:
-            return self.alt[:40]
+            return status+self.alt[:36]
         elif self.image:
             # added if, because it raised attribute error when file wasn't
             # defined.
             try:
-                return u"%s" % basename(self.image.path)
+                return u"%s%s" % (status, basename(self.image.path))
             except:
                 pass
         return "<empty>"

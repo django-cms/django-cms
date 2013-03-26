@@ -1,4 +1,4 @@
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin,StatusModel, WrapModel
 from cms.plugins.text.utils import (plugin_admin_html_to_tags, 
     plugin_tags_to_admin_html, plugin_tags_to_id_list, replace_plugin_tags)
 from cms.utils.html import clean_html
@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 _old_tree_cache = {}
 
-class AbstractText(CMSPlugin):
+class AbstractText(CMSPlugin, StatusModel, WrapModel):
     """Abstract Text Plugin Class"""
     body = models.TextField(_("body"))
     
@@ -32,7 +32,10 @@ class AbstractText(CMSPlugin):
     search_fields = ('body',)
     
     def __unicode__(self):
-        return u"%s" % (truncate_words(strip_tags(self.body), 3)[:30]+"...")
+        if self.status:
+            return u"On - %s" % (truncate_words(strip_tags(self.body), 3)[:26]+"...")
+        else:
+            return u"Off - %s" % (truncate_words(strip_tags(self.body), 3)[:25]+"...")
     
     def clean(self):
         self.body = clean_html(self.body, full=False)

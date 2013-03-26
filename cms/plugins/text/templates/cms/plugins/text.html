@@ -1,1 +1,3 @@
-{{ body|safe }}
+{% if object.status %}
+    {{ body|safe }}
+{% endif %}
