@@ -163,6 +163,7 @@ class CMSChangeList(ChangeList):
                     # children should NOT be a queryset. If it is, check that
                     # your django-mptt version is 0.5.1
                     children[-1].last = False
+                    # children[children.count()-1].last = False
                 page.menu_level = 0
                 root_pages.append(page)
                 if page.parent_id:
