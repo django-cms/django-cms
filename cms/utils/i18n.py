@@ -34,6 +34,8 @@ def get_language_code(language_code):
     """
     Returns language code while making sure it's in LANGUAGES
     """
+    if not language_code:
+        return None
     languages = get_language_list()
     if language_code in languages: # direct hit
         return language_code

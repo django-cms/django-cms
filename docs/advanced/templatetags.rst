@@ -163,6 +163,13 @@ Example::
     <a href="{% page_url "help" %}">Help page</a>
     <a href="{% page_url request.current_page.parent %}">Parent page</a>
 
+If a matching page isn't found and :setting:`django:DEBUG` is ``True``, an
+exception will be raised. However, if :setting:`django:DEBUG` is ``False``, an
+exception will not be raised. Additionally, if
+:setting:`django:SEND_BROKEN_LINK_EMAILS` is ``True`` and you have specified
+some addresses in :setting:`django:MANAGERS`, an email will be sent to those
+addresses to inform them of the broken link.
+
 .. templatetag:: page_attribute
 
 page_attribute
