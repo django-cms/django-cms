@@ -51,27 +51,17 @@ from cms.utils.plugins import current_site
 from cms.plugins.utils import has_reached_plugin_limit
 from menus.menu_pool import menu_pool
 
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
+DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:
     import reversion
+    import reversion.models
     from reversion.admin import VersionAdmin as ModelAdmin
-    create_on_success = reversion.revision.create_on_success
+    from reversion import create_revision
 else: # pragma: no cover
     from django.contrib.admin import ModelAdmin
-    create_on_success = lambda x: x
-
-if DJANGO_1_3:
-    """
-    Backwards compatibility for Django < 1.4 and django-reversion 1.6
-    """
-    class ModelAdmin(ModelAdmin):
-        def get_inline_instances(self, request):
-            return self.inline_instances
-
-        def get_prepopulated_fields(self, request):
-            return self.prepopulated_fields
+    create_revision = lambda: lambda x: x
 
 
 def contribute_fieldsets(cls):
@@ -445,10 +435,14 @@ class PageAdmin(ModelAdmin):
 
         return form
 
-    def get_inline_instances(self, request):
-        inlines = super(PageAdmin, self).get_inline_instances(request)
-        if get_cms_setting('PERMISSION') and hasattr(self, '_current_page')\
-                and self._current_page:
+    def get_inline_instances(self, request, obj=None):
+        if DJANGO_1_4:
+            inlines = super(PageAdmin, self).get_inline_instances(request)
+            if hasattr(self, '_current_page'):
+                obj = self._current_page
+        else:
+            inlines = super(PageAdmin, self).get_inline_instances(request, obj)
+        if get_cms_setting('PERMISSION') and obj:
             filtered_inlines = []
             for inline in inlines:
                 if (isinstance(inline, PagePermissionInlineAdmin)
@@ -456,7 +450,7 @@ class PageAdmin(ModelAdmin):
                     if "recover" in request.path or "history" in request.path:
                         # do not display permissions in recover mode
                         continue
-                    if not self._current_page.has_change_permissions_permission(request):
+                    if not obj.has_change_permissions_permission(request):
                         continue
                 filtered_inlines.append(inline)
             inlines = filtered_inlines
@@ -524,9 +518,10 @@ class PageAdmin(ModelAdmin):
 
         # get_inline_instances will need access to 'obj' so that it can
         # determine if current user has enough rights to see PagePermissionInlineAdmin
-        # because get_inline_instances doesn't receive 'obj' as a parameter,
-        # the workaround is to set it as an attribute...
-        self._current_page = obj
+        # because in django versions <1.5 get_inline_instances doesn't receive 'obj'
+        # as a parameter, the workaround is to set it as an attribute...
+        if DJANGO_1_4:
+            self._current_page = obj
         response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path :
             location = response._headers['location']
@@ -626,12 +621,8 @@ class PageAdmin(ModelAdmin):
         if not self.has_change_permission(request, None):
             return HttpResponseForbidden(_("You do not have permission to change pages."))
         try:
-            if DJANGO_1_3:
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
-            else:
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
+            cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -728,7 +719,7 @@ class PageAdmin(ModelAdmin):
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def change_template(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
         if not page.has_change_permission(request):
@@ -950,7 +941,7 @@ class PageAdmin(ModelAdmin):
             return HttpResponseRedirect("../../../../")
         return HttpResponseRedirect("../../")
 
-    @create_on_success
+    @create_revision()
     def delete_translation(self, request, object_id, extra_context=None):
 
         language = get_language_from_request(request)
@@ -1121,7 +1112,7 @@ class PageAdmin(ModelAdmin):
                 template="admin/cms/page/lazy_menu.html")
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def add_plugin(self, request):
         """
         Could be either a page or a parent - if it's a parent we get the page via parent.
@@ -1190,7 +1181,7 @@ class PageAdmin(ModelAdmin):
         return HttpResponse(str(plugin.pk), content_type='text/plain')
 
     @require_POST
-    @create_on_success
+    @create_revision()
     @transaction.commit_on_success
     def copy_plugins(self, request):
         if 'history' in request.path or 'recover' in request.path:
@@ -1225,7 +1216,7 @@ class PageAdmin(ModelAdmin):
         plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by('position')
         return render_to_response('admin/cms/page/widgets/plugin_item.html', {'plugin_list':plugin_list}, RequestContext(request))
 
-    @create_on_success
+    @create_revision()
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         if not 'history' in request.path and not 'recover' in request.path:
@@ -1350,7 +1341,7 @@ class PageAdmin(ModelAdmin):
         return response
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def move_plugin(self, request):
         if 'history' in request.path:
             return HttpResponseBadRequest(str("error"))
@@ -1417,7 +1408,7 @@ class PageAdmin(ModelAdmin):
         return HttpResponse(str("ok"))
 
     @require_POST
-    @create_on_success
+    @create_revision()
     def remove_plugin(self, request):
         if 'history' in request.path:
             raise Http404()

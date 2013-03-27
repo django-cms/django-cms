@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from distutils.version import LooseVersion
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm
 from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter, PageAdmin
@@ -19,6 +20,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_DELETE,
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
+import django
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import site
@@ -31,6 +33,7 @@ from django.utils.encoding import smart_str
 from menus.menu_pool import menu_pool
 from types import MethodType
 
+DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 class AdminTestsBase(CMSTestCase):
 
@@ -951,7 +954,8 @@ class PluginPermissionTests(AdminTestsBase):
         # => must see the PagePermissionInline
         self.assertTrue(
             any(type(inline) is PagePermissionInlineAdmin
-                for inline in page_admin.get_inline_instances(request)))
+                for inline in page_admin.get_inline_instances(request,
+                    page if not DJANGO_1_4 else None)))
 
         page = Page.objects.get(pk=page.pk)
         # remove can_change_permission
@@ -963,7 +967,8 @@ class PluginPermissionTests(AdminTestsBase):
         # => PagePermissionInline is no longer visible
         self.assertFalse(
             any(type(inline) is PagePermissionInlineAdmin
-                for inline in page_admin.get_inline_instances(request)))
+                for inline in page_admin.get_inline_instances(request,
+                    page if not DJANGO_1_4 else None)))
 
     def test_plugin_add_returns_valid_pk_for_plugin(self):
         admin = self._get_admin()

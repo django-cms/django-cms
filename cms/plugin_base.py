@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
-from cms.utils import get_cms_setting
+from distutils.version import LooseVersion
 import re
+
+from cms.utils import get_cms_setting
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
+import django
 from django import forms
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
+
+DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     """
@@ -178,14 +184,19 @@ class CMSPluginBase(admin.ModelAdmin):
         self.object_successfully_changed = True
         return super(CMSPluginBase, self).response_change(request, obj)
 
-    def response_add(self, request, obj):
+    def response_add(self, request, obj, **kwargs):
         """
         Just set a flag, so we know something was changed, and can make
         new version if reversion installed.
         New version will be created in admin.views.edit_plugin
         """
         self.object_successfully_changed = True
-        return super(CMSPluginBase, self).response_add(request, obj)
+        if not DJANGO_1_4:
+            post_url_continue = reverse('admin:cms_page_edit_plugin',
+                    args=(obj._get_pk_val(),),
+                    current_app=self.admin_site.name)
+            kwargs.setdefault('post_url_continue', post_url_continue)
+        return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
 
     def log_addition(self, request, object):
         pass
