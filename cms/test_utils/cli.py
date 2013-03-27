@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from distutils.version import LooseVersion
-import django
 import os
 import dj_database_url
 
 gettext = lambda s: s
 
 urlpatterns = []
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(db_url, **extra):
     from django.conf import settings
@@ -227,12 +224,8 @@ def configure(db_url, **extra):
             'django.contrib.auth.hashers.MD5PasswordHasher',
         )
     )
-    if DJANGO_1_3:
-        defaults['INSTALLED_APPS'].append("i18nurls")
-        defaults['MIDDLEWARE_CLASSES'][4] = 'i18nurls.middleware.LocaleMiddleware'
-    else:
-        from django.utils.functional import empty
-        settings._wrapped = empty
+    from django.utils.functional import empty
+    settings._wrapped = empty
     defaults.update(extra)
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)

@@ -81,13 +81,7 @@ def get_page_from_request(request):
     return new(request)
 
 
-"""
-The following class is taken from https://github.com/jezdez/django/compare/feature/staticfiles-templatetag
-and should be removed and replaced by the django-core version in 1.4
-"""
 default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-if LooseVersion(django.get_version()) < LooseVersion('1.3'):
-    default_storage = 'staticfiles.storage.StaticFilesStorage'
 
 
 class ConfiguredStorage(LazyObject):

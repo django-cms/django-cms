@@ -133,7 +133,7 @@ def post_save_user(instance, raw, created, **kwargs):
     from cms.utils.permissions import get_current_user
     # read current user from thread locals
     creator = get_current_user()
-    if not creator or not created or not hasattr(creator, 'pk'):
+    if not creator or not created or creator.is_anonymous():
         return
     from django.db import connection
 

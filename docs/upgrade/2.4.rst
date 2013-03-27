@@ -18,6 +18,15 @@ What's new in 2.4
     :ref:`cms-moderator-upgrade` below.
 
 
+Introducing Django 1.5 support, dropped support for Django 1.3 and Python 2.5
+=============================================================================
+
+Django CMS 2.4 introduces Django 1.5 support.
+
+In django CMS 2.4 we dropped support for Django 1.3 and Python 2.5.
+Django 1.4 and Python 2.6 are now the minimum required versions.
+
+
 .. _migrations-upgrade:
 
 Migrations overhaul
@@ -325,8 +334,7 @@ Backwards incompatible changes
 New minimum requirements for dependencies
 =========================================
 
-If you are running django 1.3.X you need to install django-i18nurls, if you want
-multilingual features. The ``cms.urls`` needs to be in a i18n url pattern.
+* Django 1.3 and Python 2.5 are no longer supported.
 
 
 ********************

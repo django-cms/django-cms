@@ -10,6 +10,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.utils import timezone
 
 from cms.admin.forms import PageForm
 from cms.admin.pageadmin import PageAdmin
@@ -27,8 +28,8 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
 from cms.test_utils.util.context_managers import (LanguageOverride,
                                                   SettingsOverride,
                                                   UserLoginContext)
+from cms.utils import get_cms_setting
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
-from cms.utils import timezone, get_cms_setting
 from cms.utils.page import is_valid_page_slug
 
 class PagesTestCase(CMSTestCase):

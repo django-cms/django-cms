@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
-from cms.utils import timezone
 
 
 class Title(models.Model):
