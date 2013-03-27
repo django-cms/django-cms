@@ -10,7 +10,7 @@ Requirements
 ************
 
 * `Python`_ 2.5 (or a higher release of 2.x).
-* `Django`_ 1.3.1 or 1.4.
+* `Django`_ 1.3.7, 1.4.5, 1.5 or higher
 * `South`_ 0.7.2 or higher
 * `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
@@ -40,11 +40,16 @@ Recommended
 
 * `django-filer`_ with its `django CMS plugins`_, file and image management
   application to use instead of some core plugins
-* `django-reversion`_ 1.6, to support versions of your content
+* `django-reversion`_ 1.5.7 (with Django 1.3.7), 1.6.6 (with Django 1.4.5),
+  1.7 (with Django 1.5) to support versions of your content (If using a
+  different Django version it is a good idea to check the page
+  `Compatible-Django-Versions`_ in the django-reversion wiki in order to
+  make sure that the package versions are compatible.)
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
 .. _django-reversion: https://github.com/etianen/django-reversion
+.. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
 On Ubuntu
 =========
