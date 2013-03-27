@@ -571,3 +571,15 @@ Example::
 
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
     :ref:`cache key prefixing <django:cache_key_prefixing>`
+
+
+CMS_MAX_PAGE_COUNT_FOR_DELETION
+===============================
+
+Default: ``10``
+
+
+This is the maximum number of pages you can delete by issuing a single delete request from the admin.
+This is needed because the Page table needs to be locked while pages are deleted for avoiding
+mptt inconsitences. Deleting a large page hierarchy might cause other requests
+to timeout waiting to acquire the table lock.

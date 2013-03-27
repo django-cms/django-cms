@@ -28,6 +28,7 @@ from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_deleted_objects
 from urllib2 import unquote
+from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
@@ -960,7 +961,11 @@ class PageAdmin(ModelAdmin):
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
-
+        max_pages_to_delete = settings.CMS_MAX_PAGE_COUNT_FOR_DELETION
+        if page.get_descendant_count() > max_pages_to_delete:
+            messages.error(request, "You can't delete more than %d pages at once" %
+                           max_pages_to_delete)
+            return HttpResponseRedirect(reverse('admin:cms_page_changelist'))
         response = super(PageAdmin, self).delete_view(request, object_id, *args, **kwargs)
         return response
 
