@@ -9,7 +9,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, urlutils, page as page_utils
-from cms.utils import timezone
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from django.conf import settings
@@ -18,6 +17,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel

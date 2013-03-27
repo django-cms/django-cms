@@ -51,7 +51,6 @@ from cms.utils.plugins import current_site
 from cms.plugins.utils import has_reached_plugin_limit
 from menus.menu_pool import menu_pool
 
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
 
@@ -63,17 +62,6 @@ if 'reversion' in settings.INSTALLED_APPS:
 else: # pragma: no cover
     from django.contrib.admin import ModelAdmin
     create_revision = lambda: lambda x: x
-
-if DJANGO_1_3:
-    """
-    Backwards compatibility for Django < 1.4 and django-reversion 1.6
-    """
-    class ModelAdmin(ModelAdmin):
-        def get_inline_instances(self, request):
-            return self.inline_instances
-
-        def get_prepopulated_fields(self, request):
-            return self.prepopulated_fields
 
 
 def contribute_fieldsets(cls):
@@ -633,12 +621,8 @@ class PageAdmin(ModelAdmin):
         if not self.has_change_permission(request, None):
             return HttpResponseForbidden(_("You do not have permission to change pages."))
         try:
-            if DJANGO_1_3:
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)
-            else:
-                cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                    self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
+            cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
+                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'

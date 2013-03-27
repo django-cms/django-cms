@@ -24,7 +24,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils import timezone
+from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User

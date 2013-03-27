@@ -8,13 +8,14 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
-from cms.utils import timezone, get_cms_setting
+from cms.utils import get_cms_setting
 
 from mptt.models import MPTTModel, MPTTModelBase
 
