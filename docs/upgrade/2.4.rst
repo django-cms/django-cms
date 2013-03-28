@@ -49,7 +49,8 @@ First, you'll need to upgrade to 2.3.3, to bring your migration history
 up-to-date with the new scheme. Then you'll need to perform the migrations for
 2.4.
 
-For the two-step upgrade process do the following in your project main directory::
+For the two-step upgrade process do the following in your project main directory
+::
 
     pip install django-cms==2.3.3
     python manage.py syncdb
@@ -62,7 +63,7 @@ Added delete orphaned plugins command
 
 Added a management command for deleting orphaned plugins from the database.
 
-The command can be run with::
+The command can be run with:
 
 	manage.py cms delete_orphaned_plugins
 
@@ -70,7 +71,7 @@ Please read :ref:`cms-delete-orphaned-plugins-command` before using.
 
 .. _cms-moderator-upgrade:
 
-Added a check command
+Addded a check command
 ======================
 
 Added a management command to check your configuration and environment.
@@ -103,7 +104,7 @@ Added Fix MPTTT Management command
 
 Added a management command for fixing MPTT tree data.
 
-The command can be run with::
+The command can be run with:
 
 	manage.py cms fix-mptt
 	
@@ -131,7 +132,7 @@ What you need to do:
   settings.
 - Be sure ``django.middleware.locale.LocaleMiddleware`` is in your settings,
   and that it comes after the SessionMiddleware.
-- Be sure that the ``cms.urls`` is included in a ``i18n_patterns``::
+- Be sure that the cms.urls is included in a ``i18n_patterns``::
 
         from django.conf.urls.defaults import *
         from django.conf.urls.i18n import i18n_patterns
@@ -153,9 +154,9 @@ What you need to do:
         ) + urlpatterns
 
 - Change your url and reverse calls to language namespaces. We now support the django way of
-  calling other language urls either via ``{% language %}`` templatetag or via ``activate("de")`` function call in views.
+  calling other language urls either via '{% language %}' templatetag or via 'activate("de")' function call in views.
 
-  Before::
+  Before ::
 
         {% url "de:myview" %}
 
@@ -224,7 +225,7 @@ The following settings are not needed any more and have been removed:
 - `CMS_SITE_LANGUAGES`
 - `CMS_FRONTEND_LANGUAGES`
 
-Please remove them from your ``settings.py``.
+Please remove them from your settings.py
 
 CMS_FLAT_URLS
 =============
@@ -236,13 +237,13 @@ Was marked deprecated in 2.3 and has now been removed.
 Plugins in Plugins
 ==================
 
-We added the ability to have plugins in plugins. Until now only the TextPlugin supported this.
-For demonstration purposes we created a MultiColumn Plugin. The possibilities for this are endless.
+We added the ability to have plugins in plugins. Till now only the TextPlugin supportet this.
+For demonstration purposes we created a MultiColumn Plugin. The Possiblities for this are endless.
 Imagine: StylePlugin, TablePlugin, GalleryPlugin etc.
 
 The column plugin can be found here:
 
-    https://github.com/divio/djangocms-column
+https://github.com/divio/djangocms-column
 
 At the moment the limitation is that plugins in plugins is only editable in the frontend.
 
@@ -271,7 +272,7 @@ If not provided you can add all plugins that are available in this placeholder.
 How to render your child plugins in the template
 ------------------------------------------------
 
-We introduce a new templatetag in the cms_tags called ``{% render_plugin %}``
+We introduce a new templatetag in the cms_tags called `{% render_plugin %}`
 Here is an example of how the MultiColumn plugin uses it::
 	
 	{% load cms_tags %}
@@ -281,7 +282,7 @@ Here is an example of how the MultiColumn plugin uses it::
 	{% endfor %}
 	</div>
 
-As you can see the children are accessible via the plugins children attribute.
+As you can see the children are accessible via the plugins childrens attribute.
 
 
 New way to handle django CMS settings
@@ -326,7 +327,7 @@ New minimum requirements for dependencies
 =========================================
 
 If you are running django 1.3.X you need to install django-i18nurls, if you want
-multilingual features. The ``cms.urls`` needs to be in a i18n url pattern.
+multilingual features. The cms.urls needs to be in a i18n url pattern.
 
 
 ********************

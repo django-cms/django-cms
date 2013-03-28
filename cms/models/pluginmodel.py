@@ -343,7 +343,7 @@ class CMSPlugin(MPTTModel):
         """
         WARNING: this is a rather expensive call compared to is_first_in_placeholder!
         """
-        return self.placeholder.cmsplugin_set.filter(parent__isnull=True).order_by('-position')[0].pk == self.pk
+        return self.placeholder.cmsplugin_set.all().order_by('-position')[0].pk == self.pk
 
     def get_position_in_placeholder(self):
         """

@@ -4,7 +4,6 @@ from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template.context import Context

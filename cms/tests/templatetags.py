@@ -190,7 +190,6 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
 
 class NoFixtureDatabaseTemplateTagTests(TestCase):
     def test_cached_show_placeholder_sekizai(self):
-        from django.core.cache import cache;cache.clear()
         from cms.test_utils import project
         template_dir = os.path.join(os.path.dirname(project.__file__), 'templates', 'alt_plugin_templates', 'show_placeholder')
         page = create_page('Test', 'col_two.html', 'en')
@@ -205,19 +204,3 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
             context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
             output = template.render(context)
             self.assertIn('JAVASCRIPT', output)
-
-    def test_show_placeholder_for_page_marks_output_safe(self):
-        from django.core.cache import cache;cache.clear()
-        page = create_page('Test', 'col_two.html', 'en')
-        placeholder = page.placeholders.all()[0]
-        add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-        request = RequestFactory().get('/')
-        template = Template("{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
-        context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
-            output = template.render(context)
-        self.assertIn('<b>Test</b>', output)
-        context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(0):
-            output = template.render(context)
-        self.assertIn('<b>Test</b>', output)

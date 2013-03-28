@@ -7,13 +7,6 @@ class PluginNotRegistered(Exception):
     pass
 
 
-class PluginLimitReached(Exception):
-    """
-    Gets triggered when a placeholder has reached it's plugin limit.
-    """
-    pass
-
-
 class AppAlreadyRegistered(Exception):
     pass
 

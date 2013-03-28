@@ -405,9 +405,9 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         cached_value = cache.get(cache_key)
         if isinstance(cached_value, dict): # new style
             _restore_sekizai(context, cached_value['sekizai'])
-            return {'content': mark_safe(cached_value['content'])}
+            return {'content': cached_value['content']}
         elif isinstance(cached_value, basestring): # old style
-            return {'content': mark_safe(cached_value)}
+            return {'content': cached_value}
 
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
     if not page:

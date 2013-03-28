@@ -4,13 +4,12 @@
 # 
 # Translators:
 # Jonas Obrist <me@ojii.ch>, 2011.
-# Michael P. Jung <michael.jung@terreon.de>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-08-14 09:44-0500\n"
-"PO-Revision-Date: 2013-03-19 23:00+0000\n"
+"PO-Revision-Date: 2011-03-22 15:38+0000\n"
 "Last-Translator: Jonas Obrist <ojiidotch@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"

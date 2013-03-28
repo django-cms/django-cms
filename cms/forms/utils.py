@@ -8,12 +8,13 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db.models.signals import post_save, post_delete
+from django.utils import translation
 from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 
 
 def update_site_and_page_choices(lang=None):
-    lang = lang or i18n.get_current_language()
+    lang = lang or translation.get_language()
     SITE_CHOICES_KEY = get_site_cache_key(lang)
     PAGE_CHOICES_KEY = get_page_cache_key(lang)
     title_queryset = (Title.objects.drafts()
@@ -57,14 +58,14 @@ def update_site_and_page_choices(lang=None):
     return site_choices, page_choices
 
 def get_site_choices(lang=None):
-    lang = lang or i18n.get_current_language()
+    lang = lang or translation.get_language()
     site_choices = cache.get(get_site_cache_key(lang))
     if site_choices is None:
         site_choices, page_choices = update_site_and_page_choices(lang)
     return site_choices
 
 def get_page_choices(lang=None):
-    lang = lang or i18n.get_current_language()
+    lang = lang or translation.get_language()
     page_choices = cache.get(get_page_cache_key(lang))
     if page_choices is None:
         site_choices, page_choices = update_site_and_page_choices(lang)

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.exceptions import PluginLimitReached
 from cms.forms.fields import PlaceholderFormField
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
@@ -7,7 +6,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request, cms_static_url, get_cms_setting
 from cms.utils.permissions import has_plugin_permission
-from cms.plugins.utils import has_reached_plugin_limit
 from copy import deepcopy
 from django.conf import settings
 from django.contrib.admin import ModelAdmin
@@ -151,11 +149,27 @@ class PlaceholderAdmin(ModelAdmin):
         # check add permissions on placeholder
         if not placeholder.has_add_permission(request):
             return HttpResponseForbidden(_("You don't have permission to add content here."))
-
-        try:
-            has_reached_plugin_limit(placeholder, plugin_type, language)
-        except PluginLimitReached, e:
-            return HttpResponseBadRequest(str(e))
+        
+        # check the limits defined in CMS_PLACEHOLDER_CONF for this placeholder
+        limits = get_cms_setting('PLACEHOLDER_CONF').get(placeholder.slot, {}).get('limits', None)
+        if limits:
+            count = placeholder.cmsplugin_set.count()
+            global_limit = limits.get("global", None)
+            type_limit = limits.get(plugin_type, None)
+            # check the global limit first
+            if global_limit and count >= global_limit:
+                return HttpResponseBadRequest(
+                    "This placeholder already has the maximum number of plugins."
+                )
+            elif type_limit: # then check the type specific limit
+                type_count = CMSPlugin.objects.filter(
+                    language=language, placeholder=placeholder, plugin_type=plugin_type
+                ).count()
+                if type_count >= type_limit:
+                    return HttpResponseBadRequest(
+                        "This placeholder already has the maximum number (%s) "
+                        "of %s plugins." % (type_limit, plugin_type)
+                    )
         
         # actually add the plugin
         plugin = CMSPlugin(language=language, plugin_type=plugin_type,
@@ -195,6 +209,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
                 'plugin': cms_plugin,
                 'is_popup': True,
+                'name': unicode(cms_plugin),
                 "type": cms_plugin.get_plugin_name(),
                 'plugin_id': plugin_id,
                 'icon': force_escape(escapejs(cms_plugin.get_instance_icon_src())),
@@ -202,14 +217,11 @@ class PlaceholderAdmin(ModelAdmin):
                 'cancel': True,
             }
             instance = cms_plugin.get_plugin_instance()[0]
-            if instance:
-                context['name'] = unicode(instance)
-            else:
+            if not instance:
                 # cancelled before any content was added to plugin
                 cms_plugin.delete()
                 context.update({
-                    "deleted": True,
-                    'name': unicode(cms_plugin),
+                    "deleted":True,
                 })
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
@@ -258,11 +270,6 @@ class PlaceholderAdmin(ModelAdmin):
             # check permissions
             if not placeholder.has_change_permission(request):
                 raise Http404
-
-            try:
-                has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language)
-            except PluginLimitReached, e:
-                return HttpResponseBadRequest(str(e))
 
             # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
             position = CMSPlugin.objects.filter(placeholder=placeholder).count()

@@ -4,7 +4,6 @@ from cms.utils import i18n
 class TestLanguages(SettingsOverrideTestCase):
 
     settings_overrides = {
-        'LANGUAGE_CODE': 'en-us',
         'LANGUAGES': (('fr', 'French'),
                       ('en', 'English'),
                       ('de', 'German'),
@@ -24,46 +23,34 @@ class TestLanguages(SettingsOverrideTestCase):
         },
         'SITE_ID': 1,
     }
-    
-    def test_language_code(self):
-        self.assertEqual(i18n.get_language_code(self.settings_overrides['LANGUAGE_CODE']), 'en')
-        self.assertEqual(i18n.get_current_language(), 'en')
 
     def test_get_languages_default_site(self):
         result = i18n.get_languages()
         self.assertEqual(2, len(result))
-        lang = result[0]        
-        self.assertEqual(lang['code'], 'en')        
-        self.assertEqual(i18n.get_language_code(lang['code']), 'en')        
+        lang = result[0]
+        self.assertEqual(lang['code'], 'en')
         self.assertEqual(lang['public'], True)
         lang = result[1]
         self.assertEqual(lang['code'], 'fr')
-        self.assertEqual(i18n.get_language_code(lang['code']), 'fr')
-        self.assertEqual(lang['public'], False)        
+        self.assertEqual(lang['public'], False)
 
     def test_get_languages_defined_site(self):
         result = i18n.get_languages(1)
         self.assertEqual(2, len(result))
         lang = result[0]
         self.assertEqual(lang['code'], 'en')
-        self.assertEqual(i18n.get_language_code(lang['code']), 'en')        
         self.assertEqual(lang['public'], True)
         lang = result[1]
         self.assertEqual(lang['code'], 'fr')
-        self.assertEqual(i18n.get_language_code(lang['code']), 'fr')        
         self.assertEqual(lang['public'], False)
 
     def test_get_languages_undefined_site(self):
         result = i18n.get_languages(66)
         self.assertEqual(4, len(result))
         self.assertEqual(result[0]['code'], 'fr')
-        self.assertEqual(i18n.get_language_code(result[0]['code']), 'fr')
         self.assertEqual(result[1]['code'], 'en')
-        self.assertEqual(i18n.get_language_code(result[1]['code']), 'en')
         self.assertEqual(result[2]['code'], 'de')
-        self.assertEqual(i18n.get_language_code(result[2]['code']), 'de')
         self.assertEqual(result[3]['code'], 'es')
-        self.assertEqual(i18n.get_language_code(result[3]['code']), 'es')
         for lang in result:
             self.assertEqual(lang['public'], True)
             self.assertEqual(lang['hide_untranslated'], False)
@@ -72,7 +59,6 @@ class TestLanguages(SettingsOverrideTestCase):
 class TestLanguagesNoDefault(SettingsOverrideTestCase):
 
     settings_overrides = {
-        'LANGUAGE_CODE': 'en-us',
         'LANGUAGES': (('fr', 'French'),
                       ('en', 'English'),
                       ('de', 'German'),
@@ -94,11 +80,9 @@ class TestLanguagesNoDefault(SettingsOverrideTestCase):
         self.assertEqual(2, len(result))
         lang = result[0]
         self.assertEqual(lang['code'], 'en')
-        self.assertEqual(i18n.get_language_code(lang['code']), 'en')        
         self.assertEqual(lang['public'], True)
         lang = result[1]
         self.assertEqual(lang['code'], 'fr')
-        self.assertEqual(i18n.get_language_code(lang['code']), 'fr') 
         self.assertEqual(lang['public'], False)
 
     def test_get_languages_defined_site(self):
@@ -106,24 +90,18 @@ class TestLanguagesNoDefault(SettingsOverrideTestCase):
         self.assertEqual(2, len(result))
         lang = result[0]
         self.assertEqual(lang['code'], 'en')
-        self.assertEqual(i18n.get_language_code(lang['code']), 'en')        
         self.assertEqual(lang['public'], True)
         lang = result[1]
         self.assertEqual(lang['code'], 'fr')
-        self.assertEqual(i18n.get_language_code(lang['code']), 'fr') 
         self.assertEqual(lang['public'], False)
 
     def test_get_languages_undefined_site(self):
         result = i18n.get_languages(66)
         self.assertEqual(4, len(result))
         self.assertEqual(result[0]['code'], 'fr')
-        self.assertEqual(i18n.get_language_code(result[0]['code']), 'fr')
         self.assertEqual(result[1]['code'], 'en')
-        self.assertEqual(i18n.get_language_code(result[1]['code']), 'en')   
         self.assertEqual(result[2]['code'], 'de')
-        self.assertEqual(i18n.get_language_code(result[2]['code']), 'de')
         self.assertEqual(result[3]['code'], 'es')
-        self.assertEqual(i18n.get_language_code(result[3]['code']), 'es')
         for lang in result:
             self.assertEqual(lang['public'], True)
             self.assertEqual(lang['hide_untranslated'], True)

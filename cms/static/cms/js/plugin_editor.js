@@ -103,17 +103,12 @@
 					var plugin_id = ui.item.attr('id').split('plugin_')[1];
 					var slot_name = ui.item.parent().parent().data('name');
 					var placeholder_id = ui.item.parent().parent().data('id');
-					$.ajax({
-						url: "move-plugin/", dataType: "html", type: "POST",
-						data: ({ placeholder:slot_name, placeholder_id:placeholder_id, plugin_id:plugin_id, ids:d }),
-						error: function(xhr) {
-							if (xhr.status < 500) {
-								alert(xhr.responseText);
-							}
-							// Cancel the drop
-							ui.sender.sortable("cancel");
-						}
-					});
+					$.post("move-plugin/", {
+						placeholder: slot_name,
+						placeholder_id: placeholder_id,
+						plugin_id: plugin_id,
+						ids: d
+					}, function(){}, "json");
 				} else {
 					// moved in placeholder
 					if (d) {
@@ -178,7 +173,7 @@
 	};
 
 	hide_iframe = function (id, type, title, msg){
-		html = "<b>"+type+"</b>";
+		html = "<strong>"+type+"</strong>";
 		if( title != "" && title != null){
 			html += " [ "+title+ " ]"
 		}
