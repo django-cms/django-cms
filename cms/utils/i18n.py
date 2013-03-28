@@ -42,6 +42,8 @@ def get_language_code(language_code):
     for lang in languages:
         if language_code.split('-')[0] == lang: # base language hit
             return lang
+        if lang.split('-')[0] == language_code: # base language hit
+            return lang
     return language_code
 
 
