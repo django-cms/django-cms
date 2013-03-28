@@ -95,9 +95,10 @@ class ShowMenu(InclusionTag):
     - to_level: max level
     - extra_inactive: how many levels should be rendered of the not active tree?
     - extra_active: how deep should the children of the active node be rendered?
+    - template: template used to render the menu
     - namespace: the namespace of the menu. if empty will use all namespaces
     - root_id: the id of the root node
-    - template: template used to render the menu
+    - truncate: if True, the menu won't contain aunt and uncle nodes
     """
     name = 'show_menu'
     template = 'menu/dummy.html'
@@ -111,10 +112,11 @@ class ShowMenu(InclusionTag):
         StringArgument('namespace', default=None, required=False),
         StringArgument('root_id', default=None, required=False),
         Argument('next_page', default=None, required=False),
+        StringArgument('truncate', default=None, required=False),
     )
     
     def get_context(self, context, from_level, to_level, extra_inactive,
-                    extra_active, template, namespace, root_id, next_page):
+        extra_active, template, namespace, root_id, next_page, truncate):
         try:
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']
@@ -125,7 +127,7 @@ class ShowMenu(InclusionTag):
             children = next_page.children
         else: 
             #new menu... get all the data so we can save a lot of queries
-            nodes = menu_pool.get_nodes(request, namespace, root_id)
+            nodes = menu_pool.get_nodes(request, namespace, root_id, None, None, truncate)
             if root_id: # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
@@ -148,7 +150,9 @@ class ShowMenu(InclusionTag):
                             'to_level':to_level,
                             'extra_inactive':extra_inactive,
                             'extra_active':extra_active,
-                            'namespace':namespace})
+                            'namespace':namespace,
+                            'truncate':truncate,
+                            })
         except:
             context = {"template":template}
         return context

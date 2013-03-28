@@ -230,7 +230,7 @@ def page_to_node(page, home, cut):
 
 class CMSMenu(Menu):
     
-    def get_nodes(self, request):
+    def get_nodes(self, request, truncate=False):
         page_queryset = get_page_queryset(request)
         site = Site.objects.get_current()
         lang = get_language_from_request(request)
@@ -243,6 +243,48 @@ class CMSMenu(Menu):
             filters['title_set__language'] = lang
             
         pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
+
+        if truncate:
+            # We now have every page in the site, but the truncate option of
+            # the {% show_menu %} template tag builds a menu containing
+            # only relevant ones, instead of ones that will never appear 
+            # in the menu such as pages related only through distant 
+            # ancestors. We'll get only: 
+            #
+            #   *   the current page 
+            #   *   all of its ancestors
+            #   *   all of their children  
+            #
+            # but we won't get any aunts or uncles, or their descendants or 
+            # ancestors that are not included in the list above
+        
+            current_page = request.current_page
+        
+            # get the current page as a queryset and make sure it's unique
+            current_page_queryset = pages.filter(id=current_page.id).distinct()
+        
+            # get all the ancestors - a chain of ancestry back to the root
+            ancestry = current_page.get_ancestors(ascending = True)
+
+            # create a queryset of relevant pages - we use the intersection of 
+            # pages & ancestry to eliminate unpublished ancestors
+            relevant_pages = pages & ancestry
+                
+            # get all of:
+            # * pages whose parents are in relevant pages
+            # * relevant pages
+            # * pages whose parents are the current page
+            # *current page            
+            pages = \
+                pages.filter(parent__in=relevant_pages).distinct() | \
+                relevant_pages.distinct() | \
+                pages.filter(parent__in=current_page_queryset).distinct() | \
+                current_page_queryset | \
+                pages.filter(level=0).distinct()
+        
+            pages = pages.order_by("tree_id", "lft")
+        
+
         ids = {}
         nodes = []
         first = True
