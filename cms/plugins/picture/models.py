@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -17,7 +16,10 @@ class Picture(CMSPlugin):
                      (CENTER, _("center")),
                      )
 
-    image = models.ImageField(_("image"), upload_to=CMSPlugin.get_media_path)
+    image_width = models.PositiveIntegerField("Image_width", blank=True, null=True)
+    image_height = models.PositiveIntegerField("Image_height", blank=True, null=True)
+    image = models.ImageField(_("image"), width_field="image_width", 
+        height_field="image_height", upload_to=CMSPlugin.get_media_path)
     url = models.CharField(_("link"), max_length=255, blank=True, null=True,
         help_text=_("If present, clicking on image will take user to link."))
     page_link = models.ForeignKey(Page, verbose_name=_("page"), null=True,
