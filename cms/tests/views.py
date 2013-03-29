@@ -127,14 +127,13 @@ class ViewTests(SettingsOverrideTestCase):
 
         # Anon user
         response = self.client.get("/en/?edit")
-        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "'edit_mode': false,", 1, 200)
 
         # Superuser
         user = self.get_superuser()
         self.client.login(username=user.username, password=user.username)
         response = self.client.get("/en/?edit")
-        #response = details(request, '')
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "'edit_mode': true,", 1, 200)
 
         # Admin but with no permission
         user = self.get_staff_user_with_no_permissions()
@@ -142,8 +141,8 @@ class ViewTests(SettingsOverrideTestCase):
 
         self.client.login(username=user.username, password=user.username)
         response = self.client.get("/en/?edit")
-        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "'edit_mode': false,", 1, 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         response = self.client.get("/en/?edit")
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "'edit_mode': true,", 1, 200)
