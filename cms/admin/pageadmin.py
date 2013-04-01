@@ -536,6 +536,7 @@ class PageAdmin(ModelAdmin):
         })
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
+    @mutually_exclusive_on_post
     def change_view(self, request, object_id, extra_context=None):
         """
         The 'change' admin view for the Page model.
@@ -940,6 +941,7 @@ class PageAdmin(ModelAdmin):
             path = '%s?edit-off' % referer.split('?')[0]
         return HttpResponseRedirect( path )
 
+    @mutually_exclusive_on_post
     def delete_view(self, request, object_id, *args, **kwargs):
         """If page is under modaretion, just mark this page for deletion = add
         delete action to page states.
@@ -1095,6 +1097,7 @@ class PageAdmin(ModelAdmin):
                                      page.site.domain, url)
         return HttpResponseRedirect(url)
 
+    @mutually_exclusive_on_post
     def change_status(self, request, page_id):
         """
         Switch the status of a page
@@ -1116,6 +1119,7 @@ class PageAdmin(ModelAdmin):
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
+    @mutually_exclusive_on_post
     def change_innavigation(self, request, page_id):
         """
         Switch the in_navigation of a page
