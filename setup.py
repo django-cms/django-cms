@@ -1,8 +1,27 @@
 from setuptools import setup, find_packages
-import os
-import cms
+import sys
 
-        
+import os
+import re
+
+
+def get_version(package):
+    """
+    Return package version as listed in `__version__` in `init.py`.
+    """
+    init_py = open(os.path.join(package, '__init__.py')).read()
+    return re.search("__version__\s*=\s*(.*)", init_py).group(1)
+
+
+version = get_version('cms')
+
+if sys.argv[-1] == 'publish':
+    os.system("python setup.py sdist upload")
+    print("You probably want to also tag the version now:")
+    print("  git tag -a %s -m 'version %s'" % (version, version))
+    print("  git push --tags")
+    sys.exit()
+
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
@@ -20,7 +39,7 @@ setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
     name='django-cms',
-    version=cms.__version__,
+    version=version,
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     url='https://www.django-cms.org/',
@@ -43,8 +62,8 @@ setup(
         'Pygments==1.5',
         'dj-database-url==0.2.1',
     ],
-    packages=find_packages(exclude=["project","project.*"]),
+    packages=find_packages(),
     include_package_data=True,
-    zip_safe = False,
-    test_suite = 'runtests.main',
+    zip_safe=False,
+    test_suite='runtests.main',
 )
