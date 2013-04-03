@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
+
 from cms import constants
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
@@ -8,10 +10,9 @@ from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
-from cms.utils import i18n, urlutils, page as page_utils
+from cms.utils import i18n, page as page_utils
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -22,8 +23,6 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 from os.path import join
-from datetime import timedelta
-import copy
 
 
 class Page(MPTTModel):
@@ -49,19 +48,27 @@ class Page(MPTTModel):
     creation_date = models.DateTimeField(auto_now_add=True)
     changed_date = models.DateTimeField(auto_now=True)
 
-    publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_('When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
-    publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True, help_text=_('When to expire the page. Leave empty to never expire.'), db_index=True)
+    publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_(
+        'When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
+    publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True,
+                                                help_text=_('When to expire the page. Leave empty to never expire.'),
+                                                db_index=True)
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
-    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False, help_text=_("All ancestors will not be displayed in the navigation"))
-    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_("An unique identifier that is used with the page_url templatetag for linking to this page"))
+    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
+                                    help_text=_("All ancestors will not be displayed in the navigation"))
+    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
+        "An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     published = models.BooleanField(_("is published"), blank=True)
 
-    template = models.CharField(_("template"), max_length=100, choices=template_choices, help_text=_('The template used to render the content.'))
+    template = models.CharField(_("template"), max_length=100, choices=template_choices,
+                                help_text=_('The template used to render the content.'))
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
 
     login_required = models.BooleanField(_("login required"), default=False)
-    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True, help_text=_("limit when this page is visible in the menu"))
+    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
+                                                        choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
+                                                        help_text=_("limit when this page is visible in the menu"))
 
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
@@ -94,9 +101,9 @@ class Page(MPTTModel):
 
     class PublisherMeta:
         exclude_fields_append = ['id', 'publisher_is_draft', 'publisher_public',
-                                 'publisher_state', 'moderator_state',
-                                 'placeholders', 'lft', 'rght', 'tree_id',
-                                 'parent']
+            'publisher_state', 'moderator_state',
+            'placeholders', 'lft', 'rght', 'tree_id',
+            'parent']
 
     def __unicode__(self):
         title = self.get_menu_title(fallback=True)
@@ -131,8 +138,8 @@ class Page(MPTTModel):
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
         if (position in ('left', 'right')
-            and not target.parent
-            and self.template == constants.TEMPLATE_INHERITANCE_MAGIC):
+        and not target.parent
+        and self.template == constants.TEMPLATE_INHERITANCE_MAGIC):
             self.template = self.get_template()
         self.move_to(target, position)
 
@@ -140,6 +147,7 @@ class Page(MPTTModel):
         from cms.models.moderatormodels import PageModeratorState
         from cms.utils import moderator
         import cms.signals as cms_signals
+
         cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
         self.save()  # always save the page after move, because of publisher
         moderator.page_changed(self, force_moderation_action=PageModeratorState.ACTION_MOVE)
@@ -159,6 +167,7 @@ class Page(MPTTModel):
             title.save()
         if old_titles:
             from titlemodels import Title
+
             Title.objects.filter(id__in=old_titles.values()).delete()
 
     def _copy_contents(self, target):
@@ -278,6 +287,7 @@ class Page(MPTTModel):
             # copy permissions if necessary
             if get_cms_setting('PERMISSION') and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
+
                 for permission in PagePermission.objects.filter(page__id=origin_id):
                     permission.pk = None
                     permission.page = page
@@ -332,6 +342,7 @@ class Page(MPTTModel):
             self.reverse_id = None
 
         from cms.utils.permissions import _thread_locals
+
         user = getattr(_thread_locals, "user", None)
         if user:
             self.changed_by = user.username
@@ -459,6 +470,7 @@ class Page(MPTTModel):
 
         # fire signal after publishing is done
         import cms.signals as cms_signals
+
         cms_signals.post_publish.send(sender=Page, instance=self)
 
         return published
@@ -507,7 +519,7 @@ class Page(MPTTModel):
         public = self.publisher_public
         public._copy_titles(self)
         if self.parent != (self.publisher_public.parent_id and
-                           self.publisher_public.parent.publisher_draft):
+            self.publisher_public.parent.publisher_draft):
             # We don't send the signals here
             self.move_to(public.parent.publisher_draft)
         public._copy_contents(self)
@@ -615,6 +627,7 @@ class Page(MPTTModel):
         if language in self.title_cache:
             return self.title_cache[language]
         from cms.models.titlemodels import EmptyTitle
+
         return EmptyTitle()
 
     def get_title_obj_attribute(self, attrname, language=None, fallback=True, version_id=None, force_reload=False):
@@ -622,7 +635,7 @@ class Page(MPTTModel):
         """
         try:
             attribute = getattr(self.get_title_obj(
-                    language, fallback, version_id, force_reload), attrname)
+                language, fallback, version_id, force_reload), attrname)
             return attribute
         except AttributeError:
             return None
@@ -703,8 +716,10 @@ class Page(MPTTModel):
             load = True
         if load:
             from cms.models.titlemodels import Title
+
             if version_id:
                 from reversion.models import Version
+
                 version = get_object_or_404(Version, pk=version_id)
                 revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                 for rev in revs:
@@ -758,7 +773,7 @@ class Page(MPTTModel):
 
         if not self.publisher_is_draft:
             return self.publisher_draft.has_view_permission(request)
-        # does any restriction exist?
+            # does any restriction exist?
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
         if request.user.is_authenticated():
@@ -776,7 +791,7 @@ class Page(MPTTModel):
             elif not is_restricted:
                 if ((get_cms_setting('PUBLIC_FOR') == 'all') or
                     (get_cms_setting('PUBLIC_FOR') == 'staff' and
-                     request.user.is_staff)):
+                        request.user.is_staff)):
                     return True
 
             # a restricted page and an authenticated user
@@ -795,7 +810,7 @@ class Page(MPTTModel):
             else:
                 # anonymous user, no restriction saved in database
                 return True
-        # Authenticated user
+            # Authenticated user
         # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
@@ -807,21 +822,22 @@ class Page(MPTTModel):
         if request.user.is_superuser:
             return True
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
-            self.has_generic_permission(request, "change")
+               self.has_generic_permission(request, "change")
 
     def has_delete_permission(self, request):
         opts = self._meta
         if request.user.is_superuser:
             return True
         return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
-            self.has_generic_permission(request, "delete")
+               self.has_generic_permission(request, "delete")
 
     def has_publish_permission(self, request):
         if request.user.is_superuser:
             return True
         opts = self._meta
         return request.user.has_perm(opts.app_label + '.' + "publish_page") and \
-            self.has_generic_permission(request, "publish")
+               self.has_generic_permission(request, "publish")
+
     has_moderate_permission = has_publish_permission
 
     def has_advanced_settings_permission(self, request):
@@ -851,11 +867,12 @@ class Page(MPTTModel):
         """
         att_name = "permission_%s_cache" % perm_type
         if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
-                or request.user.pk != self.permission_user_cache.pk:
+            or request.user.pk != self.permission_user_cache.pk:
             from cms.utils.permissions import has_generic_permission
+
             self.permission_user_cache = request.user
             setattr(self, att_name, has_generic_permission(
-                    self.id, request.user, perm_type, self.site_id))
+                self.id, request.user, perm_type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
@@ -880,6 +897,7 @@ class Page(MPTTModel):
 
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
         setattr(self, attr, value)
+
     home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
 
     def clear_home_pk_cache(self):
@@ -913,6 +931,7 @@ class Page(MPTTModel):
         Uses the same cache as last_page_states to minimize DB requests
         """
         from cms.models import PageModeratorState
+
         result = getattr(self, '_moderator_state_cache', None)
         if result is None:
             return self.pagemoderatorstate_set.get_delete_actions().exists()
@@ -927,7 +946,7 @@ class Page(MPTTModel):
         if hasattr(self, '_public_published_cache'):
             # if it was cached in change list, return cached value
             return self._public_published_cache
-        # If we have a public version it will be published as well.
+            # If we have a public version it will be published as well.
         # If it isn't published, it should be deleted.
         return self.published and self.publisher_public_id and self.publisher_public.published
 
@@ -966,7 +985,7 @@ class Page(MPTTModel):
             })
         else:
             filters.update({
-                 opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
+                opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
                 '%s__gt' % opts.left_attr: getattr(self, opts.right_attr),
             })
 
@@ -1000,7 +1019,7 @@ class Page(MPTTModel):
             order_by = '-%s' % opts.tree_id_attr
         else:
             filters.update({
-                 opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
+                opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
                 '%s__lt' % opts.right_attr: getattr(self, opts.left_attr),
             })
             order_by = '-%s' % opts.right_attr
@@ -1049,8 +1068,8 @@ class Page(MPTTModel):
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
             if self.level != obj.level or \
-                public_parent != obj.parent or \
-                public_prev_sib != prev_public_sibling:
+                            public_parent != obj.parent or \
+                            public_prev_sib != prev_public_sibling:
                 if public_prev_sib:
                     obj.move_to(public_prev_sib, position="right")
                 elif public_parent:
@@ -1070,6 +1089,7 @@ class Page(MPTTModel):
         """
         # inline import to prevent circular imports
         from cms.utils.plugins import get_placeholders
+
         placeholders = get_placeholders(self.get_template())
         found = {}
         for placeholder in self.placeholders.all():
@@ -1090,4 +1110,6 @@ def _reversion():
         follow=["title_set", "placeholders", "pagepermission_set"],
         exclude_fields=exclude_fields
     )
+
+
 _reversion()
