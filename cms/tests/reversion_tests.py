@@ -8,6 +8,7 @@ from cms.plugins.text.models import Text
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
     URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT)
+from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -116,7 +117,7 @@ class ReversionTestCase(CMSTestCase):
 
             # test that CMSPlugin subclasses are reverted
             self.assertEquals(Text.objects.all().count(), 2)
-            self.assertEquals(Text.objects.get(pk=self.txt.pk).body,  "Hello World")
+            self.assertEquals(Text.objects.get(pk=self.txt.pk).body, "Hello World")
             self.assertEquals(Revision.objects.all().count(), 6)
 
     def test_recover(self):
@@ -166,6 +167,19 @@ class ReversionTestCase(CMSTestCase):
             self.assertEquals(response.status_code, 302)
             self.assertEquals(Revision.objects.all().count(), 2)
 
+    def test_publish_limit(self):
+        with self.login_user_context(User.objects.get(username="test")):
+            with SettingsOverride(CMS_MAX_PAGE_PUBLISH_REVERSIONS=5):
+                page = Page.objects.all()[0]
+                page_pk = page.pk
+                self.assertEquals(Revision.objects.all().count(), 5)
+                for x in xrange(7):
+                    publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
+                    response = self.client.get(publish_url)
+                    self.assertEquals(response.status_code, 302)
+                    self.assertTrue(Revision.objects.all().count() >= 2)
+                    self.assertTrue(Revision.objects.all().count() <= 6)
+
 
 class ReversionFileFieldTests(CMSTestCase):
     def tearDown(self):
@@ -183,7 +197,7 @@ class ReversionFileFieldTests(CMSTestCase):
             reversion.revision_context_manager.add_to_context(
                 reversion.default_revision_manager, file1,
                 adapter.get_version_data(file1, VERSION_CHANGE))
-        # reload the instance from db
+            # reload the instance from db
         file2 = FileModel.objects.all()[0]
         # delete the instance.
         file2.delete()
