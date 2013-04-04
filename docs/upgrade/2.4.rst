@@ -353,3 +353,5 @@ Pending deprecations
 
 * ``simple_language_changer`` will be removed in version 3.0. A bugfix makes
   this redundant as every non managed url will behave like this.
+
+.. _django-reversion: https://github.com/etianen/django-reversion

@@ -6,8 +6,8 @@ from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
 from cms.test_utils.project.fileapp.models import FileModel
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT)
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.auth.models import User

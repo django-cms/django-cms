@@ -752,7 +752,7 @@ class PageAdmin(ModelAdmin):
         page.template = to_template
         page.save()
         if "reversion" in settings.INSTALLED_APPS:
-            message = _("Template changed to %s") % dict(get_cms_setting('TEMPLATES')[to_template])
+            message = _("Template changed to %s") % dict(get_cms_setting('TEMPLATES'))[to_template]
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(_("The template was successfully changed"))
 
