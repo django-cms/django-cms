@@ -560,23 +560,6 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.get_moderation_states(request, page.pk)
             self.assertEqual(response.status_code, 200)
 
-    def test_remove_delete(self):
-        page = self.get_page()
-        permless = self.get_permless()
-        admin = self.get_admin()
-        with self.login_user_context(permless):
-            request = self.get_request()
-            response = self.admin_class.remove_delete_state(request, page.pk)
-            self.assertEqual(response.status_code, 403)
-        PageModeratorState.objects.create(page=page, user=admin,
-                                          action=PageModeratorState.ACTION_DELETE)
-        with self.login_user_context(admin):
-            self.assertEqual(page.pagemoderatorstate_set.get_delete_actions().count(), 1)
-            request = self.get_request()
-            response = self.admin_class.remove_delete_state(request, page.pk)
-            self.assertEqual(response.status_code, 302)
-            page = self.reload(page)
-            self.assertEqual(page.pagemoderatorstate_set.get_delete_actions().count(), 0)
 
     def test_change_status(self):
         page = self.get_page()

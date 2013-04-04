@@ -127,8 +127,12 @@ class Page(MPTTModel):
         check_title_slugs, overwrite_url on the moved page don't need any check
         as it remains the same regardless of the page position in the tree
         """
+        # do not mark the page as dirty after page moves
+        self._publisher_keep_state = True
+
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
+
         if (position in ('left', 'right')
             and not target.parent
             and self.template == constants.TEMPLATE_INHERITANCE_MAGIC):
@@ -145,13 +149,10 @@ class Page(MPTTModel):
         if self.publisher_public_id:
             # Ensure we have up to date mptt properties
             public_page = Page.objects.get(pk=self.publisher_public_id)
-        else:
-            public_page = Page(created_by=self.created_by)
-
-        # Ensure that the page is in the right position and save it
-        public_page = self._publisher_save_public(public_page)
-        public_page.save()
-        page_utils.check_title_slugs(public_page)
+            # Ensure that the page is in the right position and save it
+            public_page = self._publisher_save_public(public_page)
+            public_page.save()
+            page_utils.check_title_slugs(public_page)
 
     def _copy_titles(self, target):
         """
