@@ -296,7 +296,10 @@
 		$.fn.syncWidth = function(max) {
 			$(this).each(function() {
 				var val= $(this).width();
-				if(val > max){max = val;}
+				if(val > max){
+                    max = val;
+                }
+                console.log(this, $(this).width())
 			});
 			$(this).each(function() {
 				$(this).css("width",max + 'px');
@@ -311,9 +314,8 @@
 			$('#sitemap ul .col-softroot').syncWidth(0);
 			$('#sitemap ul .col-template').syncWidth(0);
 			$('#sitemap ul .col-creator').syncWidth(0);
-			
+            $('#sitemap ul .col-view-perms').syncWidth(0);
 			$('#sitemap ul .col-lastchange').syncWidth(0);
-			$('#sitemap ul .col-moderator').syncWidth(68);
 			$('#sitemap ul .col-draft').syncWidth(0);
 		}	
 		syncCols();

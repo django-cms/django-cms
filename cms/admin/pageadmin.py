@@ -203,8 +203,6 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
             pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
-            pat(r'^([0-9]+)/confirm-delete/$', self.confirm_delete),
-            pat(r'^([0-9]+)/remove-delete-state/$', self.remove_delete_state),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
             pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
             pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
@@ -505,7 +503,6 @@ class PageAdmin(ModelAdmin):
                 'can_change': obj.has_change_permission(request),
                 'can_change_permissions': obj.has_change_permissions_permission(request),
                 'can_publish': obj.has_publish_permission(request),
-                'delete_requested': obj.delete_requested(),
                 'show_delete_translation': len(obj.get_languages()) > 1,
                 'current_site_id': settings.SITE_ID,
             }
@@ -755,13 +752,8 @@ class PageAdmin(ModelAdmin):
         if not page.has_move_page_permission(request) or \
             not target.has_add_permission(request):
             return jsonify_request(HttpResponseForbidden(_("Error! You don't have permissions to move this page. Please reload the page")))
-
-        if page.delete_requested():
-            return jsonify_request(HttpResponseBadRequest(_('The page "%s" has a delete request. Delete or confirm the request first.') % page))
-
         # move page
         page.move_page(target, position)
-
         if "reversion" in settings.INSTALLED_APPS:
             helpers.make_revision_with_plugins(page)
 
@@ -849,13 +841,8 @@ class PageAdmin(ModelAdmin):
         # ensure user has permissions to publish this page
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
-
-        if page.delete_requested():
-            messages.error(request, _('The page "%s" has a delete request. Delete or confirm the request first.') % page)
-        else:
-            page.publish()
-
-            messages.info(request, _('The page "%s" was successfully published.') % page)
+        page.publish()
+        messages.info(request, _('The page "%s" was successfully published.') % page)
 
         if 'node' in request.REQUEST:
             # if request comes from tree..
@@ -891,55 +878,6 @@ class PageAdmin(ModelAdmin):
         if 'admin' not in referer:
             path = '%s?edit-off' % referer.split('?')[0]
         return HttpResponseRedirect(path)
-
-    #TODO: Make the change form buttons use POST
-    #@require_POST
-    def confirm_delete(self, request, object_id, *args, **kwargs):
-        """Remove all delete action from page states, requires change permission
-        """
-        page = get_object_or_404(Page, id=object_id)
-        if not page.has_publish_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to publish this page"))
-
-        page_title = unicode(page)
-        if not page.delete_requested():
-            messages.error(request, _('The page "%s" has no delete request.') % page_title)
-        else:
-            try:
-                page.delete_with_public()
-                messages.info(request, _('The page "%s" was successfully deleted.') % page_title)
-                return HttpResponseRedirect("../../")
-            except PermissionDenied, e:
-                messages.error(request, e.message)
-        return HttpResponseRedirect("../")
-
-    #TODO: Make the change form buttons use POST
-    #@require_POST
-    def remove_delete_state(self, request, object_id):
-        """Remove all delete action from page states, requires change permission
-        """
-        page = get_object_or_404(Page, id=object_id)
-        if not self.has_change_permission(request, page):
-            return HttpResponseForbidden(_("You do not have permission to change this page"))
-        page.pagemoderatorstate_set.get_delete_actions().delete()
-        page.save()
-        return HttpResponseRedirect("../../%d/" % page.id)
-
-    def delete_view(self, request, object_id, *args, **kwargs):
-        """If page is under moderation, just mark this page for deletion = add
-        delete action to page states.
-        """
-        page = get_object_or_404(Page, id=object_id)
-
-        if not self.has_delete_permission(request, page):
-            return HttpResponseForbidden(_("You do not have permission to delete this page"))
-
-        # don't perform a delete action, just mark page for deletion
-        moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_DELETE)
-
-        if not self.has_change_permission(request, None):
-            return HttpResponseRedirect("../../../../")
-        return HttpResponseRedirect("../../")
 
     @create_revision()
     def delete_translation(self, request, object_id, extra_context=None):

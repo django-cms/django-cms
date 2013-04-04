@@ -72,7 +72,6 @@ class Page(MPTTModel):
     placeholders = models.ManyToManyField(Placeholder, editable=False)
 
     # Publisher fields
-    moderator_state = models.SmallIntegerField(_('moderator state'), default=0, blank=True, editable=False)
     publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
@@ -137,14 +136,22 @@ class Page(MPTTModel):
         self.move_to(target, position)
 
         # fire signal
-        from cms.models.moderatormodels import PageModeratorState
-        from cms.utils import moderator
         import cms.signals as cms_signals
         cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
         self.save()  # always save the page after move, because of publisher
-        moderator.page_changed(self, force_moderation_action=PageModeratorState.ACTION_MOVE)
         # check the slugs
         page_utils.check_title_slugs(self)
+
+        if self.publisher_public_id:
+            # Ensure we have up to date mptt properties
+            public_page = Page.objects.get(pk=self.publisher_public_id)
+        else:
+            public_page = Page(created_by=self.created_by)
+
+        # Ensure that the page is in the right position and save it
+        public_page = self._publisher_save_public(public_page)
+        public_page.save()
+        page_utils.check_title_slugs(public_page)
 
     def _copy_titles(self, target):
         """
@@ -543,10 +550,6 @@ class Page(MPTTModel):
         """
         descendants = list(self.get_descendants().order_by('level'))
         descendants.reverse()
-        # TODO: Use a better exception class - PermissionDenied is not quite right
-        for page in descendants:
-            if not page.delete_requested():
-                raise PermissionDenied('There are descendant pages not marked for deletion')
         descendants.append(self)
 
         # Get all pages that are children of any public page that would be deleted
@@ -907,19 +910,6 @@ class Page(MPTTModel):
             result = list(self.pagemoderatorstate_set.all().order_by('created'))
             self._moderator_state_cache = result
         return result[:5]
-
-    def delete_requested(self):
-        """ Checks whether there are any delete requests for this page.
-        Uses the same cache as last_page_states to minimize DB requests
-        """
-        from cms.models import PageModeratorState
-        result = getattr(self, '_moderator_state_cache', None)
-        if result is None:
-            return self.pagemoderatorstate_set.get_delete_actions().exists()
-        for state in result:
-            if state.action == PageModeratorState.ACTION_DELETE:
-                return True
-        return False
 
     def is_public_published(self):
         """Returns true if public model is published.
