@@ -229,6 +229,8 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         # raw id field for the user
         if use_raw_id:
             from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+            # This check will be False if the number of users in the system
+            # is less than the threshold set by the RAW_ID_USERS setting.
             if isinstance(self.fields['user'].widget, ForeignKeyRawIdWidget):
                 # We can't set a queryset on a raw id lookup, but we can use
                 # the fact that it respects the limit_choices_to parameter.

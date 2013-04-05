@@ -7,6 +7,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_permission_level
 from copy import deepcopy
 from django.contrib import admin
+from django.contrub.auth.models import User
 from django.template.defaultfilters import title
 from django.utils.translation import ugettext as _
 
@@ -29,7 +30,8 @@ class PagePermissionInlineAdmin(TabularInline):
     def __getattribute__(self, name):
         # Dynamically set raw_id_fields based on settings
         if name == 'raw_id_fields':
-            if get_cms_setting('RAW_ID_USERS'):
+            threshold = get_cms_setting('RAW_ID_USERS')
+            if threshold and User.objects.count() > threshold:
                 return ['user']
             return []
         else:

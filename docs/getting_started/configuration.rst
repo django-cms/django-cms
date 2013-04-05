@@ -542,8 +542,9 @@ This setting only applies if :setting:`CMS_PERMISSION` is ``True``
 The "view restrictions" and "page permissions" inlines on the
 :class:`cms.models.Page` admin change forms can cause performance problems
 where there are many thousands of users being put into simple select boxes. If
-``True``, this setting forces the inlines on that page to use standard Django
-admin raw ID widgets rather than select boxes, dramatically improving
+set to a positive integer, this setting forces the inlines on that page to use
+standard Django admin raw ID widgets rather than select boxes if the number of
+users in the system is greater than that number, dramatically improving
 performance.
 
 .. note:: Using raw ID fields in combination with ``limit_choices_to`` causes
