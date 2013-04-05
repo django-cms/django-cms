@@ -225,10 +225,10 @@ class PageAdmin(ModelAdmin):
         data = [object]
         filters = {'placeholder__%s' % placeholder_relation: object}
         for plugin in CMSPlugin.objects.filter(**filters):
+            data.append(plugin)
             plugin_instance, admin = plugin.get_plugin_instance()
             if plugin_instance:
                 data.append(plugin_instance)
-                data.append(plugin)
         return data
 
     def save_model(self, request, obj, form, change):
@@ -286,9 +286,6 @@ class PageAdmin(ModelAdmin):
             form,
             language,
         )
-
-        #if obj and "reversion" in settings.INSTALLED_APPS:
-        #    helpers.make_revision_with_plugins(obj, request.user)
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -884,21 +881,19 @@ class PageAdmin(ModelAdmin):
                 from reversion.models import Version
 
                 content_type = ContentType.objects.get_for_model(Page)
-                versions = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk).exclude(
-                    revision__comment__exact=PUBLISH_COMMENT)
-                for version in versions:
+                versions_qs = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk)
+                for version in versions_qs.exclude(revision__comment__exact=PUBLISH_COMMENT):
                     revision = version.revision
                     revision.delete()
                     # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
                 limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
                 if limit:
-                    versions = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk,
-                                                      revision__comment__exact=PUBLISH_COMMENT).order_by('-revision__pk')
-                    for version in versions[limit - 1:]:
+                    for version in versions_qs.filter(revision__comment__exact=PUBLISH_COMMENT).order_by(
+                            '-revision__pk')[limit - 1:]:
                         revision = version.revision
                         revision.delete()
-                    # create a new publish reversion
                 helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
+                # create a new publish reversion
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
