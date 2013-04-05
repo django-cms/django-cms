@@ -46,6 +46,11 @@ Recommended
   django-reversion wiki in order to make sure that the package versions are
   compatible.)
 
+  .. note::
+
+    Since django CMS 2.4 we only save the latest 25 publish revisions anymore.
+    You can change this behavior with :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`.
+
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
 .. _django-reversion: https://github.com/etianen/django-reversion
