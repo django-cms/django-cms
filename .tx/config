@@ -4,7 +4,7 @@ source_file = cms/locale/en/LC_MESSAGES/djangojs.po
 source_lang = en
 
 [main]
-host = http://www.transifex.net
+host = https://www.transifex.com
 
 [django-cms.core]
 file_filter = cms/locale/<lang>/LC_MESSAGES/django.po

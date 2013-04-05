@@ -1,14 +1,14 @@
-WYMeditor.SKINS['twopanels'] = {
+WYMeditor.SKINS.twopanels = {
 
     init: function(wym) {
-    
+
         //move the containers panel to the left area
         jQuery(wym._box).find(wym._options.containersSelector)
           .appendTo("div.wym_area_left");
 
         //render following sections as panels
-        jQuery(wym._box).find(wym._options.classesSelector + ', '
-          + wym._options.containersSelector)
+        jQuery(wym._box).find(wym._options.classesSelector + ', ' +
+          wym._options.containersSelector)
           .addClass("wym_panel");
 
         //render following sections as buttons

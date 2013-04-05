@@ -1,0 +1,130 @@
+*************************************
+Upgrading from 2.1.x and Django 1.2.x
+*************************************
+
+Upgrading dependencies
+======================
+
+Upgrade both your version of django CMS and Django by running
+the following commands.
+
+.. code-block:: bash
+
+    pip install --upgrade django-cms==2.2 django==1.3.1
+
+If you are using django-reversion make sure to have at least
+version 1.4 installed
+
+.. code-block:: bash
+
+    pip install --upgrade django-reversion==1.4
+
+Also, make sure that django-mptt stays at a version compatible
+with django CMS
+
+.. code-block:: bash
+
+    pip install --upgrade django-mptt==0.5.1
+
+Updates to ``settings.py``
+==========================
+
+The following changes will need to be made in your settings.py file::
+
+    ADMIN_MEDIA_PREFIX = '/static/admin'
+    STATIC_ROOT = os.path.join(PROJECT_PATH, 'static')
+    STATIC_URL = "/static/"
+   
+.. note::
+
+    These are not django CMS settings.  Refer to the Django documentation on `staticfiles`_ for more information.
+
+.. _staticfiles: http://readthedocs.org/docs/django/en/latest/ref/contrib/staticfiles.html
+    
+.. note::
+
+    Please make sure the ``static`` subfolder exists in your
+    project and is writable.
+    
+.. note::
+
+    PROJECT_PATH is the absolute path to your project.  See :ref:`configure-django-cms` for instructions on how to set PROJECT_PATH.
+
+**Remove** the following from :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
+
+    django.core.context_processors.auth
+
+**Add** the following to :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
+
+    django.contrib.auth.context_processors.auth
+    django.core.context_processors.static
+    sekizai.context_processors.sekizai
+
+**Remove** the following from :setting:`django:MIDDLEWARE_CLASSES`::
+
+    cms.middleware.media.PlaceholderMediaMiddleware
+
+**Remove** the following from :setting:`django:INSTALLED_APPS`::
+
+    publisher
+
+**Add** the following to :setting:`django:INSTALLED_APPS`::
+
+    sekizai
+    django.contrib.staticfiles
+
+Template Updates
+================
+
+Make sure to add sekizai tags and ``cms_toolbar`` to your CMS templates.
+
+.. note::
+
+  ``cms_toolbar`` is only needed if you wish to use the front-end editing.  See :ref:`backwards-incompatible-changes` for more information  
+
+Here is a simple example for a base template called ``base.html``:
+
+.. code-block:: html+django
+
+  {% load cms_tags sekizai_tags %}
+  <html>
+    <head>
+        {% render_block "css" %}
+    </head>
+    <body>
+        {% cms_toolbar %}
+        {% placeholder base_content %}
+        {% block base_content%}{% endblock %}
+        {% render_block "js" %}
+    </body>
+  </html>
+
+Database Updates
+================
+
+Run the following commands to upgrade your database
+
+.. code-block:: bash
+
+    python manage.py syncdb
+    python manage.py migrate
+
+Static Media
+============
+
+Add the following to ``urls.py`` to serve static media when developing::
+
+    if settings.DEBUG:
+        urlpatterns = patterns('',
+        url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+        url(r'', include('django.contrib.staticfiles.urls')),
+    ) + urlpatterns
+
+Also run this command to collect static files into your :setting:`django:STATIC_ROOT`::
+
+    python manage.py collectstatic
+
+
+
+

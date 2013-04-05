@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['es'] = {
+WYMeditor.STRINGS.es = {
     Strong:           'Resaltar',
     Emphasis:         'Enfatizar',
     Superscript:      'Superindice',

@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load adminmedia admin_list i18n cms_admin js %}
+{% load admin_list i18n cms_admin cms_js_tags %}
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
@@ -17,7 +17,7 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/jquery.dialog.css" />
 
 {{ block.super }}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.livequery.js"></script>
 
@@ -32,6 +32,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.ui.dialog.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.functional.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_list.js"></script>
 
@@ -44,7 +45,7 @@
 {% block content %}
 <script type="text/javascript">
 //<![CDATA[	
-(function($) {
+(function namespacing($) {
 	$(document).ready(function() {
 		{% if not cl.is_filtered %}
 			initTree();
@@ -55,22 +56,35 @@
 		$("#changelist-filter").toggle();
 	}
 	moveSuccess = function(node){
-		var msg = $('<span class="success">{% trans "Successfully moved" %}</span>');
+		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
 		node.append(msg);
+        // This should not happen
+        if (node.parent().hasClass('publisher_delete_requested'))
+            return;
+        node.parent().addClass('publisher_dirty');
+        if (!node.parent().find('.col-draft .publish').length) {
+            var page_id = node.parent().parent().attr('id').replace('page_', '');
+            node.parent().find('.col-draft').prepend(
+                    '<a href="./'+page_id+'/publish/" class="icon publish" title="{% trans 'Publish' %}"></a>');
+        }
 	    msg.fadeOut(3000);
 	}
-	moveError = function(node){
-		var msg = $('<span class="success">{% trans "An error occured. Please reload the page" %}</span>');
+	moveError = function(node,message){
+        if(message && message!="error") {
+            var msg = $({% javascript_string %}<span class="success">{% end_javascript_string %}+message+{% javascript_string %}</span>{% end_javascript_string %});
+        }
+        else {
+            var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
+        }
 		node.append(msg);
 	}
 	// some settings used by javascript functions
 
 	cmsSettings = {
 		cmsPermission: {{ CMS_PERMISSION|js }},
-		cmsModerator: {{ CMS_MODERATOR|js }},
 		debug: {{ DEBUG|js }}
 	};
-})(jQuery);
+})(window.CMS.$);
 //]]>
 </script>
 

@@ -11,7 +11,7 @@ class TwoPagesFixture(object):
             'published': True,
             'in_navigation': True,
         }
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             first = create_page('first', language='en', **defaults)
             create_title('de', 'erste', first)
             second = create_page('second', language='en', reverse_id='myreverseid', **defaults)

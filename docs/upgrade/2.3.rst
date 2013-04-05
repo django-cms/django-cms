@@ -1,0 +1,97 @@
+#################
+2.3 release notes
+#################
+
+*****************
+What's new in 2.3
+*****************
+
+Introducing Django 1.4 support, dropped support for Django 1.2
+==============================================================
+
+In django CMS 2.3 we dropped support for Django 1.2. Django 1.3.1 is now the
+minimum required Django version. Django CMS 2.3 also introduces Django 1.4
+support.
+
+
+Lazy page tree loading in admin
+===============================
+
+Thanks to the work by Andrew Schoen the page tree in the admin now loads lazily,
+significantly improving the performance of that view for large sites.
+
+
+Toolbar isolation
+=================
+
+The toolbar JavaScript dependencies should now be properly isolated and no
+longer pollute the global JavaScript namespace. 
+
+
+Plugin cancel button fixed
+==========================
+
+The cancel button in plugin change forms no longer saves the changes, but 
+actually cancels.
+
+
+Tests refactor
+==============
+
+Tests can now be run using ``setup.py test`` or ``runtests.py`` (the latter
+should be done in a virtualenv with the proper dependencies installed).
+
+Check ``runtests.py -h`` for options.
+
+
+Moving text plugins to different placeholders no longer loses inline plugins
+============================================================================
+
+A serious bug where a text plugin with inline plugins would lose all
+the inline plugins when moved to a different placeholder has been fixed.
+
+
+Minor improvements
+==================
+
+* The ``or`` clause in the ``placeholder`` tag now works correctly on non-cms
+  pages.
+* The icon source URL for inline plugins for text plugins no longer gets double
+  escaped.
+* ``PageSelectWidget`` correctly orders pages again.
+* Fixed the file plugin which was sometimes causing invalid HTML (unclosed ``span`` tag).
+* Migration ordering for plugins improved.
+* Internationalized strings in JavaScript now get escaped.
+
+
+******************************
+Backwards incompatible changes
+******************************
+
+New minimum requirements for dependencies
+=========================================
+
+* ``django-reversion`` must now be at version 1.6
+* ``django-sekizai`` must be at least at version 0.6.1
+* ``django-mptt`` version 0.5.1 or 0.5.2 is required
+
+Registering a list of plugins in the plugin pool
+================================================
+This feature was deprecated in version 2.2 and removed in 2.3. Code like this
+will not work anymore::
+
+    plugin_pool.register_plugin([FooPlugin, BarPlugin])
+
+Instead, use multiple calls to ``register_plugin``::
+
+    plugin_pool.register_plugin(FooPlugin)
+    plugin_pool.register_plugin(BarPlugin)
+
+
+********************
+Pending deprecations
+********************
+
+The ``CMS_FLAT_URLS`` setting is deprecated and will be removed in version 2.4.
+The moderation feature (``CMS_MODERATOR = True``) will be deprecated in 2.4 and
+replaced with a simpler way of handling unpublished changes. 

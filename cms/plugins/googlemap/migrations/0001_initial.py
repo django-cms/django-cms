@@ -1,99 +1,75 @@
-
+# -*- coding: utf-8 -*-
+import datetime
 from south.db import db
+from south.v2 import SchemaMigration
 from django.db import models
-from cms.plugins.googlemap.models import *
 
-class Migration:
-    depends_on = (
-        ("cms", "0012_publisher"),
-    )
-    
-    needed_by = (
-        ("cms", "0019_public_table_renames"),
-    )
 
-    
+class Migration(SchemaMigration):
+
     def forwards(self, orm):
-        
-        # Adding model 'PublicGoogleMap'
-        db.create_table('googlemap_publicgooglemap', (
-            ('city', orm['googlemap.PublicGoogleMap:city']),
-            ('title', orm['googlemap.PublicGoogleMap:title']),
-            ('streetnr', orm['googlemap.PublicGoogleMap:streetnr']),
-            ('mark_delete', orm['googlemap.PublicGoogleMap:mark_delete']),
-            ('zoom', orm['googlemap.PublicGoogleMap:zoom']),
-            ('publiccmsplugin_ptr', orm['googlemap.PublicGoogleMap:publiccmsplugin_ptr']),
-            ('content', orm['googlemap.PublicGoogleMap:content']),
-            ('street', orm['googlemap.PublicGoogleMap:street']),
-            ('postcode', orm['googlemap.PublicGoogleMap:postcode']),
-        ))
-        db.send_create_signal('googlemap', ['PublicGoogleMap'])
-        
         # Adding model 'GoogleMap'
-        db.create_table('googlemap_googlemap', (
-            ('city', orm['googlemap.GoogleMap:city']),
-            ('title', orm['googlemap.GoogleMap:title']),
-            ('streetnr', orm['googlemap.GoogleMap:streetnr']),
-            ('cmsplugin_ptr', orm['googlemap.GoogleMap:cmsplugin_ptr']),
-            ('zoom', orm['googlemap.GoogleMap:zoom']),
-            ('content', orm['googlemap.GoogleMap:content']),
-            ('street', orm['googlemap.GoogleMap:street']),
-            ('postcode', orm['googlemap.GoogleMap:postcode']),
-            ('public', orm['googlemap.GoogleMap:public']),
+        db.create_table('cmsplugin_googlemap', (
+            ('cmsplugin_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cms.CMSPlugin'], unique=True, primary_key=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('address', self.gf('django.db.models.fields.CharField')(max_length=150)),
+            ('zipcode', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('city', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('content', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
+            ('zoom', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=13)),
+            ('lat', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=10, decimal_places=6, blank=True)),
+            ('lng', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=10, decimal_places=6, blank=True)),
+            ('route_planer_title', self.gf('django.db.models.fields.CharField')(default=u'Calculate your fastest way to here', max_length=150, null=True, blank=True)),
+            ('route_planer', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('width', self.gf('django.db.models.fields.CharField')(default='100%', max_length=6)),
+            ('height', self.gf('django.db.models.fields.CharField')(default='400px', max_length=6)),
         ))
         db.send_create_signal('googlemap', ['GoogleMap'])
-        
-    
-    
+
+
     def backwards(self, orm):
-        
-        # Deleting model 'PublicGoogleMap'
-        db.delete_table('googlemap_publicgooglemap')
-        
         # Deleting model 'GoogleMap'
-        db.delete_table('googlemap_googlemap')
-        
-    
-    
+        db.delete_table('cmsplugin_googlemap')
+
+
     models = {
-        'cms.publiccmsplugin': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
-        },
-        'cms.publicpage': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
-        },
         'cms.cmsplugin': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+            'Meta': {'object_name': 'CMSPlugin'},
+            'changed_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'language': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
+            'level': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.CMSPlugin']", 'null': 'True', 'blank': 'True'}),
+            'placeholder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
+            'plugin_type': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
+            'position': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
         },
-        'googlemap.publicgooglemap': {
-            'city': ('models.CharField', [], {'max_length': '100'}),
-            'content': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mark_delete': ('models.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'postcode': ('models.IntegerField', [], {}),
-            'publiccmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.PublicCMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'street': ('models.CharField', [], {'max_length': '100'}),
-            'streetnr': ('models.IntegerField', [], {}),
-            'title': ('models.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'zoom': ('models.IntegerField', [], {'null': 'True', 'blank': 'True'})
-        },
-        'cms.page': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True', 'blank': 'True'})
+        'cms.placeholder': {
+            'Meta': {'object_name': 'Placeholder'},
+            'default_width': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'slot': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'})
         },
         'googlemap.googlemap': {
-            'city': ('models.CharField', [], {'max_length': '100'}),
-            'cmsplugin_ptr': ('models.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'content': ('models.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'postcode': ('models.IntegerField', [], {}),
-            'public': ('models.OneToOneField', [], {'blank': 'True', 'related_name': "'origin'", 'unique': 'True', 'null': 'True', 'to': "orm['googlemap.PublicGoogleMap']"}),
-            'street': ('models.CharField', [], {'max_length': '100'}),
-            'streetnr': ('models.IntegerField', [], {}),
-            'title': ('models.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'zoom': ('models.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'Meta': {'object_name': 'GoogleMap', 'db_table': "'cmsplugin_googlemap'", '_ormbases': ['cms.CMSPlugin']},
+            'address': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
+            'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'content': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'height': ('django.db.models.fields.CharField', [], {'default': "'400px'", 'max_length': '6'}),
+            'lat': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
+            'lng': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '6', 'blank': 'True'}),
+            'route_planer': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'route_planer_title': ('django.db.models.fields.CharField', [], {'default': "u'Calculate your fastest way to here'", 'max_length': '150', 'null': 'True', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'width': ('django.db.models.fields.CharField', [], {'default': "'100%'", 'max_length': '6'}),
+            'zipcode': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'zoom': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '13'})
         }
     }
-    
+
     complete_apps = ['googlemap']

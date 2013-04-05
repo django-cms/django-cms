@@ -55,7 +55,9 @@ class RequestFactory(object):
 
     def request(self, **request):
         "Construct a generic request object."
-        return WSGIRequest(self._base_environ(**request))
+        req = WSGIRequest(self._base_environ(**request))
+        req.session = {}
+        return req
 
     def _get_path(self, parsed):
         # If there are parameters, add them

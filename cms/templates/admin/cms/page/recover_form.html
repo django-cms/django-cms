@@ -1,10 +1,10 @@
 {% extends "admin/cms/page/revision_form.html" %}
 {% load i18n %}
-
+{% load url from future %}
 
 {% block extrahead %}
     {{block.super}}
-    <script type="text/javascript" src="{% url admin:jsi18n %}"></script>
+    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
     {{media}}
 {% endblock %}
 

@@ -11,7 +11,7 @@ on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers. Also the functions defined in this
 module do sanity checks on arguments.
     
-.. warning:: None of the functions in this modules do any security or permission
+.. warning:: None of the functions in this module does any security or permission
              checks. They verify their input values to be sane wherever
              possible, however permission checks should be implemented manually
              before calling any of these functions.
@@ -56,7 +56,7 @@ Functions and constants
     :param string redirect: URL redirect (only applicable if :setting:`CMS_REDIRECTS` is ``True``)
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
-    :param created_by: User that creates this page
+    :param created_by: User that is creating this page
     :type created_by: string of :class:`django.contrib.auth.models.User` instance
     :param parent: Parent page of this page
     :type parent: :class:`cms.models.pagemodel.Page` instance
@@ -65,7 +65,7 @@ Functions and constants
     :param boolean in_navigation: Whether this page should be in the navigation or not
     :param boolean soft_root: Whether this page is a softroot or not
     :param string reverse_id: Reverse ID of this page (for template tags)
-    :param string navigation_extenders: Menu to attach to this page, must be a valid menu
+    :param string navigation_extenders: Menu to attach to this page. Must be a valid menu
     :param boolean published: Whether this page should be published or not
     :param site: Site to put this page on
     :type site: :class:`django.contrib.sites.models.Site` instance
@@ -121,7 +121,7 @@ Functions and constants
     :param boolean grant_all: Grant all permissions to the user
 
 
-.. function:: assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_add=False, can_change=False, can_delete=False, can_change_advanced_settings=False, can_publish=False, can_change_permissions=False, can_move_page=False, can_moderate=False, grant_all=False)
+.. function:: assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_add=False, can_change=False, can_delete=False, can_change_advanced_settings=False, can_publish=False, can_change_permissions=False, can_move_page=False, grant_all=False)
     
     Assigns a user to a page and gives them some permissions. Returns the 
     :class:`cms.models.permissionmodels.PagePermission` object that gets
@@ -132,7 +132,7 @@ Functions and constants
     :param user: The user to assign to the page
     :type user: :class:`django.contrib.auth.models.User` instance
     :param grant_on: Controls which pages are affected
-    :type grant_on: :data:`cms.models.moderatormodels.ACCESS_PAGE`, :data:`cms.models.moderatormodels.ACCESS_CHILDREN`, :data:`cms.models.moderatormodels.ACCESS_DESCENDANTS` or :data:`cms.models.moderatormodels.ACCESS_PAGE_AND_DESCENDANTS`
+    :type grant_on: :data:`cms.models.permissionmodels.ACCESS_PAGE`, :data:`cms.models.permissionmodels.ACCESS_CHILDREN`, :data:`cms.models.permissionmodels.ACCESS_DESCENDANTS` or :data:`cms.models.permissionmodels.ACCESS_PAGE_AND_DESCENDANTS`
     :param can_*: Permissions to grant
     :param boolean grant_all: Grant all permissions to the user
     
@@ -171,6 +171,19 @@ add a text plugin with the content ``'hello world'``. This is done in English::
     add_plugin(placeholder, 'TextPlugin', 'en', body='hello world')
 
 
+*************
+cms.constants
+*************
+
+.. module:: cms.constants
+
+.. data:: TEMPLATE_INHERITANCE_MAGIC
+
+    The token used to identify when a user selects "inherit" as template for a
+    page.
+
+
+
 ***************
 cms.plugin_base
 ***************
@@ -183,7 +196,7 @@ cms.plugin_base
         
     .. attribute:: admin_preview
     
-        Defaults to ``True``, if ``False`` no preview is done in the admin.
+        Defaults to ``False``, if ``True`` there will be a preview in the admin.
         
     .. attribute:: change_form_template
 
@@ -201,7 +214,7 @@ cms.plugin_base
         
     .. attribute:: module
 
-        Will be group the plugin in the plugin editor. If module is ``None``,
+        Will group the plugin in the plugin editor. If module is ``None``,
         plugin is grouped "Generic" group.
     
     .. attribute:: name

@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['tr'] = {
+WYMeditor.STRINGS.tr = {
     Strong:           'Kalın',
     Emphasis:         'Vurgu',
     Superscript:      'Superscript',

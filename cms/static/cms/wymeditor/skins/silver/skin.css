@@ -27,7 +27,7 @@
         .wym_skin_silver .wym_area_right         { display: block; }
 
 
-/*TYPO*/
+/*TYPO*/    
         .wym_skin_silver                { font-size: 62.5%; font-family: Verdana, Arial, sans-serif; }
         .wym_skin_silver h2             { font-size: 110%; /* = 11px */}
         .wym_skin_silver h3             { font-size: 100%; /* = 10px */}

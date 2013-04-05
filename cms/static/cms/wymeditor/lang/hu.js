@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['hu'] = {
+WYMeditor.STRINGS.hu = {
     Strong:           'Félkövér',
     Emphasis:         'Kiemelt',
     Superscript:      'Felső index',

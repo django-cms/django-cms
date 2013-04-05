@@ -5,7 +5,7 @@ Configuration
 #############
 
 The django CMS has a lot of settings you can use to customize your installation
-of the CMS to be exactly like you want it to be.
+so that it is exactly as you'd like it to be.
 
 *****************
 Required Settings
@@ -35,6 +35,12 @@ Example::
     ``js`` and ``css`` sekizai namespaces, for more information, see 
     :ref:`sekizai-namespaces`.
 
+.. warning::
+
+    django CMS internally relies on a number of templates to function correctly.
+    These exist beneath ``cms`` within the templates directory. As such, it
+    is highly recommended you avoid using the same directory name for your own
+    project templates.
 
 *******************
 Basic Customization
@@ -70,13 +76,13 @@ Example::
 
     CMS_PLACEHOLDER_CONF = {
         'content': {
-            'plugins': ('TextPlugin', 'PicturePlugin'),
-            'text_only_plugins': ('LinkPlugin',)
+            'plugins': ['TextPlugin', 'PicturePlugin'],
+            'text_only_plugins': ['LinkPlugin']
             'extra_context': {"width":640},
             'name':gettext("Content"),
         },
         'right-column': {
-            "plugins": ('TeaserPlugin', 'LinkPlugin'),
+            "plugins": ['TeaserPlugin', 'LinkPlugin'],
             "extra_context": {"width":280},
             'name':gettext("Right Column"),
             'limits': {
@@ -86,11 +92,11 @@ Example::
             },
         },
         'base.html content': {
-            "plugins": {'TextPlugin', 'PicturePlugin', 'TeaserPlugin'}
+            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin']
         },
     }
 
-You can combine template names and placeholder names to granually define
+You can combine template names and placeholder names to granularly define
 plugins, as shown above with ''base.html content''.
 
 **plugins**
@@ -115,7 +121,7 @@ internationalized.
 **limits**
 
 Limit the number of plugins that can be placed inside this placeholder.
-Dictionary keys are plugin names; values are their respective limits. Special
+Dictionary keys are plugin names and the values are their respective limits. Special
 case: "global" - Limit the absolute number of plugins in this placeholder
 regardless of type (takes precedence over the type-specific limits).
 
@@ -127,7 +133,7 @@ CMS_PLUGIN_CONTEXT_PROCESSORS
 Default: ``[]``
 
 A list of plugin context processors. Plugin context processors are callables
-that modify all plugin's context before rendering. See
+that modify all plugins' context before rendering. See
 :doc:`../extending_cms/custom_plugins` for more information.
 
 .. setting:: CMS_PLUGIN_PROCESSORS
@@ -179,10 +185,10 @@ Editor configuration
 
 The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
 configuration as vanilla Wymeditor. Therefore you will need to learn 
-how to configure that. The best way to understand this is to head 
-over to `Wymeditor examples page 
-<http://files.wymeditor.org/wymeditor/trunk/src/examples/>`_ 
-After understand how Wymeditor works. 
+how to configure that. The best thing to do is to head 
+over to the `Wymeditor examples page 
+<http://files.wymeditor.org/wymeditor/examples/>`_
+in order to understand how Wymeditor works. 
 
 The :mod:`cms.plugins.text` plugin exposes several variables named
 WYM_* that correspond to the wym configuration. The simplest 
@@ -202,94 +208,192 @@ Currently the following variables are available:
 I18N and L10N
 *************
 
-.. setting:: CMS_HIDE_UNTRANSLATED
-
-CMS_HIDE_UNTRANSLATED
-=====================
-
-Default: ``True``
-
-By default django CMS hides menu items that are not yet translated into the
-current language. With this setting set to False they will show up anyway.
-
 .. setting:: CMS_LANGUAGES
 
 CMS_LANGUAGES
 =============
 
-Default: Value of :setting:`django:LANGUAGES`
+Default: Value of :setting:`django:LANGUAGES` converted to this format
 
 Defines the languages available in django CMS.
 
 Example::
 
-    CMS_LANGUAGES = (
-        ('fr', gettext('French')),
-        ('de', gettext('German')),
-        ('en', gettext('English')),
-    )
+    CMS_LANGUAGES = {
+        1: [
+            {
+                'code': 'en',
+                'name': gettext('English'),
+                'fallbacks': ['de', 'fr'],
+                'public': True,
+                'hide_untranslated': True,
+                'redirect_on_fallback':False,
+            },
+            {
+                'code': 'de',
+                'name': gettext('Deutsch'),
+                'fallbacks': ['en', 'fr'],
+                'public': True,
+            },
+            {
+                'code': 'fr',
+                'name': gettext('French'),
+                'public': False,
+            },
+        ],
+        2: [
+            {
+                'code': 'nl',
+                'name': gettext('Dutch'),
+                'public': True,
+                'fallbacks': ['en'],
+            },
+        ],
+        'default': {
+            'fallbacks': ['en', 'de', 'fr'],
+            'redirect_on_fallback':True,
+            'public': False,
+            'hide_untranslated': False,
+        }
+    }
 
 .. note:: Make sure you only define languages which are also in :setting:`django:LANGUAGES`.
 
-.. setting:: CMS_LANGUAGE_FALLBACK
+CMS_LANGUAGES has different options where you can granular define how different languages behave.
 
-CMS_LANGUAGE_FALLBACK
-=====================
+On the first level you can define SITE_IDs and default values. In the example above we define two sites. The first site
+has 3 languages (English, German and French) and the second site has only Dutch. The `default` node defines
+default behavior for all languages. You can overwrite the default settings with language specific properties.
+For example we define `hide_untranslated` as False globally. The English language overwrites this behavior.
 
+Every language node needs at least a `code` and a `name` property. `code` is the iso 2 code for the language. And
+name is the verbose name of the language.
+
+.. note:: With a gettext() lambda function you can make language names translatable. To enable this add
+          `gettext = lambda s: s` at the beginning of your settings file. But maybe you want to leave the language name
+          as it is.
+
+What are the properties a language node can have?
+
+.. setting::code
+
+code
+----
+
+String. RFC5646 code of the language.
+
+Example: ``"en"``.
+
+.. note:: Is required for every language.
+
+name
+----
+String. The verbose name of the language.
+
+.. note:: Is required for every language.
+
+.. setting::public
+
+public
+------
+Is this language accessible in the frontend? For example, if you decide you want to add a new language to your page
+but don't want to show it to the world yet.
+
+Type: Boolean
 Default: ``True``
 
-This will redirect the browser to the same page in another language if the
-page is not available in the current language.
+.. setting::fallbacks
 
-.. setting:: CMS_LANGUAGE_CONF
+fallbacks
+---------
 
-CMS_LANGUAGE_CONF
-=================
+A list of languages that are used if a page is not translated yet. The ordering is relevant.
 
-Default: ``{}``
+Example: ``['de', 'fr']``
+Default: ``[]``
 
-Language fallback ordering for each language.
+.. setting::hide_untranslated
 
-Example::
+hide_untranslated
+-----------------
+Should untranslated pages be hidden in the menu?
 
-    CMS_LANGUAGE_CONF = {
-        'de': ['en', 'fr'],
-        'en': ['de'],
-    }
+Type: Boolean
+Default: ``True``
 
-.. setting:: CMS_SITE_LANGUAGES
+.. setting::redirect_on_fallback
 
-CMS_SITE_LANGUAGES
-==================
+redirect_on_fallback
+--------------------
 
-Default: ``{}``
+If a page is not available should there be a redirect to a language that is, or should the content be displayed
+in the other language in this page?
 
-If you have more than one site and :setting:`CMS_LANGUAGES` differs between
-the sites, you may want to fill this out so if you switch between the sites
-in the admin you only get the languages available on this site.
+Type: Boolean
+Default:``True``
 
-Example::
 
-    CMS_SITE_LANGUAGES = {
-        1:['en','de'],
-        2:['en','fr'],
-        3:['en'],
-    }
+Unicode support for automated slugs
+===================================
 
-.. setting:: CMS_FRONTEND_LANGUAGES
+The django CMS supports automated slug generation from page titles that contain unicode characters via the
+unihandecode.js project. To enable support for unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
+:setting:`CMS_UNIHANDECODE_VERSION` must be set.
 
-CMS_FRONTEND_LANGUAGES
-======================
 
-Default: Value of :setting:`CMS_LANGUAGES`
+.. setting:: CMS_UNIHANDECODE_HOST
 
-A list of languages django CMS uses in the frontend. For example, if
-you decide you want to add a new language to your page but don't want to
-show it to the world yet.
+CMS_UNIHANDECODE_HOST
+---------------------
 
-Example::
+default: ``None``
 
-    CMS_FRONTEND_LANGUAGES = ("de", "en", "pt-BR")
+Must be set to the URL where you host your unihandecode.js files. For licensing reasons, the django CMS does not include
+unihandecode.js.
+
+If set to ``None``, the default, unihandecode.js is not used.
+
+
+.. note::
+
+    Unihandecode.js is a rather large library, especially when loading support
+    for Japanese. It is therefore very important that you serve it from a
+    server that supports gzip compression. Further, make sure that those files
+    can be cached by the browser for a very long period.
+
+
+.. setting:: CMS_UNIHANDECODE_VERSION
+
+CMS_UNIHANDECODE_VERSION
+------------------------
+
+default: ``None``
+
+Must be set to the version number (eg ``'1.0.0'``) you want to use. Together with :setting:`CMS_UNIHANDECODE_HOST` this
+setting is used to build the full URLs for the javascript files. URLs are built like this:
+``<CMS_UNIHANDECODE_HOST>-<CMS_UNIHANDECODE_VERSION>.<DECODER>.min.js``.
+
+
+.. setting:: CMS_UNIHANDECODE_DECODERS
+
+CMS_UNIHANDECODE_DECODERS
+-------------------------
+
+default: ``['ja', 'zh', 'vn', 'kr', 'diacritic']``
+
+If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST``, you can add them to this setting.
+
+
+.. setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
+
+CMS_UNIHANDECODE_DEFAULT_DECODER
+--------------------------------
+
+default: ``'diacritic'``
+
+The default decoder to use when unihandecode.js support is enabled, but the current language does not provide a specific
+decoder in :setting:`CMS_UNIHANDECODE_DECODERS`. If set to ``None``, failing to find a specific decoder will disable
+unihandecode.js for this language.
 
 
 **************
@@ -376,25 +480,13 @@ CMS_REDIRECTS
 
 Default: ``False``
 
-This adds a new "redirect" field to the "advanced settings" tab of the page
+This adds a new "redirect" field to the "advanced settings" tab of the page.
 
-You can set a url here, which a visitor will be redirected to when the page is
+You can set a url here to which visitors will be redirected when the page is
 accessed.
 
 Note: Don't use this too much. :mod:`django.contrib.redirects` is much more
 flexible, handy, and is designed exactly for this purpose.
-
-.. setting:: CMS_FLAT_URLS
-
-CMS_FLAT_URLS
-=============
-
-Default: ``False``
-
-If this is enabled the slugs are not nested in the urls.
-
-So a page with a "world" slug will have a "/world" url, even it is a child of
-the "hello" page. If disabled the page would have the url: "/hello/world/"
 
 .. setting:: CMS_SOFTROOT
 
@@ -436,7 +528,7 @@ page". But he will only see the users he created. The users he created can also
 only inherit the rights he has. So if he only has been granted the right to edit
 a certain page all users he creates can, in turn, only edit this page. Naturally
 he can limit the rights of the users he creates even further, allowing them to see
-only a subset of the pages he's allowed access to, for example.
+only a subset of the pages to which he is allowed access.
 
 .. setting:: CMS_RAW_ID_USERS
 
@@ -471,29 +563,8 @@ CMS_PUBLIC_FOR
 
 Default: ``all``
 
-Decides if pages without any view restrictions are public by default, or staff
+Decides if pages without any view restrictions are public by default or staff
 only. Possible values are ``all`` and ``staff``.
-
-.. setting:: CMS_MODERATOR
-
-CMS_MODERATOR
-=============
-
-Default: ``False``
-
-If set to true, gives you a new "moderation" column in the tree view.
-
-You can select to moderate pages or whole trees. If a page is under moderation
-you will receive an email if somebody changes a page and you will be asked to
-approve the changes. Only after you approved the changes will they be updated
-on the "live" site. If you make changes to a page you moderate yourself, you
-will need to approve it anyway. This allows you to change a lot of pages for
-a new version of the site, for example, and go live with all the changes at the
-same time.
-
-.. note:: When switching this value to ``True`` on an existing site, you have
-          to run the ``cms moderator on`` command to make the required database
-          changes.
 
 .. setting:: CMS_SHOW_START_DATE
 .. setting:: CMS_SHOW_END_DATE
@@ -587,3 +658,6 @@ Example::
 
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
     :ref:`cache key prefixing <django:cache_key_prefixing>`
+
+
+.. _unihandecode.js: https://github.com/ojii/unihandecode.js

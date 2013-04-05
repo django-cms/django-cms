@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
+
 
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=15, db_index=True)
@@ -19,40 +20,39 @@ class Title(models.Model):
     meta_keywords = models.CharField(_("keywords"), max_length=255, blank=True, null=True)
     page_title = models.CharField(_("title"), max_length=255, blank=True, null=True, help_text=_("overwrite the title (html title tag)"))
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
-    creation_date = models.DateTimeField(_("creation date"), editable=False, default=datetime.now)
-    
+    creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
+
     objects = TitleManager()
-    
+
     class Meta:
         unique_together = (('language', 'page'),)
         app_label = 'cms'
-    
-    def __unicode__(self):
-        return "%s (%s)" % (self.title, self.slug) 
 
-    def save(self, *args, **kwargs):
+    def __unicode__(self):
+        return u"%s (%s, %s)" % (self.title, self.slug, self.language)
+
+    def update_path(self):
         # Build path from parent page's path and slug
-        current_path = self.path
-        parent_page = self.page.parent
-        
         slug = u'%s' % self.slug
         if not self.has_url_overwrite:
             self.path = u'%s' % slug
-            if parent_page:
+            if self.page.parent_id:
+                parent_page = self.page.parent_id
+
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
                     self.path = u'%s/%s' % (parent_title.path, slug)
-        super(Title, self).save(*args, **kwargs)
+        
 
     @property
     def overwrite_url(self):
-        """Return overrwriten url, or None
+        """Return overwritten url, or None
         """
         if self.has_url_overwrite:
             return self.path
         return None
-        
-        
+
+
 class EmptyTitle(object):
     """Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
@@ -67,10 +67,10 @@ class EmptyTitle(object):
     application_urls = ""
     menu_title = ""
     page_title = ""
-    
+
     @property
     def overwrite_url(self):
         return None
-    
-    
+
+
 reversion_register(Title)

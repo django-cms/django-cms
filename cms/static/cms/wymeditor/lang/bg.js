@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['bg'] = {
+WYMeditor.STRINGS.bg = {
     Strong:           'Получер',
     Emphasis:         'Курсив',
     Superscript:      'Горен индекс',

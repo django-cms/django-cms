@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from cms.models.placeholdermodel import Placeholder
-from cms.plugin_processors import (plugin_meta_context_processor, 
+from cms.plugin_processors import (plugin_meta_context_processor,
     mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
+from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
-from cms.utils.placeholder import (get_page_from_placeholder_if_exists, 
-    get_placeholder_conf)
+from cms.utils.placeholder import get_placeholder_conf
 from django.conf import settings
 from django.template import Template, Context
 from django.template.defaultfilters import title
@@ -36,11 +36,11 @@ class PluginContext(Context):
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
             self.update(processor(instance, placeholder))
-        for processor in iterload_objects(settings.CMS_PLUGIN_CONTEXT_PROCESSORS):
+        for processor in iterload_objects(get_cms_setting('PLUGIN_CONTEXT_PROCESSORS')):
             self.update(processor(instance, placeholder))
         for processor in processors:
             self.update(processor(instance, placeholder))
-            
+
 def render_plugin(context, instance, placeholder, template, processors=None,
                   current_app=None):
     """
@@ -50,12 +50,12 @@ def render_plugin(context, instance, placeholder, template, processors=None,
     if not processors:
         processors = []
     if isinstance(template, basestring):
-        content = render_to_string(template, context)
+        content = render_to_string(template, context_instance=context)
     elif isinstance(template, Template):
         content = template.render(context)
     else:
         content = ''
-    for processor in iterload_objects(settings.CMS_PLUGIN_PROCESSORS):
+    for processor in iterload_objects(get_cms_setting('PLUGIN_PROCESSORS')):
         content = processor(instance, placeholder, content, context)
     for processor in processors:
         content = processor(instance, placeholder, content, context)
@@ -72,15 +72,15 @@ def render_plugins(plugins, context, placeholder, processors=None):
     This is the main plugin rendering utility function, use this function rather than
     Plugin.render_plugin().
     """
-    c = []
+    out = []
     total = len(plugins)
     for index, plugin in enumerate(plugins):
-        plugin._render_meta.total = total 
+        plugin._render_meta.total = total
         plugin._render_meta.index = index
         context.push()
-        c.append(plugin.render_plugin(context, placeholder, processors=processors))
+        out.append(plugin.render_plugin(context, placeholder, processors=processors))
         context.pop()
-    return c
+    return out
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"):
     """
@@ -88,11 +88,11 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
-    context = context_to_copy 
+    context = context_to_copy
     context.push()
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
-    page = get_page_from_placeholder_if_exists(placeholder)
+    page = placeholder.page if placeholder else None
     if page:
         template = page.template
     else:
@@ -109,12 +109,12 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         if not key in context:
             context[key] = value
 
-    c = []
+    content = []
 
     # Prepend frontedit toolbar output if applicable
     edit = False
     toolbar = getattr(request, 'toolbar', None)
-    
+
     if (getattr(toolbar, 'edit_mode', False) and
         (not page or page.has_change_permission(request))):
             edit = True
@@ -122,10 +122,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         from cms.middleware.toolbar import toolbar_plugin_processor
         processors = (toolbar_plugin_processor,)
     else:
-        processors = None 
+        processors = None
 
-    c.extend(render_plugins(plugins, context, placeholder, processors))
-    content = "".join(c)
+    content.extend(render_plugins(plugins, context, placeholder, processors))
+    content = "".join(content)
     if edit:
         content = render_placeholder_toolbar(placeholder, context, content, name_fallback)
     context.pop()
@@ -134,7 +134,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
     request = context['request']
-    page = get_page_from_placeholder_if_exists(placeholder)
+    page = placeholder.page if placeholder else None
     if not page:
         page = getattr(request, 'current_page', None)
     if page:
@@ -142,6 +142,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
         if name_fallback and not placeholder:
             placeholder = Placeholder.objects.create(slot=name_fallback)
             page.placeholders.add(placeholder)
+            placeholder.page = page
     else:
         template = None
     if placeholder:
@@ -149,16 +150,14 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     else:
         slot = None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
-    name = get_placeholder_conf(slot, template, "name", title(slot))
+    name = get_placeholder_conf("name", slot, template, title(slot))
     name = _(name)
     context.push()
-    context.update({
-        'installed_plugins': installed_plugins,
-        'language': get_language_from_request(request),
-        'placeholder_label': name,
-        'placeholder': placeholder,
-        'page': page,
-    })
+    context['installed_plugins'] = installed_plugins
+    context['language'] = get_language_from_request(request)
+    context['placeholder_label'] = name
+    context['placeholder'] = placeholder
+    context['page'] = page
     toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()
     return "".join([toolbar, content])

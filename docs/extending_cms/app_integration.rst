@@ -7,9 +7,9 @@ You have 5 ways of integrating your app:
 
 1. Menus
 
-    Static extend the menu entries
+    Statically extend the menu entries
 
-2. AttachMenus
+2. Attach Menus
 
     Attach your menu to a page.
 
@@ -29,7 +29,7 @@ You have 5 ways of integrating your app:
 Menus
 *****
 
-Create a menu.py in your application and write the following inside::
+Create a ``menu.py`` in your application and write the following inside::
 
     from menus.base import Menu, NavigationNode
     from menus.menu_pool import menu_pool
@@ -58,7 +58,7 @@ The get_nodes function should return a list of
 
 - title
 
-  What should the menu entry read?
+  What the menu entry should read as
 
 - url,
 
@@ -70,7 +70,7 @@ The get_nodes function should return a list of
 
 - parent_id=None
 
-  If this is a child of another node give here the id of the parent.
+  If this is a child of another node supply the the id of the parent here.
 
 - parent_namespace=None
 
@@ -87,7 +87,7 @@ The get_nodes function should return a list of
 
   Whether or not this menu item should be visible.
 
-Additionally, each :class:`NavigationNode` provides a number of methods, which are
+Additionally, each :class:`NavigationNode` provides a number of methods which are
 detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 ************
@@ -95,7 +95,7 @@ Attach Menus
 ************
 
 Classes that extend from :class:`menus.base.Menu` always get attached to the
-root. But if you want the menu be attached to a CMS Page you can do that as
+root. But if you want the menu to be attached to a CMS Page you can do that as
 well.
 
 Instead of extending from :class:`~menus.base.Menu` you need to extend from
@@ -157,7 +157,7 @@ App-Hooks
 With App-Hooks you can attach whole Django applications to pages. For example
 you have a news app and you want it attached to your news page.
 
-To create an apphook create a ``cms_app.py`` in your application. And in there
+To create an apphook create a ``cms_app.py`` in your application. And in it
 write the following::
 
     from cms.app_base import CMSApp
@@ -188,7 +188,7 @@ under "Application". Save the page.
     there is a cms management command called uninstall apphooks
     that removes the specified apphook(s) from all pages by name.
     eg. ``manage.py cms uninstall apphooks MyApphook``.
-    To find all names for uninstallable apphooks there is a command for this aswell
+    To find all names for uninstallable apphooks there is a command for this as well
     ``manage.py cms list apphooks``.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
@@ -204,7 +204,6 @@ a urls.py that looks like this::
 The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the url ``/hello/world/sublevel/``.
 
-
 .. note::
 
     All views that are attached like this must return a
@@ -212,30 +211,8 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
     default :class:`~django.template.Context` instance.
 
 
-Language Namespaces
--------------------
-
-An additional feature of apphooks is that if you use the
-:class:`cms.middleware.multilingual.MultilingualURLMiddleware` all apphook urls
-are language namespaced.
-
-What this means:
-
-To reverse the first url from above you would use something like this in your
-template:
-
-.. code-block:: html+django
-
-    {% url app_main %}
-
-If you want to access the same url but in a different language use a langauge
-namespace:
-
-.. code-block:: html+django
-
-    {% url de:app_main %}
-    {% url en:app_main %}
-    {% url fr:app_main %}
+Apphook Menus
+-------------
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
@@ -293,7 +270,7 @@ We would now create a menu out of these categories::
                     category.get_absolute_url(),
                     category.pk,
                     category.parent_id
-                )                
+                )
                 nodes.append(node)
             return nodes
 
@@ -310,6 +287,73 @@ If you add this menu now to your app-hook::
 
 You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 :class:`CategoryMenu` both attached to the same page.
+
+
+Application and instance namespaces
+-----------------------------------
+
+If you'd like to use application namespaces to reverse the URLs related to
+your app, you can assign a value to the `app_name` attribute of your app
+hook like this::
+
+    class MyNamespacedApphook(CMSApp):
+        name = _("My Namespaced Apphook")
+        urls = ["myapp.urls"]
+        app_name = "myapp_namespace"
+
+    apphook_pool.register(MyNamespacedApphook)
+
+As seen for Language Namespaces, you can reverse namespaced apps similarly:
+
+.. code-block:: html+django
+
+    {% url myapp_namespace:app_main %}
+
+If you want to access the same url but in a different language use the language
+templatetag:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+    {% language "de" %}
+        {% url myapp_namespace:app_main %}
+    {% endlanguage %}
+
+What makes namespaced app hooks really interesting is the fact that you can
+hook them up to more than one page and reverse their URLs by using their
+instance namespace. Django CMS takes the value of the `reverse_id` field
+assigned to a page and uses it as instance namespace for the app hook.
+
+To reverse the URLs you now have two different ways: explicitly by defining
+the instance namespace, or implicitely by specifiyng the application namespace
+and letting the `url` templatetag resolving the correct application instance
+by looking at the currently set `current_app` value.
+
+.. note::
+
+    The official Django documentation has more details about application and
+    instance namespaces, the `current_app` scope and the reversing of such
+    URLs. You can look it up at https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces
+
+When using the `reverse` function, the `current_app` has to be explicitly passed
+as an argument. You can do so by looking up the `current_app` attribute of
+the request instance::
+
+    def myviews(request):
+        ...
+        reversed_url = reverse('myapp_namespace:app_main',
+                current_app=request.current_app)
+        ...
+
+Or, if you are rendering a plugin, of the context instance::
+
+    class MyPlugin(CMSPluginBase):
+        def render(self, context, instance, placeholder):
+            ...
+            reversed_url = reverse('myapp_namespace:app_main',
+                    current_app=context.current_app)
+            ...
+
 
 ********************
 Navigation Modifiers
@@ -370,7 +414,7 @@ of :class:`~menus.base.NavigationNode` instances.
 
 - request
 
-  A Django request instance. Maybe you want to modify based on sessions, or
+  A Django request instance. You want to modify based on sessions, or
   user or permissions?
 
 - nodes
@@ -389,7 +433,7 @@ of :class:`~menus.base.NavigationNode` instances.
 - post_cut
 
   Every modifier is called two times. First on the whole tree. After that the
-  tree gets cut. To only show the nodes that are shown in the current menu.
+  tree gets cut to only show the nodes that are shown in the current menu.
   After the cut the modifiers are called again with the final tree. If this is
   the case ``post_cut`` is ``True``.
 

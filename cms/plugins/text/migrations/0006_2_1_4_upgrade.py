@@ -1,30 +1,22 @@
-# encoding: utf-8
-from django.db import models
+# -*- coding: utf-8 -*-
 from south.db import db
-from south.v2 import DataMigration
-import datetime
-import traceback
+from django.db import models
+from cms.plugins.text.models import *
 
-class Migration(DataMigration):
-
+class Migration:
+    
     def forwards(self, orm):
-        "Write your forwards methods here."
-        for textplugin in orm.Text.objects.all():
-            try:
-                textplugin.full_clean()
-            except:
-                traceback.print_exc()
-                print 'ERROR CLEANING TEXT PLUGIN %s, PLEASE FIX MANUALLY' % textplugin.pk
-            textplugin.save()
-
-
+        "Write your forwards migration here"
+    
+    
     def backwards(self, orm):
-        "Write your backwards methods here."
-
-
+        "Write your backwards migration here"
+    
+    
     models = {
         'cms.cmsplugin': {
             'Meta': {'object_name': 'CMSPlugin'},
+            'changed_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
@@ -46,7 +38,7 @@ class Migration(DataMigration):
         'text.text': {
             'Meta': {'object_name': 'Text', 'db_table': "'cmsplugin_text'"},
             'body': ('django.db.models.fields.TextField', [], {}),
-            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': True})
+            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'})
         }
     }
 

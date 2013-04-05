@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.models import Page
+from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.text.models import Text
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD,
-    URL_CMS_PLUGIN_EDIT)
+from cms.test_utils.project.fileapp.models import FileModel
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, 
+    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT)
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from os.path import join
-from project.fileapp.models import FileModel
-from reversion.models import Revision, Version
-from reversion import revision as revision_manager
+from cms.test_utils.project.fileapp.models import FileModel
+import reversion
+from reversion.models import Revision, Version, VERSION_CHANGE
 import shutil
 
 class ReversionTestCase(CMSTestCase):
@@ -57,9 +57,9 @@ class ReversionTestCase(CMSTestCase):
             txt = Text.objects.all()[0]
             self.assertEquals("Bye Bye World", txt.body)
             p_data = self.page_data.copy()
-            p_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
+            page.publish()
 
     def test_revert(self):
         """
@@ -67,8 +67,9 @@ class ReversionTestCase(CMSTestCase):
         """
         with self.login_user_context(User.objects.get(username="test")):
             self.assertEquals(Page.objects.all().count(), 2)
+            self.assertEquals(Title.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEquals(Revision.objects.all().count(), 7)
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
@@ -82,8 +83,9 @@ class ReversionTestCase(CMSTestCase):
             revert_url = history_url + "%s/" % version.pk
             response = self.client.get(revert_url)
             self.assertEquals(response.status_code, 200)
-
-            response = self.client.post(revert_url, self.page_data)
+            data = self.page_data
+            response = self.client.post("%s?language=en&" % revert_url, self.page_data)
+            #print response
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
 
             # test for publisher_is_draft, published is set for both draft and
@@ -93,14 +95,14 @@ class ReversionTestCase(CMSTestCase):
 
             # test that CMSPlugin subclasses are reverted
             self.assertEquals(Text.objects.all().count(), 2)
-            self.assertEquals(Revision.objects.all().count(), 6)
+            self.assertEquals(Revision.objects.all().count(), 9)
 
     def test_recover(self):
         """
         Test that you can recover a page
         """
         with self.login_user_context(User.objects.get(username="test")):
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEquals(Revision.objects.all().count(), 7)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
             version = Version.objects.get(content_type=ctype, revision=revision)
@@ -137,7 +139,7 @@ class ReversionFileFieldTests(CMSTestCase):
         shutil.rmtree(join(settings.MEDIA_ROOT, 'fileapp'))
 
     def test_file_persistence(self):
-        with revision_manager:
+        with reversion.create_revision():
             # add a file instance
             file1 = FileModel()
             file1.test_file.save('file1.txt',
@@ -145,7 +147,10 @@ class ReversionFileFieldTests(CMSTestCase):
             file1.save()
             # manually add a revision because we use the explicit way
             # django-cms uses too.
-            revision_manager.add(file1)
+            adapter = reversion.get_adapter(FileModel)
+            reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1, VERSION_CHANGE))
 
         # reload the instance from db
         file2 = FileModel.objects.all()[0]
@@ -153,7 +158,7 @@ class ReversionFileFieldTests(CMSTestCase):
         file2.delete()
 
         # revert the old version
-        file_version = Version.objects.get_for_object(file1)[0]
+        file_version = reversion.get_for_object(file1)[0]
         file_version.revert()
 
         # reload the reverted instance and check for its content

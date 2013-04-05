@@ -25,11 +25,6 @@ class PluginPool(object):
 
         If a plugin is already registered, this will raise PluginAlreadyRegistered.
         """
-        if hasattr(plugin,'__iter__'):
-            warnings.warn("Registering more than one plugin at once will be deprecated in 2.3", DeprecationWarning)
-            for single_plugin in plugin:
-                self.register_plugin(single_plugin)
-            return
         if not issubclass(plugin, CMSPluginBase):
             raise ImproperlyConfigured(
                 "CMS Plugins must be subclasses of CMSPluginBase, %r is not."
@@ -60,11 +55,6 @@ class PluginPool(object):
 
         If a plugin isn't already registered, this will raise PluginNotRegistered.
         """
-        if hasattr(plugin,'__iter__'):
-            warnings.warn("Unregistering more than one plugin at once will be deprecated in 2.3", DeprecationWarning)
-            for single_plugin in plugin:
-                self.unregister_plugin(single_plugin)
-            return 
         plugin_name = plugin.__name__
         if plugin_name not in self.plugins:
             raise PluginNotRegistered(

@@ -3,7 +3,7 @@ from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import Page
 from cms.templatetags.cms_tags import Placeholder
 from cms.utils.placeholder import validate_placeholder_name
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
 from django.template import (NodeList, TextNode, VariableNode, 
     TemplateSyntaxError)
@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.template.loader_tags import (ConstantIncludeNode, ExtendsNode, 
     BlockNode)
 import warnings
+from sekizai.helpers import is_variable_extend_node
 
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
@@ -20,7 +21,7 @@ def _extend_blocks(extend_node, blocks):
     Extends the dictionary `blocks` with *new* blocks in the parent node (recursive)
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if is_variable_extend_node(extend_node):
         return
     parent = extend_node.get_parent(None)
     # Search for new blocks
@@ -36,11 +37,17 @@ def _extend_blocks(extend_node, blocks):
                 block = block.super
             block.super = node
     # search for further ExtendsNodes
-    for node in parent.nodelist:
-        if not isinstance(node, TextNode):
-            if isinstance(node, ExtendsNode):
-                _extend_blocks(node, blocks)
-            break
+    for node in parent.nodelist.get_nodes_by_type(ExtendsNode):
+        _extend_blocks(node, blocks)
+        break
+        
+def _find_topmost_template(extend_node):
+    parent_template = extend_node.get_parent({})
+    for node in parent_template.nodelist.get_nodes_by_type(ExtendsNode):
+        # Their can only be one extend block in a template, otherwise django raises an exception
+        return _find_topmost_template(node)
+    # No ExtendsNode
+    return extend_node.get_parent({}) 
 
 def _extend_nodelist(extend_node):
     """
@@ -48,8 +55,9 @@ def _extend_nodelist(extend_node):
     ExtendsNode
     """
     # we don't support variable extensions
-    if extend_node.parent_name_expr:
+    if is_variable_extend_node(extend_node):
         return []
+    # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
     blocks = extend_node.blocks
     _extend_blocks(extend_node, blocks)
     placeholders = []
@@ -57,14 +65,17 @@ def _extend_nodelist(extend_node):
     for block in blocks.values():
         placeholders += _scan_placeholders(block.nodelist, block, blocks.keys())
 
-    parent_template = extend_node.get_parent({})
-    # if this is the topmost template, check for placeholders outside of blocks
-    if not parent_template.nodelist.get_nodes_by_type(ExtendsNode):
-        placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
+    # Scan topmost template for placeholder outside of blocks
+    parent_template = _find_topmost_template(extend_node)
+    placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
     return placeholders
 
-def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
+def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
     placeholders = []
+    if ignore_blocks is None:
+        # List of BlockNode instances to ignore.
+        # This is important to avoid processing overriden block nodes.
+        ignore_blocks = []
 
     for node in nodelist:
         # check if this is a placeholder first
@@ -97,7 +108,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
                     if isinstance(subnodelist, NodeList):
                         if isinstance(node, BlockNode):
                             current_block = node
-                        placeholders += _scan_placeholders(subnodelist, current_block)
+                        placeholders += _scan_placeholders(subnodelist, current_block, ignore_blocks)
         # else just scan the node for nodelist instance attributes
         else:
             for attr in dir(node):
@@ -105,7 +116,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=[]):
                 if isinstance(obj, NodeList):
                     if isinstance(node, BlockNode):
                         current_block = node
-                    placeholders += _scan_placeholders(obj, current_block)
+                    placeholders += _scan_placeholders(obj, current_block, ignore_blocks)
     return placeholders
 
 def get_placeholders(template):
@@ -124,13 +135,16 @@ SITE_VAR = "site__exact"
 
 def current_site(request):
     if SITE_VAR in request.REQUEST:
-        return Site.objects.get(pk=request.REQUEST[SITE_VAR])
+        site_pk = request.REQUEST[SITE_VAR]
     else:
+        session = getattr(request, 'session')
         site_pk = request.session.get('cms_admin_site', None)
-        if site_pk:
-            try:
-                return Site.objects.get(pk=site_pk)
-            except Site.DoesNotExist:
-                return None
-        else:
-            return Site.objects.get_current()
+    if site_pk:
+        try:
+            site = SITE_CACHE.get(site_pk) or Site.objects.get(pk=site_pk)
+            SITE_CACHE[site_pk] = site
+            return site
+        except Site.DoesNotExist:
+            return None
+    else:
+        return Site.objects.get_current()

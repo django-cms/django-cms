@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
-from cms.utils.i18n import get_default_language
+from cms import constants
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_default_language, get_language_list, get_language_code
 from distutils.version import LooseVersion
 from django.conf import settings
 from django.core.files.storage import get_storage_class
@@ -20,8 +22,8 @@ def get_template_from_request(request, obj=None, no_current_page=False):
     template.
     """
     template = None
-    if len(settings.CMS_TEMPLATES) == 1:
-        return settings.CMS_TEMPLATES[0][0]
+    if len(get_cms_setting('TEMPLATES')) == 1:
+        return get_cms_setting('TEMPLATES')[0][0]
     if "template" in request.REQUEST:
         template = request.REQUEST['template']
     if not template and obj is not None:
@@ -30,32 +32,32 @@ def get_template_from_request(request, obj=None, no_current_page=False):
         current_page = request.current_page
         if hasattr(current_page, "get_template"):
             template = current_page.get_template()
-    if template is not None and template in dict(settings.CMS_TEMPLATES).keys():
-        if template == settings.CMS_TEMPLATE_INHERITANCE_MAGIC and obj:
+    if template is not None and template in dict(get_cms_setting('TEMPLATES')).keys():
+        if template == constants.TEMPLATE_INHERITANCE_MAGIC and obj:
             # Happens on admin's request when changing the template for a page
             # to "inherit".
             return obj.get_template()
         return template    
-    return settings.CMS_TEMPLATES[0][0]
+    return get_cms_setting('TEMPLATES')[0][0]
 
 
 def get_language_from_request(request, current_page=None):
-    from cms.models import Page
     """
     Return the most obvious language according the request
     """
     language = request.REQUEST.get('language', None)
+    site_id = current_page.site_id if current_page else None
     if language:
-        if not language in dict(settings.CMS_LANGUAGES).keys():
+        language = get_language_code(language)
+        if not language in get_language_list(site_id):
             language = None
     if language is None:
-        language = getattr(request, 'LANGUAGE_CODE', None)
+        language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
     if language:
-        if not language in dict(settings.CMS_LANGUAGES).keys():
+        if not language in get_language_list(site_id):
             language = None
 
-    # TODO: This smells like a refactoring oversight - was current_page ever a page object? It appears to be a string now
-    if language is None and isinstance(current_page, Page):
+    if language is None and current_page:
         # in last resort, get the first language available in the page
         languages = current_page.get_languages()
 
@@ -66,7 +68,7 @@ def get_language_from_request(request, current_page=None):
         # language must be defined in CMS_LANGUAGES, so check first if there
         # is any language with LANGUAGE_CODE, otherwise try to split it and find
         # best match
-        language = get_default_language()
+        language = get_default_language(site_id=site_id)
 
     return language
 
@@ -80,13 +82,7 @@ def get_page_from_request(request):
     return new(request)
 
 
-"""
-The following class is taken from https://github.com/jezdez/django/compare/feature/staticfiles-templatetag
-and should be removed and replaced by the django-core version in 1.4
-"""
 default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-if LooseVersion(django.get_version()) < LooseVersion('1.3'):
-    default_storage = 'staticfiles.storage.StaticFilesStorage'
 
 
 class ConfiguredStorage(LazyObject):
@@ -100,5 +96,5 @@ def cms_static_url(path):
     Helper that prefixes a URL with STATIC_URL and cms
     '''
     if not path:
-        ''
+        return ''
     return configured_storage.url(os.path.join('cms', path))

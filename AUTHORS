@@ -1,13 +1,19 @@
 Current or previous core committers:
 
 * Angelo Dini
+* Beni Wohlwend
 * Chris Glass
+* Daniele Procida
 * Eric Robitaille
 * Jonas Obrist
 * Patrick Lauber
 * Peter Ciciman
 * Stefan Foulis
 * Øyvind Saltvik
+
+Current and previous core designers:
+
+* Christian Bertschy
 
 Contributors (in alphabetical order):
 
@@ -19,19 +25,34 @@ Contributors (in alphabetical order):
 * Adrián Ribao
 * Alberto Paro
 * Alessandro Ronchi
+* Aleš Kocjančič
+* Alex Cucu
+* Alexandre Leray
+* Alexey Subbotin
+* Alvin Mites
+* Andrew Cassidy
+* Andrew Schoen
 * angular_circle
+* Anton Parkhomenko
 * Antoni Aloy López
 * Arne Gellhaus
 * Artem Skoretskiy
 * Arthur Debert
+* Aymeric Augustin
 * Batiste Bieler
 * behrooz
 * Behrooz Nobakht
 * Benjamin Wohlwend
+* benjaoming
 * Bernd Zeimetz
+* Bertrand Bordage
 * beshrkayali
+* Bjorn Sandberg
 * Bob Karreman
+* Bouke Haarsma
+* Braden MacDonald
 * brightwhitefox
+* Calvin Cheng
 * Chanita Siridechkun
 * Charpentier Johan
 * Cheng-Chia Tseng
@@ -39,8 +60,9 @@ Contributors (in alphabetical order):
 * Chris Hughes
 * Chris Wesseling
 * Christof Hagedorn
-* Daniele Procida
+* Conrado Bührer
 * DaNmarner
+* Daniel Barden
 * Darryl Woods
 * David Jean Louis
 * David Thompson
@@ -50,27 +72,40 @@ Contributors (in alphabetical order):
 * eged
 * Egor V. Nazarkin
 * Ekrem Seren
+* Erlend Dalen
+* Eric Eldredge
 * Erik Allik
+* Eugen MechanisM
 * Evandro Miquelito
+* F. Gabriel Gosselin
 * f4nt
 * fcurella
 * Filip Kazimierczak
 * Frank Bieniek
+* Gabe Jackson
+* Gabriel Hurley
 * GaretJax
+* Geoffrey Hing
 * George Marshall
 * Gerard Świderski
+* guandalino
+* hedberg
+* Herbert Poul
 * homebrew79
 * hysia
 * Iacopo Spalletti
 * Ian Lewis
 * indexofire
 * Ionel Cristian Maries
+* Iván Raskovsky
 * Ivan Vershigora
 * izi
+* Jacob Rief
 * Jameel Al-Aziz
 * James Richards
 * Jannis Leidel
 * Janusz Harkot
+* Jason Brown
 * Jason Davies
 * Jason Jenkins
 * Jason Zylks
@@ -80,10 +115,12 @@ Contributors (in alphabetical order):
 * Jonathan Stoppani
 * jordanjambazov
 * Jorge Vargas (elpargo)
+* Joseph Bergantine
 * kar1m
 * Keryn Knight
 * Kim Blomqvist
 * kochin
+* Kristian Øllegaard
 * Krzysztof Bandurski
 * kunitoki
 * Lars Smit
@@ -105,22 +142,30 @@ Contributors (in alphabetical order):
 * Martin Kosír
 * martinkosir
 * mathijs
+* Matt Chisholm
 * Maxim Bodyansky
 * Maxime Haineault
 * mbouchar
 * mcosta
+* Mel Collins
 * meers
 * MerLex
-* Mokys
+* Michael P. Jung
 * Mike Johnson
 * Mitar
+* Mokys
 * mrlundis
 * MW
 * neoprolog
+* Nickolay V. Shmyrev
 * Orne Brocaar
 * padelt
+* Paolo
+* Pascal Mouret
 * Patrick Toal
 * Paul van der Linden
+* Paulo Alvarado
+* Pavel Puchkin
 * pbgc
 * Pedro Gracia
 * Pete Loggie
@@ -133,9 +178,16 @@ Contributors (in alphabetical order):
 * pigletto
 * Piotr Kilczuk
 * poweredbypenguins
+* Rebecca Breu
 * Remco Wendt
 * Restless Being
+* Richard Barran
+* rizumu
+* Robert Barsch
+* Robert Buchholz
+* Robert Clark
 * Robert Pogorzelski
+* Robin Lewis
 * Rodolfo Carvalho
 * rtpm
 * Samuel Lüscher
@@ -155,15 +207,18 @@ Contributors (in alphabetical order):
 * ssteinerX
 * Stavros Korokithakis
 * Stephan Jaekel
+* Stephen Muss
 * Steve R. Jones
 * Steve Steiner
 * Tanel Külaots
 * Thomas Parslow
 * timesong
+* Tim Davies
 * Tino de Bruijn
 * tiret
 * Ulrich Petri
 * Vasil Vangelovski
+* Viliam Segeda
 * wangJunjie
 * Wayne Moore
 * wid

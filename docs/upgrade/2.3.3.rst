@@ -1,0 +1,19 @@
+###################
+2.3.3 release notes
+###################
+
+*******************
+What's new in 2.3.3
+*******************
+
+Restored Python 2.5 support
+===========================
+
+2.3.3 restores Python 2.5 suppport for the django CMS.
+
+
+********************
+Pending deprecations
+********************
+
+Python 2.5 support will be dropped in django CMS 2.4.
