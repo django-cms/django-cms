@@ -865,30 +865,30 @@ class PageAdmin(ModelAdmin):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
         page.publish()
         messages.info(request, _('The page "%s" was successfully published.') % page)
-            if "reversion" in settings.INSTALLED_APPS:
-                # delete revisions that are not publish revisions
-                from reversion.models import Version
+        if "reversion" in settings.INSTALLED_APPS:
+            # delete revisions that are not publish revisions
+            from reversion.models import Version
 
-                content_type = ContentType.objects.get_for_model(Page)
-                versions_qs = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk)
+            content_type = ContentType.objects.get_for_model(Page)
+            versions_qs = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk)
+            deleted = []
+            for version in versions_qs.exclude(revision__comment__exact=PUBLISH_COMMENT):
+                if not version.revision_id in deleted:
+                    revision = version.revision
+                    revision.delete()
+                    deleted.append(revision.pk)
+                # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
+            limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
+            if limit:
                 deleted = []
-                for version in versions_qs.exclude(revision__comment__exact=PUBLISH_COMMENT):
+                for version in versions_qs.filter(revision__comment__exact=PUBLISH_COMMENT).order_by(
+                        '-revision__pk')[limit - 1:]:
                     if not version.revision_id in deleted:
                         revision = version.revision
                         revision.delete()
                         deleted.append(revision.pk)
-                    # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
-                limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
-                if limit:
-                    deleted = []
-                    for version in versions_qs.filter(revision__comment__exact=PUBLISH_COMMENT).order_by(
-                            '-revision__pk')[limit - 1:]:
-                        if not version.revision_id in deleted:
-                            revision = version.revision
-                            revision.delete()
-                            deleted.append(revision.pk)
-                helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
-                # create a new publish reversion
+            helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
+            # create a new publish reversion
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
