@@ -299,7 +299,6 @@
 				if(val > max){
                     max = val;
                 }
-                console.log(this, $(this).width())
 			});
 			$(this).each(function() {
 				$(this).css("width",max + 'px');
