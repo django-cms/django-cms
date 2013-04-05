@@ -492,6 +492,8 @@ class PageAdmin(ModelAdmin):
         """
         The 'change' admin view for the Page model.
         """
+        if extra_context is None:
+            extra_context = {}
         try:
             obj = self.model.objects.get(pk=object_id)
         except self.model.DoesNotExist:

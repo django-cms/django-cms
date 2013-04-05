@@ -373,6 +373,12 @@ class AdminTestCase(AdminTestsBase):
         # but not any further down the tree
         self.assertFalse('id="page_%s"' % third_level_page.pk in response.content)
 
+    def test_unihandecode_doesnt_break_404_in_admin(self):
+        admin = self.get_superuser()
+        self.client.login(username='admin', password='admin')
+        response = self.client.get('/en/admin/cms/page/1/?language=en')
+        self.assertEqual(response.status_code, 404)
+
 
 class AdminFieldsetTests(CMSTestCase):
     def validate_attributes(self, a, b, ignore=None):
