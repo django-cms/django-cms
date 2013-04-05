@@ -25,8 +25,8 @@ def use_draft(request):
     """
     preview_draft = 'preview' in request.GET and 'draft' in request.GET
     edit_mode = 'edit' in request.GET
-
-    return preview_draft or edit_mode
+    authenticated = request.user.is_authenticated() and request.user.is_staff
+    return (preview_draft or edit_mode) and authenticated
 
 
 def get_page_queryset(request=None):
@@ -129,11 +129,6 @@ def get_page_from_request(request, use_path=None):
 
     draft = use_draft(request)
     preview = 'preview' in request.GET
-    # If non-staff user, any request for preview/edit results in a "not found"
-    # This is to avoid confusing the toolbar logic into thinking it has an
-    # editable version
-    if draft and not request.user.is_authenticated():
-        return None
 
     # If use_path is given, someone already did the path cleaning
     if use_path is not None:
@@ -154,7 +149,7 @@ def get_page_from_request(request, use_path=None):
 
     page = get_page_from_path(path, preview, draft)
     if draft and page and not page.has_change_permission(request):
-        return None
+        page = get_page_from_path(path, preview, draft=False)
 
     request._current_page_cache = page
     return page
