@@ -634,4 +634,19 @@ Example::
     :ref:`cache key prefixing <django:cache_key_prefixing>`
 
 
+.. setting::CMS_MAX_PAGE_PUBLISH_REVERSIONS
+
+CMS_MAX_PAGE_PUBLISH_REVERSIONS
+===============================
+
+Default: 25
+
+If `django-reversion`_ is installed everything you do with a page and all plugin changes will be saved in a revision.
+In the page admin there is a history button to revert to previous version of a page. In the past we had the problem
+with huge databases from the revision tables after some time. As a mitigation when you publish a page all revisions
+that are not publish revision will be deleted. This setting however declares how many publish revisions are saved in the
+database. By default the newest 25 publish revisions are kept and all other are deleted when you publish a page.
+If you set this to 0 all publish revisions are kept but you are responsible to keep the revision table small.
+
+.. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js

@@ -13,7 +13,7 @@ What's new in 2.4
 
     2.4 introduces some changes that **require** action if you are upgrading
     from a previous version.
-    
+
     You will need to read the sections :ref:`migrations-upgrade` and
     :ref:`cms-moderator-upgrade` below.
 
@@ -73,7 +73,7 @@ Added a management command for deleting orphaned plugins from the database.
 
 The command can be run with::
 
-	manage.py cms delete_orphaned_plugins
+    manage.py cms delete_orphaned_plugins
 
 Please read :ref:`cms-delete-orphaned-plugins-command` before using.
 
@@ -114,8 +114,8 @@ Added a management command for fixing MPTT tree data.
 
 The command can be run with::
 
-	manage.py cms fix-mptt
-	
+    manage.py cms fix-mptt
+
 
 Removed the MultilingualMiddleware
 ==================================
@@ -256,14 +256,14 @@ The column plugin can be found here:
 At the moment the limitation is that plugins in plugins is only editable in the frontend.
 
 Here is the MultiColumn Plugin as an example::
-	
-	class MultiColumnPlugin(CMSPluginBase):
-	    model = MultiColumns
-	    name = _("Multi Columns")
-	    render_template = "cms/plugins/multi_column.html"
-	    allow_children = True
-	    child_classes = ["ColumnPlugin"]
-	
+
+    class MultiColumnPlugin(CMSPluginBase):
+        model = MultiColumns
+        name = _("Multi Columns")
+        render_template = "cms/plugins/multi_column.html"
+        allow_children = True
+        child_classes = ["ColumnPlugin"]
+
 There are 2 new properties for plugins:
 
 **allow_children**
@@ -282,13 +282,13 @@ How to render your child plugins in the template
 
 We introduce a new templatetag in the cms_tags called ``{% render_plugin %}``
 Here is an example of how the MultiColumn plugin uses it::
-	
-	{% load cms_tags %}
-	<div class="multicolumn">
-	{% for plugin in instance.child_plugins %}
-    	{% render_plugin plugin %}
-	{% endfor %}
-	</div>
+
+    {% load cms_tags %}
+    <div class="multicolumn">
+    {% for plugin in instance.child_plugins %}
+        {% render_plugin plugin %}
+    {% endfor %}
+    </div>
 
 As you can see the children are accessible via the plugins children attribute.
 
@@ -327,6 +327,16 @@ which used to live in ``cms.conf.global_settings`` but was moved to the new
 ``cms.constants`` module in the settings overhaul mentioned above.
 
 
+django-reversion integration changes
+====================================
+
+`django-reversion`_ integration has changed. Because of huge databases after some time we introduce some changes
+to the way revisions are handled for pages.
+
+     1. Only publish revisions are saved. All other revisions are deleted when you publish a page.
+     2. By default only the latest 25 publish revisions are kept. You can change this behavior with the new
+        :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS` setting.
+
 ******************************
 Backwards incompatible changes
 ******************************
@@ -341,5 +351,7 @@ New minimum requirements for dependencies
 Pending deprecations
 ********************
 
-* ``simple_language_changer`` will be removed in version 2.5. A bugfix makes
+* ``simple_language_changer`` will be removed in version 3.0. A bugfix makes
   this redundant as every non managed url will behave like this.
+
+.. _django-reversion: https://github.com/etianen/django-reversion

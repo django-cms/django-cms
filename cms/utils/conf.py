@@ -53,6 +53,7 @@ DEFAULTS = {
     'UNIHANDECODE_VERSION': None,
     'UNIHANDECODE_DECODERS': ['ja', 'zh', 'kr', 'vn', 'diacritic'],
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
+    'MAX_PAGE_PUBLISH_REVERSIONS': 25,
 }
 
 def get_cache_durations():
