@@ -36,7 +36,7 @@ setup(
         'django-sekizai>=0.7',
     ],
     tests_require=[
-        'django-reversion>=1.6',
+        'django-reversion>=1.6.6',
         'Pillow==1.7.7',
         'Sphinx==1.1.3',
         'Jinja2==2.6',

@@ -193,6 +193,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 method='GET',
                 COOKIES={},
                 META={},
+                user=User(),
             )
             self.assertRaises(Http404, details, request, '')
 
@@ -222,6 +223,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 method='GET',
                 COOKIES={},
                 META={},
+                user=User(),
             )
 
             response = details(request, '')

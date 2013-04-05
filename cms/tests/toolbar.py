@@ -305,7 +305,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertFalse(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
-        self.assertTrue(toolbar.edit_mode)
+        self.assertFalse(toolbar.edit_mode)
         items = toolbar.get_items({})
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 4)

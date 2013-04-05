@@ -19,6 +19,7 @@ from django.http import HttpRequest
 from django.template import RequestContext, Context
 from django.template.base import Template
 from django.utils.html import escape
+from django.contrib.auth.models import User
 
 
 class TemplatetagTests(TestCase):
@@ -127,6 +128,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             request = HttpRequest()
             request.REQUEST = {}
             request.session = {}
+            request.user = User()
             self.assertRaises(Placeholder.DoesNotExist,
                               _show_placeholder_for_page,
                               RequestContext(request),
@@ -214,7 +216,7 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         request = RequestFactory().get('/')
         template = Template("{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
