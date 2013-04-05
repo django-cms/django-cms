@@ -707,6 +707,8 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         self.pe = Page.objects.get(pk=self.pe.pk)
         self.pg = Page.objects.get(pk=self.pg.pk)
         self.move_page(self.pe, self.pg)
+        self.pe = Page.objects.get(pk=self.pe.pk)
+        self.pg = Page.objects.get(pk=self.pg.pk)
         self.assertEqual(self.pe.parent_id, self.pg.pk)
         self.assertEqual(self.pe.publisher_public.parent_id, self.pg.publisher_public_id)
 
