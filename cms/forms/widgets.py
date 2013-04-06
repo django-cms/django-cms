@@ -90,7 +90,7 @@ class PageSelectWidget(MultiWidget):
 (function($) {
     var handleSiteChange = function(site_name, selected_id) {
         $("#id_%(name)s_1 optgroup").remove();
-        var myOptions = $("#id_%(name)s_2 optgroup[label=" + site_name + "]").clone();
+        var myOptions = $("#id_%(name)s_2 optgroup[label='" + site_name + "']").clone();
         $("#id_%(name)s_1").append(myOptions);
         $("#id_%(name)s_1").change();
     };
@@ -171,7 +171,7 @@ class UserSelectAdminWidget(Select):
             add_url = '../../../cms/pageuser/add/'
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-            output.append(u'<img src="%simg/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (admin_static_url(), _('Add Another')))
+            output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
     
     
