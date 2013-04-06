@@ -20,14 +20,9 @@ class PageModeratorState(models.Model):
     ACTION_ADD = "ADD"
     ACTION_CHANGED = "CHA"
 
-    ACTION_MOVE = "MOV"
-    ACTION_DELETE = "DEL"
-
     _action_choices = (
         (ACTION_ADD, _('created')),
         (ACTION_CHANGED, _('changed')),
-        (ACTION_DELETE, _('delete req.')),
-        (ACTION_MOVE, _('move req.')),
     )
 
     page = models.ForeignKey(Page)

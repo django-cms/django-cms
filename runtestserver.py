@@ -5,7 +5,6 @@ import argparse
 from django.utils import autoreload
 import os
 import sys
-import urlparse
 
 
 def main():
@@ -16,7 +15,7 @@ def main():
     new_db = not os.path.exists('cmstestdb.sqlite')
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
-            configure("sqlite://cmstestdb.sqlite",
+            configure("sqlite://localhost/cmstestdb.sqlite",
                 ROOT_URLCONF='cms.test_utils.project.urls',
                 STATIC_ROOT=STATIC_ROOT,
                 MEDIA_ROOT=MEDIA_ROOT,

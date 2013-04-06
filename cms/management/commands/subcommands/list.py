@@ -15,12 +15,19 @@ class ListApphooksCommand(NoArgsCommand):
             self.stdout.write('%s\n' % url)
             
 def plugin_report():
+    # structure of report:
+    # [
+    #     {
+    #         'type': CMSPlugin class,
+    #         'model': plugin_type.model,
+    #         'instances': instances in the CMSPlugin table,
+    #         'unsaved_instances': those with no corresponding model instance,
+    #     },
+    # ]
     plugin_report = []
     all_plugins = CMSPlugin.objects.order_by("plugin_type")
     plugin_types = list(set(all_plugins.values_list("plugin_type", flat=True)))
     plugin_types.sort()
-    #     self.stdout.write(plugin+'\n')
-    uninstalled_plugins = []                
 
     for plugin_type in plugin_types: 
         plugin = {}
@@ -36,7 +43,6 @@ def plugin_report():
                
         # catch uninstalled plugins
         except KeyError:
-            uninstalled_plugins.append(plugin_type)
             plugin["model"] = None
             plugin["instances"] = plugins
             plugin["unsaved_instances"] = []
