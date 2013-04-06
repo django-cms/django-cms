@@ -51,12 +51,6 @@
 			</label>
 		</div>
 
-
-		<div class="col-draft">
-			{% if has_publish_permission and page.is_dirty %}<a href="./{{ page.id }}/publish/" class="icon publish" title="{% trans 'Publish' %}"></a>{% endif %}
-			<a href="./{{ page.id }}/preview/" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>
-		</div>
-
 		<div class="col-published">
             <label>{{ page.is_public_published|boolean_icon }}</label>
 			{% if has_publish_permission %}
@@ -74,10 +68,9 @@
 
 
 		<div class="col-lastchange">
+            {% if has_publish_permission and page.is_dirty %}<a href="./{{ page.id }}/publish/" class="icon publish" title="{% trans 'Publish' %}"></a>{% endif %}
 			{% for state in page.last_page_states %}<span class="icon state-icon {{ state.css_class }}" title="{{ state.get_action_display }}"></span>
 			{% endfor %}
-
-
 		</div>
 
 		<div class="col-creator">{{ page.changed_by }}</div>

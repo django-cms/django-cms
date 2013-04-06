@@ -58,9 +58,8 @@ def get_admin_menu_item_context(request, page, filtered=False):
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
 
-    if page.delete_requested():
-        css_class = "publisher_delete_requested"
-    elif not page.published:
+
+    if not page.published:
         css_class = "publisher_draft"
     else:
         css_class = publisher_classes.get(page.publisher_state, "")
