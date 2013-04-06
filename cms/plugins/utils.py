@@ -20,6 +20,7 @@ def get_plugins(request, placeholder, lang=None):
         assign_plugins(request, [placeholder], lang)
     return getattr(placeholder, '_%s_plugins_cache' % lang)
 
+
 def assign_plugins(request, placeholders, lang=None):
     """
     Fetch all plugins for the given ``placeholders`` and
@@ -39,8 +40,9 @@ def assign_plugins(request, placeholders, lang=None):
                 if fallback in languages:
                     request_lang = fallback
                     break
-    # get all plugins for the given placeholders
-    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by('placeholder', 'tree_id', 'lft')
+                    # get all plugins for the given placeholders
+    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
+        'placeholder', 'tree_id', 'lft')
     plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
@@ -50,6 +52,7 @@ def assign_plugins(request, placeholders, lang=None):
         groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
         setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
+
 
 def build_plugin_tree(plugin_list):
     root = []
@@ -67,6 +70,7 @@ def build_plugin_tree(plugin_list):
         if plugin.child_plugin_instances and len(plugin.child_plugin_instances) > 1:
             plugin.child_plugin_instances.sort(key=lambda x: x.position)
     return root
+
 
 def downcast_plugins(queryset, select_placeholder=False):
     plugin_types_map = defaultdict(list)
@@ -86,19 +90,20 @@ def downcast_plugins(queryset, select_placeholder=False):
         # downcasted versions
         for instance in plugin_qs:
             plugin_lookup[instance.pk] = instance
-        # make the equivalent list of qs, but with downcasted instances
+            # make the equivalent list of qs, but with downcasted instances
     plugin_list = [plugin_lookup[p.pk] for p in queryset if p.pk in plugin_lookup]
     return plugin_list
 
 
 def get_plugins_for_page(request, page, lang=None):
     from cms.utils.plugins import get_placeholders
+
     if not page:
         return []
     lang = lang or get_language_from_request(request)
     if not hasattr(page, '_%s_plugins_cache' % lang):
         slots = get_placeholders(page.template)
-        setattr(page, '_%s_plugins_cache' % lang,  get_cmsplugin_queryset(request).filter(
+        setattr(page, '_%s_plugins_cache' % lang, get_cmsplugin_queryset(request).filter(
             placeholder__page=page, placeholder__slot__in=slots, language=lang, parent__isnull=True
         ).order_by('placeholder', 'position').select_related())
     return getattr(page, '_%s_plugins_cache' % lang)
@@ -125,5 +130,7 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
             ).count()
             if type_count >= type_limit:
                 plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
-                raise PluginLimitReached(_("This placeholder already has the maximum number (%s) of allowed %s plugins.") % (type_limit, plugin_name))
+                raise PluginLimitReached(_(
+                    "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
+                                         % {'limit': type_limit, 'plugin_name': plugin_name})
     return False
