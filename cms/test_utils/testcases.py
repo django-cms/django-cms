@@ -25,6 +25,7 @@ URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE_CHANGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE_CHANGE, "edit-plugin/")
 URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE_CHANGE, "remove-plugin/")
 URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
+URL_CMS_PAGE_CHANGE_STATUS = urljoin(URL_CMS_PAGE_CHANGE, "change-status/")
 
 
 class _Warning(object):
