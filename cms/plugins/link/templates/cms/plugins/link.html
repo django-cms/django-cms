@@ -1,1 +1,12 @@
+<<<<<<< HEAD
 <span class="plugin_link"><a href="{{ link }}"{% if target %} target="{{ target }}"{% endif %}>{{ name }}</a></span>
+=======
+<span class="plugin_link"
+      {% if inherited_from_parent and inherited_from_parent.style %}
+        style="{{inherited_from_parent.style}}"
+      {% endif %}
+>
+  <a href="{{ link }}"{% if target %} target="{{ target }}"{% endif %}>{{ name }}</a>
+</span>
+
+>>>>>>> c304042... The text plugin is able to pass down the attributes attached to the tag of the embedded plugin.
