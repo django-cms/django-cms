@@ -4,6 +4,7 @@ from cms.admin.forms import (GlobalPagePermissionAdminForm,
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
 from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
 from copy import deepcopy
 from django.contrib import admin
@@ -26,16 +27,14 @@ class PagePermissionInlineAdmin(TabularInline):
     classes = ['collapse', 'collapsed']
     exclude = ['can_view']
     extra = 0 # edit page load time boost
-    
-    def __getattribute__(self, name):
+
+    @classproperty
+    def raw_id_fields(cls):
         # Dynamically set raw_id_fields based on settings
-        if name == 'raw_id_fields':
-            threshold = get_cms_setting('RAW_ID_USERS')
-            if threshold and User.objects.count() > threshold:
-                return ['user']
-            return []
-        else:
-            return super(PagePermissionInlineAdmin, self).__getattribute__(name)
+        threshold = get_cms_setting('RAW_ID_USERS')
+        if threshold and User.objects.count() > threshold:
+            return ['user']
+        return []
 
     def queryset(self, request):
         """
