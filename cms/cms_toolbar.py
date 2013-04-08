@@ -235,6 +235,11 @@ class CMSToolbar(Toolbar):
         request = self.request
         if 'cms-toolbar-logout' in request.GET:
             logout(request)
+            # If request contains cms page, and user has no permission to view it, redirect him
+            # to login
+            if request.current_page and not request.current_page.has_view_permission(request):
+                _get = u'?next=%s' % request.current_page.get_absolute_url()
+                return HttpResponseRedirect(settings.LOGIN_URL + _get)
             return HttpResponseRedirect(request.path)
 
     def _request_hook_post(self):
