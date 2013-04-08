@@ -341,7 +341,7 @@ to the way revisions are handled for pages.
 Changes to the show_sub_menu templatetag
 ========================================
 
-the :templatetag:`show_sub_menu` has received two new parameters.
+the :ttag:`show_sub_menu` has received two new parameters.
 The first stays the same and is still: how many levels of menu should be displayed.
 
 The second: ``root_level`` (default=None), specifies at what level, if any, the menu should root at.
