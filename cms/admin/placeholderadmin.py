@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.exceptions import PluginLimitReached
 from cms.forms.fields import PlaceholderFormField
 from cms.models.fields import PlaceholderField
@@ -9,15 +10,12 @@ from cms.utils import get_language_from_request, cms_static_url, get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.plugins.utils import has_reached_plugin_limit
 from copy import deepcopy
-from django.conf import settings
 from django.contrib.admin import ModelAdmin
-from django.http import (HttpResponse, Http404, HttpResponseBadRequest, 
-    HttpResponseForbidden)
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
-from cms.templatetags.cms_admin import admin_static_url
 
 
 class PlaceholderAdmin(ModelAdmin):
@@ -125,7 +123,8 @@ class PlaceholderAdmin(ModelAdmin):
             pat(r'copy-plugins/$', self.copy_plugins),            
         )
         return url_patterns + super(PlaceholderAdmin, self).get_urls()
-    
+
+    @xframe_options_sameorigin
     def add_plugin(self, request):
         # only allow POST
         if request.method != "POST":
@@ -164,7 +163,8 @@ class PlaceholderAdmin(ModelAdmin):
         
         # returns it's ID as response
         return HttpResponse(str(plugin.pk))
-    
+
+    @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         # get the plugin to edit of bail out
@@ -242,6 +242,7 @@ class PlaceholderAdmin(ModelAdmin):
             
         return response
 
+    @xframe_options_sameorigin
     def move_plugin(self, request):
         # only allow POST
         if request.method != "POST":
@@ -292,7 +293,8 @@ class PlaceholderAdmin(ModelAdmin):
         else:
             HttpResponse(str("error"))
         return HttpResponse(str("ok"))
-    
+
+    @xframe_options_sameorigin
     def remove_plugin(self, request):
         if request.method != "POST": # only allow POST
             raise Http404
@@ -307,7 +309,8 @@ class PlaceholderAdmin(ModelAdmin):
         plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
         comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {'plugin_name':plugin_name, 'position':plugin.position, 'placeholder':plugin.placeholder}
         return HttpResponse("%s,%s" % (plugin_id, comment))
-    
+
+    @xframe_options_sameorigin
     def copy_plugins(self, request):
         # only allow POST
         if request.method != "POST":
