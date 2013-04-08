@@ -10,3 +10,4 @@ django-sekizai>=0.7
 argparse
 dj-database-url
 transifex-client
+-e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad

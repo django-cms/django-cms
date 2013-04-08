@@ -9,15 +9,12 @@ from cms.utils import get_language_from_request, cms_static_url, get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.plugins.utils import has_reached_plugin_limit
 from copy import deepcopy
-from django.conf import settings
 from django.contrib.admin import ModelAdmin
-from django.http import (HttpResponse, Http404, HttpResponseBadRequest, 
-    HttpResponseForbidden)
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
-from cms.templatetags.cms_admin import admin_static_url
 
 
 class PlaceholderAdmin(ModelAdmin):
@@ -100,6 +97,8 @@ class PlaceholderAdmin(ModelAdmin):
         return super(PlaceholderAdmin, self).formfield_for_dbfield(db_field, **kwargs)
     
     def placeholder_plugin_filter(self, request, queryset):
+        if 'language' in request.GET:
+            queryset = queryset.filter(language=request.GET['language'])
         return queryset
     
     def _get_placeholder_fields(self, form):

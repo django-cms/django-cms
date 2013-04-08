@@ -1,7 +1,8 @@
 from cms.admin.placeholderadmin import PlaceholderAdmin
-from cms.test_utils.project.placeholderapp.models import (Example1, Example2, 
-    Example3, Example4, Example5)
+from cms.test_utils.project.placeholderapp.models import (Example1, Example2,
+    Example3, Example4, Example5, MultilingualExample1)
 from django.contrib import admin
+from hvad.admin import TranslatableAdmin
 
 
 class MixinAdmin(admin.ModelAdmin):
@@ -20,6 +21,7 @@ class MixinAdmin(admin.ModelAdmin):
 class Example1Admin(PlaceholderAdmin, MixinAdmin):
     pass
 
+
 class Example2Admin(PlaceholderAdmin):
     fieldsets = (
         ('Placeholder + more fields', {
@@ -31,6 +33,7 @@ class Example2Admin(PlaceholderAdmin):
             'fields': ('char_3', 'char_4',)
         }),
     )
+
 
 class Example3Admin(PlaceholderAdmin):
     fieldsets = (
@@ -48,6 +51,7 @@ class Example3Admin(PlaceholderAdmin):
         }),
     )
 
+
 class Example4Admin(PlaceholderAdmin):
     fieldsets = (
         ('Only chars', {
@@ -63,6 +67,7 @@ class Example4Admin(PlaceholderAdmin):
             'fields': ('char_3', 'char_4',)
         }),
     )
+
 
 class Example5Admin(PlaceholderAdmin):
     fieldsets = (
@@ -80,8 +85,14 @@ class Example5Admin(PlaceholderAdmin):
         }),
     )
 
+
+class MultilingualAdmin(TranslatableAdmin, PlaceholderAdmin):
+    pass
+
+
 admin.site.register(Example1, Example1Admin)
 admin.site.register(Example2, Example2Admin)
 admin.site.register(Example3, Example3Admin)
 admin.site.register(Example4, Example4Admin)
 admin.site.register(Example5, Example5Admin)
+admin.site.register(MultilingualExample1, MultilingualAdmin)
