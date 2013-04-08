@@ -103,7 +103,7 @@ show_sub_menu
 
 Displays the sub menu of the current page (as a nested list).
 
-The first argument, ``levels`` (default=100), specifies how many levels deep the submenu should be
+The first argument, ``levels`` (default=100), specifies how many levels deep the sub menu should be
 displayed
 
 The second argument, ``root_level`` (default=None), specifies at what level, if any, the menu should root at.
