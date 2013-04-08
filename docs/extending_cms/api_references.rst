@@ -96,7 +96,7 @@ Functions and constants
     :param string overwrite_url: Overwritten path for this page
 
 
-.. function:: add_plugin(placeholder, plugin_type, language, position='last-child', **data)
+.. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
 
     Adds a plugin to a placeholder and returns it.
 
@@ -106,6 +106,7 @@ Functions and constants
     :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` subclass, must be a valid plugin
     :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
     :param string position: Position to add this plugin to the placeholder, must be a valid django-mptt position
+    :param target: Parent plugin. Must be plugin instance
     :param kwargs data: Data for the plugin type instance
 
 
