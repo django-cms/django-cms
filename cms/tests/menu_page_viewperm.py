@@ -3,7 +3,6 @@ from __future__ import with_statement
 
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser, User, Group
-from django.test.client import Client
 
 from cms.api import create_page
 from cms.menu import get_visible_pages
@@ -83,7 +82,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         page_d_c = create_page("page_d_c", parent=page_d, **stdkwargs) 
         page_d_d = create_page("page_d_d", parent=page_d, **stdkwargs)
 
-        return [page_a,
+        pages = [ page_a,
                 page_b,
                 page_b_a,
                 page_b_b,
@@ -102,80 +101,38 @@ class ViewPermissionTests(SettingsOverrideTestCase):
                 page_d_b,
                 page_d_c,
                 page_d_d,
-    ]
+        ]
+        for page in pages:
+            page.save()
+        return pages
 
     def _setup_user_groups(self):
         """
         Setup a group for every grant on ACCESS TYPE
         """
-        user = User.objects.create(username='user_1', email='user_1@domain.com', is_active=True, is_staff=True)
-        user.set_password(user.username)
-        user.save()
-        group = Group.objects.create(name=self.GROUPNAME_1)
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_1_nostaff', email='user_1_nostaff@domain.com', is_active=True, is_staff=False)
-        user.set_password(user.username)
-        user.save()
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_2', email='user_2@domain.com', is_active=True, is_staff=True)
-        user.set_password(user.username)
-        user.save()
-        group = Group.objects.create(name=self.GROUPNAME_2)
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_2_nostaff', email='user_2_nostaff@domain.com', is_active=True, is_staff=False)
-        user.set_password(user.username)
-        user.save()
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_3', email='user_3@domain.com', is_active=True, is_staff=True)
-        user.set_password(user.username)
-        user.save()
-        group = Group.objects.create(name=self.GROUPNAME_3)
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_3_nostaff', email='user_3_nostaff@domain.com', is_active=True, is_staff=False)
-        user.set_password(user.username)
-        user.save()
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_4', email='user_4@domain.com', is_active=True, is_staff=True)
-        user.set_password(user.username)
-        user.save()
-        group = Group.objects.create(name=self.GROUPNAME_4)
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_4_nostaff', email='user_4_nostaff@domain.com', is_active=True, is_staff=False)
-        user.set_password(user.username)
-        user.save()
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_5', email='user_5@domain.com', is_active=True, is_staff=True)
-        user.set_password(user.username)
-        user.save()
-        group = Group.objects.create(name=self.GROUPNAME_5)
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_5_nostaff', email='user_5_nostaff@domain.com', is_active=True, is_staff=False)
-        user.set_password(user.username)
-        user.save()
-        group.user_set.add(user)
-        group.save()
-
-        user = User.objects.create(username='user_staff', email='user_staff@domain.com', is_active=True, is_staff=True)
-        user.set_password(user.username)
-        user.save()
+        userdata = [('user_1', True, self.GROUPNAME_1),
+                    ('user_1_nostaff', False, self.GROUPNAME_1),
+                    ('user_2', True, self.GROUPNAME_2),
+                    ('user_2_nostaff', False, self.GROUPNAME_2),
+                    ('user_3', True, self.GROUPNAME_3),
+                    ('user_3_nostaff', False, self.GROUPNAME_3),
+                    ('user_4', True, self.GROUPNAME_4),
+                    ('user_4_nostaff', False, self.GROUPNAME_4),
+                    ('user_5', True, self.GROUPNAME_5),
+                    ('user_5_nostaff', False, self.GROUPNAME_5),
+                    ('user_staff', True, None),
+                    ]
+        for username, is_staff, groupname in userdata:
+            user = User.objects.create(username=username,
+                                       email=username + '@domain.com',
+                                       is_active=True,
+                                       is_staff=is_staff)
+            user.set_password(username)
+            user.save()
+            if groupname:
+                group, _ = Group.objects.get_or_create(name=groupname)
+                group.user_set.add(user)
+                group.save()
 
         self.assertEquals(11, User.objects.all().count())
 
@@ -183,45 +140,30 @@ class ViewPermissionTests(SettingsOverrideTestCase):
     def _setup_view_restrictions(self):
         """
         Setup a view restriction with every type of the grant_on ACCESS_*
-        'group_b_ACCESS_PAGE_AND_CHILDREN' 
-        'group_b_b_ACCESS_CHILDREN'
-        'group_b_ACCESS_PAGE_AND_DESCENDANTS'
-        'group_b_b_ACCESS_DESCENDANTS'
-        'group_d_ACCESS_PAGE'
         """
-
-        page = Page.objects.get(title_set__title="page_b")
-        group = Group.objects.get(name__iexact=self.GROUPNAME_1)
-        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_CHILDREN)
-
-        page = Page.objects.get(title_set__title="page_b_b")
-        group = Group.objects.get(name__iexact=self.GROUPNAME_2)
-        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_CHILDREN)
-
-        page = Page.objects.get(title_set__title="page_b")
-        group = Group.objects.get(name__iexact=self.GROUPNAME_3)
-        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
-
-        page = Page.objects.get(title_set__title="page_b_b")
-        group = Group.objects.get(name__iexact=self.GROUPNAME_4)
-        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_DESCENDANTS)
-
-        page = Page.objects.get(title_set__title="page_d")
-        group = Group.objects.get(name__iexact=self.GROUPNAME_5)
-        PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE)
+        data = [("page_b", self.GROUPNAME_1, ACCESS_PAGE_AND_CHILDREN),
+                ("page_b_b", self.GROUPNAME_2, ACCESS_CHILDREN),
+                ("page_b", self.GROUPNAME_3, ACCESS_PAGE_AND_DESCENDANTS),
+                ("page_b_b", self.GROUPNAME_4, ACCESS_DESCENDANTS),
+                ("page_d", self.GROUPNAME_5, ACCESS_PAGE),
+        ]
+        for title, groupname, inherit in data:
+            page = Page.objects.drafts().get(title_set__title=title)
+            group = Group.objects.get(name__iexact=groupname)
+            PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=inherit)
 
         self.assertEquals(5, PagePermission.objects.all().count())
         self.assertEquals(0, GlobalPagePermission.objects.all().count())
 
     def assertPageFound(self, url, client=None):
         if not client:
-            client = Client()
+            client = self.client
         response = client.get(url)
         self.assertEquals(response.status_code, 200)
 
     def assertPageNotFound(self, url, client=None):
         if not client:
-            client = Client()
+            client = self.client
         response = client.get(url)
         self.assertEquals(response.status_code, 404)
 
@@ -261,9 +203,9 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             user = User.objects.get(username__iexact=username)
         request = self.get_request(user)
         visible_page_ids = get_visible_pages(request, all_pages, self.site)
+        public_page_ids = Page.objects.drafts().filter(title_set__title__in=expected_granted_pages).values_list('id', flat=True)
         self.assertEquals(len(visible_page_ids), len(expected_granted_pages))
-        public_page_ids = Page.objects.filter(title_set__title__in=expected_granted_pages).values_list('id', flat=True)
-        restricted_pages = Page.objects.exclude(title_set__title__in=expected_granted_pages).values_list('id', flat=True)
+        restricted_pages = Page.objects.public().exclude(title_set__title__in=expected_granted_pages).values_list('id', flat=True)
         self.assertNodeMemberships(visible_page_ids, restricted_pages, public_page_ids)
 
     def get_request(self, user=None):
@@ -276,7 +218,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         return type('Request', (object,), attrs)
 
     def get_url_dict(self, pages, language='en'):
-        return dict(('/%s%s' % (language, page.get_absolute_url(language=language)), page) for page in pages)
+        return dict((page.get_absolute_url(language=language), page) for page in pages)
 
 
 class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
@@ -284,7 +226,6 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
     Test CMS_PUBLIC_FOR=all group access and menu nodes rendering
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }
@@ -477,7 +418,6 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     Test if this affects the menu entries and page visibility
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }
@@ -525,7 +465,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         """
         Setup group_6_ACCESS_PAGE view restriction 
         """
-        page = Page.objects.get(title_set__title="page_6")
+        page = Page.objects.drafts().get(title_set__title="page_6")
         group = Group.objects.get(name__iexact=self.GROUPNAME_6)
         PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_CHILDREN)
         PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_DESCENDANTS)

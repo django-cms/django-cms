@@ -1,22 +1,27 @@
 {% extends "base.html" %}
-{% load cms_tags %}
+{% load cms_tags i18n_compat %}
 {% load url from future %}
 
 {% block content %}
 	<h2>Sample application home page - on page {% page_attribute page_title %}</h2>
 	<h3>{{ message }}</h3>
+	{% if my_params %}<p>my_params: {{ my_params }}</p>{% endif %}
 	{{ block.super }}
 	<ul>
 		<li>
 			<a href="{% url 'sample-root' %}">Sample app root reverse test</a>
 		</li>
 		<li>
-			<a href="{% url 'de:sample-account' %}">Sample app account reverse test german</a>
+            {% language 'de' %}
+			<a href="{% url 'sample-account' %}">Sample app account reverse test german</a>
+            {% endlanguage %}
 		</li>
 		<li>
-			<a href="{% url 'en:sample-account' %}">Sample app account reverse test english</a>
+            {% language 'en' %}
+			<a href="{% url 'sample-account' %}">Sample app account reverse test english</a>
+            {% endlanguage %}
 		</li>
 	</ul>
 	<h4>Sample image  - appmedia works?</h4>
-	<img src="{{ MEDIA_URL }}sampleapp/img/gift.jpg" alt="gift">
+	<img src="{{ STATIC_URL }}sampleapp/img/gift.jpg" alt="gift">
 {% endblock content %}

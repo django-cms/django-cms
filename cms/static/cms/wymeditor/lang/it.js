@@ -1,4 +1,4 @@
-WYMeditor.STRINGS['it'] = {
+WYMeditor.STRINGS.it = {
     Strong:           'Grassetto',
     Emphasis:         'Corsetto',
     Superscript:      'Apice',

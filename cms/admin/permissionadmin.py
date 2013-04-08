@@ -3,37 +3,20 @@ from cms.admin.forms import (GlobalPagePermissionAdminForm,
     PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm)
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
+from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_permission_level
 from copy import deepcopy
-from distutils.version import LooseVersion
 from django.conf import settings
 from django.contrib import admin
 from django.template.defaultfilters import title
 from django.utils.translation import ugettext as _
-import django
 
 
-
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 PAGE_ADMIN_INLINES = []
 
 
 class TabularInline(admin.TabularInline):
     pass
-
-if DJANGO_1_3 and 'reversion' in settings.INSTALLED_APPS:
-    """
-    Backwards compatibility for Django < 1.4 and django-reversion 1.6
-    """
-    class TabularInline(TabularInline):
-        def get_prepopulated_fields(self, request, obj=None):
-            return self.prepopulated_fields
-    from reversion.admin import helpers
-    class CompatInlineAdminFormSet(helpers.InlineAdminFormSet):
-        def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
-                readonly_fields=None, model_admin=None):
-            super(CompatInlineAdminFormSet, self).__init__(inline, formset, fieldsets, readonly_fields, model_admin)
-    helpers.InlineAdminFormSet = CompatInlineAdminFormSet
 
 
 class PagePermissionInlineAdmin(TabularInline):
@@ -78,8 +61,6 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_change_advanced_settings')
             if not obj.has_move_page_permission(request):
                 exclude.append('can_move_page')
-            if not settings.CMS_MODERATOR or not obj.has_moderate_permission(request):
-                exclude.append('can_moderate')
         formset_cls = super(PagePermissionInlineAdmin, self
             ).get_formset(request, obj=None, exclude=exclude, *kwargs)
         qs = self.queryset(request)
@@ -96,7 +77,7 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
     exclude = [
         'can_add', 'can_change', 'can_delete', 'can_view',
         'can_publish', 'can_change_advanced_settings', 'can_move_page',
-        'can_moderate', 'can_change_permissions'
+        'can_change_permissions'
     ]
 
     def get_formset(self, request, obj=None, **kwargs):
@@ -133,12 +114,6 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     
     list_display.append('can_change_advanced_settings')
     list_filter.append('can_change_advanced_settings')
-    
-    if settings.CMS_MODERATOR:
-        list_display.append('can_moderate')
-        list_filter.append('can_moderate')
-    else:
-        exclude.append('can_moderate')
 
 
 class GenericCmsPermissionAdmin(object):
@@ -188,7 +163,7 @@ class GenericCmsPermissionAdmin(object):
             super(self.__class__, self).has_change_permission(request, obj)
 
 
-if settings.CMS_PERMISSION:
+if get_cms_setting('PERMISSION'):
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
     PAGE_ADMIN_INLINES.extend([
         ViewRestrictionInlineAdmin,

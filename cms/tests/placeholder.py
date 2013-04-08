@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms import constants
 from cms.api import add_plugin, create_page
-from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
+from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
@@ -45,6 +46,10 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_scanning_extend(self):
         placeholders = get_placeholders('placeholder_tests/test_one.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
+
+    def test_placeholder_scanning_sekizai_extend(self):
+        placeholders = get_placeholders('placeholder_tests/test_one_sekizai.html')
+        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
         
     def test_placeholder_scanning_include(self):
         placeholders = get_placeholders('placeholder_tests/test_two.html')
@@ -52,6 +57,10 @@ class PlaceholderTestCase(CMSTestCase):
         
     def test_placeholder_scanning_double_extend(self):
         placeholders = get_placeholders('placeholder_tests/test_three.html')
+        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
+
+    def test_placeholder_scanning_sekizai_double_extend(self):
+        placeholders = get_placeholders('placeholder_tests/test_three_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
         
     def test_placeholder_scanning_complex(self):
@@ -74,8 +83,16 @@ class PlaceholderTestCase(CMSTestCase):
         placeholders = get_placeholders('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
+    def test_placeholder_scanning_sekizai_extend_outside_block(self):
+        placeholders = get_placeholders('placeholder_tests/outside_sekizai.html')
+        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+
     def test_placeholder_scanning_extend_outside_block_nested(self):
         placeholders = get_placeholders('placeholder_tests/outside_nested.html')
+        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+
+    def test_placeholder_scanning_sekizai_extend_outside_block_nested(self):
+        placeholders = get_placeholders('placeholder_tests/outside_nested_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
     
     def test_fieldsets_requests(self):
@@ -158,6 +175,52 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3], list(ph2.cmsplugin_set.order_by('position')))
 
+    def test_nested_plugin_escapejs(self):
+        """
+        Checks #1366 error condition.
+        When adding/editing a plugin whose icon_src() method returns a URL
+        containing an hyphen, the hyphen is escaped by django escapejs resulting
+        in a incorrect URL
+        """
+        with SettingsOverride(CMS_PERMISSION=False):
+            ex = Example1(
+                char_1='one',
+                char_2='two',
+                char_3='tree',
+                char_4='four'
+            )
+            ex.save()
+            ph1 = ex.placeholder
+            ###
+            # add the test plugin
+            ###
+            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+            test_plugin.save()
+            pl_url = "%sedit-plugin/%s/" % (
+                reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
+                test_plugin.pk)
+            response = self.client.post(pl_url, {})
+            self.assertContains(response,"/static/plugins/empty-image-file.png")
+
+    def test_nested_plugin_escapejs_page(self):
+        """
+        Sibling test of the above, on a page.
+        #1366 does not apply to placeholder defined in a page
+        """
+        with SettingsOverride(CMS_PERMISSION=False):
+            page = create_page('page', 'col_two.html', 'en')
+            ph1 = page.placeholders.get(slot='col_left')
+            ###
+            # add the test plugin
+            ###
+            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+            test_plugin.save()
+            pl_url = "%sedit-plugin/%s/" % (
+                reverse('admin:cms_page_change', args=(page.pk,)),
+                test_plugin.pk)
+            response = self.client.post(pl_url, {})
+            self.assertContains(response,"/static/plugins/empty-image-file.png")
+
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
 
@@ -199,6 +262,9 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_scanning_nested_super(self):
         placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
         self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
+
+    def test_placeholder_field_no_related_name(self):
+        self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
@@ -346,14 +412,8 @@ class PlaceholderModelTests(CMSTestCase):
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
         
-class PlaceholderAdminTest(CMSTestCase):
-    placeholderconf = {'test': {
-            'limits': {
-                'global': 2,
-                'TextPlugin': 1,
-            }
-        }
-    }
+
+class PlaceholderAdminTestBase(CMSTestCase):
     def get_placeholder(self):
         return Placeholder.objects.create(slot='test')
     
@@ -364,6 +424,15 @@ class PlaceholderAdminTest(CMSTestCase):
     def get_post_request(self, data):
         return self.get_request(post_data=data)
     
+
+class PlaceholderAdminTest(PlaceholderAdminTestBase):
+    placeholderconf = {'test': {
+            'limits': {
+                'global': 2,
+                'TextPlugin': 1,
+            }
+        }
+    }
     def test_global_limit(self):
         placeholder = self.get_placeholder()
         admin = self.get_admin()
@@ -382,7 +451,7 @@ class PlaceholderAdminTest(CMSTestCase):
                 self.assertEqual(response.status_code, 200)
                 response = admin.add_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins.")
+                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit(self):
         placeholder = self.get_placeholder()
@@ -400,10 +469,94 @@ class PlaceholderAdminTest(CMSTestCase):
                 self.assertEqual(response.status_code, 200)
                 response = admin.add_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of TextPlugin plugins.")
+                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of allowed Text plugins.")
+
+    def test_global_limit_on_plugin_move(self):
+        admin = self.get_admin()
+        superuser = self.get_superuser()
+        source_placeholder = Placeholder.objects.create(slot='source')
+        target_placeholder = self.get_placeholder()
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        plugin_2 = add_plugin(**data)
+        plugin_3 = add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
+                response = admin.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
+                response = admin.move_plugin(request) # second
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
+                response = admin.move_plugin(request) # third
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+
+    def test_type_limit_on_plugin_move(self):
+        admin = self.get_admin()
+        superuser = self.get_superuser()
+        source_placeholder = Placeholder.objects.create(slot='source')
+        target_placeholder = self.get_placeholder()
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'TextPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        plugin_2 = add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
+                response = admin.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
+                response = admin.move_plugin(request) # second
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of allowed Text plugins.")
+
+    def test_edit_plugin_and_cancel(self):
+        placeholder = self.get_placeholder()
+        admin = self.get_admin()
+        data = {
+            'plugin_type': 'TextPlugin',
+            'placeholder': placeholder.pk,
+            'language': 'en',
+        }
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request(data)
+                response = admin.add_plugin(request)
+                self.assertEqual(response.status_code, 200)
+                plugin_id = int(response.content)
+                data = {
+                    'body': 'Hello World',
+                    }
+                request = self.get_post_request(data)
+                response = admin.edit_plugin(request, plugin_id)
+                self.assertEqual(response.status_code, 200)
+                text_plugin = Text.objects.get(pk=plugin_id)
+                self.assertEquals('Hello World', text_plugin.body)
+
+                # edit again, but this time press cancel
+                data = {
+                    'body': 'Hello World!!',
+                    '_cancel': True,
+                    }
+                request = self.get_post_request(data)
+                response = admin.edit_plugin(request, plugin_id)
+                self.assertEqual(response.status_code, 200)
+                text_plugin = Text.objects.get(pk=plugin_id)
+                self.assertEquals('Hello World', text_plugin.body)
 
 
-class PlaceholderPluginPermissionTests(PlaceholderAdminTest):
+
+class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
 
     def _testuser(self):
         u = User(username="test", is_staff = True, is_active = True, is_superuser = False)
@@ -517,7 +670,7 @@ class PlaceholderConfTests(TestCase):
 
     def test_get_all_plugins_inherit(self):
         parent = create_page('parent', 'col_two.html', 'en')
-        page = create_page('page', CMS_TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
+        page = create_page('page', constants.TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
         placeholder = page.placeholders.get(slot='col_left')
         conf = {
             'col_two': {

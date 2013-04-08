@@ -1,4 +1,4 @@
-{% load i18n adminmedia sekizai_tags cms_js_tags cms_admin %}
+{% load i18n sekizai_tags cms_js_tags cms_admin %}
 {% addtoblock "js" %}
 <script type="text/javascript">
 	var _jQuery = window.jQuery || null;
@@ -67,10 +67,14 @@ CMS.$(document).ready(function () {
 			<li>
 				<a href="#" class="cms_placeholder-icon cms_placeholder-icon_more" rel="more">{% trans "more" %}</a>
 				<ul class="cms_placeholder-options_more cms_placeholder-subnav">
-					<li class="cms_placeholder-subnav-title"><span>{% trans "Move to placeholder" %}</span>
+                    <li class="cms_placeholder-subnav-title add_child"><span>{% trans "Add child plugin" %}</span>
+                        <ul><li><span>&nbsp;</span></li></ul>
+                    </li>
+                    <li class="cms_placeholder-subnav-title move"><span>{% trans "Move to placeholder" %}</span>
 						<ul><li><span>&nbsp;</span></li></ul>
 					</li>
 				</ul>
+
 			</li>
 		</ul>
 		<div class="cms_placeholder-overlay_bg"></div>

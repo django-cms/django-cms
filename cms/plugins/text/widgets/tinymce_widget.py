@@ -1,5 +1,5 @@
 from cms.utils import cms_static_url
-from django.conf import settings
+from cms.utils.conf import get_cms_setting
 from django.forms.widgets import flatatt
 from django.template.defaultfilters import escape
 from django.template.loader import render_to_string
@@ -22,7 +22,7 @@ class TinyMCEEditor(TinyMCE):
         context = {
             'name': name,
             'language': language,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'installed_plugins': self.installed_plugins,
         }
         return mark_safe(render_to_string(
@@ -68,7 +68,18 @@ class TinyMCEEditor(TinyMCE):
         mce_config['plugins'] = plugins
         if mce_config['theme'] == "simple":
             mce_config['theme'] = "advanced"
-        mce_config['theme_advanced_buttons1_add_before'] = "cmsplugins,cmspluginsedit"
+        # Add cmsplugin to first toolbar, if not already present
+        all_tools = []
+        idx = 0
+        while True:
+            idx += 1
+            buttons = mce_config.get('theme_advanced_buttons%d' % (idx,), None)
+            if buttons is None:
+                break
+            all_tools.extend(buttons.split(','))
+        if 'cmsplugins' not in all_tools and 'cmspluginsedit' not in all_tools:
+            mce_config['theme_advanced_buttons1_add_before'] = "cmsplugins,cmspluginsedit"
+        
         json = simplejson.dumps(mce_config)
         html = [u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))]
         if tinymce.settings.USE_COMPRESSOR:

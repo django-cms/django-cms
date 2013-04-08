@@ -16,14 +16,14 @@ from sekizai.context import SekizaiContext
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
-def test_plugin_processor(instance, placeholder, rendered_content, original_context):
+def sample_plugin_processor(instance, placeholder, rendered_content, original_context):
     original_context_var = original_context['original_context_var']
     return '%s|test_plugin_processor_ok|%s|%s|%s' % (rendered_content,
                                                    instance.body,
                                                    placeholder.slot,
                                                    original_context_var)
 
-def test_plugin_context_processor(instance, placeholder):
+def sample_plugin_context_processor(instance, placeholder):
     content = 'test_plugin_context_processor_ok|'+instance.body+'|'+placeholder.slot
     return {'test_plugin_context_processor': content}
 
@@ -32,7 +32,6 @@ class RenderingTestCase(SettingsOverrideTestCase):
     
     settings_overrides = {
         'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME), ('extra_context.html', 'extra_context.html')],
-        'CMS_MODERATOR': False,
     }
 
     def setUp(self):
@@ -77,15 +76,18 @@ class RenderingTestCase(SettingsOverrideTestCase):
         self.test_placeholders = {}
         for placeholder in p.placeholders.all():
             self.test_placeholders[placeholder.slot] = placeholder
-        # Insert another page that is not the home page
-        p2 = create_page(self.test_data2['title'], TEMPLATE_NAME, 'en',
-                    parent=p, slug=self.test_data2['slug'], published=True,
-                    reverse_id=self.test_data2['reverse_id'])
-        # Insert some test Text plugins
+            # Insert some test Text plugins
         add_plugin(self.test_placeholders['main'], 'TextPlugin', 'en',
                    body=self.test_data['text_main'])
         add_plugin(self.test_placeholders['sub'], 'TextPlugin', 'en',
                    body=self.test_data['text_sub'])
+        p.publish()
+
+        # Insert another page that is not the home page
+        p2 = create_page(self.test_data2['title'], TEMPLATE_NAME, 'en',
+                    parent=p, slug=self.test_data2['slug'], published=True,
+                    reverse_id=self.test_data2['reverse_id'])
+        p2.publish()
 
         # Insert another page that is not the home page
         p3 = create_page(self.test_data3['title'], TEMPLATE_NAME, 'en',
@@ -98,7 +100,8 @@ class RenderingTestCase(SettingsOverrideTestCase):
         # # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
                    body=self.test_data3['text_sub'])
-                   
+        p3.publish()
+
         # Insert another page that is not the home
         p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
         # Placeholders have been inserted on post_save signal:
@@ -107,12 +110,13 @@ class RenderingTestCase(SettingsOverrideTestCase):
             self.test_placeholders4[placeholder.slot] = placeholder
         # Insert some test plugins
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')        
+        p4.publish()
 
         # Reload test pages
-        self.test_page = self.reload(p)
-        self.test_page2 = self.reload(p2)
-        self.test_page3 = self.reload(p3)
-        self.test_page4 = self.reload(p4)
+        self.test_page = self.reload(p.publisher_public)
+        self.test_page2 = self.reload(p2.publisher_public)
+        self.test_page3 = self.reload(p3.publisher_public)
+        self.test_page4 = self.reload(p4.publisher_public)
         
     def get_context(self, page, context_vars={}):
         request = self.get_request(page)
@@ -149,8 +153,8 @@ class RenderingTestCase(SettingsOverrideTestCase):
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
         """
         with SettingsOverride(
-                CMS_PLUGIN_PROCESSORS = ('cms.tests.rendering.test_plugin_processor',),
-                CMS_PLUGIN_CONTEXT_PROCESSORS = ('cms.tests.rendering.test_plugin_context_processor',),
+                CMS_PLUGIN_PROCESSORS = ('cms.tests.rendering.sample_plugin_processor',),
+                CMS_PLUGIN_CONTEXT_PROCESSORS = ('cms.tests.rendering.sample_plugin_context_processor',),
             ):
             def test_passed_plugin_context_processor(instance, placeholder):
                 return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
@@ -183,7 +187,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['extra'])
 
-    def test_placeholderor(self):
+    def test_placeholder_or(self):
         """
         Tests the {% placeholder %} templatetag.
         """
@@ -203,14 +207,14 @@ class RenderingTestCase(SettingsOverrideTestCase):
             u'|{% show_placeholder "sub" test_page %}'
         r = self.render(t, self.test_page, {'test_page': self.test_page, 'test_dict': {'pk': self.test_page.pk}})
         self.assertEqual(r, (u'|'+self.test_data['text_main'])*2+(u'|'+self.test_data['text_sub'])*2)
-        
+
     def test_show_placeholder_extra_context(self):
-        t = u'{% load cms_tags %}{% show_placeholder "extra_context" '+str(self.test_page4.pk)+' %}'
+        t = u'{% load cms_tags %}{% show_uncached_placeholder "extra_context" '+str(self.test_page4.pk)+' %}'
         r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['no_extra'])
         with SettingsOverride(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
             r = self.render(t, self.test_page4)
-        self.assertEqual(r, self.test_data4['extra'])
+            self.assertEqual(r, self.test_data4['extra'])
             
     def test_show_uncached_placeholder_by_pk(self):
         """
@@ -288,52 +292,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             u'|{% placeholder "main" inherit %}|{% placeholder "sub" %}'
         r = self.render(t, self.test_page3)
         self.assertEqual(r, u'|'+self.test_data['text_main']+'|'+self.test_data3['text_sub'])
-        
-    def test_detail_view_404_when_no_language_is_found(self):
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGES=[
-                                  ('x-klingon', 'Klingon'),
-                                  ('x-elvish', 'Elvish')
-                              ]):
-            from cms.views import details
-            request = AttributeObject(
-                REQUEST={'language': 'x-elvish'},
-                GET=[],
-                session={},
-                path='/',
-                user=self.test_user,
-                current_page=None,
-                method='GET',
-            )
-            self.assertRaises(Http404, details, request, '')
 
-    def test_detail_view_fallback_language(self):
-        '''
-        Ask for a page in elvish (doesn't exist), and assert that it fallsback
-        to English
-        '''
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-                              CMS_LANGUAGE_CONF={
-                                  'x-elvish': ['x-klingon', 'en',]
-                              },
-                              CMS_LANGUAGES=[
-                                  ('x-klingon', 'Klingon'),
-                                  ('x-elvish', 'Elvish'),
-                              ]):
-            from cms.views import details
-            request = AttributeObject(
-                REQUEST={'language': 'x-elvish'},
-                GET=[],
-                session={},
-                path='/',
-                user=self.test_user,
-                current_page=None,
-                method='GET',
-            )
-
-            response = details(request, '')
-            self.assertTrue(isinstance(response,HttpResponseRedirect))
-            
     def test_extra_context_isolation(self):
         with ChangeModel(self.test_page, template='extra_context.html'):
             response = self.client.get(self.test_page.get_absolute_url())

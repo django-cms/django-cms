@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.exceptions import AppAlreadyRegistered
+from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -15,9 +16,10 @@ class ApphookPool(object):
         if self.discovered:
             return
         #import all the modules
-        if settings.CMS_APPHOOKS:
+        apphooks = get_cms_setting('APPHOOKS')
+        if apphooks:
             self.block_register = True
-            for cls in iterload_objects(settings.CMS_APPHOOKS):
+            for cls in iterload_objects(apphooks):
                 self.block_register = False
                 self.register(cls)
                 self.block_register = True
@@ -43,7 +45,7 @@ class ApphookPool(object):
                 "but the 'menus' attribute is empty, did you make a typo?")
         name = app.__name__
         if name in self.apps.keys():
-            raise AppAlreadyRegistered, "[%s] an cms app with this name is already registered" % name
+            raise AppAlreadyRegistered, "[%s] a cms app with this name is already registered" % name
         self.apps[name] = app
 
     def get_apphooks(self):

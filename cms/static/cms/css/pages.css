@@ -131,7 +131,7 @@ a.collapsed span.collapsed{
 }
 
 .ac_loading {
-    background: white url('../indicator.gif') right center no-repeat;
+    background: white url('../images/indicator.gif') right center no-repeat;
 }
 
 .ac_odd {
@@ -252,19 +252,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-draft a, #sitemap li .col-draft span{vertical-align:middle; margin-top:0;}
 #sitemap li  .col-navigation img{vertical-align:middle;}
 
-
-/*
-#sitemap li .col-actions { width: 80px; }
-#sitemap li .col-published {width:100px;}
-#sitemap li .col-navigation { width: 65px; }
-#sitemap li .col-softroot { width: 20px; }
-#sitemap li .col-moderator  { width:80px; }
-#sitemap li .col-creator{width: 70px;}
-#sitemap li .col-draft{width:119px; text-align: right;}
-#sitemap li .col-lastchange { width:96px; text-align: left;}
-*/
-#sitemap li .col-view-perms { width: 55px; text-align: center;}
-
+#sitemap li .col-view-perms { text-align: center;}
 #sitemap li .col-draft {text-align: right;}
 #sitemap li .col-lastchange, 
 #sitemap li .col-published {text-align: left;}
@@ -281,7 +269,8 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li a.copy {
 	width:15px;
 	height:15px;
-	margin-left:4px;
+	margin-left:1px;
+    margin-top:-1px;
 	display:inline-block;
 	background:url(../images/copy.gif) 0px 0px no-repeat; 
 }
@@ -290,13 +279,14 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 
 #sitemap li a.selector-add {
 	margin-left:4px;
+    margin-top:-1px;
 	background-position: -20px 0px;
 }
 
-#sitemap li .col-draft a.approve {
+#sitemap li .col-lastchange a.publish {
 	margin-left:4px;
-	background-position: -60px -80px;
-	margin-top:-4px;
+	background-position: -60px -82px;
+
 }
 
 #sitemap li a.selector-add span{display:none;}
@@ -464,22 +454,18 @@ div#sitemap ul.header li{
 #sitemap li .col-lastchange .state-icon.app { background-position: -600px -60px; } 
 
 /* moderation - changed */
-#sitemap li .cont.moderatorstate0 { background-position: 0px -500px; } 
+#sitemap li .cont.publisher_pending { background-position: 0px -500px; }
 
-/* moderation - requires approvement */
-#sitemap li .cont.moderatorstate1 { background-position: 0px -300px; } 
-#sitemap li .cont.moderatorstate1 .col-draft span.state { color: #ff6600; }
-
-/* moderation - requires deletion approvement */
-#sitemap li .cont.moderatorstate200 { background-position: 0px -600px; } 
-#sitemap li .cont.moderatorstate200 .col-draft span.state { color: #cc0000; }
+/* moderation - requires approval */
+#sitemap li .cont.publisher_dirty { background-position: 0px -300px; }
+#sitemap li .cont.publisher_dirty .col-draft span.state { color: #ff6600; }
 
 /* moderation - approved */
 #sitemap li .cont.moderatorstate10 {} 
 
 /* moderation - you should approve */
-#sitemap li .cont.moderatorstate11 { background-position: 0px -400px; } 
-#sitemap li .cont.moderatorstate11 .col-draft span.state { color: #44ad41; }
+#sitemap li .cont.publisher_draft { background-position: 0px -400px; }
+#sitemap li .cont.publisher_draft .col-draft span.state { color: #44ad41; }
  
 
 /* softroot icon */

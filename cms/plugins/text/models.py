@@ -4,7 +4,7 @@ from cms.plugins.text.utils import (plugin_admin_html_to_tags,
 from cms.utils.html import clean_html
 from django.db import models
 from django.utils.html import strip_tags
-from django.utils.text import truncate_words
+from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _
 
 _old_tree_cache = {}
@@ -32,7 +32,7 @@ class AbstractText(CMSPlugin):
     search_fields = ('body',)
     
     def __unicode__(self):
-        return u"%s" % (truncate_words(strip_tags(self.body), 3)[:30]+"...")
+        return Truncator(strip_tags(self.body)).chars(30)
     
     def clean(self):
         self.body = clean_html(self.body, full=False)
@@ -41,7 +41,7 @@ class AbstractText(CMSPlugin):
         ids = plugin_tags_to_id_list(self.body)
         plugins = CMSPlugin.objects.filter(parent=self)
         for plugin in plugins:
-            if not str(plugin.pk) in ids:
+            if not plugin.pk in ids:
                 plugin.delete() #delete plugins that are not referenced in the text anymore
 
     def post_copy(self, old_instance, ziplist):

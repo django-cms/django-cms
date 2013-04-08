@@ -51,7 +51,11 @@ def make_revision_with_plugins(obj, user=None, message=None):
         
         placeholder_relation = find_placeholder_relation(obj)
 
-        if revision_context.is_active():      
+        if revision_context.is_active():
+            if user:
+                revision_context.set_user(user)
+            if message:
+                revision_context.set_comment(message)
             # add toplevel object to the revision
             adapter = revision_manager.get_adapter(obj.__class__)
             revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))

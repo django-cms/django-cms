@@ -130,12 +130,13 @@ You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_C
 at the right position::
 
     MIDDLEWARE_CLASSES = (
-        'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
-        'cms.middleware.multilingual.MultilingualURLMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.doc.XViewMiddleware',
+        'django.middleware.common.CommonMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
@@ -227,13 +228,14 @@ You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
 urlpatterns. We suggest starting with the following ``urls.py``::
 
     from django.conf.urls.defaults import *
+    from django.conf.urls.i18n import i18n_patterns
     from django.contrib import admin
     from django.conf import settings
 
     admin.autodiscover()
 
-    urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
+    urlpatterns = i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
         url(r'^', include('cms.urls')),
     )
 
@@ -357,6 +359,14 @@ Run::
     python manage.py migrate
 
 
+Check you did everything right
+==============================
+
+Now, use the following command to check if you did everything correctly::
+
+    python manage.py cms check
+
+
 Up and running!
 ===============
 
@@ -460,6 +470,11 @@ The right part of the plugin area displays a rich text editor (`TinyMCE`_).
 
 In the editor, type in some text and then press the "Save" button.
 
+The new text is only visible on the draft copy so far, but you can see it by using the
+top button "Preview draft". If you use the "View on site" button instead, you can see that the
+page is still blank to the normal users.
+
+To publish the changes you have made, click on the "Publish draft" button.
 Go back to your website using the top right-hand "View on site" button. That's it!
 
 |hello-cms-world|

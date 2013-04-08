@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
+from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, 
-    PageUserGroup)
+    PageUserGroup, titlemodels)
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
-from cms.utils.page_resolver import get_page_from_path
+from cms.utils.page_resolver import get_page_from_path, is_valid_url
 from cms.utils.permissions import (get_current_user, get_subordinate_users, 
     get_subordinate_groups)
 from cms.utils.urlutils import any_path_re
 from django import forms
-from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -60,7 +62,7 @@ class PageAddForm(forms.ModelForm):
         help_text=_('The default title'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the URL'))
-    language = forms.ChoiceField(label=_("Language"), choices=settings.CMS_LANGUAGES,
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
         help_text=_('The current language of the content fields.'))
     
     class Meta:
@@ -74,28 +76,19 @@ class PageAddForm(forms.ModelForm):
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
         site_id = self.fields['site'].initial
-        languages = []
-        language_mappings = dict(settings.LANGUAGES)
-        if site_id in settings.CMS_SITE_LANGUAGES:
-            for lang in settings.CMS_SITE_LANGUAGES[site_id]:
-                languages.append((lang, language_mappings.get(lang, lang)))
-        else:
-            languages = settings.CMS_LANGUAGES
+        languages = get_language_tuple(site_id)
         self.fields['language'].choices = languages
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
-        if self.fields['parent'].initial and \
-            settings.CMS_TEMPLATE_INHERITANCE_MAGIC in \
-            [name for name, value in settings.CMS_TEMPLATES]:
+        if (self.fields['parent'].initial and
+            get_cms_setting('TEMPLATE_INHERITANCE') in
+            [name for name, value in get_cms_setting('TEMPLATES')]):
             # non-root pages default to inheriting their template
-            self.fields['template'].initial = settings.CMS_TEMPLATE_INHERITANCE_MAGIC
+            self.fields['template'].initial = constants.TEMPLATE_INHERITANCE_MAGIC
         
     def clean(self):
         cleaned_data = self.cleaned_data
-        if 'slug' in cleaned_data.keys():
-            slug = cleaned_data['slug']
-        else:
-            slug = ""
+        slug = cleaned_data.get('slug', '')
         
         page = self.instance
         lang = cleaned_data.get('language', None)
@@ -112,10 +105,33 @@ class PageAddForm(forms.ModelForm):
         except Site.DoesNotExist:
             site = None
             raise ValidationError("No site found for current settings.")
+
+        if parent and parent.site != site:
+            raise ValidationError("Site doesn't match the parent's page site")
         
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
+        if self.cleaned_data.get('published') and page.title_set.count():
+            #Check for titles attached to the page makes sense only because
+            #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
+            #Looks like just a theoretical corner case
+            try:
+                title = page.get_title_obj(lang, fallback=False)
+            except titlemodels.Title.DoesNotExist:
+                title = None
+            if title and not isinstance(title, titlemodels.EmptyTitle) and slug:
+                oldslug = title.slug
+                title.slug = slug
+                title.save()
+                try:
+                    is_valid_url(title.path,page)
+                except ValidationError,e:
+                    title.slug = oldslug
+                    title.save()
+                    if 'slug' in cleaned_data:
+                        del cleaned_data['slug']
+                    self._errors['slug'] = ErrorList(e.messages)
         return cleaned_data
     
     def clean_slug(self):
@@ -126,7 +142,7 @@ class PageAddForm(forms.ModelForm):
     
     def clean_language(self):
         language = self.cleaned_data['language']
-        if not language in dict(settings.CMS_LANGUAGES).keys():
+        if not language in get_language_list():
             raise ValidationError("Given language does not match language settings.")
         return language
         
@@ -141,11 +157,7 @@ class PageForm(PageAddForm):
         help_text=_('Hook application to this page.'))
     overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
         help_text=_('Keep this field empty if standard path should be used.'))
-    # moderation state
-    moderator_state = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=Page.MODERATOR_CHANGED) 
-    # moderation - message is a fake field
-    moderator_message = forms.CharField(max_length=1000, widget=forms.HiddenInput, required=False)
-    
+
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
         help_text=_('Redirects to this URL.'))
     meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
@@ -173,15 +185,9 @@ class PageForm(PageAddForm):
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:
             url = self.cleaned_data['overwrite_url']
-            if url:
-                if not any_path_re.match(url):
-                    raise forms.ValidationError(_('Invalid URL, use /my/url format.'))
-                page = get_page_from_path(url.strip('/'))
-                if (page and
-                    page.pk not in [self.instance.pk,
-                                    self.instance.publisher_public_id]):
-                    raise forms.ValidationError(_('Page with redirect url %r already exist') % url)
-        return url
+            is_valid_url(url,self.instance)
+            # TODO: Check what happens if 'overwrite_url' is NOT in self.fields
+            return url
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
     """

@@ -84,8 +84,13 @@ CMS.$(document).ready(function ($) {
 					// we get the id back
 					that.editPlugin.call(that, values.placeholder_id, response, editUrl);
 				},
-				'error': function () {
-					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+				'error': function(xhr) {
+					if (xhr.status < 500) {
+						alert(xhr.responseText);
+					}
+					else{
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					};
 				}
 			});
 		},
@@ -110,7 +115,7 @@ CMS.$(document).ready(function ($) {
 			// for that we create an iframe with the specific url
 			var iframe = $('<iframe />', {
 				'id': 'cms_placeholder-iframe',
-				'src': url + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
+				'src': url + placeholder_id + '/edit-plugin/' + plugin_id + '/?popup=true&no_preview',
 				'style': 'width:100%; height:0; border:none; overflow:auto;',
 				'allowtransparency': true,
 				'scrollbars': 'no',
@@ -176,7 +181,12 @@ CMS.$(document).ready(function ($) {
 					'data': { 'plugin_id': plugin_id },
 					'success': function () {
 						// remove plugin from the dom
-						plugin.remove();
+                        if(plugin.parent().hasClass('cms_multi')){
+                            plugin.parent().remove()
+                        }else{
+                            plugin.remove();
+                        }
+
 					},
 					'error': function () {
 						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
@@ -189,7 +199,13 @@ CMS.$(document).ready(function ($) {
 			// save reference to this class
 			var that = this;
 			// get all siblings within the placeholder
-			var holders = plugin.siblings('.cms_placeholder').andSelf();
+            var plugin_id = $(plugin).attr('id').split("-")[1];
+            var multi = $('#cms_placeholder_multi-'+plugin_id)
+            if(multi.length > 0) {
+                plugin = multi
+            }
+
+			var holders = plugin.siblings('.cms_moveable').andSelf();
 			// get selected index and bound
 			var index = holders.index(plugin);
 			var bound = holders.length;
@@ -204,6 +220,10 @@ CMS.$(document).ready(function ($) {
 			var array = [];
 
 			holders.each(function (index, item) {
+                if($(item).hasClass('cms_multi')) {
+                    var item_id = $(item).attr('id').split("-")[1];
+                    var item = $('#cms_placeholder-'+item_id)
+                }
 				array.push($(item).data('options').plugin_id);
 			});
 			// remove current array
@@ -225,18 +245,41 @@ CMS.$(document).ready(function ($) {
 				'url': url,
 				'data': { 'ids': array.join('_') },
 				'success': refreshPluginPosition,
-				'error': function () {
-					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+				'error': function(xhr) {
+					if (xhr.status < 500) {
+						alert(xhr.responseText);
+					}
+					else{
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					};
 				}
 			});
 
 			// lets refresh the elements in the dom as well
 			function refreshPluginPosition() {
-				if(dir === 'moveup' && index !== bound+1) plugin.insertBefore($(holders[index-1]));
-				if(dir === 'movedown' && index !== -1) plugin.insertAfter($(holders[index+1]));
+				var target;
+				var before = false;
+				if(dir === 'moveup' && index !== bound+1){
+					before = true;
+					target = $(holders[index-1]);
+				}
+				if(dir === 'movedown' && index !== -1){
+					target = $(holders[index+1]);
+				}
 				// move in or out of boundary
-				if(dir === 'moveup' && index === bound+1) plugin.insertAfter($(holders[index-2]));
-				if(dir === 'movedown' && index === -1) plugin.insertBefore($(holders[index+1]));
+				if(dir === 'moveup' && index === bound+1){
+					 target = $(holders[index-2]);
+				}
+				if(dir === 'movedown' && index === -1){
+					target = $(holders[index+1]);
+					before = true;
+				} 
+				var target_id = target.attr('id').split("-")[1];
+				if(before){
+					plugin.insertBefore(target);
+				}else{
+					plugin.insertAfter(target);
+				}
 
 				// close overlay
 				that.hideOverlay();
@@ -251,7 +294,7 @@ CMS.$(document).ready(function ($) {
 			}
 		},
 
-		morePluginOptions: function (plugin, values, url) {
+		morePluginOptions: function (plugin, values, url, options) {
 			// save reference to this class
 			var that = this;
 
@@ -273,9 +316,9 @@ CMS.$(document).ready(function ($) {
 
 			// grab the element
 			var more = that.overlay.find('.cms_placeholder-options_more');
-				more.show();
+			more.show();
 
-			var list = more.find('ul');
+			var list = more.find('.move ul');
 
 			// we need to stop if the array is empty
 			if(array.length) list.html('');
@@ -305,8 +348,13 @@ CMS.$(document).ready(function ($) {
 					'success': function () {
 						refreshPluginPosition(slot);
 					},
-					'error': function () {
-						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					'error': function(xhr) {
+						if (xhr.status < 500) {
+							alert(xhr.responseText);
+						}
+						else{
+							throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+						};
 					}
 				});
 			});
@@ -341,6 +389,47 @@ CMS.$(document).ready(function ($) {
 					cls = cls.join('::');
 				plugin.attr('class', cls);
 			}
+
+            // If allow_children for plugins... fill up list.
+
+            var add_list = more.find('.add_child');
+
+            if(options.allow_children){
+                add_list.show();
+                plugin_list = add_list.find('ul')
+                plugin_list.html('')
+                for (var i=0; i< options.child_classes.length; i++){
+                    var class_name = options.child_classes[i].class_name
+                    var plugin_name = options.child_classes[i].plugin_name
+                    plugin_list.append($('<li><a href="" rel="type::'+class_name+'">' + plugin_name + '</a></li>').data({
+                        'class_name': class_name,
+                        'placeholder_id': values.placeholder,
+                        'plugin_id': values.plugin_id
+                    }));
+                }
+
+                plugin_list.find('a').bind('click', function (e) {
+                    e.preventDefault();
+                    // save slot var
+                    var slot = $(this).parent().data('slot');
+                    var placeholder_id = $(this).parent().data('placeholder_id');
+                    // now lets do the ajax request
+
+                    var vals = {
+                        'parent_id': values.plugin_id,
+                        'plugin_type': $(this).attr('rel').split('::')[1]
+                    };
+
+                    // try to add a new plugin
+                    CMS.API.Placeholders.addPlugin(vals, options.urls.add_plugin, options.urls.change_list);
+
+                });
+
+            }else{
+                add_list.hide();
+            }
+
+
 		},
 
 		showOverlay: function (holder) {
@@ -585,7 +674,7 @@ CMS.$(document).ready(function ($) {
 				// attach more event
 				buttons.find('a[rel^=more]').bind('click', function (e) {
 					e.preventDefault();
-					CMS.API.Placeholders.morePluginOptions(holder, values, that.options.urls.move_plugin);
+					CMS.API.Placeholders.morePluginOptions(holder, values, that.options.urls.move_plugin, that.options);
 				});
 		}
 

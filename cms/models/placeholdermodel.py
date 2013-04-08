@@ -79,7 +79,7 @@ class Placeholder(models.Model):
 
     def get_media(self, request, context):
         from cms.plugins.utils import get_plugin_media
-        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.cmsplugin_set.all()]
+        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
         if media_classes:
             return reduce(operator.add, media_classes)
         return Media()
@@ -126,8 +126,7 @@ class Placeholder(models.Model):
         """
         return [field.model for field in self._get_attached_fields()]
 
-    @property
-    def page(self):
+    def page_getter(self):
         if not hasattr(self, '_page'):
             from cms.models.pagemodel import Page
             try:
@@ -136,15 +135,16 @@ class Placeholder(models.Model):
                 self._page = None
         return self._page
 
-    @page.setter
-    def page(self, value):
+    def page_setter(self, value):
         self._page = value
+
+    page = property(page_getter, page_setter)
 
     def get_plugins_list(self):
         return list(self.get_plugins())
 
     def get_plugins(self):
-        return self.cmsplugin_set.all().order_by('tree_id', '-rght')
+        return self.cmsplugin_set.all().order_by('tree_id', 'lft')
 
     @property
     def actions(self):

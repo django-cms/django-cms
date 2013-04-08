@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-from cms.forms.utils import get_site_choices, get_page_choices
-from cms.models import Page, PageUser, Placeholder
-from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request, cms_static_url
-from django.conf import settings
+import copy
+
 from django.contrib.sites.models import Site
 from django.forms.widgets import Select, MultiWidget, Widget
 from django.template.context import RequestContext
@@ -11,8 +8,13 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-import copy
-from cms.templatetags.cms_admin import admin_static_url
+
+from cms.forms.utils import get_site_choices, get_page_choices
+from cms.models import Page, PageUser, Placeholder
+from cms.plugin_pool import plugin_pool
+from cms.utils import get_language_from_request, cms_static_url
+from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
+
 
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
@@ -90,7 +92,7 @@ class PageSelectWidget(MultiWidget):
 (function($) {
     var handleSiteChange = function(site_name, selected_id) {
         $("#id_%(name)s_1 optgroup").remove();
-        var myOptions = $("#id_%(name)s_2 optgroup[label=" + site_name + "]").clone();
+        var myOptions = $("#id_%(name)s_2 optgroup[label='" + site_name + "']").clone();
         $("#id_%(name)s_1").append(myOptions);
         $("#id_%(name)s_1").change();
     };
@@ -171,7 +173,7 @@ class UserSelectAdminWidget(Select):
             add_url = '../../../cms/pageuser/add/'
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-            output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (admin_static_url(), _('Add Another')))
+            output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
     
     

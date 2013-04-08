@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify adminmedia cms_tags cms_admin %}
+{% load i18n admin_modify cms_tags cms_admin %}
 {% load url from future %}
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
@@ -16,16 +16,21 @@
 {% if add %}
 <script type="text/javascript">
 //<![CDATA[	
-(function($) {
-	$(document).ready(function (){
-		$("#id_title").keyup(function () {
-			var e = $("#id_slug")[0];
-			if(!e._changed) {
-				e.value = URLify(this.value, 64);
-			}
-	    });
+
+	jQuery(document).ready(function (){
+        var title= jQuery('#id_title');
+        var slug = jQuery('#id_slug');
+        var update = function(){
+            var value = title.val();
+            if (window.UNIHANDECODER){
+                value = UNIHANDECODER.decode(value);
+            }
+            slug.val(URLify(value, 64));
+        };
+		title.keyup(update);
+        update();
 	});
-})(jQuery);
+
 //]]>
 </script>
 {% endif %}
@@ -37,7 +42,7 @@
 	margin-bottom:-1px;
 	border-color:#ddd #aaa #ccc #ddd !important;
 	border:1px;
-	background:#fff url('{% admin_static_url %}img/admin/nav-bg.gif') repeat-x center bottom !important;
+	background:#fff url('{% cms_admin_icon_base %}nav-bg.gif') repeat-x center bottom !important;
 }
 
 #lang_tab_content h2.header {
@@ -46,7 +51,7 @@
 	font-size:11px;
 	text-align:left;
 	font-weight:bold;
-	background:#7ca0c7 url('{% admin_static_url %}img/admin/default-bg.gif') repeat-x left top;
+	background:#7ca0c7 url('{% cms_admin_icon_base %}default-bg.gif') repeat-x left top;
 	color:#fff;
 }
 
@@ -64,41 +69,23 @@
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
      <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
-     {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo; 
+     {% if can_change %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo;
      {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original.get_title|truncatewords:"18" }}{% endif %}
 </div>
 {% endif %}{% endblock %}
-
-{% block content_title %}
-	{% if moderation_delete_request %}
-	<h1 class="moderation-approve-deletion">{% trans "Approve page deletion" %}</h1>
-
-	{% else %}
-
-	<h1>{{ title }}
-	{% if CMS_MODERATOR %}
-		{% if moderation_required %}<span class="moderation-requires-approvement">{% blocktrans %}(requires approvement at {{ moderation_level }} level){% endblocktrans %}</span>
-		{% else %}<span>{% trans '(you can perform actions on this page directly)' %}</span>
-		{% endif %}
-	{% endif %}
-	</h1>
-	{% endif %}
-	
-{% endblock %}
 
 {% block content %}<div id="content-main">
 
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
-	{% if moderation_delete_request %}<li><a href="remove-delete-state/" class="approvelink">{% trans "Remove delete request" %}</a></li>{% endif %}  	
-	{% if moderator_should_approve %}
-	<li><a href="approve/" class="approvelink">{% if moderation_delete_request %}{% trans "Approve delete" %}{% else %}{% trans "Approve" %} {% trans "draft" %}{% endif %}</a></li>
-	<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http{% if request.is_secure %}s{% endif %}://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page.get_absolute_url }}?preview&draft=1" class="previewdraftlink">{% trans "Preview" %} {% trans "draft" %}</a></li>
+	{% if can_publish %}
+	<li><a href="publish/" class="publishlink">{% trans "Publish draft" %}</a></li>
+	<li><a href="preview/?language={{ language }}" class="previewdraftlink">{% trans "Preview draft" %}</a></li>
 	{% endif %}
-	
+	{% if can_change and page.published and page.is_dirty %}<li><a href="revert/" class="revertlink">{% trans "Revert to public" %}</a></li>{% endif %}
 	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if has_absolute_url %}<li><a href="{% if current_site_id %}{% ifnotequal current_site_id page.site.id %}http{% if request.is_secure %}s{% endif %}://{{ page.site.domain }}{% endifnotequal %}{% endif %}{{ page|preview_link:language }}?preview" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  	{% if page.publisher_public %}<li><a href="preview/?public=1&language={{ language }}">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
@@ -144,7 +131,7 @@
 
 
 {% if not add %}
-	{% if CMS_PERMISSION and has_change_permissions_permission %}
+	{% if CMS_PERMISSION and can_change_permissions %}
 		<div class="inline-group">
 			<div class="tabular inline-related">
 				<fieldset id="inherited_permissions" class="module aligned collapse">
@@ -156,116 +143,15 @@
 		</div>
 	{% endif %}
 
-	{% if CMS_MODERATOR and has_moderate_permission %}
-		<div class="inline-group">
-			<div class="tabular inline-related">
-				<fieldset id="inherited_permissions" class="module aligned collapse">
-				  <h2 class="load_remote">{% trans 'Page states' %}</h2>
-				  <div class="loading">{% trans 'Loading...' %}</div>
-				  <div class="load">./moderation-states/</div>
-				</fieldset>
-			</div>
-		</div>
-	{% endif %}
-
-	{% if moderation_delete_request %}<script type="text/javascript">
-		$(function(){
-			// disable all fields
-			function lockControls(){
-				$('input,select,textarea').attr("disabled", "disabled");
-				$('a[id^=add_],span[class^=add-plugin],a[class^=selector-],p[class^=selector-]').remove();
-			}
-			$('fieldset[class=collapsed]').remove();
-			lockControls();
-			setTimeout(lockControls,200);
-		});
-	</script>{% endif %}
-
-	{% if CMS_MODERATOR and moderation_required %}
-		<div id="dialog" title="Approve dialog">
-			<p>{% blocktrans %}This page must be moderated at level {{ moderation_level }}, post a message for moderator.{% endblocktrans %}</p>
-			<div class="row"><input type="text" name="df_moderator_message" id="id_df_moderator_message" class="wide" value=""/></div>
-			<div class="row"><input type="checkbox" name="df_moderator_state" id="id_df_moderator_state" value="1"/><label for="id_df_moderator_reguest">{% trans 'Request approvemet' %}</label></div>
-		</div>
-
-		<script type="text/javascript">
-		//<![CDATA[	
-		(function($) {
-			$(function(){
-			
-				var submitActor;
-				var forceSubmit = false;
-				var seen = false;
-
-				// change submit states, open dialog
-				$('#page_form').submit(function(event){
-					return showDialog(event);
-				});
-
-				$('#page_form input[name=_continue]').click(function(event){
-					return showDialog(event, this);
-				});
-
-				function showDialog(event, actor) {
-					if (forceSubmit) return true; // escape sequence
-
-					if (!seen) {
-						// show previously posted message if there were an error
-						$('#id_df_moderator_message').val($('#id_moderator_message').val());
-					}
-					seen = true;
-					event.preventDefault();
-					submitActor = actor;
-					$('#dialog').dialog('open');
-					return false;
-				}
-
-				function dialogSave(){
-					// assign values from dialog form to real form
-					$('#id_moderator_message').val($('#id_df_moderator_message').val());
-					$('#id_moderator_state').val(
-						$('#id_df_moderator_state').is(':checked') ? $('#id_df_moderator_state').val() : 0 
-					);
-					$('#dialog').dialog('close');
-					forceSubmit = true;
-					$(submitActor || '#page_form input[name=_save]').click();
-					return false;
-				}
-
-				$('#dialog').dialog({
-					bgiframe: true,
-					autoOpen: false,
-					height: 200,
-					width: 400,
-					modal: true,
-					buttons: {
-						Cancel: function() {
-							$(this).dialog('close');
-						},
-						Save: function() {
-							dialogSave();
-						}
-					},
-					open: function(){
-						var val = $('#id_moderator_state').val();
-						$('#id_df_moderator_state').attr('checked', val >= 1 ? 'checked': '');
-						$('#id_df_moderator_message')
-							.focus()
-							.keydown(function(event) { if (event.keyCode == 13) dialogSave()});
-
-						// add default button class to last rendered button (Save)
-						$(this.uiDialogButtonPane).find('div.ui-dialog-buttonpane button:last').addClass('default');
-					},
-					close: function(){
-						forceSubmit = false;
-					}
-				});
-			});
-		})(jQuery);
-		//]]>
-		</script>
-	{% endif %}
-
+    <div class="inline-group">
+        <div class="tabular inline-related">
+            <fieldset id="page_states" class="module aligned collapse">
+              <h2 class="load_remote">{% trans 'Page states' %}</h2>
+              <div class="loading">{% trans 'Loading...' %}</div>
+              <div class="load">./moderation-states/</div>
+            </fieldset>
+        </div>
+    </div>
 {% endif %}
 
 {% block after_related_objects %}{% endblock %}
@@ -281,6 +167,15 @@
 
 {% if add %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
+
+{% endif %}
+{% for url in unihandecode_urls %}
+<script type="text/javascript" src="{{ url }}"></script>
+{% endfor %}
+{% if unihandecode_urls %}
+<script type="text/javascript">
+    var UNIHANDECODER = unihandecode.Unihan('{{ unihandecode_lang }}');
+</script>
 {% endif %}
 
 {# JavaScript for prepopulated fields #}

@@ -89,6 +89,8 @@
 .cms_toolbar-item_moderator a span { background-position:right -251px; color:#eee; }
 .cms_toolbar-item_moderator a:hover span { color:#385e92; }
 
+.cms_toolbar-item_revert { padding-top:8px !important; }
+
 /* #TOOLBAR/list# */
 .cms_toolbar-item_list { display:none; list-style:none; padding:0; margin:0; min-width:230px; overflow:hidden;
 	position:absolute; top:35px; z-index:1000; zoom:1;

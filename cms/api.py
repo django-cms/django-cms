@@ -7,6 +7,9 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+from cms.utils.conf import get_cms_setting
+from django.core.exceptions import PermissionDenied
+from cms.utils.i18n import get_language_list
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -18,9 +21,9 @@ from menus.menu_pool import menu_pool
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.models.moderatormodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import PageUser, PagePermission, GlobalPagePermission
+from cms.models.permissionmodels import (PageUser, PagePermission,
+    GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS)
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
@@ -122,10 +125,16 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
     
     # validate template
-    assert template in [tpl[0] for tpl in settings.CMS_TEMPLATES]
-    
+    assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+
+    # validate site
+    if not site:
+        site = Site.objects.get_current()
+    else:
+        assert isinstance(site, Site)
+
     # validate language:
-    assert language in [lang[0] for lang in settings.CMS_LANGUAGES]
+    assert language in get_language_list(site), get_cms_setting('LANGUAGES').get(site.pk)
     
     # set default slug:
     if not slug:
@@ -140,7 +149,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate parent
     if parent:
         assert isinstance(parent, Page)
-    
+
     # validate publication date
     if publication_date:
         assert isinstance(publication_date, datetime.date)
@@ -150,14 +159,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
         assert isinstance(publication_end_date, datetime.date)
         
     # validate softroot
-    assert settings.CMS_SOFTROOT or not soft_root
+    assert get_cms_setting('SOFTROOT') or not soft_root
     
-    # validate site
-    if not site:
-        site = Site.objects.get_current()
-    else:
-        assert isinstance(site, Site)
-        
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
         menus = [menu[0] for menu in raw_menus]
@@ -190,9 +193,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page.insert_at(parent, position)
     page.save()
 
-    if settings.CMS_MODERATOR and _thread_locals.user:
-        page.pagemoderator_set.create(user=_thread_locals.user)
-    
     create_title(
         language=language,
         title=title,
@@ -205,7 +205,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page=page,
         overwrite_url=overwrite_url
     )
-        
+
+    if published:
+        page.publish()
+
     del _thread_locals.user
     return page
     
@@ -219,12 +222,12 @@ def create_title(language, title, page, menu_title=None, slug=None,
     
     See docs/extending_cms/api_reference.rst for more info
     """
-    # validate language:
-    assert language in [lang[0] for lang in settings.CMS_LANGUAGES]
-    
     # validate page
     assert isinstance(page, Page)
-    
+
+    # validate language:
+    assert language in get_language_list(page.site_id)
+
     # set default slug:
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
@@ -331,7 +334,7 @@ def create_page_user(created_by, user,
 def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     can_add=False, can_change=False, can_delete=False, 
     can_change_advanced_settings=False, can_publish=False, 
-    can_change_permissions=False, can_move_page=False, can_moderate=False, 
+    can_change_permissions=False, can_move_page=False,
     can_recover_page=True, can_view=False,
     grant_all=False, global_permission=False):
     """
@@ -339,22 +342,18 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     
     See docs/extending_cms/api_reference.rst for more info
     """
-    if grant_all and not global_permission:
-        # shortcut to grant all permissions
-        return assign_user_to_page(page, user, grant_on, True, True, True, True,
-                                   True, True, True, True, True)
-    
+    grant_all = grant_all and not global_permission
     data = {
-        'can_add': can_add,
-        'can_change': can_change,
-        'can_delete': can_delete, 
-        'can_change_advanced_settings': can_change_advanced_settings,
-        'can_publish': can_publish, 
-        'can_change_permissions': can_change_permissions, 
-        'can_move_page': can_move_page, 
-        'can_moderate': can_moderate,  
-        'can_view': can_view,
-    }
+        'can_add': can_add or grant_all,
+        'can_change': can_change or grant_all,
+        'can_delete': can_delete or grant_all,
+        'can_change_advanced_settings': can_change_advanced_settings or grant_all,
+        'can_publish': can_publish or grant_all,
+        'can_change_permissions': can_change_permissions or grant_all,
+        'can_move_page': can_move_page or grant_all,
+        'can_view': can_view or grant_all,
+        }
+
     page_permission = PagePermission(page=page, user=user,
                                      grant_on=grant_on, **data)
     page_permission.save()
@@ -365,27 +364,10 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         page_permission.sites.add(Site.objects.get_current())
     return page_permission
     
-def publish_page(page, user, approve=False):
+def publish_page(page, user):
     """
-    Publish a page. This sets `page.published` to `True` and saves it, which
-    triggers `cms.utils.moderator.page_changed` which does the actual moderation
-    and publishing action.
-    
-    See docs/extending_cms/api_reference.rst for more info
-    """
-    page.published = True
-    # the magic happens in the post save signal here... WTF?
-    page.save()
-    # reload page
-    page = Page.objects.get(pk=page.pk)
-    # approve page if requested
-    if approve:
-        page = approve_page(page, user)
-    return page.reload()
-    
-def approve_page(page, user):
-    """
-    Approve a page version.
+    Publish a page. This sets `page.published` to `True` and calls publish()
+    which does the actual publishing.
     
     See docs/extending_cms/api_reference.rst for more info
     """
@@ -393,5 +375,9 @@ def approve_page(page, user):
         def __init__(self, user):
             self.user = user
     request = FakeRequest(user)
-    moderator.approve_page(request, page)
-    return Page.objects.get(pk=page.pk)
+    if not page.has_publish_permission(request):
+        raise PermissionDenied()
+    page.published = True
+    page.save()
+    page.publish()
+    return page.reload()

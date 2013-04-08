@@ -1,5 +1,5 @@
 // some very small jquery extensions
-(function($) {
+(function namespacing($) {
 	// very simple yellow fade plugin..
 	$.fn.yft = function(){ this.effect("highlight", {}, 1000); };
 	
@@ -131,7 +131,7 @@
 		}
 
 		function refreshIfChildren(pageId){
-			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){};
+			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){ return true; };
 		}
 
 		/**
@@ -219,15 +219,14 @@
 			// grab base url to construct full absolute URLs
 			admin_base_url = document.URL.split("/cms/page/")[0] + "/";
 			
-			// publish
+			// published checkbox
 			if(jtarget.hasClass("publish-checkbox")) {
 				pageId = jtarget.attr("name").split("status-")[1];
-				// if I don't put data in the post, django doesn't get it
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", { 1:1 });
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", {1:1}, refreshIfChildren(pageId));
 				e.stopPropagation();
-				return true;
+				return false;
 			}
-			
+
 			// in navigation
 			if(jtarget.hasClass("navigation-checkbox")) {
 				pageId = jtarget.attr("name").split("navigation-")[1];
@@ -236,56 +235,34 @@
 				e.stopPropagation();
 				return true;
 			}
-			
-			// moderation
-			if(jtarget.hasClass("moderator-checkbox")) {
+
+			// quick publish
+			if(jtarget.hasClass("publish")) {
 				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-				parent = jtarget.parents('div.col-moderator');
-				
-				value = 0;
-				parent.find('input[type=checkbox]').each(function(i, el){
-					value += $(el).attr("checked") ? parseInt($(el).val()) : 0;
-				});
-				
-				// just reload the page for now in callback... 
-				// TODO: this must be changed sometimes to reloading just the portion
-				// of the tree = current node + descendants
-				
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-moderation/", { moderate: value }, refreshIfChildren(pageId));
+				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/publish/?node=1", {}, refreshIfChildren(pageId));
 				e.stopPropagation();
-				return true;
+				return false;
 			}
-			
-			// quick approve
-			if(jtarget.hasClass("approve")) {
-				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-				// just reload the page for now in callback... 
-				// TODO: this must be changed sometimes to reloading just the portion
-				// of the tree = current node + descendants 
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/approve/?node=1", {}, refreshIfChildren(pageId));
-				e.stopPropagation();
-	            return false;
-	        }
 
-	        // lazy load descendants on tree open
-	        if(jtarget.hasClass("closed")) {
-	        	// only load them once
-	        	if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
-	        		// keeps this event from firing multiple times before
-	        		// the dom as changed. it still needs to propagate for 
-	        		// the other click event on this element to fire
-                    jtarget.addClass("loading");
-                    var pageId = $(jtarget).attr("id").split("page_")[1];
-
-                    $.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
-                        jtarget.children('ul').append(r);    
-                        // show move targets if needed
-                        if($('span.move-target-container:visible').length > 0) {
-                        	jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
-                        }
-                    });
-                }
-	        }
+			// lazy load descendants on tree open
+			if(jtarget.hasClass("closed")) {
+				// only load them once
+				if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
+					// keeps this event from firing multiple times before
+					// the dom as changed. it still needs to propagate for 
+					// the other click event on this element to fire
+					jtarget.addClass("loading");
+					var pageId = $(jtarget).attr("id").split("page_")[1];
+					
+					$.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
+						jtarget.children('ul').append(r);    
+						// show move targets if needed
+						if($('span.move-target-container:visible').length > 0) {
+							jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
+						};
+					});
+				}
+			}
 			
 			if(jtarget.hasClass("move-target")) {
 				if(jtarget.hasClass("left")){
@@ -319,10 +296,12 @@
 		$.fn.syncWidth = function(max) {
 			$(this).each(function() {
 				var val= $(this).width();
-				if(val > max){max = val;}
+				if(val > max){
+                    max = val;
+                }
 			});
-	 		$(this).each(function() {
-	  			$(this).css("width",max + 'px');
+			$(this).each(function() {
+				$(this).css("width",max + 'px');
 			});
 			return this;
 		};
@@ -334,9 +313,8 @@
 			$('#sitemap ul .col-softroot').syncWidth(0);
 			$('#sitemap ul .col-template').syncWidth(0);
 			$('#sitemap ul .col-creator').syncWidth(0);
-			
+            $('#sitemap ul .col-view-perms').syncWidth(0);
 			$('#sitemap ul .col-lastchange').syncWidth(0);
-			$('#sitemap ul .col-moderator').syncWidth(68);
 			$('#sitemap ul .col-draft').syncWidth(0);
 		}	
 		syncCols();
@@ -399,12 +377,15 @@
 			};
 			data = $.extend(data, options);
 			
-			$.post("./" + item_id + "/copy-page/", data, function(html) {
-				if(html=="ok"){
+			$.post("./" + item_id + "/copy-page/", data, function(decoded) {
+				response = decoded.content;
+				status = decoded.status;
+				if(status==200) {
 					// reload tree
 					window.location = window.location.href;
 				}else{
-					moveError($('#page_'+item_id + " div.col1:eq(0)"));  
+					alert(response);
+					moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
 				}
 			});
 		}
@@ -434,25 +415,33 @@
 			// probably some filter here, tell backend, we need a filtered
 			// version of item	
 			
-			data['fitlered'] = 1;
+			data['filtered'] = 1;
 		}
 		
 		function onSuccess(response, textStatus) {
-			if (callback) callback(response, textStatus);
-			
-			if (/page_\d+/.test($(el).attr('id'))) {
-				// one level higher
-				target = $(el).find('div.cont:first');
-			} else { 
-				target = $(el).parents('div.cont:first');
+			var status = true;
+			if (callback) status = callback(response, textStatus);
+			if (status) {
+				if (/page_\d+/.test($(el).attr('id'))) {
+					// one level higher
+					target = $(el).find('div.cont:first');
+				} else {
+					target = $(el).parents('div.cont:first');
+				}
+
+				var parent = target.parent();
+				if (response == "NotFound") {
+					return parent.remove();
+				}
+				var origin = $('.messagelist');
+				target.replace(response);
+				var messages = $(parent).find('.messagelist');
+				if (messages.length) {
+					origin.remove();
+					messages.insertAfter('.breadcrumbs');
+				}
+				parent.find('div.cont:first').yft();
 			}
-			
-			var parent = target.parent();
-			if (response == "NotFound") {
-				return parent.remove();
-			}
-			target.replace(response);
-			parent.find('div.cont:first').yft();
 
 			return true;
 		}
@@ -476,21 +465,25 @@
 		reloadItem(
 			jtarget, "./" + item_id + "/move-page/", 
 			
-			{ position: position, target: target_id }, 
-			
+			{ position: position, target: target_id },
+
 			// on success
-			function(){
-				if (tree) {
-					var tree_pos = {'left': 'before', 'right': 'after'}[position] || 'inside';
-					tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
-				} else {
-					moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
+			function(decoded,textStatus){
+				response = decoded.content;
+				status = decoded.status;
+				if(status==200) {
+					if (tree) {
+						var tree_pos = {'left': 'before', 'right': 'after'}[position] || 'inside';
+						tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
+					} else {
+						moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
+					}
+					return false;
 				}
-			},
-			
-			// on error
-			function(){
-				moveError($('#page_'+item_id + " div.col1:eq(0)"));
+				else {
+					moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
+					return false;
+				}
 			}
 		);
 	}
@@ -500,4 +493,4 @@
 	function addUndo(node, target, position){
 		undos.push({node:node, target:target, position:position});
 	}
-})(jQuery);
+})(window.CMS.$);
