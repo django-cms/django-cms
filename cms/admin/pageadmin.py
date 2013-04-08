@@ -2,6 +2,7 @@
 from copy import deepcopy
 from distutils.version import LooseVersion
 from urllib2 import unquote
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import find_placeholder_relation
 
@@ -1094,6 +1095,7 @@ class PageAdmin(ModelAdmin):
                                                   template="admin/cms/page/lazy_menu.html")
 
     @require_POST
+    @xframe_options_sameorigin
     @create_revision()
     def add_plugin(self, request):
         """
@@ -1197,6 +1199,7 @@ class PageAdmin(ModelAdmin):
         return render_to_response('admin/cms/page/widgets/plugin_item.html', {'plugin_list': plugin_list},
                                   RequestContext(request))
 
+    @xframe_options_sameorigin
     @create_revision()
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
@@ -1323,6 +1326,7 @@ class PageAdmin(ModelAdmin):
         return response
 
     @require_POST
+    @xframe_options_sameorigin
     @create_revision()
     def move_plugin(self, request):
         if 'history' in request.path:
@@ -1387,6 +1391,7 @@ class PageAdmin(ModelAdmin):
         return HttpResponse(str("ok"))
 
     @require_POST
+    @xframe_options_sameorigin
     @create_revision()
     def remove_plugin(self, request):
         if 'history' in request.path:
