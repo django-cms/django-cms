@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import urllib
+
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
@@ -12,7 +14,7 @@ from django.core.urlresolvers import reverse, resolve
 from django.utils.translation import activate, get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-import urllib
+
 
 register = template.Library()
 
@@ -38,11 +40,13 @@ def cut_after(node, levels, removed):
             node.children.remove(removed_child)
         removed.extend(removed_local)
 
+
 def remove(node, removed):
     removed.append(node)
     if node.parent:
         if node in node.parent.children:
             node.parent.children.remove(node)
+
 
 def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     """
@@ -51,7 +55,7 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     final = []
     removed = []
     selected = None
-    for node in nodes: 
+    for node in nodes:
         if not hasattr(node, 'level'):
             # remove and ignore nodes that don't have level information
             remove(node, removed)
@@ -80,6 +84,7 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
                 final.remove(node)
     return final
 
+
 def flatten(nodes):
     flat = []
     for node in nodes:
@@ -101,7 +106,7 @@ class ShowMenu(InclusionTag):
     """
     name = 'show_menu'
     template = 'menu/dummy.html'
-    
+
     options = Options(
         IntegerArgument('from_level', default=0, required=False),
         IntegerArgument('to_level', default=100, required=False),
@@ -112,7 +117,7 @@ class ShowMenu(InclusionTag):
         StringArgument('root_id', default=None, required=False),
         Argument('next_page', default=None, required=False),
     )
-    
+
     def get_context(self, context, from_level, to_level, extra_inactive,
                     extra_active, template, namespace, root_id, next_page):
         try:
@@ -120,11 +125,11 @@ class ShowMenu(InclusionTag):
             request = context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
-        
+
         if next_page:
             children = next_page.children
-        else: 
-            #new menu... get all the data so we can save a lot of queries
+        else:
+        #new menu... get all the data so we can save a lot of queries
             nodes = menu_pool.get_nodes(request, namespace, root_id)
             if root_id: # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
@@ -140,18 +145,20 @@ class ShowMenu(InclusionTag):
                     nodes = []
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
-    
+
         try:
-            context.update({'children':children,
-                            'template':template,
-                            'from_level':from_level,
-                            'to_level':to_level,
-                            'extra_inactive':extra_inactive,
-                            'extra_active':extra_active,
-                            'namespace':namespace})
+            context.update({'children': children,
+                'template': template,
+                'from_level': from_level,
+                'to_level': to_level,
+                'extra_inactive': extra_inactive,
+                'extra_active': extra_active,
+                'namespace': namespace})
         except:
-            context = {"template":template}
+            context = {"template": template}
         return context
+
+
 register.tag(ShowMenu)
 
 
@@ -167,6 +174,8 @@ class ShowMenuBelowId(ShowMenu):
         Argument('namespace', default=None, required=False),
         Argument('next_page', default=None, required=False),
     )
+
+
 register.tag(ShowMenuBelowId)
 
 
@@ -174,20 +183,20 @@ class ShowSubMenu(InclusionTag):
     """
     show the sub menu of the current nav-node.
     - levels: how many levels deep
-    -root_level: the level to start the menu at
-    -nephews: the level of descendants of siblings (nephews) to show
+    - root_level: the level to start the menu at
+    - nephews: the level of descendants of siblings (nephews) to show
     - template: template used to render the navigation
     """
     name = 'show_sub_menu'
     template = 'menu/dummy.html'
-    
+
     options = Options(
         IntegerArgument('levels', default=100, required=False),
         IntegerArgument('root_level', default=None, required=False),
         IntegerArgument('nephews', default=100, required=False),
         Argument('template', default='menu/sub_menu.html', required=False),
     )
-    
+
     def get_context(self, context, levels, root_level, nephews, template):
         try:
             # If there's an exception (500), default context_processors may not be called.
@@ -199,7 +208,7 @@ class ShowSubMenu(InclusionTag):
         # adjust root_level so we cut before the specified level, not after
         include_root = False
         if root_level > 0:
-            root_level = root_level - 1
+            root_level -= 1
         elif root_level == 0:
             include_root = True
         for node in nodes:
@@ -207,7 +216,7 @@ class ShowSubMenu(InclusionTag):
                 if node.selected:
                     # if no root_level specified, set it to the selected nodes level
                     root_level = node.level
-            # is this the ancestor of current selected node at the root level?
+                # is this the ancestor of current selected node at the root level?
             is_root_ancestor = (node.ancestor and node.level == root_level)
             # is a node selected on the root_level specified
             root_selected = (node.selected and node.level == root_level)
@@ -218,21 +227,23 @@ class ShowSubMenu(InclusionTag):
                     child.parent = None
                     if child.sibling:
                         cut_after(child, nephews, [])
-                # if root_level was 0 we need to give the menu the entire tree
+                    # if root_level was 0 we need to give the menu the entire tree
                 # not just the children
                 if include_root:
                     children = menu_pool.apply_modifiers([node], request, post_cut=True)
                 else:
                     children = menu_pool.apply_modifiers(children, request, post_cut=True)
         context.update({
-            'children':children,
-            'template':template,
-            'from_level':0,
-            'to_level':0,
-            'extra_inactive':0,
-            'extra_active':0
+            'children': children,
+            'template': template,
+            'from_level': 0,
+            'to_level': 0,
+            'extra_inactive': 0,
+            'extra_active': 0
         })
-        return context        
+        return context
+
+
 register.tag(ShowSubMenu)
 
 
@@ -245,7 +256,7 @@ class ShowBreadcrumb(InclusionTag):
     """
     name = 'show_breadcrumb'
     template = 'menu/dummy.html'
-    
+
     options = Options(
         Argument('start_level', default=0, required=False),
         Argument('template', default='menu/breadcrumb.html', required=False),
@@ -288,24 +299,30 @@ class ShowBreadcrumb(InclusionTag):
             ancestors = ancestors[start_level:]
         else:
             ancestors = []
-        context.update({'ancestors':ancestors,
-                        'template': template})
+        context.update({'ancestors': ancestors,
+            'template': template})
         return context
+
+
 register.tag(ShowBreadcrumb)
 
 
 def _raw_language_marker(language, lang_code):
     return language
 
+
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
         return unicode(ugettext(language))
 
+
 def _current_language_marker(language, lang_code):
     return unicode(ugettext(language))
 
+
 def _short_language_marker(language, lang_code):
     return lang_code
+
 
 MARKERS = {
     'raw': _raw_language_marker,
@@ -314,6 +331,7 @@ MARKERS = {
     'short': _short_language_marker,
 }
 
+
 class LanguageChooser(InclusionTag):
     """
     Displays a language chooser
@@ -321,7 +339,7 @@ class LanguageChooser(InclusionTag):
     """
     name = 'language_chooser'
     template = 'menu/dummy.html'
-    
+
     options = Options(
         Argument('template', default=NOT_PROVIDED, required=False),
         Argument('i18n_mode', default='raw', required=False),
@@ -351,11 +369,13 @@ class LanguageChooser(InclusionTag):
             if user_is_staff or lang.get('public', True):
                 languages.append((lang['code'], marker(lang['name'], lang['code'])))
         context.update({
-            'languages':languages,
-            'current_language':current_lang,
-            'template':template,
+            'languages': languages,
+            'current_language': current_lang,
+            'template': template,
         })
         return context
+
+
 register.tag(LanguageChooser)
 
 
@@ -367,11 +387,11 @@ class PageLanguageUrl(InclusionTag):
     """
     name = 'page_language_url'
     template = 'cms/content.html'
-    
+
     options = Options(
         Argument('lang'),
     )
-    
+
     def get_context(self, context, lang):
         try:
             # If there's an exception (500), default context_processors may not be called.
@@ -384,5 +404,6 @@ class PageLanguageUrl(InclusionTag):
             # use the default language changer
             url = DefaultLanguageChanger(request)(lang)
         return {'content': url}
+
 
 register.tag(PageLanguageUrl)
