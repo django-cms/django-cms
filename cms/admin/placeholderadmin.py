@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from cms.exceptions import PluginLimitReached
 from cms.forms.fields import PlaceholderFormField
@@ -17,6 +17,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _, get_language
 from django.conf import settings
+from copy import deepcopy
 
 
 class PlaceholderAdmin(ModelAdmin):
@@ -39,8 +40,9 @@ class PlaceholderAdmin(ModelAdmin):
             'js/libs/jquery.query.js',
             'js/libs/jquery.ui.core.js',
             'js/libs/jquery.ui.dialog.js',
+            ]
         ]
-        ]
+        
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -160,6 +162,7 @@ class PlaceholderAdmin(ModelAdmin):
         )
         return url_patterns + super(PlaceholderAdmin, self).get_urls()
 
+    @xframe_options_sameorigin
     def add_plugin(self, request):
         # only allow POST
         if request.method != "POST":
@@ -199,6 +202,7 @@ class PlaceholderAdmin(ModelAdmin):
         # returns it's ID as response
         return HttpResponse(str(plugin.pk))
 
+    @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         # get the plugin to edit of bail out
@@ -276,6 +280,7 @@ class PlaceholderAdmin(ModelAdmin):
 
         return response
 
+    @xframe_options_sameorigin
     def move_plugin(self, request):
         # only allow POST
         if request.method != "POST":
@@ -327,6 +332,7 @@ class PlaceholderAdmin(ModelAdmin):
             HttpResponse(str("error"))
         return HttpResponse(str("ok"))
 
+    @xframe_options_sameorigin
     def remove_plugin(self, request):
         if request.method != "POST": # only allow POST
             raise Http404
@@ -343,6 +349,7 @@ class PlaceholderAdmin(ModelAdmin):
             'plugin_name': plugin_name, 'position': plugin.position, 'placeholder': plugin.placeholder}
         return HttpResponse("%s,%s" % (plugin_id, comment))
 
+    @xframe_options_sameorigin
     def copy_plugins(self, request):
         # only allow POST
         if request.method != "POST":
