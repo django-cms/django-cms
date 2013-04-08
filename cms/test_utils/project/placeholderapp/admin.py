@@ -53,6 +53,8 @@ class Example3Admin(PlaceholderAdmin):
 
 
 class Example4Admin(PlaceholderAdmin):
+    render_placeholder_language_tabs = False
+
     fieldsets = (
         ('Only chars', {
             'classes': ('wide',),
