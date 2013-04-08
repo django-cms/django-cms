@@ -134,7 +134,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_FRONTEND_LANGUAGES setting removed
 - MultilingualMiddleware has been removed
 - CMS_FLAT_URLS has been removed
-
+- PlaceholderAdmin has now language tabs and has support for django-hvad
 
 ==== NEXT ====
 - Fixed #1543: Nasty empty line in cms/plugins/link.html
