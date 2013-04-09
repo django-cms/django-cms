@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import os
 import cms
 
-        
+
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
@@ -42,9 +42,10 @@ setup(
         'Jinja2==2.6',
         'Pygments==1.5',
         'dj-database-url==0.2.1',
+        'django-hvad',
     ],
-    packages=find_packages(exclude=["project","project.*"]),
+    packages=find_packages(exclude=["project", "project.*"]),
     include_package_data=True,
-    zip_safe = False,
-    test_suite = 'runtests.main',
+    zip_safe=False,
+    test_suite='runtests.main',
 )
