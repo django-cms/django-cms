@@ -6,6 +6,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.plugins.utils import get_plugins_for_page
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
@@ -23,7 +24,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils import timezone
+from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -133,7 +134,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test plugin history view
         """
-        from reversion.models import Version
+        import reversion
         page_data = self.get_new_page_data()
         # two versions created by simply creating the page
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -147,7 +148,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # page version 5
         txt = self._edit_text_plugin(created_plugin_id, "Hello Bar")
         self.assertEquals("Hello Bar", txt.body)
-        versions = [v.pk for v in Version.objects.get_for_object(page)]
+        versions = [v.pk for v in reversed(reversion.get_for_object(page))]
         history_url = '%s%d/' % (
             URL_CMS_PLUGIN_HISTORY_EDIT % (page_id, versions[-2]),
             created_plugin_id)
@@ -697,6 +698,32 @@ class PluginsTestCase(PluginsTestBaseCase):
         from cms.plugins.utils import build_plugin_tree
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
         plugin_pool.unregister_plugin(DumbFixturePlugin)
+
+    def test_get_plugins_for_page(self):
+        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+                              slug="page1", published=True, in_navigation=True)
+        ph_en = page_en.placeholders.get(slot="col_left")
+        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm inside an existing placeholder.")
+        # This placeholder is not in the template.
+        ph_en_not_used = page_en.placeholders.create(slot="not_used")
+        text_plugin_2 = add_plugin(ph_en_not_used, "TextPlugin", "en", body="I'm inside a non-existent placeholder.")
+        page_plugins = get_plugins_for_page(None, page_en, page_en.get_title_obj_attribute('language'))
+        db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
+        self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
+        self.assertEquals(db_text_plugin_1.pk, text_plugin_1.pk)
+
+    def test_is_last_in_placeholder(self):
+        """
+        Tests that children plugins don't affect the is_last_in_placeholder plugin method.
+        """
+        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+                              slug="page1", published=True, in_navigation=True)
+        ph_en = page_en.placeholders.get(slot="col_left")
+        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
+        inner_text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1")
+        text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
+        self.assertEquals(text_plugin_2.is_last_in_placeholder(), True)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

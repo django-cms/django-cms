@@ -6,35 +6,17 @@ from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_permission_level
 from copy import deepcopy
-from distutils.version import LooseVersion
 from django.conf import settings
 from django.contrib import admin
 from django.template.defaultfilters import title
 from django.utils.translation import ugettext as _
-import django
 
 
-
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 PAGE_ADMIN_INLINES = []
 
 
 class TabularInline(admin.TabularInline):
     pass
-
-if DJANGO_1_3 and 'reversion' in settings.INSTALLED_APPS:
-    """
-    Backwards compatibility for Django < 1.4 and django-reversion 1.6
-    """
-    class TabularInline(TabularInline):
-        def get_prepopulated_fields(self, request, obj=None):
-            return self.prepopulated_fields
-    from reversion.admin import helpers
-    class CompatInlineAdminFormSet(helpers.InlineAdminFormSet):
-        def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
-                readonly_fields=None, model_admin=None):
-            super(CompatInlineAdminFormSet, self).__init__(inline, formset, fieldsets, readonly_fields, model_admin)
-    helpers.InlineAdminFormSet = CompatInlineAdminFormSet
 
 
 class PagePermissionInlineAdmin(TabularInline):

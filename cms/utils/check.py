@@ -3,6 +3,7 @@ from __future__ import with_statement
 from contextlib import contextmanager
 from cms import constants
 from cms.utils import get_cms_setting
+from cms.management.commands.subcommands.list import plugin_report
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
@@ -161,7 +162,7 @@ def check_sekizai(output):
         if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
             section.success("Sekizai template context processor is installed")
         else:
-            section.error("Sekizai template context processor is not install, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -197,6 +198,27 @@ def check_deprecated_settings(output):
         if not found:
             section.skip("No deprecated settings found")
 
+
+@define_check
+def check_plugin_instances(output):
+    with output.section("Plugin instances") as section:
+        # get the report
+        report = plugin_report()
+        section.success("Plugin instances of %s types found in the database" % len(report))
+        # loop over plugin types in the report
+        for plugin_type in report:
+            # warn about those that are not installed
+            if not plugin_type["model"]:
+                section.error("%s has instances but is no longer installed" % plugin_type["type"] )
+            # warn about those that have unsaved instances
+            if plugin_type["unsaved_instances"]:
+                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))                
+
+        if section.successful:
+            section.finish_success("The plugins in your database are in good order")
+        else:
+            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
+        
 
 def check(output):
     """

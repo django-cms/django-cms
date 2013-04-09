@@ -91,7 +91,7 @@ class CMSToolbar(Toolbar):
 
     @property
     def edit_mode(self):
-        return self.is_staff and self.edit_mode_switcher.get_state(self.request)
+        return self.is_staff and self.edit_mode_switcher.get_state(self.request) and self.can_change
 
     @property
     def show_toolbar(self):

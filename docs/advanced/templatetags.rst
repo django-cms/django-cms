@@ -163,6 +163,13 @@ Example::
     <a href="{% page_url "help" %}">Help page</a>
     <a href="{% page_url request.current_page.parent %}">Parent page</a>
 
+If a matching page isn't found and :setting:`django:DEBUG` is ``True``, an
+exception will be raised. However, if :setting:`django:DEBUG` is ``False``, an
+exception will not be raised. Additionally, if
+:setting:`django:SEND_BROKEN_LINK_EMAILS` is ``True`` and you have specified
+some addresses in :setting:`django:MANAGERS`, an email will be sent to those
+addresses to inform them of the broken link.
+
 .. templatetag:: page_attribute
 
 page_attribute
@@ -330,11 +337,25 @@ show_sub_menu
 =============
 
 Displays the sub menu of the current page (as a nested list).
-Takes one argument that specifies how many levels deep the submenu should be
-displayed. The template can be found at ``cms/sub_menu.html``::
+
+The first argument, ``levels`` (default=100), specifies how many levels deep the submenu should be
+displayed
+
+The second argument, ``root_level`` (default=None), specifies at what level, if any, the menu should root at.
+For example, if root_level is 0 the menu will start at that level regardless of what level the current page is on.
+
+The third argument, ``nephews`` (default=100), specifies how many levels of nephews (children of siblings) are show.
+
+The template can be found at ``cms/sub_menu.html``::
 
     <ul>
         {% show_sub_menu 1 %}
+    </ul>
+
+Rooted at level 0::
+
+    <ul>
+        {% show_sub_menu 1 0 %}
     </ul>
 
 Or with a custom template::

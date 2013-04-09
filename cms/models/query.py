@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 from cms.publisher.query import PublisherQuerySet
 from django.conf import settings
 from cms.exceptions import NoHomeFound
-from cms.utils import timezone
+from django.utils import timezone
 
 
 class PageQuerySet(PublisherQuerySet):

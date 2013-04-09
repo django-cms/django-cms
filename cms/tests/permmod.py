@@ -704,10 +704,13 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
         # We have to reload pe when using mptt >= 0.4.2, 
         # so that mptt realized that pg is no longer a child of pe
-        #self.pe = self.pe.reload()
+        self.pe = Page.objects.get(pk=self.pe.pk)
+        self.pg = Page.objects.get(pk=self.pg.pk)
         self.move_page(self.pe, self.pg)
+        self.pe = Page.objects.get(pk=self.pe.pk)
+        self.pg = Page.objects.get(pk=self.pg.pk)
         self.assertEqual(self.pe.parent_id, self.pg.pk)
-        self.assertEqual(self.pe.publisher_public.parent_id, self.pb.publisher_public_id)
+        self.assertEqual(self.pe.publisher_public.parent_id, self.pg.publisher_public_id)
 
         # check urls - they should stay them same, there wasn't approved yet
         self.assertEqual(

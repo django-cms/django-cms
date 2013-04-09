@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
+from django.utils import timezone
 from cms.models import Page, PageModeratorState, CMSPlugin, Title
-from cms.utils import timezone
 
 
 def page_changed(page, old_page=None, force_moderation_action=None):
