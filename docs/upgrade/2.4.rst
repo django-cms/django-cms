@@ -350,6 +350,19 @@ For example, if root_level is 0 the menu will start at that level regardless of 
 The third argument: ``nephews`` (default=100), specifies how many levels of nephews (children of siblings) are shown.
 
 
+PlaceholderAdmin support i18n
+=============================
+
+
+If you use placeholders in other apps or models we now support more than one language out of the box.
+If you just use the :class:`PlaceholderAdmin` it will display language tabs like the cms. If you
+use `django-hvad`_ it uses the hvad language tabs.
+
+If you want to disable this behavior you can set ``render_placeholder_language_tabs = False`` on your Admin
+class that extends PlaceholderAdmin. If you use a custom ``change_form_template`` be sure to have a look at
+``cms/templates/admin/placeholders/placeholder/change_form.html`` for how to incorporate language tabs.
+
+
 ******************************
 Backwards incompatible changes
 ******************************
@@ -368,3 +381,4 @@ Pending deprecations
   this redundant as every non managed url will behave like this.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
+.. _django-hvad: https://github.com/kristianoellegaard/django-hvad
