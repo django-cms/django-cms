@@ -99,6 +99,7 @@ def configure(db_url, **extra):
             'south',
             'reversion',
             'sekizai',
+            'hvad',
         ],
         LANGUAGE_CODE="en",
         LANGUAGES=(
