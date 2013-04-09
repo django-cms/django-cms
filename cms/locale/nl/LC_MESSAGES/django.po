@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # André Hendriks <andre.hendriks@deltares.nl>, 2011.
 # Bouke Haarsma <bouke@webatoom.nl>, 2012.
@@ -10,19 +10,20 @@
 # Jacques de Hooge <>, 2012.
 # Jonas Obrist <me@ojii.ch>, 2011.
 #   <leon@cmsworks.nl>, 2012.
+#  <transifex.net@kurdyenviolien.nl>, 2013.
 #   <vande.ryse.steven@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-06 11:50+0200\n"
-"PO-Revision-Date: 2012-09-19 15:06+0000\n"
-"Last-Translator: Bouke Haarsma <bouke@webatoom.nl>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2013-04-09 09:51+0200\n"
+"PO-Revision-Date: 2013-04-06 11:16+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -30,7 +31,7 @@ msgstr ""
 
 #: cms_toolbar.py:71
 msgid "Revert"
-msgstr ""
+msgstr "Draai terug"
 
 #: cms_toolbar.py:75
 msgid "Edit mode"
@@ -134,10 +135,9 @@ msgid "Page Title"
 msgstr "Pagina-titel"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Overschrijft wat wordt weergegeven in de titelbalk van de browser of in "
-"bladwijzers"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Overschrijft wat wordt weergegeven in de titelbalk van de browser of in bladwijzers"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -165,14 +165,11 @@ msgstr "Stuurt door naar deze URL."
 
 #: admin/forms.py:164
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
-"Een beschrijving van de pagina die soms door zoekmachines wordt gebruikt."
+msgstr "Een beschrijving van de pagina die soms door zoekmachines wordt gebruikt."
 
 #: admin/forms.py:166
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Een door komma's gescheiden lijst van trefwoorden die soms door zoekmachines "
-"wordt gebruikt."
+msgstr "Een door komma's gescheiden lijst van trefwoorden die soms door zoekmachines wordt gebruikt."
 
 #: admin/forms.py:182
 msgid "A page with this reverse URL id exists already."
@@ -186,16 +183,11 @@ msgstr "gebruiker"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Om het recht te hebben pagina's toe te voegen, is ook toegang nodig tot de "
-"kinderen (of afstammelingen), anders kan de toegevoegde pagina niet door "
-"zijn maker worden aangepast."
+msgstr "Om het recht te hebben pagina's toe te voegen, is ook toegang nodig tot de kinderen (of afstammelingen), anders kan de toegevoegde pagina niet door zijn maker worden aangepast."
 
 #: admin/forms.py:229
 msgid "Add page permission also requires edit page permission."
-msgstr ""
-"Voor het recht om pagina's toe te voegen is ook het recht nodig pagina's te "
-"bewerken."
+msgstr "Voor het recht om pagina's toe te voegen is ook het recht nodig pagina's te bewerken."
 
 #: admin/forms.py:256
 msgid "can_view"
@@ -234,10 +226,7 @@ msgstr "Licht gebruiker in"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Stuur een e-mailnotificatie naar de gebruiker over het aanpassen van de "
-"gebruikersnaam of het wachtwoord. Hiervoor is het e-mailadres van de "
-"gebruiker nodig."
+msgstr "Stuur een e-mailnotificatie naar de gebruiker over het aanpassen van de gebruikersnaam of het wachtwoord. Hiervoor is het e-mailadres van de gebruiker nodig."
 
 #: admin/forms.py:326
 msgid "New password"
@@ -254,202 +243,180 @@ msgstr "Voor e-mailnotificatie is een geldig e-mailadres vereist."
 #: admin/forms.py:349
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"Het recht om pagina's toe te voegen vereist het recht pagina's aan te passen!"
+msgstr "Het recht om pagina's toe te voegen vereist het recht pagina's aan te passen!"
 
 #: admin/forms.py:351
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Het recht om gebruikers toe te voegen vereist het recht om gebruikers aan te "
-"passen!"
+msgstr "Het recht om gebruikers toe te voegen vereist het recht om gebruikers aan te passen!"
 
 #: admin/forms.py:353
 msgid "To add permissions you also need to edit them!"
 msgstr "Om rechten toe te voegen moet je ze ook bewerken!"
 
-#: admin/pageadmin.py:102
+#: admin/pageadmin.py:103
 msgid "Basic Settings"
 msgstr "Basisinstelling"
 
-#: admin/pageadmin.py:105
+#: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Opmerking: Deze pagina herlaadt wanneer je de selectie verandert. Sla het "
-"eerst op."
+msgstr "Opmerking: Deze pagina herlaadt wanneer je de selectie verandert. Sla het eerst op."
 
-#: admin/pageadmin.py:107 admin/pageadmin.py:158
+#: admin/pageadmin.py:108 admin/pageadmin.py:159
 msgid "Hidden"
 msgstr "Verborgen"
 
-#: admin/pageadmin.py:111
+#: admin/pageadmin.py:112
 msgid "Advanced Settings"
 msgstr "Geavanceerde instellingen"
 
-#: admin/pageadmin.py:118
+#: admin/pageadmin.py:119
 msgid "SEO Settings"
 msgstr "SEO-instellingen"
 
-#: admin/pageadmin.py:637
-#, fuzzy
+#: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
-msgstr "Je bent niet toegestaan deze pagina de bewerken"
+msgstr "U heeft geen toestemming deze pagina te veranderen"
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:650
 msgid "Database error"
 msgstr "Databasefout"
 
-#: admin/pageadmin.py:742
-#, fuzzy
+#: admin/pageadmin.py:743
 msgid "You do not have permission to change the template"
-msgstr "Je bent niet toegestaan deze pagina de bewerken"
+msgstr "U heeft geen toestemming dit template te veranderen"
 
-#: admin/pageadmin.py:746
-#, fuzzy
+#: admin/pageadmin.py:747
 msgid "Template not valid"
-msgstr "Sjabloon"
+msgstr "Template ongeldig"
 
-#: admin/pageadmin.py:751
-#, fuzzy, python-format
+#: admin/pageadmin.py:752
+#, python-format
 msgid "Template changed to %s"
-msgstr "laatste aanpassingen"
+msgstr ""
 
-#: admin/pageadmin.py:753
-#, fuzzy
+#: admin/pageadmin.py:754
 msgid "The template was successfully changed"
-msgstr "Pagina is succesvol goedgekeurd."
+msgstr "Het template was succesvol veranderd"
 
-#: admin/pageadmin.py:775
+#: admin/pageadmin.py:776
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
-"Fout! Je hebt geen rechten om deze pagina te verplaatsen. Vernieuw de pagina "
-"en probeer opnieuw"
+msgstr "Fout! Je hebt geen rechten om deze pagina te verplaatsen. Vernieuw de pagina en probeer opnieuw"
 
-#: admin/pageadmin.py:779
-#, fuzzy
+#: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr "kan verplaatsen"
+msgstr ""
 
-#: admin/pageadmin.py:865 admin/pageadmin.py:1053
+#: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
 msgstr "Je hebt geen toestemming deze pagina te publiceren"
 
-#: admin/pageadmin.py:867
-#, fuzzy, python-format
+#: admin/pageadmin.py:868
+#, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr "Pagina is succesvol goedgekeurd."
+msgstr "De pagina \"%s\" is succesvol gepubliceerd."
 
-#: admin/pageadmin.py:909 admin/pageadmin.py:945 admin/pageadmin.py:1176
-#: admin/pageadmin.py:1208 admin/pageadmin.py:1340 admin/pageadmin.py:1372
+#: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
 msgid "You do not have permission to change this page"
 msgstr "Je bent niet toegestaan deze pagina de bewerken"
 
-#: admin/pageadmin.py:913
-#, fuzzy, python-format
+#: admin/pageadmin.py:914
+#, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr "Pagina is succesvol goedgekeurd."
+msgstr "De pagina \"%s\" is succesvol teruggedraaid."
 
-#: admin/pageadmin.py:949
+#: admin/pageadmin.py:950
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-object met primaire sleutel %(key)r bestaat niet."
 
-#: admin/pageadmin.py:955
+#: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
 msgstr "Er bestaat slechts één vertaling voor deze pagina"
 
-#: admin/pageadmin.py:984
+#: admin/pageadmin.py:985
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Titel en plugins voor de taal %(language)s zijn verwijderd"
 
-#: admin/pageadmin.py:1006
+#: admin/pageadmin.py:1007
 msgid "Are you sure?"
 msgstr "Weet je het zeker?"
 
-#: admin/pageadmin.py:1062
-#, fuzzy, python-format
+#: admin/pageadmin.py:1063
+#, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr "Pagina is succesvol goedgekeurd."
+msgstr "Het publiceren van pagina \"%s\" is suucesvol ongedaan gemaakt."
 
-#: admin/pageadmin.py:1064
-#, fuzzy, python-format
+#: admin/pageadmin.py:1065
+#, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr "Pagina is succesvol goedgekeurd."
+msgstr "De pagina \"%s\" is succesvol gepubliceerd"
 
-#: admin/pageadmin.py:1082
+#: admin/pageadmin.py:1083
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
-"Je bent niet toegestaan om de in_navigatie toestand van deze pagina aan te "
-"passen"
+msgstr "Je bent niet toegestaan om de in_navigatie toestand van deze pagina aan te passen"
 
-#: admin/pageadmin.py:1106
-#, fuzzy
+#: admin/pageadmin.py:1108
 msgid "You do not have permission to add a plugin"
-msgstr "U heeft geen toestemming om plugins toe te voegen"
+msgstr "U heeft geen toestemming om een plugin toe te voegen."
 
-#: admin/pageadmin.py:1147 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1149 admin/pageadmin.py:1180
 msgid "Language must be set to a supported language!"
 msgstr "De taal moet worden ingesteld op een ondersteunde taal!"
 
-#: admin/pageadmin.py:1158
+#: admin/pageadmin.py:1160
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s-plugin toegevoegd aan %(placeholder)s"
 
-#: admin/pageadmin.py:1180
+#: admin/pageadmin.py:1182
 msgid "Language must be different than the copied language!"
 msgstr "De taal moet verschillend zijn van de gekopieerde taal!"
 
-#: admin/pageadmin.py:1186
+#: admin/pageadmin.py:1188
 msgid "You do not have permission to add plugins"
 msgstr "U heeft geen toestemming om plugins toe te voegen"
 
-#: admin/pageadmin.py:1191
+#: admin/pageadmin.py:1193
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "%(language)s plugins zijn gekopieerd naar %(placeholder)s"
 
-#: admin/pageadmin.py:1240
+#: admin/pageadmin.py:1243
 msgid "This plugin is not saved in a revision"
-msgstr ""
+msgstr "Deze plugin is niet bewaard in een revisie"
 
-#: admin/pageadmin.py:1243 admin/pageadmin.py:1336
-#, fuzzy
+#: admin/pageadmin.py:1246 admin/pageadmin.py:1340
 msgid "You do not have permission to edit a plugin"
-msgstr "U heeft geen toestemming om plugins toe te voegen"
+msgstr "U heeft geen toestemming om een plugin te bewerken"
 
-#: admin/pageadmin.py:1303
+#: admin/pageadmin.py:1306
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"%(plugin_name)s-plugin bewerkt op positie %(position)s in %(placeholder)s"
+msgstr "%(plugin_name)s-plugin bewerkt op positie %(position)s in %(placeholder)s"
 
-#: admin/pageadmin.py:1367
-#, fuzzy
+#: admin/pageadmin.py:1371
 msgid "You do not have permission to move a plugin"
-msgstr "U heeft geen toestemming om plugins toe te voegen"
+msgstr "U heeft geen toestemming om een plugin te verplaatsen"
 
-#: admin/pageadmin.py:1386
-#, fuzzy
+#: admin/pageadmin.py:1390
 msgid "Plugins were moved"
 msgstr "Plugins zijn verplaatst"
 
-#: admin/pageadmin.py:1398 admin/pageadmin.py:1407
-#, fuzzy
+#: admin/pageadmin.py:1403 admin/pageadmin.py:1412
 msgid "You do not have permission to remove a plugin"
-msgstr "U heeft geen toestemming om plugins toe te voegen"
+msgstr "U heeft geen toestemming om een plugin te verwijderen"
 
-#: admin/pageadmin.py:1417 admin/placeholderadmin.py:308
+#: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"%(plugin_name)s-plugin op positie %(position)s in %(placeholder)s is "
-"verwijderd."
+msgstr "%(plugin_name)s-plugin op positie %(position)s in %(placeholder)s is verwijderd."
 
 #: admin/permissionadmin.py:75
 msgid "View restriction"
@@ -471,15 +438,15 @@ msgstr "Gebruikers- & groepsrechten"
 msgid "Page permissions management"
 msgstr "Beheer paginarechten"
 
-#: admin/placeholderadmin.py:153 admin/placeholderadmin.py:178
+#: admin/placeholderadmin.py:190 admin/placeholderadmin.py:216
 msgid "You don't have permission to add content here."
 msgstr "U heeft geen toestemming hier inhoud toe te voegen"
 
-#: admin/placeholderadmin.py:174
+#: admin/placeholderadmin.py:212
 msgid "You don't have permission to add plugins"
 msgstr "U heeft geen toestemming om plugins toe te voegen"
 
-#: admin/placeholderadmin.py:304
+#: admin/placeholderadmin.py:344
 msgid "You don't have permission to delete a plugin"
 msgstr "U heeft geen toestemming om een plugin toe te verwijderen"
 
@@ -507,7 +474,7 @@ msgstr "Selecteer een geldige site"
 msgid "Select a valid page"
 msgstr "Selecteer een geldige pagina"
 
-#: forms/widgets.py:174
+#: forms/widgets.py:176
 msgid "Add Another"
 msgstr "Nog één toevoegen"
 
@@ -551,9 +518,7 @@ msgstr "publicatiedatum"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"Wanneer de pagina publiek moet worden. Status moet op \"Gepubliceerd\" staan "
-"om publiek te worden."
+msgstr "Wanneer de pagina publiek moet worden. Status moet op \"Gepubliceerd\" staan om publiek te worden."
 
 #: models/pagemodel.py:53
 msgid "publication end date"
@@ -583,9 +548,7 @@ msgstr "id"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Een unieke naam die door de 'page_url' sjabloon-tag wordt gebruikt om naar "
-"deze pagina te verwijzen."
+msgstr "Een unieke naam die door de 'page_url' sjabloon-tag wordt gebruikt om naar deze pagina te verwijzen."
 
 #: models/pagemodel.py:61
 msgid "attached menu"
@@ -867,9 +830,7 @@ msgstr "hoogte"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-"Flash-plugin ontbreekt. Gelieve de laatste versie van Adobe Flash Player te "
-"downloaden:"
+msgstr "Flash-plugin ontbreekt. Gelieve de laatste versie van Adobe Flash Player te downloaden:"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -886,8 +847,7 @@ msgstr "Geavanceerd"
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
-msgstr ""
-"Waarde groter dan of gelijk aan 0 en gevolgd door \"px\" of \"%\" vereist."
+msgstr "Waarde groter dan of gelijk aan 0 en gevolgd door \"px\" of \"%\" vereist."
 
 #: plugins/googlemap/forms.py:26
 msgid "Must be a positive integer followed by “px”."
@@ -927,9 +887,7 @@ msgstr "breedtegraad"
 
 #: plugins/googlemap/models.py:26
 msgid "Use latitude & longitude to fine tune the map position."
-msgstr ""
-"Gebruik breedtegraad & lengtegraad om de positie op de kaart nauwkeurig in "
-"te stellen."
+msgstr "Gebruik breedtegraad & lengtegraad om de positie op de kaart nauwkeurig in te stellen."
 
 #: plugins/googlemap/models.py:28
 msgid "longitude"
@@ -979,9 +937,7 @@ msgstr "Taal of Pagina moet ingevuld zijn"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Kies een pagina om diens plugins in de 'placeholder' in te voegen, indien "
-"leeggelaten wordt de huidige pagina gekozen"
+msgstr "Kies een pagina om diens plugins in de 'placeholder' in te voegen, indien leeggelaten wordt de huidige pagina gekozen"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1054,13 +1010,13 @@ msgid "image"
 msgstr "afbeelding"
 
 #: plugins/picture/models.py:22
-#, fuzzy
 msgid "If present, clicking on image will take user to link."
-msgstr "Indien opgegeven zal de afbeelding klikbaar zijn."
+msgstr "Indien aanwezig, zal klikken op een plaatje de gebruiker naar de link brengen."
 
 #: plugins/picture/models.py:24
-msgid "If present, clicking on image will take user         to specified page."
-msgstr ""
+msgid ""
+"If present, clicking on image will take user         to specified page."
+msgstr "Indien aanwezig, zal klikken op een plaatje de gebruiker naar de bepaalde pagina brengen."
 
 #: plugins/picture/models.py:26
 msgid "alternate text"
@@ -1069,8 +1025,9 @@ msgstr "alternatieve tekst"
 #: plugins/picture/models.py:27
 msgid ""
 "Specifies an alternate text for an image, if         the image cannot be "
-"displayed.<br />Is also used by search engines to         classify the image."
-msgstr ""
+"displayed.<br />Is also used by search engines to         classify the "
+"image."
+msgstr "Specificeer een alternatieve tekst voor een plaatje, voor als het plaatje niet getoond kan worden.<br> Wordt ook gebruikt door de zoekmachine om een plaatje te classificeren."
 
 #: plugins/picture/models.py:30
 msgid "long description"
@@ -1079,7 +1036,7 @@ msgstr "lange beschrijving"
 #: plugins/picture/models.py:31
 msgid ""
 "When user hovers above picture,        this text will appear in a popup."
-msgstr ""
+msgstr "Als een gebruiker boven een plaatje hangt, zal deze tekst verschijnen in een popup"
 
 #: plugins/picture/models.py:33
 msgid "side"
@@ -1087,11 +1044,11 @@ msgstr "kant"
 
 #: plugins/picture/models.py:34
 msgid "Move image left, right or center."
-msgstr ""
+msgstr "Verplaats plaatje naar link, rechts of het midden."
 
 #: plugins/picture/models.py:51
 msgid "You can enter a Link or a Page, but not both."
-msgstr ""
+msgstr "U kunt een Link of Pagina toevoegen, maar niet beide."
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
@@ -1110,9 +1067,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Voer een sjabloon in (bijv. \"knipsels/plugin_xy.html\") dat weergegeven zal "
-"worden."
+msgstr "Voer een sjabloon in (bijv. \"knipsels/plugin_xy.html\") dat weergegeven zal worden."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1162,8 +1117,7 @@ msgstr "Geselecteerde plugin bewerken"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr ""
-"Tekst-bewerker biedt geen ondersteuning voor het bewerken van objecten."
+msgstr "Tekst-bewerker biedt geen ondersteuning voor het bewerken van objecten."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
@@ -1174,8 +1128,7 @@ msgstr "Geen object geselecteerd."
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
-"Tekst-bewerker biedt geen ondersteuning voor het invoegen van objecten."
+msgstr "Tekst-bewerker biedt geen ondersteuning voor het invoegen van objecten."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
@@ -1218,9 +1171,7 @@ msgstr "link hint"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-"Indien opgegeven wordt deze hint weergegeven als een link naar je Twitter-"
-"profiel."
+msgstr "Indien opgegeven wordt deze hint weergegeven als een link naar je Twitter-profiel."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1231,10 +1182,7 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr ""
-"Voorbeeld: \"hersenen AND zombies AND from:umbrella AND to:nemesis\": tweets "
-"van de gebruiker \"umbrella\" aan de gebruiker \"nemesis\" die de woorden "
-"\"hersenen\" en \"zombies\" bevatten"
+msgstr "Voorbeeld: \"hersenen AND zombies AND from:umbrella AND to:nemesis\": tweets van de gebruiker \"umbrella\" aan de gebruiker \"nemesis\" die de woorden \"hersenen\" en \"zombies\" bevatten"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1282,10 +1230,9 @@ msgstr "video url"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"Vimeo- of YouTube-URL. Voorbeeld: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "Vimeo- of YouTube-URL. Voorbeeld: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1375,9 +1322,7 @@ msgstr "Opslaan en opnieuw bewerken"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Pagina <a href=\"%(admin_url)s\">%(page)s</a> moet mogelijk door jou worden "
-"goedgekeurd."
+msgstr "Pagina <a href=\"%(admin_url)s\">%(page)s</a> moet mogelijk door jou worden goedgekeurd."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1419,18 +1364,16 @@ msgid "Home"
 msgstr "Voorpagina"
 
 #: templates/admin/cms/page/change_form.html:83
-#, fuzzy
 msgid "Publish draft"
-msgstr "Publiceer"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:84
-#, fuzzy
 msgid "Preview draft"
-msgstr "Voorbeeld"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
-msgstr ""
+msgstr "Draai terug naar publiek"
 
 #: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/revision_form.html:10
@@ -1700,9 +1643,7 @@ msgstr "Herstel verwijderde %(verbose_name)s"
 
 #: templates/admin/cms/page/recover_form.html:24
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
-"Druk op de Opslaan-knop hieronder om deze versie van het object te "
-"herstellen."
+msgstr "Druk op de Opslaan-knop hieronder om deze versie van het object te herstellen."
 
 #: templates/admin/cms/page/revision_form.html:11
 #, python-format
@@ -1711,9 +1652,7 @@ msgstr "Stel %(verbose_name)s terug"
 
 #: templates/admin/cms/page/revision_form.html:24
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
-"Druk op de Oplaan-knop hieronder om naa deze versie van het object terug te "
-"stellen."
+msgstr "Druk op de Oplaan-knop hieronder om naa deze versie van het object terug te stellen."
 
 #: templates/admin/cms/page/dialog/copy.html:4
 msgid "Copy options"
@@ -1757,8 +1696,7 @@ msgstr "Beschikbare plugins"
 
 #: templates/cms/toolbar/toolbar.html:27
 msgid "The selected element can not be moved to the desired location."
-msgstr ""
-"Het geselecteerde element kan niet naar de gewenste locatie verplaatst worden"
+msgstr "Het geselecteerde element kan niet naar de gewenste locatie verplaatst worden"
 
 #: templates/cms/toolbar/toolbar.html:28
 msgid "Are you sure you want to delete this plugin?"
@@ -1773,9 +1711,8 @@ msgid "down"
 msgstr "omlaag"
 
 #: templates/cms/toolbar/toolbar.html:70
-#, fuzzy
 msgid "Add child plugin"
-msgstr "Sub-pagina toevoegen"
+msgstr "Voeg kind plugin toe"
 
 #: templates/cms/toolbar/toolbar.html:73
 msgid "Move to placeholder"
@@ -1807,55 +1744,52 @@ msgstr "Pagina niet gevonden in %(domain)s"
 #: templatetags/cms_tags.py:86
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"Een template tag kan de pagina met opzoek argumenten `%(page_lookup)s\n"
-"` niet vinden. De URL van het verzoek was: http://%(host)s%(path)s"
+msgstr "Een template tag kan de pagina met opzoek argumenten `%(page_lookup)s\n` niet vinden. De URL van het verzoek was: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:105 test_utils/cli.py:115
+#: test_utils/cli.py:106 test_utils/cli.py:116
 msgid "English"
 msgstr "Engels"
 
-#: test_utils/cli.py:106 test_utils/cli.py:127 test_utils/cli.py:145
+#: test_utils/cli.py:107 test_utils/cli.py:128 test_utils/cli.py:146
 msgid "French"
 msgstr "Frans"
 
-#: test_utils/cli.py:107 test_utils/cli.py:121 test_utils/cli.py:139
-#: test_utils/cli.py:158
+#: test_utils/cli.py:108 test_utils/cli.py:122 test_utils/cli.py:140
+#: test_utils/cli.py:159
 msgid "German"
 msgstr "Duits"
 
-#: test_utils/cli.py:108 test_utils/cli.py:132
+#: test_utils/cli.py:109 test_utils/cli.py:133
 msgid "Brazilian Portuguese"
-msgstr ""
+msgstr "Braziliaans Portugees"
 
-#: test_utils/cli.py:109 test_utils/cli.py:152
+#: test_utils/cli.py:110 test_utils/cli.py:153
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: test_utils/cli.py:168
+#: test_utils/cli.py:169
 msgid "two columns"
 msgstr "twee kolommen"
 
-#: test_utils/cli.py:169
+#: test_utils/cli.py:170
 msgid "three columns"
 msgstr "drie kolommen"
 
-#: test_utils/cli.py:170
+#: test_utils/cli.py:171
 msgid "navigation examples"
 msgstr "navigatievoorbeelden"
 
-#: test_utils/cli.py:176
+#: test_utils/cli.py:177
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:182
+#: test_utils/cli.py:183
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:188
+#: test_utils/cli.py:189
 msgid "right column"
 msgstr "background color"
 
@@ -1876,14 +1810,12 @@ msgid "Sample App"
 msgstr "Voorbeeldapplicatie"
 
 #: test_utils/project/sampleapp/cms_app.py:15
-#, fuzzy
 msgid "Sample App 2"
-msgstr "Voorbeeldapplicatie"
+msgstr "Voorbeeld app 2"
 
 #: test_utils/project/sampleapp/cms_app.py:22
-#, fuzzy
 msgid "Namespaced App"
-msgstr "Voorbeeldapplicatie"
+msgstr "Namespaced App"
 
 #: test_utils/project/sampleapp/menu.py:16
 msgid "sample root page"
@@ -1910,9 +1842,8 @@ msgid "Static Menu2"
 msgstr "Statisch menu 2"
 
 #: test_utils/project/sampleapp/urls.py:12
-#, fuzzy
 msgid "^account/$"
-msgstr "aantal"
+msgstr "^account/$"
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"
@@ -1935,189 +1866,34 @@ msgstr "Ongeldige URL, gebruik het formaat /mijn/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
-msgstr[0] ""
-"Pagina %(pages)s heeft dezelfde url '%(url)s' als de huidige pagina "
+"Pages %(pages)s have the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr[1] ""
-"Pagina's %(pages)s hebben dezelfde url '%(url)s' als de huidige pagina "
-"\"%(instance)s\"."
-
-#, fuzzy
-#~ msgid "The page \"%s\" was successfully deleted."
-#~ msgstr "Pagina is succesvol goedgekeurd."
-
-#, fuzzy
-#~ msgid "You do not have permission to delete this page"
-#~ msgstr "Je bent niet toegestaan deze pagina de bewerken"
+msgstr[0] "Pagina %(pages)s heeft dezelfde url '%(url)s' als de huidige pagina \"%(instance)s\"."
+msgstr[1] "Pagina's %(pages)s hebben dezelfde url '%(url)s' als de huidige pagina \"%(instance)s\"."
 
 #~ msgid "delete req."
-#~ msgstr "verwijderverzoek"
+#~ msgstr "deletion request"
 
 #~ msgid "move req."
-#~ msgstr "verplaatsverzoek"
-
-#~ msgid "moderator state"
-#~ msgstr "moderatie-toestand"
-
-#, fuzzy
-#~ msgid "Confirm page deletion"
-#~ msgstr "Pagina verwijderen goedkeuren"
-
-#~ msgid "Remove delete request"
-#~ msgstr "Verwijder verzoek tot verwijderen"
-
-#, fuzzy
-#~ msgid "Confirm delete"
-#~ msgstr "Kan verwijderen"
-
-#~ msgid "draft"
-#~ msgstr "concept"
-
-#~ msgid "Request Approval"
-#~ msgstr "Verzoek Goedkeuring"
-
-#~ msgid "You have no permission to change the template"
-#~ msgstr "U heeft geen toestemming dit sjabloon te wijzigen"
-
-#~ msgid "higher"
-#~ msgstr "hoger"
-
-#~ msgid "You have no permission to add a plugin"
-#~ msgstr "U heeft geen toestemming om een plugin toe te voegen"
-
-#~ msgid "You have no permission to change this page"
-#~ msgstr "U heeft geen toestemming deze pagina te wijzigen"
-
-#~ msgid "You have no permission to edit a plugin"
-#~ msgstr "U heeft geen toestemming om een plugin toe te wijzigen"
-
-#~ msgid "You have no permission to move a plugin"
-#~ msgstr "U heeft geen toestemming om een plugin toe te verplaatsen"
-
-#~ msgid "You have no permission to remove a plugin"
-#~ msgstr "U heeft geen toestemming om een plugin toe te verwijderen"
-
-#~ msgid "Copy moderation"
-#~ msgstr "Kopiëer moderatie"
-
-#~ msgid "path"
-#~ msgstr "pad"
-
-#~ msgid "everybody"
-#~ msgstr "iedereen"
-
-#~ msgid "type"
-#~ msgstr "type"
-
-#~ msgid "can change soft-root"
-#~ msgstr "kan schijn-oorsprong aanpassen"
-
-#~ msgid "status"
-#~ msgstr "status"
-
-#~ msgid "navigation extenders"
-#~ msgstr "navigatie-uitbreiders"
+#~ msgstr "move request"
 
 #~ msgid "url overwrite"
-#~ msgstr "overschreven URL"
-
-#~ msgid "author"
-#~ msgstr "auteur"
-
-#~ msgid "reverse url id"
-#~ msgstr "omgekeerde URL-kenmerk"
-
-#~ msgid "Moderate page"
-#~ msgstr "Modereer pagina"
-
-#~ msgid "Moderate children"
-#~ msgstr "Modereer onderliggende pagina's"
-
-#~ msgid "Moderate descendants"
-#~ msgstr "Modereer alle onderliggende pagina's"
-
-#~ msgid "PageModerator"
-#~ msgstr "Paginamoderator"
-
-#~ msgid "publish req."
-#~ msgstr "publicatieverzoek"
+#~ msgstr "URL overwrite"
 
 #~ msgid "unpublish req."
-#~ msgstr "depublicatieverzoek"
-
-#~ msgid "approved"
-#~ msgstr "goedgekeurd"
+#~ msgstr "unpublish request"
 
 #~ msgid "req. app."
-#~ msgstr "goedkeuren vereist"
-
-#~ msgid "app. par."
-#~ msgstr "ouders goedkeuren vereist"
-
-#~ msgid "can moderate"
-#~ msgstr "kan modereren"
-
-#~ msgid "if present image will be clickable"
-#~ msgstr "indien opgegeven zal de afbeelding klikbaar zijn"
-
-#~ msgid "textual description of the image"
-#~ msgstr "een tekstuele omschrijving van de afbeelding"
-
-#~ msgid "additional description of the image"
-#~ msgstr "een aanvullende beschrijving van de afbeelding"
+#~ msgstr "approval required"
 
 #~ msgid "(requires approvement at %(moderation_level)s level)"
-#~ msgstr "(moet goedgekeurd worden op %(moderation_level)s-niveau)"
-
-#~ msgid "(you can perform actions on this page directly)"
-#~ msgstr "(je kunt direct acties uitvoeren op deze pagina)"
-
-#~ msgid "Approve delete"
-#~ msgstr "Verwijderen goedkeuren"
-
-#~ msgid "Approve"
-#~ msgstr "Goedkeuren"
-
-#~ msgid ""
-#~ "This page must be moderated at level %(moderation_level)s, post a message "
-#~ "for moderator."
-#~ msgstr ""
-#~ "Deze pagina moet gemodereerd worden op %(moderation_level)s-niveau, stuur "
-#~ "een bericht naar de moderator."
+#~ msgstr "(requires approval at %(moderation_level)s level)"
 
 #~ msgid "Request approvemet"
-#~ msgstr "Goedkeuren verzoek"
-
-#~ msgid "moderate"
-#~ msgstr "modereer"
-
-#~ msgid "Approve directly"
-#~ msgstr "Direct goedkeuren"
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "Unbind page moderation"
-#~ msgstr "Pagina-moderatie ontbinden"
-
-#~ msgid "Unbind children moderation"
-#~ msgstr "Kind-moderatie ontbinden"
-
-#~ msgid "Unbind descendants moderation"
-#~ msgstr "Afstammelingen-moderatie ontbinden"
-
-#~ msgid "Brazil"
-#~ msgstr "Braziliaans"
-
-#~ msgid "parent first"
-#~ msgstr "ouder eerst"
-
-#~ msgid "approve"
-#~ msgstr "keur goed"
+#~ msgstr "Request approval"
 
 #~ msgid "CMS - Page %s requires approvement."
-#~ msgstr "CMS - Pagina %s moet goedgekeurd worden."
+#~ msgstr "CMS - Page %s requires approval."
 
 #~ msgid "move"
 #~ msgstr "move request"

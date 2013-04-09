@@ -1,23 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 #   <legendri@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-06 11:50+0200\n"
-"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2013-04-09 09:51+0200\n"
+"PO-Revision-Date: 2013-04-06 11:16+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Language: hr\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -128,7 +127,8 @@ msgid "Page Title"
 msgstr "Naslov stranice"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Pregazit će ono što je prikazano u vrhu preglednika i u oznakama."
 
 #: admin/forms.py:155
@@ -161,8 +161,7 @@ msgstr "Opis stranice koji koriste neki pretraživači."
 
 #: admin/forms.py:166
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Popis ključnih riječi, razadvojenih zarezima, koji koriste neki pretraživači."
+msgstr "Popis ključnih riječi, razadvojenih zarezima, koji koriste neki pretraživači."
 
 #: admin/forms.py:182
 msgid "A page with this reverse URL id exists already."
@@ -176,16 +175,11 @@ msgstr "korisnik"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Privilegije za dodavanje stranice također zahtjeva pravo pristupa djeci ili "
-"potomcima. U suprotnom, stranica se neće moći mijenjati od strane njenog "
-"tvorca."
+msgstr "Privilegije za dodavanje stranice također zahtjeva pravo pristupa djeci ili potomcima. U suprotnom, stranica se neće moći mijenjati od strane njenog tvorca."
 
 #: admin/forms.py:229
 msgid "Add page permission also requires edit page permission."
-msgstr ""
-"Privilegije za dodavanje stranice zahtjevaju i privilegije za izmijenu "
-"stranice."
+msgstr "Privilegije za dodavanje stranice zahtjevaju i privilegije za izmijenu stranice."
 
 #: admin/forms.py:256
 msgid "can_view"
@@ -224,9 +218,7 @@ msgstr "Obavjesti korisnika"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Šalji e-mail obavijesti korisnicima pri promijeni korisničkog imena ili "
-"lozinke. Zahtjeva e-mail adresu korisnika."
+msgstr "Šalji e-mail obavijesti korisnicima pri promijeni korisničkog imena ili lozinke. Zahtjeva e-mail adresu korisnika."
 
 #: admin/forms.py:326
 msgid "New password"
@@ -248,191 +240,175 @@ msgstr "Pravo na kreiranje nove stranice zahtjeva pravo za izmjenu stranice!"
 #: admin/forms.py:351
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Pravo na dodavanje novog korisnika zahtjeva pravo za izmjenu kornisika!"
+msgstr "Pravo na dodavanje novog korisnika zahtjeva pravo za izmjenu kornisika!"
 
 #: admin/forms.py:353
 msgid "To add permissions you also need to edit them!"
 msgstr "Za dodavanje dozvole morate je i izmjeniti!"
 
-#: admin/pageadmin.py:102
+#: admin/pageadmin.py:103
 msgid "Basic Settings"
 msgstr "Osnovna podešavanja"
 
-#: admin/pageadmin.py:105
+#: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Napomena: Ova stranica će se ponovo učitati ako izmjenite odabir. Prvo "
-"spremite stranicu."
+msgstr "Napomena: Ova stranica će se ponovo učitati ako izmjenite odabir. Prvo spremite stranicu."
 
-#: admin/pageadmin.py:107 admin/pageadmin.py:158
+#: admin/pageadmin.py:108 admin/pageadmin.py:159
 msgid "Hidden"
 msgstr "Skriveno"
 
-#: admin/pageadmin.py:111
+#: admin/pageadmin.py:112
 msgid "Advanced Settings"
 msgstr "Napredna podešavanja"
 
-#: admin/pageadmin.py:118
+#: admin/pageadmin.py:119
 msgid "SEO Settings"
 msgstr "SEO podešavanja"
 
-#: admin/pageadmin.py:637
-#, fuzzy
+#: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
-msgstr "Nemate ovlasti da izmjenite ovu stranicu"
+msgstr ""
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:650
 msgid "Database error"
 msgstr "Greška baze podataka"
 
-#: admin/pageadmin.py:742
-#, fuzzy
+#: admin/pageadmin.py:743
 msgid "You do not have permission to change the template"
-msgstr "Nemate ovlasti da izmjenite ovu stranicu"
+msgstr ""
 
-#: admin/pageadmin.py:746
-#, fuzzy
+#: admin/pageadmin.py:747
 msgid "Template not valid"
-msgstr "Predložak"
+msgstr ""
 
-#: admin/pageadmin.py:751
-#, fuzzy, python-format
+#: admin/pageadmin.py:752
+#, python-format
 msgid "Template changed to %s"
-msgstr "posljednje izmjene"
+msgstr ""
 
-#: admin/pageadmin.py:753
-#, fuzzy
+#: admin/pageadmin.py:754
 msgid "The template was successfully changed"
-msgstr "Stranica je uspješno odobrena."
+msgstr ""
 
-#: admin/pageadmin.py:775
+#: admin/pageadmin.py:776
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:779
-#, fuzzy
+#: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr "može premještati"
+msgstr ""
 
-#: admin/pageadmin.py:865 admin/pageadmin.py:1053
+#: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
 msgstr "Nemate ovlasti da izbrišete ovu stranicu"
 
-#: admin/pageadmin.py:867
-#, fuzzy, python-format
+#: admin/pageadmin.py:868
+#, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr "Stranica je uspješno odobrena."
+msgstr ""
 
-#: admin/pageadmin.py:909 admin/pageadmin.py:945 admin/pageadmin.py:1176
-#: admin/pageadmin.py:1208 admin/pageadmin.py:1340 admin/pageadmin.py:1372
+#: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
 msgid "You do not have permission to change this page"
 msgstr "Nemate ovlasti da izmjenite ovu stranicu"
 
-#: admin/pageadmin.py:913
-#, fuzzy, python-format
+#: admin/pageadmin.py:914
+#, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr "Stranica je uspješno odobrena."
+msgstr ""
 
-#: admin/pageadmin.py:949
+#: admin/pageadmin.py:950
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "objekt %(name)s sa primarnim ključem %(key)r ne postoji."
 
-#: admin/pageadmin.py:955
+#: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
 msgstr "Postoji samo jedan prijevod ove stranice"
 
-#: admin/pageadmin.py:984
+#: admin/pageadmin.py:985
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Naslov i plagin na jeziku %(language)s je obrisan"
 
-#: admin/pageadmin.py:1006
+#: admin/pageadmin.py:1007
 msgid "Are you sure?"
 msgstr "Da li ste sigurni?"
 
-#: admin/pageadmin.py:1062
-#, fuzzy, python-format
+#: admin/pageadmin.py:1063
+#, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr "Stranica je uspješno odobrena."
+msgstr ""
 
-#: admin/pageadmin.py:1064
-#, fuzzy, python-format
+#: admin/pageadmin.py:1065
+#, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr "Stranica je uspješno odobrena."
+msgstr ""
 
-#: admin/pageadmin.py:1082
+#: admin/pageadmin.py:1083
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Nemate ovlasti da izmjenite status ove stranice \"u navigaciji\""
 
-#: admin/pageadmin.py:1106
-#, fuzzy
+#: admin/pageadmin.py:1108
 msgid "You do not have permission to add a plugin"
-msgstr "Nemate ovlasti da dodajete pluginove"
+msgstr ""
 
-#: admin/pageadmin.py:1147 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1149 admin/pageadmin.py:1180
 msgid "Language must be set to a supported language!"
 msgstr "Jezik mora biti postavljen na jedan od podržanih!"
 
-#: admin/pageadmin.py:1158
+#: admin/pageadmin.py:1160
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plugin dodan u %(placeholder)s"
 
-#: admin/pageadmin.py:1180
+#: admin/pageadmin.py:1182
 msgid "Language must be different than the copied language!"
 msgstr "Jezik mora biti različit od kopiranog jezika!"
 
-#: admin/pageadmin.py:1186
+#: admin/pageadmin.py:1188
 msgid "You do not have permission to add plugins"
 msgstr "Nemate ovlasti da dodajete pluginove"
 
-#: admin/pageadmin.py:1191
+#: admin/pageadmin.py:1193
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "Kopirano %(language)s plugina u %(placeholder)s"
 
-#: admin/pageadmin.py:1240
+#: admin/pageadmin.py:1243
 msgid "This plugin is not saved in a revision"
 msgstr ""
 
-#: admin/pageadmin.py:1243 admin/pageadmin.py:1336
-#, fuzzy
+#: admin/pageadmin.py:1246 admin/pageadmin.py:1340
 msgid "You do not have permission to edit a plugin"
-msgstr "Nemate ovlasti da dodajete pluginove"
+msgstr ""
 
-#: admin/pageadmin.py:1303
+#: admin/pageadmin.py:1306
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"%(plugin_name)s plugin, izmjenjen na poziciji %(position)s u %(placeholder)s"
+msgstr "%(plugin_name)s plugin, izmjenjen na poziciji %(position)s u %(placeholder)s"
 
-#: admin/pageadmin.py:1367
-#, fuzzy
+#: admin/pageadmin.py:1371
 msgid "You do not have permission to move a plugin"
-msgstr "Nemate ovlasti da dodajete pluginove"
+msgstr ""
 
-#: admin/pageadmin.py:1386
-#, fuzzy
+#: admin/pageadmin.py:1390
 msgid "Plugins were moved"
-msgstr "Plugin je premješten"
+msgstr ""
 
-#: admin/pageadmin.py:1398 admin/pageadmin.py:1407
-#, fuzzy
+#: admin/pageadmin.py:1403 admin/pageadmin.py:1412
 msgid "You do not have permission to remove a plugin"
-msgstr "Nemate ovlasti da dodajete pluginove"
+msgstr ""
 
-#: admin/pageadmin.py:1417 admin/placeholderadmin.py:308
+#: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"%(plugin_name)s plugin na poziciji %(position)s u %(placeholder)s je "
-"uklonjen."
+msgstr "%(plugin_name)s plugin na poziciji %(position)s u %(placeholder)s je uklonjen."
 
 #: admin/permissionadmin.py:75
 msgid "View restriction"
@@ -454,15 +430,15 @@ msgstr "Ovlasti korisnika i grupe"
 msgid "Page permissions management"
 msgstr "Upravljanje ovlastima stranice"
 
-#: admin/placeholderadmin.py:153 admin/placeholderadmin.py:178
+#: admin/placeholderadmin.py:190 admin/placeholderadmin.py:216
 msgid "You don't have permission to add content here."
 msgstr "Nemate ovlasti da ovdje dodajete sadržaj."
 
-#: admin/placeholderadmin.py:174
+#: admin/placeholderadmin.py:212
 msgid "You don't have permission to add plugins"
 msgstr "Nemate ovlasti da dodajete pluginove"
 
-#: admin/placeholderadmin.py:304
+#: admin/placeholderadmin.py:344
 msgid "You don't have permission to delete a plugin"
 msgstr "Nemate ovlasti da izbrišete plugin"
 
@@ -490,7 +466,7 @@ msgstr "Izaberite ispravnu web stranicu"
 msgid "Select a valid page"
 msgstr "Izaberite ispravnu stranicu"
 
-#: forms/widgets.py:174
+#: forms/widgets.py:176
 msgid "Add Another"
 msgstr "Dodaj još"
 
@@ -564,9 +540,7 @@ msgstr "id"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"Jedinstveni identifikator koji se koristi sa page_url oznakom za povezivanje "
-"sa ovom stranicom"
+msgstr "Jedinstveni identifikator koji se koristi sa page_url oznakom za povezivanje sa ovom stranicom"
 
 #: models/pagemodel.py:61
 msgid "attached menu"
@@ -848,9 +822,7 @@ msgstr "visina"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-"Nemate instaliran flash plugin. Molimo prezumite najnoviji Adobe Flash "
-"Player."
+msgstr "Nemate instaliran flash plugin. Molimo prezumite najnoviji Adobe Flash Player."
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
@@ -957,9 +929,7 @@ msgstr "Jezik ili stranica se moraju popuniti"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"Izaberite stranicu čije pluginove treba uključiti u placeholder, ako je "
-"prazno, biti će izabrana trenutna stranica"
+msgstr "Izaberite stranicu čije pluginove treba uključiti u placeholder, ako je prazno, biti će izabrana trenutna stranica"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1032,12 +1002,12 @@ msgid "image"
 msgstr "slika"
 
 #: plugins/picture/models.py:22
-#, fuzzy
 msgid "If present, clicking on image will take user to link."
-msgstr "Ako je izabrano, na sliku će se moći kliknuti."
+msgstr ""
 
 #: plugins/picture/models.py:24
-msgid "If present, clicking on image will take user         to specified page."
+msgid ""
+"If present, clicking on image will take user         to specified page."
 msgstr ""
 
 #: plugins/picture/models.py:26
@@ -1047,7 +1017,8 @@ msgstr "alternativni tekst"
 #: plugins/picture/models.py:27
 msgid ""
 "Specifies an alternate text for an image, if         the image cannot be "
-"displayed.<br />Is also used by search engines to         classify the image."
+"displayed.<br />Is also used by search engines to         classify the "
+"image."
 msgstr ""
 
 #: plugins/picture/models.py:30
@@ -1088,9 +1059,7 @@ msgstr "HTML"
 #: plugins/snippet/models.py:15
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-"Unesite ime predloška (na primjer \"snippets/plugin_xy.html\") koji se treba "
-"prikazivati."
+msgstr "Unesite ime predloška (na primjer \"snippets/plugin_xy.html\") koji se treba prikazivati."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
@@ -1194,8 +1163,7 @@ msgstr "link hint"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-"Ako je upisano, nagovještaj se prikazuje kao link na Vaš Twitter profil."
+msgstr "Ako je upisano, nagovještaj se prikazuje kao link na Vaš Twitter profil."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1206,10 +1174,7 @@ msgid ""
 "Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
 "from the user \"umbrella\" to the user \"nemesis\" that contain the words "
 "\"brains\" and \"zombies\""
-msgstr ""
-"Primjer: \"mozgovi AND zombiji AND from:kišobran AND to:nemesis\": tweetovi "
-"od korisnika \"kišobran\" do korisnika \"nemesis\" koji sadrže riječi "
-"\"mozgovi\" i \"zombiji\""
+msgstr "Primjer: \"mozgovi AND zombiji AND from:kišobran AND to:nemesis\": tweetovi od korisnika \"kišobran\" do korisnika \"nemesis\" koji sadrže riječi \"mozgovi\" i \"zombiji\""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
@@ -1257,10 +1222,9 @@ msgstr "URL do videa"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
-msgstr ""
-"vimeo ili youtube URL. Na primer: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
+msgstr "vimeo ili youtube URL. Na primer: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
@@ -1350,9 +1314,7 @@ msgstr "Spremi i nastavi uređivanje"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"Stranica <a href=\"%(admin_url)s\">%(page)s</a> može zahtijevati Vaše "
-"odobrenje."
+msgstr "Stranica <a href=\"%(admin_url)s\">%(page)s</a> može zahtijevati Vaše odobrenje."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1394,14 +1356,12 @@ msgid "Home"
 msgstr "može dodati"
 
 #: templates/admin/cms/page/change_form.html:83
-#, fuzzy
 msgid "Publish draft"
-msgstr "Objavi"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:84
-#, fuzzy
 msgid "Preview draft"
-msgstr "Pregled"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
@@ -1744,9 +1704,8 @@ msgid "down"
 msgstr "dolje"
 
 #: templates/cms/toolbar/toolbar.html:70
-#, fuzzy
 msgid "Add child plugin"
-msgstr "Dodaj podređenu stranicu"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:73
 msgid "Move to placeholder"
@@ -1778,55 +1737,52 @@ msgstr "Stranica nije pronađena na %(domain)s"
 #: templatetags/cms_tags.py:86
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
-"Template tag ne može pronaći stranicu sa parametrima `%(page_lookup)s `. URL "
-"je bio: http://%(host)s%(path)s"
+msgstr "Template tag ne može pronaći stranicu sa parametrima `%(page_lookup)s `. URL je bio: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:105 test_utils/cli.py:115
+#: test_utils/cli.py:106 test_utils/cli.py:116
 msgid "English"
 msgstr ""
 
-#: test_utils/cli.py:106 test_utils/cli.py:127 test_utils/cli.py:145
+#: test_utils/cli.py:107 test_utils/cli.py:128 test_utils/cli.py:146
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:107 test_utils/cli.py:121 test_utils/cli.py:139
-#: test_utils/cli.py:158
+#: test_utils/cli.py:108 test_utils/cli.py:122 test_utils/cli.py:140
+#: test_utils/cli.py:159
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:108 test_utils/cli.py:132
+#: test_utils/cli.py:109 test_utils/cli.py:133
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:109 test_utils/cli.py:152
+#: test_utils/cli.py:110 test_utils/cli.py:153
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:168
+#: test_utils/cli.py:169
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:169
+#: test_utils/cli.py:170
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:170
+#: test_utils/cli.py:171
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:176
+#: test_utils/cli.py:177
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:182
+#: test_utils/cli.py:183
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:188
+#: test_utils/cli.py:189
 msgid "right column"
 msgstr "background color"
 
@@ -1879,9 +1835,8 @@ msgid "Static Menu2"
 msgstr ""
 
 #: test_utils/project/sampleapp/urls.py:12
-#, fuzzy
 msgid "^account/$"
-msgstr "račun"
+msgstr ""
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"
@@ -1904,183 +1859,35 @@ msgstr "Nepravilan URL, koristite format: /my/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#, fuzzy
-#~ msgid "The page \"%s\" was successfully deleted."
-#~ msgstr "Stranica je uspješno odobrena."
-
-#, fuzzy
-#~ msgid "You do not have permission to delete this page"
-#~ msgstr "Nemate ovlasti da izmjenite ovu stranicu"
-
 #~ msgid "delete req."
-#~ msgstr " zahtjev za brisanje"
+#~ msgstr "deletion request"
 
 #~ msgid "move req."
-#~ msgstr " zahtjev za premještanje"
-
-#~ msgid "moderator state"
-#~ msgstr "stanje uređivanja"
-
-#, fuzzy
-#~ msgid "Confirm page deletion"
-#~ msgstr "Odobri brisanje stranice"
-
-#~ msgid "Remove delete request"
-#~ msgstr "Ukloni zahtjev za brisanjem"
-
-#, fuzzy
-#~ msgid "Confirm delete"
-#~ msgstr "Može brisati"
-
-#~ msgid "draft"
-#~ msgstr "skica"
-
-#~ msgid "Request Approval"
-#~ msgstr "Potrebno odobrenje"
-
-#~ msgid "You have no permission to change the template"
-#~ msgstr "Nemate ovlasti da mjenjate predložak"
-
-#~ msgid "higher"
-#~ msgstr "više"
-
-#~ msgid "You have no permission to add a plugin"
-#~ msgstr "Nemate ovlasti da dodate plugin"
-
-#~ msgid "You have no permission to change this page"
-#~ msgstr "Nemate ovlasti da mjenjate ovu stranicu"
-
-#~ msgid "You have no permission to edit a plugin"
-#~ msgstr "Nemate ovlasti da mjenjate plugin"
-
-#~ msgid "You have no permission to move a plugin"
-#~ msgstr "Nemate ovlasti da premještate plugin"
-
-#~ msgid "You have no permission to remove a plugin"
-#~ msgstr "Nemate ovlasti da uklonite plugin"
-
-#~ msgid "Copy moderation"
-#~ msgstr "Dosljednost kopiranja"
-
-#~ msgid "path"
-#~ msgstr "putanja"
-
-#~ msgid "everybody"
-#~ msgstr "svi"
-
-#~ msgid "type"
-#~ msgstr "tip"
-
-#~ msgid "can change soft-root"
-#~ msgstr "može mijenjati soft-root"
-
-#~ msgid "status"
-#~ msgstr "status"
-
-#~ msgid "navigation extenders"
-#~ msgstr "proširenja navigacije"
+#~ msgstr "move request"
 
 #~ msgid "url overwrite"
-#~ msgstr "prepisivanje url-a"
-
-#~ msgid "author"
-#~ msgstr "autor"
-
-#~ msgid "reverse url id"
-#~ msgstr "id inverznog url-a"
-
-#~ msgid "Moderate page"
-#~ msgstr "uredi stranicu"
-
-#~ msgid "Moderate children"
-#~ msgstr "Uredi neposredne potomke stranice"
-
-#~ msgid "Moderate descendants"
-#~ msgstr "uredi potomke"
-
-#~ msgid "PageModerator"
-#~ msgstr "PageModerator"
-
-#~ msgid "publish req."
-#~ msgstr "zahtjev za objavljivanje "
+#~ msgstr "URL overwrite"
 
 #~ msgid "unpublish req."
-#~ msgstr "zahtjev za obustavljanje objave"
-
-#~ msgid "approved"
-#~ msgstr "odobreno"
+#~ msgstr "unpublish request"
 
 #~ msgid "req. app."
-#~ msgstr "potrebna dozvola"
-
-#~ msgid "app. par."
-#~ msgstr "app. par."
-
-#~ msgid "can moderate"
-#~ msgstr "može uređivati"
-
-#~ msgid "if present image will be clickable"
-#~ msgstr "ako je izabrano, na sliku će se moći kliknuti"
-
-#~ msgid "textual description of the image"
-#~ msgstr "tekstualni opis slike"
-
-#~ msgid "additional description of the image"
-#~ msgstr "dodatni opis slike"
+#~ msgstr "approval required"
 
 #~ msgid "(requires approvement at %(moderation_level)s level)"
-#~ msgstr "(zahtjeva odobrenje na nivou %(moderation_level)s)"
-
-#~ msgid "(you can perform actions on this page directly)"
-#~ msgstr "(možete direktno izvesti akcije nad ovom stranicom)"
-
-#~ msgid "Approve delete"
-#~ msgstr "Odobri brisanje"
-
-#~ msgid "Approve"
-#~ msgstr "Odobri"
-
-#~ msgid ""
-#~ "This page must be moderated at level %(moderation_level)s, post a message "
-#~ "for moderator."
-#~ msgstr ""
-#~ "Stranica se mora uređivati na nivou %(moderation_level)s, pošaljite "
-#~ "poruku moderatoru."
+#~ msgstr "(requires approval at %(moderation_level)s level)"
 
 #~ msgid "Request approvemet"
-#~ msgstr "Zatraži odobrenje"
-
-#~ msgid "moderate"
-#~ msgstr "uredi"
-
-#~ msgid "Approve directly"
-#~ msgstr "Odobri direktno"
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "Unbind page moderation"
-#~ msgstr "Ukini uređivanje stranica"
-
-#~ msgid "Unbind children moderation"
-#~ msgstr "Ukini uređivanje podređenih stranica"
-
-#~ msgid "Unbind descendants moderation"
-#~ msgstr "Ukini uređivanje potomaka"
-
-#~ msgid "parent first"
-#~ msgstr "prvi roditelj"
-
-#~ msgid "approve"
-#~ msgstr "odobri"
+#~ msgstr "Request approval"
 
 #~ msgid "CMS - Page %s requires approvement."
-#~ msgstr "CMS - Stranica %s zahtjeva odobrenje."
+#~ msgstr "CMS - Page %s requires approval."
 
 #~ msgid "move"
 #~ msgstr "move request"

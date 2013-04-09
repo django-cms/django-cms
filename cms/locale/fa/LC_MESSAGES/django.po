@@ -1,21 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Alireza Savand <alireza.savand@gmail.com>, 2012.
+# cafe-click <cafeclick@rocketmail.com>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-06 11:49+0200\n"
-"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2013-04-09 09:51+0200\n"
+"PO-Revision-Date: 2013-04-06 11:16+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fa\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -112,7 +113,7 @@ msgstr "زبان جاری فیلدهای محتوا."
 
 #: admin/forms.py:113
 msgid "Another page with this slug already exists"
-msgstr "صفحه-ای با همین نشانک موجود است."
+msgstr "صفحه دیگری با همین نشانک موجود است."
 
 #: admin/forms.py:151
 msgid "Menu Title"
@@ -120,23 +121,24 @@ msgstr "عنوان منو"
 
 #: admin/forms.py:152
 msgid "Overwrite what is displayed in the menu"
-msgstr "جاینوشت در منوی نمایش داده شده"
+msgstr "بازنویسی در منوی نمایش داده شده"
 
 #: admin/forms.py:153
 msgid "Page Title"
 msgstr "عنوان صفحه"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr " عنوان مرورگر یا بوک مارک ها جاینوشت می-شوند"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr " عنوان مرورگر یا بوک مارک ها بازنویسی می شوند."
 
 #: admin/forms.py:155
 msgid "Application"
-msgstr "نرم-افزار"
+msgstr "برنامه کاربردی"
 
 #: admin/forms.py:157
 msgid "Hook application to this page."
-msgstr "اتصال نرم-افزار به این صفحه"
+msgstr "اتصال برنامه کاربردی به این صفحه"
 
 #: admin/forms.py:158
 msgid "Overwrite URL"
@@ -160,9 +162,7 @@ msgstr "شرح صفحه که توسط موتورهای جستجو استفاده
 
 #: admin/forms.py:166
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"لیست کلمات کلیدی با ویرگول از هم جداشده که توسط موتورهای جستجو استفاده می "
-"شود."
+msgstr "لیست کلمات کلیدی با ویرگول از هم جداشده که توسط موتورهای جستجو استفاده می شود."
 
 #: admin/forms.py:182
 msgid "A page with this reverse URL id exists already."
@@ -176,15 +176,11 @@ msgstr "کاربر"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-" اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات "
-"فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن "
-"را نخواهد داشت."
+msgstr " اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن را نخواهد داشت."
 
 #: admin/forms.py:229
 msgid "Add page permission also requires edit page permission."
-msgstr ""
-"اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را دارد."
+msgstr "اجازه دسترسی به اضافه کردن صفحه همچنین نیاز به اجازه ویرایش صفحه را دارد."
 
 #: admin/forms.py:256
 msgid "can_view"
@@ -223,9 +219,7 @@ msgstr "هشدار به کاربر"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع کن. نیاز "
-"به ایمیل کاربر دارد."
+msgstr "از طریق ایمیل به کاربر در مورد نام کاربری یا تغییر رمز عبور را مطلع کن. نیاز به ایمیل کاربر دارد."
 
 #: admin/forms.py:326
 msgid "New password"
@@ -253,183 +247,169 @@ msgstr "اجازه ایجاد کاربران نیاز به اجازه تغییر
 msgid "To add permissions you also need to edit them!"
 msgstr "برای اضافه کردن دسترسی شما باید دسترسی ویرایش آنها را نیز داشته باشید."
 
-#: admin/pageadmin.py:102
+#: admin/pageadmin.py:103
 msgid "Basic Settings"
 msgstr "تنظیمات پایه"
 
-#: admin/pageadmin.py:105
+#: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"توجه: اگر انتخابتان را تغییر دهید، این صفحه بارگذاری مجدد می-شود. آن را "
-"ابتدا ذخیره کنید."
+msgstr "توجه: اگر انتخابتان را تغییر دهید، این صفحه بارگذاری مجدد می-شود. آن را ابتدا ذخیره کنید."
 
-#: admin/pageadmin.py:107 admin/pageadmin.py:158
+#: admin/pageadmin.py:108 admin/pageadmin.py:159
 msgid "Hidden"
 msgstr "پنهان"
 
-#: admin/pageadmin.py:111
+#: admin/pageadmin.py:112
 msgid "Advanced Settings"
 msgstr "تنظیمات پیشرفته"
 
-#: admin/pageadmin.py:118
+#: admin/pageadmin.py:119
 msgid "SEO Settings"
 msgstr "تنظیمات جستجوگرها"
 
-#: admin/pageadmin.py:637
-#, fuzzy
+#: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
-msgstr "شما اجازه ویرایش این صفحه را ندارید."
+msgstr "شما فاقد مجوز لازم برای تغییر صفحات می باشید."
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:650
 msgid "Database error"
 msgstr "خطای پایگاه داده"
 
-#: admin/pageadmin.py:742
-#, fuzzy
+#: admin/pageadmin.py:743
 msgid "You do not have permission to change the template"
-msgstr "شما اجازه ویرایش این صفحه را ندارید."
+msgstr "شما فاقد مجوز لازم برای تغییر قالب می باشید."
 
-#: admin/pageadmin.py:746
-#, fuzzy
+#: admin/pageadmin.py:747
 msgid "Template not valid"
-msgstr "الگو"
+msgstr "قالب معتبر نمی باشد."
 
-#: admin/pageadmin.py:751
-#, fuzzy, python-format
+#: admin/pageadmin.py:752
+#, python-format
 msgid "Template changed to %s"
-msgstr "آخرین تغییرات"
+msgstr ""
 
-#: admin/pageadmin.py:753
-#, fuzzy
+#: admin/pageadmin.py:754
 msgid "The template was successfully changed"
-msgstr "صفحه با موفقیت به تصویب رسید."
+msgstr "قالب با موفقیت تغییر یافت"
 
-#: admin/pageadmin.py:775
+#: admin/pageadmin.py:776
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:779
-#, fuzzy
+#: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr "می-تواند جابجا کند"
+msgstr ""
 
-#: admin/pageadmin.py:865 admin/pageadmin.py:1053
+#: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
 msgstr "شما اجازه انجام این کار به انتشار این صفحه را ندارید"
 
-#: admin/pageadmin.py:867
-#, fuzzy, python-format
+#: admin/pageadmin.py:868
+#, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr "صفحه با موفقیت به تصویب رسید."
+msgstr "صفحه \"%s\" با موفقیت منتشر گردید."
 
-#: admin/pageadmin.py:909 admin/pageadmin.py:945 admin/pageadmin.py:1176
-#: admin/pageadmin.py:1208 admin/pageadmin.py:1340 admin/pageadmin.py:1372
+#: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
 msgid "You do not have permission to change this page"
 msgstr "شما اجازه ویرایش این صفحه را ندارید."
 
-#: admin/pageadmin.py:913
-#, fuzzy, python-format
+#: admin/pageadmin.py:914
+#, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr "صفحه با موفقیت به تصویب رسید."
+msgstr ""
 
-#: admin/pageadmin.py:949
+#: admin/pageadmin.py:950
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "شی %(name)s با کلید اصلی %(key)r موجود نیست."
 
-#: admin/pageadmin.py:955
+#: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
 msgstr "تنها یک ترجمه برای این صفحه موجود است."
 
-#: admin/pageadmin.py:984
+#: admin/pageadmin.py:985
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "عنوان و افزونه-ها به زبان %(language)s حذف شدند."
 
-#: admin/pageadmin.py:1006
+#: admin/pageadmin.py:1007
 msgid "Are you sure?"
 msgstr "آیا مطمئن هستید؟"
 
-#: admin/pageadmin.py:1062
-#, fuzzy, python-format
+#: admin/pageadmin.py:1063
+#, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr "صفحه با موفقیت به تصویب رسید."
+msgstr ""
 
-#: admin/pageadmin.py:1064
-#, fuzzy, python-format
+#: admin/pageadmin.py:1065
+#, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr "صفحه با موفقیت به تصویب رسید."
+msgstr ""
 
-#: admin/pageadmin.py:1082
+#: admin/pageadmin.py:1083
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "شما اجازه  تغییر وضعیت in_navigation این صفحه را ندارید"
 
-#: admin/pageadmin.py:1106
-#, fuzzy
+#: admin/pageadmin.py:1108
 msgid "You do not have permission to add a plugin"
-msgstr "شما اجازه ویرایش این صفحه را ندارید."
+msgstr ""
 
-#: admin/pageadmin.py:1147 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1149 admin/pageadmin.py:1180
 msgid "Language must be set to a supported language!"
 msgstr "یکی از زبانهای پشتیبانی شده را انتخاب کنید."
 
-#: admin/pageadmin.py:1158
+#: admin/pageadmin.py:1160
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "افزونه %(plugin_name)s به %(placeholder)s اضافه شد."
 
-#: admin/pageadmin.py:1180
+#: admin/pageadmin.py:1182
 msgid "Language must be different than the copied language!"
 msgstr "زبان انتخابی باید غیر از زبان کپی شده باشد."
 
-#: admin/pageadmin.py:1186
+#: admin/pageadmin.py:1188
 msgid "You do not have permission to add plugins"
-msgstr ""
+msgstr "شما فاقد مجوز لازم برای افزودن پلاگین ها می باشید."
 
-#: admin/pageadmin.py:1191
+#: admin/pageadmin.py:1193
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr "افزونه-های زبان(های) %(language)s به %(placeholder)s کپی شد."
 
-#: admin/pageadmin.py:1240
+#: admin/pageadmin.py:1243
 msgid "This plugin is not saved in a revision"
 msgstr ""
 
-#: admin/pageadmin.py:1243 admin/pageadmin.py:1336
-#, fuzzy
+#: admin/pageadmin.py:1246 admin/pageadmin.py:1340
 msgid "You do not have permission to edit a plugin"
-msgstr "شما اجازه ویرایش این صفحه را ندارید."
+msgstr "شما فاقد مجوز لازم برای ویرایش پلاگین می باشید"
 
-#: admin/pageadmin.py:1303
+#: admin/pageadmin.py:1306
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s تغییر کرد."
+msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s تغییر کرد."
 
-#: admin/pageadmin.py:1367
-#, fuzzy
+#: admin/pageadmin.py:1371
 msgid "You do not have permission to move a plugin"
-msgstr "شما اجازه ویرایش این صفحه را ندارید."
+msgstr ""
 
-#: admin/pageadmin.py:1386
-#, fuzzy
+#: admin/pageadmin.py:1390
 msgid "Plugins were moved"
-msgstr "افزونه-ها حذف شدند."
+msgstr ""
 
-#: admin/pageadmin.py:1398 admin/pageadmin.py:1407
-#, fuzzy
+#: admin/pageadmin.py:1403 admin/pageadmin.py:1412
 msgid "You do not have permission to remove a plugin"
-msgstr "شما اجازه ویرایش این صفحه را ندارید."
+msgstr ""
 
-#: admin/pageadmin.py:1417 admin/placeholderadmin.py:308
+#: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
-"افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s حذف شد."
+msgstr "افزونه %(plugin_name)s در موقعیت %(position)s در %(placeholder)s حذف شد."
 
 #: admin/permissionadmin.py:75
 msgid "View restriction"
@@ -451,17 +431,17 @@ msgstr "اختیارات کاربر و گروه"
 msgid "Page permissions management"
 msgstr "مدیریت اختیارات صفحه"
 
-#: admin/placeholderadmin.py:153 admin/placeholderadmin.py:178
+#: admin/placeholderadmin.py:190 admin/placeholderadmin.py:216
 msgid "You don't have permission to add content here."
-msgstr ""
+msgstr "شما فاقد مجوز لازم برای افزودن محتوا در اینجا می باشید."
 
-#: admin/placeholderadmin.py:174
+#: admin/placeholderadmin.py:212
 msgid "You don't have permission to add plugins"
-msgstr ""
+msgstr "شما فاقد مجوز لازم برای افزودن پلاگین ها می باشید."
 
-#: admin/placeholderadmin.py:304
+#: admin/placeholderadmin.py:344
 msgid "You don't have permission to delete a plugin"
-msgstr ""
+msgstr "شما فاقد مجوز لازم برای حذف پلاگین می باشید."
 
 #: admin/useradmin.py:26
 msgid "User details"
@@ -481,13 +461,13 @@ msgstr "اختیارات کپی"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "یک سایت معتبر انتخاب کنید."
 
 #: forms/fields.py:20
 msgid "Select a valid page"
 msgstr "یک صفحه معتبر انتخاب کنید"
 
-#: forms/widgets.py:174
+#: forms/widgets.py:176
 msgid "Add Another"
 msgstr "اضافه کردن یکی دیگر"
 
@@ -531,8 +511,7 @@ msgstr "تاریخ انتشار"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
-"زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ دهد."
+msgstr "زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ دهد."
 
 #: models/pagemodel.py:53
 msgid "publication end date"
@@ -562,9 +541,7 @@ msgstr "شناسه"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
-"شناسه-ی بکتایی که برای تگ الگوی page_url برای آدرس به این صفحه استفاده می-"
-"شود."
+msgstr "شناسه-ی بکتایی که برای تگ الگوی page_url برای آدرس به این صفحه استفاده می-شود."
 
 #: models/pagemodel.py:61
 msgid "attached menu"
@@ -695,9 +672,7 @@ msgstr "می-تواند هر صفحه پاک-شده را بازیابی کند"
 
 #: models/permissionmodels.py:74
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-"اگر انتخابی صورت نگیرد، کاربر در تمام وبگاه-ها، اختیارات داده-شده را خواهد "
-"داشت."
+msgstr "اگر انتخابی صورت نگیرد، کاربر در تمام وبگاه-ها، اختیارات داده-شده را خواهد داشت."
 
 #: models/permissionmodels.py:74
 msgid "sites"
@@ -848,12 +823,12 @@ msgstr "ارتفاع"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
+msgstr "پلاگین فلش موجود نیست. لطفا فلش پلیر را دانلود نمایید."
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
 msgid "Get Adobe Flash Player"
-msgstr ""
+msgstr "دریافت فلش پلیر"
 
 #: plugins/googlemap/cms_plugins.py:10
 msgid "Google Map"
@@ -865,11 +840,11 @@ msgstr ""
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
-msgstr ""
+msgstr "باید یک عدد صحیح مثبت و به دنبال آن \"px\" یا \"%\" باشد."
 
 #: plugins/googlemap/forms.py:26
 msgid "Must be a positive integer followed by “px”."
-msgstr ""
+msgstr "باید یک عدد صحیح مثبت و به دنبال آن \"px\" باشد."
 
 #: plugins/googlemap/models.py:10
 msgid "map title"
@@ -925,11 +900,11 @@ msgstr "برنامه‌ریز مسیر"
 
 #: plugins/googlemap/models.py:37
 msgid "Plugin width (in pixels or percent)."
-msgstr ""
+msgstr "عرض پلاگین (برحسب پیکسل یا درصد)"
 
 #: plugins/googlemap/models.py:39
 msgid "Plugin height (in pixels)."
-msgstr ""
+msgstr "ارتفاع پلاگین (برحسب پیکسل)"
 
 #: plugins/googlemap/models.py:47
 msgid "Map"
@@ -955,9 +930,7 @@ msgstr "زبان صفحه باید مشخص شود."
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
-"صفحه‌ای را برای دربرداشتن افزونه‌هایش در این placeholder انتخاب کنید. در صورت "
-"عدم انتخاب صفحه جاری انتخاب می‌شود."
+msgstr "صفحه‌ای را برای دربرداشتن افزونه‌هایش در این placeholder انتخاب کنید. در صورت عدم انتخاب صفحه جاری انتخاب می‌شود."
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -994,19 +967,19 @@ msgstr ""
 
 #: plugins/link/models.py:15
 msgid "same window"
-msgstr ""
+msgstr "همان پنجره"
 
 #: plugins/link/models.py:16
 msgid "new window"
-msgstr ""
+msgstr "پنجره جدید"
 
 #: plugins/link/models.py:17
 msgid "parent window"
-msgstr ""
+msgstr "پنجره والد"
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
-msgstr ""
+msgstr "بالاترین فریم"
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
@@ -1030,12 +1003,12 @@ msgid "image"
 msgstr "تصویر"
 
 #: plugins/picture/models.py:22
-#, fuzzy
 msgid "If present, clicking on image will take user to link."
-msgstr "اگر تصویر حاضر قابل کلیک‌کردن باشد."
+msgstr ""
 
 #: plugins/picture/models.py:24
-msgid "If present, clicking on image will take user         to specified page."
+msgid ""
+"If present, clicking on image will take user         to specified page."
 msgstr ""
 
 #: plugins/picture/models.py:26
@@ -1045,7 +1018,8 @@ msgstr "متن جایگزین"
 #: plugins/picture/models.py:27
 msgid ""
 "Specifies an alternate text for an image, if         the image cannot be "
-"displayed.<br />Is also used by search engines to         classify the image."
+"displayed.<br />Is also used by search engines to         classify the "
+"image."
 msgstr ""
 
 #: plugins/picture/models.py:30
@@ -1063,7 +1037,7 @@ msgstr "کنار"
 
 #: plugins/picture/models.py:34
 msgid "Move image left, right or center."
-msgstr ""
+msgstr "جابجایی تصویر به چپ، راست یا مرکز."
 
 #: plugins/picture/models.py:51
 msgid "You can enter a Link or a Page, but not both."
@@ -1190,9 +1164,7 @@ msgstr "راهنمایی پیوند"
 
 #: plugins/twitter/models.py:9
 msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-"در صورت مشخص کردن راهنمایی به عنوان پیوند به صفحه شخصی شما در توییتر نمایش "
-"داده می‌شود."
+msgstr "در صورت مشخص کردن راهنمایی به عنوان پیوند به صفحه شخصی شما در توییتر نمایش داده می‌شود."
 
 #: plugins/twitter/models.py:16
 msgid "query"
@@ -1215,7 +1187,7 @@ msgstr "ما"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
 msgid "we were"
-msgstr ""
+msgstr "آدرس ویدئو در یوتیوب یا ویمئو. مثال: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
 msgid "we replied to"
@@ -1227,7 +1199,7 @@ msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
 msgid "loading tweets..."
-msgstr ""
+msgstr "در حال بارگذاری توئیت ها..."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1251,8 +1223,8 @@ msgstr "آدرس اینترنتی ویدیو"
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1343,9 +1315,7 @@ msgstr "ذخیره و ادامه ویرایش"
 #, python-format
 msgid ""
 "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-"صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز به تایید شما داشته "
-"باشد."
+msgstr "صفحه <a href=\"%(admin_url)s\">%(page)s</a> ممکن است نیاز به تایید شما داشته باشد."
 
 #: templates/admin/cms/mail/approvement_required.html:8
 #: templates/admin/cms/mail/approvement_required.txt:7
@@ -1387,14 +1357,12 @@ msgid "Home"
 msgstr "آغازه"
 
 #: templates/admin/cms/page/change_form.html:83
-#, fuzzy
 msgid "Publish draft"
-msgstr "انتشار"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:84
-#, fuzzy
 msgid "Preview draft"
-msgstr "پیش‌نمایش"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
@@ -1413,7 +1381,7 @@ msgstr "مشاهده روی وب‌گاه"
 #: templates/admin/cms/page/plugin_change_form.html:90
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
+msgstr[0] "لطفا خطاهای زیر را تصحیح کنید."
 
 #: templates/admin/cms/page/change_form.html:138
 msgid "All permissions"
@@ -1654,7 +1622,7 @@ msgstr "نمی‌توان نگارش قدیمی یک افزونه را ذخیر�
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Your changes to this plugin have not been saved."
-msgstr ""
+msgstr "تغییرات انجام شده روی پلاگین، ذخیره نخواهد شد."
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1735,9 +1703,8 @@ msgid "down"
 msgstr "پایین"
 
 #: templates/cms/toolbar/toolbar.html:70
-#, fuzzy
 msgid "Add child plugin"
-msgstr "صفحه‌ی فرزند اضافه‌کن"
+msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:73
 msgid "Move to placeholder"
@@ -1769,53 +1736,52 @@ msgstr "صغحه پیدا نشد روی %(domain)s"
 #: templatetags/cms_tags.py:86
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:105 test_utils/cli.py:115
+#: test_utils/cli.py:106 test_utils/cli.py:116
 msgid "English"
-msgstr ""
+msgstr "انگلیسی"
 
-#: test_utils/cli.py:106 test_utils/cli.py:127 test_utils/cli.py:145
+#: test_utils/cli.py:107 test_utils/cli.py:128 test_utils/cli.py:146
 msgid "French"
-msgstr ""
+msgstr "فرانسوی"
 
-#: test_utils/cli.py:107 test_utils/cli.py:121 test_utils/cli.py:139
-#: test_utils/cli.py:158
+#: test_utils/cli.py:108 test_utils/cli.py:122 test_utils/cli.py:140
+#: test_utils/cli.py:159
 msgid "German"
-msgstr ""
+msgstr "آلمانی"
 
-#: test_utils/cli.py:108 test_utils/cli.py:132
+#: test_utils/cli.py:109 test_utils/cli.py:133
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:109 test_utils/cli.py:152
+#: test_utils/cli.py:110 test_utils/cli.py:153
 msgid "Dutch"
-msgstr ""
-
-#: test_utils/cli.py:168
-msgid "two columns"
-msgstr ""
+msgstr "هلندی"
 
 #: test_utils/cli.py:169
-msgid "three columns"
-msgstr ""
+msgid "two columns"
+msgstr "دو ستون"
 
 #: test_utils/cli.py:170
+msgid "three columns"
+msgstr "سه ستون"
+
+#: test_utils/cli.py:171
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:176
+#: test_utils/cli.py:177
 msgid "sidebar column"
 msgstr "رنگ زمینه seekbar"
 
-#: test_utils/cli.py:182
+#: test_utils/cli.py:183
 msgid "left column"
 msgstr "رنگ زمینه seekbar"
 
-#: test_utils/cli.py:188
+#: test_utils/cli.py:189
 msgid "right column"
 msgstr "رنگ زمینه seekbar"
 
@@ -1829,7 +1795,7 @@ msgstr ""
 
 #: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "مقالات"
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
@@ -1861,16 +1827,15 @@ msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:31
 msgid "Static Menu"
-msgstr ""
+msgstr "منوی ایستا"
 
 #: test_utils/project/sampleapp/menu.py:47
 msgid "Static Menu2"
-msgstr ""
+msgstr "منوی ایستا 2"
 
 #: test_utils/project/sampleapp/urls.py:12
-#, fuzzy
 msgid "^account/$"
-msgstr "تعداد"
+msgstr ""
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"
@@ -1893,163 +1858,33 @@ msgstr "آدرس نامعتبر، از الگوی /my/url استفاده کنی�
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 
-#, fuzzy
-#~ msgid "The page \"%s\" was successfully deleted."
-#~ msgstr "صفحه با موفقیت به تصویب رسید."
-
-#, fuzzy
-#~ msgid "You do not have permission to delete this page"
-#~ msgstr "شما اجازه ویرایش این صفحه را ندارید."
-
 #~ msgid "delete req."
-#~ msgstr "نیاز به حذف"
+#~ msgstr "deletion request"
 
 #~ msgid "move req."
-#~ msgstr "نیاز به جابجایی"
-
-#~ msgid "moderator state"
-#~ msgstr "نظارت وضعیت"
-
-#, fuzzy
-#~ msgid "Confirm page deletion"
-#~ msgstr "تایید حذف صفحه"
-
-#~ msgid "Remove delete request"
-#~ msgstr "حذف درخواست حذف"
-
-#, fuzzy
-#~ msgid "Confirm delete"
-#~ msgstr "می‌تواند پاک کند"
-
-#~ msgid "draft"
-#~ msgstr "پیش‌نویس"
-
-#~ msgid "Request Approval"
-#~ msgstr "موافقت با درخواست"
-
-#~ msgid "higher"
-#~ msgstr "بالاتر"
-
-#~ msgid "Copy moderation"
-#~ msgstr "بازرسی کپی"
-
-#~ msgid "path"
-#~ msgstr "آدرس"
-
-#~ msgid "everybody"
-#~ msgstr "همه"
-
-#~ msgid "type"
-#~ msgstr "نوع"
-
-#~ msgid "can change soft-root"
-#~ msgstr "می-تواند ریشه نرم را تغییر دهد"
-
-#~ msgid "status"
-#~ msgstr "وضعیت"
-
-#~ msgid "navigation extenders"
-#~ msgstr "توسعه-دهندگان گردش"
+#~ msgstr "move request"
 
 #~ msgid "url overwrite"
-#~ msgstr "بازنویسی آدرس"
-
-#~ msgid "author"
-#~ msgstr "نویسنده"
-
-#~ msgid "reverse url id"
-#~ msgstr "شناسه آدرس معکوس"
-
-#~ msgid "Moderate page"
-#~ msgstr "نظارت صفحه"
-
-#~ msgid "Moderate children"
-#~ msgstr "نظارت فرزندان"
-
-#~ msgid "Moderate descendants"
-#~ msgstr "نظارت نوادگان"
-
-#~ msgid "PageModerator"
-#~ msgstr "ناظر صفحه"
-
-#~ msgid "publish req."
-#~ msgstr "نیاز به انتشار"
+#~ msgstr "URL overwrite"
 
 #~ msgid "unpublish req."
-#~ msgstr "نیاز به پایان انتشار"
-
-#~ msgid "approved"
-#~ msgstr "تاییدشده"
+#~ msgstr "unpublish request"
 
 #~ msgid "req. app."
-#~ msgstr "نرم-افزار مورد نیاز"
-
-#~ msgid "app. par."
-#~ msgstr "قسمت نرم-افزار"
-
-#~ msgid "can moderate"
-#~ msgstr "می-تواند نظارت کند"
-
-#~ msgid "if present image will be clickable"
-#~ msgstr "اگر تصویر موجود قابل کلیک‌کردن باشد"
-
-#~ msgid "textual description of the image"
-#~ msgstr "توصیف متنی تصویر"
-
-#~ msgid "additional description of the image"
-#~ msgstr "توصیف تکمیلی تصویر"
+#~ msgstr "approval required"
 
 #~ msgid "(requires approvement at %(moderation_level)s level)"
-#~ msgstr "(نیاز به تایید در سطح %(moderation_level)s)"
-
-#~ msgid "(you can perform actions on this page directly)"
-#~ msgstr ")شما می‌توانید به طور مستقیم روی این صفحه کار انجام دهید("
-
-#~ msgid "Approve delete"
-#~ msgstr "تایید حذف"
-
-#~ msgid "Approve"
-#~ msgstr "تایید"
-
-#~ msgid ""
-#~ "This page must be moderated at level %(moderation_level)s, post a message "
-#~ "for moderator."
-#~ msgstr ""
-#~ "این صفحه باید در سطح %(moderation_level)s نظارت شود، پیامی برای ناظر آن "
-#~ "بفرستید."
+#~ msgstr "(requires approval at %(moderation_level)s level)"
 
 #~ msgid "Request approvemet"
-#~ msgstr "درخواست تایید"
-
-#~ msgid "moderate"
-#~ msgstr "نظارت"
-
-#~ msgid "Approve directly"
-#~ msgstr "مستقیما تأیید کن"
-
-#~ msgid "Status"
-#~ msgstr "وضعیت"
-
-#~ msgid "Unbind page moderation"
-#~ msgstr "نظارت صفحه را لغو کن"
-
-#~ msgid "Unbind children moderation"
-#~ msgstr "نظارت فرزندان را لغو کن"
-
-#~ msgid "Unbind descendants moderation"
-#~ msgstr "نظارت نوادگان را لغو کن"
-
-#~ msgid "parent first"
-#~ msgstr "ابتدا پدر"
-
-#~ msgid "approve"
-#~ msgstr "تأیید کردن"
+#~ msgstr "Request approval"
 
 #~ msgid "CMS - Page %s requires approvement."
-#~ msgstr "CMS - صفحه %s نیاز به تأیید دارد."
+#~ msgstr "CMS - Page %s requires approval."
 
 #~ msgid "move"
 #~ msgstr "move request"

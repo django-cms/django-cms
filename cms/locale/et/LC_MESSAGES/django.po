@@ -1,21 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Martin  <martinpajuste@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-06 11:49+0200\n"
-"PO-Revision-Date: 2012-12-26 19:42+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2013-04-09 09:51+0200\n"
+"PO-Revision-Date: 2013-04-06 11:16+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
@@ -127,7 +127,8 @@ msgid "Page Title"
 msgstr "Lehekülje pealkiri"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Kirjuta üle veebilehitseja ülaosas või järjehoidjas kuvatav"
 
 #: admin/forms.py:155
@@ -160,9 +161,7 @@ msgstr "Lehekülje kirjeldus mida mõnikord kasutavad otsingumootorid."
 
 #: admin/forms.py:166
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"Komade eraldatud nimekiri märksõnadest mida mõnikord kasutavad "
-"otsingumootorid."
+msgstr "Komade eraldatud nimekiri märksõnadest mida mõnikord kasutavad otsingumootorid."
 
 #: admin/forms.py:182
 msgid "A page with this reverse URL id exists already."
@@ -176,9 +175,7 @@ msgstr "kasutaja"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Õigus lehekülge lisada nõuab ka ligipääsu alamlehekülgede, vastasel juhul ei "
-"saa lehekülje looja lisatud lehekülge muuta."
+msgstr "Õigus lehekülge lisada nõuab ka ligipääsu alamlehekülgede, vastasel juhul ei saa lehekülje looja lisatud lehekülge muuta."
 
 #: admin/forms.py:229
 msgid "Add page permission also requires edit page permission."
@@ -221,9 +218,7 @@ msgstr "Teavita kasutajat"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Saada kasutajale märguanne kasutajanime või parooli muutusest. Vajab "
-"kasutaja e-posti aadressi. "
+msgstr "Saada kasutajale märguanne kasutajanime või parooli muutusest. Vajab kasutaja e-posti aadressi. "
 
 #: admin/forms.py:326
 msgid "New password"
@@ -251,173 +246,164 @@ msgstr "Õigus lisada uusi kasutajaid nõuab õigust kasutajaid muuta!"
 msgid "To add permissions you also need to edit them!"
 msgstr "Õiguste lisamiseks pead sa neid ka muutma!"
 
-#: admin/pageadmin.py:102
+#: admin/pageadmin.py:103
 msgid "Basic Settings"
 msgstr "Põhiseadistused"
 
-#: admin/pageadmin.py:105
+#: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Tähelepanu: Valiku muutmisel lehekülg laeb ennast uuesti. Salvesta enne."
+msgstr "Tähelepanu: Valiku muutmisel lehekülg laeb ennast uuesti. Salvesta enne."
 
-#: admin/pageadmin.py:107 admin/pageadmin.py:158
+#: admin/pageadmin.py:108 admin/pageadmin.py:159
 msgid "Hidden"
 msgstr "Peidetud"
 
-#: admin/pageadmin.py:111
+#: admin/pageadmin.py:112
 msgid "Advanced Settings"
 msgstr "Muud seadistused"
 
-#: admin/pageadmin.py:118
+#: admin/pageadmin.py:119
 msgid "SEO Settings"
 msgstr "Otsingumootoritele suunatud seadistused"
 
-#: admin/pageadmin.py:637
-#, fuzzy
+#: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
-msgstr "Puuduvad õigused malli muutmiseks"
+msgstr ""
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:650
 msgid "Database error"
 msgstr "Andmebaasi viga"
 
-#: admin/pageadmin.py:742
-#, fuzzy
+#: admin/pageadmin.py:743
 msgid "You do not have permission to change the template"
-msgstr "Puuduvad õigused malli muutmiseks"
+msgstr ""
 
-#: admin/pageadmin.py:746
+#: admin/pageadmin.py:747
 msgid "Template not valid"
 msgstr ""
 
-#: admin/pageadmin.py:751
-#, fuzzy, python-format
+#: admin/pageadmin.py:752
+#, python-format
 msgid "Template changed to %s"
-msgstr "viimased muudatused"
+msgstr ""
 
-#: admin/pageadmin.py:753
-#, fuzzy
+#: admin/pageadmin.py:754
 msgid "The template was successfully changed"
-msgstr "Leheküljele heakskiit antud."
+msgstr ""
 
-#: admin/pageadmin.py:775
+#: admin/pageadmin.py:776
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:779
-#, fuzzy
+#: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr "Lehekülje pealkiri"
+msgstr ""
 
-#: admin/pageadmin.py:865 admin/pageadmin.py:1053
+#: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
 msgstr ""
 
-#: admin/pageadmin.py:867
-#, fuzzy, python-format
+#: admin/pageadmin.py:868
+#, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr "Leheküljele heakskiit antud."
+msgstr ""
 
-#: admin/pageadmin.py:909 admin/pageadmin.py:945 admin/pageadmin.py:1176
-#: admin/pageadmin.py:1208 admin/pageadmin.py:1340 admin/pageadmin.py:1372
+#: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
 msgid "You do not have permission to change this page"
 msgstr ""
 
-#: admin/pageadmin.py:913
-#, fuzzy, python-format
+#: admin/pageadmin.py:914
+#, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr "Leheküljele heakskiit antud."
+msgstr ""
 
-#: admin/pageadmin.py:949
+#: admin/pageadmin.py:950
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekti %(name)s primaarvõtmega %(key)r ei ole olemas."
 
-#: admin/pageadmin.py:955
+#: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
 msgstr "Sellel leheküljel on ainult üks tõlge."
 
-#: admin/pageadmin.py:984
+#: admin/pageadmin.py:985
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Pealkiri ja pluginad %(language)s keeles kustutatud"
 
-#: admin/pageadmin.py:1006
+#: admin/pageadmin.py:1007
 msgid "Are you sure?"
 msgstr "Kas oled kindel?"
 
-#: admin/pageadmin.py:1062
-#, fuzzy, python-format
+#: admin/pageadmin.py:1063
+#, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr "Leheküljele heakskiit antud."
+msgstr ""
 
-#: admin/pageadmin.py:1064
-#, fuzzy, python-format
+#: admin/pageadmin.py:1065
+#, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr "Leheküljele heakskiit antud."
+msgstr ""
 
-#: admin/pageadmin.py:1082
+#: admin/pageadmin.py:1083
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 
-#: admin/pageadmin.py:1106
-#, fuzzy
+#: admin/pageadmin.py:1108
 msgid "You do not have permission to add a plugin"
-msgstr "Puuduvad õigused malli muutmiseks"
+msgstr ""
 
-#: admin/pageadmin.py:1147 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1149 admin/pageadmin.py:1180
 msgid "Language must be set to a supported language!"
 msgstr ""
 
-#: admin/pageadmin.py:1158
+#: admin/pageadmin.py:1160
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1180
+#: admin/pageadmin.py:1182
 msgid "Language must be different than the copied language!"
 msgstr ""
 
-#: admin/pageadmin.py:1186
+#: admin/pageadmin.py:1188
 msgid "You do not have permission to add plugins"
 msgstr ""
 
-#: admin/pageadmin.py:1191
+#: admin/pageadmin.py:1193
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1240
+#: admin/pageadmin.py:1243
 msgid "This plugin is not saved in a revision"
 msgstr ""
 
-#: admin/pageadmin.py:1243 admin/pageadmin.py:1336
-#, fuzzy
+#: admin/pageadmin.py:1246 admin/pageadmin.py:1340
 msgid "You do not have permission to edit a plugin"
-msgstr "Puuduvad õigused malli muutmiseks"
+msgstr ""
 
-#: admin/pageadmin.py:1303
+#: admin/pageadmin.py:1306
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1367
-#, fuzzy
+#: admin/pageadmin.py:1371
 msgid "You do not have permission to move a plugin"
-msgstr "Puuduvad õigused malli muutmiseks"
+msgstr ""
 
-#: admin/pageadmin.py:1386
+#: admin/pageadmin.py:1390
 msgid "Plugins were moved"
 msgstr ""
 
-#: admin/pageadmin.py:1398 admin/pageadmin.py:1407
-#, fuzzy
+#: admin/pageadmin.py:1403 admin/pageadmin.py:1412
 msgid "You do not have permission to remove a plugin"
-msgstr "Puuduvad õigused malli muutmiseks"
+msgstr ""
 
-#: admin/pageadmin.py:1417 admin/placeholderadmin.py:308
+#: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -444,15 +430,15 @@ msgstr ""
 msgid "Page permissions management"
 msgstr ""
 
-#: admin/placeholderadmin.py:153 admin/placeholderadmin.py:178
+#: admin/placeholderadmin.py:190 admin/placeholderadmin.py:216
 msgid "You don't have permission to add content here."
 msgstr ""
 
-#: admin/placeholderadmin.py:174
+#: admin/placeholderadmin.py:212
 msgid "You don't have permission to add plugins"
 msgstr ""
 
-#: admin/placeholderadmin.py:304
+#: admin/placeholderadmin.py:344
 msgid "You don't have permission to delete a plugin"
 msgstr ""
 
@@ -480,7 +466,7 @@ msgstr ""
 msgid "Select a valid page"
 msgstr ""
 
-#: forms/widgets.py:174
+#: forms/widgets.py:176
 msgid "Add Another"
 msgstr ""
 
@@ -1020,7 +1006,8 @@ msgid "If present, clicking on image will take user to link."
 msgstr ""
 
 #: plugins/picture/models.py:24
-msgid "If present, clicking on image will take user         to specified page."
+msgid ""
+"If present, clicking on image will take user         to specified page."
 msgstr ""
 
 #: plugins/picture/models.py:26
@@ -1030,7 +1017,8 @@ msgstr ""
 #: plugins/picture/models.py:27
 msgid ""
 "Specifies an alternate text for an image, if         the image cannot be "
-"displayed.<br />Is also used by search engines to         classify the image."
+"displayed.<br />Is also used by search engines to         classify the "
+"image."
 msgstr ""
 
 #: plugins/picture/models.py:30
@@ -1234,8 +1222,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1372,9 +1360,8 @@ msgid "Publish draft"
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:84
-#, fuzzy
 msgid "Preview draft"
-msgstr "Eelvaade"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
@@ -1749,53 +1736,52 @@ msgstr ""
 #: templatetags/cms_tags.py:86
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:105 test_utils/cli.py:115
+#: test_utils/cli.py:106 test_utils/cli.py:116
 msgid "English"
 msgstr ""
 
-#: test_utils/cli.py:106 test_utils/cli.py:127 test_utils/cli.py:145
+#: test_utils/cli.py:107 test_utils/cli.py:128 test_utils/cli.py:146
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:107 test_utils/cli.py:121 test_utils/cli.py:139
-#: test_utils/cli.py:158
+#: test_utils/cli.py:108 test_utils/cli.py:122 test_utils/cli.py:140
+#: test_utils/cli.py:159
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:108 test_utils/cli.py:132
+#: test_utils/cli.py:109 test_utils/cli.py:133
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:109 test_utils/cli.py:152
+#: test_utils/cli.py:110 test_utils/cli.py:153
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:168
+#: test_utils/cli.py:169
 msgid "two columns"
 msgstr "kaks veergu"
 
-#: test_utils/cli.py:169
+#: test_utils/cli.py:170
 msgid "three columns"
 msgstr "kolm veergu"
 
-#: test_utils/cli.py:170
+#: test_utils/cli.py:171
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:176
+#: test_utils/cli.py:177
 msgid "sidebar column"
 msgstr "taustavärv"
 
-#: test_utils/cli.py:182
+#: test_utils/cli.py:183
 msgid "left column"
 msgstr "taustavärv"
 
-#: test_utils/cli.py:188
+#: test_utils/cli.py:189
 msgid "right column"
 msgstr "taustavärv"
 
@@ -1872,36 +1858,34 @@ msgstr "Vigane internetiaadress, kasuta formaati /minu/url ."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
-#~ msgid "The page \"%s\" was successfully deleted."
-#~ msgstr "Leheküljele heakskiit antud."
+#~ msgid "delete req."
+#~ msgstr "deletion request"
 
-#, fuzzy
-#~ msgid "You do not have permission to delete this page"
-#~ msgstr "Puuduvad õigused malli muutmiseks"
+#~ msgid "move req."
+#~ msgstr "move request"
 
-#, fuzzy
-#~ msgid "Confirm delete"
-#~ msgstr "Võib kustutada"
+#~ msgid "url overwrite"
+#~ msgstr "URL overwrite"
 
-#~ msgid "draft"
-#~ msgstr "mustand"
+#~ msgid "unpublish req."
+#~ msgstr "unpublish request"
 
-#~ msgid "higher"
-#~ msgstr "kõrgem"
+#~ msgid "req. app."
+#~ msgstr "approval required"
 
-#~ msgid "type"
-#~ msgstr "tüüp"
+#~ msgid "(requires approvement at %(moderation_level)s level)"
+#~ msgstr "(requires approval at %(moderation_level)s level)"
 
-#~ msgid "author"
-#~ msgstr "autor"
+#~ msgid "Request approvemet"
+#~ msgstr "Request approval"
 
-#~ msgid "textual description of the image"
-#~ msgstr "pildi tekstiline kirjeldus"
+#~ msgid "CMS - Page %s requires approvement."
+#~ msgstr "CMS - Page %s requires approval."
 
 #~ msgid "move"
 #~ msgstr "move request"

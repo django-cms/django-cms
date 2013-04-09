@@ -1,24 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Denis Darii <sinednx@gmail.com>, 2011.
 #   <ilie_lipan@yahoo.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-06 11:51+0200\n"
-"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2013-04-09 09:51+0200\n"
+"PO-Revision-Date: 2013-04-06 11:20+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
-"Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
-"2:1));\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 "X-Poedit-Country: SWITZERLAND\n"
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -129,10 +128,9 @@ msgid "Page Title"
 msgstr "Titlul paginii"
 
 #: admin/forms.py:154
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Înlocuește ceea ce este afişat în partea de sus a browser-ului sau în "
-"etichete"
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Înlocuește ceea ce este afişat în partea de sus a browser-ului sau în etichete"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -148,8 +146,7 @@ msgstr "Suprascrie URL"
 
 #: admin/forms.py:159
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
-"Păstraţi acest câmp gol dacă percursul standard ar trebui să fie utilizat."
+msgstr "Păstraţi acest câmp gol dacă percursul standard ar trebui să fie utilizat."
 
 #: admin/forms.py:161
 msgid "Redirect"
@@ -165,9 +162,7 @@ msgstr "O descriere a paginii uneori utilizată de către motoarele de căutare.
 
 #: admin/forms.py:166
 msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr ""
-"O listă de cuvinte cheie separate prin virgula uneori utilizate de către "
-"motoarele de căutare."
+msgstr "O listă de cuvinte cheie separate prin virgula uneori utilizate de către motoarele de căutare."
 
 #: admin/forms.py:182
 msgid "A page with this reverse URL id exists already."
@@ -181,16 +176,11 @@ msgstr "utilizator"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
-"Pentru a adauga permisie de pagină are nevoie să ai acces, de asemenea, la "
-"copiii sau descendenţii ei, altfel paginile adăugate nu vor putea fi "
-"schimbate de către creatorii lor."
+msgstr "Pentru a adauga permisie de pagină are nevoie să ai acces, de asemenea, la copiii sau descendenţii ei, altfel paginile adăugate nu vor putea fi schimbate de către creatorii lor."
 
 #: admin/forms.py:229
 msgid "Add page permission also requires edit page permission."
-msgstr ""
-"Permisiunea de a adauga pagina, de asemenea, are nevoie de permisiunea de a "
-"edita pagina."
+msgstr "Permisiunea de a adauga pagina, de asemenea, are nevoie de permisiunea de a edita pagina."
 
 #: admin/forms.py:256
 msgid "can_view"
@@ -229,9 +219,7 @@ msgstr "Anunță utilizatorul"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
-"Trimite utilizatorului notificare prin e-mail despre schimbarea numelui "
-"utilizator sau parolei. Se cere e-mail utilizator.  "
+msgstr "Trimite utilizatorului notificare prin e-mail despre schimbarea numelui utilizator sau parolei. Se cere e-mail utilizator.  "
 
 #: admin/forms.py:326
 msgid "New password"
@@ -248,190 +236,175 @@ msgstr "Notificarea prin email necesită adresa de e-mail validă."
 #: admin/forms.py:349
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
-"Permisiunea de a adauga noi pagini cere permisiunea de a efectua schimbari "
-"ale paginilor!"
+msgstr "Permisiunea de a adauga noi pagini cere permisiunea de a efectua schimbari ale paginilor!"
 
 #: admin/forms.py:351
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
-"Permisiunea de a adauga noi utilizatori cere permisiunea de a efectua "
-"schimbari ale utilizatorilor!"
+msgstr "Permisiunea de a adauga noi utilizatori cere permisiunea de a efectua schimbari ale utilizatorilor!"
 
 #: admin/forms.py:353
 msgid "To add permissions you also need to edit them!"
 msgstr "Penru a adauga permisiuni se cere perimisiunea de editare!"
 
-#: admin/pageadmin.py:102
+#: admin/pageadmin.py:103
 msgid "Basic Settings"
 msgstr "Setări de bază"
 
-#: admin/pageadmin.py:105
+#: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-"Nota: Aceasta pagine se reincarca daca schimbati selectia. Salvati-o mai "
-"intai."
+msgstr "Nota: Aceasta pagine se reincarca daca schimbati selectia. Salvati-o mai intai."
 
-#: admin/pageadmin.py:107 admin/pageadmin.py:158
+#: admin/pageadmin.py:108 admin/pageadmin.py:159
 msgid "Hidden"
 msgstr "Ascuns"
 
-#: admin/pageadmin.py:111
+#: admin/pageadmin.py:112
 msgid "Advanced Settings"
 msgstr "Setări avansate"
 
-#: admin/pageadmin.py:118
+#: admin/pageadmin.py:119
 msgid "SEO Settings"
 msgstr "Setări SEO"
 
-#: admin/pageadmin.py:637
-#, fuzzy
+#: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
-msgstr "Nu aveţi permisiunea de a publica această pagină"
+msgstr ""
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:650
 msgid "Database error"
 msgstr "Eroare bază de date"
 
-#: admin/pageadmin.py:742
-#, fuzzy
+#: admin/pageadmin.py:743
 msgid "You do not have permission to change the template"
-msgstr "Nu aveţi permisiunea de a publica această pagină"
+msgstr ""
 
-#: admin/pageadmin.py:746
+#: admin/pageadmin.py:747
 msgid "Template not valid"
 msgstr ""
 
-#: admin/pageadmin.py:751
+#: admin/pageadmin.py:752
 #, python-format
 msgid "Template changed to %s"
 msgstr ""
 
-#: admin/pageadmin.py:753
-#, fuzzy
+#: admin/pageadmin.py:754
 msgid "The template was successfully changed"
-msgstr "Pagina a fost aprobată cu succes."
+msgstr ""
 
-#: admin/pageadmin.py:775
+#: admin/pageadmin.py:776
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:779
-#, fuzzy
+#: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr "poate mișca"
+msgstr ""
 
-#: admin/pageadmin.py:865 admin/pageadmin.py:1053
+#: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
 msgstr "Nu aveţi permisiunea de a publica această pagină"
 
-#: admin/pageadmin.py:867
-#, fuzzy, python-format
+#: admin/pageadmin.py:868
+#, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr "Pagina a fost aprobată cu succes."
+msgstr ""
 
-#: admin/pageadmin.py:909 admin/pageadmin.py:945 admin/pageadmin.py:1176
-#: admin/pageadmin.py:1208 admin/pageadmin.py:1340 admin/pageadmin.py:1372
+#: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
 msgid "You do not have permission to change this page"
 msgstr ""
 
-#: admin/pageadmin.py:913
-#, fuzzy, python-format
+#: admin/pageadmin.py:914
+#, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr "Pagina a fost aprobată cu succes."
+msgstr ""
 
-#: admin/pageadmin.py:949
+#: admin/pageadmin.py:950
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s obiect cu cheiea primara %(key)r nu exista."
 
-#: admin/pageadmin.py:955
+#: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
 msgstr "Există o singură traducere pentru această pagină"
 
-#: admin/pageadmin.py:984
+#: admin/pageadmin.py:985
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Titlu şi plugin-urile cu limba %(language)s  au fost şterse"
 
-#: admin/pageadmin.py:1006
+#: admin/pageadmin.py:1007
 msgid "Are you sure?"
 msgstr "Esti sigur?"
 
-#: admin/pageadmin.py:1062
-#, fuzzy, python-format
+#: admin/pageadmin.py:1063
+#, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr "Pagina a fost aprobată cu succes."
+msgstr ""
 
-#: admin/pageadmin.py:1064
-#, fuzzy, python-format
+#: admin/pageadmin.py:1065
+#, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr "Pagina a fost aprobată cu succes."
+msgstr ""
 
-#: admin/pageadmin.py:1082
+#: admin/pageadmin.py:1083
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 
-#: admin/pageadmin.py:1106
-#, fuzzy
+#: admin/pageadmin.py:1108
 msgid "You do not have permission to add a plugin"
-msgstr "Nu aveţi permisiunea de a publica această pagină"
+msgstr ""
 
-#: admin/pageadmin.py:1147 admin/pageadmin.py:1178
+#: admin/pageadmin.py:1149 admin/pageadmin.py:1180
 msgid "Language must be set to a supported language!"
 msgstr "Limba trebuie setată din limbile acceptate!"
 
-#: admin/pageadmin.py:1158
+#: admin/pageadmin.py:1160
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1180
+#: admin/pageadmin.py:1182
 msgid "Language must be different than the copied language!"
 msgstr ""
 
-#: admin/pageadmin.py:1186
+#: admin/pageadmin.py:1188
 msgid "You do not have permission to add plugins"
 msgstr ""
 
-#: admin/pageadmin.py:1191
+#: admin/pageadmin.py:1193
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1240
+#: admin/pageadmin.py:1243
 msgid "This plugin is not saved in a revision"
 msgstr ""
 
-#: admin/pageadmin.py:1243 admin/pageadmin.py:1336
-#, fuzzy
+#: admin/pageadmin.py:1246 admin/pageadmin.py:1340
 msgid "You do not have permission to edit a plugin"
-msgstr "Nu aveţi permisiunea de a publica această pagină"
+msgstr ""
 
-#: admin/pageadmin.py:1303
+#: admin/pageadmin.py:1306
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1367
-#, fuzzy
+#: admin/pageadmin.py:1371
 msgid "You do not have permission to move a plugin"
-msgstr "Nu aveţi permisiunea de a publica această pagină"
+msgstr ""
 
-#: admin/pageadmin.py:1386
-#, fuzzy
+#: admin/pageadmin.py:1390
 msgid "Plugins were moved"
-msgstr "Plugin-ul a fost mutat"
+msgstr ""
 
-#: admin/pageadmin.py:1398 admin/pageadmin.py:1407
-#, fuzzy
+#: admin/pageadmin.py:1403 admin/pageadmin.py:1412
 msgid "You do not have permission to remove a plugin"
-msgstr "Nu aveţi permisiunea de a publica această pagină"
+msgstr ""
 
-#: admin/pageadmin.py:1417 admin/placeholderadmin.py:308
+#: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -458,15 +431,15 @@ msgstr "Utilizator & Permisii de grup"
 msgid "Page permissions management"
 msgstr ""
 
-#: admin/placeholderadmin.py:153 admin/placeholderadmin.py:178
+#: admin/placeholderadmin.py:190 admin/placeholderadmin.py:216
 msgid "You don't have permission to add content here."
 msgstr ""
 
-#: admin/placeholderadmin.py:174
+#: admin/placeholderadmin.py:212
 msgid "You don't have permission to add plugins"
 msgstr ""
 
-#: admin/placeholderadmin.py:304
+#: admin/placeholderadmin.py:344
 msgid "You don't have permission to delete a plugin"
 msgstr ""
 
@@ -494,7 +467,7 @@ msgstr ""
 msgid "Select a valid page"
 msgstr ""
 
-#: forms/widgets.py:174
+#: forms/widgets.py:176
 msgid "Add Another"
 msgstr "Adaugă altul"
 
@@ -1034,7 +1007,8 @@ msgid "If present, clicking on image will take user to link."
 msgstr ""
 
 #: plugins/picture/models.py:24
-msgid "If present, clicking on image will take user         to specified page."
+msgid ""
+"If present, clicking on image will take user         to specified page."
 msgstr ""
 
 #: plugins/picture/models.py:26
@@ -1044,7 +1018,8 @@ msgstr ""
 #: plugins/picture/models.py:27
 msgid ""
 "Specifies an alternate text for an image, if         the image cannot be "
-"displayed.<br />Is also used by search engines to         classify the image."
+"displayed.<br />Is also used by search engines to         classify the "
+"image."
 msgstr ""
 
 #: plugins/picture/models.py:30
@@ -1248,8 +1223,8 @@ msgstr ""
 
 #: plugins/video/models.py:10
 msgid ""
-"vimeo or youtube video url. Example: http://www.youtube.com/watch?v=-"
-"iJ7bs4mTUY"
+"vimeo or youtube video url. Example: "
+"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr ""
 
 #: plugins/video/models.py:11
@@ -1382,14 +1357,12 @@ msgid "Home"
 msgstr "Acasă"
 
 #: templates/admin/cms/page/change_form.html:83
-#, fuzzy
 msgid "Publish draft"
 msgstr "publică cererea"
 
 #: templates/admin/cms/page/change_form.html:84
-#, fuzzy
 msgid "Preview draft"
-msgstr "Previzualizează"
+msgstr ""
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
@@ -1765,53 +1738,52 @@ msgstr ""
 #: templatetags/cms_tags.py:86
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:105 test_utils/cli.py:115
+#: test_utils/cli.py:106 test_utils/cli.py:116
 msgid "English"
 msgstr ""
 
-#: test_utils/cli.py:106 test_utils/cli.py:127 test_utils/cli.py:145
+#: test_utils/cli.py:107 test_utils/cli.py:128 test_utils/cli.py:146
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:107 test_utils/cli.py:121 test_utils/cli.py:139
-#: test_utils/cli.py:158
+#: test_utils/cli.py:108 test_utils/cli.py:122 test_utils/cli.py:140
+#: test_utils/cli.py:159
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:108 test_utils/cli.py:132
+#: test_utils/cli.py:109 test_utils/cli.py:133
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:109 test_utils/cli.py:152
+#: test_utils/cli.py:110 test_utils/cli.py:153
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:168
+#: test_utils/cli.py:169
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:169
+#: test_utils/cli.py:170
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:170
+#: test_utils/cli.py:171
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:176
+#: test_utils/cli.py:177
 msgid "sidebar column"
 msgstr ""
 
-#: test_utils/cli.py:182
+#: test_utils/cli.py:183
 msgid "left column"
 msgstr ""
 
-#: test_utils/cli.py:188
+#: test_utils/cli.py:189
 msgid "right column"
 msgstr ""
 
@@ -1864,9 +1836,8 @@ msgid "Static Menu2"
 msgstr ""
 
 #: test_utils/project/sampleapp/urls.py:12
-#, fuzzy
 msgid "^account/$"
-msgstr "conta"
+msgstr ""
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"
@@ -1889,94 +1860,35 @@ msgstr "URL invalid, utilizează formatul /calea/mea."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page "
+"\"%(instance)s\"."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#, fuzzy
-#~ msgid "The page \"%s\" was successfully deleted."
-#~ msgstr "Pagina a fost aprobată cu succes."
-
-#, fuzzy
-#~ msgid "You do not have permission to delete this page"
-#~ msgstr "Nu aveţi permisiunea de a publica această pagină"
+#~ msgid "delete req."
+#~ msgstr "deletion request"
 
 #~ msgid "move req."
-#~ msgstr "mută cererea"
-
-#~ msgid "moderator state"
-#~ msgstr "moderator de stat"
-
-#, fuzzy
-#~ msgid "Confirm delete"
-#~ msgstr "poate şterge"
-
-#~ msgid "higher"
-#~ msgstr "mai mare"
-
-#~ msgid "Copy moderation"
-#~ msgstr "Copie moderarea"
-
-#~ msgid "path"
-#~ msgstr "cale"
-
-#~ msgid "everybody"
-#~ msgstr "toți"
-
-#~ msgid "type"
-#~ msgstr "tip"
-
-#~ msgid "can change soft-root"
-#~ msgstr "poate schimba soft-root"
-
-#~ msgid "status"
-#~ msgstr "statut"
-
-#~ msgid "navigation extenders"
-#~ msgstr "Prelungitoare de navigare"
+#~ msgstr "move request"
 
 #~ msgid "url overwrite"
-#~ msgstr "Suprascrie URL-ul"
-
-#~ msgid "author"
-#~ msgstr "autor"
-
-#~ msgid "reverse url id"
-#~ msgstr "reverse url id"
+#~ msgstr "URL overwrite"
 
 #~ msgid "unpublish req."
-#~ msgstr "cerere de a anula publicarea"
-
-#~ msgid "approved"
-#~ msgstr "aprobat"
+#~ msgstr "unpublish request"
 
 #~ msgid "req. app."
-#~ msgstr "este nevoie de aprovare"
+#~ msgstr "approval required"
 
-#~ msgid "app. par."
-#~ msgstr "app. par."
+#~ msgid "(requires approvement at %(moderation_level)s level)"
+#~ msgstr "(requires approval at %(moderation_level)s level)"
 
-#~ msgid "can moderate"
-#~ msgstr "poate modera"
+#~ msgid "Request approvemet"
+#~ msgstr "Request approval"
 
-#~ msgid "additional description of the image"
-#~ msgstr "descriere suplimentară a imaginii"
-
-#~ msgid "Approve delete"
-#~ msgstr "Aprobă eliminarea"
-
-#~ msgid "Approve"
-#~ msgstr "Aprobă"
-
-#~ msgid "moderate"
-#~ msgstr "moderează"
-
-#~ msgid "parent first"
-#~ msgstr "părintele întîi"
-
-#~ msgid "approve"
-#~ msgstr "aprobă"
+#~ msgid "CMS - Page %s requires approvement."
+#~ msgstr "CMS - Page %s requires approval."
 
 #~ msgid "move"
 #~ msgstr "move request"
