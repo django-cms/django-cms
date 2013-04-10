@@ -63,6 +63,7 @@ def configure(db_url, **extra):
             'django.middleware.common.CommonMiddleware',
             'django.middleware.transaction.TransactionMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
+            'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
