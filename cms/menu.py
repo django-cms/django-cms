@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 from cms.apphook_pool import apphook_pool
-from cms.models import Page
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
@@ -34,13 +33,12 @@ def get_visible_pages(request, pages, site=None):
     is_auth_user = request.user.is_authenticated()
     visible_page_ids = []
     restricted_pages = defaultdict(list)
-    pages_perms_q = Q(can_view=True)
-    page_permissions = PagePermission.objects.filter(pages_perms_q).distinct().select_related('page', 'group__users')
+    page_permissions = PagePermission.objects.filter(can_view=True).select_related('page', 'group__users')
 
     for perm in page_permissions:
 
         # collect the pages that are affected by permissions
-        if site and perm.page.site_id!=site.pk:
+        if site and perm.page.site_id != site.pk:
             continue
         if perm is not None and perm not in restricted_pages[perm.page.pk]:
             # affective restricted pages gathering
