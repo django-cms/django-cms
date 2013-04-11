@@ -149,7 +149,7 @@ class Page(MPTTModel):
         # fire signal
         import cms.signals as cms_signals
 
-        cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
+        cms_signals.page_moved.send(sender=Page, instance=self)
         self.save()  # always save the page after move, because of publisher
         # check the slugs
         page_utils.check_title_slugs(self)
@@ -159,6 +159,7 @@ class Page(MPTTModel):
             public_page = Page.objects.get(pk=self.publisher_public_id)
             # Ensure that the page is in the right position and save it
             public_page = self._publisher_save_public(public_page)
+            cms_signals.page_moved.send(sender=Page, instance=public_page)
             public_page.save()
             page_utils.check_title_slugs(public_page)
 

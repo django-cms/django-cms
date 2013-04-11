@@ -107,9 +107,7 @@ class ReversionTestCase(CMSTestCase):
             self.assertEquals(response.status_code, 200)
             data = self.page_data
             response = self.client.post("%s?language=en&" % revert_url, self.page_data)
-            #print response
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
-
             # test for publisher_is_draft, published is set for both draft and
             # published page
             self.assertEquals(Page.objects.all()[0].publisher_is_draft, True)

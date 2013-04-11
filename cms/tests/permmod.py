@@ -718,18 +718,14 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         self.assertEqual(self.pg.parent_id, self.pc.pk)
         # Public page is under PC
         self.assertEqual(self.pg.publisher_public.parent_id, self.pc.publisher_public_id)
-
-        # We have to reload pe when using mptt >= 0.4.2, 
-        # so that mptt realized that pg is no longer a child of pe
-
+        self.assertEqual(self.pg.publisher_public.parent.get_absolute_url(), self.pc.publisher_public.get_absolute_url())
+        self.assertEqual(self.pg.get_absolute_url(), self.pg.publisher_public.get_absolute_url())
         self.move_page(self.pe, self.pg)
         self.reload_pages()
         self.assertEqual(self.pe.parent_id, self.pg.pk)
         self.assertEqual(self.pe.publisher_public.parent_id, self.pg.publisher_public_id)
         self.ph = self.ph.reload()
         # check urls - they should stay be the same now after the move
-        for p in Page.objects.all():
-            print p.publisher_is_draft, p.get_absolute_url(), p.tree_id, p.lft, p.rght
         self.assertEqual(
             self.pg.publisher_public.get_absolute_url(),
             self.pg.get_absolute_url()
