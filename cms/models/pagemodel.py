@@ -79,7 +79,7 @@ class Page(MPTTModel):
     placeholders = models.ManyToManyField(Placeholder, editable=False)
 
     # Publisher fields
-    publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
+    publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
@@ -791,7 +791,6 @@ class Page(MPTTModel):
             # a global permission was given to the request's user
             if global_view_perms:
                 return True
-
             elif not is_restricted:
                 if ((get_cms_setting('PUBLIC_FOR') == 'all') or
                     (get_cms_setting('PUBLIC_FOR') == 'staff' and
