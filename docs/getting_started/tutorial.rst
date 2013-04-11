@@ -140,6 +140,7 @@ at the right position::
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
     )
 
 You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
@@ -491,5 +492,5 @@ with the different plugins provided out of the box and to build great websites!
 
 .. _South: http://south.aeracode.org/
 .. _TinyMCE: http://tinymce.moxiecode.com/
-.. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
+.. _official documentation: http://docs.djangoproject.com/en/1.5/topics/templates/
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms

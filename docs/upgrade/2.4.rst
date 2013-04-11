@@ -177,6 +177,17 @@ What you need to do:
 - reverse urls now return the language prefix as well. So maybe there is some code that adds language prefixes. Remove
   this code.
 
+Added LanguageCookieMiddleware
+==============================
+
+To fix the behavior of django to determine the language every time from new, when you visit `/` on a page, this
+middleware saves the current language in a cookie with every response.
+
+To enable this middleware add the following to your `MIDDLEWARE_CLASSES` setting:
+
+    `cms.middleware.language.LanguageCookieMiddleware`
+
+
 CMS_LANGUAGES
 =============
 
