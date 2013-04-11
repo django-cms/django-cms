@@ -413,6 +413,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_sitemap_uses_publication_date_when_later_than_modification(self):
         now = timezone.now()
+        now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
         page.creation_date = one_day_ago
