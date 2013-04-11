@@ -1,6 +1,6 @@
+import HTMLParser
 import re
 
-from django.template.defaultfilters import force_escape
 
 from cms.models import CMSPlugin
 from cms.plugins.utils import downcast_plugins
@@ -52,7 +52,19 @@ def plugin_tags_to_user_html(text, context, placeholder):
             # Object must have been deleted.  It cannot be rendered to
             # end user so just remove it from the HTML altogether
             return u''
+        attributes = {}
+
+        class AttributeExractor(HTMLParser.HTMLParser):
+            def handle_starttag(self, tag, attrs):
+                for attr in attrs:
+                    name, value = attr
+                    attributes[name] = value
+        
+        parser = AttributeExractor()
+        parser.feed(m.group())
+        context['inherited_from_parent'] = attributes
         return obj.render_plugin(context, placeholder)
+
     return OBJ_ADMIN_RE.sub(_render_tag, text)
 
 
