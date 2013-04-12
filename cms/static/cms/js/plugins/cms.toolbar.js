@@ -100,10 +100,12 @@ CMS.$(document).ready(function ($) {
 		// sets collapsed data to false
 		_showToolbar: function () {
 			// add toolbar padding
-			var padding = parseInt($(document.body).css('margin-top'));
+			var padding = parseInt($(document.body).css('margin-top'), 10);
 				$(document.body).css('margin-top', (padding+43)); // 43 = height of toolbar
 			// show toolbar
 			this.toolbar.show();
+			// adds class to allow css to prepare page for edits
+			$('html').toggleClass('cms_toolbar', true);
 			// change data information
 			this.toolbar.data('collapsed', false);
 			// add class to trigger
@@ -117,10 +119,12 @@ CMS.$(document).ready(function ($) {
 		// sets collapsed data to true
 		_hideToolbar: function () {
 			// remove toolbar padding
-			var padding = parseInt($(document.body).css('margin-top'));
+			var padding = parseInt($(document.body).css('margin-top'), 10);
 				$(document.body).css('margin-top', (padding-this.toolbar.height()-1)); // substract 1 cause of the border
 			// hide toolbar
 			this.toolbar.hide();
+			// remove class
+			$('html').toggleClass('cms_toolbar', false);
 			// change data information
 			this.toolbar.data('collapsed', true);
 			// remove class from trigger
@@ -243,6 +247,8 @@ CMS.$(document).ready(function ($) {
 			} else {
 				btn.data('state', false).css('backgroundPosition', '-40px -198px');
 			}
+
+			$('html').toggleClass('cms_toolbar-switcher', obj.state);
 
 			// add events
 			template.find('.cms_toolbar-item_switcher-link').bind('click', function (e) {
