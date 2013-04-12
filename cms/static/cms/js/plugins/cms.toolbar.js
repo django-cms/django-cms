@@ -248,6 +248,8 @@ CMS.$(document).ready(function ($) {
 				btn.data('state', false).css('backgroundPosition', '-40px -198px');
 			}
 
+			$('html').toggleClass('cms_toolbar-switcher', obj.state);
+
 			// add events
 			template.find('.cms_toolbar-item_switcher-link').bind('click', function (e) {
 				e.preventDefault();
