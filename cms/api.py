@@ -149,6 +149,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate parent
     if parent:
         assert isinstance(parent, Page)
+        parent = Page.objects.get(pk=parent.pk)
 
     # validate publication date
     if publication_date:
@@ -183,14 +184,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
         soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        published=published,
+        published=False, # will be published later
         template=template,
         site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
     )
-    if parent:
-        page.insert_at(parent, position)
+    page.insert_at(parent, position)
     page.save()
 
     create_title(
@@ -210,7 +210,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page.publish()
 
     del _thread_locals.user
-    return page
+    return page.reload()
     
 def create_title(language, title, page, menu_title=None, slug=None,
                  apphook=None, redirect=None, meta_description=None,
@@ -371,6 +371,7 @@ def publish_page(page, user):
     
     See docs/extending_cms/api_reference.rst for more info
     """
+    page = page.reload()
     class FakeRequest(object):
         def __init__(self, user):
             self.user = user

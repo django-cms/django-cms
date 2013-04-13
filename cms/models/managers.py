@@ -5,7 +5,6 @@ from cms.models.query import PageQuerySet
 from cms.publisher import PublisherManager
 from cms.utils import get_cms_setting
 from cms.utils.i18n import get_fallback_languages
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
@@ -22,9 +21,7 @@ class PageManager(PublisherManager):
         return PageQuerySet(self.model)
 
     def drafts(self):
-        return super(PageManager, self).drafts()#.exclude(
-            #publisher_state=self.model.PUBLISHER_STATE_DELETE
-        #)
+        return super(PageManager, self).drafts()
 
     def public(self):
         return super(PageManager, self).public().exclude(
@@ -70,21 +67,6 @@ class PageManager(PublisherManager):
     def expired(self):
         return self.drafts().expired()
 
-#    - seems this is not used anymore...
-#    def get_pages_with_application(self, path, language):
-#        """Returns all pages containing application for current path, or
-#        any parrent. Returned list is sorted by path length, longer path first.
-#        """
-#        paths = levelize_path(path)
-#        q = Q()
-#        for path in paths:
-#            # build q for all the paths
-#            q |= Q(title_set__path=path, title_set__language=language)
-#        app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
-#        # add proper ordering
-#        app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
-#        return app_pages
-
     def get_all_pages_with_application(self):
         """Returns all pages containing applications for all sites.
 
@@ -101,6 +83,7 @@ class PageManager(PublisherManager):
         Plugins can define a 'search_fields' tuple similar to ModelAdmin classes
         """
         from cms.plugin_pool import plugin_pool
+
         qs = self.get_query_set()
         qs = qs.public()
 
@@ -118,7 +101,7 @@ class PageManager(PublisherManager):
             if hasattr(cmsplugin, 'search_fields'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{'placeholders__cmsplugin__%s__%s__icontains' % \
-                                   (cmsplugin.__name__.lower(), field):q})
+                               (cmsplugin.__name__.lower(), field): q})
         if language:
             qt &= Q(title_set__language=language)
             qp &= Q(cmsplugin__language=language)
@@ -236,6 +219,7 @@ class BasicPagePermissionManager(models.Manager):
 
     !IMPORTANT: take care, PagePermissionManager extends this manager
     """
+
     def with_user(self, user):
         """Get all objects for given user, also takes look if user is in some
         group.
@@ -253,6 +237,7 @@ class BasicPagePermissionManager(models.Manager):
 class PagePermissionManager(BasicPagePermissionManager):
     """Page permission manager accessible under objects.
     """
+
     def subordinate_to_user(self, user):
         """Get all page permission objects on which user/group is lover in
         hierarchy then given user and given user can change permissions on them.
@@ -306,18 +291,20 @@ class PagePermissionManager(BasicPagePermissionManager):
         Result of this is used in admin for page permissions inline.
         """
         from cms.models import GlobalPagePermission, Page
+
         if user.is_superuser or \
-            GlobalPagePermission.objects.with_can_change_permissions(user):
-            # everything for those guys
-                return self.all()
+                GlobalPagePermission.objects.with_can_change_permissions(user):
+        # everything for those guys
+            return self.all()
 
         # get user level
         from cms.utils.permissions import get_user_permission_level
+
         try:
             user_level = get_user_permission_level(user)
         except NoPermissionsException:
             return self.none()
-        # get current site
+            # get current site
         site = Site.objects.get_current()
         # get all permissions
         page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
@@ -342,22 +329,20 @@ class PagePermissionManager(BasicPagePermissionManager):
         # permissions should be managed on the draft page only
         page = page.get_draft_object()
         from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, \
-            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
-        # code taken from
-        # https://github.com/divio/django-cms/issues/1113#issuecomment-3376790
-        q_tree = Q(page__tree_id=page.tree_id)
-        q_page = Q(page=page)
+            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE
 
-        # NOTE:  '... or 0' is used for test cases,
-        #        if the page is not saved through mptt
-        left_right = {
-              'page__%s__lte' % page._mptt_meta.left_attr: getattr(page, page._mptt_meta.left_attr) or 0,
-              'page__%s__gte' % page._mptt_meta.right_attr: getattr(page, page._mptt_meta.right_attr) or 0,
-        }
-        q_parents = Q(**left_right)
-        q_desc = (Q(page__level__lt=page.level) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
-        q_kids = (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))
-        query = q_tree & q_parents & (q_page | q_desc | q_kids)
+        parents = Q(page__tree_id=page.tree_id, page__lft__lte=page.lft, page__rght__gte=page.rght) & (
+            Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
+        direct_parents = Q(
+            page__tree_id=page.tree_id,
+            page__lft__lte=page.lft,
+            page__rght__gte=page.rght,
+            page__level=page.level - 1) & \
+            (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
+        page_qs = Q(page=page) & (
+            Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) | Q(grant_on=ACCESS_PAGE))
+
+        query = (parents | direct_parents | page_qs)
         return self.filter(query).order_by('page__level')
 
 
@@ -447,7 +432,8 @@ class PagePermissionsPermissionManager(models.Manager):
 
     def __get_id_list(self, user, site, attr):
         from cms.models import (GlobalPagePermission, PagePermission,
-                                MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
+            MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
+
         if attr != "can_view":
             if not user.is_authenticated() or not user.is_staff:
                 return []
@@ -455,19 +441,19 @@ class PagePermissionsPermissionManager(models.Manager):
             # got superuser, or permissions aren't enabled? just return grant
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
-        # read from cache if possible
+            # read from cache if possible
         cached = get_permission_cache(user, attr)
         if cached is not None:
             return cached
-        # check global permissions
+            # check global permissions
         global_permissions = GlobalPagePermission.objects.with_user(user)
         if global_permissions.filter(**{
-                attr: True, 'sites__in': [site]
-            }).exists():
+            attr: True, 'sites__in': [site]
+        }).exists():
             # user or his group are allowed to do `attr` action
             # !IMPORTANT: page permissions must not override global permissions
             return PagePermissionsPermissionManager.GRANT_ALL
-        # for standard users without global permissions, get all pages for him or
+            # for standard users without global permissions, get all pages for him or
         # his group/s
         qs = PagePermission.objects.with_user(user)
         qs.order_by('page__tree_id', 'page__level', 'page__lft')
@@ -475,7 +461,6 @@ class PagePermissionsPermissionManager(models.Manager):
         page_id_allow_list = []
         for permission in qs:
             if getattr(permission, attr):
-
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":
                     page_id_allow_list.append(permission.page.id)
@@ -483,7 +468,7 @@ class PagePermissionsPermissionManager(models.Manager):
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-        # store value in cache
+                    # store value in cache
         set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list
 
@@ -491,4 +476,5 @@ class PagePermissionsPermissionManager(models.Manager):
 class PageModeratorStateManager(models.Manager):
     def get_delete_actions(self):
         from cms.models import PageModeratorState
+
         return self.filter(action=PageModeratorState.ACTION_DELETE)

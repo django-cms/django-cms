@@ -211,7 +211,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertTrue(has_generic_permission(page.pk, self.user_master, "publish", page.site.pk))
         # should be True user_master should have publish permissions for children as well
         publish_page(page, self.user_master)
-        self.assertTrue(page.published)
+        self.assertTrue(page.reload().published)
         # user_master is moderator for top level page / but can't approve descendants?
         # approve / publish as user_master
         # user master should be able to approve descendants
@@ -362,6 +362,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_PENDING)
         
         # publish slave page
+        self.slave_page = self.slave_page.reload()
         slave_page = publish_page(self.slave_page, self.user_master)
         
         self.assertFalse(page.publisher_public)
@@ -646,6 +647,8 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             self.assertFalse(self.pg.publisher_public)
             
             # login as master for approval
+            self.slave_page = self.slave_page.reload()
+
             publish_page(self.slave_page, self.user_master)
             
             # publish and approve them all
@@ -657,6 +660,18 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             publish_page(self.pf, self.user_master)
             publish_page(self.pg, self.user_master)
             publish_page(self.ph, self.user_master)
+            self.reload_pages()
+
+    def reload_pages(self):
+        self.pa = self.pa.reload()
+        self.pb = self.pb.reload()
+        self.pc = self.pc.reload()
+        self.pd = self.pd.reload()
+        self.pe = self.pe.reload()
+        self.pf = self.pf.reload()
+        self.pg = self.pg.reload()
+        self.ph = self.ph.reload()
+
 
     def test_patricks_move(self):
         """
@@ -695,41 +710,31 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         """
         # TODO: this takes 5 seconds to run on my MBP. That's TOO LONG!
         self.assertEqual(self.pg.parent_id, self.pe.pk)
+        self.assertEqual(self.pg.publisher_public.parent_id, self.pe.publisher_public_id)
         # perform moves under slave...
         self.move_page(self.pg, self.pc)
+        self.reload_pages()
         # Draft page is now under PC
         self.assertEqual(self.pg.parent_id, self.pc.pk)
-        # Public page is still under PE
-        self.assertEqual(self.pg.publisher_public.parent_id, self.pe.publisher_public_id)
-
-        # We have to reload pe when using mptt >= 0.4.2, 
-        # so that mptt realized that pg is no longer a child of pe
-        self.pe = Page.objects.get(pk=self.pe.pk)
-        self.pg = Page.objects.get(pk=self.pg.pk)
+        # Public page is under PC
+        self.assertEqual(self.pg.publisher_public.parent_id, self.pc.publisher_public_id)
+        self.assertEqual(self.pg.publisher_public.parent.get_absolute_url(), self.pc.publisher_public.get_absolute_url())
+        self.assertEqual(self.pg.get_absolute_url(), self.pg.publisher_public.get_absolute_url())
         self.move_page(self.pe, self.pg)
-        self.pe = Page.objects.get(pk=self.pe.pk)
-        self.pg = Page.objects.get(pk=self.pg.pk)
+        self.reload_pages()
         self.assertEqual(self.pe.parent_id, self.pg.pk)
         self.assertEqual(self.pe.publisher_public.parent_id, self.pg.publisher_public_id)
-
-        # check urls - they should stay them same, there wasn't approved yet
+        self.ph = self.ph.reload()
+        # check urls - they should stay be the same now after the move
         self.assertEqual(
-            self.pg.publisher_public.get_absolute_url(), 
-            u'%smaster/slave-home/pb/pe/pg/' % self.get_pages_root()
+            self.pg.publisher_public.get_absolute_url(),
+            self.pg.get_absolute_url()
         )
         self.assertEqual(
             self.ph.publisher_public.get_absolute_url(),
-            u'%smaster/slave-home/pb/pe/ph/' % self.get_pages_root()
+            self.ph.get_absolute_url()
         )
 
-        # login as master, and approve moves
-        publish_page(self.pg, self.user_master)
-        publish_page(self.pe, self.user_master)
-        self.ph = self.ph.reload()
-        # TODO: this should not be necessary
-        publish_page(self.ph, self.user_master)
-        publish_page(self.pf, self.user_master)
-        
         # public parent check after move
         self.assertEqual(self.pg.publisher_public.parent.pk, self.pc.publisher_public_id)
         self.assertEqual(self.pe.publisher_public.parent.pk, self.pg.publisher_public_id)

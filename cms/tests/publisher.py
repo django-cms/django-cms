@@ -157,6 +157,7 @@ class PublishingTests(TestCase):
     def test_publish_child_first(self):
         parent = self.create_page('parent', published=False)
         child = self.create_page('child', published=False, parent=parent)
+        parent = parent.reload()
         self.assertFalse(parent.published)
         self.assertFalse(child.published)
 
@@ -231,6 +232,7 @@ class PublishingTests(TestCase):
         pageA = self.create_page('pageA', parent=page, published=True)
         pageC = self.create_page('pageC', parent=page, published=True)
         pageB = self.create_page('pageB', parent=page, published=True)
+        page = page.reload()
         pageB.move_page(pageA, 'right')
         pageB.publish()
         # pageC needs reload since B has swapped places with it
@@ -288,6 +290,7 @@ class PublishingTests(TestCase):
         home = self.create_page("Home", published=True, in_navigation=True)
         child = self.create_page("Child", published=True, parent=home,
                                  in_navigation=False)
+        home = home.reload()
         home.unpublish()
         child = self.reload(child)
         self.assertTrue(child.published)
@@ -316,7 +319,7 @@ class PublishingTests(TestCase):
         home = self.create_page("Home", published=True)
         child = self.create_page("Child", published=True, parent=home)
         gc = self.create_page("GC", published=True, parent=child)
-
+        home = home.reload()
         home.unpublish()
         child = self.reload(child)
         gc = self.reload(gc)
@@ -402,6 +405,8 @@ class PublishingTests(TestCase):
         page = self.create_page("Page", published=True)
         child = self.create_page("Child", parent=page, published=True)
         self.create_page("Grandchild", parent=child, published=True)
+        page = page.reload()
+        child = child.reload()
         drafts = Page.objects.drafts()
         public = Page.objects.public()
         published = Page.objects.public().published()
@@ -564,6 +569,8 @@ class PublishingTests(TestCase):
 
         child = create_page("Child", "nav_playground.html", "en", published=True,
                             parent=page)
+        parent = parent.reload()
+        page = page.reload()
         self.assertEqual(page.get_absolute_url(), parent_url + "page/")
         self.assertEqual(child.get_absolute_url(), parent_url + "page/child/")
 
@@ -573,16 +580,9 @@ class PublishingTests(TestCase):
         child = self.reload(child)
         self.assertEqual(page.get_absolute_url(), other_url + "page/")
         self.assertEqual(child.get_absolute_url(), other_url + "page/child/")
-        # Public version is still in the same url
-        self.assertEqual(page.publisher_public.get_absolute_url(), parent_url + "page/")
-        self.assertEqual(child.publisher_public.get_absolute_url(), parent_url + "page/child/")
-
-        # Use revert to bring things back to normal
-        page.revert()
-        page = self.reload(page)
-        child = self.reload(child)
-        self.assertEqual(page.get_absolute_url(), other_url + "page/")
-        self.assertEqual(child.get_absolute_url(), other_url + "page/child/")
+        # Public version changed the url as well
+        self.assertEqual(page.publisher_public.get_absolute_url(), other_url + "page/")
+        self.assertEqual(child.publisher_public.get_absolute_url(), other_url + "page/child/")
 
     def test_publish_works_with_descendants(self):
         """
@@ -608,7 +608,7 @@ class PublishingTests(TestCase):
                     published=True)
         create_page("subitem2", "nav_playground.html", "en", parent=item2,
                     published=True)
-            
+        item2 = item2.reload()
         not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
         drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
         
