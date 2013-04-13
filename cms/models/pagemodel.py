@@ -79,7 +79,7 @@ class Page(MPTTModel):
     placeholders = models.ManyToManyField(Placeholder, editable=False)
 
     # Publisher fields
-    publisher_is_draft = models.BooleanField(default=1, editable=False, db_index=True)
+    publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
@@ -149,7 +149,7 @@ class Page(MPTTModel):
         # fire signal
         import cms.signals as cms_signals
 
-        cms_signals.page_moved.send(sender=Page, instance=self)  # titles get saved before moderation
+        cms_signals.page_moved.send(sender=Page, instance=self)
         self.save()  # always save the page after move, because of publisher
         # check the slugs
         page_utils.check_title_slugs(self)
@@ -159,6 +159,7 @@ class Page(MPTTModel):
             public_page = Page.objects.get(pk=self.publisher_public_id)
             # Ensure that the page is in the right position and save it
             public_page = self._publisher_save_public(public_page)
+            cms_signals.page_moved.send(sender=Page, instance=public_page)
             public_page.save()
             page_utils.check_title_slugs(public_page)
 
@@ -791,7 +792,6 @@ class Page(MPTTModel):
             # a global permission was given to the request's user
             if global_view_perms:
                 return True
-
             elif not is_restricted:
                 if ((get_cms_setting('PUBLIC_FOR') == 'all') or
                     (get_cms_setting('PUBLIC_FOR') == 'staff' and
