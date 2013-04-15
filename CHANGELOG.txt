@@ -137,4 +137,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_MODERATOR has been removed and replaced with simple publisher.
 - PlaceholderAdmin has now language tabs and has support for django-hvad
 - Added `cms.middleware.language.LanguageCookieMiddleware`
-- Added RAW_ID_USERS
+- Added CMS_RAW_ID_USERS
