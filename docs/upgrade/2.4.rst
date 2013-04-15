@@ -374,6 +374,13 @@ class that extends PlaceholderAdmin. If you use a custom ``change_form_template`
 ``cms/templates/admin/placeholders/placeholder/change_form.html`` for how to incorporate language tabs.
 
 
+Added RAW_ID_USERS
+==================
+
+If you have a lot of users (500+) you can set this setting to a number after which admin User fields are displayed in
+a RAW Id field. This improves performance a lot in the admin as it has not to load all the users into the html.
+
+
 ******************************
 Backwards incompatible changes
 ******************************
