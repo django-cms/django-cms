@@ -4,10 +4,11 @@ from cms.admin.forms import (GlobalPagePermissionAdminForm,
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
 from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
 from copy import deepcopy
-from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.models import User
 from django.template.defaultfilters import title
 from django.utils.translation import ugettext as _
 
@@ -26,7 +27,15 @@ class PagePermissionInlineAdmin(TabularInline):
     classes = ['collapse', 'collapsed']
     exclude = ['can_view']
     extra = 0 # edit page load time boost
-    
+
+    @classproperty
+    def raw_id_fields(cls):
+        # Dynamically set raw_id_fields based on settings
+        threshold = get_cms_setting('RAW_ID_USERS')
+        if threshold and User.objects.count() > threshold:
+            return ['user']
+        return []
+
     def queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
