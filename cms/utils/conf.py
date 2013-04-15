@@ -32,6 +32,8 @@ DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
+    # Whether to use raw ID lookups for users when PERMISSION is True
+    'RAW_ID_USERS': False,
     'PUBLIC_FOR': 'all',
     'CONTENT_CACHE_DURATION': 60,
     'SHOW_START_DATE': False,

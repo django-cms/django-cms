@@ -71,3 +71,34 @@ def make_revision_with_plugins(obj, user=None, message=None):
                 
 def find_placeholder_relation(obj):
     return 'page'
+
+
+class classproperty(object):
+    """Like @property, but for classes, not just instances.
+
+    Example usage:
+
+        >>> from cms.utils.helpers import classproperty
+        >>> class A(object):
+        ...     @classproperty
+        ...     def x(cls):
+        ...         return 'x'
+        ...     @property
+        ...     def y(self):
+        ...         return 'y'
+        ...
+        >>> A.x
+        'x'
+        >>> A().x
+        'x'
+        >>> A.y
+        <property object at 0x2939628>
+        >>> A().y
+        'y'
+
+    """
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)

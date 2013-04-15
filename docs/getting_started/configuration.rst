@@ -530,6 +530,33 @@ a certain page all users he creates can, in turn, only edit this page. Naturally
 he can limit the rights of the users he creates even further, allowing them to see
 only a subset of the pages to which he is allowed access.
 
+.. setting:: CMS_RAW_ID_USERS
+
+CMS_RAW_ID_USERS
+================
+
+Default: ``False``
+
+This setting only applies if :setting:`CMS_PERMISSION` is ``True``
+
+The "view restrictions" and "page permissions" inlines on the
+:class:`cms.models.Page` admin change forms can cause performance problems
+where there are many thousands of users being put into simple select boxes. If
+set to a positive integer, this setting forces the inlines on that page to use
+standard Django admin raw ID widgets rather than select boxes if the number of
+users in the system is greater than that number, dramatically improving
+performance.
+
+.. note:: Using raw ID fields in combination with ``limit_choices_to`` causes
+          errors due to excessively long URLs if you have many thousands of
+          users (the PKs are all included in the URL of the popup window). For
+          this reason, we only apply this limit if the number of users is
+          relatively small (fewer than 500). If the number of users we need to
+          limit to is greater than that, we use the usual input field instead
+          unless the user is a CMS superuser, in which case we bypass the
+          limit.  Unfortunately, this means that non-superusers won't see any
+          benefit from this setting.
+
 .. setting:: CMS_PUBLIC_FOR
 
 CMS_PUBLIC_FOR
