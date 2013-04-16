@@ -3,6 +3,7 @@ from __future__ import with_statement
 from contextlib import contextmanager
 from cms import constants
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from cms.management.commands.subcommands.list import plugin_report
 from django.conf import settings
@@ -225,7 +226,9 @@ def check_plugin_instances(output):
 def check_copy_relations(output):
     c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
     with output.section('Presence of "copy_relations"') as section:
-        for plugin_class in CMSPlugin.__subclasses__():
+        plugin_pool.discover_plugins()
+        for plugin in plugin_pool.plugins.values():
+            plugin_class = plugin.model
             if 'copy_relations' in plugin_class.__dict__:
                 # this class defines a ``copy_relations`` method, nothing more
                 # to do
