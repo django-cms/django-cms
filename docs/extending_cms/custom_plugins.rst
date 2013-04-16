@@ -262,6 +262,8 @@ else clause.
     and your plugin will not work as intended in the administration without
     further work.
 
+.. _handling-relations:
+
 Handling Relations
 ==================
 

@@ -106,6 +106,12 @@ can publish changes to the public site.
     will fail and leave bad data in your database. See :ref:`cms-list-command`
     and :ref:`cms-delete-orphaned-plugins-command`.
 
+    Also, check if all your plugins define a
+    :meth:`~cms.models.CMSPlugin.copy_relations` method if required. You can do
+    this by running ``manage.py cms check`` and read the *Presence of
+    "copy_relations"* section. See :ref:`handling-relations` for guidance on
+    this topic.
+
 
 Added Fix MPTTT Management command
 ==================================
