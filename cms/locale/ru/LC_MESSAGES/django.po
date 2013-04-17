@@ -3,19 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Denis Darii <sinednx@gmail.com>, 2011.
-# Dimmus <dmitri.chudinov@gmail.com>, 2011.
-# Gleb Chipiga <gleb.chipiga@gmail.com>, 2011.
-#   <koodjo@mail.ru>, 2012.
-#  <little_pea@list.ru>, 2013.
-#   <tezro.gb@gmail.com>, 2011.
+# Denis Darii <sinednx@gmail.com>, 2011
+# Dimmus <dmitri.chudinov@gmail.com>, 2011
+# Gleb Chipiga <gleb.chipiga@gmail.com>, 2011
+# koodjo <koodjo@mail.ru>, 2012
+# slam <little_pea@list.ru>, 2013
+# m05quit0 <sjkomarov@gmail.com>, 2013
+# andrey_shipilov <tezro.gb@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2013-04-09 14:10+0000\n"
+"Last-Translator: m05quit0 <sjkomarov@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -290,7 +291,7 @@ msgstr "Неправильный шаблон"
 #: admin/pageadmin.py:752
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "Шаблон изменен на %s"
 
 #: admin/pageadmin.py:754
 msgid "The template was successfully changed"
@@ -303,7 +304,7 @@ msgstr "Ошибка! Вам не достаточно прав для пере�
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "Страница перемещена"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -790,14 +791,14 @@ msgstr "переписать заголовок (html тег title)"
 #: plugins/utils.py:124
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Этот плейсхолдер уже имеет максимальное число плагинов (%s)."
 
 #: plugins/utils.py:134
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "Этот плейсхолдер уже имеет максимальное количество (%(limit)s) плагинов типа %(plugin_name)s."
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -1362,11 +1363,11 @@ msgstr "Домой"
 
 #: templates/admin/cms/page/change_form.html:83
 msgid "Publish draft"
-msgstr ""
+msgstr "запрос публикации"
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Preview draft"
-msgstr ""
+msgstr "Предпросмотр черновика"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"

@@ -3,12 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-#   <adaptivelogic@gmail.com>, 2013.
-#   <hannseman@gmail.com>, 2011.
-# Mattias Lindvall <mattias.lindvall@gmail.com>, 2013.
-# Patrik Gärdeman <patrik.gardeman@gmail.com>, 2011.
-# Simon Hedberg <simon@in-formation.se>, 2011.
-# tapetersen <tobias.alex.petersen@gmail.com>, 2011.
+# adaptivelogic <adaptivelogic@gmail.com>, 2013
+# hannseman <hannseman@gmail.com>, 2011
+# thnee <mattias.lindvall@gmail.com>, 2013
+# Patrik Gärdeman <patrik.gardeman@gmail.com>, 2011
+# Simon Hedberg <simon@in-formation.se>, 2011
+# tapetersen <tobias.alex.petersen@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

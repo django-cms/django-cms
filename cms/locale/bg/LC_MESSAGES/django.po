@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Boris Chervenkov <office@sentido.bg>, 2012.
-# masarliev <mitko@masarliev.net>, 2011.
-# Miroslav Slavkov <roshko.bg@gmail.com>, 2013.
+# Boris Chervenkov <office@sentido.bg>, 2012
+# masarliev <mitko@masarliev.net>, 2011
+# roshko <roshko.bg@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

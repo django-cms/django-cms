@@ -3,11 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ahmet Çakır <bursoft@gmail.com>, 2013.
-# Cumhur Korkut <cumhurkorkut@gmail.com>, 2013.
-# Mustafa Arıcı <>, 2012.
-#   <mustafaimer@gmail.com>, 2011.
-# suleyman <posta@suleymans.com>, 2011.
+# bursoftbfc1681230474f25 <bursoft@gmail.com>, 2013
+# wavesofthought <cumhurkorkut@gmail.com>, 2013
+# Mustafa Arıcı <>, 2012
+# mustafaimer <mustafaimer@gmail.com>, 2011
+# suleyman <posta@suleymans.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

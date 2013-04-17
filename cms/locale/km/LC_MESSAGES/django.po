@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# pykhmer <admin@pykhmer.org>, 2011.
-# សុវិចិត្រ Sovichet ទេព Tep <sovichet.tep@gmail.com>, 2011.
-# vireax <vireax@ximplex.info>, 2011.
+# pykhmer <admin@pykhmer.org>, 2011
+# សុវិចិត្រ Sovichet ទេព Tep <sovichet.tep@gmail.com>, 2011
+# vireax <vireax@ximplex.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

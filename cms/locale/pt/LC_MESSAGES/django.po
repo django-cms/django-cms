@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# jumpifzero <jumpifzero@gmail.com>, 2011.
-#   <miguelmclara@gmail.com>, 2012.
-#   <vfigueiro@gmail.com>, 2012.
+# jumpifzero <jumpifzero@gmail.com>, 2011
+# mikec <miguelmclara@gmail.com>, 2012
+# Vítor Figueiró <vfigueiro@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

@@ -3,22 +3,23 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# André Hendriks <andre.hendriks@deltares.nl>, 2011.
-# Bouke Haarsma <bouke@webatoom.nl>, 2012.
-#   <bouke@webatoom.nl>, 2012.
-# Chris Wesseling <chris.wesseling@xs4all.nl>, 2011.
-# Jacques de Hooge <>, 2012.
-# Jonas Obrist <me@ojii.ch>, 2011.
-#   <leon@cmsworks.nl>, 2012.
-#  <transifex.net@kurdyenviolien.nl>, 2013.
-#   <vande.ryse.steven@gmail.com>, 2012.
+# André Hendriks <andre.hendriks@deltares.nl>, 2011
+# Bouke Haarsma <bouke@webatoom.nl>, 2012
+# Bouke Haarsma <bouke@webatoom.nl>, 2012
+# Chris Wesseling <chris.wesseling@xs4all.nl>, 2011
+# Jacques de Hooge <>, 2012
+# Jonas Obrist <me@ojii.ch>, 2011
+# leonderijke <leon@cmsworks.nl>, 2012
+# maartendraijer <maarten@madra.nl>, 2013
+# kurdy <transifex.net@kurdyenviolien.nl>, 2013
+# Steven Vande Ryse <vande.ryse.steven@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2013-04-09 16:30+0000\n"
+"Last-Translator: maartendraijer <maarten@madra.nl>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -293,7 +294,7 @@ msgstr "Template ongeldig"
 #: admin/pageadmin.py:752
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "Template aangepast naar %s"
 
 #: admin/pageadmin.py:754
 msgid "The template was successfully changed"
@@ -306,7 +307,7 @@ msgstr "Fout! Je hebt geen rechten om deze pagina te verplaatsen. Vernieuw de pa
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "Pagina verplaatst"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -793,14 +794,14 @@ msgstr "overschrijf de titel (html 'title'-tag)"
 #: plugins/utils.py:124
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Deze placeholder bevat al het maximale aantal plugins (%s)."
 
 #: plugins/utils.py:134
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "Deze placeholder bevat al het maximale aantal (%(limit)s) van toegestane %(plugin_name)s plugins."
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -1365,11 +1366,11 @@ msgstr "Voorpagina"
 
 #: templates/admin/cms/page/change_form.html:83
 msgid "Publish draft"
-msgstr ""
+msgstr "verzoek tot publiceren"
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Preview draft"
-msgstr ""
+msgstr "Bekijk concept"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"

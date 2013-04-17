@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Mattias Lindvall <mattias.lindvall@gmail.com>, 2013.
+# thnee <mattias.lindvall@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

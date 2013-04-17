@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Daigo Sakamoto <superdaigo@gmail.com>, 2011.
-# Jonas Obrist <me@ojii.ch>, 2011.
-# Jonas Obrist <ojiidotch@gmail.com>, 2012.
+# Daigo Sakamoto <superdaigo@gmail.com>, 2011
+# Jonas Obrist <me@ojii.ch>, 2011
+# Jonas Obrist <ojiidotch@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ahmed H <info@draco-003.com>, 2013.
+# draco003 <info@draco-003.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

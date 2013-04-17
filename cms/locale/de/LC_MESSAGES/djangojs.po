@@ -3,8 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Jonas Obrist <me@ojii.ch>, 2011.
-# Michael P. Jung <michael.jung@terreon.de>, 2013.
+# Jonas Obrist <me@ojii.ch>, 2011
+# bikeshedder <michael.jung@terreon.de>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

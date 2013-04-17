@@ -3,8 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# aaffdd11 <chenyuan328@gmail.com>, 2011.
-#   <glacier_05@yahoo.com.cn>, 2011.
+# aaffdd11 <chenyuan328@gmail.com>, 2011
+# ofive <glacier_05@yahoo.com.cn>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

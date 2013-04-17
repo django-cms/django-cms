@@ -3,8 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Alireza Savand <alireza.savand@gmail.com>, 2012.
-# cafe-click <cafeclick@rocketmail.com>, 2013.
+# Alireza Savand <alireza.savand@gmail.com>, 2012
+# cafeclick <cafeclick@rocketmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

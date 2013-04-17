@@ -3,8 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-#   <commonzenpython@gmail.com>, 2012.
-# Juan Carizza <sencillomail@gmail.com>, 2011.
+# paulo alvarado <commonzenpython@gmail.com>, 2012
+# Juan Carizza <sencillomail@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

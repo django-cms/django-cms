@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# babu <marco.badan@gmail.com>, 2011.
-# Denis Darii <sinednx@gmail.com>, 2011.
-# Francesco Moggia <f.moggia@gmail.com>, 2013.
-# Iacopo Spalletti <i.spalletti@nephila.it>, 2011.
-#   <i.spalletti@nephila.it>, 2012.
-# karim79 <karim@gorjux.net>, 2011.
-# Marco Barberis <mbarberis@gmail.com>, 2011.
-# Marco Bonetti <marco@cruncher.ch>, 2013.
-#   <sbrentegani@gmail.com>, 2011.
+# babu <marco.badan@gmail.com>, 2011
+# Denis Darii <sinednx@gmail.com>, 2011
+# fram74 <f.moggia@gmail.com>, 2013
+# yakky <i.spalletti@nephila.it>, 2011
+# yakky <i.spalletti@nephila.it>, 2012
+# karim79 <karim@gorjux.net>, 2011
+# Marco Barberis <mbarberis@gmail.com>, 2011
+# Marco Bonetti <marco@cruncher.ch>, 2013
+# brente <sbrentegani@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

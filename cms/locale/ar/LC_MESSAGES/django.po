@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ahmed H <info@draco-003.com>, 2013.
-# Jonas Obrist <me@ojii.ch>, 2011.
+# draco003 <info@draco-003.com>, 2013
+# KuwaitNET <bashar@kuwaitnet.net>, 2013
+# Jonas Obrist <me@ojii.ch>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2013-04-16 21:36+0000\n"
+"Last-Translator: KuwaitNET <bashar@kuwaitnet.net>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -286,7 +287,7 @@ msgstr "قالب غير صحيح"
 #: admin/pageadmin.py:752
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "تم تعديل القالب إلى %s"
 
 #: admin/pageadmin.py:754
 msgid "The template was successfully changed"
@@ -299,7 +300,7 @@ msgstr "خطأ! ليس لديك الصلاحية لنقل هذه الصفحة. �
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "تم نقل الصفحة"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -786,14 +787,14 @@ msgstr "تحرير العنوان في الـ HTML"
 #: plugins/utils.py:124
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "هذا الموضع المؤقت به الحد الأقصى من البرامج المساعدة (%s)."
 
 #: plugins/utils.py:134
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "هذا الموضع المؤقت به الحد الأفصى  (%(limit)s) من عدد %(plugin_name)s من برامج المساعدة"
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -1358,11 +1359,11 @@ msgstr "الرئيسية"
 
 #: templates/admin/cms/page/change_form.html:83
 msgid "Publish draft"
-msgstr ""
+msgstr "نشر الطلب"
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Preview draft"
-msgstr ""
+msgstr "عرض المسودة"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"

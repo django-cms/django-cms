@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ales Zabala Alava <shagi@gisa-elkartea.org>, 2012.
+# Ales Zabala Alava <shagi@gisa-elkartea.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

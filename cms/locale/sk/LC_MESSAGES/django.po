@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# juraj.hudak <juraj.hudak@solvere.sk>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2013-04-14 18:30+0000\n"
+"Last-Translator: juraj.hudak <juraj.hudak@solvere.sk>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,7 +31,7 @@ msgstr "Editovací mód"
 
 #: cms_toolbar.py:109
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
 #: cms_toolbar.py:133 templates/admin/cms/page/menu_item.html:58
 #: templates/admin/cms/page/menu_item.html:71
@@ -79,7 +80,7 @@ msgstr "Zobraziť históriu"
 
 #: cms_toolbar.py:224
 msgid "Admin"
-msgstr ""
+msgstr "Administrátor"
 
 #: plugin_base.py:72
 msgid "Advanced options"
@@ -365,7 +366,7 @@ msgstr "Zásuvný modul %(plugin_name)s bol pridaný do %(placeholder)s"
 
 #: admin/pageadmin.py:1182
 msgid "Language must be different than the copied language!"
-msgstr ""
+msgstr "Jazyk musí byť odlišný od kopírovaného jazyka!"
 
 #: admin/pageadmin.py:1188
 msgid "You do not have permission to add plugins"
@@ -969,7 +970,7 @@ msgstr ""
 
 #: plugins/link/models.py:16
 msgid "new window"
-msgstr ""
+msgstr "Nové okno"
 
 #: plugins/link/models.py:17
 msgid "parent window"
@@ -1142,7 +1143,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/cms_plugins.py:23
 msgid "Twitter Search"
-msgstr ""
+msgstr "Twitter vyhľadávanie"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1449,11 +1450,11 @@ msgstr "publikované"
 
 #: templates/admin/cms/page/change_list_tree.html:11
 msgid "start"
-msgstr ""
+msgstr "Štart"
 
 #: templates/admin/cms/page/change_list_tree.html:12
 msgid "end"
-msgstr ""
+msgstr "Koniec"
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "restricted"
@@ -1684,7 +1685,7 @@ msgstr "Žiadny zásuvný modul. Pridať zásuvný modul do tejto oblasti."
 
 #: templates/cms/toolbar/placeholder.html:33
 msgid "Available plugins"
-msgstr ""
+msgstr "Dostupné zásuvné moduly"
 
 #: templates/cms/toolbar/toolbar.html:27
 msgid "The selected element can not be moved to the desired location."
@@ -1717,7 +1718,7 @@ msgstr "Užívateľské meno"
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
 msgid "Login"
-msgstr ""
+msgstr "Prihlásiť"
 
 #: templates/cms/toolbar/items/switcher.html:4
 msgid "Switch on/off"

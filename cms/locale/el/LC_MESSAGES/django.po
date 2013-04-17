@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# George Petsagourakis <petsagouris@gmail.com>, 2013.
-# Kostas Papadimitriou <vinilios@gmail.com>, 2011.
+# George Petsagourakis <petsagouris@gmail.com>, 2013
+# Kostas Papadimitriou <vinilios@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
+"PO-Revision-Date: 2013-04-12 06:50+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
 "MIME-Version: 1.0\n"
@@ -947,11 +947,11 @@ msgstr "όνομα"
 #: plugins/link/models.py:11 plugins/picture/models.py:21
 #: plugins/teaser/models.py:19
 msgid "link"
-msgstr ""
+msgstr "σύνδεσμος"
 
 #: plugins/link/models.py:12
 msgid "A link to a page has priority over a text link."
-msgstr ""
+msgstr "Ένας σύνδεσμος σε σελίδα έχει προτεραιότητα έναντι ενός σύνδεσμου σε κειμένο."
 
 #: plugins/link/models.py:13
 msgid "mailto"
@@ -959,23 +959,23 @@ msgstr "δεσμός αποστολής email"
 
 #: plugins/link/models.py:13
 msgid "An email adress has priority over a text link."
-msgstr ""
+msgstr "Μια διεύθυνση ηλεκτρονικής αλληλογραφίας έχει προτεραιότητα έναντι ενός συνδέσμου σε κείμενο"
 
 #: plugins/link/models.py:14
 msgid "target"
-msgstr ""
+msgstr "στόχος"
 
 #: plugins/link/models.py:15
 msgid "same window"
-msgstr ""
+msgstr "ίδιο παράθυρο"
 
 #: plugins/link/models.py:16
 msgid "new window"
-msgstr ""
+msgstr "νέο παράθυρο"
 
 #: plugins/link/models.py:17
 msgid "parent window"
-msgstr ""
+msgstr "αρχικό παράθυρο"
 
 #: plugins/link/models.py:18
 msgid "topmost frame"

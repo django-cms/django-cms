@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# AriesAnywhere Anywhere <ariesanywhere@gmail.com>, 2012.
+# AriesAnywhere Anywhere <ariesanywhere@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

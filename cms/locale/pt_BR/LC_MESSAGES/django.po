@@ -3,10 +3,10 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fábio  <bnafta@gmail.com>, 2011.
-#  <felipemocruha@gmail.com>, 2013.
-# Juliano Fischer Naves <>, 2012.
-# Marcelo J. Both <marcelo.both@gmail.com>, 2012.
+# Fábio <bnafta@gmail.com>, 2011
+# felipemocruha <felipemocruha@gmail.com>, 2013
+# Juliano Fischer Naves <>, 2012
+# marcelo.both <marcelo.both@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

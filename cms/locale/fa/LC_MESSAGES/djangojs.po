@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# cafe-click <cafeclick@rocketmail.com>, 2013.
+# cafeclick <cafeclick@rocketmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
