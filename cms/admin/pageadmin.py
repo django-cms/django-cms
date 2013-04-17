@@ -539,6 +539,7 @@ class PageAdmin(ModelAdmin):
                 'moderation_delete_request': moderation_delete_request,
                 'show_delete_translation': len(obj.get_languages()) > 1,
                 'current_site_id': settings.SITE_ID,
+                'CSRF_COOKIE_NAME': settings.CSRF_COOKIE_NAME,
             }
             extra_context = self.update_language_tab_context(request, obj, extra_context)
         tab_language = request.GET.get("language", None)
@@ -704,6 +705,7 @@ class PageAdmin(ModelAdmin):
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
             'open_menu_trees': open_menu_trees,
+            'CSRF_COOKIE_NAME': settings.CSRF_COOKIE_NAME,
         }
         if 'reversion' in settings.INSTALLED_APPS:
             context['has_change_permission'] = self.has_change_permission(request)

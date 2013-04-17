@@ -12,6 +12,7 @@
 
 {% block coltype %}flex{% endblock %}
 {% block extrahead %}
+<script type="text/javascript">window.__csrf_cookie_name__ = "{% filter escapejs %}{{CSRF_COOKIE_NAME}}{% endfilter %}";</script>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/pages.css"/>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/tree_component.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/jquery.dialog.css" />

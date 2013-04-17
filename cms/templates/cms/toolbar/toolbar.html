@@ -1,5 +1,6 @@
 {% load i18n adminmedia sekizai_tags cms_js_tags cms_admin %}
 {% addtoblock "js" %}
+<script type="text/javascript">window.__csrf_cookie_name__ = "{% filter escapejs %}{{CSRF_COOKIE_NAME}}{% endfilter %}";</script>
 <script type="text/javascript">
 	var _jQuery = window.jQuery || null;
 	var _$ = window.$;
