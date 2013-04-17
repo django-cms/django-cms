@@ -105,7 +105,7 @@ CMS.$(document).ready(function ($) {
 			// show toolbar
 			this.toolbar.show();
 			// adds class to allow css to prepare page for edits
-			$('html').toggleClass('cms_toolbar', true);
+			$('html').toggleClass('cms_toolbar-toolbar', true);
 			// change data information
 			this.toolbar.data('collapsed', false);
 			// add class to trigger
