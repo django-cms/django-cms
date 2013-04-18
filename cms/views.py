@@ -62,7 +62,7 @@ def details(request, slug):
             if languages:
                 with SettingsOverride(LANGUAGES=languages, LANGUAGE_CODE=languages[0][0]):
                     #get supported language
-                    new_language = translation.get_language_from_request(request)
+                    new_language = get_language_from_request(request)
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
