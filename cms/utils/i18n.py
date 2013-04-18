@@ -72,6 +72,8 @@ def get_language_list(site_id=None):
     """
     :return: returns a list of iso2codes for this site
     """
+    if not settings.USE_I18N:
+        return [settings.LANGUAGE_CODE]
     languages = []
     for language in get_languages(site_id):
         languages.append(language['code'])

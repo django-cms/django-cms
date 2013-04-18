@@ -248,7 +248,10 @@ class CMSTestCase(testcases.TestCase):
             path = self.get_pages_root()
 
         if not language:
-            language = settings.LANGUAGES[0][0]
+            if settings.USE_I18N:
+                language = settings.LANGUAGES[0][0]
+            else:
+                language = settings.LANGUAGE_CODE
 
         if post_data:
             request = factory.post(path, post_data)
