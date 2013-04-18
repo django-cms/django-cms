@@ -24,7 +24,7 @@ urlpatterns = patterns('',
 
 urlpatterns += staticfiles_urlpatterns()
 
-urlpatterns += patterns('',
+urlpatterns += i18n_patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^example/$', 'cms.test_utils.project.placeholderapp.views.example_view'),
     url(r'^', include('cms.urls')),
