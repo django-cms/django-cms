@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import inspect
 from contextlib import contextmanager
 from cms import constants
 from cms.models.pluginmodel import CMSPlugin
@@ -225,11 +226,18 @@ def check_plugin_instances(output):
 @define_check
 def check_copy_relations(output):
     c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
+
+    def get_class(method_name, model):
+        for cls in inspect.getmro(model):
+            if method_name in cls.__dict__:
+                return cls
+        return None
+
     with output.section('Presence of "copy_relations"') as section:
         plugin_pool.discover_plugins()
         for plugin in plugin_pool.plugins.values():
             plugin_class = plugin.model
-            if 'copy_relations' in plugin_class.__dict__:
+            if get_class('copy_relations', plugin_class) is not CMSPlugin or plugin_class is CMSPlugin:
                 # this class defines a ``copy_relations`` method, nothing more
                 # to do
                 continue
