@@ -46,6 +46,9 @@ class TestNoI18N(SettingsOverrideTestCase):
         clear_url_caches()
         super(TestNoI18N, self).setUp()
 
+    def tearDown(self):
+        clear_url_caches()
+
     def test_language_chooser(self):
         # test simple language chooser with default args
         page1 = create_page("home", template="col_two.html", language="en-us", published=True)
