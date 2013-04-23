@@ -2,6 +2,7 @@
 from copy import deepcopy
 from distutils.version import LooseVersion
 from urllib2 import unquote
+from django.utils import simplejson
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import find_placeholder_relation
@@ -192,7 +193,7 @@ class PageAdmin(ModelAdmin):
                                 pat(r'copy-plugins/$', self.copy_plugins),
                                 pat(r'add-plugin/$', self.add_plugin),
                                 pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-                                pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
+                                pat(r'delete-plugin/$', self.delete_plugin),
                                 pat(r'move-plugin/$', self.move_plugin),
                                 pat(r'^([0-9]+)/edit-title/$', self.edit_title),
                                 pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
@@ -1188,8 +1189,7 @@ class PageAdmin(ModelAdmin):
 
         plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by(
             'position')
-        return render_to_response('admin/cms/page/widgets/plugin_item.html', {'plugin_list': plugin_list},
-                                  RequestContext(request))
+        return HttpResponse(simplejson.dumps({'plugin_list': list(plugin_list)}), content_type='application/json')
 
     @xframe_options_sameorigin
     @create_revision()

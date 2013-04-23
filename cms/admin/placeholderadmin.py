@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+from django.utils import simplejson
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.exceptions import PluginLimitReached
@@ -247,7 +248,7 @@ class PlaceholderAdmin(ModelAdmin):
                     "deleted": True,
                     'name': unicode(cms_plugin),
                 })
-            return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
+            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
 
         if not instance:
             # instance doesn't exist, call add view
@@ -274,7 +275,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'icon': force_escape(saved_object.get_instance_icon_src()),
                 'alt': force_escape(escapejs(saved_object.get_instance_icon_alt())),
             }
-            return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
+            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
 
         return response
 
@@ -369,7 +370,6 @@ class PlaceholderAdmin(ModelAdmin):
             model=placeholder._get_attached_model(),
         )
         if plugins:
-            return render_to_response('admin/cms/page/widgets/plugin_item.html',
-                                      {'plugin_list': list(plugins)}, RequestContext(request))
+            return HttpResponse(simplejson.dumps({'plugin_list': list(plugins)}), content_type='application/json')
         else:
             return HttpResponseBadRequest("Error during copy")

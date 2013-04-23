@@ -97,45 +97,8 @@ class PlaceholderTestCase(CMSTestCase):
     def test_fieldsets_requests(self):
         response = self.client.get(reverse('admin:placeholderapp_example1_add'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example2_add'))
+        response = self.client.get(reverse('admin:placeholderapp_twoplaceholderexample_add'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example3_add'))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example4_add'))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example5_add'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_fieldsets(self):
-        from cms.test_utils.project.placeholderapp import admin as __ # load admin
-
-        request = self.get_request('/')
-        admins = [
-            (Example1, 2),
-            (Example2, 3),
-            (Example3, 3),
-            (Example4, 3),
-            (Example5, 4),
-        ]
-        for model, fscount in admins:
-            ainstance = admin.site._registry[model]
-            fieldsets = ainstance.get_fieldsets(request)
-            form = ainstance.get_form(request, None)
-            phfields = ainstance._get_placeholder_fields(form)
-            self.assertEqual(len(fieldsets), fscount, (
-                "Asserting fieldset count for %s. Got %s instead of %s: %s. "
-                "Using %s." % (model.__name__, len(fieldsets),
-                fscount, fieldsets, ainstance.__class__.__name__)
-            ))
-            for label, fieldset in fieldsets:
-                fields = list(fieldset['fields'])
-                for field in fields:
-                    if field in phfields:
-                        self.assertTrue(len(fields) == 1)
-                        self.assertTrue('plugin-holder' in fieldset['classes'])
-                        self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
-                        phfields.remove(field)
-            self.assertEqual(phfields, [])
 
     def test_page_only_plugins(self):
         ex = Example1(
@@ -150,7 +113,7 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
 
     def test_inter_placeholder_plugin_move(self):
-        ex = Example5(
+        ex = TwoPlaceholderExample(
             char_1='one',
             char_2='two',
             char_3='tree',
@@ -165,7 +128,7 @@ class PlaceholderTestCase(CMSTestCase):
         ph2_pl1 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin1').cmsplugin_ptr
         ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
-        response = self.client.post(reverse('admin:placeholderapp_example5_move_plugin'), {
+        response = self.client.post(reverse('admin:placeholderapp_twoplaceholderexample_move_plugin'), {
             'placeholder': ph2.slot,
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
@@ -713,7 +676,7 @@ class PlaceholderI18NTest(CMSTestCase):
 
     def test_no_tabs(self):
 
-        ex = Example4(
+        ex = Example1(
             char_1='one',
             char_2='two',
             char_3='one',
@@ -723,12 +686,12 @@ class PlaceholderI18NTest(CMSTestCase):
         user = self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/example4/1/')
+        response = self.client.get('/de/admin/placeholderapp/example1/1/')
         self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_placeholder_tabs(self):
 
-        ex = Example5(
+        ex = TwoPlaceholderExample(
             char_1='one',
             char_2='two',
             char_3='one',
