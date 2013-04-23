@@ -290,17 +290,13 @@ class PageAdmin(ModelAdmin):
         Add fieldsets of placeholders to the list of already existing
         fieldsets.
         """
+        #TODO: 3.0 one save
         if obj: # edit
             given_fieldsets = deepcopy(self.fieldsets)
             if not obj.has_publish_permission(request):
                 fields = list(given_fieldsets[0][1]['fields'][2])
                 fields.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(fields)
-            placeholders_template = get_template_from_request(request, obj)
-            for placeholder_name in self.get_fieldset_placeholders(placeholders_template):
-                name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
-                name = _(name)
-                given_fieldsets += [(title(name), {'fields': [placeholder_name], 'classes': ['plugin-holder']})]
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
                 given_fieldsets.append(advanced)
@@ -366,7 +362,7 @@ class PageAdmin(ModelAdmin):
                 form.base_fields['template'].choices = template_choices
                 form.base_fields['template'].initial = force_unicode(selected_template)
 
-            placeholders = self.get_fieldset_placeholders(selected_template)
+            placeholders = []#self.get_fieldset_placeholders(selected_template)
             for placeholder_name in placeholders:
                 plugin_list = []
                 show_copy = False
@@ -1091,7 +1087,7 @@ class PageAdmin(ModelAdmin):
         """
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
-                                                  template="admin/cms/page/lazy_menu.html")
+                                                  template="admin/cms/page/tree/lazy_menu.html")
 
     @require_POST
     @xframe_options_sameorigin

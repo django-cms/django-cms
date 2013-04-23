@@ -12,11 +12,9 @@ from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholderapp.models import (Example1, Example2,
-    Example3, Example4, Example5, MultilingualExample1)
+from cms.test_utils.project.placeholderapp.models import (Example1, TwoPlaceholderExample, MultilingualExample1)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride,
-    UserLoginContext)
+from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
@@ -740,7 +738,7 @@ class PlaceholderI18NTest(CMSTestCase):
         user = self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/example5/1/')
+        response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/1/')
         self.assertNotContains(response, """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
 
 
