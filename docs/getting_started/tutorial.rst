@@ -59,7 +59,7 @@ To make your life easier, add the following at the top of the file::
     # -*- coding: utf-8 -*-
     import os
     gettext = lambda s: s
-    PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+    PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
 
 Add the following apps to your :setting:`django:INSTALLED_APPS`.
