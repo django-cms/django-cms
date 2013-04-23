@@ -66,6 +66,7 @@ CMS.$(document).ready(function () {
 				{% for item in request.toolbar.get_items %}
 					{{ item.render }}
 				{% endfor %}
+                {% if current_page %}
 				<li{% if not request.toolbar.edit_mode %} class="cms_toolbar-item_navigation-disabled"{% endif %}>
 					<a href="{% url admin:cms_page_change current_page.pk %}">{% trans "Publish" %}</a>
 					<ul>
@@ -73,6 +74,7 @@ CMS.$(document).ready(function () {
 						<li><a href="{% url admin:cms_page_revert_page current_page.pk %}" data-text="{% trans "Are you sure you want to revert to live?" %}" rel="dialogue">{% trans "Revert to live" %}</a></li>
 					</ul>
 				</li>
+                {% endif %}
 			</ul>
             {% endif %}
 		</div>

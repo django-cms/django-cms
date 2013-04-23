@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import urllib
+
 from django.contrib.auth.forms import AuthenticationForm
 from cms.toolbar.base import Toolbar
 from cms.toolbar.items import List, Item, Break
@@ -9,14 +11,15 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from utils.permissions import has_page_change_permission
-import urllib
 
 
 def _get_page_admin_url(toolbar):
     return reverse('admin:cms_page_change', args=(toolbar.request.current_page.pk,))
 
+
 def _get_page_history_url(toolbar):
     return reverse('admin:cms_page_history', args=(toolbar.request.current_page.pk,))
+
 
 def _get_add_child_url(toolbar):
     data = {
@@ -25,6 +28,7 @@ def _get_add_child_url(toolbar):
     }
     args = urllib.urlencode(data)
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
+
 
 def _get_add_sibling_url(toolbar):
     data = {
@@ -35,11 +39,14 @@ def _get_add_sibling_url(toolbar):
     args = urllib.urlencode(data)
     return '%s?%s' % (reverse('admin:cms_page_add'), args)
 
+
 def _get_delete_url(toolbar):
     return reverse('admin:cms_page_delete', args=(toolbar.request.current_page.pk,))
 
+
 def _get_approve_url(toolbar):
     return reverse('admin:cms_page_approve_page', args=(toolbar.request.current_page.pk,))
+
 
 def _get_publish_url(toolbar):
     return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.pk,))
@@ -59,6 +66,7 @@ class CMSToolbar(Toolbar):
     """
     The default CMS Toolbar
     """
+
     def __init__(self, request):
         super(CMSToolbar, self).__init__(request)
         self.login_form = CMSToolbarLoginForm(request=request)
@@ -119,8 +127,11 @@ class CMSToolbar(Toolbar):
         """
         Builds the 'page menu'
         """
+        if not self.request.current_page.pk:
+            return []
         menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
-        menu_items.items.append(Item(reverse('admin:cms_page_change', args=[page.pk]), _('Settings'), load_side_frame=True))
+        menu_items.items.append(
+            Item(reverse('admin:cms_page_change', args=[page.pk]), _('Settings'), load_side_frame=True))
         menu_items.items.append(Break())
         menu_items.items.append(Item(reverse('admin:cms_page_changelist'), _('Move/add Pages'), load_side_frame=True))
         menu_items.items.append(Item(_get_add_child_url(self), _('Add child page'), load_side_frame=True))
@@ -128,7 +139,7 @@ class CMSToolbar(Toolbar):
         menu_items.items.append(Break())
         menu_items.items.append(Item(_get_delete_url(self), _('Delete Page'), load_side_frame=True))
         if 'reversion' in settings.INSTALLED_APPS:
-                menu_items.items.append(Item(_get_page_history_url, _('View History'), load_side_frame=True))
+            menu_items.items.append(Item(_get_page_history_url, _('View History'), load_side_frame=True))
         return menu_items
 
     def get_admin_menu(self, can_change):

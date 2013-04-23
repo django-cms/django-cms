@@ -301,6 +301,29 @@ class RenderPlugin(InclusionTag):
 register.tag(RenderPlugin)
 
 
+class PluginChildClasses(InclusionTag):
+    template = "cms/toolbar/draggable_menu.html"
+    name = "plugin_child_classes"
+    options = Options(
+        Argument('plugin')
+    )
+
+    def get_context(self, context, plugin):
+        # Prepend frontedit toolbar output if applicable
+
+        request = context['request']
+        page = request.current_page
+        slot = context['slot']
+        child_plugin_classes = []
+        if plugin.get_plugin_class().allow_children:
+            instance, plugin = plugin.get_plugin_instance()
+            for child_class_name in plugin.get_child_classes(slot, page):
+                cls = plugin_pool.get_plugin(child_class_name)
+                child_plugin_classes.append((cls.__name__, unicode(cls.name)))
+        return {'plugin_classes': child_plugin_classes}
+
+register.tag(PluginChildClasses)
+
 class PageAttribute(AsTag):
     """
     This template node is used to output attribute from a page such
