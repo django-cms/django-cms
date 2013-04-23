@@ -147,3 +147,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - check_copy_relations fixed for abstract classes
 - non public frontend languages fixed
 
+==== 3.0.0 (XXXXX) ===
+
+- Plugins are only editable in frontend
+- PluginEditor has been removed

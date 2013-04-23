@@ -24,4 +24,4 @@ def get_copy_dialog(request, page_id):
         'form': PermissionForm(), # class needs to be instantiated
         'callback': request.REQUEST['callback'],
     }
-    return render_to_response("admin/cms/page/dialog/copy.html", context)
+    return render_to_response("admin/cms/page/tree/copy_premissions.html", context)

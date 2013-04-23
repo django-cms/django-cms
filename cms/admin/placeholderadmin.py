@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.views.decorators.clickjacking import xframe_options_sameorigin
+from copy import deepcopy
 
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.exceptions import PluginLimitReached
 from cms.forms.fields import PlaceholderFormField
 from cms.models.fields import PlaceholderField
@@ -17,7 +18,6 @@ from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _, get_language
 from django.conf import settings
-from copy import deepcopy
 
 
 class PlaceholderAdmin(ModelAdmin):
@@ -27,22 +27,20 @@ class PlaceholderAdmin(ModelAdmin):
     class Media:
         css = {
             'all': [cms_static_url(path) for path in (
-                'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
-                'css/jquery.dialog.css',
+                'css/cms.base.css',
                 'css/plugin_editor.css',
             )]
         }
         js = [cms_static_url(path) for path in [
-            'js/plugins/admincompat.js',
+            'js/jquery.min.js',
             'js/csrf.js',
-            'js/libs/jquery.query.js',
-            'js/libs/jquery.ui.core.js',
-            'js/libs/jquery.ui.dialog.js',
-            ]
+            'js/plugins/jquery.query.js',
+            'js/plugins/jquery.ui.custom.js',
         ]
-        
+        ]
+
 
     def get_fieldsets(self, request, obj=None):
         """
