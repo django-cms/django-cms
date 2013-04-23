@@ -3,16 +3,14 @@ from cms.api import create_page
 from cms.cms_toolbar import CMSToolbar
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
-    GetButton)
 from cms.utils import get_cms_setting
-from django.conf import settings
+
 from django.contrib.auth.models import AnonymousUser, User, Permission
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 
-class ToolbarTestBase(SettingsOverrideTestCase):
 
+class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False):
         path = page and page.get_absolute_url() or path
         if edit:
@@ -44,7 +42,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
             email='nonstaff@staff.org',
             is_active=True,
             is_staff=False,
-            )
+        )
         nonstaff.set_password('nonstaff')
         nonstaff.save()
         nonstaff.user_permissions.add(Permission.objects.get(codename='change_page'))
@@ -64,7 +62,6 @@ class ToolbarTestBase(SettingsOverrideTestCase):
 
 
 class ToolbarTests(ToolbarTestBase):
-
     settings_overrides = {'CMS_PERMISSION': False}
 
     def test_toolbar_no_page_anon(self):
@@ -211,11 +208,11 @@ class ToolbarTests(ToolbarTestBase):
         overview, addchild, addsibling, delete = pagemenu.raw_items
         self.assertEqual(overview.url, reverse('admin:cms_page_changelist'))
         self.assertEqual(addchild.serialize_url({}, toolbar),
-            reverse('admin:cms_page_add') + '?position=last-child&target=%s' % page.pk)
+                         reverse('admin:cms_page_add') + '?position=last-child&target=%s' % page.pk)
         self.assertEqual(addsibling.serialize_url({}, toolbar),
-            reverse('admin:cms_page_add') + '?position=last-child')
+                         reverse('admin:cms_page_add') + '?position=last-child')
         self.assertEqual(delete.serialize_url({}, toolbar),
-            reverse('admin:cms_page_delete', args=(page.pk,)))
+                         reverse('admin:cms_page_delete', args=(page.pk,)))
 
         # check the admin-menu
         admin = items[4]
@@ -237,7 +234,7 @@ class ToolbarTests(ToolbarTestBase):
             toolbar = CMSToolbar(request)
             items = toolbar.get_items({})
             self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
-        
+
     def test_toolbar_markup(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         superuser = self.get_superuser()

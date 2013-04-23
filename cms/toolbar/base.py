@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.toolbar.constants import ALIGNMENTS
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils import simplejson
 from django.utils.encoding import force_unicode
 from django.utils.functional import Promise
@@ -59,7 +58,7 @@ class Serializable(object):
         return {}
 
 
-class Toolbar(Serializable):
+class Toolbar(object):
     """
     A base toolbar, implements the request_hook API and the get_items API.
     """

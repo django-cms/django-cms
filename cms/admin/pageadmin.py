@@ -16,11 +16,10 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction, models
-from django.forms import CharField
 from django.http import (HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
-from django.template.defaultfilters import (title, escape, force_escape, escapejs)
+from django.template.defaultfilters import (escape, force_escape, escapejs)
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -40,7 +39,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import copy_plugins, helpers, moderator, permissions, plugins, get_template_from_request,\
-    get_language_from_request, placeholder as placeholder_utils, admin as admin_utils, cms_static_url
+    get_language_from_request, admin as admin_utils, cms_static_url
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
@@ -193,8 +192,9 @@ class PageAdmin(ModelAdmin):
                                 pat(r'copy-plugins/$', self.copy_plugins),
                                 pat(r'add-plugin/$', self.add_plugin),
                                 pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-                                pat(r'remove-plugin/$', self.delete_plugin),
+                                pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
                                 pat(r'move-plugin/$', self.move_plugin),
+                                pat(r'^([0-9]+)/edit-title/$', self.edit_title),
                                 pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
                                 pat(r'^([0-9]+)/move-page/$', self.move_page),
                                 pat(r'^([0-9]+)/copy-page/$', self.copy_page),

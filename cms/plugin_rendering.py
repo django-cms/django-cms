@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from cms.models.placeholdermodel import Placeholder
-from cms.plugin_processors import (plugin_meta_context_processor,
-    mark_safe_plugin_processor)
+from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import get_placeholder_conf
-from django.conf import settings
 from django.template import Template, Context
 from django.template.defaultfilters import title
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 # these are always called before all other plugin context processors
@@ -41,8 +40,7 @@ class PluginContext(Context):
         for processor in processors:
             self.update(processor(instance, placeholder))
 
-def render_plugin(context, instance, placeholder, template, processors=None,
-                  current_app=None):
+def render_plugin(context, instance, placeholder, template, processors=None, current_app=None):
     """
     Renders a single plugin and applies the post processors to it's rendered
     content.
@@ -81,6 +79,12 @@ def render_plugins(plugins, context, placeholder, processors=None):
         out.append(plugin.render_plugin(context, placeholder, processors=processors))
         context.pop()
     return out
+
+
+def render_dragables(plugins, slot, request):
+    return render_to_string("cms/toolbar/draggable.html", {'plugins':plugins, 'slot':slot, 'request':request})
+
+
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"):
     """
@@ -125,11 +129,16 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         processors = None
 
     content.extend(render_plugins(plugins, context, placeholder, processors))
-    content = "".join(content)
+    toolbar_content = ''
+    draggable_content = ''
     if edit:
-        content = render_placeholder_toolbar(placeholder, context, content, name_fallback)
+        toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback))
+        draggable_content = mark_safe(render_dragables(plugins, slot, request))
+    content = mark_safe("".join(content))
+
+    result = render_to_string("cms/toolbar/placeholder.html", {'plugins':content, "bar":toolbar_content, "draggables":draggable_content, 'edit':edit})
     context.pop()
-    return content
+    return result
 
 def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
@@ -158,6 +167,6 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     context['placeholder_label'] = name
     context['placeholder'] = placeholder
     context['page'] = page
-    toolbar = render_to_string("cms/toolbar/placeholder.html", context)
+    toolbar = render_to_string("cms/toolbar/placeholder_bar.html", context)
     context.pop()
-    return "".join([toolbar, content])
+    return toolbar
