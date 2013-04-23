@@ -118,7 +118,7 @@
 - Fixed page change form (jQuery and permissions)
 - Fixed placeholder field permission checks
 
-==== 2.4.0 (1013-4-17)===
+==== 2.4.0 (2013-4-17)===
 
 Please see Install/2.4 release notes *before* attempting to upgrade to version 2.4.
 
@@ -138,3 +138,12 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - PlaceholderAdmin has now language tabs and has support for django-hvad
 - Added `cms.middleware.language.LanguageCookieMiddleware`
 - Added CMS_RAW_ID_USERS
+
+
+==== 2.4.1 (2013-4-22)===
+
+- USE_I18N=False fixed
+- some frontend css stuff fixed
+- check_copy_relations fixed for abstract classes
+- non public frontend languages fixed
+

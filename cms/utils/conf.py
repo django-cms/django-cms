@@ -23,8 +23,10 @@ def default(name):
             if hasattr(settings, name):
                 return getattr(settings, name)
             return wrapped()
+
         update_wrapper(wrapper, wrapped)
         return wrapped
+
     return decorator
 
 
@@ -58,6 +60,7 @@ DEFAULTS = {
     'MAX_PAGE_PUBLISH_REVERSIONS': 25,
 }
 
+
 def get_cache_durations():
     return {
         'menus': getattr(settings, 'MENU_CACHE_DURATION', 60 * 60),
@@ -65,17 +68,21 @@ def get_cache_durations():
         'permissions': 60 * 60,
     }
 
+
 @default('CMS_MEDIA_ROOT')
 def get_media_root():
     return os.path.join(settings.MEDIA_ROOT, get_cms_setting('MEDIA_PATH'))
+
 
 @default('CMS_MEDIA_ROOT')
 def get_media_url():
     return urlparse.urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
 
+
 @default('PLACEHOLDER_FRONTEND_EDITING')
 def get_placeholder_frontend_editing():
     return True
+
 
 def get_templates():
     templates = list(getattr(settings, 'CMS_TEMPLATES', []))
@@ -111,7 +118,7 @@ def _ensure_languages_settings_new(languages):
             for required_key in required_language_keys:
                 if required_key not in language_object:
                     raise ImproperlyConfigured("CMS_LANGUAGES has a language which is missing the required key %r "
-                        "in site %r" % (key, site))
+                                               "in site %r" % (key, site))
             language_code = language_object['code']
             for key in language_object:
                 if key not in valid_language_keys:
@@ -132,11 +139,13 @@ def _ensure_languages_settings_new(languages):
     for site, language_object in needs_fallbacks:
         if site not in site_fallbacks:
             site_fallbacks[site] = [lang['code'] for lang in languages[site] if lang['public']]
-        language_object['fallbacks'] = [lang_code for lang_code in site_fallbacks[site] if lang_code != language_object['code']]
+        language_object['fallbacks'] = [lang_code for lang_code in site_fallbacks[site] if
+            lang_code != language_object['code']]
 
     languages['default'] = defaults
 
     return languages
+
 
 def _get_old_language_conf(code, name, template):
     language = template.copy()
@@ -160,10 +169,11 @@ def _get_old_language_conf(code, name, template):
         language['public'] = code in settings.CMS_FRONTEND_LANGUAGES
     return language
 
+
 def _translate_legacy_languages_settings(languages):
     new_languages = {}
     lang_template = {'fallbacks': [], 'public': True, 'redirect_on_fallback': True,
-                     'hide_untranslated': getattr(settings, 'CMS_HIDE_UNTRANSLATED', False)}
+        'hide_untranslated': getattr(settings, 'CMS_HIDE_UNTRANSLATED', False)}
     codes = dict(languages)
     for site, site_languages in getattr(settings, 'CMS_SITE_LANGUAGES', {1: languages}).items():
         new_languages[site] = []
@@ -173,10 +183,11 @@ def _translate_legacy_languages_settings(languages):
 
     pp = pprint.PrettyPrinter(indent=4)
     warnings.warn("CMS_LANGUAGES has changed in django-cms 2.4\n"
-        "You may replace CMS_LANGUAGES with the following:\n%s" % pp.pformat(new_languages),
-        CMSDeprecationWarning)
+                  "You may replace CMS_LANGUAGES with the following:\n%s" % pp.pformat(new_languages),
+                  CMSDeprecationWarning)
     new_languages['default'] = lang_template.copy()
     return new_languages
+
 
 def _ensure_languages_settings(languages):
     if isinstance(languages, dict):
@@ -186,13 +197,18 @@ def _ensure_languages_settings(languages):
     verified_languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
     return verified_languages
 
+
 def get_languages():
+    if not settings.USE_I18N:
+        return _ensure_languages_settings(
+            {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
     languages = getattr(settings, 'CMS_LANGUAGES', {
         settings.SITE_ID: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
     })
     if VERIFIED in languages:
         return languages
     return _ensure_languages_settings(languages)
+
 
 def get_unihandecode_host():
     host = getattr(settings, 'CMS_UNIHANDECODE_HOST', None)
@@ -202,6 +218,7 @@ def get_unihandecode_host():
         return host
     else:
         return host + '/'
+
 
 COMPLEX = {
     'CACHE_DURATIONS': get_cache_durations,
@@ -213,6 +230,7 @@ COMPLEX = {
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
 }
+
 
 def get_cms_setting(name):
     if name in COMPLEX:
