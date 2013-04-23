@@ -1108,16 +1108,15 @@ class PageAdmin(ModelAdmin):
         page = placeholder.page
         parent = None
         language = request.POST['plugin_language'] or get_language_from_request(request)
+        try:
+            has_reached_plugin_limit(placeholder, plugin_type, language, template=page.get_template())
+        except PluginLimitReached, e:
+            return HttpResponseBadRequest(str(e))
         # page add-plugin
         if not parent_id:
 
             position = request.POST.get('plugin_order',
                                         CMSPlugin.objects.filter(language=language, placeholder=placeholder).count())
-
-            try:
-                has_reached_plugin_limit(placeholder, plugin_type, language, template=page.get_template())
-            except PluginLimitReached, e:
-                return HttpResponseBadRequest(str(e))
         # in-plugin add-plugin
         else:
             parent = get_object_or_404(CMSPlugin, pk=parent_id)

@@ -650,7 +650,7 @@ class AdminTests(AdminTestsBase):
         admin = self.get_admin()
         with self.login_user_context(admin):
             request = self.get_request()
-            response = self.admin_class.remove_plugin(request)
+            response = self.admin_class.delete_plugin(request)
             self.assertEqual(response.status_code, 405)
 
     def test_move_plugin(self):
@@ -751,8 +751,8 @@ class AdminTests(AdminTestsBase):
             with self.login_user_context(admin):
                 data = {
                     'plugin_type': 'TextPlugin',
-                    'placeholder': body.pk,
-                    'language': 'en',
+                    'placeholder_id': body.pk,
+                    'plugin_language': 'en',
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
@@ -775,8 +775,9 @@ class AdminTests(AdminTestsBase):
             with self.login_user_context(admin):
                 data = {
                     'plugin_type': 'TextPlugin',
-                    'placeholder': body.pk,
-                    'language': 'en',
+                    'placeholder_id': body.pk,
+                    'plugin_language': 'en',
+                    'plugin_parent':'',
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
