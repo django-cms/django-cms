@@ -1,0 +1,20 @@
+{% load i18n admin_modify adminmedia cms_js_tags cms_admin %}
+{% comment %}
+- This template is used when an iframe is closed to refresh the page
+{% endcomment %}
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>{% trans "Successfully saved." %}</title>
+		<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
+		<script type="text/javascript">
+		jQuery().ready(function ($) {
+			window.parent.CMS.API.Helpers.reloadBrowser();
+		});
+		</script>
+	</head>
+	<body>
+		{% trans "Successfully saved." %}
+	</body>
+</html>

@@ -1,4 +1,8 @@
 {% load cms_admin i18n %}
+{% comment %}
+- This template is used within the pagetree menu-item as the content
+{% endcomment %}
+
 <div class="cont {{ css_class }}">
 	<div class="col1">
 		{% if has_change_permission %}
@@ -22,15 +26,21 @@
 
 		{% if page.soft_root or page.is_home %}<div class="col-softroot"><span class="icon softroot-icon" title="{% if page.soft_root %}{% trans 'softroot' %}{% else %}{% trans 'home' %}{% endif %}"></span></div>{% endif %}
 
-		<div class="col-language">{% for lang in page.get_languages|in_filtered:site_languages %}
-			{% if has_change_permission %}<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>
-			{% else %}{{ lang|upper }}
+		<div class="col-language">
+		{% for lang in page.get_languages|in_filtered:site_languages %}
+			{% if has_change_permission %}
+				<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{{ lang }}</a>
+			{% else %}
+				{{ lang|upper }}
 			{% endif %}
 			{% if not forloop.last %} | {% endif %}
-		{% endfor %}</div>
+		{% endfor %}
+		</div>
 
-		<div class="col-actions">{% if not filtered %}
-			{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}{% endif %}
+		<div class="col-actions">
+			{% if not filtered %}
+				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
+			{% endif %}
 			{% if has_change_permission %}<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
 
 			{% if has_add_page_permission and has_add_on_same_level_permission %}
@@ -51,7 +61,7 @@
 			</label>
 		</div>
 
-		<div class="col-published">
+			<div class="col-published">
             <label>{{ page.is_public_published|boolean_icon }}</label>
 			{% if has_publish_permission %}
 				{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
@@ -63,7 +73,7 @@
 		</div>
 
 		<div class="col-published">{{ page.publication_date|date:"Y-m-d" }}</div>
-        {% if CMS_SHOW_END_DATE %}<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>{% endif %}
+            {% if CMS_SHOW_END_DATE %}<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>{% endif %}
 		<div class="col-view-perms">{{ page|is_restricted:request }}</div>
 
 
