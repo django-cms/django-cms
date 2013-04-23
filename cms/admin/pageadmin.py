@@ -16,7 +16,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction, models
-from django.http import (HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden)
+from django.http import (HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import (escape, force_escape, escapejs)
@@ -45,7 +45,7 @@ from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
 from cms.utils.permissions import has_global_page_permission
-from cms.utils.plugins import current_site
+from cms.utils.plugins import current_site, get_page_from_plugin_or_404
 from cms.plugins.utils import has_reached_plugin_limit
 from menus.menu_pool import menu_pool
 
@@ -1336,7 +1336,7 @@ class PageAdmin(ModelAdmin):
 
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
             return HttpResponseForbidden(_("You have no permission to move a plugin"))
-        page = plugins.get_page_from_plugin_or_404(plugin)
+        page = get_page_from_plugin_or_404(plugin)
         if page and not page.has_change_permission(request):
             return HttpResponseForbidden(_("You have no permission to change this page"))
         if plugin.parent_id != parent_id:

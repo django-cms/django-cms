@@ -25,6 +25,7 @@ from django.contrib.auth.models import User, Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
+from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from menus.menu_pool import menu_pool
 from types import MethodType
@@ -135,7 +136,6 @@ class AdminTestCase(AdminTestsBase):
                 'pagepermission_set-2-INITIAL_FORMS': 0,
                 'pagepermission_set-2-MAX_NUM_FORMS': 0
             }
-
 
         with self.login_user_context(admin):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
@@ -659,6 +659,7 @@ class AdminTests(AdminTestsBase):
         page = self.get_page()
         source, target = list(page.placeholders.all())[:2]
         pageplugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        placeholder = Placeholder.objects.all()[0]
         permless = self.get_permless()
         admin = self.get_admin()
         with self.login_user_context(permless):
@@ -666,38 +667,35 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 405)
             request = self.get_request(post_data={'not_usable': '1'})
-            response = self.admin_class.move_plugin(request)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "error")
+            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
-            request = self.get_request(post_data={'plugin_id': plugin.pk})
+            request = self.get_request(
+                post_data={'plugin_id': plugin.pk, 'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             self.assertRaises(Http404, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'ids': plugin.pk})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder': 'invalid-placeholder'})
-            response = self.admin_class.move_plugin(request)
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.content, "error")
+                'placeholder_id': 'invalid-placeholder'})
+            self.assertRaises(ValueError, self.admin_class.move_plugin, request)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder': target.slot})
+                'placeholder_id': placeholder.pk, 'plugin_parent':''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder': target.slot})
+                'placeholder_id': placeholder.pk, 'plugin_parent':''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
         with self.login_user_context(permless):
-            request = self.get_request(post_data={'ids': pageplugin.pk,
-                'placeholder': target.slot})
+            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.id, 'plugin_parent':''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
-            request = self.get_request(post_data={'ids': pageplugin.pk,
-                'placeholder': target.slot})
+            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.id, 'plugin_parent':''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
