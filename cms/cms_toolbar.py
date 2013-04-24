@@ -94,17 +94,20 @@ class CMSToolbar(Toolbar):
         self.page_states = []
         if self.is_staff:
             # The 'Admin' Menu
-            items.append(self.get_admin_menu(self.can_change))
+            items.append(self.get_admin_menu())
             if self.request.current_page:
                 has_global_current_page_change_permission = False
                 if settings.CMS_PERMISSION:
                     has_global_current_page_change_permission = has_page_change_permission(self.request)
                 has_current_page_change_permission = self.request.current_page.has_change_permission(self.request)
-                # The 'page' Menu
-                items.append(self.get_page_menu(self.request.current_page))
-                # The 'templates' Menu
                 if has_global_current_page_change_permission or has_current_page_change_permission:
+                    # The 'page' Menu
+                    items.append(self.get_page_menu(self.request.current_page))
+                    # The 'templates' Menu
                     items.append(self.get_template_menu())
+                    # Publish Menu
+                    if self.request.current_page.has_publish_permission(self.request):
+                        items.append(self.get_publish_menu(self.request.current_page))
 
         return items
 
@@ -142,14 +145,25 @@ class CMSToolbar(Toolbar):
             menu_items.items.append(Item(_get_page_history_url, _('View History'), load_side_frame=True))
         return menu_items
 
-    def get_admin_menu(self, can_change):
+    def get_publish_menu(self, page):
+        menu_items = List('', _("Publish"))
+        menu_items.items.append(Item(reverse('admin:cms_page_publish_page',
+                                             args=[page.pk]), _('Publish now'), ajax=True))
+        menu_items.items.append(Item(reverse('admin:cms_page_revert_page',
+                                             args=[page.pk]), _('Revert to live'), ajax=True,
+                                     question=_("Are you sure you want to revert to live?")))
+        return menu_items
+
+    def get_admin_menu(self):
         """
         Builds the 'admin menu' (the one with the cogwheel)
         """
         admin_items = List(reverse("admin:index"), _("Admin"))
         admin_items.items.append(Item(reverse('admin:index'), _('Administration'), load_side_frame=True))
-        admin_items.items.append(Item(reverse("admin:cms_page_changelist"), _('Pages'), load_side_frame=True))
-        admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
+        if self.can_change:
+            admin_items.items.append(Item(reverse("admin:cms_page_changelist"), _('Pages'), load_side_frame=True))
+        if self.request.user.has_perm('user.change_user'):
+            admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
         admin_items.items.append(Break())
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True, active=True))
         return admin_items
