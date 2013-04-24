@@ -924,7 +924,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(response.content.count('<li '), 1)
+        self.assertEqual(response.content.count('"position":'), 1)
         # assert copy success
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)

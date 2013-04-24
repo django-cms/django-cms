@@ -33,13 +33,13 @@ from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES, PagePermissionInlineA
 from cms.admin.views import revert_plugins
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import PluginLimitReached
-from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission,\
+from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
     titlemodels
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.templatetags.cms_admin import admin_static_url
-from cms.utils import copy_plugins, helpers, moderator, permissions, plugins, get_template_from_request,\
+from cms.utils import copy_plugins, helpers, moderator, permissions, plugins, get_template_from_request, \
     get_language_from_request, admin as admin_utils, cms_static_url
 from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
@@ -421,15 +421,15 @@ class PageAdmin(ModelAdmin):
                 language = get_language_from_request(request, obj)
                 if copy_languages and len(get_language_list()) > 1:
                     show_copy = True
-                # widget = PluginEditor(attrs={
-                #     'installed': installed_plugins,
-                #     'list': plugin_list,
-                #     'copy_languages': copy_languages.items(),
-                #     'show_copy': show_copy,
-                #     'language': language,
-                #     'placeholder': placeholder
-                # })
-                # form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
+                    # widget = PluginEditor(attrs={
+                    #     'installed': installed_plugins,
+                    #     'list': plugin_list,
+                    #     'copy_languages': copy_languages.items(),
+                    #     'show_copy': show_copy,
+                    #     'language': language,
+                    #     'placeholder': placeholder
+                    # })
+                    # form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
 
             if not obj.has_advanced_settings_permission(request):
                 for field in self.advanced_fields:
@@ -1113,7 +1113,7 @@ class PageAdmin(ModelAdmin):
             has_reached_plugin_limit(placeholder, plugin_type, language, template=page.get_template())
         except PluginLimitReached, e:
             return HttpResponseBadRequest(str(e))
-        # page add-plugin
+            # page add-plugin
         if not parent_id:
 
             position = request.POST.get('plugin_order',
@@ -1189,7 +1189,12 @@ class PageAdmin(ModelAdmin):
 
         plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by(
             'position')
-        return HttpResponse(simplejson.dumps({'plugin_list': list(plugin_list)}), content_type='application/json')
+        reduced_list = []
+        for plugin in plugin_list:
+            reduced_list.append(
+                {'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id, 'position': plugin.position,
+                    'desc': plugin.get_short_description()})
+        return HttpResponse(simplejson.dumps({'plugin_list': reduced_list}), content_type='application/json')
 
     @xframe_options_sameorigin
     @create_revision()

@@ -102,7 +102,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
 
         items = toolbar.get_items()
-        self.assertEqual(len(items), 0) 
+        self.assertEqual(len(items), 0)
 
     def test_toolbar_nonstaff(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
