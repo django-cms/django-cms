@@ -78,17 +78,21 @@ class PluginsTestBaseCase(CMSTestCase):
         request.placeholder_media = Media()
         return request
 
+    def get_response_pk(self, response):
+        return int(response.content.split("/edit-plugin/")[1].split("/")[0])
+
 
 class PluginsTestCase(PluginsTestBaseCase):
     def _create_text_plugin_on_page(self, page):
         plugin_data = {
             'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        created_plugin_id = int(response.content)
+        created_plugin_id = self.get_response_pk(response)
         self.assertEquals(created_plugin_id, CMSPlugin.objects.all()[0].pk)
         return created_plugin_id
 
@@ -189,14 +193,18 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        self.assertEquals(response.content,
+                          '{"url": "/en/admin/cms/page/edit-plugin/%s/",' % CMSPlugin.objects.all()[0].pk +
+                          ' "breadcrumb": [{"url": "/en/admin/cms/page/edit-plugin/%s/", "title": "Text"}]}' %
+                          CMSPlugin.objects.all()[0].pk)
         # now click cancel instead of editing
-        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        edit_url = response.content.split('"url": "')[1].split('"')[0]
         response = self.client.get(edit_url)
         self.assertEquals(response.status_code, 200)
         data = {
@@ -217,14 +225,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
         # now edit the plugin
-        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        edit_url = URL_CMS_PLUGIN_EDIT + "%s/" % CMSPlugin.objects.all()[0].pk
         response = self.client.get(edit_url)
         self.assertEquals(response.status_code, 200)
         data = {
@@ -245,14 +253,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
         # now edit the plugin
-        edit_url = URL_CMS_PLUGIN_EDIT + response.content + "/"
+        edit_url = URL_CMS_PLUGIN_EDIT + "%s/" % CMSPlugin.objects.all()[0].pk
         response = self.client.get(edit_url)
         self.assertEquals(response.status_code, 200)
         data = {
@@ -332,18 +340,19 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add a plugin
         plugin_data = {
             'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        self.assertEquals(self.get_response_pk(response), CMSPlugin.objects.all()[0].pk)
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
 
         # delete the plugin
         plugin_data = {
-            'plugin_id': int(response.content)
+            'plugin_id': self.get_response_pk(response)
         }
         remove_url = URL_CMS_PLUGIN_REMOVE
         response = self.client.post(remove_url, plugin_data)
@@ -360,13 +369,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add a plugin
         plugin_data = {
             'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        plugin_id = int(response.content)
+        plugin_id = self.get_response_pk(response)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        self.assertEquals(self.get_response_pk(response), CMSPlugin.objects.all()[0].pk)
 
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
@@ -403,13 +413,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add a plugin
         plugin_data = {
             'plugin_type': "TextPlugin",
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot="body").pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(int(response.content), CMSPlugin.objects.all()[0].pk)
+        self.assertEquals(self.get_response_pk(response), CMSPlugin.objects.all()[0].pk)
 
         # there should be only 1 plugin
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
@@ -420,7 +431,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_type': "TextPlugin",
             'language': settings.LANGUAGES[0][0],
             'placeholder': ph.pk,
-            'parent': int(response.content)
+            'parent': self.get_response_pk(response)
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         # no longer allowed for security reasons
@@ -629,7 +640,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(response.content.count('<li '), 3)
+        self.assertEqual(response.content.count('"position":'), 3)
         # assert copy success
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
@@ -677,22 +688,23 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = create_page("page", "nav_playground.html", "en", published=True)
         plugin_data = {
             'plugin_type': 'DumbFixturePlugin',
-            'language': settings.LANGUAGES[0][0],
-            'placeholder': page.placeholders.get(slot='body').pk,
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot='body').pk,
+            'plugin_parent': '',
         }
-        response = self.client.post(URL_CMS_PLUGIN_ADD % page.pk, plugin_data)
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
 
-        plugin_data['parent_id'] = int(response.content)
-        del plugin_data['placeholder']
-        response = self.client.post(URL_CMS_PLUGIN_ADD % page.pk, plugin_data)
+        plugin_data['plugin_parent'] = self.get_response_pk(response)
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
 
         post = {
-            'plugin_id': int(response.content),
-            'placeholder': 'right-column',
+            'plugin_id': self.get_response_pk(response),
+            'placeholder_id': page.placeholders.get(slot='right-column').pk,
+            'plugin_parent': '',
         }
-        response = self.client.post(URL_CMS_PLUGIN_MOVE % page.pk, post)
+        response = self.client.post(URL_CMS_PLUGIN_MOVE, post)
         self.assertEquals(response.status_code, 200)
 
         from cms.plugins.utils import build_plugin_tree
