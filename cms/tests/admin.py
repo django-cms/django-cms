@@ -858,8 +858,9 @@ class PluginPermissionTests(AdminTestsBase):
         url = reverse('admin:cms_page_add_plugin')
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': self._placeholder.pk,
-            'language': 'en',
+            'placeholder_id': self._placeholder.pk,
+            'plugin_language': 'en',
+            'plugin_parent':'',
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -885,7 +886,7 @@ class PluginPermissionTests(AdminTestsBase):
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         self.client.login(username='test', password='test')
-        url = reverse('admin:cms_page_remove_plugin')
+        url = reverse('admin:cms_page_delete_plugin')
         data = dict(plugin_id=plugin.id)
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -901,7 +902,9 @@ class PluginPermissionTests(AdminTestsBase):
         self.client.login(username='test', password='test')
         url = reverse('admin:cms_page_move_plugin')
         data = dict(plugin_id=plugin.id,
-                    placeholder=self._placeholder)
+                    placeholder_id=self._placeholder.pk,
+                    plugin_parent='',
+                    )
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
@@ -965,13 +968,15 @@ class PluginPermissionTests(AdminTestsBase):
         url = reverse('admin:cms_page_add_plugin')
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': self._placeholder.pk,
-            'language': 'en',
+            'placeholder_id': self._placeholder.pk,
+            'plugin_language': 'en',
+            'plugin_parent':'',
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertEqual(response['content-type'], 'text/plain')
-        self.assertTrue(CMSPlugin.objects.filter(pk=int(response.content)).exists())
+        self.assertEqual(response['content-type'], 'application/json')
+        pk = response.content.split("edit-plugin/")[1].split("/")[0]
+        self.assertTrue(CMSPlugin.objects.filter(pk=int(pk)).exists())
 
 
 class AdminFormsTests(AdminTestsBase):
