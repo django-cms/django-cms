@@ -57,7 +57,7 @@ class ReversionTestCase(CMSTestCase):
                 'plugin_type': "TextPlugin",
                 'plugin_language': settings.LANGUAGES[0][0],
                 'placeholder_id': placeholderpk,
-                'plugin_parent':'',
+                'plugin_parent': '',
             }
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEquals(response.status_code, 200)

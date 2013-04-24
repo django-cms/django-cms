@@ -66,27 +66,19 @@ CMS.$(document).ready(function () {
 				{% for item in request.toolbar.get_items %}
 					{{ item.render }}
 				{% endfor %}
-                {% if current_page %}
-				<li{% if not request.toolbar.edit_mode %} class="cms_toolbar-item_navigation-disabled"{% endif %}>
-					<a href="{% url admin:cms_page_change current_page.pk %}">{% trans "Publish" %}</a>
-					<ul>
-						<li><a href="{% url admin:cms_page_publish_page current_page.pk %}" rel="ajax">{% trans "Publish now" %}</a></li>
-						<li><a href="{% url admin:cms_page_revert_page current_page.pk %}" data-text="{% trans "Are you sure you want to revert to live?" %}" rel="dialogue">{% trans "Revert to live" %}</a></li>
-					</ul>
-				</li>
-                {% endif %}
 			</ul>
             {% endif %}
 		</div>
 
 		<div class="cms_toolbar-right">
-			{% if request.toolbar.edit_mode %}
+			{% if request.toolbar.edit_mode and request.toolbar.can_change %}
 			<ul class="cms_toolbar-item cms_toolbar-item_buttons">
 				<li{% if request.toolbar.edit_mode %} class="active"{% endif %}><a href="?edit">{% trans "Edit" %}</a></li>
 				<li><a href="?build=true">{% trans "Build" %}</a></li>
 				<!--<li{% if not request.toolbar.edit_mode %} class="active"{% endif %}><a href="?edit-off">{% trans "View" %}</a></li>-->
 			</ul>
 			{% endif %}
+            {% if request.toolbar.can_change %}
 			<div class="cms_toolbar-item cms_toolbar-item_switch{% if not request.toolbar.edit_mode %} cms_toolbar-item_switch-active{% endif %}">
 				<!--
 					TODO: URL STYLE:
@@ -101,6 +93,7 @@ CMS.$(document).ready(function () {
 				</a>
 				<span class="cms_toolbar-item_switch-knob">{% trans "Change" %}</span>
 			</div>
+            {% endif %}
 		</div>
 	</div>
 	<div class="cms_toolbar-trigger"><a href="#">{% trans "Toggle toolbar" %}</a></div>
