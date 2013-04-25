@@ -1,0 +1,29 @@
+#################
+3.0 release notes
+#################
+
+*****************
+What's new in 3.0
+*****************
+
+
+.. _upgrade-to-3.0:
+
+.. warning:: Upgrading from previous versions
+
+    3.0 introduces some changes that **require** action if you are upgrading
+    from a previous version.
+
+
+
+New Frontend Editing
+====================
+
+Django CMS 3.0 introduces a new Frontend Editing. We now have a edit and build mode. In edit mode you can only edit
+plugins and in build mode you can rearrange and add plugins.
+
+
+New Toolbar
+===========
+
+The Toolbar code has been simplified.

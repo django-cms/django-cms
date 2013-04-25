@@ -150,4 +150,10 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 ==== 3.0.0 (XXXXX) ===
 
 - Plugins are only editable in frontend
-- PluginEditor has been removed
+- PluginEditor has been removed in backend
+- New frontend editing
+- New Toolbar
+- Plugin API for creating new plugins and moving has changed
+
+
+
