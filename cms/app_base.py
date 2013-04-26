@@ -4,3 +4,6 @@ class CMSApp(object):
     urls = None
     menus = []
     app_name = None
+
+    def get_toolbar_items(self):
+        return None

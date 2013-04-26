@@ -1,13 +1,11 @@
 from __future__ import with_statement
 from cms.api import create_page
-from cms.cms_toolbar import CMSToolbar
+from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils import get_cms_setting
 
 from django.contrib.auth.models import AnonymousUser, User, Permission
-from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 
 
