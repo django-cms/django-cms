@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
-from cms.toolbar.items import Item, List, Break
+from cms.toolbar.items import Item, List, Break, Switch
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import has_page_change_permission
@@ -11,12 +11,12 @@ from django.utils.translation import ugettext_lazy as _
 
 class PageToolbar(CMSToolbar):
     def insert_items(self, items, toolbar, request, is_app):
-        print "insert items", is_app
         self.is_app = is_app
         self.request = request
         self.toolbar = toolbar
         self.can_change = (hasattr(self.request.current_page, 'has_change_permission') and
                            self.request.current_page.has_change_permission(self.request))
+        toolbar.can_change = self.can_change
         if toolbar.is_staff:
             # The 'Admin' Menu
             items.append(self.get_admin_menu())
@@ -33,6 +33,8 @@ class PageToolbar(CMSToolbar):
                     # Publish Menu
                     if self.request.current_page.has_publish_permission(self.request):
                         items.append(self.get_publish_menu(self.request.current_page))
+                    if toolbar.edit_mode:
+                        items.append(self.get_mode_switchers())
         return items
 
     def get_template_menu(self):
@@ -71,10 +73,14 @@ class PageToolbar(CMSToolbar):
 
     def get_publish_menu(self, page):
         menu_items = List('', _("Publish"))
+        if page.publisher_is_draft:
+            pk = page.pk
+        else:
+            pk = page.publisher_draft.pk
         menu_items.items.append(Item(reverse('admin:cms_page_publish_page',
-                                             args=[page.publisher_draft.pk]), _('Publish now'), ajax=True))
+                                             args=[pk]), _('Publish now'), ajax=True))
         menu_items.items.append(Item(reverse('admin:cms_page_revert_page',
-                                             args=[page.publisher_draft.pk]), _('Revert to live'), ajax=True,
+                                             args=[pk]), _('Revert to live'), ajax=True,
                                      question=_("Are you sure you want to revert to live?")))
         return menu_items
 
@@ -92,6 +98,12 @@ class PageToolbar(CMSToolbar):
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True, active=True))
         return admin_items
 
+    def get_mode_switchers(self):
+
+        switch = Switch(right=True)
+        switch.addItem(_("Edit"), "?edit", self.toolbar.edit_mode)
+        switch.addItem(_("Build"), "?build", not self.toolbar.edit_mode)
+        return switch
 
 toolbar_pool.register(PageToolbar)
 

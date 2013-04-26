@@ -4,7 +4,6 @@ Edit Toolbar middleware
 """
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
-from django.core.urlresolvers import resolve
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
@@ -27,6 +26,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     original_context.pop()
     return output
 
+
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
@@ -43,9 +43,7 @@ class ToolbarMiddleware(object):
             request.session['cms_edit'] = False
         request.toolbar = CMSToolbar(request)
 
-
     def process_view(self, request, view_func, view_args, view_kwarg):
-        print "process view"
         response = request.toolbar.request_hook(view_func.__module__)
         if isinstance(response, HttpResponse):
             return response

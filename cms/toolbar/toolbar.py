@@ -4,7 +4,7 @@ from cms.toolbar_pool import toolbar_pool
 from django.contrib.auth.forms import AuthenticationForm
 from django import forms
 from django.contrib.auth import login, logout
-from django.core.urlresolvers import resolve
+from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 
@@ -33,7 +33,11 @@ class CMSToolbar(object):
         self.is_staff = self.request.user.is_staff
         self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
         self.show_toolbar = self.request.session.get('cms_edit', False) or self.is_staff
-        self.view_name = resolve(self.request.path).func.__module__
+        try:
+            self.view_name = resolve(self.request.path).func.__module__
+        except Resolver404:
+            self.view_name = ""
+        self.items = self._get_items()
 
     def get_state(self, request, param, session_key):
         state = self.add_parameter in request.GET
@@ -41,18 +45,14 @@ class CMSToolbar(object):
             return True
         return state
 
-    def get_items(self):
+    def _get_items(self):
         """
         Get the CMS items on the toolbar
         """
-        print "get items"
-        print self.view_name
         toolbars = toolbar_pool.get_toolbars()
-        print 'toolbars',toolbars
         items = []
         for key in toolbars:
             toolbar = toolbars[key]()
-            print key, self.view_name
             toolbar.insert_items(items, self, self.request, ".".join(key.split(".")[:-2]) in self.view_name)
         return items
 

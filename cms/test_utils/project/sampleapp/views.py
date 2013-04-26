@@ -1,4 +1,6 @@
 # Create your views here.
+from cms.toolbar.items import Item
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -11,8 +13,12 @@ def sample_view(request, **kw):
 
 
 def category_view(request, id):
+    cat = Category.objects.get(pk=id)
+    if request.user.is_staff:
+        request.toolbar.items[2].items.append(
+            Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "change category"))
     return render_to_response('sampleapp/category_view.html',
-                              RequestContext(request, {'category': Category.objects.get(pk=id)}))
+                              RequestContext(request, {'category': cat}))
 
 
 def extra_view(request, **kw):
