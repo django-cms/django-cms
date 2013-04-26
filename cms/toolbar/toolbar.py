@@ -51,13 +51,17 @@ class CMSToolbar(object):
         """
         toolbars = toolbar_pool.get_toolbars()
         items = []
+        app_key = ""
+        for key in toolbars:
+            app_name = ".".join(key.split(".")[:-2])
+            if app_name in self.view_name and len(key) > len(app_key):
+                app_key = key
         for key in toolbars:
             toolbar = toolbars[key]()
-            toolbar.insert_items(items, self, self.request, ".".join(key.split(".")[:-2]) in self.view_name)
+            toolbar.insert_items(items, self, self.request, key == app_key)
         return items
 
-    def request_hook(self, view_name):
-        self.view_name = view_name
+    def request_hook(self):
         if self.request.method != 'POST':
             return self._request_hook_get()
         else:

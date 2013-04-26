@@ -15,8 +15,8 @@ def sample_view(request, **kw):
 def category_view(request, id):
     cat = Category.objects.get(pk=id)
     if request.user.is_staff:
-        request.toolbar.items[2].items.append(
-            Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "change category"))
+        request.toolbar.items[1].items.append(
+            Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "Change Category"))
     return render_to_response('sampleapp/category_view.html',
                               RequestContext(request, {'category': cat}))
 

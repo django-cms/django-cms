@@ -44,7 +44,7 @@ class ToolbarMiddleware(object):
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):
-        response = request.toolbar.request_hook(view_func.__module__)
+        response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
 

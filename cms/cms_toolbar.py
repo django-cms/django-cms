@@ -89,11 +89,11 @@ class PageToolbar(CMSToolbar):
         Builds the 'admin menu' (the one with the cogwheel)
         """
         admin_items = List(reverse("admin:index"), _("Admin"))
-        admin_items.items.append(Item(reverse('admin:index'), _('Administration'), load_side_frame=True))
         if self.can_change:
             admin_items.items.append(Item(reverse("admin:cms_page_changelist"), _('Pages'), load_side_frame=True))
         if self.request.user.has_perm('user.change_user'):
             admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
+        admin_items.items.append(Item(reverse('admin:index'), _('Administration'), load_side_frame=True))
         admin_items.items.append(Break())
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True, active=True))
         return admin_items
