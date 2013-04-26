@@ -1,5 +1,14 @@
 {% load i18n sekizai_tags %}
 
+{% addtoblock "css" %}                                                         
+  <style type="text/css">                                                        
+    /** FIX for Bootstrap and Google Maps Info window styes problem **/          
+    img[src*="gstatic.com/"], img[src*="googleapis.com/"] {                      
+      max-width: none;                                                           
+    }                                                                            
+  </style>                                                                       
+{% endaddtoblock %}   
+
 {% addtoblock "js" %}
   <script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true"></script>
 {% endaddtoblock %}
