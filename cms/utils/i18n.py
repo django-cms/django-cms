@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
-from cms.exceptions import LanguageError
-from cms.utils.conf import get_cms_setting
+
+from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
 from django.conf import settings
 from django.utils import translation
-from django.utils.translation import ugettext_lazy  as _
+from django.utils.translation import ugettext_lazy as _
+
+from cms.exceptions import LanguageError
+from cms.utils.conf import get_cms_setting
 
 
 @contextmanager
@@ -162,6 +165,7 @@ def get_fallback_languages(language, site_id=None):
     language = get_language_object(language, site_id)
     return language.get('fallbacks', [])
 
+
 def get_redirect_on_fallback(language, site_id=None):
     """
     returns if you should redirect on language fallback
@@ -172,6 +176,7 @@ def get_redirect_on_fallback(language, site_id=None):
     language = get_language_object(language, site_id)
     return language.get('redirect_on_fallback', True)
 
+
 def hide_untranslated(language, site_id=None):
     """
     Should untranslated pages in this language be hidden?
@@ -181,3 +186,14 @@ def hide_untranslated(language, site_id=None):
     """
     obj = get_language_object(language, site_id)
     return obj.get('hide_untranslated', True)
+
+
+def is_language_prefix_patterns_used():
+    """
+    Returns `True` if the `LocaleRegexURLResolver` is used
+    at root level of the urlpatterns, else it returns `False`.
+    """
+    for url_pattern in get_resolver(None).url_patterns:
+        if isinstance(url_pattern, LocaleRegexURLResolver):
+            return True
+    return False
