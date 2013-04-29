@@ -59,16 +59,6 @@ class ApphookPool(object):
         hooks = sorted(hooks, key=lambda hook: hook[1])
         return hooks
 
-    def get_toolbar_items(self):
-        self.discover_apps()
-        hooks = []
-        for app_name in self.apps.keys():
-            app = self.apps[app_name]
-            if app.urls:
-                hooks.append((app_name, app.name))
-            # Unfortunately, we loose the ordering since we now have a list of tuples. Let's reorder by app_name:
-        hooks = sorted(hooks, key=lambda hook: hook[1])
-
     def get_apphook(self, app_name):
         self.discover_apps()
         try:
