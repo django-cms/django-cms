@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from cms.plugins.text.models import Text
+from django.contrib.auth.models import User
+from cms.models import Page, CMSPlugin
 from django.core.urlresolvers import clear_url_caches
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.template import Template
 from cms.api import create_page
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_ADD
 
 
 class TestNoI18N(SettingsOverrideTestCase):
@@ -102,3 +105,56 @@ class TestNoI18N(SettingsOverrideTestCase):
             create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
             response = self.client.get('/', follow=False)
             self.assertEqual(response['Location'], 'http://testserver/foobar/')
+
+    def test_plugin_add_edit(self):
+        page_data = {
+            'title': 'test page 1',
+            'slug': 'test-page1',
+            'language': "en-us",
+            'template': 'nav_playground.html',
+            'parent': '',
+            'site': 1,
+            'pagepermission_set-TOTAL_FORMS': 0,
+            'pagepermission_set-INITIAL_FORMS': 0,
+            'pagepermission_set-MAX_NUM_FORMS': 0,
+            'pagepermission_set-2-TOTAL_FORMS': 0,
+            'pagepermission_set-2-INITIAL_FORMS': 0,
+            'pagepermission_set-2-MAX_NUM_FORMS': 0
+        }
+        # required only if user haves can_change_permission
+        self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        self.super_user.set_password("test")
+        self.super_user.save()
+        self.client.login(username="test", password="test")
+        response = self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
+        page = Page.objects.all()[0]
+        plugin_data = {
+            'plugin_type': "TextPlugin",
+            'language': "en-us",
+            'placeholder': page.placeholders.get(slot="body").pk,
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD[3:], plugin_data)
+        self.assertEquals(response.status_code, 200)
+        created_plugin_id = int(response.content)
+        self.assertEquals(created_plugin_id, CMSPlugin.objects.all()[0].pk)
+        # now edit the plugin
+        edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
+        response = self.client.get(edit_url)
+        self.assertEquals(response.status_code, 200)
+        data = {
+            "body": "Hello World"
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.get(pk=created_plugin_id)
+        self.assertEquals("Hello World", txt.body)
+        # edit body, but click cancel button
+        data = {
+            "body": "Hello World!!",
+            "_cancel": True,
+        }
+        edit_url = '%s%d/' % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
+        response = self.client.post(edit_url, data)
+        self.assertEquals(response.status_code, 200)
+        txt = Text.objects.all()[0]
+        self.assertEquals("Hello World", txt.body)
