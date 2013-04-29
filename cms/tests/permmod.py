@@ -142,15 +142,14 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         with self.login_user_context(user):
             placeholder = page.placeholders.all()[0]
             post_data = {
-                'language': 'en',
-                'page_id': page.pk,
-                'placeholder': placeholder.pk,
+                'plugin_language': 'en',
+                'plugin_parent': '',
+                'placeholder_id': placeholder.pk,
                 'plugin_type': 'TextPlugin'
             }
-            url = URL_CMS_PLUGIN_ADD % page.pk
+            url = URL_CMS_PLUGIN_ADD
             response = self.client.post(url, post_data)
             self.assertEqual(response.status_code, 200)
-            self.assertTrue(response.content.isdigit())
             return response.content
 
     def test_super_can_add_page_to_root(self):

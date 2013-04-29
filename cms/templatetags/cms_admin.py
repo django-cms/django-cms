@@ -24,7 +24,7 @@ else:
 
 class ShowAdminMenu(InclusionTag):
     name = 'show_admin_menu'
-    template = 'admin/cms/page/menu.html'
+    template = 'admin/cms/page/tree/menu.html'
     
     options = Options(
         Argument('page')
@@ -57,7 +57,7 @@ register.tag(ShowAdminMenu)
 
 class ShowLazyAdminMenu(InclusionTag):
     name = 'show_lazy_admin_menu'
-    template = 'admin/cms/page/lazy_child_menu.html'
+    template = 'admin/cms/page/tree/lazy_child_menu.html'
     
     options = Options(
         Argument('page')

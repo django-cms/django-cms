@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.views.decorators.clickjacking import xframe_options_sameorigin
+from copy import deepcopy
+from django.utils import simplejson
 
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.exceptions import PluginLimitReached
 from cms.forms.fields import PlaceholderFormField
 from cms.models.fields import PlaceholderField
@@ -17,7 +19,6 @@ from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _, get_language
 from django.conf import settings
-from copy import deepcopy
 
 
 class PlaceholderAdmin(ModelAdmin):
@@ -27,22 +28,20 @@ class PlaceholderAdmin(ModelAdmin):
     class Media:
         css = {
             'all': [cms_static_url(path) for path in (
-                'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
-                'css/jquery.dialog.css',
+                'css/cms.base.css',
                 'css/plugin_editor.css',
             )]
         }
         js = [cms_static_url(path) for path in [
-            'js/plugins/admincompat.js',
+            'js/jquery.min.js',
             'js/csrf.js',
-            'js/libs/jquery.query.js',
-            'js/libs/jquery.ui.core.js',
-            'js/libs/jquery.ui.dialog.js',
-            ]
+            'js/plugins/jquery.query.js',
+            'js/plugins/jquery.ui.custom.js',
         ]
-        
+        ]
+
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -249,7 +248,7 @@ class PlaceholderAdmin(ModelAdmin):
                     "deleted": True,
                     'name': unicode(cms_plugin),
                 })
-            return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
+            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
 
         if not instance:
             # instance doesn't exist, call add view
@@ -276,7 +275,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'icon': force_escape(saved_object.get_instance_icon_src()),
                 'alt': force_escape(escapejs(saved_object.get_instance_icon_alt())),
             }
-            return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
+            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
 
         return response
 
@@ -371,7 +370,6 @@ class PlaceholderAdmin(ModelAdmin):
             model=placeholder._get_attached_model(),
         )
         if plugins:
-            return render_to_response('admin/cms/page/widgets/plugin_item.html',
-                                      {'plugin_list': list(plugins)}, RequestContext(request))
+            return HttpResponse(simplejson.dumps({'plugin_list': list(plugins)}), content_type='application/json')
         else:
             return HttpResponseBadRequest("Error during copy")

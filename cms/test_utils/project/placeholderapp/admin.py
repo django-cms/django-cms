@@ -1,6 +1,5 @@
 from cms.admin.placeholderadmin import PlaceholderAdmin
-from cms.test_utils.project.placeholderapp.models import (Example1, Example2,
-    Example3, Example4, Example5, MultilingualExample1)
+from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1, TwoPlaceholderExample)
 from django.contrib import admin
 from hvad.admin import TranslatableAdmin
 
@@ -18,83 +17,18 @@ class MixinAdmin(admin.ModelAdmin):
         return super(MixinAdmin, self).formfield_for_dbfield(db_field, request=request, **kwargs)
 
 
-class Example1Admin(PlaceholderAdmin, MixinAdmin):
+class ExampleAdmin(PlaceholderAdmin, MixinAdmin):
     pass
 
 
-class Example2Admin(PlaceholderAdmin):
-    fieldsets = (
-        ('Placeholder + more fields', {
-            'classes': ('wide',),
-            'fields': ('char_1', 'placeholder', 'char_2',)
-        }),
-        ('Other fields', {
-            'classes': ('wide',),
-            'fields': ('char_3', 'char_4',)
-        }),
-    )
-
-
-class Example3Admin(PlaceholderAdmin):
-    fieldsets = (
-        ('Only chars', {
-            'classes': ('wide',),
-            'fields': ('char_1', 'char_2',)
-        }),
-        (u'Only Placeholder with rigth classes', {
-            'classes': ('plugin-holder', 'plugin-holder-nopage',),
-            'fields': ('placeholder',)
-        }),
-        ('Only chars', {
-            'classes': ('wide',),
-            'fields': ('char_3', 'char_4',)
-        }),
-    )
-
-
-class Example4Admin(PlaceholderAdmin):
-    render_placeholder_language_tabs = False
-
-    fieldsets = (
-        ('Only chars', {
-            'classes': ('wide',),
-            'fields': ('char_1', 'char_2',)
-        }),
-        (u'Only Placeholder, with wrong classes', {
-            'classes': ('wide', 'plugin-holder-nopage',),
-            'fields': ('placeholder',)
-        }),
-        ('Only chars', {
-            'classes': ('wide',),
-            'fields': ('char_3', 'char_4',)
-        }),
-    )
-
-
-class Example5Admin(PlaceholderAdmin):
-    fieldsets = (
-        ('Only chars', {
-            'classes': ('wide',),
-            'fields': ('char_1', 'char_2',)
-        }),
-        (u'Two Placeholder, with right classes', {
-            'classes': ('plugin', 'plugin-holder-nopage',),
-            'fields': ('placeholder_1', 'placeholder_2',)
-        }),
-        ('Only chars', {
-            'classes': ('wide',),
-            'fields': ('char_3', 'char_4',)
-        }),
-    )
+class TwoPlaceholderExampleAdmin(PlaceholderAdmin, MixinAdmin):
+    pass
 
 
 class MultilingualAdmin(TranslatableAdmin, PlaceholderAdmin):
     pass
 
 
-admin.site.register(Example1, Example1Admin)
-admin.site.register(Example2, Example2Admin)
-admin.site.register(Example3, Example3Admin)
-admin.site.register(Example4, Example4Admin)
-admin.site.register(Example5, Example5Admin)
+admin.site.register(Example1, ExampleAdmin)
+admin.site.register(TwoPlaceholderExample, TwoPlaceholderExampleAdmin)
 admin.site.register(MultilingualExample1, MultilingualAdmin)

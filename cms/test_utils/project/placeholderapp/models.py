@@ -11,31 +11,7 @@ class Example1(models.Model):
     placeholder = PlaceholderField('placeholder')
 
 
-class Example2(models.Model):
-    char_1 = models.CharField(u'char_1', max_length=255)
-    char_2 = models.CharField(u'char_2', max_length=255)
-    char_3 = models.CharField(u'char_3', max_length=255)
-    char_4 = models.CharField(u'char_4', max_length=255)
-    placeholder = PlaceholderField('placeholder')
-
-
-class Example3(models.Model):
-    char_1 = models.CharField(u'char_1', max_length=255)
-    char_2 = models.CharField(u'char_2', max_length=255)
-    char_3 = models.CharField(u'char_3', max_length=255)
-    char_4 = models.CharField(u'char_4', max_length=255)
-    placeholder = PlaceholderField('placeholder')
-
-
-class Example4(models.Model):
-    char_1 = models.CharField(u'char_1', max_length=255)
-    char_2 = models.CharField(u'char_2', max_length=255)
-    char_3 = models.CharField(u'char_3', max_length=255)
-    char_4 = models.CharField(u'char_4', max_length=255)
-    placeholder = PlaceholderField('placeholder')
-
-
-class Example5(models.Model):
+class TwoPlaceholderExample(models.Model):
     char_1 = models.CharField(u'char_1', max_length=255)
     char_2 = models.CharField(u'char_2', max_length=255)
     char_3 = models.CharField(u'char_3', max_length=255)

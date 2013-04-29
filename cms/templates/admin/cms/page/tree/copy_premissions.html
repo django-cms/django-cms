@@ -1,0 +1,42 @@
+{% load i18n %}
+{% comment %}
+- This template is used within the pagetree when a page is copied to show which permissions should be transfered
+{% endcomment %}
+
+<div id="{{ dialog_id }}" title="{% block title %}{% trans "Copy options" %}{% endblock %}">
+	{% block content %}
+		{% block header %}<p>{% blocktrans %}Choose copy options{% endblocktrans %}</p>{% endblock %}
+
+		{% block form %}{% if form %}<form id="{{ dialog_id }}-form">{% csrf_token %}{{ form.as_p }}</form>{% endif %}{% endblock %}
+	{% endblock %}
+</div>
+
+{% block script %}
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	// change submit states, open dialog
+	var dialog = '#{{ dialog_id }}';
+
+	$(dialog).dialog({
+		'bgiframe': true,
+		'autoOpen': true,
+		'height': 200,
+		'width': 400,
+		'modal': true,
+		'buttons': {
+			'Cancel': function() {
+				$(this).dialog('close');
+			},
+			'OK': function() {
+				formData = {};
+				$.each($('#{{ dialog_id }}-form').formToArray(), function(i, item){
+					formData[item.name] = item.value;
+				});
+				$.callbackCall("{{ callback }}", formData);
+				$(this).dialog('close');
+			}
+		}
+	});
+});
+</script>
+{% endblock %}
