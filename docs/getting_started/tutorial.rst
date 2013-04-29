@@ -67,10 +67,12 @@ This includes django CMS itself as well as its dependenices and
 other highly recommended applications/libraries:
 
 * ``'cms'``, django CMS itself
+* ``'stacks'``, for reusable content
 * ``'mptt'``, utilities for implementing a modified pre-order traversal tree
 * ``'menus'``, helper for model independent hierarchical website navigation
 * ``'south'``, intelligent schema and data migrations
 * ``'sekizai'``, for javascript and css management
+
 
 Also add any (or all) of the following plugins, depending on your needs:
 
