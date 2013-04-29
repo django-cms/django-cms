@@ -2,6 +2,7 @@
 from copy import deepcopy
 from distutils.version import LooseVersion
 from urllib2 import unquote
+from django.contrib.admin.helpers import AdminForm
 from django.utils import simplejson
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.utils.conf import get_cms_setting
@@ -28,7 +29,7 @@ from django.views.decorators.http import require_POST
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
-from cms.admin.forms import PageForm, PageAddForm
+from cms.admin.forms import PageForm, PageAddForm, PageTitleForm
 from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.apphook_pool import apphook_pool
@@ -1361,8 +1362,10 @@ class PageAdmin(ModelAdmin):
         return super(PageAdmin, self).lookup_allowed(key, *args, **kwargs)
 
     def edit_title(self, request, page_id):
-        # TODO: Permission checks
-        # TODO: Reversion support
+        # TODO: 3.0 Permission checks
+        # TODO: 3.0 Reversion support
+        # TODO: 3.0 mark draft dirtyy
+        # TODO: 3.0 make generic
         language = 'en'
         title = Title.objects.get(page_id=page_id, language=language)
         saved_successfully = False
@@ -1374,14 +1377,14 @@ class PageAdmin(ModelAdmin):
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=title)
-        adminform = AdminForm(form, fieldsets=[(None, {'fields': ('title',)})], prepopulated_fields={},
+        admin_form = AdminForm(form, fieldsets=[(None, {'fields': ('title',)})], prepopulated_fields={},
                               model_admin=self)
-        media = self.media + adminform.media
+        media = self.media + admin_form.media
         context = {
             'title': 'Title',
             'plugin': title.page,
             'plugin_id': title.page.id,
-            'adminform': adminform,
+            'adminform': admin_form,
             'add': False,
             'is_popup': True,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,

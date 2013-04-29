@@ -77,3 +77,28 @@ class TestNoI18N(SettingsOverrideTestCase):
             tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % "en-us")
             url = tpl.render(context)
             self.assertEqual(url, "%s" % path)
+
+    def test_url_redirect(self):
+        with SettingsOverride(
+                ROOT_URLCONF='cms.test_utils.project.urls_no18n',
+                USE_I18N=True,
+                MIDDLEWARE_CLASSES=[
+                    'django.contrib.sessions.middleware.SessionMiddleware',
+                    'django.contrib.auth.middleware.AuthenticationMiddleware',
+                    'django.contrib.messages.middleware.MessageMiddleware',
+                    'django.middleware.csrf.CsrfViewMiddleware',
+                    'django.middleware.locale.LocaleMiddleware',
+                    'django.middleware.doc.XViewMiddleware',
+                    'django.middleware.common.CommonMiddleware',
+                    'django.middleware.transaction.TransactionMiddleware',
+                    'django.middleware.cache.FetchFromCacheMiddleware',
+                    #'cms.middleware.language.LanguageCookieMiddleware',
+                    'cms.middleware.user.CurrentUserMiddleware',
+                    'cms.middleware.page.CurrentPageMiddleware',
+                    'cms.middleware.toolbar.ToolbarMiddleware',
+                ],
+                CMS_LANGUAGES={1: []},
+                LANGUAGES=(('en-us', 'English'),)):
+            create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
+            response = self.client.get('/', follow=False)
+            self.assertEqual(response['Location'], 'http://testserver/foobar/')
