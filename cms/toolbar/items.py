@@ -25,6 +25,9 @@ class List(BaseItem):
     def get_context(self):
         return {'items': self.items, 'url': self.url, 'title': self.name}
 
+    def __repr__(self):
+        return unicode(self.name)
+
 
 class Item(BaseItem):
     template = "cms/toolbar/menu/item.html"
@@ -50,6 +53,8 @@ class Item(BaseItem):
             mod = "dialogue"
         return {'url': self.url, 'title': self.title, 'type': mod, 'active': self.active, 'question': self.question}
 
+    def __repr__(self):
+        return unicode(self.title)
 
 class Break(BaseItem):
     template = "cms/toolbar/menu/break.html"

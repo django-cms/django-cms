@@ -83,7 +83,7 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.items
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 1)
-        self.assertEqual(len(items[0].get_context()['items']), 3)
+        self.assertEqual(len(items[0].get_context()['items']), 4)
 
     def test_toolbar_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
@@ -92,7 +92,7 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.items
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 1)
-        self.assertEqual(len(items[0].get_context()['items']), 4)
+        self.assertEqual(len(items[0].get_context()['items']), 5)
 
     def test_toolbar_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -181,6 +181,6 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.items
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 1)
-        self.assertEqual(len(items[0].get_context()['items']), 3)
+        self.assertEqual(len(items[0].get_context()['items']), 4)
 
 
