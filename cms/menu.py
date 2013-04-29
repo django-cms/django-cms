@@ -71,7 +71,7 @@ def get_visible_pages(request, pages, site=None):
         site = current_site(request)
 
     # authenticated user and global permission
-    if is_auth_user:
+    if is_auth_user and get_cms_setting('VIEW_PERMISSION'):
         global_page_perm_q = Q(
             Q(user=request.user) | Q(group__user=request.user)
         ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
@@ -89,6 +89,8 @@ def get_visible_pages(request, pages, site=None):
             not restricted_pages and
             not global_view_perms):
             return []
+    else:
+        global_view_perms = False
 
 
     def has_global_perm():

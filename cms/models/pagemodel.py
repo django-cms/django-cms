@@ -778,6 +778,9 @@ class Page(MPTTModel):
 
         if not self.publisher_is_draft:
             return self.publisher_draft.has_view_permission(request)
+        
+        if not get_cms_setting('VIEW_PERMISSION'):
+            return True
             # does any restriction exist?
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
