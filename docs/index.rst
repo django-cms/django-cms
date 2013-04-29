@@ -23,6 +23,7 @@ Install
     :maxdepth: 1
 
     getting_started/installation
+    upgrade/3.0
     upgrade/2.4
     upgrade/2.3.4
     upgrade/2.3.3

@@ -38,6 +38,8 @@ class ToolbarMiddleware(object):
         """
         if 'edit' in request.GET and not request.session.get('cms_edit', False):
             request.session['cms_edit'] = True
+        if 'edit_off' in request.GET and request.session.get('cms_edit', True):
+            request.session['cms_edit'] = False
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):

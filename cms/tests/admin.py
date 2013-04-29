@@ -24,8 +24,8 @@ from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden,
-    HttpResponse)
+from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
+from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from menus.menu_pool import menu_pool
 from types import MethodType
@@ -136,7 +136,6 @@ class AdminTestCase(AdminTestsBase):
                 'pagepermission_set-2-INITIAL_FORMS': 0,
                 'pagepermission_set-2-MAX_NUM_FORMS': 0
             }
-
 
         with self.login_user_context(admin):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
@@ -651,7 +650,7 @@ class AdminTests(AdminTestsBase):
         admin = self.get_admin()
         with self.login_user_context(admin):
             request = self.get_request()
-            response = self.admin_class.remove_plugin(request)
+            response = self.admin_class.delete_plugin(request)
             self.assertEqual(response.status_code, 405)
 
     def test_move_plugin(self):
@@ -660,6 +659,7 @@ class AdminTests(AdminTestsBase):
         page = self.get_page()
         source, target = list(page.placeholders.all())[:2]
         pageplugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        placeholder = Placeholder.objects.all()[0]
         permless = self.get_permless()
         admin = self.get_admin()
         with self.login_user_context(permless):
@@ -667,38 +667,35 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 405)
             request = self.get_request(post_data={'not_usable': '1'})
-            response = self.admin_class.move_plugin(request)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "error")
+            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
-            request = self.get_request(post_data={'plugin_id': plugin.pk})
+            request = self.get_request(
+                post_data={'plugin_id': plugin.pk, 'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             self.assertRaises(Http404, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'ids': plugin.pk})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
+            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder': 'invalid-placeholder'})
-            response = self.admin_class.move_plugin(request)
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.content, "error")
+                'placeholder_id': 'invalid-placeholder'})
+            self.assertRaises(ValueError, self.admin_class.move_plugin, request)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder': target.slot})
+                'placeholder_id': placeholder.pk, 'plugin_parent':''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder': target.slot})
+                'placeholder_id': placeholder.pk, 'plugin_parent':''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
         with self.login_user_context(permless):
-            request = self.get_request(post_data={'ids': pageplugin.pk,
-                'placeholder': target.slot})
+            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.id, 'plugin_parent':''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
-            request = self.get_request(post_data={'ids': pageplugin.pk,
-                'placeholder': target.slot})
+            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.id, 'plugin_parent':''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
@@ -754,8 +751,8 @@ class AdminTests(AdminTestsBase):
             with self.login_user_context(admin):
                 data = {
                     'plugin_type': 'TextPlugin',
-                    'placeholder': body.pk,
-                    'language': 'en',
+                    'placeholder_id': body.pk,
+                    'plugin_language': 'en',
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
@@ -778,8 +775,9 @@ class AdminTests(AdminTestsBase):
             with self.login_user_context(admin):
                 data = {
                     'plugin_type': 'TextPlugin',
-                    'placeholder': body.pk,
-                    'language': 'en',
+                    'placeholder_id': body.pk,
+                    'plugin_language': 'en',
+                    'plugin_parent':'',
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
@@ -860,8 +858,9 @@ class PluginPermissionTests(AdminTestsBase):
         url = reverse('admin:cms_page_add_plugin')
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': self._placeholder.pk,
-            'language': 'en',
+            'placeholder_id': self._placeholder.pk,
+            'plugin_language': 'en',
+            'plugin_parent':'',
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -887,7 +886,7 @@ class PluginPermissionTests(AdminTestsBase):
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         self.client.login(username='test', password='test')
-        url = reverse('admin:cms_page_remove_plugin')
+        url = reverse('admin:cms_page_delete_plugin')
         data = dict(plugin_id=plugin.id)
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -903,7 +902,9 @@ class PluginPermissionTests(AdminTestsBase):
         self.client.login(username='test', password='test')
         url = reverse('admin:cms_page_move_plugin')
         data = dict(plugin_id=plugin.id,
-                    placeholder=self._placeholder)
+                    placeholder_id=self._placeholder.pk,
+                    plugin_parent='',
+                    )
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
@@ -967,13 +968,15 @@ class PluginPermissionTests(AdminTestsBase):
         url = reverse('admin:cms_page_add_plugin')
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': self._placeholder.pk,
-            'language': 'en',
+            'placeholder_id': self._placeholder.pk,
+            'plugin_language': 'en',
+            'plugin_parent':'',
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertEqual(response['content-type'], 'text/plain')
-        self.assertTrue(CMSPlugin.objects.filter(pk=int(response.content)).exists())
+        self.assertEqual(response['content-type'], 'application/json')
+        pk = response.content.split("edit-plugin/")[1].split("/")[0]
+        self.assertTrue(CMSPlugin.objects.filter(pk=int(pk)).exists())
 
 
 class AdminFormsTests(AdminTestsBase):

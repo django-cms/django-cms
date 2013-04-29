@@ -314,7 +314,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         )
         classes = [
             "cms_placeholder-bar-%s" % placeholder.pk,
-            "cms_placeholder_slot::test",
+            '"cms_placeholder-bar"',
         ]
         output = render_placeholder_toolbar(placeholder, context, '', 'test')
         for cls in classes:
