@@ -461,7 +461,7 @@ page. With this field you can overwrite the whole relative url of the page.
 CMS_MENU_TITLE_OVERWRITE
 ========================
 
-Default: ``False``
+Default: ``True``
 
 This adds a new "menu title" field beside the title field.
 
