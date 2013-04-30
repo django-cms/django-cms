@@ -58,7 +58,7 @@ class PageToolbar(CMSToolbar):
             else:
                 url = DefaultLanguageChanger(self.request)(lang['code'])
             menu_items.items.append(
-                Item(url, lang['name'], active=current_lang and lang['code'] == current_lang['code']))
+                Item(url, lang['name'], active=current_lang and lang['code'] == current_lang['code'], load_modal=False))
         return menu_items
 
     def get_template_menu(self):

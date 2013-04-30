@@ -36,8 +36,9 @@ class Item(BaseItem):
                  load_modal=True):
         super(Item, self).__init__(right)
         if load_side_frame and ajax:
-            raise Exception("laod_side_frame and ajax can not both be True.")
+            raise Exception("load_side_frame and ajax can not both be True.")
         self.url = url
+        self.load_modal = load_modal
         self.title = title
         self.load_side_frame = load_side_frame
         self.ajax = ajax
@@ -52,6 +53,8 @@ class Item(BaseItem):
             mod = "ajax"
         elif self.question:
             mod = "dialogue"
+        elif self.load_modal:
+            mod = "modal"
         return {'url': self.url, 'title': self.title, 'type': mod, 'active': self.active, 'question': self.question}
 
     def __repr__(self):
