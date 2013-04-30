@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Title
@@ -145,4 +146,4 @@ def details(request, slug):
     if not context['has_view_permissions']:
         return _handle_no_page(request, slug)
 
-    return render_to_response(template_name, context_instance=context)
+    return TemplateResponse(request, template_name, context)
