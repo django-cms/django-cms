@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 import urllib
+from cms.utils.i18n import get_language_objects, get_language_object
 from cms.toolbar.items import Item, List, Break, Switch
+from django.contrib.sites.models import Site
+from cms.utils import get_language_from_request
+
+from django.contrib.auth.forms import AuthenticationForm
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import has_page_change_permission
@@ -35,7 +40,21 @@ class PageToolbar(CMSToolbar):
                         items.append(self.get_publish_menu(self.request.current_page))
                     if toolbar.edit_mode:
                         items.append(self.get_mode_switchers())
+            items.append(self.get_language_menu())
         return items
+
+    def get_language_menu(self):
+        site = Site.objects.get_current()
+        current_lang = get_language_object(get_language_from_request(self.request), site.pk)
+        menu_items = List("#", current_lang['name'], right=True)
+        for lang in get_language_objects(site.pk):
+            if hasattr(self.request, "_language_changer"):
+                url = self.request._language_changer(lang['code'])
+            else:
+                url = DefaultLanguageChanger(self.request)(lang['code'])
+            menu_items.items.append(
+                Item(url, lang['name'], active=lang['code'] == current_lang['code']))
+        return menu_items
 
     def get_template_menu(self):
         menu_items = List("#", _("Template"))
