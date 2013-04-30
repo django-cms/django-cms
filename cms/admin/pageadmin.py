@@ -1011,7 +1011,7 @@ class PageAdmin(ModelAdmin):
     def descendants(self, request, page_id):
         """
         Get html for descendants of given page
-        Used for lazy loading pages in change_list.js
+        Used for lazy loading pages in cms.changelist.js
         
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
