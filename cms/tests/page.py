@@ -23,11 +23,8 @@ from cms.plugins.text.cms_plugins import TextPlugin
 from cms.plugins.text.models import Text
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
-    URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride,
-    SettingsOverride,
-    UserLoginContext)
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
+from cms.test_utils.util.context_managers import (LanguageOverride, SettingsOverride, UserLoginContext)
 from cms.utils import get_cms_setting
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug
