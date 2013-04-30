@@ -154,6 +154,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - New frontend editing
 - New Toolbar
 - Plugin API for creating new plugins and moving has changed
-
+- CMS_SEO_FIELDS removed and seo fields better integrated
+- CMS_MENU_TITLE_OVERWRITE default changed to True
 
 
