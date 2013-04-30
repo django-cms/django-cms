@@ -235,7 +235,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page.get_title(), 'new title')
 
 
-    def test_meta_description_and_keywords_fields_from_admin(self):
+    def test_meta_description_fields_from_admin(self):
         """
         Test that description and keywords tags can be set via the admin
         """
@@ -243,7 +243,6 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             page_data["meta_description"] = "I am a page"
-            page_data["meta_keywords"] = "page,cms,stuff"
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             response = self.client.get('/en/admin/cms/page/%s/' % page.id)
@@ -253,9 +252,8 @@ class PagesTestCase(CMSTestCase):
             self.assertRedirects(response, URL_CMS_PAGE)
             page = Page.objects.get(title_set__slug=page_data["slug"])
             self.assertEqual(page.get_meta_description(), 'I am a duck')
-            self.assertEqual(page.get_meta_keywords(), 'page,cms,stuff')
 
-    def test_meta_description_and_keywords_from_template_tags(self):
+    def test_meta_description_from_template_tags(self):
         from django import template
 
         superuser = self.get_superuser()
@@ -263,18 +261,17 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             page_data["title"] = "Hello"
             page_data["meta_description"] = "I am a page"
-            page_data["meta_keywords"] = "page,cms,stuff"
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
             t = template.Template(
-                "{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %} {% page_attribute meta_keywords %}")
+                "{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %}")
             req = HttpRequest()
             page.published = True
             page.save()
             req.current_page = page
             req.REQUEST = {}
-            self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page,cms,stuff")
+            self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page")
 
 
     def test_copy_page(self):

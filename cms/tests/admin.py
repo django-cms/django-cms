@@ -449,17 +449,6 @@ class AdminFieldsetTests(CMSTestCase):
         self.assertTrue('publication_date' in experiment2.general_fields, experiment2.general_fields)
         self.assertFalse('publication_date' in experiment3.general_fields, experiment3.general_fields)
 
-    def test_no_seo(self):
-        with SettingsOverride(CMS_SEO_FIELDS=True):
-            control = AttributeObject()
-            contribute_fieldsets(control)
-        with SettingsOverride(CMS_SEO_FIELDS=False):
-            experiment = AttributeObject()
-            contribute_fieldsets(experiment)
-        self.validate_attributes(control, experiment, ['fieldsets', 'seo_fields'])
-        self.assertEqual(control.seo_fields, ['page_title', 'meta_description', 'meta_keywords'])
-        self.assertFalse(experiment.seo_fields, [])
-
     def test_url_overwrite(self):
         with SettingsOverride(CMS_URL_OVERWRITE=False):
             control = AttributeObject()
