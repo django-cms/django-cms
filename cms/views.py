@@ -5,21 +5,21 @@ from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Title
 from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, get_language_list, is_language_prefix_patterns_used
+from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, \
+    get_language_list, is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
-from django.conf.urls.defaults import patterns
+from django.conf.urls import patterns
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.utils import translation
 from django.utils.http import urlquote
+
 
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
-        return render_to_response("cms/new.html", RequestContext(request))
+        return TemplateResponse(request, "cms/new.html", RequestContext(request))
     raise Http404('CMS: Page not found for "%s"' % slug)
 
 
@@ -52,7 +52,7 @@ def details(request, slug):
         attrs = '?preview=1'
         if 'draft' in request.GET:
             attrs += '&draft=1'
-    # Check that the language is in FRONTEND_LANGUAGES:
+        # Check that the language is in FRONTEND_LANGUAGES:
     if not current_language in user_languages:
         #are we on root?
         if not slug:
@@ -114,11 +114,11 @@ def details(request, slug):
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass
-        # Check if the page has a redirect url defined for this language.
+                # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
         if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
-            and not redirect_url.startswith('/%s/' % current_language)):
+        and not redirect_url.startswith('/%s/' % current_language)):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
