@@ -271,7 +271,7 @@ class PagesTestCase(CMSTestCase):
             page.save()
             req.current_page = page
             req.REQUEST = {}
-            self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page page")
+            self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
 
 
     def test_copy_page(self):
