@@ -138,7 +138,7 @@ Functions and constants
     :param boolean grant_all: Grant all permissions to the user
     
 
-.. function:: publish_page(page, user, approve=False)
+.. function:: publish_page(page, user)
 
     Publishes a page and optionally approves that publication.
     
@@ -146,7 +146,6 @@ Functions and constants
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
-    :param boolean approve: Whether to approve the publication or not
     
 
 .. function:: approve_page(page, user)
