@@ -32,7 +32,8 @@ class List(BaseItem):
 class Item(BaseItem):
     template = "cms/toolbar/menu/item.html"
 
-    def __init__(self, url, title, load_side_frame=False, ajax=False, active=False, question="", right=False):
+    def __init__(self, url, title, load_side_frame=False, ajax=False, active=False, question="", right=False,
+                 load_modal=True):
         super(Item, self).__init__(right)
         if load_side_frame and ajax:
             raise Exception("laod_side_frame and ajax can not both be True.")
@@ -55,6 +56,7 @@ class Item(BaseItem):
 
     def __repr__(self):
         return unicode(self.title)
+
 
 class Break(BaseItem):
     template = "cms/toolbar/menu/break.html"

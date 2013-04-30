@@ -3,7 +3,7 @@ import urllib
 from cms.utils.i18n import get_language_objects, get_language_object
 from cms.toolbar.items import Item, List, Break, Switch
 from django.contrib.sites.models import Site
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, get_cms_setting
 
 from django.contrib.auth.forms import AuthenticationForm
 from cms.toolbar_base import CMSToolbar
@@ -12,6 +12,7 @@ from cms.utils.permissions import has_page_change_permission
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from menus.utils import DefaultLanguageChanger
 
 
 class PageToolbar(CMSToolbar):
@@ -27,7 +28,7 @@ class PageToolbar(CMSToolbar):
             items.append(self.get_admin_menu())
             if toolbar.request.current_page and is_app:
                 has_global_current_page_change_permission = False
-                if settings.CMS_PERMISSION:
+                if get_cms_setting('PERMISSION'):
                     has_global_current_page_change_permission = has_page_change_permission(self.request)
                 has_current_page_change_permission = self.request.current_page.has_change_permission(self.request)
                 if has_global_current_page_change_permission or has_current_page_change_permission:
@@ -46,7 +47,7 @@ class PageToolbar(CMSToolbar):
     def get_language_menu(self):
         site = Site.objects.get_current()
         current_lang = get_language_object(get_language_from_request(self.request), site.pk)
-        menu_items = List("#", current_lang['name'], right=True)
+        menu_items = List("#", _("Language"))
         for lang in get_language_objects(site.pk):
             if hasattr(self.request, "_language_changer"):
                 url = self.request._language_changer(lang['code'])
@@ -59,7 +60,7 @@ class PageToolbar(CMSToolbar):
     def get_template_menu(self):
         menu_items = List("#", _("Template"))
         url = reverse('admin:cms_page_change_template', args=(self.request.current_page.pk,))
-        for path, name in settings.CMS_TEMPLATES:
+        for path, name in get_cms_setting('TEMPLATES'):
             args = urllib.urlencode({'template': path})
             active = False
             if self.request.current_page.get_template() == path:
