@@ -90,7 +90,8 @@ CMS_SEO_FIELDS
 ==============
 
 Was removed. ``meta_description`` fields max_length was changed to 155 for optimal Google integration.
-``page_title`` is default on top. SEO fieldset in admin removed.
+``page_title`` is default on top. SEO fieldset in admin removed. ``meta_keywords`` field removed as not relevant
+anymore.
 
 CMS_MENU_TITLE_OVERWRITE
 ========================
