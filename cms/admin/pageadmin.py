@@ -167,18 +167,15 @@ class PageAdmin(ModelAdmin):
     class Media:
         css = {
             'all': [cms_static_url(path) for path in (
-                'css/rte.css',
                 'css/pages.css',
                 'css/change_form.css',
-                'css/jquery.dialog.css',
+                'css/cms.base.css',
             )]
         }
         js = ['%sjs/jquery.min.js' % admin_static_url()] + [cms_static_url(path) for path in [
-            'js/plugins/admincompat.js',
-            'js/libs/jquery.query.js',
-            'js/libs/jquery.ui.core.js',
-            'js/libs/jquery.ui.dialog.js',
-        ]
+                'js/plugins/jquery.query.js',
+                'js/plugins/jquery.ui.custom.js',
+            ]
         ]
 
 
@@ -1014,7 +1011,7 @@ class PageAdmin(ModelAdmin):
     def descendants(self, request, page_id):
         """
         Get html for descendants of given page
-        Used for lazy loading pages in change_list.js
+        Used for lazy loading pages in cms.changelist.js
         
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
@@ -1067,9 +1064,11 @@ class PageAdmin(ModelAdmin):
             raise Http404()
 
         # Sanity check to make sure we're not getting bogus values from JavaScript:
-        if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
-            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
-
+        if settings.USE_I18N:
+            if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
+                return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+        else:
+            language = settings.LANGUAGE_CODE
         plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
 
         if parent:
