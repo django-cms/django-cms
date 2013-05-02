@@ -21,7 +21,8 @@ from cms.test_utils.project.pluginapp.models import Article, Section
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel)
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, URL_CMS_PLUGIN_HISTORY_EDIT
+    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, \
+    URL_CMS_PLUGIN_HISTORY_EDIT
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
