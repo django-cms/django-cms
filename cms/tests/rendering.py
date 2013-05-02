@@ -144,6 +144,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         with SettingsOverride(CMS_TEMPLATES=[(TEMPLATE_NAME, '')]):
             from cms.views import details
             response = details(self.get_request(self.test_page), '')
+            response.render()
             r = self.strip_rendered(response.content)
             self.assertEqual(r, u'|'+self.test_data['text_main']+u'|'+self.test_data['text_sub']+u'|')
         
