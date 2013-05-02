@@ -1145,9 +1145,11 @@ class PageAdmin(ModelAdmin):
             raise Http404()
 
         # Sanity check to make sure we're not getting bogus values from JavaScript:
-        if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
-            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
-
+        if settings.USE_I18N:
+            if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
+                return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+        else:
+            language = settings.LANGUAGE_CODE
         plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
 
         if parent:
