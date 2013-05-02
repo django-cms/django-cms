@@ -44,6 +44,7 @@ DEFAULTS = {
     'MENU_TITLE_OVERWRITE': True,
     'REDIRECTS': False,
     'APPHOOKS': [],
+    'TOOLBARS': [],
     'SOFTROOT': False,
     'SITE_CHOICES_CACHE_KEY': 'CMS:site_choices',
     'PAGE_CHOICES_CACHE_KEY': 'CMS:page_choices',
