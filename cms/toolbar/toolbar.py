@@ -9,7 +9,7 @@ from django.contrib.auth import login, logout
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-
+from django.conf import settings
 
 class CMSToolbarLoginForm(AuthenticationForm):
     username = forms.CharField(label=_("Username"), max_length=100)
@@ -39,7 +39,10 @@ class CMSToolbar(object):
             self.view_name = resolve(self.request.path).func.__module__
         except Resolver404:
             self.view_name = ""
-        self.language = self.request.LANGUAGE_CODE
+        if settings.USE_I18N:
+            self.language = self.request.LANGUAGE_CODE
+        else:
+            self.language = settings.LANGUAGE_CODE
         if self.is_staff:
             try:
                 self.language = UserSettings.objects.get(user=self.request.user).language
