@@ -6,7 +6,6 @@ from cms.toolbar.items import Item, List, Break, Switch
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
 
-from django.contrib.auth.forms import AuthenticationForm
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import has_page_change_permission
@@ -101,11 +100,12 @@ class PageToolbar(CMSToolbar):
             pk = page.pk
         else:
             pk = page.publisher_draft.pk
+        dirty = self.request.current_page.is_dirty()
         menu_items.items.append(Item(reverse('admin:cms_page_publish_page',
-                                             args=[pk]), _('Publish now'), ajax=True))
+                                             args=[pk]), _('Publish now'), ajax=True, disabled=not dirty))
         menu_items.items.append(Item(reverse('admin:cms_page_revert_page',
                                              args=[pk]), _('Revert to live'), ajax=True,
-                                     question=_("Are you sure you want to revert to live?")))
+                                     question=_("Are you sure you want to revert to live?"), disabled=not dirty))
         return menu_items
 
     def get_admin_menu(self):
@@ -130,6 +130,7 @@ class PageToolbar(CMSToolbar):
         switch.addItem(_("Edit"), "?edit", self.toolbar.edit_mode)
         switch.addItem(_("Build"), "?build", not self.toolbar.edit_mode)
         return switch
+
 
 toolbar_pool.register(PageToolbar)
 

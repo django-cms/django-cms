@@ -33,7 +33,7 @@ class Item(BaseItem):
     template = "cms/toolbar/menu/item.html"
 
     def __init__(self, url, title, load_side_frame=False, ajax=False, active=False, question="", right=False,
-                 load_modal=True):
+                 load_modal=True, disabled=False):
         super(Item, self).__init__(right)
         if load_side_frame and ajax:
             raise Exception("load_side_frame and ajax can not both be True.")
@@ -44,6 +44,7 @@ class Item(BaseItem):
         self.ajax = ajax
         self.active = active
         self.question = question
+        self.disabled = disabled
 
     def get_context(self):
         mod = None
@@ -55,7 +56,14 @@ class Item(BaseItem):
             mod = "dialogue"
         elif self.load_modal:
             mod = "modal"
-        return {'url': self.url, 'title': self.title, 'type': mod, 'active': self.active, 'question': self.question}
+        return {
+            'url': self.url,
+            'title': self.title,
+            'type': mod,
+            'active': self.active,
+            'question': self.question,
+            'disabled': self.disabled
+        }
 
     def __repr__(self):
         return unicode(self.title)
