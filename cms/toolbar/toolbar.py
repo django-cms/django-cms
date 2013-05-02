@@ -45,7 +45,7 @@ class CMSToolbar(object):
                 self.language = UserSettings.objects.get(user=self.request.user).language
             except UserSettings.DoesNotExist:
                 pass
-        page = self.request.current_page
+        page = self.request.current_page #query the page in the right language
         with force_language(self.language):
             self.items = self._get_items()
 
