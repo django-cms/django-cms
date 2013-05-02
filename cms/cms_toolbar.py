@@ -119,6 +119,8 @@ class PageToolbar(CMSToolbar):
             admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
         admin_items.items.append(Item(reverse('admin:index'), _('Administration'), load_side_frame=True))
         admin_items.items.append(Break())
+        admin_items.items.append(Item(reverse('admin:cms_usersettings_change'), _('Settings'), load_side_frame=True))
+        admin_items.items.append(Break())
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True, active=True))
         return admin_items
 

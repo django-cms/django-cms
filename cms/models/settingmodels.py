@@ -2,11 +2,20 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 
 class UserSettings(models.Model):
-    user = models.ForeignKey(User)
-    language = models.CharField(_("Language"), max_length=10)
+    user = models.ForeignKey(User, editable=False)
+    language = models.CharField(_("Language"), max_length=10, choices=settings.LANGUAGES,
+                                help_text=_("The language for the admin interface and toolbar"))
 
+    class Meta:
+        verbose_name = _('user setting')
+        verbose_name_plural = _('user settings')
+        app_label = 'cms'
+
+    def __unicode__(self):
+        return unicode(self.user)
 
 

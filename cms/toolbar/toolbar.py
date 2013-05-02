@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from cms.models import UserSettings
 from cms.toolbar_pool import toolbar_pool
+from cms.utils.i18n import force_language
 
 from django.contrib.auth.forms import AuthenticationForm
 from django import forms
@@ -37,13 +39,15 @@ class CMSToolbar(object):
             self.view_name = resolve(self.request.path).func.__module__
         except Resolver404:
             self.view_name = ""
-        self.items = self._get_items()
-
-    def get_state(self, request, param, session_key):
-        state = self.add_parameter in request.GET
-        if self.session_key and request.session.get(self.session_key, False):
-            return True
-        return state
+        self.language = self.request.LANGUAGE_CODE
+        if self.is_staff:
+            try:
+                self.language = UserSettings.objects.get(user=self.request.user).language
+            except UserSettings.DoesNotExist:
+                pass
+        page = self.request.current_page
+        with force_language(self.language):
+            self.items = self._get_items()
 
     def _get_items(self):
         """
