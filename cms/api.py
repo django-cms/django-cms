@@ -106,7 +106,7 @@ def _verify_plugin_type(plugin_type):
 
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, redirect=None, meta_description=None,
-                meta_keywords=None, created_by='python-api', parent=None,
+                created_by='python-api', parent=None,
                 publication_date=None, publication_end_date=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
@@ -201,7 +201,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         apphook=application_urls,
         redirect=redirect,
         meta_description=meta_description,
-        meta_keywords=meta_keywords,
         page=page,
         overwrite_url=overwrite_url
     )
@@ -214,7 +213,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
 def create_title(language, title, page, menu_title=None, slug=None,
                  apphook=None, redirect=None, meta_description=None,
-                 meta_keywords=None, parent=None, overwrite_url=None):
+                 parent=None, overwrite_url=None):
     """
     Create a title.
     
@@ -246,7 +245,6 @@ def create_title(language, title, page, menu_title=None, slug=None,
         application_urls=application_urls,
         redirect=redirect,
         meta_description=meta_description,
-        meta_keywords=meta_keywords,
         page=page
     )
 

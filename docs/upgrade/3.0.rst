@@ -73,7 +73,6 @@ In the `insert_items()` function you recieve some parameters:
 
     Is the current url mapped to this app? True if yes.
 
-
 If you want to add items based on the current view you can do this in the view itself.
 
 Example::
@@ -85,3 +84,16 @@ Example::
                 Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "Change Category"))
         return render_to_response('sampleapp/category_view.html',
                                   RequestContext(request, {'category': cat}))
+
+
+CMS_SEO_FIELDS
+==============
+
+Was removed. ``meta_description`` fields max_length was changed to 155 for optimal Google integration.
+``page_title`` is default on top. SEO fieldset in admin removed. ``meta_keywords`` field removed as not relevant
+anymore.
+
+CMS_MENU_TITLE_OVERWRITE
+========================
+
+New default is True.

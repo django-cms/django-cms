@@ -461,7 +461,7 @@ page. With this field you can overwrite the whole relative url of the page.
 CMS_MENU_TITLE_OVERWRITE
 ========================
 
-Default: ``False``
+Default: ``True``
 
 This adds a new "menu title" field beside the title field.
 
@@ -578,29 +578,6 @@ Default: ``False`` for both
 This adds two new :class:`~django.db.models.DateTimeField` fields in the
 "advanced settings" tab of the page. With this option you can limit the time a
 page is published.
-
-.. setting:: CMS_SEO_FIELDS
-
-CMS_SEO_FIELDS
-==============
-
-Default: ``False``
-
-This adds a new "SEO Fields" fieldset to the page admin. You can set the
-Page Title, Meta Keywords and Meta Description in there.
-
-To access these fields in the template use:
-
-.. code-block:: html+django
-
-    {% load cms_tags %}
-    <head>
-        <title>{% page_attribute page_title %}</title>
-        <meta name="description" content="{% page_attribute meta_description %}"/>
-        <meta name="keywords" content="{% page_attribute meta_keywords %}"/>
-        ...
-        ...
-    </head>
 
 .. setting:: CMS_CACHE_DURATIONS
 
