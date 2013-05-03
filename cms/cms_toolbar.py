@@ -83,14 +83,13 @@ class PageToolbar(CMSToolbar):
         menu_items = List("#", _("Template"))
         url = reverse('admin:cms_page_change_template', args=(self.request.current_page.pk,))
         for path, name in get_cms_setting('TEMPLATES'):
-            args = urllib.urlencode({'template': path})
             active = False
             if self.request.current_page.get_template() == path:
                 active = True
             if path == "INHERIT":
                 menu_items.items.append(Break())
             menu_items.items.append(
-                Item('%s?%s' % (url, args), name, ajax=True, active=active),
+                Item(url, name, ajax=True, ajax_data={'template': path}, active=active),
             )
         return menu_items
 
