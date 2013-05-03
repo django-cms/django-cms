@@ -26,7 +26,10 @@ plugins and in build mode you can rearrange and add plugins.
 New Toolbar
 ===========
 
-The Toolbar code has been simplified. Toolbar now allows for adding and changing entries.
+The Toolbar code has been simplified and the appearance refreshed. Toolbar now allows for adding and changing entries.
+The toolbar has now a built in language chooser for languages that are not public yet. A user settings module has been
+introduced to save the language of the staff user so the toolbar and admin interface stays the same even when he
+switches languages.
 
 To add a toolbar for you app create a `cms_toolbar.py` in your app.
 
@@ -85,3 +88,11 @@ Example::
                 Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "Change Category"))
         return render_to_response('sampleapp/category_view.html',
                                   RequestContext(request, {'category': cat}))
+
+
+language_chooser
+================
+
+The ``language_chooser`` templatetag now only displays languages that are public. Use the toolbar language chooser
+to change the language to non public languages.
+
