@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import urllib
 from cms.exceptions import LanguageError
+from cms.models import Page
 from cms.utils.i18n import get_language_objects, get_language_object
 from cms.toolbar.items import Item, List, Break, Switch
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
 
@@ -140,12 +142,7 @@ class PageToolbar(CMSToolbar):
             _('Delete Page'),
             load_side_frame=True)
         )
-        if 'reversion' in settings.INSTALLED_APPS:
-            menu_items.items.append(Item(
-                reverse('admin:cms_page_history', args=(self.toolbar.request.current_page.pk,)),
-                _('View History'),
-                load_side_frame=True)
-            )
+
         return menu_items
 
     def get_history_menu(self):
@@ -162,6 +159,27 @@ class PageToolbar(CMSToolbar):
             question=_("Are you sure you want to revert to live?"),
             disabled=not dirty)
         )
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_history', args=(self.toolbar.request.current_page.pk,)),
+            _('View History'),
+            load_side_frame=True)
+        )
+        if 'reversion' in settings.INSTALLED_APPS:
+            from reversion.models import Revision
+            content_type = ContentType.objects.get_for_model(Page)
+            revisions = Revision.objects.filter(content_type=content_type, object_id=self.request.current_page.pk)
+
+            menu_items.items.append(Item(
+                reverse('admin:cms_page_revert_page', args=[pk]),
+                _('Undo'), ajax=True,
+                disabled=False)
+            )
+            menu_items.items.append(Item(
+                reverse('admin:cms_page_revert_page', args=[pk]),
+                _('Redo'), ajax=True,
+                disabled=not "revision" in self.request.GET)
+            )
+        return menu_items
 
     def get_publish_menu(self):
         page = self.request.current_page
@@ -186,7 +204,8 @@ class PageToolbar(CMSToolbar):
             admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
         admin_items.items.append(Item(reverse('admin:index'), _('Administration'), load_side_frame=True))
         admin_items.items.append(Break())
-        admin_items.items.append(Item(reverse('admin:cms_usersettings_change'), _('Settings'), load_side_frame=True))
+        admin_items.items.append(
+            Item(reverse('admin:cms_usersettings_change'), _('Settings'), load_side_frame=True))
         admin_items.items.append(Break())
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True, active=True))
         return admin_items
