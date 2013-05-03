@@ -112,7 +112,9 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Break())
         menu_items.items.append(Item(_get_delete_url(self.toolbar), _('Delete Page'), load_side_frame=True))
         if 'reversion' in settings.INSTALLED_APPS:
-            menu_items.items.append(Item(_get_page_history_url(self.toolbar), _('View History'), load_side_frame=True))
+            menu_items.items.append(
+                Item(reverse('admin:cms_page_history', args=(self.toolbar.request.current_page.pk,)), _('View History'),
+                     load_side_frame=True))
         return menu_items
 
     def get_history_menu(self):
@@ -167,10 +169,6 @@ toolbar_pool.register(PageToolbar)
 
 def _get_page_admin_url(toolbar):
     return reverse('admin:cms_page_change', args=(toolbar.request.current_page.pk,))
-
-
-def _get_page_history_url(toolbar):
-    return reverse('admin:cms_page_history', args=(toolbar.request.current_page.pk,))
 
 
 def _get_add_child_url(toolbar):
