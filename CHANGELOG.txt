@@ -154,6 +154,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - New frontend editing
 - New Toolbar
 - Plugin API for creating new plugins and moving has changed
+- render_to_response replaced with TemplateResponse in cms.views
 - Toolbar has language switcher built in
 - User settings module added for saving the language of the user so when he switches languages the toolbar/interface
   keeps the language.
