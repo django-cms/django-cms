@@ -687,12 +687,6 @@ class Page(MPTTModel):
         """
         return self.get_title_obj_attribute("meta_description", language, fallback, version_id, force_reload)
 
-    def get_meta_keywords(self, language=None, fallback=True, version_id=None, force_reload=False):
-        """
-        get content for the keywords meta tag for the page depending on the given language
-        """
-        return self.get_title_obj_attribute("meta_keywords", language, fallback, version_id, force_reload)
-
     def get_application_urls(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get application urls conf for application hook

@@ -76,7 +76,6 @@ In the `insert_items()` function you recieve some parameters:
 
     Is the current url mapped to this app? True if yes.
 
-
 If you want to add items based on the current view you can do this in the view itself.
 
 Example::
@@ -90,9 +89,20 @@ Example::
                                   RequestContext(request, {'category': cat}))
 
 
+CMS_SEO_FIELDS
+==============
+
+Was removed. ``meta_description`` fields max_length was changed to 155 for optimal Google integration.
+``page_title`` is default on top. SEO fieldset in admin removed. ``meta_keywords`` field removed as not relevant
+anymore.
+
+CMS_MENU_TITLE_OVERWRITE
+========================
+
+New default is True.
+
 language_chooser
 ================
 
 The ``language_chooser`` templatetag now only displays languages that are public. Use the toolbar language chooser
 to change the language to non public languages.
-

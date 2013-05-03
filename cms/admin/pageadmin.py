@@ -18,7 +18,8 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction, models
-from django.http import (HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError)
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, \
+    HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import (escape, force_escape, escapejs)
@@ -42,7 +43,7 @@ from cms.plugin_pool import plugin_pool
 from cms.templatetags.cms_admin import admin_static_url
 from cms.utils import copy_plugins, helpers, moderator, permissions, plugins, get_template_from_request, \
     get_language_from_request, admin as admin_utils, cms_static_url
-from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple, get_language_object
+from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
@@ -67,15 +68,14 @@ PUBLISH_COMMENT = "Publish"
 
 def contribute_fieldsets(cls):
     if get_cms_setting('MENU_TITLE_OVERWRITE'):
-        general_fields = [('title', 'menu_title')]
+        general_fields = [('title', 'page_title', 'menu_title')]
     else:
-        general_fields = ['title']
-    general_fields += ['slug', ('published', 'in_navigation')]
+        general_fields = [('title', 'page_title')]
+    general_fields += ['slug', 'meta_description', ('published', 'in_navigation')]
     additional_hidden_fields = []
     advanced_fields = ['reverse_id', 'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
     template_fields = ['template']
     hidden_fields = ['site', 'parent']
-    seo_fields = []
     if get_cms_setting('SOFTROOT'):
         advanced_fields.append('soft_root')
     if get_cms_setting('SHOW_START_DATE') and get_cms_setting('SHOW_END_DATE'):
@@ -84,8 +84,6 @@ def contribute_fieldsets(cls):
         general_fields.append('publication_date')
     elif get_cms_setting('SHOW_END_DATE'):
         general_fields.append('publication_end_date')
-    if get_cms_setting('SEO_FIELDS'):
-        seo_fields = ['page_title', 'meta_description', 'meta_keywords']
     if not get_cms_setting('URL_OVERWRITE'):
         advanced_fields.remove("overwrite_url")
     if not get_cms_setting('REDIRECTS'):
@@ -114,19 +112,12 @@ def contribute_fieldsets(cls):
             'classes': ('collapse',),
         }),
     ]
-
-    if get_cms_setting('SEO_FIELDS'):
-        fieldsets.append((_("SEO Settings"), {
-            'fields': seo_fields,
-            'classes': ('collapse',),
-        }))
     setattr(cls, 'fieldsets', fieldsets)
     setattr(cls, 'advanced_fields', advanced_fields)
     setattr(cls, 'hidden_fields', hidden_fields)
     setattr(cls, 'general_fields', general_fields)
     setattr(cls, 'template_fields', template_fields)
     setattr(cls, 'additional_hidden_fields', additional_hidden_fields)
-    setattr(cls, 'seo_fields', seo_fields)
 
 
 def contribute_list_filter(cls):
@@ -145,7 +136,7 @@ class PageAdmin(ModelAdmin):
 
     exclude = []
     mandatory_placeholders = (
-        'title', 'slug', 'parent', 'site', 'meta_description', 'meta_keywords', 'page_title', 'menu_title')
+        'title', 'slug', 'parent', 'site', 'meta_description', 'page_title', 'menu_title')
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
 
@@ -299,9 +290,6 @@ class PageAdmin(ModelAdmin):
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
                 given_fieldsets.append(advanced)
-            if get_cms_setting('SEO_FIELDS'):
-                seo = given_fieldsets.pop(3)
-                given_fieldsets.append(seo)
         else: # new page
             given_fieldsets = deepcopy(self.add_fieldsets)
 
@@ -347,7 +335,6 @@ class PageAdmin(ModelAdmin):
                 'application_urls',
                 'redirect',
                 'meta_description',
-                'meta_keywords',
                 'menu_title',
                 'page_title']:
                 form.base_fields[name].initial = getattr(title_obj, name)
@@ -1377,7 +1364,7 @@ class PageAdmin(ModelAdmin):
         else:
             form = PageTitleForm(instance=title)
         admin_form = AdminForm(form, fieldsets=[(None, {'fields': ('title',)})], prepopulated_fields={},
-                              model_admin=self)
+                               model_admin=self)
         media = self.media + admin_form.media
         context = {
             'title': 'Title',
