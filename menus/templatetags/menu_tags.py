@@ -7,11 +7,9 @@ from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.utils.i18n import force_language, get_language_objects
 from django import template
-from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.cache import cache
-from django.core.urlresolvers import reverse, resolve
-from django.utils.translation import activate, get_language, ugettext
+from django.core.urlresolvers import reverse
+from django.utils.translation import get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -216,7 +214,7 @@ class ShowSubMenu(InclusionTag):
                 if node.selected:
                     # if no root_level specified, set it to the selected nodes level
                     root_level = node.level
-                # is this the ancestor of current selected node at the root level?
+                    # is this the ancestor of current selected node at the root level?
             is_root_ancestor = (node.ancestor and node.level == root_level)
             # is a node selected on the root_level specified
             root_selected = (node.selected and node.level == root_level)
@@ -227,8 +225,8 @@ class ShowSubMenu(InclusionTag):
                     child.parent = None
                     if child.sibling:
                         cut_after(child, nephews, [])
-                    # if root_level was 0 we need to give the menu the entire tree
-                # not just the children
+                        # if root_level was 0 we need to give the menu the entire tree
+                    # not just the children
                 if include_root:
                     children = menu_pool.apply_modifiers([node], request, post_cut=True)
                 else:
@@ -363,10 +361,9 @@ class LanguageChooser(InclusionTag):
         marker = MARKERS[i18n_mode]
         current_lang = get_language()
         site = Site.objects.get_current()
-        user_is_staff = context['request'].user.is_staff
         languages = []
         for lang in get_language_objects(site.pk):
-            if user_is_staff or lang.get('public', True):
+            if lang.get('public', True):
                 languages.append((lang['code'], marker(lang['name'], lang['code'])))
         context.update({
             'languages': languages,

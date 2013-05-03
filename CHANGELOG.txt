@@ -158,5 +158,13 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_SEO_FIELDS removed and seo fields better integrated
 - meta_keywords field removed as not relevant anymore
 - CMS_MENU_TITLE_OVERWRITE default changed to True
+- Toolbar has language switcher built in
+- User settings module added for saving the language of the user so when he switches languages the toolbar/interface
+  keeps the language.
+- language_chooser templatetag now only displays public languages, even when you are logged in as staff.
+
+
+
+
 
 

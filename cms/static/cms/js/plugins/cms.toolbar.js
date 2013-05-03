@@ -280,6 +280,12 @@ $(document).ready(function () {
 			var target = el.attr('rel');
 
 			switch(target) {
+				case 'modal':
+					this.openModal(el.attr('href'), el.attr('data-name'), [{
+						'title': el.attr('data-name'),
+						'url': el.attr('href')
+					}]);
+					break;
 				case 'dialogue':
 					this.openDialogue(el.attr('data-text'), el.attr('href'));
 					break;
@@ -290,10 +296,7 @@ $(document).ready(function () {
 					this.openAjax(el.attr('href'));
 					break;
 				default:
-					this.openModal(el.attr('href'), el.attr('data-name'), [{
-						'title': el.attr('data-name'),
-						'url': el.attr('href')
-					}]);
+					window.location.href = el.attr('href');
 			}
 		},
 
