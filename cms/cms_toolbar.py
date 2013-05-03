@@ -103,18 +103,49 @@ class PageToolbar(CMSToolbar):
 
         menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
         menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
-        menu_items.items.append(
-            Item(reverse('admin:cms_page_change', args=[page.pk]), _('Settings'), load_side_frame=True))
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_change', args=[page.pk]),
+            _('Settings'),
+            load_side_frame=True)
+        )
         menu_items.items.append(Break())
-        menu_items.items.append(Item(reverse('admin:cms_page_changelist'), _('Move/add Pages'), load_side_frame=True))
-        menu_items.items.append(Item(_get_add_child_url(self.toolbar), _('Add child page'), load_side_frame=True))
-        menu_items.items.append(Item(_get_add_sibling_url(self.toolbar), _('Add sibling page'), load_side_frame=True))
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_changelist'),
+            _('Move/add Pages'),
+            load_side_frame=True)
+        )
+        data = {
+            'position': 'last-child',
+            'target': self.request.current_page.pk,
+        }
+        menu_items.items.append(Item(
+            '%s?%s' % (reverse('admin:cms_page_add'), urllib.urlencode(data)),
+            _('Add child page'),
+            load_side_frame=True)
+        )
+        data = {
+            'position': 'last-child',
+        }
+        if self.request.current_page.parent_id:
+            data['target'] = self.request.current_page.parent_id
+        menu_items.items.append(Item(
+            '%s?%s' % (reverse('admin:cms_page_add'),
+            urllib.urlencode(data)),
+            _('Add sibling page'),
+            load_side_frame=True)
+        )
         menu_items.items.append(Break())
-        menu_items.items.append(Item(_get_delete_url(self.toolbar), _('Delete Page'), load_side_frame=True))
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_delete', args=(self.request.current_page.pk,)),
+            _('Delete Page'),
+            load_side_frame=True)
+        )
         if 'reversion' in settings.INSTALLED_APPS:
-            menu_items.items.append(
-                Item(reverse('admin:cms_page_history', args=(self.toolbar.request.current_page.pk,)), _('View History'),
-                     load_side_frame=True))
+            menu_items.items.append(Item(
+                reverse('admin:cms_page_history', args=(self.toolbar.request.current_page.pk,)),
+                _('View History'),
+                load_side_frame=True)
+            )
         return menu_items
 
     def get_history_menu(self):
@@ -125,9 +156,12 @@ class PageToolbar(CMSToolbar):
             pk = page.publisher_draft.pk
         dirty = page.is_dirty()
         menu_items = List('', _("History"))
-        menu_items.items.append(Item(reverse('admin:cms_page_revert_page',
-                                             args=[pk]), _('Revert to live'), ajax=True,
-                                     question=_("Are you sure you want to revert to live?"), disabled=not dirty))
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_revert_page', args=[pk]),
+            _('Revert to live'), ajax=True,
+            question=_("Are you sure you want to revert to live?"),
+            disabled=not dirty)
+        )
 
     def get_publish_menu(self):
         page = self.request.current_page
@@ -165,38 +199,3 @@ class PageToolbar(CMSToolbar):
 
 
 toolbar_pool.register(PageToolbar)
-
-
-def _get_page_admin_url(toolbar):
-    return reverse('admin:cms_page_change', args=(toolbar.request.current_page.pk,))
-
-
-def _get_add_child_url(toolbar):
-    data = {
-        'position': 'last-child',
-        'target': toolbar.request.current_page.pk,
-    }
-    args = urllib.urlencode(data)
-    return '%s?%s' % (reverse('admin:cms_page_add'), args)
-
-
-def _get_add_sibling_url(toolbar):
-    data = {
-        'position': 'last-child',
-    }
-    if toolbar.request.current_page.parent_id:
-        data['target'] = toolbar.request.current_page.parent_id
-    args = urllib.urlencode(data)
-    return '%s?%s' % (reverse('admin:cms_page_add'), args)
-
-
-def _get_delete_url(toolbar):
-    return reverse('admin:cms_page_delete', args=(toolbar.request.current_page.pk,))
-
-
-def _get_approve_url(toolbar):
-    return reverse('admin:cms_page_approve_page', args=(toolbar.request.current_page.pk,))
-
-
-def _get_publish_url(toolbar):
-    return reverse('admin:cms_page_publish_page', args=(toolbar.request.current_page.pk,))
