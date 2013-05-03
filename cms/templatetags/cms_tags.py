@@ -352,7 +352,6 @@ class PageAttribute(AsTag):
     - page_title
     - slug
     - meta_description
-    - meta_keywords
 
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
@@ -373,7 +372,6 @@ class PageAttribute(AsTag):
         "title",
         "slug",
         "meta_description",
-        "meta_keywords",
         "page_title",
         "menu_title"
     ]
