@@ -37,9 +37,10 @@ class PageToolbar(CMSToolbar):
                     # The 'templates' Menu
                     items.append(self.get_template_menu())
                     # Publish Menu
-                    if self.request.current_page.has_publish_permission(self.request):
-                        items.append(self.get_publish_menu(self.request.current_page))
-                    if toolbar.edit_mode:
+                    items.append(self.get_history_menu())
+                    if self.toolbar.edit_mode:
+                        if self.request.current_page.has_publish_permission(self.request):
+                            items.append(self.get_publish_menu())
                         items.append(self.get_mode_switchers())
             items.append(self.get_language_menu())
         return items
@@ -81,7 +82,9 @@ class PageToolbar(CMSToolbar):
         """
         if not self.request.current_page.pk:
             return []
+
         menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
+        menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode))
         menu_items.items.append(
             Item(reverse('admin:cms_page_change', args=[page.pk]), _('Settings'), load_side_frame=True))
         menu_items.items.append(Break())
@@ -94,19 +97,29 @@ class PageToolbar(CMSToolbar):
             menu_items.items.append(Item(_get_page_history_url(self.toolbar), _('View History'), load_side_frame=True))
         return menu_items
 
-    def get_publish_menu(self, page):
-        menu_items = List('', _("Publish"))
+    def get_history_menu(self):
+        page = self.request.current_page
         if page.publisher_is_draft:
             pk = page.pk
         else:
             pk = page.publisher_draft.pk
-        dirty = self.request.current_page.is_dirty()
-        menu_items.items.append(Item(reverse('admin:cms_page_publish_page',
-                                             args=[pk]), _('Publish now'), ajax=True, disabled=not dirty))
+        dirty = page.is_dirty()
+        menu_items = List('', _("History"))
         menu_items.items.append(Item(reverse('admin:cms_page_revert_page',
                                              args=[pk]), _('Revert to live'), ajax=True,
                                      question=_("Are you sure you want to revert to live?"), disabled=not dirty))
-        return menu_items
+
+    def get_publish_menu(self):
+        page = self.request.current_page
+        if page.publisher_is_draft:
+            pk = page.pk
+        else:
+            pk = page.publisher_draft.pk
+        dirty = page.is_dirty()
+
+        switch = Switch(right=True)
+        switch.addItem(_("Publish now"), reverse('admin:cms_page_publish_page', args=[pk]), True)
+        return switch
 
     def get_admin_menu(self):
         """
@@ -125,7 +138,6 @@ class PageToolbar(CMSToolbar):
         return admin_items
 
     def get_mode_switchers(self):
-
         switch = Switch(right=True)
         switch.addItem(_("Edit"), "?edit", self.toolbar.edit_mode)
         switch.addItem(_("Build"), "?build", not self.toolbar.edit_mode)
