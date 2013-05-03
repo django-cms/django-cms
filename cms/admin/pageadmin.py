@@ -668,7 +668,7 @@ class PageAdmin(ModelAdmin):
         if not page.has_change_permission(request):
             return HttpResponseForbidden(_("You do not have permission to change the template"))
 
-        to_template = request.POST.get("template", None)
+        to_template = request.GET.get("template", None)
         if to_template not in dict(get_cms_setting('TEMPLATES')):
             return HttpResponseBadRequest(_("Template not valid"))
 
