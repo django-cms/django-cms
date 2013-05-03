@@ -8,7 +8,7 @@ from cms.utils import get_language_from_request, get_cms_setting
 
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.permissions import has_page_change_permission
+from cms.utils.permissions import has_page_change_permission, get_user_sites_queryset
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -26,6 +26,7 @@ class PageToolbar(CMSToolbar):
         if toolbar.is_staff:
             # The 'Admin' Menu
             items.append(self.get_admin_menu())
+            self.get_sites_menu(items)
             if toolbar.request.current_page and is_app:
                 has_global_current_page_change_permission = False
                 if get_cms_setting('PERMISSION'):
@@ -44,6 +45,23 @@ class PageToolbar(CMSToolbar):
                         items.append(self.get_mode_switchers())
             items.append(self.get_language_menu())
         return items
+
+    def get_sites_menu(self, items):
+        if get_cms_setting('PERMISSION'):
+            sites = get_user_sites_queryset(self.request.user)
+        else:
+            sites = Site.objects.all()
+        if len(sites) > 1:
+            menu_items = List("#", _("Sites"))
+            menu_items.items.append(
+                Item(reverse("admin:sites_site_changelist"), _("Admin Sites"), load_side_frame=True))
+            menu_items.items.append(Break())
+            items.append(menu_items)
+            current_site = Site.objects.get_current()
+            for site in sites:
+                menu_items.items.append(
+                    Item("http://%s" % site.domain, site.name, load_modal=False,
+                         active=site.pk == current_site.pk))
 
     def get_language_menu(self):
         site = Site.objects.get_current()
@@ -84,7 +102,7 @@ class PageToolbar(CMSToolbar):
             return []
 
         menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
-        menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode))
+        menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
         menu_items.items.append(
             Item(reverse('admin:cms_page_change', args=[page.pk]), _('Settings'), load_side_frame=True))
         menu_items.items.append(Break())
