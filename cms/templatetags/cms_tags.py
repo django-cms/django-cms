@@ -5,10 +5,11 @@ from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
-from cms.models import Page, Placeholder as PlaceholderModel
+from cms.models import Page, Placeholder as PlaceholderModel, UserSettings
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_queryset, use_draft
 from cms.utils.placeholder import validate_placeholder_name
 from django import template
@@ -528,7 +529,10 @@ class CMSToolbar(InclusionTag):
             return ''
         if not toolbar.show_toolbar:
             return ''
-        return super(CMSToolbar, self).render(context)
+        language = request.toolbar.language
+        with force_language(language):
+            content = super(CMSToolbar, self).render(context)
+        return content
 
     def get_context(self, context):
         return context
