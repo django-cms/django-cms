@@ -83,7 +83,8 @@ class Page(MPTTModel):
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
-
+    # If the draft is loaded from a reversion version save the revision id here.
+    revision_id = models.PositiveIntegerField(default=0, editable=False)
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
