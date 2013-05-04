@@ -1,4 +1,5 @@
 from django.template.loader import render_to_string
+from django.utils import simplejson
 
 
 class BaseItem(object):
@@ -32,8 +33,8 @@ class List(BaseItem):
 class Item(BaseItem):
     template = "cms/toolbar/menu/item.html"
 
-    def __init__(self, url, title, load_side_frame=False, ajax=False, active=False, question="", right=False,
-                 load_modal=True, disabled=False):
+    def __init__(self, url, title, load_side_frame=False, ajax=False, ajax_data=None, active=False, question="",
+                 right=False, load_modal=True, disabled=False):
         super(Item, self).__init__(right)
         if load_side_frame and ajax:
             raise Exception("load_side_frame and ajax can not both be True.")
@@ -45,6 +46,7 @@ class Item(BaseItem):
         self.active = active
         self.question = question
         self.disabled = disabled
+        self.ajax_data = ajax_data
 
     def get_context(self):
         mod = None
@@ -56,13 +58,17 @@ class Item(BaseItem):
             mod = "dialogue"
         elif self.load_modal:
             mod = "modal"
+        data = None
+        if self.ajax_data:
+            data = simplejson.dumps(self.ajax_data)
         return {
             'url': self.url,
             'title': self.title,
             'type': mod,
             'active': self.active,
             'question': self.question,
-            'disabled': self.disabled
+            'disabled': self.disabled,
+            'data': data,
         }
 
     def __repr__(self):
