@@ -1,6 +1,9 @@
 from __future__ import with_statement
-from cms.api import create_page, create_title
+import os
+from django.test import RequestFactory, TestCase
+from cms.api import create_page, create_title, add_plugin
 from cms.models.pagemodel import Page, Placeholder
+from cms.plugins.text.cms_plugins import TextPlugin
 from cms.templatetags.cms_tags import (get_site_id, _get_page_by_untyped_arg,
         _show_placeholder_for_page)
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
@@ -180,3 +183,20 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             context['request'].current_page = page_3
             res = tpl.render(context)
             self.assertEqual(res,"/de/")
+
+class NoFixtureDatabaseTemplateTagTests(TestCase):
+    def test_cached_show_placeholder_sekizai(self):
+        from cms.test_utils import project
+        template_dir = os.path.join(os.path.dirname(project.__file__), 'templates', 'alt_plugin_templates', 'show_placeholder')
+        page = create_page('Test', 'col_two.html', 'en')
+        placeholder = page.placeholders.all()[0]
+        add_plugin(placeholder, TextPlugin, 'en', body='HIDDEN')
+        request = RequestFactory().get('/')
+        with SettingsOverride(TEMPLATE_DIRS=[template_dir]):
+            template = Template("{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
+            context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
+            output = template.render(context)
+            self.assertIn('JAVASCRIPT', output)
+            context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
+            output = template.render(context)
+            self.assertIn('JAVASCRIPT', output)
