@@ -63,21 +63,18 @@ CMS.$(document).ready(function () {
 			{% else %}
 
 			<ul class="cms_toolbar-item cms_toolbar-item_navigation">
-				{% for item in request.toolbar.get_items %}
-					{{ item.render }}
+				{% for item in request.toolbar.items %}
+					{% if not item.right %}{{ item.render }}{% endif %}
 				{% endfor %}
 			</ul>
             {% endif %}
 		</div>
 
 		<div class="cms_toolbar-right">
-			{% if request.toolbar.edit_mode and request.toolbar.can_change %}
-			<ul class="cms_toolbar-item cms_toolbar-item_buttons">
-				<li{% if request.toolbar.edit_mode %} class="active"{% endif %}><a href="?edit">{% trans "Edit" %}</a></li>
-				<li><a href="?build=true">{% trans "Build" %}</a></li>
-				<!--<li{% if not request.toolbar.edit_mode %} class="active"{% endif %}><a href="?edit-off">{% trans "View" %}</a></li>-->
-			</ul>
-			{% endif %}
+
+            {% for item in request.toolbar.items %}
+				{% if item.right %}{{ item.render }}{% endif %}
+			{% endfor %}
             {% if request.toolbar.can_change %}
 			<div class="cms_toolbar-item cms_toolbar-item_switch{% if not request.toolbar.edit_mode %} cms_toolbar-item_switch-active{% endif %}">
 				<!--

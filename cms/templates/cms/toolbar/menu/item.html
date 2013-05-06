@@ -1,3 +1,9 @@
-<li class="{% if active %}cms_toolbar-item-navigation-active{% endif %}{% if children %} cms_toolbar-item-navigation-children{% endif %}">
-	<a href="{{ url }}"{% if type %} rel="{{ type }}"{% endif %}{% if question %} data-text="{{ question }}"{% endif %}><span>{{ title }}</span></a>
+<li class="{% spaceless %}
+	{% if active %}cms_toolbar-item-navigation-active{% endif %}
+	{% if disabled %} cms_toolbar-item_navigation-disabled{% endif %}
+	{% if children %} cms_toolbar-item-navigation-children{% endif %}{% endspaceless %}">
+	<a href="{{ url }}"{% spaceless %}
+	{% if type %} rel="{{ type }}"{% endif %}
+	{% if question %} data-text="{{ question }}"{% endif %}
+	{% if data %} data="{{ data }}"{% endif %}{% endspaceless %}><span>{{ title }}</span></a>
 </li>

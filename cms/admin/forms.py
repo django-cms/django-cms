@@ -159,10 +159,10 @@ class PageForm(PageAddForm):
 
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
                                help_text=_('Redirects to this URL.'))
-    meta_description = forms.CharField(label='Description meta tag', required=False, widget=forms.Textarea,
-                                       help_text=_('A description of the page sometimes used by search engines.'))
-    meta_keywords = forms.CharField(label='Keywords meta tag', max_length=255, required=False,
-                                    help_text=_('A list of comma seperated keywords sometimes used by search engines.'))
+    meta_description = forms.CharField(label='Description meta tag', required=False,
+                                       widget=forms.Textarea(attrs={'maxlength': '155', 'rows': '4'}),
+                                       help_text=_('A description of the page used by search engines.'),
+                                       max_length=155)
 
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)

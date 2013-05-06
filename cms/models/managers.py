@@ -168,7 +168,6 @@ class TitleManager(PublisherManager):
             'slug',
             'title',
             'meta_description',
-            'meta_keywords',
             'page_title',
             'menu_title'
         ]

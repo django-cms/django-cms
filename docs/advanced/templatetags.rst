@@ -185,7 +185,7 @@ Arguments:
   information)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
-``"page_title"``, ``"slug"``, ``"meta_description"``, ``"meta_keywords"``
+``"page_title"``, ``"slug"``, ``"meta_description"``
 (note that you can also supply that argument without quotes, but this is
 deprecated because the argument might also be a template variable).
 
@@ -462,19 +462,10 @@ Toolbar Templatetags
 
 .. highlightlang:: html+django
 
-To use any of the following templatetags you first need to load them at the
-top of your template::
-
-    {% load cms_toolbar %}
-	
-.. templatetag:: cms_toolbar
-
-cms_toolbar
-===========
-
-The ``cms_toolbar`` templatetag will add the required css and javascript to the
-sekizai blocks in the base template. The templatetag has to be placed after the
-``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences within your HTML.
+The ``cms_toolbar`` templatetag is included in the ``cms_tags`` library and will add the 
+required css and javascript to the sekizai blocks in the base template. The templatetag 
+has to be placed after the ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences 
+within your HTML.
 
 Example::
 
