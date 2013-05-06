@@ -1,10 +1,13 @@
-{% load i18n %}{% if edit %}
+{% load i18n %}
+{% if edit %}
 	<div class="cms_placeholder cms_light cms_reset">
 		{{ bar }}
-        {% language request.toolbar.language %}
+		{% language request.toolbar.language %}
 		<div class="cms_droppable cms_droppable-empty">{% trans "Drop a plugin here" %}</div>
-        {% endlanguage %}
+		{% endlanguage %}
 		<ul class="cms_draggables">{{ draggables }}</ul>
 	</div>
 	<div class="cms_plugins">{{ plugins }}</div>
-{% else %}{{ plugins }}{% endif %}
+{% else %}å
+	{{ plugins }}
+{% endif %}

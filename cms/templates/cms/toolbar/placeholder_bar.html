@@ -3,7 +3,7 @@
 {% regroup installed_plugins by module as module_list %}
 <div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar">
 	<div class="cms_placeholder-btn">
-        {% language request.toolbar.language %}
+		{% language request.toolbar.language %}
 		<a href="#"><span>{% trans "Add Plugin" %}</span></a>
 		<ul class="cms_placeholder-subnav">
 			{% for module in module_list %}
@@ -13,7 +13,7 @@
 			{% endfor %}
 			{% endfor %}
 		</ul>
-        {% endlanguage %}
+		{% endlanguage %}
 	</div>
 	<div class="cms_placeholder-title">{{ placeholder_label }}</div>
 </div>

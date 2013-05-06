@@ -343,7 +343,7 @@
 				// DRAGGABLE
 				var that = this;
 				var draggable = $('#cms_draggable-' + this.options.plugin_id);
-				var menu = draggable.find('> .cms_dragitem .cms_dragmenu-dropdown');
+				var menu = draggable.find('> .cms_dragitem .cms_dragmenu-subnav');
 				var speed = 200;
 
 				// attach events
