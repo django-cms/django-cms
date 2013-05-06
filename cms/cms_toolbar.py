@@ -21,6 +21,7 @@ class PageToolbar(CMSToolbar):
     def insert_items(self, items, toolbar, request, is_app):
         self.is_app = is_app
         self.request = request
+
         self.toolbar = toolbar
         self.can_change = (hasattr(self.request.current_page, 'has_change_permission') and
                            self.request.current_page.has_change_permission(self.request))
@@ -30,13 +31,17 @@ class PageToolbar(CMSToolbar):
             items.append(self.get_admin_menu())
             self.get_sites_menu(items)
             if toolbar.request.current_page and is_app:
+                if self.request.current_page.publisher_is_draft:
+                    self.page = request.current_page
+                else:
+                    self.page = request.current_page.publisher_draft
                 has_global_current_page_change_permission = False
                 if get_cms_setting('PERMISSION'):
                     has_global_current_page_change_permission = has_page_change_permission(self.request)
                 has_current_page_change_permission = self.request.current_page.has_change_permission(self.request)
                 if has_global_current_page_change_permission or has_current_page_change_permission:
                     # The 'page' Menu
-                    items.append(self.get_page_menu(self.request.current_page))
+                    items.append(self.get_page_menu(self.page))
                     # The 'templates' Menu
                     items.append(self.get_template_menu())
                     # Publish Menu
@@ -83,10 +88,10 @@ class PageToolbar(CMSToolbar):
 
     def get_template_menu(self):
         menu_items = List("#", _("Template"))
-        url = reverse('admin:cms_page_change_template', args=(self.request.current_page.pk,))
+        url = reverse('admin:cms_page_change_template', args=(self.page.pk,))
         for path, name in get_cms_setting('TEMPLATES'):
             active = False
-            if self.request.current_page.get_template() == path:
+            if self.page.get_template() == path:
                 active = True
             if path == "INHERIT":
                 menu_items.items.append(Break())
@@ -99,9 +104,6 @@ class PageToolbar(CMSToolbar):
         """
         Builds the 'page menu'
         """
-        if not self.request.current_page.pk:
-            return []
-
         menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
         menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
         menu_items.items.append(Item(
@@ -117,7 +119,7 @@ class PageToolbar(CMSToolbar):
         )
         data = {
             'position': 'last-child',
-            'target': self.request.current_page.pk,
+            'target': self.page.pk,
         }
         menu_items.items.append(Item(
             '%s?%s' % (reverse('admin:cms_page_add'), urllib.urlencode(data)),
@@ -127,8 +129,8 @@ class PageToolbar(CMSToolbar):
         data = {
             'position': 'last-child',
         }
-        if self.request.current_page.parent_id:
-            data['target'] = self.request.current_page.parent_id
+        if self.page.parent_id:
+            data['target'] = self.page.parent_id
         menu_items.items.append(Item(
             '%s?%s' % (reverse('admin:cms_page_add'),
             urllib.urlencode(data)),
@@ -137,7 +139,7 @@ class PageToolbar(CMSToolbar):
         )
         menu_items.items.append(Break())
         menu_items.items.append(Item(
-            reverse('admin:cms_page_delete', args=(self.request.current_page.pk,)),
+            reverse('admin:cms_page_delete', args=(self.page.pk,)),
             _('Delete Page'),
             load_side_frame=True)
         )
@@ -145,21 +147,17 @@ class PageToolbar(CMSToolbar):
         return menu_items
 
     def get_history_menu(self):
-        page = self.request.current_page
-        if page.publisher_is_draft:
-            pk = page.pk
-        else:
-            pk = page.publisher_draft.pk
+        page = self.page
         dirty = page.is_dirty()
         menu_items = List('', _("History"))
         menu_items.items.append(Item(
-            reverse('admin:cms_page_revert_page', args=[pk]),
+            reverse('admin:cms_page_revert_page', args=[page.pk]),
             _('Revert to live'), ajax=True,
             question=_("Are you sure you want to revert to live?"),
             disabled=not dirty)
         )
         menu_items.items.append(Item(
-            reverse('admin:cms_page_history', args=(self.toolbar.request.current_page.pk,)),
+            reverse('admin:cms_page_history', args=(self.page.pk,)),
             _('View History'),
             load_side_frame=True)
         )
@@ -169,27 +167,23 @@ class PageToolbar(CMSToolbar):
             #revisions = Revision.objects.filter(content_type=content_type, object_id=self.request.current_page.pk)
 
             menu_items.items.append(Item(
-                reverse('admin:cms_page_undo', args=[pk]),
+                reverse('admin:cms_page_undo', args=[page.pk]),
                 _('Undo'), ajax=True,
                 disabled=False)
             )
             menu_items.items.append(Item(
-                reverse('admin:cms_page_revert_page', args=[pk]),
+                reverse('admin:cms_page_revert_page', args=[page.pk]),
                 _('Redo'), ajax=True,
                 disabled=not "revision" in self.request.GET)
             )
         return menu_items
 
     def get_publish_menu(self):
-        page = self.request.current_page
-        if page.publisher_is_draft:
-            pk = page.pk
-        else:
-            pk = page.publisher_draft.pk
+        page = self.page
         dirty = page.is_dirty()
 
         switch = Switch(right=True)
-        switch.addItem(_("Publish now"), reverse('admin:cms_page_publish_page', args=[pk]), True)
+        switch.addItem(_("Publish now"), reverse('admin:cms_page_publish_page', args=[page.pk]), True)
         return switch
 
     def get_admin_menu(self):

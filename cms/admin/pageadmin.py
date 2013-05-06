@@ -658,26 +658,32 @@ class PageAdmin(ModelAdmin):
         import reversion
 
         page = get_object_or_404(Page, pk=object_id)
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
         if not page.has_change_permission(request):
             return HttpResponseForbidden(_("You do not have permission to change this page"))
-        reversions = reversion.get_for_object_reference(Page, page.pk)
+        versions = reversion.get_for_object(page)
         if page.revision_id:
             current_revision = Revision.objects.get(pk=page.revision_id)
         else:
             try:
-                current_version = reversions[0]
+                print versions
+                current_version = versions[0]
             except IndexError:
+                content_type = ContentType.objects.get_for_model(Page)
+                print content_type.pk, page.pk
                 return HttpResponseBadRequest("no current revision found")
             current_revision = current_version.revision
         try:
-            previous_version = reversions.filter(version__pk__lt=current_revision.pk)[0]
+            previous_version = versions.filter(revision__pk__lt=current_revision.pk)[0]
         except IndexError:
             return HttpResponseBadRequest("no previous revision found")
         previous_revision = previous_version.revision
         previous_revision.revert()
-        page = get_object_or_404(Page, pk=object_id)
+        page = get_object_or_404(Page, pk=page.pk)
         page.revision_id = previous_revision.pk
         page.save()
+        return HttpResponse("ok")
 
     @require_POST
     def redo(self, request, object_id):
