@@ -5,5 +5,5 @@
 	<a href="{{ url }}"{% spaceless %}
 	{% if type %} rel="{{ type }}"{% endif %}
 	{% if question %} data-text="{{ question }}"{% endif %}
-	{% if data %} data="{{ data }}"{% endif %}{% endspaceless %}><span>{{ title }}</span></a>
+	{% if data %} data-post="{{ data }}"{% endif %}{% endspaceless %}><span>{{ title }}</span></a>
 </li>

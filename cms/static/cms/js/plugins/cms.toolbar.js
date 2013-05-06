@@ -100,7 +100,7 @@ $(document).ready(function () {
 					if(!$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')) that.delegate($(this));
 				});
 				// remove events from first level
-				item.find('li > a').bind('click', function (e) {
+				item.find('> li > a').bind('click', function (e) {
 					e.preventDefault();
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
@@ -303,7 +303,7 @@ $(document).ready(function () {
 					this.openSideframe(el.attr('href'));
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'));
+					this.openAjax(el.attr('href'), el.attr('data-post'));
 					break;
 				default:
 					window.location.href = el.attr('href');
@@ -383,16 +383,13 @@ $(document).ready(function () {
 			}
 		},
 
-		openAjax: function (url) {
+		openAjax: function (url, post) {
 			var that = this;
 
-			// TODO: the crsf token needs to be added through the backend or read from the options
 			$.ajax({
 				'type': 'POST',
 				'url': url,
-				'data': {
-					'csrfmiddlewaretoken': this.options.csrf
-				},
+				'data': JSON.parse(post) || {},
 				'success': function () {
 					window.location.reload();
 				},
