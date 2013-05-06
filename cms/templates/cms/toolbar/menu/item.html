@@ -1,1 +1,3 @@
-<li{% if active %} class="active" {% endif %}><a href="{{ url }}"{% if type %} rel="{{ type }}"{% endif %}{% if question %}data-text="{{ question }}"{% endif %}>{{ title }}</a></li>
+<li class="{% if active %}cms_toolbar-item-navigation-active{% endif %}{% if children %} cms_toolbar-item-navigation-children{% endif %}">
+	<a href="{{ url }}"{% if type %} rel="{{ type }}"{% endif %}{% if question %} data-text="{{ question }}"{% endif %}><span>{{ title }}</span></a>
+</li>

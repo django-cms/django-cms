@@ -93,18 +93,28 @@ $(document).ready(function () {
 
 			// attach event to the navigation elements
 			this.navigations.each(function () {
-				$(this).find('li ul a').bind('click', function (e) {
+				var item = $(this);
+				// attach delegate event
+				item.find('li ul a').bind('click', function (e) {
 					e.preventDefault();
-					that.delegate($(e.currentTarget));
+					if(!$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')) that.delegate($(this));
 				});
-				$(this).find('li > a').bind('click', function (e) {
+				// remove events from first level
+				item.find('li > a').bind('click', function (e) {
 					e.preventDefault();
+					if($(this).attr('href') !== ''
+						&& $(this).attr('href') !== '#'
+						&& !$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')
+						&& !$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')) that.delegate($(this));
 				});
-				// handle active passive states
-				var root = $(this).find('> li');
-					root.bind('mouseenter mouseleave', function (e) {
-						root.removeClass('active');
-						if(e.type === 'mouseenter') $(this).addClass('active');
+
+				// handle states
+				var states = $(['> li', '> li li', '> li li li']);
+					states.each(function (index, list) {
+						item.find(list).bind('mouseenter mouseleave', function (e) {
+							item.find(list).removeClass('cms_toolbar-item-navigation-hover');
+							if(e.type === 'mouseenter') $(this).addClass('cms_toolbar-item-navigation-hover');
+						});
 					});
 			});
 
@@ -280,6 +290,12 @@ $(document).ready(function () {
 			var target = el.attr('rel');
 
 			switch(target) {
+				case 'modal':
+					this.openModal(el.attr('href'), el.attr('data-name'), [{
+						'title': el.attr('data-name'),
+						'url': el.attr('href')
+					}]);
+					break;
 				case 'dialogue':
 					this.openDialogue(el.attr('data-text'), el.attr('href'));
 					break;
@@ -290,10 +306,7 @@ $(document).ready(function () {
 					this.openAjax(el.attr('href'));
 					break;
 				default:
-					this.openModal(el.attr('href'), el.attr('data-name'), [{
-						'title': el.attr('data-name'),
-						'url': el.attr('href')
-					}]);
+					window.location.href = el.attr('href');
 			}
 		},
 
