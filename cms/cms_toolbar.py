@@ -165,11 +165,11 @@ class PageToolbar(CMSToolbar):
         )
         if 'reversion' in settings.INSTALLED_APPS:
             from reversion.models import Revision
-            content_type = ContentType.objects.get_for_model(Page)
-            revisions = Revision.objects.filter(content_type=content_type, object_id=self.request.current_page.pk)
+            #content_type = ContentType.objects.get_for_model(Page)
+            #revisions = Revision.objects.filter(content_type=content_type, object_id=self.request.current_page.pk)
 
             menu_items.items.append(Item(
-                reverse('admin:cms_page_revert_page', args=[pk]),
+                reverse('admin:cms_page_undo', args=[pk]),
                 _('Undo'), ajax=True,
                 disabled=False)
             )
