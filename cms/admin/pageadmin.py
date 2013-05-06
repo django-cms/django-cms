@@ -654,7 +654,7 @@ class PageAdmin(ModelAdmin):
     def undo(self, request, object_id):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
-        from reversion.models import Version, Revision
+        from reversion.models import Revision
         import reversion
 
         page = get_object_or_404(Page, pk=object_id)
@@ -667,11 +667,8 @@ class PageAdmin(ModelAdmin):
             current_revision = Revision.objects.get(pk=page.revision_id)
         else:
             try:
-                print versions
                 current_version = versions[0]
             except IndexError:
-                content_type = ContentType.objects.get_for_model(Page)
-                print content_type.pk, page.pk
                 return HttpResponseBadRequest("no current revision found")
             current_revision = current_version.revision
         try:
@@ -687,7 +684,35 @@ class PageAdmin(ModelAdmin):
 
     @require_POST
     def redo(self, request, object_id):
-        pass
+        if not 'reversion' in settings.INSTALLED_APPS:
+            return HttpResponseBadRequest('django reversion not installed')
+        from reversion.models import Revision
+        import reversion
+
+        page = get_object_or_404(Page, pk=object_id)
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(_("You do not have permission to change this page"))
+        versions = reversion.get_for_object(page)
+        if page.revision_id:
+            current_revision = Revision.objects.get(pk=page.revision_id)
+        else:
+            try:
+                current_version = versions[0]
+            except IndexError:
+                return HttpResponseBadRequest("no current revision found")
+            current_revision = current_version.revision
+        try:
+            previous_version = versions.filter(revision__pk__gt=current_revision.pk).order_by('pk')[0]
+        except IndexError:
+            return HttpResponseBadRequest("no next revision found")
+        next_revision = previous_version.revision
+        next_revision.revert()
+        page = get_object_or_404(Page, pk=page.pk)
+        page.revision_id = next_revision.pk
+        page.save()
+        return HttpResponse("ok")
 
 
 

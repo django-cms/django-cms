@@ -172,9 +172,9 @@ class PageToolbar(CMSToolbar):
                 disabled=False)
             )
             menu_items.items.append(Item(
-                reverse('admin:cms_page_revert_page', args=[page.pk]),
+                reverse('admin:cms_page_redo', args=[page.pk]),
                 _('Redo'), ajax=True,
-                disabled=not "revision" in self.request.GET)
+                disabled=False)
             )
         return menu_items
 
