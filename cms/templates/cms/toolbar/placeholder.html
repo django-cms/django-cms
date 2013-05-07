@@ -3,7 +3,9 @@
 <div class="cms_placeholder cms_light cms_reset">
 	{{ bar }}
 	{% language request.toolbar.language %}
-	<div class="cms_droppable cms_droppable-empty">{% trans "Drop a plugin here" %}</div>
+	<div class="cms_droppable-empty-wrapper">
+		<div class="cms_droppable cms_droppable-empty">{% trans "Drop a plugin here" %}</div>
+	</div>
 	{% endlanguage %}
 	<ul class="cms_draggables">{{ draggables }}</ul>
 </div>

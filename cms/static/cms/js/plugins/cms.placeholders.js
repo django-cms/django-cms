@@ -180,7 +180,14 @@
 
 						return that.state;
 					},
+					'start': function () {
+						// show empty
+						$('.cms_droppable-empty-wrapper').slideDown(200);
+					},
 					'stop': function (event, ui) {
+						// hide empty
+						$('.cms_droppable-empty-wrapper').slideUp(200);
+
 						// cancel if isAllowed returns false
 						if(!that.state) return false;
 
@@ -213,7 +220,7 @@
 					'hoverClass': 'cms_draggable-hover-allowed',
 					'drop': function (event) {
 						dropped = true;
-						droparea = $(event.target).nextAll('.cms_draggables').first();
+						droparea = $(event.target).parent().nextAll('.cms_draggables').first();
 					}
 				});
 			},

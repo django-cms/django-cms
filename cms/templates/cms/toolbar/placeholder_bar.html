@@ -5,6 +5,9 @@
 	{% language request.toolbar.language %}
 	<div class="cms_submenu">
 		<ul class="cms_submenu-dropdown">
+			<li><span>{% trans "Settings" %}</span></li>
+			<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
+			<li><a data-rel="modal" href="#">{% trans "Stack" %}</a></li>
 			{% for module in module_list %}
 			<li><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></li>
 			{% for p in module.list %}

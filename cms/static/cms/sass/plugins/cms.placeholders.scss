@@ -48,7 +48,7 @@
 		li:first-child span { border-top:none !important; }
 	}
 
-	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:258px !important; z-index:1000;
+	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:250px !important; z-index:1000;
 		cursor:default; text-align:right; height:25px; @include border-radius(0 0 3px 3px);
 		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -354px; }
 	.cms_submenu-quicksearch label { cursor:pointer; padding-right:25px; }
@@ -74,13 +74,17 @@
 		.cms_submenu { margin-top:2px; }
 		.cms_submenu:hover { background-position:-22px -184px; }
 		.cms_submenu-dropdown { right:-1px; top:26px; }
+		.cms_submenu-quicksearch { top:258px !important; }
 	}
 
 	// #DRAGGABLES/specific#
 	.cms_draggable { cursor:move; z-index:100; color:$color-black; border:1px solid $color-grey-5; background:$color-grey-5;
 		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); border-color:$color-grey-10; } }
 	.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
-	.cms_droppable-empty { margin-bottom:5px !important; }
+
+	.cms_droppable-empty { font-size:11px; text-transform:uppercase;
+		padding-top:0 !important; padding-bottom:0 !important; }
+	.cms_droppable-empty-wrapper { display:none; }
 
 	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px !important; }
 	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/arrow-down-active.png') no-repeat 3px 7px !important; }
