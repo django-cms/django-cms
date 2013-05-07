@@ -23,41 +23,36 @@
 	.cms_placeholder-title { font-size:12px; line-height:16px; text-transform:uppercase;
 		font-weight:500; padding:0 0 0 2px; height:20px;
 		color:$color-white; @include text-shadow(0px 1px 0px $color-black); }
-	.cms_placeholder-btn {
-		float:right; margin:0; width:15px; height:15px;
-
-		> a { float:right; font-weight:bold; width:100%; height:100%; }
-		> a span { float:left; @include hide-text(); width:100%; height:100%;
-			background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -2px -184px; }
-		> a:hover span, > a:active span, > a:focus span, > a.active span {
-			background-position:-42px -184px; }
-
-		&:hover > ul { display:block; }
-	}
-}
-
-// #PLACEHOLDER/subnav#
-.cms_placeholder-bar .cms_placeholder-subnav,
-.cms_draggable .cms_dragmenu-subnav,
-.cms_droppable .cms_dragmenu-subnav {
-	display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
-	min-width:140px; max-height:230px; overflow:auto; @include border-radius(0 0 3px 3px);
-	border:1px solid $color-grey-10; background:$color-white;
-	@include box-shadow(0 2px 2px $color-grey-10);
-
-	li { zoom:1; }
-	li a, span { display:block; font-size:12px; line-height:11px; text-align:right; padding:6px 8px 5px 5px; }
-
-	li a { color:$color-black;
-		&:hover { color:$color-white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
-		&:first-child { border-top:none; } }
-	li span { cursor:default; font-weight:bold; color:$color-black; border-bottom:1px solid $color-grey-10; }
-	*:last-child { border:none !important; }
 }
 
 //######################################################################################################################
+// #PLACEHOLDER/subnav#
+.cms_placeholder, body {
+	.cms_submenu { display:block; float:right; width:15px; height:15px; cursor:pointer;
+		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -2px -184px;
+		&:hover { background-position:-42px -184px; } }
+	.cms_submenu-dropdown {
+		display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
+		min-width:140px; max-height:230px; overflow:auto; @include border-radius(0 0 3px 3px);
+		border:1px solid $color-grey-10; background:$color-white;
+		@include box-shadow(0 2px 2px $color-grey-10);
+
+		li { zoom:1; }
+		li a, span { display:block; font-size:12px; line-height:15px; text-align:right; padding:4px 8px 3px 5px; }
+
+		li a { color:$color-black;
+			&:hover { color:$color-white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
+			&:first-child { border-top:none; } }
+		li span { cursor:default; font-weight:bold; color:$color-black;
+			border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }
+		li:first-child span { border-top:none !important; }
+
+		.cms_submenu-quicksearch { cursor:default; }
+	}
+}
+//######################################################################################################################
 // #DRAGGABLES#
-body { // we need body to overwrite cms_reset
+.cms_placeholder, body { // we need body to overwrite cms_reset
 	.cms_draggables { list-style-type:none; padding:0; margin:0; }
 	.cms_draggables .cms_draggables { min-height:25px; }
 
@@ -70,13 +65,10 @@ body { // we need body to overwrite cms_reset
 		.cms_draggable { position:relative; z-index:99; white-space:nowrap;
 			border-color:$color-grey-10; background:$color-white; }
 
-		// dragmenu
-		.cms_dragmenu { display:none; float:right; width:20px; height:20px; cursor:pointer;
-			background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -181px;
-			&:hover { background-position:-17px -181px; } }
-		.cms_dragmenu-subnav { right:-1px; top:26px; }
-
-		&:hover .cms_dragmenu { display:block; }
+		// menu overwrites
+		.cms_submenu { margin-top:2px; }
+		.cms_submenu:hover { background-position:-22px -184px; }
+		.cms_submenu-dropdown { right:-1px; top:26px; }
 	}
 
 	// #DRAGGABLES/specific#

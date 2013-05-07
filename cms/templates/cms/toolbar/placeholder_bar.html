@@ -2,19 +2,19 @@
 
 {% regroup installed_plugins by module as module_list %}
 <div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar">
-	<div class="cms_placeholder-btn">
-		{% language request.toolbar.language %}
-		<a href="#"><span>{% trans "Add Plugin" %}</span></a>
-		<ul class="cms_placeholder-subnav">
+	{% language request.toolbar.language %}
+	<div class="cms_submenu">
+		<ul class="cms_submenu-dropdown">
 			{% for module in module_list %}
-			<li class="cms_placeholder-subnav-title"><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></li>
+			<li><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></li>
 			{% for p in module.list %}
-			<li><a href="#{{ p.value }}">{{ p.name }}</a></li>
+			<li><a data-rel="custom" href="#{{ p.value }}">{{ p.name }}</a></li>
 			{% endfor %}
 			{% endfor %}
 		</ul>
-		{% endlanguage %}
 	</div>
+	{% endlanguage %}
+
 	<div class="cms_placeholder-title">{{ placeholder_label }}</div>
 </div>
 

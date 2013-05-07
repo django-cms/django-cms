@@ -17,6 +17,7 @@ $color-red: #f00;
 // #COLORS/auto#
 $color-grey-5: lighten($color-grey, 58%); // fafafa
 $color-grey-10: lighten($color-grey, 50%); // e5e5e5
+$color-grey-20: lighten($color-grey, 25%); // 454545
 $color-grey-70: darken($color-grey, 13%); // 454545
 
 $gradient-toolbar: linear-gradient(top, lighten($color-grey, 58%) 0%, lighten($color-grey, 59%) 50%, lighten($color-grey, 58%) 100%);

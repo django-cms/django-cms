@@ -287,7 +287,7 @@ $(document).ready(function () {
 
 		delegate: function (el) {
 			// save local vars
-			var target = el.attr('rel');
+			var target = el.attr('data-rel');
 
 			switch(target) {
 				case 'modal':

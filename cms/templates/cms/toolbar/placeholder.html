@@ -1,13 +1,13 @@
 {% load i18n %}
 {% if edit %}
-	<div class="cms_placeholder cms_light cms_reset">
-		{{ bar }}
-		{% language request.toolbar.language %}
-		<div class="cms_droppable cms_droppable-empty">{% trans "Drop a plugin here" %}</div>
-		{% endlanguage %}
-		<ul class="cms_draggables">{{ draggables }}</ul>
-	</div>
-	<div class="cms_plugins">{{ plugins }}</div>
+<div class="cms_placeholder cms_light cms_reset">
+	{{ bar }}
+	{% language request.toolbar.language %}
+	<div class="cms_droppable cms_droppable-empty">{% trans "Drop a plugin here" %}</div>
+	{% endlanguage %}
+	<ul class="cms_draggables">{{ draggables }}</ul>
+</div>
+<div class="cms_plugins">{{ plugins }}</div>
 {% else %}å
-	{{ plugins }}
+{{ plugins }}
 {% endif %}

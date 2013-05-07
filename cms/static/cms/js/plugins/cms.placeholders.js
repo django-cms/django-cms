@@ -280,6 +280,8 @@
 
 				this.body = $(document);
 				this.csrf = CMS.API.Toolbar.options.csrf;
+				this.timer = function () {};
+				this.timeout = 200;
 
 				// handler for placeholder bars
 				if(this.options.type === 'bar') this._setBar();
@@ -295,31 +297,13 @@
 			},
 
 			_setBar: function () {
-				var that = this;
-
-				// attach event to the button
-				this.container.find('.cms_placeholder-btn').bind('click mouseenter mouseleave', function (e) {
-					e.preventDefault();
-
-					if(e.type === 'mouseenter') {
-						$(this).find('> a').addClass('active');
-						$(this).parent().css('z-index', 99999);
-					} else if(e.type === 'mouseleave') {
-						$(this).find('> a').removeClass('active');
-						$(this).parent().css('z-index', 9999);
-					}
-				});
-
-				// attach events to the anchors
-				this.container.find('.cms_placeholder-subnav a').bind('click', function (e) {
-					e.preventDefault();
-
-					that.addPlugin($(this).attr('href').replace('#', ''), $(this).text());
-				});
+				// attach event to the bar menu
+				this._setSubnav(this.container.find('.cms_submenu'));
 			},
 
 			_setPlugin: function () {
 				var that = this;
+
 				// CONTENT
 				this.container.bind('dblclick', function (e) {
 					e.preventDefault();
@@ -328,55 +312,14 @@
 					that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
 				});
 
-				// setup dragmenu
-				this._setPluginMenu();
+				// attach event to the plugin menu
+				this._setSubnav($('#cms_draggable-' + this.options.plugin_id).find('> .cms_dragitem .cms_submenu'));
 
 				// update plugin position
 				this.container.bind('cms.placeholder.update', function (e) {
 					e.stopPropagation();
 
 					that.movePlugin();
-				});
-			},
-
-			_setPluginMenu: function () {
-				// DRAGGABLE
-				var that = this;
-				var draggable = $('#cms_draggable-' + this.options.plugin_id);
-				var menu = draggable.find('> .cms_dragitem .cms_dragmenu-subnav');
-				var speed = 200;
-
-				// attach events
-				draggable.find('> .cms_dragitem .cms_dragmenu').bind('click', function (e) {
-					e.stopPropagation();
-					(menu.is(':visible')) ? hide() : show();
-				}).bind('mouseleave', function () {
-					that.timer = setTimeout(hide, speed);
-				});
-				menu.bind('mouseleave.cms.draggable mouseenter.cms.draggable', function (e) {
-					clearTimeout(that.timer);
-					if(e.type === 'mouseleave') that.timer = setTimeout(hide, speed);
-				});
-
-				function hide() {
-					menu.hide();
-					draggable.parents().andSelf().css('z-index', 99);
-				}
-				function show() {
-					menu.show();
-					draggable.parents().andSelf().css('z-index', 999);
-				}
-
-				// atach default item behaviour
-				menu.find('a').bind('click', function (e) {
-					e.preventDefault();
-					var el = $(this);
-
-					if(el.attr('rel') === 'custom') {
-						that.addPlugin(el.attr('href').replace('#', ''), el.text(), that._getId(el.closest('.cms_draggable')))
-					} else {
-						that._delegate(el);
-					}
 				});
 			},
 
@@ -472,6 +415,45 @@
 			},
 
 			// API helpers
+			_setSubnav: function (nav) {
+				var that = this;
+
+				nav.bind('mouseenter mouseleave', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					(e.type === 'mouseenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
+				});
+
+				nav.find('a').bind('click', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					var el = $(this);
+					if(el.attr('data-rel') === 'custom') {
+						that.addPlugin(el.attr('href').replace('#', ''), el.text(), that._getId(el.closest('.cms_draggable')));
+					} else {
+						that._delegate(el);
+					}
+				});
+			},
+
+			_showSubnav: function (nav) {
+				clearTimeout(this.timer);
+
+				nav.parent().css('z-index', 99999);
+				nav.parents().andSelf().css('z-index', 999);
+				nav.find('> ul').show();
+			},
+
+			_hideSubnav: function (nav) {
+				this.timer = setTimeout(function () {
+					nav.parent().css('z-index', 9999);
+					nav.parents().andSelf().css('z-index', 99);
+					nav.find('> ul').hide();
+				}, this.timeout);
+			},
+
 			_getId: function (el) {
 				return CMS.API.Placeholders.getId(el);
 			},
