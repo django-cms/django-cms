@@ -21,7 +21,7 @@
 				this.bars = this.placeholders.find('.cms_placeholder-bar');
 				this.sortables = this.placeholders.find('.cms_draggables');
 
-				this.dragitems = $('.cms_draggable');
+				// this.dragitems = $('.cms_draggable');
 				this.dropareas = $('.cms_droppable');
 
 				this.timer = function () {};
@@ -78,7 +78,7 @@
 				// bind menu specific events so its not hidden when hovered
 				this.menu.bind('mouseover.cms.placeholder mouseout.cms.placeholder', function (e) {
 					e.stopPropagation();
-					(e.type === 'mouseover') ? that._showMenu($(this)) : that._hideMenu($(this));
+					(e.type === 'mouseover') ? that._showMenu($(this)) : that._hideMenu();
 				});
 			},
 
@@ -106,7 +106,7 @@
 				}, timeout);
 			},
 
-			_hideMenu: function (el) {
+			_hideMenu: function () {
 				var that = this;
 				var speed = 50;
 				var timeout = 100;
@@ -211,7 +211,7 @@
 					'tolerance': 'pointer',
 					'activeClass': 'cms_draggable-allowed',
 					'hoverClass': 'cms_draggable-hover-allowed',
-					'drop': function (event, ui) {
+					'drop': function (event) {
 						dropped = true;
 						droparea = $(event.target).nextAll('.cms_draggables').first();
 					}
@@ -282,6 +282,8 @@
 				this.csrf = CMS.API.Toolbar.options.csrf;
 				this.timer = function () {};
 				this.timeout = 200;
+				this.focused = false;
+				this.keyBound = 3;
 
 				// handler for placeholder bars
 				if(this.options.type === 'bar') this._setBar();
@@ -403,7 +405,7 @@
 					'type': 'POST',
 					'url': this.options.urls.move_plugin,
 					'data': data,
-					'success': function (response, status) {
+					'success': function (response) {
 						if(response === 'success') that._showSuccess(dragitem);
 					},
 					'error': function (jqXHR) {
@@ -436,6 +438,24 @@
 						that._delegate(el);
 					}
 				});
+
+				nav.find('input').bind('keyup focus blur', function (e) {
+					if(e.type === 'focus') that.focused = true;
+					if(e.type === 'blur') {
+						that.focused = false;
+						that._hideSubnav(nav);
+						that._searchSubnav(nav, '');
+						$(this).val('');
+					}
+					if(e.type === 'keyup') {
+						clearTimeout(that.timer);
+						// cancel if we have less than x keys
+						if($(this).val().length < this.keyBound) return false;
+						that.timer = setTimeout(function () {
+							that._searchSubnav(nav, $(e.currentTarget).val());
+						}, 200);
+					}
+				});
 			},
 
 			_showSubnav: function (nav) {
@@ -444,14 +464,34 @@
 				nav.parent().css('z-index', 99999);
 				nav.parents().andSelf().css('z-index', 999);
 				nav.find('> ul').show();
+				// show quicksearch only at a certain height
+				if(nav.find('> ul').height() >= 230) {
+					nav.find('.cms_submenu-quicksearch').show();
+					// we need to set a fixed height for the search
+					nav.find('> ul').css('height', 230);
+				}
 			},
 
 			_hideSubnav: function (nav) {
+				// cancel if quicksearch is focues
+				if(this.focused) return false;
+
 				this.timer = setTimeout(function () {
 					nav.parent().css('z-index', 9999);
 					nav.parents().andSelf().css('z-index', 99);
 					nav.find('> ul').hide();
+					nav.find('.cms_submenu-quicksearch').hide();
 				}, this.timeout);
+			},
+
+			_searchSubnav: function (nav, value) {
+				// loop through items and figure out if we need to hide items
+				nav.find('li a').each(function (index, item) {
+					var text = $(item).text().toLowerCase();
+					var search = value.toLowerCase();
+
+					(text.indexOf(search) >= 0 || search === '') ? $(this).parent().show() : $(this).parent().hide();
+				});
 			},
 
 			_getId: function (el) {

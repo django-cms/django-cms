@@ -33,7 +33,7 @@
 		&:hover { background-position:-42px -184px; } }
 	.cms_submenu-dropdown {
 		display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
-		min-width:140px; max-height:230px; overflow:auto; @include border-radius(0 0 3px 3px);
+		min-width:140px; max-height:230px; overflow:auto;
 		border:1px solid $color-grey-10; background:$color-white;
 		@include box-shadow(0 2px 2px $color-grey-10);
 
@@ -46,9 +46,14 @@
 		li span { cursor:default; font-weight:bold; color:$color-black;
 			border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }
 		li:first-child span { border-top:none !important; }
-
-		.cms_submenu-quicksearch { cursor:default; }
 	}
+
+	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:258px !important; z-index:1000;
+		cursor:default; text-align:right; height:25px; @include border-radius(0 0 3px 3px);
+		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -354px; }
+	.cms_submenu-quicksearch label { cursor:pointer; padding-right:25px; }
+	.cms_submenu-quicksearch input { font-size:12px; color:white; text-align:right; -webkit-appearance:none;
+		width:111px; padding:2px 1px 2px 5px; border:none; background:none; }
 }
 //######################################################################################################################
 // #DRAGGABLES#
