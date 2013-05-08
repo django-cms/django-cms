@@ -32,6 +32,9 @@ CMS.$(document).ready(function () {
 		}
 	});
 
+	// open preselection
+	CMS.API.Toolbar.openSideframe('/admin');
+
 	// global accessor for placeholders
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
 
@@ -102,22 +105,28 @@ CMS.$(document).ready(function () {
 		<div class="cms_sideframe-resize"><span class="cms_sideframe-knob"></span></div>
 		<div class="cms_sideframe-frame"></div>
 		<div class="cms_sideframe-shim"></div>
+		<div class="cms_sideframe-btn">
+			<div class="cms_sideframe-close"></div>
+			<div class="cms_sideframe-hide"></div>
+			<div class="cms_sideframe-maximize"></div>
+		</div>
+		<div class="cms_sideframe-copy"></div>
 	</div>
 	<!-- end: sidebar -->
 
-	<!-- start: dialogue -->
-	<div class="cms_dialogue">
-		<div class="cms_dialogue-title">{% trans "Notification" %}</div>
-		<div class="cms_dialogue-inner">
-			<div class="cms_dialogue-text"></div>
-			<div class="cms_dialogue-buttons">
-				<a href="#" class="cms_dialogue-cancel">{% trans "No" %}</a>
-				<a href="#" class="cms_dialogue-confirm">{% trans "Yes" %}</a>
-				<a href="#" class="cms_dialogue-accept">{% trans "Ok" %}</a>
+	<!-- start: dialog -->
+	<div class="cms_dialog">
+		<div class="cms_dialog-title">{% trans "Notification" %}</div>
+		<div class="cms_dialog-inner">
+			<div class="cms_dialog-text"></div>
+			<div class="cms_dialog-buttons">
+				<a href="#" class="cms_dialog-cancel">{% trans "No" %}</a>
+				<a href="#" class="cms_dialog-confirm">{% trans "Yes" %}</a>
+				<a href="#" class="cms_dialog-accept">{% trans "Ok" %}</a>
 			</div>
 		</div>
 	</div>
-	<!-- end: dialogue -->
+	<!-- end: dialog -->
 
 	<!-- start: modal -->
 	<div class="cms_modal">

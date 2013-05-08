@@ -19,6 +19,7 @@ $color-grey-5: lighten($color-grey, 58%); // fafafa
 $color-grey-10: lighten($color-grey, 50%); // e5e5e5
 $color-grey-20: lighten($color-grey, 25%); // 454545
 $color-grey-70: darken($color-grey, 13%); // 454545
+$color-grey-90: darken($color-grey, 20%); // 333333
 
 $gradient-toolbar: linear-gradient(top, lighten($color-grey, 58%) 0%, lighten($color-grey, 59%) 50%, lighten($color-grey, 58%) 100%);
 $gradient-light: linear-gradient(top, lighten($color-grey-10, 5%), $color-grey-10);
