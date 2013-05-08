@@ -56,7 +56,7 @@
 			_setupPlugins: function (plugins) {
 				var that = this;
 
-				plugins.bind('mouseover.cms.placeholder mouseout.cms.placeholder', function (e) {
+				plugins.bind('mouseover mouseout', function (e) {
 					e.stopPropagation();
 					// add events to placeholder
 					(e.type === 'mouseover') ? that.tooltip.show() : that.tooltip.hide();
@@ -68,7 +68,7 @@
 				var that = this;
 
 				// this sets the correct position for the edit tooltip
-				$(document.body).bind('mousemove.cms.placeholder', function (e) {
+				$(document.body).bind('mousemove', function (e) {
 					that.tooltip.css({
 						'left': e.pageX + 20,
 						'top': e.pageY - 12
@@ -76,7 +76,7 @@
 				});
 
 				// bind menu specific events so its not hidden when hovered
-				this.menu.bind('mouseover.cms.placeholder mouseout.cms.placeholder', function (e) {
+				this.menu.bind('mouseover mouseout', function (e) {
 					e.stopPropagation();
 					(e.type === 'mouseover') ? that._showMenu($(this)) : that._hideMenu();
 				});
@@ -85,7 +85,7 @@
 			_showMenu: function (el) {
 				var that = this;
 				var speed = 50;
-				var timeout = 100;
+				var timeout = 200;
 
 				clearTimeout(this.timer);
 
@@ -288,7 +288,7 @@
 				this.body = $(document);
 				this.csrf = CMS.API.Toolbar.options.csrf;
 				this.timer = function () {};
-				this.timeout = 200;
+				this.timeout = 250;
 				this.focused = false;
 				this.keyBound = 3;
 
@@ -321,8 +321,18 @@
 					that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
 				});
 
+				var draggable = $('#cms_draggable-' + this.options.plugin_id);
 				// attach event to the plugin menu
-				this._setSubnav($('#cms_draggable-' + this.options.plugin_id).find('> .cms_dragitem .cms_submenu'));
+				this._setSubnav(draggable.find('> .cms_dragitem .cms_submenu'));
+
+				// only show button when hovering the plugin
+				draggable.bind('mousemove mouseleave', function (e) {
+					if(e.type === 'mousemove') {
+						draggable.find('.cms_submenu').fadeIn(200);
+					} else {
+						draggable.find('.cms_submenu').stop(true, true).fadeOut(200);
+					}
+				});
 
 				// update plugin position
 				this.container.bind('cms.placeholder.update', function (e) {
@@ -460,13 +470,18 @@
 						if($(this).val().length < this.keyBound) return false;
 						that.timer = setTimeout(function () {
 							that._searchSubnav(nav, $(e.currentTarget).val());
-						}, 200);
+						}, 100);
 					}
 				});
 			},
 
 			_showSubnav: function (nav) {
 				clearTimeout(this.timer);
+
+				// we need to hide previous menu
+				$('.cms_submenu > ul').filter(':visible').hide()
+					.parent().css('z-index', 9999).end()
+					.parents().andSelf().css('z-index', 99);
 
 				nav.parent().css('z-index', 99999);
 				nav.parents().andSelf().css('z-index', 999);
@@ -488,6 +503,9 @@
 					nav.parents().andSelf().css('z-index', 99);
 					nav.find('> ul').hide();
 					nav.find('.cms_submenu-quicksearch').hide();
+
+					// hide settings icon
+					nav.parent().trigger('mouseleave');
 				}, this.timeout);
 			},
 

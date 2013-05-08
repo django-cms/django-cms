@@ -71,7 +71,7 @@
 			border-color:$color-grey-10; background:$color-white; }
 
 		// menu overwrites
-		.cms_submenu { margin-top:2px; }
+		.cms_submenu { display:none; margin-top:2px; }
 		.cms_submenu:hover { background-position:-22px -184px; }
 		.cms_submenu-dropdown { right:-1px; top:26px; }
 		.cms_submenu-quicksearch { top:258px !important; }
