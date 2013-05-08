@@ -48,6 +48,7 @@ $(document).ready(function () {
 
 			this.navigations = this.container.find('.cms_toolbar-item_navigation');
 			this.buttons = this.container.find('.cms_toolbar-item_buttons');
+			this.modes = this.container.find('.cms_toolbar-item_buttons-group li a');
 			this.switcher = this.container.find('.cms_toolbar-item_switch');
 
 			this.body = $('html');
@@ -148,11 +149,13 @@ $(document).ready(function () {
 				var id = $(this).data('id');
 				$('#cms_draggable-' + id).addClass('cms_draggable-selected');
 			});
-			this.toolbar.find('.cms_toolbar-item_buttons li a').eq(0).bind('click', function (e) {
+
+			this.modes.eq(0).bind('click', function (e) {
 				e.preventDefault();
+				console.log('trigger');
 				that._enableEditMode(300);
 			});
-			this.toolbar.find('.cms_toolbar-item_buttons li a').eq(1).bind('click', function (e) {
+			this.modes.eq(1).bind('click', function (e) {
 				e.preventDefault();
 				that._enableDragMode(300);
 			});
@@ -255,7 +258,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.toolbar.find('.cms_toolbar-item_buttons li').removeClass('active').eq(0).addClass('active');
+			this.modes.parent().removeClass('active').eq(0).addClass('active');
 			this.settings.mode = 'edit';
 
 			if(!init) this.setSettings();
@@ -268,7 +271,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.toolbar.find('.cms_toolbar-item_buttons li').removeClass('active').eq(1).addClass('active');
+			this.modes.parent().removeClass('active').eq(1).addClass('active');
 			this.settings.mode = 'drag';
 
 			if(!init) this.setSettings();
