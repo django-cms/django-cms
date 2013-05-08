@@ -89,6 +89,9 @@
 				// handle class handling
 				if(el.hasClass('cms_draggable')) this.menu.addClass('cms_placeholders-menu-alternate');
 
+				// hide all settings
+				$('.cms_draggable .cms_submenu').hide();
+
 				// exclude if hovering menu itself
 				if(!el.hasClass('cms_placeholders-menu')) {
 					this.menu.css({
@@ -496,9 +499,6 @@
 					nav.parents().andSelf().css('z-index', 99);
 					nav.find('> ul').hide();
 					nav.find('.cms_submenu-quicksearch').hide();
-
-					// hide settings icon
-					nav.parent().trigger('mouseleave');
 				}, this.timeout);
 			},
 
