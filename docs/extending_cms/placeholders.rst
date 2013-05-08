@@ -76,6 +76,18 @@ use a `TranslatableModel` model be sure to not include the placeholder fields in
         def __unicode__(self):
             return self.title
 
+Be sure to combine both hvad's :class:`TranslatableAdmin` and :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` when
+registering your model with the admin site::
+
+    from cms.admin.placeholderadmin import PlaceholderAdmin
+    from django.contrib import admin
+    from hvad.admin import TranslatableAdmin
+    from myapp.models import MultilingualExample1
+
+    class MultilingualModelAdmin(TranslatableAdmin, PlaceholderAdmin):
+        pass
+
+    admin.site.register(MultilingualExample1, MultilingualModelAdmin)
 
 Templates
 =========
