@@ -475,9 +475,9 @@
 				clearTimeout(this.timer);
 
 				// we need to hide previous menu
-				$('.cms_submenu > ul').filter(':visible').hide()
-					.parent().css('z-index', 9999).end()
-					.parents().andSelf().css('z-index', 99);
+				$('.cms_submenu > ul').hide()
+					.parent().css('z-index', 0).end()
+					.parents().andSelf().css('z-index', 0);
 
 				nav.parent().css('z-index', 99999);
 				nav.parents().andSelf().css('z-index', 999);
