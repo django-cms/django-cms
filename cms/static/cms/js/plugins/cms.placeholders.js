@@ -40,10 +40,10 @@
 				var that = this;
 				var draggables = placeholders.find('.cms_draggable');
 
-				draggables.bind('mouseover.cms.placeholder mouseout.cms.placeholder', function (e) {
+				draggables.bind('mouseenter mouseleave', function (e) {
 					e.stopPropagation();
 					// add events to dragholder
-					(e.type === 'mouseover') ? that._showMenu($(this)) : that._hideMenu($(this));
+					(e.type === 'mouseenter') ? that._showMenu($(this)) : that._hideMenu($(this));
 				});
 
 				// TODO we need to define the initial state and expanded behaviour
@@ -83,39 +83,32 @@
 			},
 
 			_showMenu: function (el) {
-				var that = this;
-				var speed = 50;
-				var timeout = 200;
-
+				// clear timer
 				clearTimeout(this.timer);
 
 				// handle class handling
 				if(el.hasClass('cms_draggable')) this.menu.addClass('cms_placeholders-menu-alternate');
 
-				// sets the timer to switch elements
-				this.timer = setTimeout(function () {
-					// exclude if hovering menu itself
-					if(!el.hasClass('cms_placeholders-menu')) {
-						that.menu.css({
-							'left': el.offset().left,
-							'top': el.offset().top
-						});
-						// show element and attach id to CMS.Toolbar
-						that.menu.fadeIn(speed).data('id', that.getId(el));
-					}
-				}, timeout);
+				// exclude if hovering menu itself
+				if(!el.hasClass('cms_placeholders-menu')) {
+					this.menu.css({
+						'left': el.offset().left,
+						'top': el.offset().top
+					});
+					// show element and attach id to CMS.Toolbar
+					this.menu.show().data('id', this.getId(el));
+				}
 			},
 
 			_hideMenu: function () {
 				var that = this;
-				var speed = 50;
-				var timeout = 100;
+				var timeout = 200;
 
 				clearTimeout(this.timer);
 
 				// sets the timer for closing
 				this.timer = setTimeout(function () {
-					that.menu.fadeOut(speed, function () {
+					that.menu.fadeOut(50, function () {
 						that.menu.removeClass('cms_placeholders-menu-alternate');
 					});
 				}, timeout);
@@ -326,12 +319,12 @@
 				this._setSubnav(draggable.find('> .cms_dragitem .cms_submenu'));
 
 				// only show button when hovering the plugin
-				draggable.bind('mousemove mouseleave', function (e) {
-					if(e.type === 'mousemove') {
-						draggable.find('.cms_submenu').fadeIn(200);
-					} else {
-						draggable.find('.cms_submenu').stop(true, true).fadeOut(200);
-					}
+				draggable.bind('mouseenter mouseleave mousemove', function (e) {
+					e.stopPropagation();
+
+					if(e.type === 'mouseenter') draggable.find('.cms_submenu').show();
+					if(e.type === 'mouseleave') draggable.find('.cms_submenu').hide();
+					if(e.type === 'mousemove') draggable.trigger('mouseenter');
 				});
 
 				// update plugin position
