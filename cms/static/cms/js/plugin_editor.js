@@ -127,7 +127,7 @@
 				var splits = data.split(",");
 				id = splits.shift();
 				$("#plugin_"+id).remove();
-				$("#iframe_"+id).parent().html("<p>" + splits.join(",") + "</p>")
+				$("#iframe_"+id).parent().html("<p>" + splits.join(",") + "</p>");
 			}, "html");
 		}
 	}
@@ -161,8 +161,8 @@
 
 	hide_iframe = function (id, type, title, msg){
 		html = "<b>"+type+"</b>";
-		if( title != "" && title != null){
-			html += " [ "+title+ " ]"
+		if( title !== "" && title !== null){
+			html += " [ "+title+ " ]";
 		}
 		$('#plugin_'+id+" span.text").html(html);
 		$('#iframe_'+id).parent().html("<p>"+msg+"</p>");
@@ -170,6 +170,5 @@
 
 	removed_cancelled_plugin = function(plugin_id) {
 		$('#plugin_'+plugin_id).remove();
-	}
-
+	};
 })(jQuery);
