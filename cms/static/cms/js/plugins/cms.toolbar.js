@@ -6,7 +6,7 @@ $(document).ready(function () {
 	/*!
 	 * Toolbar
 	 * @version: 2.0.0
-	 * @description: Adds toolbar, sidebar, dialogue and modal
+	 * @description: Adds toolbar, sidebar, dialog and modal
 	 */
 	CMS.Toolbar = new CMS.Class({
 
@@ -21,13 +21,13 @@ $(document).ready(function () {
 			},
 			'sidebarDuration': 300,
 			'sidebarWidth': 275,
-			'dialogueDuration': 300,
+			'dialogDuration': 300,
 			'modalDuration': 300,
 			'modalWidth': 800,
 			'modalHeight': 400,
 			'urls': {
 				'settings': '', // url to save settings
-				'css_dialogue': '/static/cms/css/plugins/cms.toolbar.dialog.css',
+				'css_dialog': '/static/cms/css/plugins/cms.toolbar.dialog.css',
 				'css_sideframe': '/static/cms/css/plugins/cms.toolbar.sideframe.css'
 			},
 			'lang': {
@@ -48,11 +48,12 @@ $(document).ready(function () {
 
 			this.navigations = this.container.find('.cms_toolbar-item_navigation');
 			this.buttons = this.container.find('.cms_toolbar-item_buttons');
+			this.modes = this.container.find('.cms_toolbar-item_buttons-group li a');
 			this.switcher = this.container.find('.cms_toolbar-item_switch');
 
 			this.body = $('html');
 			this.sideframe = this.container.find('.cms_sideframe');
-			this.dialogue = this.container.find('.cms_dialogue');
+			this.dialog = this.container.find('.cms_dialog');
 			this.modal = this.container.find('.cms_modal');
 			this.tooltip = this.container.find('.cms_placeholders-tooltip');
 			this.menu = this.container.find('.cms_placeholders-menu');
@@ -93,18 +94,28 @@ $(document).ready(function () {
 
 			// attach event to the navigation elements
 			this.navigations.each(function () {
-				$(this).find('li ul a').bind('click', function (e) {
+				var item = $(this);
+				// attach delegate event
+				item.find('li ul a').bind('click', function (e) {
 					e.preventDefault();
-					that.delegate($(e.currentTarget));
+					if(!$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')) that.delegate($(this));
 				});
-				$(this).find('li > a').bind('click', function (e) {
+				// remove events from first level
+				item.find('> li > a').bind('click', function (e) {
 					e.preventDefault();
+					if($(this).attr('href') !== ''
+						&& $(this).attr('href') !== '#'
+						&& !$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')
+						&& !$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')) that.delegate($(this));
 				});
-				// handle active passive states
-				var root = $(this).find('> li');
-					root.bind('mouseenter mouseleave', function (e) {
-						root.removeClass('active');
-						if(e.type === 'mouseenter') $(this).addClass('active');
+
+				// handle states
+				var states = $(['> li', '> li li', '> li li li']);
+					states.each(function (index, list) {
+						item.find(list).bind('mouseenter mouseleave', function (e) {
+							item.find(list).removeClass('cms_toolbar-item-navigation-hover');
+							if(e.type === 'mouseenter') $(this).addClass('cms_toolbar-item-navigation-hover');
+						});
 					});
 			});
 
@@ -138,11 +149,13 @@ $(document).ready(function () {
 				var id = $(this).data('id');
 				$('#cms_draggable-' + id).addClass('cms_draggable-selected');
 			});
-			this.toolbar.find('.cms_toolbar-item_buttons li a').eq(0).bind('click', function (e) {
+
+			this.modes.eq(0).bind('click', function (e) {
 				e.preventDefault();
+				console.log('trigger');
 				that._enableEditMode(300);
 			});
-			this.toolbar.find('.cms_toolbar-item_buttons li a').eq(1).bind('click', function (e) {
+			this.modes.eq(1).bind('click', function (e) {
 				e.preventDefault();
 				that._enableDragMode(300);
 			});
@@ -151,18 +164,18 @@ $(document).ready(function () {
 		_eventsDialog: function () {
 			var that = this;
 
-			// attach events to the dialogue window
-			this.dialogue.find('.cms_dialogue-confirm').bind('click', function (e) {
+			// attach events to the dialog window
+			this.dialog.find('.cms_dialog-confirm').bind('click', function (e) {
 				e.preventDefault();
-				that.openAjax(that.dialogue.data('url'));
+				that.openAjax(that.dialog.data('url'));
 			});
-			this.dialogue.find('.cms_dialogue-cancel').bind('click', function (e) {
+			this.dialog.find('.cms_dialog-cancel').bind('click', function (e) {
 				e.preventDefault();
-				that._hideDialogue();
+				that._hidedialog();
 			});
-			this.dialogue.find('.cms_dialogue-accept').bind('click', function (e) {
+			this.dialog.find('.cms_dialog-accept').bind('click', function (e) {
 				e.preventDefault();
-				that._hideDialogue();
+				that._hidedialog();
 			});
 		},
 
@@ -170,9 +183,32 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach event to the sidebar
-			this.sideframe.bind('dblclick', function () {
-				that._hideSideframe();
+			this.sideframe.find('.cms_sideframe-close').bind('click', function () {
+				that._hideSideframe(true);
 			});
+
+			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
+				if($(this).hasClass('cms_sideframe-hidden')) {
+					$(this).removeClass('cms_sideframe-hidden');
+					that._showSideframe(that.options.sidebarWidth);
+				} else {
+					$(this).addClass('cms_sideframe-hidden');
+					that._hideSideframe(false);
+				}
+			});
+
+			this.sideframe.find('.cms_sideframe-maximize').bind('click', function () {
+				if($(this).hasClass('cms_sideframe-minimize')) {
+					$(this).removeClass('cms_sideframe-minimize');
+					that.sideframe.find('.cms_sideframe-hide').show();
+					that._showSideframe(that.options.sidebarWidth);
+				} else {
+					$(this).addClass('cms_sideframe-minimize');
+					that.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
+					that._showSideframe(0, true);
+				}
+			});
+
 			this.sideframe.find('.cms_sideframe-resize').bind('mousedown', function (e) {
 				e.preventDefault();
 				that._startSideframeResize();
@@ -229,7 +265,7 @@ $(document).ready(function () {
 		},
 
 		_hideToolbar: function (speed, init) {
-			// cancel if dialogue is active
+			// cancel if dialog is active
 			if(this.lockToolbar) return false;
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
@@ -245,7 +281,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.toolbar.find('.cms_toolbar-item_buttons li').removeClass('active').eq(0).addClass('active');
+			this.modes.parent().removeClass('active').eq(0).addClass('active');
 			this.settings.mode = 'edit';
 
 			if(!init) this.setSettings();
@@ -258,7 +294,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.toolbar.find('.cms_toolbar-item_buttons li').removeClass('active').eq(1).addClass('active');
+			this.modes.parent().removeClass('active').eq(1).addClass('active');
 			this.settings.mode = 'drag';
 
 			if(!init) this.setSettings();
@@ -277,7 +313,7 @@ $(document).ready(function () {
 
 		delegate: function (el) {
 			// save local vars
-			var target = el.attr('rel');
+			var target = el.attr('data-rel');
 
 			switch(target) {
 				case 'modal':
@@ -286,14 +322,14 @@ $(document).ready(function () {
 						'url': el.attr('href')
 					}]);
 					break;
-				case 'dialogue':
-					this.openDialogue(el.attr('data-text'), el.attr('href'));
+				case 'dialog':
+					this.opendialog(el.attr('data-text'), el.attr('href'));
 					break;
 				case 'sideframe':
 					this.openSideframe(el.attr('href'));
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'));
+					this.openAjax(el.attr('href'), el.attr('data-post'));
 					break;
 				default:
 					window.location.href = el.attr('href');
@@ -338,7 +374,7 @@ $(document).ready(function () {
 			}, duration);
 		},
 
-		openSideframe: function (url) {
+		openSideframe: function (url, maximized) {
 			// prepare iframe
 			var that = this;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
@@ -356,14 +392,14 @@ $(document).ready(function () {
 				// sidebar is already open
 				insertHolder(iframe);
 				// reanimate the frame
-				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width);
+				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width, maximized);
 			} else {
 				// load iframe after frame animation is done
 				setTimeout(function () {
 					insertHolder(iframe);
 				}, this.options.sidebarDuration);
 				// display the frame
-				this._showSideframe(width);
+				this._showSideframe(width, maximized);
 			}
 
 			function insertHolder(iframe) {
@@ -373,16 +409,13 @@ $(document).ready(function () {
 			}
 		},
 
-		openAjax: function (url) {
+		openAjax: function (url, post) {
 			var that = this;
 
-			// TODO: the crsf token needs to be added through the backend or read from the options
 			$.ajax({
 				'type': 'POST',
 				'url': url,
-				'data': {
-					'csrfmiddlewaretoken': this.options.csrf
-				},
+				'data': JSON.parse(post) || {},
 				'success': function () {
 					window.location.reload();
 				},
@@ -392,26 +425,26 @@ $(document).ready(function () {
 			});
 		},
 
-		openDialogue: function (msg, url) {
-			var field = this.dialogue.find('.cms_dialogue-text');
+		opendialog: function (msg, url) {
+			var field = this.dialog.find('.cms_dialog-text');
 				field.html(msg);
 
-			var confirm = this.dialogue.find('.cms_dialogue-confirm, .cms_dialogue-cancel');
-			var alert = this.dialogue.find('.cms_dialogue-accept');
+			var confirm = this.dialog.find('.cms_dialog-confirm, .cms_dialog-cancel');
+			var alert = this.dialog.find('.cms_dialog-accept');
 
-			// activate confirm dialogue
+			// activate confirm dialog
 			if(url) {
-				this.dialogue.data('url', url);
+				this.dialog.data('url', url);
 				confirm.show();
 				alert.hide();
-				// activate alert dialogue
+				// activate alert dialog
 			} else {
 				confirm.hide();
 				alert.show();
 			}
 
-			// show the dialogue
-			this._showDialogue();
+			// show the dialog
+			this._showdialog();
 		},
 
 		openModal: function (url, name, breadcrumb) {
@@ -431,7 +464,7 @@ $(document).ready(function () {
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialogue + '" />'));
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialog + '" />'));
 
 				// than show
 				iframe.show();
@@ -481,18 +514,30 @@ $(document).ready(function () {
 			this._showModal(this.options.modalDuration);
 		},
 
-		_showSideframe: function (width) {
-			this.sideframe.animate({ 'width': width }, this.options.sidebarDuration);
-			this.body.animate({ 'margin-left': width }, this.options.sidebarDuration);
+		_showSideframe: function (width, maximized) {
+			if(maximized) {
+				this.sideframe.animate({ 'width': $(window).width() }, 0);
+				this.body.animate({ 'margin-left': 0 }, 0);
+				// invert icon position
+				this.sideframe.find('.cms_sideframe-btn').css('right', -2);
+			} else {
+				this.sideframe.animate({ 'width': width }, this.options.sidebarDuration);
+				this.body.animate({ 'margin-left': width }, this.options.sidebarDuration);
+				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
+			}
 			this.lockToolbar = true;
 		},
 
-		_hideSideframe: function () {
-			this.sideframe.animate({ 'width': 0 }, this.options.sidebarDuration, function () { $(this).hide(); });
-			this.body.animate({ 'margin-left': 0 }, this.options.sidebarDuration);
-			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_modal-loader');
+		_hideSideframe: function (close) {
+			var duration = this.options.sidebarDuration;
 			// remove the iframe
-			this.sideframe.find('iframe').remove();
+			if(close && this.sideframe.width() <= 0) duration = 0;
+			if(close) this.sideframe.find('iframe').remove();
+			this.sideframe.animate({ 'width': 0 }, duration, function () {
+				if(close) $(this).hide();
+			});
+			this.body.animate({ 'margin-left': 0 }, duration);
+			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_modal-loader');
 			this.lockToolbar = false;
 		},
 
@@ -515,20 +560,20 @@ $(document).ready(function () {
 			$(document).unbind('mousemove.cms');
 		},
 
-		_showDialogue: function () {
-			var height = this.dialogue.outerHeight(true);
-			this.dialogue.css('top', -height).show().animate({
+		_showdialog: function () {
+			var height = this.dialog.outerHeight(true);
+			this.dialog.css('top', -height).show().animate({
 				'top': 30
-			}, this.options.dialogueDuration);
+			}, this.options.dialogDuration);
 
 			this.lockToolbar = true;
 		},
 
-		_hideDialogue: function () {
-			var height = this.dialogue.outerHeight(true);
-			this.dialogue.show().animate({
+		_hidedialog: function () {
+			var height = this.dialog.outerHeight(true);
+			this.dialog.show().animate({
 				'top': -height
-			}, this.options.dialogueDuration);
+			}, this.options.dialogDuration);
 
 			this.lockToolbar = false;
 		},
@@ -719,7 +764,7 @@ $(document).ready(function () {
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialogue + '" />'));
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialog + '" />'));
 
 				// than show
 				iframe.show();
@@ -733,7 +778,7 @@ $(document).ready(function () {
 		},
 
 		showError: function (msg) {
-			this.openDialogue(msg);
+			this.opendialog(msg);
 		}
 
 	});

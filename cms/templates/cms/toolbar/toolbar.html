@@ -51,13 +51,13 @@ CMS.$(document).ready(function () {
 	<!-- start: toolbar -->
 	<div class="cms_toolbar">
 		<div class="cms_toolbar-left">
-			<div class="cms_toolbar-item cms_toolbar-item_logo"><a href="/">{% trans "django CMS" %}</a></div>
+			<div class="cms_toolbar-item cms_toolbar-item-logo"><a href="/">{% trans "django CMS" %}</a></div>
 
 			{% if not user.is_authenticated %}
 			<form class="cms_toolbar-item cms_form-login" method="post" action="?edit&cms-toolbar-login=1">
 				{% csrf_token %}
-				<label{% if request.toolbar.login_form.username.errors %} class="cms_error"{% endif %}>{% trans "Username" %} {{ request.toolbar.login_form.username }}</label>
-				<label{% if request.toolbar.login_form.password.errors or request.toolbar.login_form.non_field_errors %} class="cms_error"{% endif %}>{% trans "Password" %} {{ request.toolbar.login_form.password }}</label>
+				<label>{% if request.toolbar.login_form.username.errors %} class="cms_error"{% endif %}>{% trans "Username" %} {{ request.toolbar.login_form.username }}</label>
+				<label>{% if request.toolbar.login_form.password.errors or request.toolbar.login_form.non_field_errors %} class="cms_error"{% endif %}>{% trans "Password" %} {{ request.toolbar.login_form.password }}</label>
 				<label><input type="submit" value="Login" /></label>
 			</form>
 			{% else %}
@@ -102,22 +102,28 @@ CMS.$(document).ready(function () {
 		<div class="cms_sideframe-resize"><span class="cms_sideframe-knob"></span></div>
 		<div class="cms_sideframe-frame"></div>
 		<div class="cms_sideframe-shim"></div>
+		<div class="cms_sideframe-btn">
+			<div class="cms_sideframe-close"></div>
+			<div class="cms_sideframe-hide"></div>
+			<div class="cms_sideframe-maximize"></div>
+		</div>
+		<div class="cms_sideframe-copy"></div>
 	</div>
 	<!-- end: sidebar -->
 
-	<!-- start: dialogue -->
-	<div class="cms_dialogue">
-		<div class="cms_dialogue-title">{% trans "Notification" %}</div>
-		<div class="cms_dialogue-inner">
-			<div class="cms_dialogue-text"></div>
-			<div class="cms_dialogue-buttons">
-				<a href="#" class="cms_dialogue-cancel">{% trans "No" %}</a>
-				<a href="#" class="cms_dialogue-confirm">{% trans "Yes" %}</a>
-				<a href="#" class="cms_dialogue-accept">{% trans "Ok" %}</a>
+	<!-- start: dialog -->
+	<div class="cms_dialog">
+		<div class="cms_dialog-title">{% trans "Notification" %}</div>
+		<div class="cms_dialog-inner">
+			<div class="cms_dialog-text"></div>
+			<div class="cms_dialog-buttons">
+				<a href="#" class="cms_dialog-cancel">{% trans "No" %}</a>
+				<a href="#" class="cms_dialog-confirm">{% trans "Yes" %}</a>
+				<a href="#" class="cms_dialog-accept">{% trans "Ok" %}</a>
 			</div>
 		</div>
 	</div>
-	<!-- end: dialogue -->
+	<!-- end: dialog -->
 
 	<!-- start: modal -->
 	<div class="cms_modal">
