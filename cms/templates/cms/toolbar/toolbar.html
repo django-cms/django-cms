@@ -63,7 +63,7 @@ CMS.$(document).ready(function () {
 			{% else %}
 
 			<ul class="cms_toolbar-item cms_toolbar-item_navigation">
-				{% for item in request.toolbar.items %}
+				{% for item in request.toolbar.get_items %}
 					{% if not item.right %}{{ item.render }}{% endif %}
 				{% endfor %}
 			</ul>
@@ -72,7 +72,7 @@ CMS.$(document).ready(function () {
 
 		<div class="cms_toolbar-right">
 
-            {% for item in request.toolbar.items %}
+            {% for item in request.toolbar.get_items %}
 				{% if item.right %}{{ item.render }}{% endif %}
 			{% endfor %}
             {% if request.toolbar.can_change %}

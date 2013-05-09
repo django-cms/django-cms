@@ -106,3 +106,8 @@ language_chooser
 
 The ``language_chooser`` templatetag now only displays languages that are public. Use the toolbar language chooser
 to change the language to non public languages.
+
+Undo and Redo
+=============
+
+If you have django-reversion installed you now have undo and redo directly in the toolbar.
