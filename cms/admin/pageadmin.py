@@ -164,9 +164,9 @@ class PageAdmin(ModelAdmin):
             )]
         }
         js = ['%sjs/jquery.min.js' % admin_static_url()] + [cms_static_url(path) for path in [
-                'js/plugins/jquery.query.js',
-                'js/plugins/jquery.ui.custom.js',
-            ]
+            'js/plugins/jquery.query.js',
+            'js/plugins/jquery.ui.custom.js',
+        ]
         ]
 
 
@@ -195,6 +195,8 @@ class PageAdmin(ModelAdmin):
                                 pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
                                 pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
                                 pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
+                                pat(r'^([0-9]+)/undo/$', self.undo),
+                                pat(r'^([0-9]+)/redo/$', self.redo),
                                 pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
                                 pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
                                 pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
@@ -647,6 +649,74 @@ class PageAdmin(ModelAdmin):
         obj.version = version
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
+
+    @require_POST
+    def undo(self, request, object_id):
+        if not 'reversion' in settings.INSTALLED_APPS:
+            return HttpResponseBadRequest('django reversion not installed')
+        from reversion.models import Revision
+        import reversion
+
+        page = get_object_or_404(Page, pk=object_id)
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(_("You do not have permission to change this page"))
+        versions = reversion.get_for_object(page)
+        if page.revision_id:
+            current_revision = Revision.objects.get(pk=page.revision_id)
+        else:
+            try:
+                current_version = versions[0]
+            except IndexError:
+                return HttpResponseBadRequest("no current revision found")
+            current_revision = current_version.revision
+        try:
+            previous_version = versions.filter(revision__pk__lt=current_revision.pk)[0]
+        except IndexError:
+            return HttpResponseBadRequest("no previous revision found")
+        previous_revision = previous_version.revision
+        previous_revision.revert()
+        rev_page = get_object_or_404(Page, pk=page.pk)
+        rev_page.revision_id = previous_revision.pk
+        rev_page.publisher_public_id = page.publisher_public_id
+        rev_page.save()
+        return HttpResponse("ok")
+
+    @require_POST
+    def redo(self, request, object_id):
+        if not 'reversion' in settings.INSTALLED_APPS:
+            return HttpResponseBadRequest('django reversion not installed')
+        from reversion.models import Revision
+        import reversion
+
+        page = get_object_or_404(Page, pk=object_id)
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(_("You do not have permission to change this page"))
+        versions = reversion.get_for_object(page)
+        if page.revision_id:
+            current_revision = Revision.objects.get(pk=page.revision_id)
+        else:
+            try:
+                current_version = versions[0]
+            except IndexError:
+                return HttpResponseBadRequest("no current revision found")
+            current_revision = current_version.revision
+        try:
+            previous_version = versions.filter(revision__pk__gt=current_revision.pk).order_by('pk')[0]
+        except IndexError:
+            return HttpResponseBadRequest("no next revision found")
+        next_revision = previous_version.revision
+        next_revision.revert()
+        rev_page = get_object_or_404(Page, pk=page.pk)
+        rev_page.revision_id = next_revision.pk
+        rev_page.publisher_public_id = page.publisher_public_id
+        rev_page.save()
+        return HttpResponse("ok")
+
+
 
     @require_POST
     @create_revision()
