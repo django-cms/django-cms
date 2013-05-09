@@ -42,19 +42,10 @@
 			var splits = window.location.href.split("/");
 			var page_id = splits[splits.length-2];
 
-			var to_language = $('input.language_button.selected').attr('name');
-
-			if (!to_language) {
-				to_language = $('input[name=language]').attr("value");
-			}
-
-			if (!to_language) {
-				//alert("Unable to determine the correct language for this plugin! Please report the bug!");
-			}
-
+			var to_language = select.attr('data-language');
 			//var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
-			if ((copy_from_language) && (copy_from_language != "")) {
-			 var ul_list = $(this).parent().parent().children("ul.plugin-list");
+			if ((copy_from_language) && (copy_from_language !== "")) {
+				var ul_list = $(this).parent().parent().children("ul.plugin-list");
 				$.ajax({
 					url: "copy-plugins/", dataType: "html", type: "POST",
 					data: { page_id: page_id, placeholder: placeholder, copy_from: copy_from_language, language: to_language },
