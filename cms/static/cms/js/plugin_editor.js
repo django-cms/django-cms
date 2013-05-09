@@ -8,21 +8,12 @@
 	$(document).ready(function() {
 		// Add Plugin Handler
 		$('span.add-plugin').click(function(){
-		 var select = $(this).parent().children("select[name=plugins]");
+			var select = $(this).parent().children("select[name=plugins]");
 			var pluginvalue = select.attr('value');
 			var placeholder_id = $(this).parent().parent().data('id');
 			//var splits = window.location.href.split("/");
 
-			var language = $('input.language_button.selected').attr('name');
-
-			if (!language) {
-				language = $('input[name=language]').attr("value");
-			}
-			// The new placeholder branch allows adding non-language plugins!
-			if (!language) {
-				//alert("Unable to determine the correct language for this plugin! Please report the bug!");
-			}
-
+			var language = select.attr('data-language');
 			var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
 			if (pluginvalue) {
 				var pluginname = select.children('[selected]').text();
