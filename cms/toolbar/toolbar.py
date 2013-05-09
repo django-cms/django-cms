@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+
 class CMSToolbarLoginForm(AuthenticationForm):
     username = forms.CharField(label=_("Username"), max_length=100)
 
@@ -29,16 +30,10 @@ class CMSToolbar(object):
     def __init__(self, request):
         self.request = request
         self.login_form = CMSToolbarLoginForm(request=request)
-        self.init()
-
-    def init(self):
         self.is_staff = self.request.user.is_staff
         self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
-        self.show_toolbar = self.request.session.get('cms_edit', False) or self.is_staff
-        try:
-            self.view_name = resolve(self.request.path).func.__module__
-        except Resolver404:
-            self.view_name = ""
+        self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
+        self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
         if settings.USE_I18N:
             self.language = self.request.LANGUAGE_CODE
         else:
@@ -48,25 +43,27 @@ class CMSToolbar(object):
                 self.language = UserSettings.objects.get(user=self.request.user).language
             except UserSettings.DoesNotExist:
                 pass
-        page = self.request.current_page #query the page in the right language
-        with force_language(self.language):
-            self.items = self._get_items()
 
-    def _get_items(self):
+    def get_items(self):
         """
         Get the CMS items on the toolbar
         """
-        toolbars = toolbar_pool.get_toolbars()
-        items = []
-        app_key = ""
-        for key in toolbars:
-            app_name = ".".join(key.split(".")[:-2])
-            if app_name in self.view_name and len(key) > len(app_key):
-                app_key = key
-        for key in toolbars:
-            toolbar = toolbars[key]()
-            toolbar.insert_items(items, self, self.request, key == app_key)
-        return items
+        try:
+            self.view_name = resolve(self.request.path).func.__module__
+        except Resolver404:
+            self.view_name = ""
+        with force_language(self.language):
+            toolbars = toolbar_pool.get_toolbars()
+            items = []
+            app_key = ""
+            for key in toolbars:
+                app_name = ".".join(key.split(".")[:-2])
+                if app_name in self.view_name and len(key) > len(app_key):
+                    app_key = key
+            for key in toolbars:
+                toolbar = toolbars[key]()
+                toolbar.insert_items(items, self, self.request, key == app_key)
+            return items
 
     def request_hook(self):
         if self.request.method != 'POST':

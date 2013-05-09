@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
 from os.path import join
 import reversion
 from reversion.models import Revision, Version, VERSION_CHANGE
@@ -114,6 +115,39 @@ class ReversionTestCase(CMSTestCase):
             self.assertEquals(Text.objects.all().count(), 2)
             self.assertEquals(Text.objects.get(pk=self.txt.pk).body, "Hello World")
             self.assertEquals(Revision.objects.all().count(), 6)
+
+    def test_undo_redo(self):
+        """
+        Test that you can revert a plugin
+        """
+        with self.login_user_context(User.objects.get(username="test")):
+            self.assertEquals(Page.objects.all().count(), 2)
+            self.assertEquals(Title.objects.all().count(), 2)
+            self.assertEquals(CMSPlugin.objects.all().count(), 2)
+            self.assertEquals(Revision.objects.all().count(), 5)
+
+            ctype = ContentType.objects.get_for_model(Page)
+            revision = Revision.objects.all()[2]
+            version = Version.objects.get(content_type=ctype, revision=revision)
+            page = Page.objects.all()[0]
+
+            undo_url = reverse("admin:cms_page_undo", args=[page.pk])
+            response = self.client.post(undo_url)
+            self.assertEquals(response.status_code, 200)
+            page = Page.objects.all()[0]
+            self.assertTrue(page.revision_id != 0)
+            rev = page.revision_id
+            redo_url = reverse("admin:cms_page_redo", args=[page.pk])
+            response = self.client.post(redo_url)
+            self.assertEquals(response.status_code, 200)
+            page = Page.objects.all()[0]
+            self.assertTrue(page.revision_id != rev)
+            txt = Text.objects.all()[0]
+            edit_url = URL_CMS_PLUGIN_EDIT + str(txt.pk) + "/"
+            response = self.client.post(edit_url, {"body": "Hello World2"})
+            self.assertEquals(response.status_code, 200)
+            page = Page.objects.all()[0]
+            self.assertTrue(page.revision_id == 0)
 
     def test_recover(self):
         """
