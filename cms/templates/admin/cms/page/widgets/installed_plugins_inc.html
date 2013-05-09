@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="plugin-select-holder">
-    <select name="plugins">
+    <select name="plugins" data-language="{{ language }}">
         <option value="" selected="selected">{% trans "Available Plugins" %}</option>
 	{% regroup installed_plugins by module as module_list %}
 	{% for module in module_list %}
