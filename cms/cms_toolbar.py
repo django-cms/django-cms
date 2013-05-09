@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 import urllib
 from cms.exceptions import LanguageError
-from cms.models import Page
 from cms.utils.i18n import get_language_objects, get_language_object
 from cms.toolbar.items import Item, List, Break, Switch
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
 
@@ -42,12 +40,13 @@ class PageToolbar(CMSToolbar):
                 if has_global_current_page_change_permission or has_current_page_change_permission:
                     # The 'page' Menu
                     items.append(self.get_page_menu(self.page))
-                    # The 'templates' Menu
-                    items.append(self.get_template_menu())
-                    # Publish Menu
-                    items.append(self.get_history_menu())
                     if self.toolbar.edit_mode:
-                        if self.request.current_page.has_publish_permission(self.request):
+                        # The 'templates' Menu
+                        items.append(self.get_template_menu())
+                        # Publish Menu
+                        items.append(self.get_history_menu())
+
+                        if self.page.has_publish_permission(self.request):
                             items.append(self.get_publish_menu())
                         items.append(self.get_mode_switchers())
             items.append(self.get_language_menu())
@@ -162,19 +161,27 @@ class PageToolbar(CMSToolbar):
             load_side_frame=True)
         )
         if 'reversion' in settings.INSTALLED_APPS:
+            import reversion
             from reversion.models import Revision
-            #content_type = ContentType.objects.get_for_model(Page)
-            #revisions = Revision.objects.filter(content_type=content_type, object_id=self.request.current_page.pk)
 
+            versions = reversion.get_for_object(page)
+            if page.revision_id:
+                current_revision = Revision.objects.get(pk=page.revision_id)
+                has_undo = versions.filter(revision__pk__lt=current_revision.pk).count() > 0
+                has_redo = versions.filter(revision__pk__gt=current_revision.pk).count() > 0
+            else:
+                has_redo = False
+                has_undo = versions.count() > 1
             menu_items.items.append(Item(
                 reverse('admin:cms_page_undo', args=[page.pk]),
                 _('Undo'), ajax=True,
-                disabled=False)
+                disabled=not has_undo)
             )
+
             menu_items.items.append(Item(
                 reverse('admin:cms_page_redo', args=[page.pk]),
                 _('Redo'), ajax=True,
-                disabled=False)
+                disabled=not has_redo)
             )
         return menu_items
 
@@ -183,7 +190,7 @@ class PageToolbar(CMSToolbar):
         dirty = page.is_dirty()
 
         switch = Switch(right=True)
-        switch.addItem(_("Publish now"), reverse('admin:cms_page_publish_page', args=[page.pk]), True)
+        switch.addItem(_("Publish now"), reverse('admin:cms_page_publish_page', args=[page.pk]), dirty)
         return switch
 
     def get_admin_menu(self):
@@ -205,8 +212,8 @@ class PageToolbar(CMSToolbar):
 
     def get_mode_switchers(self):
         switch = Switch(right=True)
-        switch.addItem(_("Edit"), "?edit", self.toolbar.edit_mode)
-        switch.addItem(_("Build"), "?build", not self.toolbar.edit_mode)
+        switch.addItem(_("Edit"), "?edit", self.toolbar.build_mode)
+        switch.addItem(_("Layout"), "?build", not self.toolbar.build_mode)
         return switch
 
 

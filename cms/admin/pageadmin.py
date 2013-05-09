@@ -677,9 +677,10 @@ class PageAdmin(ModelAdmin):
             return HttpResponseBadRequest("no previous revision found")
         previous_revision = previous_version.revision
         previous_revision.revert()
-        page = get_object_or_404(Page, pk=page.pk)
-        page.revision_id = previous_revision.pk
-        page.save()
+        rev_page = get_object_or_404(Page, pk=page.pk)
+        rev_page.revision_id = previous_revision.pk
+        rev_page.publisher_public_id = page.publisher_public_id
+        rev_page.save()
         return HttpResponse("ok")
 
     @require_POST
@@ -709,9 +710,10 @@ class PageAdmin(ModelAdmin):
             return HttpResponseBadRequest("no next revision found")
         next_revision = previous_version.revision
         next_revision.revert()
-        page = get_object_or_404(Page, pk=page.pk)
-        page.revision_id = next_revision.pk
-        page.save()
+        rev_page = get_object_or_404(Page, pk=page.pk)
+        rev_page.revision_id = next_revision.pk
+        rev_page.publisher_public_id = page.publisher_public_id
+        rev_page.save()
         return HttpResponse("ok")
 
 
