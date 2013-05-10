@@ -82,5 +82,4 @@ class CMSToolbar(object):
             self.login_form = CMSToolbarLoginForm(request=self.request, data=self.request.POST)
             if self.login_form.is_valid():
                 login(self.request, self.login_form.user_cache)
-                self.init()
                 return HttpResponseRedirect(self.request.path)

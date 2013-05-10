@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.utils.i18n import get_language_objects, get_language_object
 from cms.toolbar.items import Item, List, Break, Switch
@@ -10,6 +11,7 @@ from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import has_page_change_permission, get_user_sites_queryset
 from django.conf import settings
+from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from menus.utils import DefaultLanguageChanger
@@ -41,8 +43,6 @@ class PageToolbar(CMSToolbar):
                     # The 'page' Menu
                     items.append(self.get_page_menu(self.page))
                     if self.toolbar.edit_mode:
-                        # The 'templates' Menu
-                        items.append(self.get_template_menu())
                         # Publish Menu
                         items.append(self.get_history_menu())
 
@@ -86,16 +86,18 @@ class PageToolbar(CMSToolbar):
         return menu_items
 
     def get_template_menu(self):
-        menu_items = List("#", _("Template"))
+        menu_items = List("#", _("Template"), sub_level=True)
         url = reverse('admin:cms_page_change_template', args=(self.page.pk,))
         for path, name in get_cms_setting('TEMPLATES'):
             active = False
-            if self.page.get_template() == path:
+            if self.page.template == path:
                 active = True
-            if path == "INHERIT":
+            if path == TEMPLATE_INHERITANCE_MAGIC:
                 menu_items.items.append(Break())
             menu_items.items.append(
-                Item(url, name, ajax=True, ajax_data={'template': path}, active=active),
+                Item(url, name, ajax=True,
+                     ajax_data={'template': path, 'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+                     active=active)
             )
         return menu_items
 
@@ -110,6 +112,7 @@ class PageToolbar(CMSToolbar):
             _('Settings'),
             load_side_frame=True)
         )
+        menu_items.items.append(self.get_template_menu())
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_changelist'),
@@ -149,17 +152,6 @@ class PageToolbar(CMSToolbar):
         page = self.page
         dirty = page.is_dirty()
         menu_items = List('', _("History"))
-        menu_items.items.append(Item(
-            reverse('admin:cms_page_revert_page', args=[page.pk]),
-            _('Revert to live'), ajax=True,
-            question=_("Are you sure you want to revert to live?"),
-            disabled=not dirty)
-        )
-        menu_items.items.append(Item(
-            reverse('admin:cms_page_history', args=(self.page.pk,)),
-            _('View History'),
-            load_side_frame=True)
-        )
         if 'reversion' in settings.INSTALLED_APPS:
             import reversion
             from reversion.models import Revision
@@ -174,15 +166,32 @@ class PageToolbar(CMSToolbar):
                 has_undo = versions.count() > 1
             menu_items.items.append(Item(
                 reverse('admin:cms_page_undo', args=[page.pk]),
-                _('Undo'), ajax=True,
+                _('Undo'),
+                ajax=True,
+                ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
                 disabled=not has_undo)
             )
 
             menu_items.items.append(Item(
                 reverse('admin:cms_page_redo', args=[page.pk]),
-                _('Redo'), ajax=True,
+                _('Redo'),
+                ajax=True,
+                ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
                 disabled=not has_redo)
             )
+            menu_items.items.append(Break())
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_revert_page', args=[page.pk]),
+            _('Revert to live'), ajax=True,
+            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+            question=_("Are you sure you want to revert to live?"),
+            disabled=not dirty)
+        )
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_history', args=(self.page.pk,)),
+            _('View History'),
+            load_side_frame=True)
+        )
         return menu_items
 
     def get_publish_menu(self):

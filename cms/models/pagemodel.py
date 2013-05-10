@@ -537,6 +537,7 @@ class Page(MPTTModel):
         self.published = True
         self.publisher_state = self.PUBLISHER_STATE_DEFAULT
         self._publisher_keep_state = True
+        self.revision_id = 0
         self.save()
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()

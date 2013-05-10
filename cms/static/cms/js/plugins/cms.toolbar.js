@@ -411,11 +411,14 @@ $(document).ready(function () {
 
 		openAjax: function (url, post) {
 			var that = this;
-
+            var data = {};
+            if (post){
+                data =  JSON.parse(post);
+            }
 			$.ajax({
 				'type': 'POST',
 				'url': url,
-				'data': JSON.parse(post) || {},
+				'data': data,
 				'success': function () {
 					window.location.reload();
 				},
