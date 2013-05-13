@@ -635,9 +635,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(Page.objects.all().count(), 1)
 
         copy_data = {
-            'placeholder': placeholder.pk,
-            'language': self.SECOND_LANG,
-            'copy_from': self.FIRST_LANG,
+            'source_placeholder_id': placeholder.pk,
+            'target_placeholder_id': placeholder.pk,
+            'target_language': self.SECOND_LANG,
+            'source_language': self.FIRST_LANG,
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
@@ -931,9 +932,10 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.count(), 1)
         self.assertEquals(Page.objects.all().count(), 1)
         copy_data = {
-            'placeholder': placeholder.pk,
-            'language': self.SECOND_LANG,
-            'copy_from': self.FIRST_LANG,
+            'source_placeholder_id': placeholder.pk,
+            'target_placeholder_id': placeholder.pk,
+            'target_language': self.SECOND_LANG,
+            'source_language': self.FIRST_LANG,
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
