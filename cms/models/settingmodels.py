@@ -9,7 +9,7 @@ class UserSettings(models.Model):
     user = models.ForeignKey(User, editable=False)
     language = models.CharField(_("Language"), max_length=10, choices=settings.LANGUAGES,
                                 help_text=_("The language for the admin interface and toolbar"))
-    clipboard = models.ForeignKey('cms.Placeholder', blank=True, null=True)
+    clipboard = models.ForeignKey('cms.Placeholder', blank=True, null=True, editable=False)
 
     class Meta:
         verbose_name = _('user setting')

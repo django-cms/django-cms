@@ -49,6 +49,11 @@ class SettingsAdmin(ModelAdmin):
         post_url = reverse('admin:index', current_app=self.admin_site.name)
         return HttpResponseRedirect(post_url)
 
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.user == request.user:
+            return True
+        return False
+
     def get_model_perms(self, request):
         """
         Return empty perms dict thus hiding the model from admin index.
