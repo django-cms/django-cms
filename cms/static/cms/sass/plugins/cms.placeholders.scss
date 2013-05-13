@@ -45,10 +45,10 @@
 			&:first-child { border-top:none; } }
 		li span { cursor:default; font-weight:bold; color:$color-black;
 			border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }
-		li:first-child span { border-top:none !important; }
+		li:first-child span { border-top:none; }
 	}
 
-	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:250px !important; z-index:1000;
+	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:250px; z-index:1000;
 		cursor:default; text-align:right; height:25px; @include border-radius(0 0 3px 3px);
 		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -354px; }
 	.cms_submenu-quicksearch label { cursor:pointer; padding-right:25px; }
@@ -64,7 +64,7 @@
 	// #DRAGGABLES/general#
 	.cms_draggable, .cms_droppable { list-style-type:none;
 		position:relative; left:0; top:0; z-index:99; @include border-radius(3px);
-		padding:4px 5px 3px 5px !important; margin:0 0 5px !important;
+		padding:4px 5px 3px 5px; margin:0 0 5px;
 
 		// levels
 		.cms_draggable { position:relative; z-index:99; white-space:nowrap;
@@ -74,7 +74,7 @@
 		.cms_submenu { display:none; margin-top:2px; }
 		.cms_submenu:hover { background-position:-17px -184px; }
 		.cms_submenu-dropdown { right:-1px; top:26px; }
-		.cms_submenu-quicksearch { top:258px !important; }
+		.cms_submenu-quicksearch { top:258px; }
 	}
 
 	// #DRAGGABLES/specific#
@@ -83,19 +83,19 @@
 	.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
 
 	.cms_droppable-empty { font-size:11px; text-transform:uppercase;
-		padding-top:0 !important; padding-bottom:0 !important; }
+		padding-top:0; padding-bottom:0; }
 	.cms_droppable-empty-wrapper { display:none; }
 
-	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px !important; }
-	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/arrow-down-active.png') no-repeat 3px 7px !important; }
-	.cms_dragitem-collapsed { background:url('/static/cms/img/toolbar/arrow-down-collapsed.png') no-repeat 3px 6px !important; }
+	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
+	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/arrow-down-active.png') no-repeat 3px 7px; }
+	.cms_dragitem-collapsed { background:url('/static/cms/img/toolbar/arrow-down-collapsed.png') no-repeat 3px 6px; }
 	.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
-		width:100%; height:100% !important;
+		width:100%; height:100%;
 		@include opacity(0.6); }
 
 	// #DRAGGABLES/states#
 	.cms_draggable-selected { border:1px solid adjust-hue($color-blue, 15deg) !important;
-		background:adjust-hue($color-blue, 15deg) !important; @include background-image($gradient-blue !important); }
+		background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
 	.cms_draggable-selected .cms_dragitem,
 	.cms_draggable-selected .cms_dragitem strong { color:$color-white; }
 
@@ -116,11 +116,16 @@ only screen and (-o-min-device-pixel-ratio:3/2),
 only screen and (min--moz-device-pixel-ratio:1.5),
 only screen and (min-device-pixel-ratio:1.5) {
 
-	.cms_draggable .cms_dragmenu,
-	.cms_placeholder-bar .cms_placeholder-btn > a span {
+	.cms_placeholder .cms_submenu, body .cms_submenu,
+	.cms_placeholder .cms_submenu-quicksearch, body .cms_submenu-quicksearch {
 		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png');
-		background-size:190px;
-	}
+		background-size:190px; }
+
+	.cms_placeholder .cms_dragitem-collapsable,
+	body .cms_dragitem-collapsable { background-image:url('/static/cms/img/toolbar/arrow-down-active@2x.png'); background-size:16px; }
+	.cms_placeholder .cms_dragitem-collapsed,
+	body .cms_dragitem-collapsed { background-image:url('/static/cms/img/toolbar/arrow-down-collapsed@2x.png'); background-size:16px; }
+
 
 // end of retina
 }
