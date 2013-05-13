@@ -20,7 +20,7 @@ $(document).ready(function () {
 				'mode': 'edit' // live, draft, edit or layout
 			},
 			'sidebarDuration': 300,
-			'sidebarWidth': 275,
+			'sidebarWidth': 320,
 			'dialogDuration': 300,
 			'modalDuration': 300,
 			'modalWidth': 800,
