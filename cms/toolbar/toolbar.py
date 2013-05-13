@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.models import UserSettings
+from cms.models import UserSettings, Placeholder
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import force_language
 
@@ -40,9 +40,15 @@ class CMSToolbar(object):
             self.language = settings.LANGUAGE_CODE
         if self.is_staff:
             try:
-                self.language = UserSettings.objects.get(user=self.request.user).language
+                settings = UserSettings.objects.get(user=self.request.user)
             except UserSettings.DoesNotExist:
-                pass
+                settings = UserSettings(language=self.language, user=self.request.user)
+                placeholder = Placeholder(slot="clipboard")
+                placeholder.save()
+                settings.clipboard = placeholder
+                settings.save()
+            self.language = settings.language
+            self.clipboard = settings.clipboard
 
     def get_items(self):
         """
