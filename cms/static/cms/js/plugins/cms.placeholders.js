@@ -454,7 +454,10 @@
 
 				nav.find('input').bind('keyup focus blur', function (e) {
 					if(e.type === 'focus') that.focused = true;
-					if(e.type === 'blur') that.focused = false;
+					if(e.type === 'blur') {
+						that.focused = false;
+						that._hideSubnav(nav);
+					}
 					if(e.type === 'keyup') {
 						clearTimeout(that.timer);
 						// cancel if we have less than x keys
