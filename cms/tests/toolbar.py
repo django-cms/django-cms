@@ -157,7 +157,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_items()
-        self.assertEqual(len(items), 7)
+        self.assertEqual(len(items), 6)
 
     def test_toolbar_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
@@ -168,7 +168,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_items()
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 6)
+        self.assertEqual(len(items), 5)
 
     def test_toolbar_no_change_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)

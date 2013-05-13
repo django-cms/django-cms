@@ -40,15 +40,15 @@ class CMSToolbar(object):
             self.language = settings.LANGUAGE_CODE
         if self.is_staff:
             try:
-                settings = UserSettings.objects.get(user=self.request.user)
+                user_settings = UserSettings.objects.get(user=self.request.user)
             except UserSettings.DoesNotExist:
-                settings = UserSettings(language=self.language, user=self.request.user)
+                user_settings = UserSettings(language=self.language, user=self.request.user)
                 placeholder = Placeholder(slot="clipboard")
                 placeholder.save()
-                settings.clipboard = placeholder
-                settings.save()
-            self.language = settings.language
-            self.clipboard = settings.clipboard
+                user_settings.clipboard = placeholder
+                user_settings.save()
+            self.language = user_settings.language
+            self.clipboard = user_settings.clipboard
 
     def get_items(self):
         """
