@@ -184,7 +184,7 @@ $(document).ready(function () {
 
 			// attach event to the sidebar
 			this.sideframe.find('.cms_sideframe-close').bind('click', function () {
-				that._hideSideframe(true);
+				that.closeSideframe(true);
 			});
 
 			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
@@ -193,7 +193,7 @@ $(document).ready(function () {
 					that._showSideframe(that.options.sidebarWidth);
 				} else {
 					$(this).addClass('cms_sideframe-hidden');
-					that._hideSideframe(false);
+					that._hideSideframe();
 				}
 			});
 
@@ -407,6 +407,10 @@ $(document).ready(function () {
 				that.sideframe.find('.cms_sideframe-frame').addClass('cms_modal-loader');
 				holder.html(iframe);
 			}
+		},
+
+		closeSideframe: function () {
+			this._hideSideframe(true);
 		},
 
 		openAjax: function (url, post) {
