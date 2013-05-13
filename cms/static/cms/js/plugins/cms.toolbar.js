@@ -415,7 +415,7 @@ $(document).ready(function () {
 			$.ajax({
 				'type': 'POST',
 				'url': url,
-				'data': JSON.parse(post) || {},
+				'data': (post) ? JSON.parse(post) : {},
 				'success': function () {
 					window.location.reload();
 				},
