@@ -6,7 +6,7 @@ from django.dispatch import Signal
 
 from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, PageUser, PageUserGroup
-
+from django.conf import settings
 from menus.menu_pool import menu_pool
 
 # fired after page location is changed - is moved from one node to other
@@ -259,6 +259,14 @@ def pre_save_delete_page(instance, **kwargs):
     clear_permission_cache()
 
 
+def post_revision(instances, **kwargs):
+    for inst in instances:
+        if isinstance(inst, Page):
+            page = Page.objects.get(pk=inst.pk)
+            page.revision_id = 0
+            page.save()
+            return
+
 if get_cms_setting('PERMISSION'):
     signals.pre_save.connect(pre_save_user, sender=User)
     signals.pre_delete.connect(pre_delete_user, sender=User)
@@ -280,3 +288,7 @@ if get_cms_setting('PERMISSION'):
 
     signals.pre_save.connect(pre_save_delete_page, sender=Page)
     signals.pre_delete.connect(pre_save_delete_page, sender=Page)
+
+if 'reversion' in settings.INSTALLED_APPS:
+    from reversion.models import post_revision_commit
+    post_revision_commit.connect(post_revision)

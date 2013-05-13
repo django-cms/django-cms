@@ -125,7 +125,10 @@ def get_placeholders(template):
     clean_placeholders = []
     for placeholder in placeholders:
         if placeholder in clean_placeholders:
-            warnings.warn("Duplicate placeholder found: `%s`" % placeholder, DuplicatePlaceholderWarning)
+            warnings.warn("Duplicate {{% placeholder \"{0}\" %}} "
+                          "in template {1}."
+                          .format(placeholder, template, placeholder),
+                          DuplicatePlaceholderWarning)
         else:
             validate_placeholder_name(placeholder)
             clean_placeholders.append(placeholder)

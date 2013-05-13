@@ -1,5 +1,4 @@
-{% load i18n %}
-{% if edit %}
+{% load i18n %}{% if edit %}
 <div class="cms_placeholder cms_light cms_reset">
 	{{ bar }}
 	{% language request.toolbar.language %}
@@ -10,6 +9,4 @@
 	<ul class="cms_draggables">{{ draggables }}</ul>
 </div>
 <div class="cms_plugins">{{ plugins }}</div>
-{% else %}å
-{{ plugins }}
-{% endif %}
+{% else %}{{ plugins }}{% endif %}

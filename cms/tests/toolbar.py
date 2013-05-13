@@ -74,14 +74,14 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(None, self.get_anon(), '/')
         toolbar = CMSToolbar(request)
 
-        items = toolbar.items
+        items = toolbar.get_items()
         self.assertEqual(len(items), 0)
 
     def test_toolbar_no_page_staff(self):
         request = self.get_page_request(None, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
 
-        items = toolbar.items
+        items = toolbar.get_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         self.assertEqual(len(items[0].get_context()['items']), 6)
@@ -90,7 +90,7 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(None, self.get_superuser(), '/')
         toolbar = CMSToolbar(request)
 
-        items = toolbar.items
+        items = toolbar.get_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         self.assertEqual(len(items[0].get_context()['items']), 7)
@@ -100,14 +100,14 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, self.get_anon())
         toolbar = CMSToolbar(request)
 
-        items = toolbar.items
+        items = toolbar.get_items()
         self.assertEqual(len(items), 0)
 
     def test_toolbar_nonstaff(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_nonstaff())
         toolbar = CMSToolbar(request)
-        items = toolbar.items
+        items = toolbar.get_items()
         # Logo + edit-mode + logout
         self.assertEqual(len(items), 0)
 
@@ -116,7 +116,7 @@ class ToolbarTests(ToolbarTestBase):
             page = create_page('test', 'nav_playground.html', 'en', published=True)
             request = self.get_page_request(page, self.get_nonstaff())
             toolbar = CMSToolbar(request)
-            items = toolbar.items
+            items = toolbar.get_items()
             self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
 
     def test_toolbar_markup(self):
@@ -156,7 +156,7 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, self.get_superuser(), edit=True)
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.edit_mode)
-        items = toolbar.items
+        items = toolbar.get_items()
         self.assertEqual(len(items), 7)
 
     def test_toolbar_no_publish_button(self):
@@ -166,7 +166,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
         self.assertTrue(toolbar.edit_mode)
-        items = toolbar.items
+        items = toolbar.get_items()
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 6)
 
@@ -179,7 +179,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
 
-        items = toolbar.items
+        items = toolbar.get_items()
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 2)
         self.assertEqual(len(items[0].get_context()['items']), 6)

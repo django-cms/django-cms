@@ -16,15 +16,16 @@ class BaseItem(object):
 class List(BaseItem):
     template = "cms/toolbar/menu/list.html"
 
-    def __init__(self, url, name, right=False):
+    def __init__(self, url, name, sub_level=False, right=False):
         super(List, self).__init__(right)
         self.items = []
         self.url = url
         self.name = name
+        self.sub_level = sub_level
 
 
     def get_context(self):
-        return {'items': self.items, 'url': self.url, 'title': self.name}
+        return {'items': self.items, 'url': self.url, 'title': self.name, 'sub_level': self.sub_level}
 
     def __repr__(self):
         return unicode(self.name)
