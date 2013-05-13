@@ -717,7 +717,6 @@ class PageAdmin(ModelAdmin):
         return HttpResponse("ok")
 
 
-
     @require_POST
     @create_revision()
     def change_template(self, request, object_id):
@@ -1148,36 +1147,43 @@ class PageAdmin(ModelAdmin):
     @create_revision()
     @transaction.commit_on_success
     def copy_plugins(self, request):
-        if 'history' in request.path or 'recover' in request.path:
-            return HttpResponseBadRequest(str("error"))
-        copy_from = request.POST['copy_from']
-        placeholder_id = request.POST['placeholder']
-        placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        page = placeholder.page
-        language = request.POST['language'] or get_language_from_request(request)
+        source_language = request.POST['source_language']
+        source_placeholder_id = request.POST['source_placeholder_id']
+        source_plugin_id = request.POST.get('source_plugin_id', None)
+        target_language = request.POST['target_language']
+        target_placeholder_id = request.POST['target_placeholder_id']
+        target_plugin_id = request.POST.get('target_placeholder_id', None)
 
-        if not page.has_change_permission(request):
+        source_placeholder = get_object_or_404(Placeholder, pk=source_placeholder_id)
+        target_placeholder = get_object_or_404(Placeholder, pk=target_placeholder_id)
+        page = target_placeholder.page
+
+        if page and not page.has_change_permission(request):
             return HttpResponseForbidden(_("You do not have permission to change this page"))
-        if not language or not language in get_language_list():
+        if not target_language or not target_language in get_language_list():
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
-        if language == copy_from:
-            return HttpResponseBadRequest(_("Language must be different than the copied language!"))
-        plugins = list(placeholder.cmsplugin_set.filter(language=copy_from).order_by('tree_id', '-rght'))
+        if source_plugin_id:
+            source_plugin = get_object_or_404(CMSPlugin, pk=source_plugin_id)
+            plugins = list(
+                source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
+                                                        rght__lte=source_plugin.rght).order_by('tree_id', '-rght'))
+        else:
+            plugins = list(
+                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', '-rght'))
 
         # check permissions before copy the plugins:
         for plugin in plugins:
             if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
                 return HttpResponseForbidden(_("You do not have permission to add plugins"))
 
-        copy_plugins.copy_plugins_to(plugins, placeholder, language)
+        copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
 
         if page and "reversion" in settings.INSTALLED_APPS:
-            message = _(u"Copied %(language)s plugins to %(placeholder)s") % {
-                'language': _(dict(settings.LANGUAGES)[language]), 'placeholder': placeholder}
+            message = _(u"Copied plugins to %(placeholder)s") % {'placeholder': target_placeholder}
             helpers.make_revision_with_plugins(page, request.user, message)
 
-        plugin_list = CMSPlugin.objects.filter(language=language, placeholder=placeholder, parent=None).order_by(
-            'position')
+        plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
+            'tree_id', 'lft')
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(

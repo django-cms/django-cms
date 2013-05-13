@@ -670,21 +670,21 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(ValueError, self.admin_class.move_plugin, request)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent':''})
+                'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent':''})
+                'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent':''})
+                'placeholder_id': placeholder.id, 'plugin_parent': ''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent':''})
+                'placeholder_id': placeholder.id, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
@@ -766,7 +766,7 @@ class AdminTests(AdminTestsBase):
                     'plugin_type': 'TextPlugin',
                     'placeholder_id': body.pk,
                     'plugin_language': 'en',
-                    'plugin_parent':'',
+                    'plugin_parent': '',
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
@@ -849,7 +849,7 @@ class PluginPermissionTests(AdminTestsBase):
             'plugin_type': 'TextPlugin',
             'placeholder_id': self._placeholder.pk,
             'plugin_language': 'en',
-            'plugin_parent':'',
+            'plugin_parent': '',
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -893,7 +893,7 @@ class PluginPermissionTests(AdminTestsBase):
         data = dict(plugin_id=plugin.id,
                     placeholder_id=self._placeholder.pk,
                     plugin_parent='',
-                    )
+        )
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
@@ -907,10 +907,12 @@ class PluginPermissionTests(AdminTestsBase):
         _, normal_guy = self._get_guys()
         self.client.login(username='test', password='test')
         url = reverse('admin:cms_page_copy_plugins')
-        data = dict(plugin_id=plugin.id,
-                    placeholder=self._placeholder.pk,
-                    language='fr',
-                    copy_from='en')
+        data = dict(source_plugin_id=plugin.id,
+                    source_placeholder_id=self._placeholder.pk,
+                    source_language='en',
+                    target_language='fr',
+                    target_placeholder_id=self._placeholder.pk,
+        )
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
@@ -959,7 +961,7 @@ class PluginPermissionTests(AdminTestsBase):
             'plugin_type': 'TextPlugin',
             'placeholder_id': self._placeholder.pk,
             'plugin_language': 'en',
-            'plugin_parent':'',
+            'plugin_parent': '',
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
