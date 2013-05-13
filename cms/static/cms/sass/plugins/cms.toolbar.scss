@@ -71,7 +71,7 @@
 			.cms_toolbar-item-navigation-children {
 				ul { display:none; left:100%; top:-5px; }
 				> a { cursor:default; }
-				> a span { display:block; background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -297px; }
+				> a span { display:block; background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -270px; }
 				&:hover ul { display:block; }
 			}
 
@@ -79,7 +79,7 @@
 			> a { color:$color-white;
 				background:adjust-hue($color-blue, 15deg);
 				@include background-image($gradient-blue); }
-			> a span { background-position:right -327px !important; }
+			> a span { background-position:right -300px !important; }
 
 			strong { color:$color-white !important; }
 		}
@@ -153,10 +153,10 @@
 
 		.cms_sideframe-close { background-position:-80px -90px; }
 		.cms_sideframe-close:hover { background-position:-100px -90px; }
-		.cms_sideframe-hide { height:30px; top:72px; background-position:-101px -176px; }
-		.cms_sideframe-hide:hover { background-position:-121px -176px; }
-		.cms_sideframe-hidden { background-position:-60px -176px; }
-		.cms_sideframe-hidden:hover { background-position:-80px -176px; }
+		.cms_sideframe-hide { height:30px; top:72px; background-position:-101px -145px; }
+		.cms_sideframe-hide:hover { background-position:-121px -145px; }
+		.cms_sideframe-hidden { background-position:-60px -145px; }
+		.cms_sideframe-hidden:hover { background-position:-80px -145px; }
 		.cms_sideframe-maximize { background-position:-40px -91px; }
 		.cms_sideframe-maximize:hover { background-position:-60px -91px; }
 		.cms_sideframe-minimize { background-position:-60px -111px; }
@@ -232,7 +232,7 @@
 	// #TOOLBAR/pmenu#
 	.cms_placeholders-menu {
 		display:none; position:absolute; left:0; top:0;
-		width:28px; height:28px; padding:0; margin:0 0 0 -31px; cursor:pointer;
+		width:20px; height:20px; padding:0; margin:0 0 0 -31px; cursor:pointer;
 		font-size:11px; line-height:11px; text-align:center; overflow:hidden;
 		@include border-radius(3px);
 	}
@@ -373,13 +373,13 @@
 		.cms_modal-resize { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -117px -67px; }
 		.cms_modal-resize:hover { background-position:-137px -67px; }
 
-		.cms_modal-breadcrumb a { color:$color-grey; background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -228px; }
+		.cms_modal-breadcrumb a { color:$color-grey; background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -200px; }
 		.cms_modal-breadcrumb a span, .cms_modal-breadcrumb-title { color:$color-grey; }
 		.cms_modal-breadcrumb-title { border-right:1px solid $color-grey-10; background:$color-white; }
 		.cms_modal-breadcrumb a span { color:$color-black; }
 
 		.cms_modal-breadcrumb a:hover,
-		.cms_modal-breadcrumb-last { color:$color-black; background-position:right -260px !important; }
+		.cms_modal-breadcrumb-last { color:$color-black; background-position:right -232px !important; }
 		.cms_modal-breadcrumb a:hover span,
 		.cms_modal-breadcrumb-last span { color:$color-black; background-color:$color-white; }
 		.cms_modal-breadcrumb-last span { color:$color-blue !important; }
@@ -401,19 +401,19 @@
 
 	// #TOOLBAR/tooltip#
 	.cms_placeholders-tooltip { color:$color-grey-10;
-		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left -138px;
+		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
 	}
 
 	// #TOOLBAR/pmenu#
 	.cms_placeholders-menu {
-		color:$color-grey; border:1px solid $color-grey-70;
-		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left -202px;
+		color:$color-grey; border:5px solid $color-grey-70;
+		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 1px -150px;
 		@include border-radius(3px);
 	}
-	.cms_placeholders-menu:hover { background-position:-27px -202px; }
+	.cms_placeholders-menu:hover { background-position:-39px -150px; }
 
-	.cms_placeholders-menu-alternate { background-position:-52px -202px; }
-	.cms_placeholders-menu-alternate:hover { background-position:-78px -202px; }
+	.cms_placeholders-menu-alternate { background-position:left -170px; }
+	.cms_placeholders-menu-alternate:hover { background-position:-40px -170px; }
 
 // end of light theme
 }

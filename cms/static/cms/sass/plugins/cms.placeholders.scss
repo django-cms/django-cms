@@ -29,8 +29,8 @@
 // #PLACEHOLDER/subnav#
 .cms_placeholder, body {
 	.cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer;
-		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -184px;
-		&:hover { background-position:-37px -184px; } }
+		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -152px;
+		&:hover { background-position:-37px -152px; } }
 	.cms_submenu-dropdown {
 		display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
 		min-width:140px; max-height:230px; overflow:auto;
@@ -50,7 +50,7 @@
 
 	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:250px; z-index:1000;
 		cursor:default; text-align:right; height:25px; @include border-radius(0 0 3px 3px);
-		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -354px; }
+		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
 	.cms_submenu-quicksearch label { cursor:pointer; padding-right:25px; }
 	.cms_submenu-quicksearch input { font-size:12px; color:white; text-align:right; -webkit-appearance:none;
 		width:111px; padding:2px 1px 2px 5px; border:none; background:none; }
@@ -72,7 +72,7 @@
 
 		// menu overwrites
 		.cms_submenu { display:none; margin-top:2px; }
-		.cms_submenu:hover { background-position:-17px -184px; }
+		.cms_submenu:hover { background-position:-17px -152px; }
 		.cms_submenu-dropdown { right:-1px; top:26px; }
 		.cms_submenu-quicksearch { top:258px; }
 	}
