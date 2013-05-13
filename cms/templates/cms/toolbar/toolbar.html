@@ -47,7 +47,7 @@ CMS.$(document).ready(function () {
 	window.$ = _$;
 </script>
 {% endaddtoblock %}
-<div id="cms_toolbar" class="cms_reset cms_light{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}">
+<div id="cms_toolbar" class="cms_reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}">
 	<!-- start: toolbar -->
 	<div class="cms_toolbar">
 		<div class="cms_toolbar-left">
