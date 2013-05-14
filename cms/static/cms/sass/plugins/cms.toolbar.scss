@@ -118,7 +118,7 @@
 
 	//##################################################################################################################
 	// #TOOLBAR/sidebar#
-	.cms_sideframe { display:none; position:fixed; left:0; top:0; z-index:1; width:0; height:100%; overflow:visible !important; }
+	.cms_sideframe { display:none; position:fixed; left:0; top:0; z-index:999; width:0; height:100%; overflow:visible !important; }
 	.cms_sideframe-frame { position:relative; z-index:10; width:100%; height:100%; overflow:hidden; background:$color-white; }
 	.cms_sideframe iframe { height:100%; width:100%; border:none; background:$color-white; overflow:auto; }
 
@@ -152,7 +152,7 @@
 
 	//##################################################################################################################
 	// #TOOLBAR/clipboard#
-	.cms_clipboard { position:absolute; left:0; top:130px;
+	.cms_clipboard { position:absolute; left:0; top:130px; z-index:99;
 
 		p { pading:0; margin:0; }
 
