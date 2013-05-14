@@ -142,12 +142,25 @@ $(document).ready(function () {
 			// event for switching between edit and layout mode
 			this.menu.bind('click', function (e) {
 				($(this).hasClass('cms_placeholders-menu-alternate')) ? that._enableEditMode(300) : that._enableDragMode(300);
+
 				// reset dragholders
-				// TODO this is new placeholders
 				$('.cms_draggable').removeClass('cms_draggable-selected');
+				$('.cms_plugin').removeClass('cms_plugin-active');
+
 				// attach active class to current element
 				var id = $(this).data('id');
-				$('#cms_draggable-' + id).addClass('cms_draggable-selected');
+				var dragitem = $('#cms_draggable-' + id);
+				var plugin = $('#cms_plugin-' + id);
+
+				// reset classes
+				dragitem.addClass('cms_draggable-selected');
+				plugin.addClass('cms_plugin-active');
+
+				// set new position
+				var pos = plugin.position('body').top;
+				var bound = $(window).height();
+				var offset = 200;
+				if(bound - pos <= 0) $(window).scrollTop(pos - offset);
 			});
 
 			this.modes.eq(0).bind('click', function (e) {

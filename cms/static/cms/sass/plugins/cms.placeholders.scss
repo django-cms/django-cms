@@ -11,7 +11,8 @@
 // #PLACEHOLDER
 .cms_placeholder { padding:5px 5px 0.1px; @include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
-.cms_plugin { display:inline; position:relative; }
+.cms_plugin { display:inline-block; position:relative; }
+.cms_plugin-active { outline:2px solid adjust-hue($color-blue, 15deg); }
 
 //######################################################################################################################
 // #PLACEHOLDER/bar#
