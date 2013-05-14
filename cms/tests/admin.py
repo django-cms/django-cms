@@ -633,7 +633,7 @@ class AdminTests(AdminTestsBase):
             response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk,)))
             self.assertEqual(response.status_code, 302)
             url = response['Location']
-            self.assertTrue(url.endswith('?edit-off'))
+            self.assertTrue(url.endswith('?edit_off'))
 
     def test_remove_plugin_requires_post(self):
         admin = self.get_admin()

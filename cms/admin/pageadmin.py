@@ -879,7 +879,7 @@ class PageAdmin(ModelAdmin):
         path = '../../'
         # TODO: use admin base here!
         if 'admin' not in referrer:
-            path = '%s?edit-off' % referrer.split('?')[0]
+            path = '%s?edit_off' % referrer.split('?')[0]
         return HttpResponseRedirect(path)
 
     #TODO: Make the change form buttons use POST
@@ -903,7 +903,7 @@ class PageAdmin(ModelAdmin):
         path = '../../'
         # TODO: use admin base here!
         if 'admin' not in referer:
-            path = '%s?edit-off' % referer.split('?')[0]
+            path = '%s?edit_off' % referer.split('?')[0]
         return HttpResponseRedirect(path)
 
     @create_revision()
