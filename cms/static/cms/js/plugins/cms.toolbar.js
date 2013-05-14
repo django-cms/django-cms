@@ -25,7 +25,6 @@ $(document).ready(function () {
 			'modalDuration': 300,
 			'modalWidth': 800,
 			'modalHeight': 400,
-			'clipboard': null,
 			'urls': {
 				'settings': '', // url to save settings
 				'css_dialog': '/static/cms/css/plugins/cms.toolbar.dialog.css',
