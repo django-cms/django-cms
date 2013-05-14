@@ -33,6 +33,7 @@ class CMSToolbar(object):
         self.is_staff = self.request.user.is_staff
         self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
+        self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
         if settings.USE_I18N:
             self.language = self.request.LANGUAGE_CODE

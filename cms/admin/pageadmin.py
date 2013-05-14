@@ -2,6 +2,7 @@
 from copy import deepcopy
 from distutils.version import LooseVersion
 from urllib2 import unquote
+from django.template.response import TemplateResponse
 from django.contrib.admin.helpers import AdminForm
 from django.utils import simplejson
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -182,7 +183,8 @@ class PageAdmin(ModelAdmin):
                                 pat(r'copy-plugins/$', self.copy_plugins),
                                 pat(r'add-plugin/$', self.add_plugin),
                                 pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-                                pat(r'delete-plugin/$', self.delete_plugin),
+                                pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
+                                pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
                                 pat(r'move-plugin/$', self.move_plugin),
                                 pat(r'^([0-9]+)/edit-title/$', self.edit_title),
                                 pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
@@ -879,7 +881,7 @@ class PageAdmin(ModelAdmin):
         path = '../../'
         # TODO: use admin base here!
         if 'admin' not in referrer:
-            path = '%s?edit-off' % referrer.split('?')[0]
+            path = '%s?edit_off' % referrer.split('?')[0]
         return HttpResponseRedirect(path)
 
     #TODO: Make the change form buttons use POST
@@ -903,7 +905,7 @@ class PageAdmin(ModelAdmin):
         path = '../../'
         # TODO: use admin base here!
         if 'admin' not in referer:
-            path = '%s?edit-off' % referer.split('?')[0]
+            path = '%s?edit_off' % referer.split('?')[0]
         return HttpResponseRedirect(path)
 
     @create_revision()
@@ -1375,48 +1377,129 @@ class PageAdmin(ModelAdmin):
             helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
         return HttpResponse(str("ok"))
 
-    @require_POST
-    @xframe_options_sameorigin
     @create_revision()
-    def delete_plugin(self, request):
-        if 'history' in request.path:
-            raise Http404()
-        plugin_id = request.POST['plugin_id']
+    @xframe_options_sameorigin
+    def delete_plugin(self, request, plugin_id):
         plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
-
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
-            return HttpResponseForbidden(_("You do not have permission to remove a plugin"))
-
+            return HttpResponseForbidden(_("You do not have permission to delete a plugin"))
         placeholder = plugin.placeholder
         page = placeholder.page if placeholder else None
-
         if page:
             if not page.publisher_is_draft:
                 raise Http404()
             if not page.has_change_permission(request):
-                return HttpResponseForbidden(_("You do not have permission to remove a plugin"))
+                return HttpResponseForbidden(_("You do not have permission to delete a plugin"))
+        plugin_cms_class = plugin.get_plugin_class()
+        plugin_class = plugin_cms_class.model
+        opts = plugin_class._meta
+        using = router.db_for_write(plugin_class)
+        app_label = opts.app_label
+        (deleted_objects, perms_needed, protected) = get_deleted_objects(
+            [plugin], opts, request.user, self.admin_site, using)
 
-            # delete the draft version of the plugin
+        if request.POST: # The user has already confirmed the deletion.
+            if perms_needed:
+                raise PermissionDenied
+            obj_display = force_unicode(plugin)
+            self.log_deletion(request, plugin, obj_display)
             plugin.delete()
-            # set the page to require approval and save
             page.save()
-        else:
-            plugin.delete()
+            plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+            self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
+                'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
+
+            comment = _("%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {
+                'plugin_name': plugin_name,
+                'position': plugin.position,
+                'placeholder': plugin.placeholder,
+            }
+
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+
+            if page and 'reversion' in settings.INSTALLED_APPS:
+                helpers.make_revision_with_plugins(page, request.user, comment)
+                return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
 
         plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
-        comment = _("%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {
-            'plugin_name': plugin_name,
-            'position': plugin.position,
-            'placeholder': plugin.placeholder,
+
+        if perms_needed or protected:
+            title = _("Cannot delete %(name)s") % {"name": plugin_name}
+        else:
+            title = _("Are you sure?")
+
+        context = {
+            "title": title,
+            "object_name": plugin_name,
+            "object": plugin,
+            "deleted_objects": deleted_objects,
+            "perms_lacking": perms_needed,
+            "protected": protected,
+            "opts": opts,
+            "app_label": app_label,
         }
+        return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
+                                current_app=self.admin_site.name)
 
-        moderator.page_changed(page,
-                               force_moderation_action=PageModeratorState.ACTION_CHANGED)
+    @create_revision()
+    @xframe_options_sameorigin
+    def clear_placeholder(self, request, placeholder_id):
+        placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+        if not placeholder.has_delete_permission(request):
+            return HttpResponseForbidden(_("You do not have permission to clear a placeholder"))
+        page = placeholder.page if placeholder else None
+        if page:
+            if not page.publisher_is_draft:
+                raise Http404()
+            if not page.has_change_permission(request):
+                return HttpResponseForbidden(_("You do not have permission to clear this placeholder"))
+        plugins = placeholder.get_plugins()
 
-        if page and 'reversion' in settings.INSTALLED_APPS:
-            helpers.make_revision_with_plugins(page, request.user, comment)
+        opts = Placeholder._meta
+        using = router.db_for_write(Placeholder)
+        app_label = opts.app_label
+        (deleted_objects, perms_needed, protected) = get_deleted_objects(
+            plugins, opts, request.user, self.admin_site, using)
+        obj_display = force_unicode(placeholder)
+        if request.POST: # The user has already confirmed the deletion.
+            if perms_needed:
+                raise PermissionDenied
 
-        return HttpResponse("%s,%s" % (plugin_id, comment))
+            self.log_deletion(request, placeholder, obj_display)
+            for plugin in plugins:
+                plugin.delete()
+            page.save()
+
+            self.message_user(request, _('The placeholder "%(obj)s" was deleted successfully.') % {
+                'obj': force_unicode(obj_display)})
+
+            comment = _('All plugins in the placeholder "%(name)s" were deleted.') % {
+                'name': force_unicode(obj_display)
+            }
+
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+
+            if page and 'reversion' in settings.INSTALLED_APPS:
+                helpers.make_revision_with_plugins(page, request.user, comment)
+                return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
+        if perms_needed or protected:
+            title = _("Cannot delete %(name)s") % {"name": obj_display}
+        else:
+            title = _("Are you sure?")
+
+        context = {
+            "title": title,
+            "object_name": _("placeholder"),
+            "object": placeholder,
+            "deleted_objects": deleted_objects,
+            "perms_lacking": perms_needed,
+            "protected": protected,
+            "opts": opts,
+            "app_label": app_label,
+        }
+        return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
+                                current_app=self.admin_site.name)
+
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':

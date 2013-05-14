@@ -43,6 +43,8 @@ class ToolbarMiddleware(object):
                 request.session['cms_build'] = False
         if 'edit_off' in request.GET and request.session.get('cms_edit', True):
             request.session['cms_edit'] = False
+            if request.session.get('cms_build', False):
+                request.session['cms_build'] = False
         if 'build' in request.GET and not request.session.get('cms_build', False):
             request.session['cms_build'] = True
         request.toolbar = CMSToolbar(request)
