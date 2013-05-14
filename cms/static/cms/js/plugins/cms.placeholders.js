@@ -21,6 +21,7 @@
 				this.bars = this.placeholders.find('.cms_placeholder-bar');
 				this.sortables = $('.cms_draggables'); // use global scope
 				this.clipboard = this.toolbar.find('.cms_clipboard');
+				this.dragging = false;
 
 				// this.dragitems = $('.cms_draggable');
 				this.dropareas = $('.cms_droppable');
@@ -34,7 +35,7 @@
 
 				this._events();
 				this._preventEvents();
-				this._dragging();
+				this._drag();
 				this._clipboard();
 			},
 
@@ -88,6 +89,9 @@
 				// clear timer
 				clearTimeout(this.timer);
 
+				// cancel menu when dragging
+				if(this.dragging) return false;
+
 				// handle class handling
 				if(el.hasClass('cms_draggable')) this.menu.addClass('cms_placeholders-menu-alternate');
 
@@ -140,7 +144,7 @@
 				return id;
 			},
 
-			_dragging: function () {
+			_drag: function () {
 				var that = this;
 				var dropped = false;
 				var droparea = null;
@@ -179,10 +183,14 @@
 						return that.state;
 					},
 					'start': function () {
+						that.dragging = true;
 						// show empty
 						$('.cms_droppable-empty-wrapper').slideDown(200);
+						// ensure all menus are closed
+						$('.cms_submenu').hide();
 					},
 					'stop': function (event, ui) {
+						that.dragging = false;
 						// hide empty
 						$('.cms_droppable-empty-wrapper').slideUp(200);
 
