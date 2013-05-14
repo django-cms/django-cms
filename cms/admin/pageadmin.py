@@ -1404,22 +1404,23 @@ class PageAdmin(ModelAdmin):
             obj_display = force_unicode(plugin)
             self.log_deletion(request, plugin, obj_display)
             plugin.delete()
-            page.save()
+
             plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
                 'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
+            if page:
+                page.save()
+                comment = _("%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {
+                    'plugin_name': plugin_name,
+                    'position': plugin.position,
+                    'placeholder': plugin.placeholder,
+                }
 
-            comment = _("%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {
-                'plugin_name': plugin_name,
-                'position': plugin.position,
-                'placeholder': plugin.placeholder,
-            }
+                moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
 
-            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
-
-            if page and 'reversion' in settings.INSTALLED_APPS:
-                helpers.make_revision_with_plugins(page, request.user, comment)
-                return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
+                if 'reversion' in settings.INSTALLED_APPS:
+                    helpers.make_revision_with_plugins(page, request.user, comment)
+                    return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
 
         plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
 
@@ -1468,19 +1469,19 @@ class PageAdmin(ModelAdmin):
             self.log_deletion(request, placeholder, obj_display)
             for plugin in plugins:
                 plugin.delete()
-            page.save()
-
             self.message_user(request, _('The placeholder "%(obj)s" was deleted successfully.') % {
                 'obj': force_unicode(obj_display)})
+            if page:
+                page.save()
 
-            comment = _('All plugins in the placeholder "%(name)s" were deleted.') % {
-                'name': force_unicode(obj_display)
-            }
+                comment = _('All plugins in the placeholder "%(name)s" were deleted.') % {
+                    'name': force_unicode(obj_display)
+                }
 
-            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+                moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
 
-            if page and 'reversion' in settings.INSTALLED_APPS:
-                helpers.make_revision_with_plugins(page, request.user, comment)
+                if 'reversion' in settings.INSTALLED_APPS:
+                    helpers.make_revision_with_plugins(page, request.user, comment)
                 return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": obj_display}

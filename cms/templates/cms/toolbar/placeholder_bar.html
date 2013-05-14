@@ -1,4 +1,5 @@
 {% load i18n sekizai_tags %}
+{% load url from future %}
 
 {% regroup installed_plugins by module as module_list %}
 <div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar">
@@ -7,11 +8,12 @@
 		<ul class="cms_submenu-dropdown">
 			<li><span>{% trans "Settings" %}</span></li>
 			<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
+			<li><a data-rel="sideframe" href="{% url "admin:cms_page_clear_placeholder" placeholder.pk %}">{% trans "Empty" %}</a></li>
 			<li><a data-rel="modal" href="#">{% trans "Stack" %}</a></li>
 			{% for module in module_list %}
 			<li><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></li>
 			{% for p in module.list %}
-			<li><a data-rel="custom" href="#{{ p.value }}">{{ p.name }}</a></li>
+			<li><a data-rel="add" href="{{ p.value }}">{{ p.name }}</a></li>
 			{% endfor %}
 			{% endfor %}
 		</ul>
@@ -32,7 +34,9 @@ CMS.$(document).ready(function () {
 		'plugin_restriction': [{% for module in module_list %}{% for p in module.list %}"{{ p.value }}"{% if not forloop.last or not forloop.parentloop.last %}, {% endif %}{% endfor %}{% endfor %}],
 		'urls': {
 			'add_plugin': '{{ placeholder.get_add_url }}',
-			'edit_plugin': '{{ placeholder.get_changelist_url }}'
+			'edit_plugin': '{{ placeholder.get_changelist_url }}',
+			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}',
+			'stack_plugin': ''
 		}
 	});
 });
