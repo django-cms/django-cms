@@ -241,11 +241,11 @@
 				triggers.bind('click mouseenter', function (e) {
 					e.preventDefault();
 
-					containers.stop().css({ 'left': -position });
-					containers.eq(triggers.index(this)).stop().animate({ 'left': 0 }, speed);
+					containers.stop().css({ 'margin-left': -position });
+					containers.eq(triggers.index(this)).stop().animate({ 'margin-left': 0 }, speed);
 				});
 				containers.bind('mouseleave', function () {
-					containers.stop().css({ 'left': -position });
+					containers.stop().css({ 'margin-left': -position });
 				});
 			},
 

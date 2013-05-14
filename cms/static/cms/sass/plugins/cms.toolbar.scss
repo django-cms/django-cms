@@ -172,11 +172,12 @@
 		.cms_clipboard-triggers { position:relative; z-index:999; }
 
 		.cms_clipboard-containers { position:absolute; top:0; left:-1px; z-index:99; width:0; }
-		.cms_clipboard-containers li { left:-220px; width:190px; }
+		.cms_clipboard-containers li { margin-left:-220px; width:190px; }
 
 		// custom style for draggable item
 		.cms_draggable { border:1px solid $color-grey-70; @include border-radius(0 3px 3px 0); }
 		.cms_draggable .cms_dragitem { padding-left:20px; }
+		.cms_draggable .cms_dragitem .cms_submenu { display:none !important; }
 	}
 
 	//##################################################################################################################
