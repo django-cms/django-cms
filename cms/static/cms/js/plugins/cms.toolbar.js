@@ -20,7 +20,7 @@ $(document).ready(function () {
 				'mode': 'edit' // live, draft, edit or layout
 			},
 			'sidebarDuration': 300,
-			'sidebarWidth': 275,
+			'sidebarWidth': 320,
 			'dialogDuration': 300,
 			'modalDuration': 300,
 			'modalWidth': 800,
@@ -184,7 +184,7 @@ $(document).ready(function () {
 
 			// attach event to the sidebar
 			this.sideframe.find('.cms_sideframe-close').bind('click', function () {
-				that._hideSideframe(true);
+				that.closeSideframe(true);
 			});
 
 			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
@@ -193,7 +193,7 @@ $(document).ready(function () {
 					that._showSideframe(that.options.sidebarWidth);
 				} else {
 					$(this).addClass('cms_sideframe-hidden');
-					that._hideSideframe(false);
+					that._hideSideframe();
 				}
 			});
 
@@ -409,16 +409,17 @@ $(document).ready(function () {
 			}
 		},
 
+		closeSideframe: function () {
+			this._hideSideframe(true);
+		},
+
 		openAjax: function (url, post) {
 			var that = this;
-            var data = {};
-            if (post){
-                data =  JSON.parse(post);
-            }
+
 			$.ajax({
 				'type': 'POST',
 				'url': url,
-				'data': data,
+				'data': (post) ? JSON.parse(post) : {},
 				'success': function () {
 					window.location.reload();
 				},
