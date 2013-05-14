@@ -17,20 +17,8 @@ from cms.utils.urlutils import any_path_re
 ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
 
-
-def use_draft(request):
-    """
-    Decision function to determine if the drafts or public pages should be used
-    Public models are used unless looking at preview or edit versions of the page.
-    """
-    preview_draft = 'preview' in request.GET and 'draft' in request.GET
-    edit_mode = 'edit' in request.GET
-    authenticated = request.user.is_authenticated() and request.user.is_staff
-    return (preview_draft or edit_mode) and authenticated
-
-
 def get_page_queryset(request=None):
-    if request and use_draft(request):
+    if request and request.toolbar.use_draft:
         return Page.objects.drafts()
 
     return Page.objects.public()
@@ -127,7 +115,7 @@ def get_page_from_request(request, use_path=None):
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
 
-    draft = use_draft(request)
+    draft = request.toolbar.use_draft
     preview = 'preview' in request.GET
 
     # If use_path is given, someone already did the path cleaning

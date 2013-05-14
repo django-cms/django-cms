@@ -1,0 +1,12 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load i18n %}
+{% load url from future %}
+{% load admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ app_label|capfirst }}</a>
+&rsaquo; {% trans 'Delete' %}
+</div>
+{% endblock %}
