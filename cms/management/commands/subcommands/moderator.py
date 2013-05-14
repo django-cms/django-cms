@@ -3,6 +3,7 @@ from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import CMSPlugin
 from cms.models.pagemodel import Page
 from django.core.management.base import NoArgsCommand
+from django.db import transaction
 
 
 class ModeratorOnCommand(NoArgsCommand):
@@ -21,11 +22,17 @@ class ModeratorOnCommand(NoArgsCommand):
         have the same plugins listed. If both versions exist and have content,
         the public page has precedence. Otherwise, the draft version is used.
         """
-        for page in Page.objects.public():
-            if CMSPlugin.objects.filter(placeholder__page=page).count():
-                page.publisher_draft.revert()
-        for page in Page.objects.drafts().filter(published=True):
-            page.publish()
+        with transaction.commit_on_success():
+            pages_public = list(Page.objects.public())
+            for i, page in enumerate(pages_public):
+                self.stdout.write("Stage 1: Processing page %s - %d / %d"  % (page, i, len(pages_public)))
+                if CMSPlugin.objects.filter(placeholder__page=page).count():
+                    page.publisher_draft.revert()
+
+            pages_drafts = list(Page.objects.drafts().filter(published=True))
+            for i, page in enumerate(pages_drafts):
+                self.stdout.write("Stage 2: Processing page '%s:%s' - %d / %d " % (page.id, page, i, len(pages_drafts)))
+                page.publish()
 
 
 class ModeratorCommand(SubcommandsCommand):
