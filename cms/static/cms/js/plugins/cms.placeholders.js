@@ -234,7 +234,8 @@
 				// add remove event
 				remove.bind('click', function (e) {
 					e.preventDefault();
-					// TODO remove all entries
+
+					CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
 				});
 
 				// add events to paste

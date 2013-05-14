@@ -126,7 +126,7 @@ CMS.$(document).ready(function () {
 				{% endif %}
 			{% endfor %}
 		</ul>
-		<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post="{}">{% trans "Empty Clipboard" %}</a></p>
+		<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>{% trans "Empty Clipboard" %}</a></p>
 	</div>
 	<!-- end: clipboard -->
 	{% endwith %}
