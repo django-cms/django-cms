@@ -29,7 +29,7 @@ CMS.$(document).ready(function () {
 		'type': 'bar',
 		'placeholder_id': '{{ placeholder.pk }}',
 		'plugin_language': '{{ language }}', // todo not required should be within backend
-		'plugin_restriction': [{% for module in module_list %}{% for p in module.list %}"{{ p.value }}"{% if not forloop.last and forloop.parentloop.last %}, {% endif %}{% endfor %}{% endfor %}],
+		'plugin_restriction': [{% for module in module_list %}{% for p in module.list %}"{{ p.value }}"{% if not forloop.last or not forloop.parentloop.last %}, {% endif %}{% endfor %}{% endfor %}],
 		'urls': {
 			'add_plugin': '{{ placeholder.get_add_url }}',
 			'edit_plugin': '{{ placeholder.get_changelist_url }}'
