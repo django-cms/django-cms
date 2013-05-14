@@ -216,7 +216,8 @@ class PageToolbar(CMSToolbar):
         admin_items.items.append(
             Item(reverse('admin:cms_usersettings_change'), _('Settings'), load_side_frame=True))
         admin_items.items.append(Break())
-        admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True, active=True))
+        admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True,
+            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])}, active=True))
         return admin_items
 
     def get_mode_switchers(self):

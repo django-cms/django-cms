@@ -457,8 +457,6 @@
 					if(e.type === 'blur') {
 						that.focused = false;
 						that._hideSubnav(nav);
-						that._searchSubnav(nav, '');
-						$(this).val('');
 					}
 					if(e.type === 'keyup') {
 						clearTimeout(that.timer);
@@ -491,6 +489,7 @@
 			},
 
 			_hideSubnav: function (nav) {
+				var that = this;
 				// cancel if quicksearch is focues
 				if(this.focused) return false;
 
@@ -499,6 +498,9 @@
 					nav.parents().andSelf().css('z-index', 99);
 					nav.find('> ul').hide();
 					nav.find('.cms_submenu-quicksearch').hide();
+					// reset search
+					nav.find('input').val('');
+					that._searchSubnav(nav, '');
 				}, this.timeout);
 			},
 
