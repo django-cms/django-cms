@@ -117,8 +117,8 @@ CMS.$(document).ready(function () {
 			{% endfor %}
 		</ul>
 		{% for plugin in request.toolbar.get_clipboard_plugins %}
-		<div class="cms_plugins">{{ plugins }}</div>
-		{% endif %}
+		<div class="cms_plugins">{% include "cms/toolbar/plugin.html" with instance=plugin %}</div>
+		{% endfor %}
 		<ul class="cms_clipboard-containers cms_draggables">
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
 				{% if forloop.counter <= 5 %}
