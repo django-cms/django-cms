@@ -24,7 +24,7 @@
 // #TOOLBAR#
 #cms_toolbar { position:absolute; left:0; top:0; z-index:9999999; width:100%; }
 #cms_toolbar {
-	.cms_toolbar { position:fixed; left:0; top:0; z-index:99999; width:100%; min-width:320px;
+	.cms_toolbar { position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px;
 		border-bottom:1px solid $color-grey !important; background:$color-grey-5;
 		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2)); }
 	.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
@@ -138,14 +138,45 @@
 
 		.cms_sideframe-close { background-position:-80px -90px; }
 		.cms_sideframe-close:hover { background-position:-100px -90px; }
-		.cms_sideframe-hide { height:30px; top:72px; background-position:-101px -145px; }
-		.cms_sideframe-hide:hover { background-position:-121px -145px; }
-		.cms_sideframe-hidden { background-position:-60px -145px; }
-		.cms_sideframe-hidden:hover { background-position:-80px -145px; }
+		.cms_sideframe-hide { background-position:-101px -150px; }
+		.cms_sideframe-hide:hover { background-position:-121px -150px; }
+		.cms_sideframe-hidden { background-position:-60px -150px; }
+		.cms_sideframe-hidden:hover { background-position:-80px -150px; }
 		.cms_sideframe-maximize { background-position:-40px -91px; }
 		.cms_sideframe-maximize:hover { background-position:-60px -91px; }
 		.cms_sideframe-minimize { background-position:-60px -111px; }
 		.cms_sideframe-minimize:hover { background-position:-60px -91px; }
+
+		.cms_sideframe-hide { border:5px solid $color-grey-70; border-left:none; border-right:none; }
+	}
+
+	//##################################################################################################################
+	// #TOOLBAR/clipboard#
+	.cms_clipboard { position:absolute; left:0; top:130px;
+
+		p { pading:0; margin:0; }
+
+		ul li { margin:0 0 2px; }
+		ul a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
+			border:5px solid $color-grey-70; border-left:none; border-right:none;
+			background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left -130px;
+			&:hover, &:active, &:focus { background-color:$color-grey-90; background-position:-20px -130px; }
+		}
+
+		.cms_clipboard-empty a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
+			background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left -110px; cursor:pointer;
+			&:hover, &:active, &:focus { background-color:$color-grey-90; background-position:-20px -110px; }
+		}
+
+		// placeholders
+		.cms_clipboard-triggers { position:relative; z-index:999; }
+
+		.cms_clipboard-containers { position:absolute; top:0; left:-1px; z-index:99; width:0; }
+		.cms_clipboard-containers li { left:-220px; width:190px; }
+
+		// custom style for draggable item
+		.cms_draggable { border:1px solid $color-grey-70; @include border-radius(0 3px 3px 0); }
+		.cms_draggable .cms_dragitem { padding-left:20px; }
 	}
 
 	//##################################################################################################################

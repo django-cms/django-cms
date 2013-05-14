@@ -31,6 +31,8 @@
 	.cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer;
 		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -152px;
 		&:hover { background-position:-37px -152px; } }
+
+		.cms_submenu-lang { float:right; color:white; padding:0 5px; background:$color-grey-70; @include border-radius(3px); }
 	.cms_submenu-dropdown {
 		display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
 		min-width:140px; max-height:230px; overflow:auto;

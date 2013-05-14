@@ -1,4 +1,4 @@
-{% load i18n sekizai_tags cms_js_tags cms_admin %}
+{% load i18n sekizai_tags cms_js_tags cms_admin cms_tags %}{% load url from future %}
 {% addtoblock "js" %}
 <script type="text/javascript">
 	var _jQuery = window.jQuery || null;
@@ -25,6 +25,7 @@ CMS.$(document).ready(function () {
 			'toolbar': 'expanded',
 			'mode': 'edit'
 		},
+		'clipboard': {{ request.toolbar.clipboard.pk }},
 		'lang': {
 			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
 			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
@@ -102,9 +103,34 @@ CMS.$(document).ready(function () {
 	</div>
 	<!-- end: sidebar -->
 
+	{% if request.toolbar.get_clipboard_plugins %}
+	{% with slot="clipbaord" %}
 	<!-- start: clipboard -->
-	<div class="cms_clipboard"></div>
+	<div class="cms_clipboard ">
+		<ul class="cms_clipboard-triggers">
+			<!-- maximum of 5 -->
+			<!-- delete link -->
+			{% for plugin in request.toolbar.get_clipboard_plugins %}
+				{% if forloop.counter <= 5 %}
+				<li><a href="#">{{ forloop.index }}</a></li>
+				{% endif %}
+			{% endfor %}
+		</ul>
+		{% for plugin in request.toolbar.get_clipboard_plugins %}
+		<div class="cms_plugins">{{ plugins }}</div>
+		{% endif %}
+		<ul class="cms_clipboard-containers cms_draggables">
+			{% for plugin in request.toolbar.get_clipboard_plugins %}
+				{% if forloop.counter <= 5 %}
+				{% with show_language="true" %}{% include "cms/toolbar/draggable_item.html" with plugin=plugin %}{% endwith %}
+				{% endif %}
+			{% endfor %}
+		</ul>
+		<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post="{}">{% trans "Empty Clipboard" %}</a></p>
+	</div>
 	<!-- end: clipboard -->
+	{% endwith %}
+	{% endif %}
 
 	<!-- start: dialog -->
 	<div class="cms_dialog">
