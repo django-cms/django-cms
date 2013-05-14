@@ -20,15 +20,17 @@
 	jQuery(document).ready(function (){
         var title= jQuery('#id_title');
         var slug = jQuery('#id_slug');
-        var update = function(){
-            var value = title.val();
-            if (window.UNIHANDECODER){
-                value = UNIHANDECODER.decode(value);
-            }
-            slug.val(URLify(value, 64));
-        };
-		title.keyup(update);
-        update();
+		if (title.length > 0 && slug.length > 0) {
+			var update = function(){
+				var value = title.val();
+				if (window.UNIHANDECODER){
+					value = UNIHANDECODER.decode(value);
+				}
+				slug.val(URLify(value, 64));
+			};
+			title.keyup(update);
+			update();
+		}
 	});
 
 //]]>
