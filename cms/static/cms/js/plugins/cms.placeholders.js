@@ -545,10 +545,9 @@
 				// we need to hide previous menu
 				$('.cms_submenu > ul').hide()
 					.parent().css('z-index', 0).end()
-					.parents('.cms_placeholder').andSelf().css('z-index', 0);
-
+					.parentsUntil('.cms_placeholder').andSelf().css('z-index', 0);
 				nav.parent().css('z-index', 9999);
-				nav.parents('.cms_placeholder').andSelf().css('z-index', 999);
+				nav.parentsUntil('.cms_placeholder').andSelf().css('z-index', 999);
 				nav.find('> ul').show();
 				// show quicksearch only at a certain height
 				if(nav.find('> ul').height() >= 230) {
@@ -565,7 +564,7 @@
 
 				this.timer = setTimeout(function () {
 					nav.parent().css('z-index', 999);
-					nav.parents('.cms_placeholder').andSelf().css('z-index', 99);
+					nav.parentsUntil('.cms_placeholder').andSelf().css('z-index', 99);
 					nav.find('> ul').hide();
 					nav.find('.cms_submenu-quicksearch').hide();
 					// reset search
