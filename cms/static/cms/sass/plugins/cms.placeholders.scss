@@ -110,10 +110,8 @@
 	.cms_draggable-disallowed, .cms_draggable-hover-disallowed {
 		color:saturate($color-red, 80%); border:1px dashed saturate($color-red, 80%);
 		background:rgba(255, 0, 0, 0.1); }
-
-	// clipboard fixes
-	> .cms_draggable { margin-left:0 !important; }
 }
+.cms_placeholder .cms_draggables .cms_draggable { margin-left:0 !important; }
 
 //##################################################
 // #RETINA#

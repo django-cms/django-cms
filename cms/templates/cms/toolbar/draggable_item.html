@@ -16,7 +16,8 @@
 			<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
 		</div>
 
-		<strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}{% if show_language %}<span class="cms_submenu-lang">{{ plugin.language }}</span>{% endif %}
+		{% if show_language %}<span class="cms_submenu-lang">{{ plugin.language }}</span>{% endif %}
+		<span class="cms_dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
 		{% endlanguage %}
 	</div>
 
