@@ -32,7 +32,7 @@ $(document).ready(function () {
 			},
 			'lang': {
 				'confirm': 'Yes',
-				'cancel': 'No'
+				'cancel': 'Cancel'
 			}
 		},
 
@@ -384,7 +384,7 @@ $(document).ready(function () {
 			this._showdialog();
 		},
 
-		openModal: function (url, name, breadcrumb, buttons) {
+		openModal: function (url, name, breadcrumb) {
 			// prepare iframe
 			var that = this;
 
@@ -400,6 +400,9 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialog + '" />'));
 
+				// set modal buttons
+				that._setModalButtons($(this));
+
 				// than show
 				iframe.show();
 			});
@@ -412,7 +415,7 @@ $(document).ready(function () {
 
 			// set correct title
 			var title = this.modal.find('.cms_modal-title');
-				title.text(name);
+				title.html(name || '&nbsp;');
 
 			// insure modal is not maximized
 			if(this.modal.find('.cms_modal-collapsed').length) this._minimizeModal();
@@ -433,16 +436,10 @@ $(document).ready(function () {
 			this.maximized = false;
 
 			// we need to render the breadcrumb
-			var crumb = '';
+			this._setModalBreadcrumb(breadcrumb);
 
-			$.each(breadcrumb, function (index, item) {
-				// check if the item is the last one
-				var last = (index >= breadcrumb.length - 1) ? 'cms_modal-breadcrumb-last' : '';
-				// render breadcrumb
-				crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
-			});
-
-			this.modal.find('.cms_modal-breadcrumb-items').html(crumb);
+			// empty buttons
+			this.modal.find('.cms_modal-buttons').html('');
 
 			// display modal
 			this._showModal(this.options.modalDuration);
@@ -757,6 +754,78 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-shim').hide();
 
 			$(document).unbind('mousemove.cms');
+		},
+
+		_setModalBreadcrumb: function (breadcrumb) {
+			var bread = this.modal.find('.cms_modal-breadcrumb');
+			var crumb = '';
+
+			// cancel if there is no breadcrumb)
+			if(!breadcrumb || breadcrumb.length <= 0) return false;
+
+			// load breadcrumb
+			$.each(breadcrumb, function (index, item) {
+				// check if the item is the last one
+				var last = (index >= breadcrumb.length - 1) ? 'cms_modal-breadcrumb-last' : '';
+				// render breadcrumb
+				crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
+			});
+
+			// attach elements
+			bread.find('.cms_modal-breadcrumb-items').html(crumb);
+
+			// show breadcrumb
+			bread.show();
+		},
+
+		_setModalButtons: function (iframe) {
+			var that = this;
+			var row = iframe.contents().find('.submit-row');
+			var buttons = row.find('input, a');
+			var render = $('<div />');
+
+			// loop over input buttons
+			buttons.each(function (index, item) {
+				item = $(item);
+
+				// cancel if item is a hidden input
+				if(item.attr('type') === 'hidden') return false;
+
+				// create helper variables
+				var title = item.attr('value') || item.text();
+				var cls = 'cms_modal-btn';
+
+				// set additional css classes
+				if(item.hasClass('default')) cls = 'cms_modal-btn cms_modal-btn-action';
+				if(item.hasClass('deletelink')) cls = 'cms_modal-btn cms_modal-btn-caution';
+
+				// create the element
+				var el = $('<div class="'+cls+'" data-name="'+item.attr('name')+'" data-url="'+item.attr('href')+'">'+title+'</div>');
+					el.bind('click', function () {
+						var input = row.find('input[name="'+$(this).attr('data-name')+'"]');
+						if(input.length) input.click();
+
+						var anchor = row.find('a[href="'+$(this).attr('data-url')+'"]');
+						if(anchor.length) iframe.attr('src', iframe.attr('src') + anchor.attr('href'));
+					});
+
+				// append element
+				render.append(el);
+			});
+
+			// manually add cancel button at the end
+			var cancel = $('<div class="cms_modal-btn">'+this.options.lang.cancel+'</div>');
+				cancel.bind('click', function () {
+					that.closeModal();
+				});
+			render.append(cancel);
+
+			// unwrap helper and ide row
+			render.unwrap('<div>');
+			row.hide();
+
+			// render buttons
+			this.modal.find('.cms_modal-buttons').html(render);
 		},
 
 		_saveModal: function () {
