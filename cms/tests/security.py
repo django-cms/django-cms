@@ -91,7 +91,7 @@ class SecurityTests(CMSTestCase):
         self.assertEqual(plugin.body, 'body')
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username='staff', password='staff')
-        response = self.client.post(URL_CMS_PLUGIN_REMOVE, plugin_data)
+        response = self.client.post(URL_CMS_PLUGIN_REMOVE + "%s/" % plugin.pk, plugin_data)
         # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 1)

@@ -241,6 +241,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(edit_url, data)
         self.assertEquals(response.status_code, 200)
+        print response
         txt = Text.objects.all()[0]
         self.assertEquals('<div class="someclass"></div><p>foo</p>', txt.body)
 
