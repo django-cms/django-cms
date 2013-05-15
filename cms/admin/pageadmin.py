@@ -1376,8 +1376,7 @@ class PageAdmin(ModelAdmin):
                 plugin.save()
 
         if page and 'reversion' in settings.INSTALLED_APPS:
-            moderator.page_changed(page,
-                               force_moderation_action=PageModeratorState.ACTION_CHANGED)
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
         return HttpResponse(str("ok"))
 
