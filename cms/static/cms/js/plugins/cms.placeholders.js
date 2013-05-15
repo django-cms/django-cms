@@ -232,29 +232,46 @@
 			},
 
 			_clipboard: function () {
-				var that = this;
 				var remove = this.clipboard.find('.cms_clipboard-empty a');
 				var triggers = this.clipboard.find('.cms_clipboard-triggers a');
 				var containers = this.clipboard.find('.cms_clipboard-containers > li');
 				var position = 220;
 				var speed = 100;
+				var timer = function () {};
 
 				// add remove event
 				remove.bind('click', function (e) {
 					e.preventDefault();
-
 					CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
 				});
 
-				// add events to paste
+				// add animation events
 				triggers.bind('click mouseenter', function (e) {
 					e.preventDefault();
 
-					containers.stop().css({ 'margin-left': -position });
-					containers.eq(triggers.index(this)).stop().animate({ 'margin-left': 0 }, speed);
+					// clear timeout
+					clearTimeout(timer);
+
+					var el = containers.eq(triggers.index(this));
+					// cancel if element is already open
+					if(el.data('open') === true) return false;
+
+					// show element
+					containers.stop().css({ 'margin-left': -position }).data('open', false);
+					el.stop().animate({ 'margin-left': 0 }, speed);
+					el.data('open', true);
 				});
-				containers.bind('mouseleave', function () {
-					containers.stop().css({ 'margin-left': -position });
+				containers.add(triggers).bind('mouseenter mouseleave', function (e) {
+					// clear timeout
+					clearTimeout(timer);
+
+					// cancel if we trigger mouseover
+					if(e.type === 'mouseenter') return false;
+
+					// we need a little timer to detect if we should hide the menu
+					timer = setTimeout(function () {
+						containers.stop().css({ 'margin-left': -position }).data('open', false);
+					}, speed);
 				});
 			},
 
