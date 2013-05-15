@@ -478,6 +478,9 @@ $(document).ready(function () {
 			this.modes.parent().removeClass('active').eq(0).addClass('active');
 			this.settings.mode = 'edit';
 
+			// hide clipboard if in edit mode
+			this.container.find('.cms_clipboard').hide();
+
 			if(!init) this.setSettings();
 		},
 
@@ -490,6 +493,9 @@ $(document).ready(function () {
 			// set active item
 			this.modes.parent().removeClass('active').eq(1).addClass('active');
 			this.settings.mode = 'drag';
+
+			// show clipboard in build mode
+			this.container.find('.cms_clipboard').fadeIn(speed);
 
 			if(!init) this.setSettings();
 		},
