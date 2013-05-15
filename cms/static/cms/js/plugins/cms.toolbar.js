@@ -19,6 +19,7 @@ $(document).ready(function () {
 				'toolbar': 'expanded', // expanded or collapsed
 				'mode': 'edit' // live, draft, edit or layout
 			},
+			'clipboard': null,
 			'sidebarDuration': 300,
 			'sidebarWidth': 320,
 			'dialogDuration': 300,

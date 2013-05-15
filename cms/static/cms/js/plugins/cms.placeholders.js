@@ -480,6 +480,9 @@ $(document).ready(function () {
 				'data': data,
 				'success': function (response) {
 					if(response === 'success') that._showSuccess(dragitem);
+
+					// determin if we should refresh
+					// if(parseInt(that.options.placeholder_id) === parseInt(CMS.API.Toolbar.options.clipboard)) CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
 					var msg = 'An error occured during the update.';
