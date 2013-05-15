@@ -187,7 +187,7 @@
 						// show empty
 						$('.cms_droppable-empty-wrapper').slideDown(200);
 						// ensure all menus are closed
-						$('.cms_submenu').hide();
+						$('.cms_dragitem .cms_submenu').hide();
 					},
 					'stop': function (event, ui) {
 						that.dragging = false;
