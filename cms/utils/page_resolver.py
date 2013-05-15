@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
+from cms.utils.moderator import use_draft
 import re
 
 from django.conf import settings
@@ -17,8 +18,9 @@ from cms.utils.urlutils import any_path_re
 ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
 
+
 def get_page_queryset(request=None):
-    if request and request.toolbar.use_draft:
+    if request and use_draft(request):
         return Page.objects.drafts()
 
     return Page.objects.public()
@@ -67,7 +69,7 @@ def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
         home = pages.get_home(site=site)
     except NoHomeFound:
         home = None
-    # if there is no path (slashes stripped) and we found a home, this is the
+        # if there is no path (slashes stripped) and we found a home, this is the
     # home page.
     if not path and home:
         page = home
@@ -115,7 +117,7 @@ def get_page_from_request(request, use_path=None):
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
 
-    draft = request.toolbar.use_draft
+    draft = use_draft(request)
     preview = 'preview' in request.GET
 
     # If use_path is given, someone already did the path cleaning
@@ -131,7 +133,7 @@ def get_page_from_request(request, use_path=None):
             admin_base = None
         if path.startswith(pages_root) and (not admin_base or not path.startswith(admin_base)):
             path = path[len(pages_root):]
-        # and strip any final slash
+            # and strip any final slash
         if path.endswith("/"):
             path = path[:-1]
 
@@ -151,11 +153,11 @@ def is_valid_url(url, instance, create_links=True, site=None):
         # Url sanity check via regexp
         if not any_path_re.match(url):
             raise ValidationError(_('Invalid URL, use /my/url format.'))
-        # We only check page FK to site object to allow is_valid_url check on
+            # We only check page FK to site object to allow is_valid_url check on
         # incomplete Page instances
         if not site and instance.site_id:
             site = instance.site
-        # Retrieve complete queryset of pages with corresponding URL
+            # Retrieve complete queryset of pages with corresponding URL
         # This uses the same resolving function as ``get_page_from_path``
         if url.startswith(page_root):
             url = url[len(page_root):]
@@ -184,6 +186,6 @@ def is_valid_url(url, instance, create_links=True, site=None):
                 raise ValidationError(mark_safe(
                     ungettext_lazy('Page %(pages)s has the same url \'%(url)s\' as current page "%(instance)s".',
                                    'Pages %(pages)s have the same url \'%(url)s\' as current page "%(instance)s".',
-                                    len(url_clashes)) %
+                                   len(url_clashes)) %
                     {'pages': ', '.join(url_clashes), 'url': url, 'instance': instance}))
     return True

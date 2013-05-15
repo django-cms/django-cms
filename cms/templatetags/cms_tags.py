@@ -11,6 +11,7 @@ from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting
 from cms.utils.i18n import force_language
+from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from django import template
@@ -87,7 +88,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     try:
         if 'pk' in page_lookup:
             page = Page.objects.all().get(**page_lookup)
-            if request and request.toolbar.use_draft:
+            if request and use_draft(request):
                 if page.publisher_is_draft:
                     return page
                 else:

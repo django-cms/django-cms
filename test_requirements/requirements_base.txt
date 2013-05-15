@@ -10,6 +10,6 @@ django-sekizai>=0.7
 argparse
 dj-database-url
 transifex-client
-djangocms-text-ckeditor>=1.0.9
 djangocms-admin-style
+-e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangcms-text-ckeditor
 -e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad

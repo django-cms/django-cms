@@ -14,14 +14,14 @@ from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
 from cms.plugins.link.models import Link
 from cms.plugins.picture.models import Picture
-from cms.plugins.text.models import Text
-from cms.plugins.text.utils import (plugin_tags_to_id_list, plugin_tags_to_admin_html)
+from djangocms_text_ckeditor.models import Text
+from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
 from cms.plugins.twitter.models import TwitterRecentEntries
 from cms.test_utils.project.pluginapp.models import Article, Section
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel)
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, \
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, \
     URL_CMS_PLUGIN_HISTORY_EDIT
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -355,9 +355,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_data = {
             'plugin_id': self.get_response_pk(response)
         }
-        remove_url = URL_CMS_PLUGIN_REMOVE
+        remove_url = URL_CMS_PLUGIN_REMOVE + "%s/" % self.get_response_pk(response)
         response = self.client.post(remove_url, plugin_data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
         # there should be no plugins
         self.assertEquals(0, CMSPlugin.objects.all().count())
 
@@ -395,9 +395,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_data = {
             'plugin_id': plugin_id
         }
-        remove_url = URL_CMS_PLUGIN_REMOVE
+        remove_url = URL_CMS_PLUGIN_REMOVE + "%s/" % plugin_id
         response = self.client.post(remove_url, plugin_data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
 
         # there should be no plugins
         self.assertEquals(CMSPlugin.objects.all().count(), 1)
@@ -559,12 +559,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         text_plugin.save()
         txt = text_plugin.text
         ph = Placeholder.objects.get(pk=ph.pk)
-        with self.assertNumQueries(2):
-            # 1 query for the CMSPlugin objects,
-            # 1 query for each type of child object (1 in this case, all are Link plugins)
-            txt.body = plugin_tags_to_admin_html(
-                '\n'.join(["{{ plugin_object %d }}" % l.cmsplugin_ptr_id
-                    for l in link_plugins]))
+        txt.body = '\n'.join(['<img id="plugin_obj_%d" src=""/>' % l.cmsplugin_ptr_id for l in link_plugins])
         txt.save()
         text_plugin = self.reload(text_plugin)
 
@@ -615,8 +610,8 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         plugin_ref_2.save()
 
-        plugin.body = plugin_tags_to_admin_html(
-            ' {{ plugin_object %s }} {{ plugin_object %s }} ' % (str(plugin_ref_1.pk), str(plugin_ref_2.pk)))
+        plugin.body = ' <img id="plugin_obj_%s" src=""/><img id="plugin_obj_%s" src=""/>' % (
+            str(plugin_ref_1.pk), str(plugin_ref_2.pk))
         plugin.save()
 
         page_data = self.get_new_page_data()

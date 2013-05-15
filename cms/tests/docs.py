@@ -17,6 +17,7 @@ DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, '..', 'docs'))
 
 
 def has_no_internet():
+    return True
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('4.4.4.2', 80))

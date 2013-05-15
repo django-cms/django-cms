@@ -1,9 +1,8 @@
 from __future__ import with_statement
 from cms.api import create_page, add_plugin
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugins.text.models import Text
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD, 
-    URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_REMOVE)
+from djangocms_text_ckeditor.models import Text
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_REMOVE
 from django.conf import settings
 from django.core.urlresolvers import reverse
 

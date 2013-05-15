@@ -5,7 +5,7 @@ from cms.api import create_page, add_plugin
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugins.text.models import Text
+from djangocms_text_ckeditor.models import Text
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to

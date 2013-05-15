@@ -413,9 +413,9 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             plugin_data = {
                 'plugin_id': plugin.pk
             }
-            remove_url = URL_CMS_PLUGIN_REMOVE
+            remove_url = URL_CMS_PLUGIN_REMOVE + "%s/" % plugin.pk
             response = self.client.post(remove_url, plugin_data)
-            self.assertEquals(response.status_code, 200)
+            self.assertEquals(response.status_code, 302)
     
             # there should only be a public plugin - since the draft has been deleted
             self.assertEquals(CMSPlugin.objects.all().count(), 1)
