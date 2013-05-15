@@ -51,6 +51,9 @@ class CMSToolbar(object):
             self.language = user_settings.language
             self.clipboard = user_settings.clipboard
 
+    def get_clipboard_plugins(self):
+        return self.clipboard.get_plugins()
+
     def get_items(self):
         """
         Get the CMS items on the toolbar

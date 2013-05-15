@@ -11,7 +11,8 @@
 // #PLACEHOLDER
 .cms_placeholder { padding:5px 5px 0.1px; @include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
-.cms_plugin { display:inline; position:relative; }
+.cms_plugin { display:inline-block; position:relative; }
+.cms_plugin-active { outline:2px solid adjust-hue($color-blue, 15deg); }
 
 //######################################################################################################################
 // #PLACEHOLDER/bar#
@@ -31,6 +32,8 @@
 	.cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer;
 		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -152px;
 		&:hover { background-position:-37px -152px; } }
+
+		.cms_submenu-lang { float:right; color:white; padding:0 5px; background:$color-grey-70; @include border-radius(3px); }
 	.cms_submenu-dropdown {
 		display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
 		min-width:140px; max-height:230px; overflow:auto;
@@ -107,6 +110,9 @@
 	.cms_draggable-disallowed, .cms_draggable-hover-disallowed {
 		color:saturate($color-red, 80%); border:1px dashed saturate($color-red, 80%);
 		background:rgba(255, 0, 0, 0.1); }
+
+	// clipboard fixes
+	> .cms_draggable { margin-left:0 !important; }
 }
 
 //##################################################
