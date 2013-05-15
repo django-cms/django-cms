@@ -660,10 +660,6 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'not_usable': '1'})
             self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
-            request = self.get_request(
-                post_data={'plugin_id': plugin.pk, 'placeholder_id': placeholder.pk, 'plugin_parent': ''})
-            self.assertRaises(Http404, self.admin_class.move_plugin, request)
-        with self.login_user_context(admin):
             request = self.get_request(post_data={'ids': plugin.pk})
             self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
