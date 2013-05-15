@@ -1337,7 +1337,7 @@ class PageAdmin(ModelAdmin):
 
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
             return HttpResponseForbidden(_("You have no permission to move a plugin"))
-        page = get_page_from_plugin_or_404(plugin)
+        page = plugin.placeholder.page
         if page and not page.has_change_permission(request):
             return HttpResponseForbidden(_("You have no permission to change this page"))
         if plugin.parent_id != parent_id:
@@ -1347,7 +1347,10 @@ class PageAdmin(ModelAdmin):
                 parent = None
             plugin.move_to(parent, position='last-child')
         try:
-            has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=page.get_template())
+            template = None
+            if page:
+                template = page.get_template()
+            has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
         except PluginLimitReached, e:
             return HttpResponseBadRequest(str(e))
         plugin.placeholder = placeholder
@@ -1371,9 +1374,10 @@ class PageAdmin(ModelAdmin):
                 #plugin.delete()
             else:
                 plugin.save()
-        moderator.page_changed(page,
-                               force_moderation_action=PageModeratorState.ACTION_CHANGED)
+
         if page and 'reversion' in settings.INSTALLED_APPS:
+            moderator.page_changed(page,
+                               force_moderation_action=PageModeratorState.ACTION_CHANGED)
             helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
         return HttpResponse(str("ok"))
 
