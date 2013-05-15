@@ -230,7 +230,6 @@ class Page(MPTTModel):
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
-        from cms.utils.moderator import update_moderation_message
 
         page_copy = None
 
@@ -302,8 +301,6 @@ class Page(MPTTModel):
                     permission.pk = None
                     permission.page = page
                     permission.save()
-
-            update_moderation_message(page, unicode(_('Page was copied.')))
 
             # copy titles of this page
             for title in titles:

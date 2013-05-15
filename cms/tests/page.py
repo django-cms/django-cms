@@ -19,8 +19,8 @@ from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugins.link.cms_plugins import LinkPlugin
-from cms.plugins.text.cms_plugins import TextPlugin
-from cms.plugins.text.models import Text
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
@@ -562,21 +562,6 @@ class PagesTestCase(CMSTestCase):
         found_page = get_page_from_request(request)
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
-
-    def test_get_page_from_request_with_page_preview(self):
-        page = create_page("page", "nav_playground.html", "en", published=True)
-        request = self.get_request('%s?preview' % page.get_absolute_url())
-        request.user.is_staff = False
-        found_page = get_page_from_request(request)
-        self.assertIsNotNone(found_page)
-        self.assertFalse(found_page.publisher_is_draft)
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            request = self.get_request('%s?preview&draft' % page.get_absolute_url())
-            found_page = get_page_from_request(request)
-            self.assertTrue(found_page)
-            self.assertTrue(found_page.publisher_is_draft)
-            self.assertEqual(found_page.pk, page.pk)
 
     def test_get_page_from_request_on_cms_admin_with_editplugin(self):
         page = create_page("page", "nav_playground.html", "en")

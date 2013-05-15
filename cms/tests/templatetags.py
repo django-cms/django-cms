@@ -1,12 +1,12 @@
 from __future__ import with_statement
 import copy
+from cms.middleware.toolbar import ToolbarMiddleware
 from django.test import RequestFactory, TestCase
 import os
 from cms.api import create_page, create_title, add_plugin
 from cms.models.pagemodel import Page, Placeholder
-from cms.plugins.text.cms_plugins import TextPlugin
-from cms.templatetags.cms_tags import (get_site_id, _get_page_by_untyped_arg,
-    _show_placeholder_for_page)
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg, _show_placeholder_for_page
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -86,6 +86,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         user.save()
         request.current_page = control
         request.user = user
+        middleware = ToolbarMiddleware()
+        middleware.process_request(request)
         page = _get_page_by_untyped_arg(control.pk, request, 1)
         self.assertEqual(page, control.publisher_draft)
 

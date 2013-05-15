@@ -52,6 +52,8 @@ class CMSToolbar(object):
             self.clipboard = user_settings.clipboard
 
     def get_clipboard_plugins(self):
+        if not hasattr(self, "clipboard"):
+            return []
         return self.clipboard.get_plugins()
 
     def get_items(self):

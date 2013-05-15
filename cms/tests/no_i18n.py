@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.plugins.text.models import Text
+from djangocms_text_ckeditor.models import Text
 from django.contrib.auth.models import User
 from cms.models import Page, CMSPlugin
 from django.core.urlresolvers import clear_url_caches

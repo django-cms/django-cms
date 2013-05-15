@@ -12,7 +12,7 @@ from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
-from cms.plugins.text.models import Text
+from djangocms_text_ckeditor.models import Text
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -636,11 +636,13 @@ class AdminTests(AdminTestsBase):
             self.assertTrue(url.endswith('?edit_off'))
 
     def test_remove_plugin_requires_post(self):
+        ph = Placeholder.objects.create(slot='test')
+        plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         admin = self.get_admin()
         with self.login_user_context(admin):
             request = self.get_request()
-            response = self.admin_class.delete_plugin(request)
-            self.assertEqual(response.status_code, 405)
+            response = self.admin_class.delete_plugin(request, plugin.pk)
+            self.assertEqual(response.status_code, 200)
 
     def test_move_plugin(self):
         ph = Placeholder.objects.create(slot='test')
@@ -875,14 +877,14 @@ class PluginPermissionTests(AdminTestsBase):
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
         self.client.login(username='test', password='test')
-        url = reverse('admin:cms_page_delete_plugin')
+        url = reverse('admin:cms_page_delete_plugin', args=[plugin.pk])
         data = dict(plugin_id=plugin.id)
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
         self._give_permission(normal_guy, Text, 'delete')
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, 302)
 
     def test_plugin_move_requires_permissions(self):
         """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
