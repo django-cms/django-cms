@@ -261,17 +261,19 @@
 			a:nth-child(8) { z-index:20; }
 			a:nth-child(9) { z-index:10; }
 			a:nth-child(10) { z-index:1; }
-		}
-		.cms_modal-breadcrumb a span,
-		.cms_modal-breadcrumb-title { float:left; padding:10px 15px; position:relative; z-index:120; color:$color-grey; }
-		.cms_modal-breadcrumb-title { @include border-radius(0px 0px 0px 5px); border-right:1px solid $color-grey-10; background:$color-white; }
 
-		.cms_modal-breadcrumb a:hover,
-		.cms_modal-breadcrumb-last { color:$color-black; background-position:right -232px !important; }
-		.cms_modal-breadcrumb a:hover span,
-		.cms_modal-breadcrumb-last span { color:$color-black; background-color:$color-white; }
-		.cms_modal-breadcrumb-last span { color:$color-blue !important; }
-		.cms_modal-breadcrumb-last { cursor:default; }
+			// custom styles
+			a span, .cms_modal-breadcrumb-title { float:left; padding:10px 15px; position:relative; z-index:120; color:$color-grey; }
+			.cms_modal-breadcrumb-title { @include border-radius(0px 0px 0px 5px); border-right:1px solid $color-grey-10; background:$color-white; }
+
+			a:hover { color:$color-black; background-position:right -232px !important; }
+			a:hover span { color:$color-black; background-color:$color-white; }
+
+			.cms_modal-breadcrumb-last {
+				cursor:default;
+				span { color:$color-blue; padding-left:25px; }
+			}
+		}
 
 		// buttons
 		.cms_modal-buttons { float:right; }
