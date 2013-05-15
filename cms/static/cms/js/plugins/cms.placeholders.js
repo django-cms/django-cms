@@ -39,6 +39,7 @@
 				this._clipboard();
 			},
 
+			// initial methods
 			_setupPlaceholders: function (placeholders) {
 				var that = this;
 				var draggables = placeholders.find('.cms_draggable');
@@ -67,6 +68,25 @@
 				});
 			},
 
+			// public methods
+			getId: function (el) {
+				// cancel if no element is defined
+				if(el === undefined || el === null || el.length <= 0) return false;
+
+				var id = null;
+
+				if(el.hasClass('cms_plugin')) {
+					id = el.attr('id').replace('cms_plugin-', '');
+				} else if(el.hasClass('cms_draggable')) {
+					id = el.attr('id').replace('cms_draggable-', '');
+				} else {
+					id = el.attr('id').replace('cms_placeholder-bar-', '');
+				}
+
+				return id;
+			},
+
+			// private methods
 			_events: function () {
 				var that = this;
 
@@ -126,23 +146,6 @@
 			_collapse: function () {},
 
 			_expand: function () {},
-
-			getId: function (el) {
-				// cancel if no element is defined
-				if(el === undefined || el === null || el.length <= 0) return false;
-
-				var id = null;
-
-				if(el.hasClass('cms_plugin')) {
-					id = el.attr('id').replace('cms_plugin-', '');
-				} else if(el.hasClass('cms_draggable')) {
-					id = el.attr('id').replace('cms_draggable-', '');
-				} else {
-					id = el.attr('id').replace('cms_placeholder-bar-', '');
-				}
-
-				return id;
-			},
 
 			_drag: function () {
 				var that = this;
@@ -356,6 +359,7 @@
 				this.container.data('settings', this.options);
 			},
 
+			// initial methods
 			_setBar: function () {
 				// attach event to the bar menu
 				this._setSubnav(this.container.find('.cms_submenu'));
@@ -406,6 +410,7 @@
 				});
 			},
 
+			// public methods
 			addPlugin: function (type, name, parent) {
 				var that = this;
 				var data = {
@@ -511,7 +516,7 @@
 				});
 			},
 
-			// API helpers
+			// private methods
 			_setSubnav: function (nav) {
 				var that = this;
 
