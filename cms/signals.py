@@ -125,7 +125,7 @@ def post_save_user(instance, raw, created, **kwargs):
     """Signal called when new user is created, required only when CMS_PERMISSION.
     Assigns creator of the user to PageUserInfo model, so we know who had created
     this user account.
-    
+
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
@@ -140,11 +140,11 @@ def post_save_user(instance, raw, created, **kwargs):
 
 
 def post_save_user_group(instance, raw, created, **kwargs):
-    """The same like post_save_user, but for Group, required only when 
+    """The same like post_save_user, but for Group, required only when
     CMS_PERMISSION.
     Assigns creator of the group to PageUserGroupInfo model, so we know who had
     created this user account.
-    
+
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
@@ -159,7 +159,10 @@ def post_save_user_group(instance, raw, created, **kwargs):
 
 if get_cms_setting('PERMISSION'):
     # only if permissions are in use
-    from django.contrib.auth.models import User, Group
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import Group
+    User = get_user_model()
+
     # register signals to user related models
     signals.post_save.connect(post_save_user, User)
     signals.post_save.connect(post_save_user_group, Group)

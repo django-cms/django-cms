@@ -8,12 +8,13 @@ from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
 from cms.utils.i18n import force_language
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches, reverse
 import sys
 from cms.models.pagemodel import Page
 
 
+User = get_user_model()
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'

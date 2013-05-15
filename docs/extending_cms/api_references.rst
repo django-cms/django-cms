@@ -57,7 +57,7 @@ Functions and constants
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
     :param created_by: User that is creating this page
-    :type created_by: string of :class:`django.contrib.auth.models.User` instance
+    :type created_by: string of :class:`settings.AUTH_USER_MODEL` instance
     :param parent: Parent page of this page
     :type parent: :class:`cms.models.pagemodel.Page` instance
     :param datetime publication_date: Date to publish this page
@@ -115,9 +115,9 @@ Functions and constants
     Creates a page user for the user provided and returns that page user.
     
     :param created_by: The user that creates the page user
-    :type created_by: :class:`django.contrib.auth.models.User` instance
+    :type created_by: :class:`settings.AUTH_USER_MODEL` instance
     :param user: The user to create the page user from
-    :type user: :class:`django.contrib.auth.models.User` instance
+    :type user: :class:`settings.AUTH_USER_MODEL` instance
     :param boolean can_*: Permissions to give the user
     :param boolean grant_all: Grant all permissions to the user
 
@@ -131,7 +131,7 @@ Functions and constants
     :param page: The page to assign the user to
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user to assign to the page
-    :type user: :class:`django.contrib.auth.models.User` instance
+    :type user: :class:`settings.AUTH_USER_MODEL` instance
     :param grant_on: Controls which pages are affected
     :type grant_on: :data:`cms.models.permissionmodels.ACCESS_PAGE`, :data:`cms.models.permissionmodels.ACCESS_CHILDREN`, :data:`cms.models.permissionmodels.ACCESS_DESCENDANTS` or :data:`cms.models.permissionmodels.ACCESS_PAGE_AND_DESCENDANTS`
     :param can_*: Permissions to grant
@@ -145,7 +145,7 @@ Functions and constants
     :param page: The page to publish
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user that performs this action
-    :type user: :class:`django.contrib.auth.models.User` instance
+    :type user: :class:`settings.AUTH_USER_MODEL` instance
 
 
 

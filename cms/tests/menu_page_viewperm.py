@@ -2,7 +2,8 @@
 from __future__ import with_statement
 
 from django.contrib.sites.models import Site
-from django.contrib.auth.models import AnonymousUser, User, Group
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser, Group
 
 from cms.api import create_page
 from cms.menu import get_visible_pages
@@ -13,6 +14,8 @@ from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from menus.menu_pool import menu_pool
 
+
+User = get_user_model()
 
 class ViewPermissionTests(SettingsOverrideTestCase):
     """
@@ -227,8 +230,8 @@ class ViewPermissionTests(SettingsOverrideTestCase):
 
     def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
         """
-        helper function to check the expected_granted_pages are 
-        not in the restricted_pages list and 
+        helper function to check the expected_granted_pages are
+        not in the restricted_pages list and
         all visible pages are in the expected_granted_pages
         """
         # log the user in if present
@@ -537,7 +540,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
 
     def _setup_permviewbug(self):
         """
-        Setup group_6_ACCESS_PAGE view restriction 
+        Setup group_6_ACCESS_PAGE view restriction
         """
         page = Page.objects.drafts().get(title_set__title="page_6")
         group = Group.objects.get(name__iexact=self.GROUPNAME_6)

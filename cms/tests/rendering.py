@@ -8,10 +8,12 @@ from cms.plugin_rendering import render_plugins, PluginContext, render_placehold
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.template import Template, RequestContext
 from sekizai.context import SekizaiContext
 
+
+User = get_user_model()
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
 
