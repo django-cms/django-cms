@@ -567,6 +567,9 @@
 			_showSubnav: function (nav) {
 				clearTimeout(this.timer);
 
+				// hide quicksearch when another menu is triggeres
+				$('.cms_submenu-quicksearch').hide();
+
 				// we need to hide previous menu
 				$('.cms_submenu > ul').hide()
 					.parent().css('z-index', 0).end()
