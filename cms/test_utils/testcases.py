@@ -3,7 +3,8 @@ from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -18,6 +19,8 @@ import urllib
 import warnings
 from cms.utils.permissions import set_current_user
 
+
+User = get_user_model()
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
@@ -131,7 +134,7 @@ class CMSTestCase(testcases.TestCase):
         self.counter = self.counter + 1
         return page_data
 
-    
+
     def get_new_page_data_dbfields(self, parent=None, site=None,
                                    language=None,
                                    template='nav_playground.html',):
@@ -145,8 +148,8 @@ class CMSTestCase(testcases.TestCase):
         }
         self.counter = self.counter + 1
         return page_data
-    
-    
+
+
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
         created from get_new_page_data so you can switch between test cases
@@ -161,7 +164,7 @@ class CMSTestCase(testcases.TestCase):
         page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         return page_data
-    
+
 
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.

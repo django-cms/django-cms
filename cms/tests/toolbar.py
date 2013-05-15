@@ -5,9 +5,12 @@ from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 
-from django.contrib.auth.models import AnonymousUser, User, Permission
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.test.client import RequestFactory
 
+
+User = get_user_model()
 
 class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False):

@@ -21,7 +21,8 @@ from cms.utils import get_cms_setting
 import django
 from django.contrib import admin
 from django.contrib.admin.sites import site
-from django.contrib.auth.models import User, Permission, AnonymousUser
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
@@ -31,6 +32,7 @@ from menus.menu_pool import menu_pool
 from types import MethodType
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
+User = get_user_model()
 
 
 class AdminTestsBase(CMSTestCase):
@@ -929,7 +931,7 @@ class PluginPermissionTests(AdminTestsBase):
         request = self._get_change_page_request(user, page)
         page_admin = PageAdmin(Page, None)
         page_admin._current_page = page
-        # user has can_change_permission 
+        # user has can_change_permission
         # => must see the PagePermissionInline
         self.assertTrue(
             any(type(inline) is PagePermissionInlineAdmin
@@ -1071,8 +1073,8 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
     """
     System user count influences the size of the page edit page,
     but the users are only 2 times present on the page
-    
-    The test relates to extra=0 
+
+    The test relates to extra=0
     at PagePermissionInlineAdminForm and ViewRestrictionInlineAdmin
     """
 

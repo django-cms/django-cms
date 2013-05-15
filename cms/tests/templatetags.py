@@ -19,8 +19,10 @@ from django.http import HttpRequest
 from django.template import RequestContext, Context
 from django.template.base import Template
 from django.utils.html import escape
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
+
+User = get_user_model()
 
 class TemplatetagTests(TestCase):
     def test_get_site_id_from_nothing(self):

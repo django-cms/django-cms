@@ -8,9 +8,12 @@ from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+
+
+User = get_user_model()
 
 class Mock_PageSelectFormField(PageSelectFormField):
     def __init__(self, required=False):

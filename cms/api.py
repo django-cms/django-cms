@@ -12,7 +12,7 @@ from django.core.exceptions import PermissionDenied
 from cms.utils.i18n import get_language_list
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.db.models import Max
 from django.template.defaultfilters import slugify
@@ -33,8 +33,10 @@ from cms.utils import moderator
 from cms.utils.permissions import _thread_locals
 
 
+User = get_user_model()
+
 #===============================================================================
-# Constants 
+# Constants
 #===============================================================================
 
 VISIBILITY_ALL = None
@@ -101,7 +103,7 @@ def _verify_plugin_type(plugin_type):
     return plugin_model, plugin_type
 
 #===============================================================================
-# Public API 
+# Public API
 #===============================================================================
 
 def create_page(title, template, language, menu_title=None, slug=None,
@@ -114,7 +116,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 position="last-child", overwrite_url=None):
     """
     Create a CMS Page and it's title for the given language
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # ugly permissions hack
@@ -123,7 +125,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         created_by = created_by.username
     else:
         _thread_locals.user = None
-    
+
     # validate template
     assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
 
@@ -135,17 +137,17 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate language:
     assert language in get_language_list(site), get_cms_setting('LANGUAGES').get(site.pk)
-    
+
     # set default slug:
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
-    
-    # validate and normalize apphook 
+
+    # validate and normalize apphook
     if apphook:
         application_urls = _verify_apphook(apphook)
     else:
         application_urls = None
-    
+
     # validate parent
     if parent:
         assert isinstance(parent, Page)
@@ -154,26 +156,26 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate publication date
     if publication_date:
         assert isinstance(publication_date, datetime.date)
-    
+
     # validate publication end date
     if publication_end_date:
         assert isinstance(publication_end_date, datetime.date)
-        
+
     # validate softroot
     assert get_cms_setting('SOFTROOT') or not soft_root
-    
+
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
         menus = [menu[0] for menu in raw_menus]
         assert navigation_extenders in menus
-        
+
     # validate menu visibility
     accepted_limitations = (VISIBILITY_ALL, VISIBILITY_USERS, VISIBILITY_STAFF)
     assert limit_visibility_in_menu in accepted_limitations
-    
+
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
-    
+
     page = Page(
         created_by=created_by,
         changed_by=created_by,
@@ -210,15 +212,15 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     del _thread_locals.user
     return page.reload()
-    
+
 def create_title(language, title, page, menu_title=None, slug=None,
                  apphook=None, redirect=None, meta_description=None,
                  parent=None, overwrite_url=None):
     """
     Create a title.
-    
+
     Parent is only used if slug=None.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate page
@@ -230,13 +232,13 @@ def create_title(language, title, page, menu_title=None, slug=None,
     # set default slug:
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
-        
-    # validate and normalize apphook 
+
+    # validate and normalize apphook
     if apphook:
         application_urls = _verify_apphook(apphook)
     else:
         application_urls = None
-    
+
     title = Title.objects.create(
         language=language,
         title=title,
@@ -259,35 +261,35 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """
     Add a plugin to a placeholder
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate placeholder
     assert isinstance(placeholder, Placeholder)
-    
+
     # validate and normalize plugin type
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
-        
+
 
     max_pos = CMSPlugin.objects.filter(language=language,
         placeholder=placeholder).aggregate(Max('position'))['position__max'] or 0
 
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
-        placeholder=placeholder, 
+        placeholder=placeholder,
         position=max_pos + 1,
         language=language
     )
     plugin_base.insert_at(target, position=position, save=False)
-            
+
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
     return plugin
-    
+
 def create_page_user(created_by, user,
                      can_add_page=True, can_view_page=True,
-                     can_change_page=True, can_delete_page=True, 
+                     can_change_page=True, can_delete_page=True,
                      can_recover_page=True, can_add_pageuser=True,
                      can_change_pageuser=True, can_delete_pageuser=True,
                      can_add_pagepermission=True,
@@ -295,26 +297,26 @@ def create_page_user(created_by, user,
                      can_delete_pagepermission=True, grant_all=False):
     """
     Creates a page user.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     if grant_all:
         # just be lazy
         return create_page_user(created_by, user, True, True, True, True,
                                 True, True, True, True, True, True, True)
-    
+
     # validate created_by
     assert isinstance(created_by, User)
-    
+
     data = {
-        'can_add_page': can_add_page, 
-        'can_view_page': can_view_page, 
-        'can_change_page': can_change_page, 
-        'can_delete_page': can_delete_page, 
-        'can_recover_page': can_recover_page, 
-        'can_add_pageuser': can_add_pageuser, 
-        'can_change_pageuser': can_change_pageuser, 
-        'can_delete_pageuser': can_delete_pageuser, 
+        'can_add_page': can_add_page,
+        'can_view_page': can_view_page,
+        'can_change_page': can_change_page,
+        'can_delete_page': can_delete_page,
+        'can_recover_page': can_recover_page,
+        'can_add_pageuser': can_add_pageuser,
+        'can_change_pageuser': can_change_pageuser,
+        'can_delete_pageuser': can_delete_pageuser,
         'can_add_pagepermission': can_add_pagepermission,
         'can_change_pagepermission': can_change_pagepermission,
         'can_delete_pagepermission': can_delete_pagepermission,
@@ -328,16 +330,16 @@ def create_page_user(created_by, user,
     page_user.save()
     save_permissions(data, page_user)
     return user
-        
+
 def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
-    can_add=False, can_change=False, can_delete=False, 
-    can_change_advanced_settings=False, can_publish=False, 
+    can_add=False, can_change=False, can_delete=False,
+    can_change_advanced_settings=False, can_publish=False,
     can_change_permissions=False, can_move_page=False,
     can_recover_page=True, can_view=False,
     grant_all=False, global_permission=False):
     """
     Assigns given user to page, and gives him requested permissions.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     grant_all = grant_all and not global_permission
@@ -361,12 +363,12 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         page_permission.save()
         page_permission.sites.add(Site.objects.get_current())
     return page_permission
-    
+
 def publish_page(page, user):
     """
     Publish a page. This sets `page.published` to `True` and calls publish()
     which does the actual publishing.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     page = page.reload()

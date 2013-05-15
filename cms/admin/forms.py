@@ -11,8 +11,9 @@ from cms.utils.page_resolver import is_valid_url
 from cms.utils.permissions import get_current_user, get_subordinate_users, get_subordinate_groups, \
     get_user_permission_level
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -22,6 +23,9 @@ from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
+
+
+User = get_user_model()
 
 
 def get_permission_acessor(obj):
@@ -196,7 +200,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     """
     Page permission inline admin form used in inline admin. Required, because
     user and group queryset must be changed. User can see only users on the same
-    level or under him in choosen page tree, and users which were created by him, 
+    level or under him in choosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
     page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
@@ -261,7 +265,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to 
+            # page but after he does this, he will not have permissions to
             # access this page anymore, so avoid this
             raise forms.ValidationError(_("Add page permission requires also "
                                           "access to children, or descendants, otherwise added page "
@@ -397,7 +401,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         return cleaned_data
 
     def save(self, commit=True):
-        """Create user, assign him to staff users, and create permissions for 
+        """Create user, assign him to staff users, and create permissions for
         him if required. Also assigns creator to user.
         """
         Super = self._password_change and PageUserForm or UserCreationForm

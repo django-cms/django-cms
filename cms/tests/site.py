@@ -4,12 +4,15 @@ from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+
+
+User = get_user_model()
 
 class SiteTestCase(CMSTestCase):
     """Site framework specific test cases.
-    
+
     All stuff which is changing settings.SITE_ID for tests should come here.
     """
     def setUp(self):

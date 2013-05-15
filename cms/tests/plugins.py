@@ -30,7 +30,7 @@ from cms.utils.copy_plugins import copy_plugins_to
 from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
@@ -38,6 +38,8 @@ from django.forms.widgets import Media
 from django.test.testcases import TestCase
 import os
 
+
+User = get_user_model()
 
 class DumbFixturePlugin(CMSPluginBase):
     model = CMSPlugin
@@ -186,7 +188,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_add_cancel_plugin(self):
         """
-        Test that you can cancel a new plugin before editing and 
+        Test that you can cancel a new plugin before editing and
         that the plugin is removed.
         """
         # add a new text plugin
