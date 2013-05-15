@@ -19,6 +19,7 @@ $(document).ready(function () {
 				'toolbar': 'expanded', // expanded or collapsed
 				'mode': 'edit' // live, draft, edit or layout
 			},
+			'clipboard': null,
 			'sidebarDuration': 300,
 			'sidebarWidth': 320,
 			'dialogDuration': 300,
@@ -32,7 +33,7 @@ $(document).ready(function () {
 			},
 			'lang': {
 				'confirm': 'Yes',
-				'cancel': 'No'
+				'cancel': 'Cancel'
 			}
 		},
 
@@ -72,6 +73,7 @@ $(document).ready(function () {
 			this._events();
 		},
 
+		// initial methods
 		_setup: function () {
 			// set correct settings
 			if(this.getSettings() === null) this.setSettings();
@@ -234,7 +236,7 @@ $(document).ready(function () {
 			// attach events to window
 			this.modal.find('.cms_modal-close').bind('click', function (e) {
 				e.preventDefault();
-				that._hideModal(100);
+				that.closeModal();
 			});
 			this.modal.find('.cms_modal-collapse').bind('click', function (e) {
 				e.preventDefault();
@@ -258,7 +260,7 @@ $(document).ready(function () {
 			});
 			this.modal.find('.cms_modal-cancel').bind('click', function (e) {
 				e.preventDefault();
-				that._hideModal(100);
+				that.closeModal();
 			});
 			this.modal.find('.cms_modal-save').bind('click', function (e) {
 				e.preventDefault();
@@ -266,54 +268,11 @@ $(document).ready(function () {
 			});
 		},
 
+		// public methods
 		toggleToolbar: function (speed) {
 			(this.settings.toolbar === 'collapsed') ? this._showToolbar(speed) : this._hideToolbar(speed);
 		},
 
-		_showToolbar: function (speed, init) {
-			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
-			this.toolbar.slideDown(speed);
-			this.settings.toolbar = 'expanded';
-			if(!init) this.setSettings();
-		},
-
-		_hideToolbar: function (speed, init) {
-			// cancel if dialog is active
-			if(this.lockToolbar) return false;
-
-			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
-			this.toolbar.slideUp(speed);
-			this.settings.toolbar = 'collapsed';
-			if(!init) this.setSettings();
-		},
-
-		_enableEditMode: function (speed, init) {
-			this.bars.hide();
-			this.plugins.fadeIn(speed);
-			this.placeholders.hide();
-			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
-
-			// set active item
-			this.modes.parent().removeClass('active').eq(0).addClass('active');
-			this.settings.mode = 'edit';
-
-			if(!init) this.setSettings();
-		},
-
-		_enableDragMode: function (speed, init) {
-			this.bars.fadeIn(speed);
-			this.plugins.hide();
-			this.placeholders.fadeIn(speed);
-			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
-
-			// set active item
-			this.modes.parent().removeClass('active').eq(1).addClass('active');
-			this.settings.mode = 'drag';
-
-			if(!init) this.setSettings();
-		},
-
-		// this function is a placeholder and should update the backend with various toolbar states
 		setSettings: function () {
 			// TODO should be done different
 			return localStorage.setItem('cms_cookie', JSON.stringify(this.settings));
@@ -347,44 +306,6 @@ $(document).ready(function () {
 				default:
 					window.location.href = el.attr('href');
 			}
-		},
-
-		_setSwitcher: function (el) {
-			// save local vars
-			var active = el.hasClass('cms_toolbar-item_switch-active');
-			var anchor = el.find('a');
-			var knob = el.find('.cms_toolbar-item_switch-knob');
-			var duration = 300;
-
-			if(active) {
-				knob.animate({
-					'right': anchor.outerWidth(true) - (knob.outerWidth(true) + 2)
-				}, duration);
-				// move anchor behind the knob
-				anchor.css('z-index', 1).animate({
-					'padding-top': 6,
-					'padding-right': 14,
-					'padding-bottom': 4,
-					'padding-left': 28
-				}, duration);
-			} else {
-				knob.animate({
-					'left': anchor.outerWidth(true) - (knob.outerWidth(true) + 2)
-				}, duration);
-				// move anchor behind the knob
-				anchor.css('z-index', 1).animate({
-					'padding-top': 6,
-					'padding-right': 28,
-					'padding-bottom': 4,
-					'padding-left': 14
-				}, duration);
-			}
-
-			// reload
-			setTimeout(function () {
-				// TODO: this should only call reload insted of attaching new url
-				window.location.href = anchor.attr('href');
-			}, duration);
 		},
 
 		openSideframe: function (url, maximized) {
@@ -465,12 +386,9 @@ $(document).ready(function () {
 		},
 
 		openModal: function (url, name, breadcrumb) {
-			// TODO DOUBLE DBLCLICK OPEN
-			// TODO DBL CLICK OPEN
-
 			// prepare iframe
 			var that = this;
-			// TODO background style needs fixing
+
 			var iframe = $('<iframe src="'+url+'" frameborder="0" style="background:#fff;" />');
 				iframe.hide();
 			var holder = this.modal.find('.cms_modal-frame');
@@ -482,6 +400,9 @@ $(document).ready(function () {
 			iframe.bind('load', function () {
 				// after iframe is loaded append css
 				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialog + '" />'));
+
+				// set modal buttons
+				that._setModalButtons($(this));
 
 				// than show
 				iframe.show();
@@ -495,7 +416,7 @@ $(document).ready(function () {
 
 			// set correct title
 			var title = this.modal.find('.cms_modal-title');
-				title.text(name);
+				title.html(name || '&nbsp;');
 
 			// insure modal is not maximized
 			if(this.modal.find('.cms_modal-collapsed').length) this._minimizeModal();
@@ -516,19 +437,105 @@ $(document).ready(function () {
 			this.maximized = false;
 
 			// we need to render the breadcrumb
-			var crumb = '';
+			this._setModalBreadcrumb(breadcrumb);
 
-			$.each(breadcrumb, function (index, item) {
-				// check if the item is the last one
-				var last = (index >= breadcrumb.length - 1) ? 'cms_modal-breadcrumb-last' : '';
-				// render breadcrumb
-				crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
-			});
-
-			this.modal.find('.cms_modal-breadcrumb-items').html(crumb);
+			// empty buttons
+			this.modal.find('.cms_modal-buttons').html('');
 
 			// display modal
 			this._showModal(this.options.modalDuration);
+		},
+
+		closeModal: function () {
+			this._hideModal(100);
+		},
+
+		// private methods
+		_showToolbar: function (speed, init) {
+			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
+			this.toolbar.slideDown(speed);
+			this.settings.toolbar = 'expanded';
+			if(!init) this.setSettings();
+		},
+
+		_hideToolbar: function (speed, init) {
+			// cancel if dialog is active
+			if(this.lockToolbar) return false;
+
+			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
+			this.toolbar.slideUp(speed);
+			this.settings.toolbar = 'collapsed';
+			if(!init) this.setSettings();
+		},
+
+		_enableEditMode: function (speed, init) {
+			this.bars.hide();
+			this.plugins.fadeIn(speed);
+			this.placeholders.hide();
+			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
+
+			// set active item
+			this.modes.parent().removeClass('active').eq(0).addClass('active');
+			this.settings.mode = 'edit';
+
+			// hide clipboard if in edit mode
+			this.container.find('.cms_clipboard').hide();
+
+			if(!init) this.setSettings();
+		},
+
+		_enableDragMode: function (speed, init) {
+			this.bars.fadeIn(speed);
+			this.plugins.hide();
+			this.placeholders.fadeIn(speed);
+			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
+
+			// set active item
+			this.modes.parent().removeClass('active').eq(1).addClass('active');
+			this.settings.mode = 'drag';
+
+			// show clipboard in build mode
+			this.container.find('.cms_clipboard').fadeIn(speed);
+
+			if(!init) this.setSettings();
+		},
+
+		_setSwitcher: function (el) {
+			// save local vars
+			var active = el.hasClass('cms_toolbar-item_switch-active');
+			var anchor = el.find('a');
+			var knob = el.find('.cms_toolbar-item_switch-knob');
+			var duration = 300;
+
+			if(active) {
+				knob.animate({
+					'right': anchor.outerWidth(true) - (knob.outerWidth(true) + 2)
+				}, duration);
+				// move anchor behind the knob
+				anchor.css('z-index', 1).animate({
+					'padding-top': 6,
+					'padding-right': 14,
+					'padding-bottom': 4,
+					'padding-left': 28
+				}, duration);
+			} else {
+				knob.animate({
+					'left': anchor.outerWidth(true) - (knob.outerWidth(true) + 2)
+				}, duration);
+				// move anchor behind the knob
+				anchor.css('z-index', 1).animate({
+					'padding-top': 6,
+					'padding-right': 28,
+					'padding-bottom': 4,
+					'padding-left': 14
+				}, duration);
+			}
+
+			// reload
+			setTimeout(function () {
+				// TODO: this should only call reload insted of attaching new url
+				window.location.href = anchor.attr('href');
+			}, duration);
 		},
 
 		_showSideframe: function (width, maximized) {
@@ -754,6 +761,78 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-shim').hide();
 
 			$(document).unbind('mousemove.cms');
+		},
+
+		_setModalBreadcrumb: function (breadcrumb) {
+			var bread = this.modal.find('.cms_modal-breadcrumb');
+			var crumb = '';
+
+			// cancel if there is no breadcrumb)
+			if(!breadcrumb || breadcrumb.length <= 0) return false;
+
+			// load breadcrumb
+			$.each(breadcrumb, function (index, item) {
+				// check if the item is the last one
+				var last = (index >= breadcrumb.length - 1) ? 'cms_modal-breadcrumb-last' : '';
+				// render breadcrumb
+				crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
+			});
+
+			// attach elements
+			bread.find('.cms_modal-breadcrumb-items').html(crumb);
+
+			// show breadcrumb
+			bread.show();
+		},
+
+		_setModalButtons: function (iframe) {
+			var that = this;
+			var row = iframe.contents().find('.submit-row');
+			var buttons = row.find('input, a');
+			var render = $('<div />');
+
+			// loop over input buttons
+			buttons.each(function (index, item) {
+				item = $(item);
+
+				// cancel if item is a hidden input
+				if(item.attr('type') === 'hidden') return false;
+
+				// create helper variables
+				var title = item.attr('value') || item.text();
+				var cls = 'cms_modal-btn';
+
+				// set additional css classes
+				if(item.hasClass('default')) cls = 'cms_modal-btn cms_modal-btn-action';
+				if(item.hasClass('deletelink')) cls = 'cms_modal-btn cms_modal-btn-caution';
+
+				// create the element
+				var el = $('<div class="'+cls+'" data-name="'+item.attr('name')+'" data-url="'+item.attr('href')+'">'+title+'</div>');
+					el.bind('click', function () {
+						var input = row.find('input[name="'+$(this).attr('data-name')+'"]');
+						if(input.length) input.click();
+
+						var anchor = row.find('a[href="'+$(this).attr('data-url')+'"]');
+						if(anchor.length) iframe.attr('src', iframe.attr('src') + anchor.attr('href'));
+					});
+
+				// append element
+				render.append(el);
+			});
+
+			// manually add cancel button at the end
+			var cancel = $('<div class="cms_modal-btn">'+this.options.lang.cancel+'</div>');
+				cancel.bind('click', function () {
+					that.closeModal();
+				});
+			render.append(cancel);
+
+			// unwrap helper and ide row
+			render.unwrap('<div>');
+			row.hide();
+
+			// render buttons
+			this.modal.find('.cms_modal-buttons').html(render);
 		},
 
 		_saveModal: function () {

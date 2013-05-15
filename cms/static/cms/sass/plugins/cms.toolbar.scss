@@ -178,6 +178,7 @@
 		.cms_draggable { border:1px solid $color-grey-70; @include border-radius(0 3px 3px 0); }
 		.cms_draggable .cms_dragitem { padding-left:20px; }
 		.cms_draggable .cms_dragitem .cms_submenu { display:none !important; }
+		.cms_draggable .cms_dragitem-text { @include inline-block(); width:140px; height:21px; overflow:hidden; }
 
 		.cms_plugins { display:none; }
 	}
@@ -242,7 +243,7 @@
 			&:hover { background-position:-137px -67px; }
 		}
 
-		.cms_modal-breadcrumb { float:left; font-size:12px; line-height:12px;
+		.cms_modal-breadcrumb { display:none; float:left; font-size:12px; line-height:12px;
 			height:32px; min-width:225px; padding-right:25px;
 
 			a { float:left; font-size:12px; line-height:12px; margin-left:-10px; position:relative; z-index:100; padding-right:10px;
@@ -260,35 +261,44 @@
 			a:nth-child(8) { z-index:20; }
 			a:nth-child(9) { z-index:10; }
 			a:nth-child(10) { z-index:1; }
-		}
-		.cms_modal-breadcrumb a span,
-		.cms_modal-breadcrumb-title { float:left; padding:10px 15px; position:relative; z-index:120; color:$color-grey; }
-		.cms_modal-breadcrumb-title { @include border-radius(0px 0px 0px 5px); border-right:1px solid $color-grey-10; background:$color-white; }
 
-		.cms_modal-breadcrumb a:hover,
-		.cms_modal-breadcrumb-last { color:$color-black; background-position:right -232px !important; }
-		.cms_modal-breadcrumb a:hover span,
-		.cms_modal-breadcrumb-last span { color:$color-black; background-color:$color-white; }
-		.cms_modal-breadcrumb-last span { color:$color-blue !important; }
-		.cms_modal-breadcrumb-last { cursor:default; }
+			// custom styles
+			a span, .cms_modal-breadcrumb-title { float:left; padding:10px 15px; position:relative; z-index:120; color:$color-grey; }
+			.cms_modal-breadcrumb-title { padding:10px 20px 10px 15px;
+				border-right:1px solid $color-grey-10; @include border-radius(0px 0px 0px 5px);
+				background:$color-white url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -113px -104px; @include hide-text(); }
+
+			a:hover { color:$color-black; background-position:right -232px !important; }
+			a:hover span { color:$color-black; background-color:$color-white; }
+
+			.cms_modal-breadcrumb-last {
+				cursor:default;
+				span { color:$color-blue; padding-left:25px; }
+			}
+		}
 
 		// buttons
-		.cms_modal-buttons { float:right; }
-		.cms_modal-save,
-		.cms_modal-cancel { float:right; font-size:12px; cursor:pointer; padding:2px 10px; margin:3px 25px 3px 0;
-			@include border-radius(3px); }
-		.cms_modal-save { color:$color-white; border:1px solid adjust-hue($color-blue, 15deg);
-			background:$color-blue; @include background-image($gradient-blue);
-			@include box-shadow(inset lighten($color-blue, 10%) 0px 1px 0px);
-			&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg); @include box-shadow(none); }
-			&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%); }
-		}
-		.cms_modal-cancel { margin-right:5px;
+		.cms_modal-buttons { float:right; margin-right:20px; }
+		.cms_modal-btn { float:right; font-size:12px; cursor:pointer; padding:2px 10px; margin:3px 5px 3px 0; @include border-radius(3px);
 			color:$color-grey; border:1px solid $color-grey-10;
 			background:$color-grey-10; @include background-image($gradient-light);
 			@include box-shadow(inset lighten($color-grey-10, 5%) 0px 1px 0px);
 			&:hover, &:active, &:focus { background:$color-grey-10; border:1px solid $color-grey-10; @include box-shadow(none); }
 			&:active, &:focus { border:1px solid darken($color-grey-10, 10%); background:darken($color-grey-10, 10%); }
+		}
+		.cms_modal-btn-action {
+			color:$color-white; border:1px solid adjust-hue($color-blue, 15deg) !important;
+			background:$color-blue; @include background-image($gradient-blue);
+			@include box-shadow(inset lighten($color-blue, 10%) 0px 1px 0px);
+			&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg); @include box-shadow(none); }
+			&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%); }
+		}
+		.cms_modal-btn-caution {
+			color:$color-white; border:1px solid adjust-hue($color-red, 15deg) !important;
+			background:$color-red; @include background-image($gradient-red);
+			@include box-shadow(inset lighten($color-red, 20%) 0px 1px 0px);
+			&:hover, &:active, &:focus { background:adjust-hue($color-red, 15deg); @include box-shadow(none); }
+			&:active, &:focus { background:darken(adjust-hue($color-red, 15deg), 10%); }
 		}
 	}
 
