@@ -9,7 +9,7 @@
 				<li><span>{% trans "Settings" %}</span></li>
 				<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
 				<li><a data-rel="edit" href="#">{% trans "Edit" %}</a></li>
-				<li><a data-rel="modal" href="{% url "admin:cms_page_delete_plugin" plugin.pk %}"  data-name="{{ plugin.get_plugin_name }}">{% trans "Delete" %}</a></li>
+				<li><a data-rel="modal" href="{% url "admin:cms_page_delete_plugin" plugin.pk %}" data-name="{{ plugin.get_plugin_name }}">{% trans "Delete" %}</a></li>
 				<li><a data-rel="stack" href="#">{% trans "Stack" %}</a></li>
 				{% plugin_child_classes plugin %}
 			</ul>
