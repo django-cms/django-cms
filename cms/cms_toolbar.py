@@ -223,7 +223,7 @@ class PageToolbar(CMSToolbar):
     def get_mode_switchers(self):
         switch = ButtonList(right=True)
         switch.addItem(_("Edit"), "?edit", self.toolbar.build_mode)
-        switch.addItem(_("Layout"), "?build", not self.toolbar.build_mode)
+        switch.addItem(_("Build"), "?build", not self.toolbar.build_mode)
         return switch
 
 
