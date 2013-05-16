@@ -99,7 +99,7 @@
 
 	// #DRAGGABLES/states#
 	.cms_draggable-selected { border:1px solid adjust-hue($color-blue, 15deg) !important;
-		background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
+		background:adjust-hue($color-blue, 15deg) !important; @include background-image($gradient-blue  !important); }
 	.cms_draggable-selected .cms_dragitem,
 	.cms_draggable-selected .cms_dragitem strong { color:$color-white; }
 
