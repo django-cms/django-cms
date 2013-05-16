@@ -84,6 +84,7 @@ def configure(db_url, **extra):
             'mptt',
             #'cms.plugins.text',
             'djangocms_text_ckeditor',
+            'djangocms_column',
             'cms.plugins.picture',
             'cms.plugins.file',
             'cms.plugins.flash',
