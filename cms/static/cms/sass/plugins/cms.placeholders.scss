@@ -81,7 +81,7 @@
 	}
 
 	// #DRAGGABLES/specific#
-	.cms_draggable { cursor:move; z-index:100; color:$color-black; border:1px solid $color-grey-5; background:$color-grey-5;
+	.cms_draggable { z-index:100; color:$color-black; border:1px solid $color-grey-5; background:$color-grey-5;
 		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); border-color:$color-grey-10; } }
 	.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
 
@@ -89,6 +89,7 @@
 		padding-top:0; padding-bottom:0; }
 	.cms_droppable-empty-wrapper { display:none; }
 
+	.cms_dragitem { cursor:move; }
 	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
 	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/arrow-down-active.png') no-repeat 3px 7px; }
 	.cms_dragitem-collapsed { background:url('/static/cms/img/toolbar/arrow-down-collapsed.png') no-repeat 3px 6px; }

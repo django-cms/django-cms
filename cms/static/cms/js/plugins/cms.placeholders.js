@@ -155,36 +155,24 @@ $(document).ready(function () {
 			this.sortables.nestedSortable({
 				'items': '.cms_draggable',
 				'handle': '.cms_dragitem',
-				'listType': 'ul',
-				'opacity': 0.4,
+				'placeholder': 'cms_droppable',
+				'connectWith': this.sortables,
 				'tolerance': 'pointer',
 				'toleranceElement': '> div',
-				'cursor': 'move',
-				'connectWith': this.sortables,
-				// creates a cline thats over everything else
-				'helper': 'clone',
-				'appendTo': 'body',
 				'dropOnEmpty': true,
 				'forcePlaceholderSize': true,
-				'placeholder': 'cms_droppable',
+				'helper': 'clone',
+				'appendTo': 'body',
+				'cursor': 'move',
+				'opacity': 0.4,
 				'zIndex': 999999,
-				'isAllowed': function(placeholder, placeholderParent, originalItem) {
-					// getting restriction array
-					var bounds = [];
-					var plugin = $('#cms_plugin-' + that.getId(originalItem));
-
-					var bar = placeholder.parent().prevAll('.cms_placeholder-bar').first();
-					var type = plugin.data('settings').plugin_type;
-
-					// now set the correct bounds
-					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
-					if(bar.length) bounds = bar.data('settings').plugin_restriction;
-
-					// if restrictions is still empty, proceed
-					that.state = ($.inArray(type, bounds) !== -1) ? true : false;
-
-					return that.state;
-				},
+				// nestedSortable
+				'listType': 'ul',
+				'doNotClear': true,
+				'disableNestingClass': 'cms_draggable-disabled',
+				'errorClass': 'cms_draggable-disallowed',
+				'hoveringClass': 'cms_draggable-hover',
+				// methods
 				'start': function () {
 					that.dragging = true;
 					// show empty
@@ -210,14 +198,23 @@ $(document).ready(function () {
 					var plugin = $('#cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
 				},
-				'disableNestingClass': 'cms_draggable-disabled',
-				'errorClass': 'cms_draggable-disallowed',
-				'hoveringClass': 'cms_draggable-hover'
-				// TODO not yet required
-				// branchClass: 'mjs-nestedSortable-branch',
-				// collapsedClass: 'mjs-nestedSortable-collapsed',
-				// expandedClass: 'cms_draggable-disallowed',
-				// leafClass: 'mjs-nestedSortable-leaf',
+				'isAllowed': function(placeholder, placeholderParent, originalItem) {
+					// getting restriction array
+					var bounds = [];
+					var plugin = $('#cms_plugin-' + that.getId(originalItem));
+
+					var bar = placeholder.parent().prevAll('.cms_placeholder-bar').first();
+					var type = plugin.data('settings').plugin_type;
+
+					// now set the correct bounds
+					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
+					if(bar.length) bounds = bar.data('settings').plugin_restriction;
+
+					// if restrictions is still empty, proceed
+					that.state = ($.inArray(type, bounds) !== -1) ? true : false;
+
+					return that.state;
+				}
 			});
 
 			// define droppable helpers
@@ -384,7 +381,7 @@ $(document).ready(function () {
 			draggable.bind('mouseenter mouseleave mousemove', function (e) {
 				e.stopPropagation();
 
-				if(e.type === 'mouseenter') draggable.find('.cms_submenu').show();
+				if(e.type === 'mouseenter') draggable.find('.cms_submenu:eq(0)').show();
 				if(e.type === 'mouseleave') draggable.find('.cms_submenu').hide();
 				if(e.type === 'mousemove') draggable.trigger('mouseenter');
 			});
@@ -578,12 +575,14 @@ $(document).ready(function () {
 			// hide quicksearch when another menu is triggeres
 			$('.cms_submenu-quicksearch').hide();
 
-			// we need to hide previous menu
-			$('.cms_submenu > ul').hide()
-				.parent().css('z-index', 0).end()
-				.parentsUntil('.cms_draggables').andSelf().css('z-index', 0);
-			nav.parent().css('z-index', 9999);
-			nav.parentsUntil('.cms_draggables').andSelf().css('z-index', 999);
+			// reset z indexes
+			var reset = $('.cms_submenu').parentsUntil('.cms_placeholder-bar');
+				reset.css('z-index', 99);
+
+			var parents = nav.parentsUntil('.cms_placeholder-bar');
+				parents.css('z-index', 999);
+
+			// set visible states
 			nav.find('> ul').show();
 			// show quicksearch only at a certain height
 			if(nav.find('> ul').height() >= 230) {
@@ -599,8 +598,7 @@ $(document).ready(function () {
 			if(this.focused) return false;
 
 			this.timer = setTimeout(function () {
-				nav.parent().css('z-index', 999);
-				nav.parentsUntil('.cms_draggables').andSelf().css('z-index', 99);
+				// set visible states
 				nav.find('> ul').hide();
 				nav.find('.cms_submenu-quicksearch').hide();
 				// reset search
