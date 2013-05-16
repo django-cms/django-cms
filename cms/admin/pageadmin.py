@@ -2,6 +2,7 @@
 from copy import deepcopy
 from distutils.version import LooseVersion
 from urllib2 import unquote
+import warnings
 from django.template.response import TemplateResponse
 from django.contrib.admin.helpers import AdminForm
 from django.utils import simplejson
@@ -49,7 +50,7 @@ from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
 from cms.utils.permissions import has_global_page_permission
-from cms.utils.plugins import current_site, get_page_from_plugin_or_404
+from cms.utils.plugins import current_site
 from cms.plugins.utils import has_reached_plugin_limit
 from menus.menu_pool import menu_pool
 
@@ -1092,7 +1093,11 @@ class PageAdmin(ModelAdmin):
             return HttpResponseForbidden(_('You do not have permission to add a plugin'))
         placeholder_id = request.POST.get('placeholder_id', None)
         parent_id = request.POST.get('parent_id', None)
-
+        if parent_id:
+            warnings.warn("parent_id is deprecated and will be removed in 3.0.1, use plugin_parent instead",
+                          DeprecationWarning)
+        if not parent_id:
+            parent_id = request.POST.get('plugin_parent', None)
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
         page = placeholder.page
         parent = None
