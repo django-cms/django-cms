@@ -3,7 +3,7 @@ import urllib
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.utils.i18n import get_language_objects, get_language_object
-from cms.toolbar.items import Item, List, Break, Switch
+from cms.toolbar.items import Item, List, Break, ButtonList
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
 
@@ -198,7 +198,7 @@ class PageToolbar(CMSToolbar):
         page = self.page
         dirty = page.is_dirty()
 
-        switch = Switch(right=True)
+        switch = ButtonList(right=True)
         switch.addItem(_("Publish now"), reverse('admin:cms_page_publish_page', args=[page.pk]), dirty)
         return switch
 
@@ -221,7 +221,7 @@ class PageToolbar(CMSToolbar):
         return admin_items
 
     def get_mode_switchers(self):
-        switch = Switch(right=True)
+        switch = ButtonList(right=True)
         switch.addItem(_("Edit"), "?edit", self.toolbar.build_mode)
         switch.addItem(_("Layout"), "?build", not self.toolbar.build_mode)
         return switch

@@ -93,11 +93,11 @@ class Dialog(BaseItem):
         return {'url': self.url, 'title': self.title, 'question': self.question}
 
 
-class Switch(BaseItem):
-    template = "cms/toolbar/menu/switch.html"
+class ButtonList(BaseItem):
+    template = "cms/toolbar/menu/buttons.html"
 
     def __init__(self, right=False):
-        super(Switch, self).__init__(right)
+        super(ButtonList, self).__init__(right)
         self.items = []
 
     def addItem(self, name, url, active=False):
