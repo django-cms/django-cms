@@ -11,8 +11,8 @@
 // #PLACEHOLDER
 .cms_placeholder { padding:5px 5px 0.1px; @include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
-.cms_plugin { display:inline-block; position:relative; }
-.cms_plugin-active { outline:2px solid adjust-hue($color-blue, 15deg); }
+.cms_plugin { display:inline; position:relative; }
+// .cms_plugin-active { outline:2px solid adjust-hue($color-blue, 15deg); }
 
 //######################################################################################################################
 // #PLACEHOLDER/bar#
@@ -99,7 +99,7 @@
 
 	// #DRAGGABLES/states#
 	.cms_draggable-selected { border:1px solid adjust-hue($color-blue, 15deg) !important;
-		background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
+		background:adjust-hue($color-blue, 15deg) !important; @include background-image($gradient-blue  !important); }
 	.cms_draggable-selected .cms_dragitem,
 	.cms_draggable-selected .cms_dragitem strong { color:$color-white; }
 

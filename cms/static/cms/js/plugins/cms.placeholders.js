@@ -246,11 +246,12 @@ $(document).ready(function () {
 			});
 
 			// add animation events
-			triggers.bind('click mouseenter', function (e) {
+			triggers.bind('click mouseenter mouseleave', function (e) {
 				e.preventDefault();
-
 				// clear timeout
 				clearTimeout(timer);
+
+				if(e.type === 'mouseleave') hide();
 
 				var el = containers.eq(triggers.index(this));
 				// cancel if element is already open
@@ -261,18 +262,22 @@ $(document).ready(function () {
 				el.stop().animate({ 'margin-left': 0 }, speed);
 				el.data('open', true);
 			});
-			containers.add(triggers).bind('mouseenter mouseleave', function (e) {
+			containers.bind('mouseover mouseleave', function (e) {
 				// clear timeout
 				clearTimeout(timer);
 
 				// cancel if we trigger mouseover
-				if(e.type === 'mouseenter') return false;
+				if(e.type === 'mouseover') return false;
 
 				// we need a little timer to detect if we should hide the menu
+				hide();
+			});
+
+			function hide() {
 				timer = setTimeout(function () {
 					containers.stop().css({ 'margin-left': -position }).data('open', false);
 				}, speed);
-			});
+			}
 		},
 
 		_preventEvents: function () {
@@ -378,12 +383,12 @@ $(document).ready(function () {
 			this._setSubnav(draggable.find('> .cms_dragitem .cms_submenu'));
 
 			// only show button when hovering the plugin
-			draggable.bind('mouseenter mouseleave mousemove', function (e) {
+			draggable.find('.cms_dragitem').bind('mouseenter mouseleave mousemove', function (e) {
 				e.stopPropagation();
 
-				if(e.type === 'mouseenter') draggable.find('.cms_submenu:eq(0)').show();
-				if(e.type === 'mouseleave') draggable.find('.cms_submenu').hide();
-				if(e.type === 'mousemove') draggable.trigger('mouseenter');
+				if(e.type === 'mouseenter') $(this).find('.cms_submenu:eq(0)').show();
+				if(e.type === 'mouseleave') $(this).find('.cms_submenu').hide();
+				if(e.type === 'mousemove') $(this).trigger('mouseenter');
 			});
 
 			// update plugin position
@@ -576,10 +581,10 @@ $(document).ready(function () {
 			$('.cms_submenu-quicksearch').hide();
 
 			// reset z indexes
-			var reset = $('.cms_submenu').parentsUntil('.cms_placeholder-bar');
-				reset.css('z-index', 99);
+			var reset = $('.cms_placeholder .cms_submenu').parentsUntil('.cms_placeholder');
+				reset.css('z-index', 0);
 
-			var parents = nav.parentsUntil('.cms_placeholder-bar');
+			var parents = nav.parentsUntil('.cms_placeholder');
 				parents.css('z-index', 999);
 
 			// set visible states
