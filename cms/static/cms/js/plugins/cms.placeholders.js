@@ -576,10 +576,10 @@ $(document).ready(function () {
 			$('.cms_submenu-quicksearch').hide();
 
 			// reset z indexes
-			var reset = $('.cms_submenu').parentsUntil('.cms_placeholder-bar');
-				reset.css('z-index', 99);
+			var reset = $('.cms_placeholder .cms_submenu').parentsUntil('.cms_placeholder');
+				reset.css('z-index', 0);
 
-			var parents = nav.parentsUntil('.cms_placeholder-bar');
+			var parents = nav.parentsUntil('.cms_placeholder');
 				parents.css('z-index', 999);
 
 			// set visible states
