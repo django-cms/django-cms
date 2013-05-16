@@ -11,5 +11,6 @@ argparse
 dj-database-url
 transifex-client
 djangocms-admin-style
+django
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangcms-text-ckeditor
 -e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad

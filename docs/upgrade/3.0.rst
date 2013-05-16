@@ -111,3 +111,9 @@ Undo and Redo
 =============
 
 If you have django-reversion installed you now have undo and redo directly in the toolbar.
+
+Plugins removed
+===============
+
+We removed plugins from the core. Espacilly cms.plugins.text
+Find the new official CKEditor based Text Plugin at djangocms-text-ckeditor.
