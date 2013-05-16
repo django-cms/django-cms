@@ -85,6 +85,7 @@ def configure(db_url, **extra):
             #'cms.plugins.text',
             'djangocms_text_ckeditor',
             'djangocms_column',
+            'djangocms_style',
             'cms.plugins.picture',
             'cms.plugins.file',
             'cms.plugins.flash',

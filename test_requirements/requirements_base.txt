@@ -14,3 +14,4 @@ djangocms-admin-style
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangcms-text-ckeditor
 -e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
+-e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
