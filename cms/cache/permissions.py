@@ -50,7 +50,7 @@ def clear_user_permission_cache(user):
     Cleans permission cache for given user.
     """
     for key in PERMISSION_KEYS:
-        cache.delete(get_cache_key(user, key))
+        cache.delete(get_cache_key(user, key), version=get_cache_version())
 
 
 def clear_permission_cache():
