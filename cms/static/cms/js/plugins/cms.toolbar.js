@@ -6,7 +6,7 @@ $(document).ready(function () {
 	/*!
 	 * Toolbar
 	 * @version: 2.0.0
-	 * @description: Adds toolbar, sidebar, dialog and modal
+	 * @description: Adds toolbar, sidebar, messages and modal
 	 */
 	CMS.Toolbar = new CMS.Class({
 
@@ -22,13 +22,13 @@ $(document).ready(function () {
 			'clipboard': null,
 			'sidebarDuration': 300,
 			'sidebarWidth': 320,
-			'dialogDuration': 300,
+			'messageDelay': 2000,
 			'modalDuration': 300,
 			'modalWidth': 800,
 			'modalHeight': 400,
 			'urls': {
 				'settings': '', // url to save settings
-				'css_dialog': '/static/cms/css/plugins/cms.toolbar.dialog.css',
+				'css_modal': '/static/cms/css/plugins/cms.toolbar.dialog.css',
 				'css_sideframe': '/static/cms/css/plugins/cms.toolbar.sideframe.css'
 			},
 			'lang': {
@@ -54,7 +54,7 @@ $(document).ready(function () {
 
 			this.body = $('html');
 			this.sideframe = this.container.find('.cms_sideframe');
-			this.dialog = this.container.find('.cms_dialog');
+			this.messages = this.container.find('.cms_messages');
 			this.modal = this.container.find('.cms_modal');
 			this.tooltip = this.container.find('.cms_placeholders-tooltip');
 			this.menu = this.container.find('.cms_placeholders-menu');
@@ -131,7 +131,6 @@ $(document).ready(function () {
 
 			// module events
 			this._eventsSidebar();
-			this._eventsDialog();
 			this._eventsModal();
 
 			// stopper events
@@ -173,24 +172,6 @@ $(document).ready(function () {
 			this.modes.eq(1).bind('click', function (e) {
 				e.preventDefault();
 				that._enableDragMode(300);
-			});
-		},
-
-		_eventsDialog: function () {
-			var that = this;
-
-			// attach events to the dialog window
-			this.dialog.find('.cms_dialog-confirm').bind('click', function (e) {
-				e.preventDefault();
-				that.openAjax(that.dialog.data('url'));
-			});
-			this.dialog.find('.cms_dialog-cancel').bind('click', function (e) {
-				e.preventDefault();
-				that._hidedialog();
-			});
-			this.dialog.find('.cms_dialog-accept').bind('click', function (e) {
-				e.preventDefault();
-				that._hidedialog();
 			});
 		},
 
@@ -294,8 +275,8 @@ $(document).ready(function () {
 						'url': el.attr('href')
 					}]);
 					break;
-				case 'dialog':
-					this.opendialog(el.attr('data-text'), el.attr('href'));
+				case 'message':
+					this.openMessage(el.attr('data-text'));
 					break;
 				case 'sideframe':
 					this.openSideframe(el.attr('href'));
@@ -347,42 +328,70 @@ $(document).ready(function () {
 			this._hideSideframe(true);
 		},
 
-		openAjax: function (url, post) {
+		openMessage: function (msg, dir, error, delay) {
+			// set toolbar freeze
+			this.lockToolbar = true;
+
+			// add content to element
+			this.messages.find('.cms_messages-inner').html(msg);
+
+			// determine width
 			var that = this;
+			var width = this.messages.outerWidth(true);
+			var height = this.messages.outerHeight(true);
+			var top = this.toolbar.outerHeight(true);
+			var close = this.messages.find('.cms_messages-close');
+				close.hide();
+				close.bind('click', function () {
+					that.closeMessage();
+				});
 
-			$.ajax({
-				'type': 'POST',
-				'url': url,
-				'data': (post) ? JSON.parse(post) : {},
-				'success': function () {
-					window.location.reload();
-				},
-				'error': function (jqXHR) {
-					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
-				}
-			});
-		},
+			// set correct position and show
+			this.messages.css('top', -height).show();
 
-		opendialog: function (msg, url) {
-			var field = this.dialog.find('.cms_dialog-text');
-				field.html(msg);
+			// error handling
+			this.messages.removeClass('cms_messages-error');
+			if(error) this.messages.addClass('cms_messages-error');
 
-			var confirm = this.dialog.find('.cms_dialog-confirm, .cms_dialog-cancel');
-			var alert = this.dialog.find('.cms_dialog-accept');
-
-			// activate confirm dialog
-			if(url) {
-				this.dialog.data('url', url);
-				confirm.show();
-				alert.hide();
-				// activate alert dialog
-			} else {
-				confirm.hide();
-				alert.show();
+			// dir should be left, center, right
+			dir = dir || 'center';
+			// set correct direction and animation
+			switch(dir) {
+				case 'left':
+					this.messages.css({
+						'top': top,
+						'left': -width
+					});
+					this.messages.animate({ 'left': 0 });
+					break;
+				case 'right':
+					this.messages.css({
+						'top': top,
+						'right': -width
+					});
+					this.messages.animate({ 'right': 0 });
+					break;
+				default:
+					this.messages.css({
+						'left': '50%',
+						'margin-left': -(width / 2)
+					});
+					this.messages.animate({ 'top': top });
 			}
 
-			// show the dialog
-			this._showdialog();
+			// cancel autohide if delay is 0
+			if(delay === 0) {
+				close.show();
+				return false
+			};
+			// add delay to hide
+			setTimeout(function () {
+				that.closeMessage();
+			}, delay || this.options.messageDelay);
+		},
+
+		closeMessage: function () {
+			this.messages.fadeOut(300);
 		},
 
 		openModal: function (url, name, breadcrumb) {
@@ -399,7 +408,7 @@ $(document).ready(function () {
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialog + '" />'));
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_modal + '" />'));
 
 				// set modal buttons
 				that._setModalButtons($(this));
@@ -450,6 +459,22 @@ $(document).ready(function () {
 			this._hideModal(100);
 		},
 
+		openAjax: function (url, post) {
+			var that = this;
+
+			$.ajax({
+				'type': 'POST',
+				'url': url,
+				'data': (post) ? JSON.parse(post) : {},
+				'success': function () {
+					window.location.reload();
+				},
+				'error': function (jqXHR) {
+					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+				}
+			});
+		},
+
 		// private methods
 		_showToolbar: function (speed, init) {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
@@ -459,7 +484,7 @@ $(document).ready(function () {
 		},
 
 		_hideToolbar: function (speed, init) {
-			// cancel if dialog is active
+			// cancel if sidebar is active
 			if(this.lockToolbar) return false;
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
@@ -584,23 +609,7 @@ $(document).ready(function () {
 			$(document).unbind('mousemove.cms');
 		},
 
-		_showdialog: function () {
-			var height = this.dialog.outerHeight(true);
-			this.dialog.css('top', -height).show().animate({
-				'top': 30
-			}, this.options.dialogDuration);
-
-			this.lockToolbar = true;
-		},
-
-		_hidedialog: function () {
-			var height = this.dialog.outerHeight(true);
-			this.dialog.show().animate({
-				'top': -height
-			}, this.options.dialogDuration);
-
-			this.lockToolbar = false;
-		},
+		// TODO depricate
 
 		_showModal: function (speed) {
 			// we need to position the modal in the center
@@ -860,7 +869,7 @@ $(document).ready(function () {
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_dialog + '" />'));
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_modal + '" />'));
 
 				// than show
 				iframe.show();
@@ -874,7 +883,7 @@ $(document).ready(function () {
 		},
 
 		showError: function (msg) {
-			this.opendialog(msg);
+			this.openMessage(msg, 'center', true);
 		}
 
 	});
