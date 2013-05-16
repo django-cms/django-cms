@@ -141,7 +141,7 @@ $(document).ready(function () {
 			});
 
 			// event for switching between edit and layout mode
-			this.menu.bind('click', function (e) {
+			this.menu.bind('click', function () {
 				($(this).hasClass('cms_placeholders-menu-alternate')) ? that._enableEditMode(300) : that._enableDragMode(300);
 
 				// reset dragholders
@@ -166,7 +166,6 @@ $(document).ready(function () {
 
 			this.modes.eq(0).bind('click', function (e) {
 				e.preventDefault();
-				console.log('trigger');
 				that._enableEditMode(300);
 			});
 			this.modes.eq(1).bind('click', function (e) {
@@ -383,7 +382,7 @@ $(document).ready(function () {
 			if(delay === 0) {
 				close.show();
 				return false
-			};
+			}
 			// add delay to hide
 			setTimeout(function () {
 				that.closeMessage();
@@ -558,7 +557,6 @@ $(document).ready(function () {
 
 			// reload
 			setTimeout(function () {
-				// TODO: this should only call reload insted of attaching new url
 				window.location.href = anchor.attr('href');
 			}, duration);
 		},
@@ -608,8 +606,6 @@ $(document).ready(function () {
 
 			$(document).unbind('mousemove.cms');
 		},
-
-		// TODO depricate
 
 		_showModal: function (speed) {
 			// we need to position the modal in the center
