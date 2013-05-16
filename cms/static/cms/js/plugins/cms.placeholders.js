@@ -378,12 +378,13 @@ $(document).ready(function () {
 			this._setSubnav(draggable.find('> .cms_dragitem .cms_submenu'));
 
 			// only show button when hovering the plugin
-			draggable.bind('mouseenter mouseleave mousemove', function (e) {
+			console.log(draggable.find('.cms_dragitem'));
+			draggable.find('.cms_dragitem').bind('mouseenter mouseleave mousemove', function (e) {
 				e.stopPropagation();
 
-				if(e.type === 'mouseenter') draggable.find('.cms_submenu:eq(0)').show();
-				if(e.type === 'mouseleave') draggable.find('.cms_submenu').hide();
-				if(e.type === 'mousemove') draggable.trigger('mouseenter');
+				if(e.type === 'mouseenter') $(this).find('.cms_submenu:eq(0)').show();
+				if(e.type === 'mouseleave') $(this).find('.cms_submenu').hide();
+				if(e.type === 'mousemove') $(this).trigger('mouseenter');
 			});
 
 			// update plugin position
