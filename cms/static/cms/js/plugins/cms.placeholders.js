@@ -509,7 +509,7 @@ $(document).ready(function () {
 				'type': 'POST',
 				'url': this.options.urls.copy_plugin,
 				'data': data,
-				'success': function (data) {
+				'success': function () {
 					// refresh browser after success
 					CMS.API.Helpers.reloadBrowser();
 				},
