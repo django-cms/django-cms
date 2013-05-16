@@ -154,6 +154,8 @@ class CMSPlugin(MPTTModel):
         plugin_class = self.get_plugin_class()
         plugin = plugin_class(plugin_class.model,
                               admin) # needed so we have the same signature as the original ModelAdmin
+        if hasattr(self, "_inst"):
+            return self._inst, plugin
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
@@ -163,7 +165,8 @@ class CMSPlugin(MPTTModel):
                 instance = None
         else:
             instance = self
-        return instance, plugin
+        self._inst = instance
+        return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()

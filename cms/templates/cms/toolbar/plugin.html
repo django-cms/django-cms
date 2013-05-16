@@ -12,8 +12,7 @@ CMS.$(document).ready(function () {
 		'plugin_parent': '{{ instance.parent_id }}',
 		'plugin_order': '{{ instance.plugin_order }}',
 		'plugin_breadcrumb': {{ instance.get_breadcrumb_json }},
-		// TODO this is hardcoded for testing only
-		'plugin_restriction': ['TextPlugin', 'MultiColumnPlugin', 'ColumnPlugin'], // only for nested plugins, see placeholder_toolbar.html
+		'plugin_restriction': [{% for cls in instance.get_child_classes %}{{ cls }}{% if not forloop.last %},{% endif %}{% endfor %}],
 		'urls': {
 			'add_plugin': '{% url "admin:cms_page_add_plugin" %}',
 			'edit_plugin': '{% url "admin:cms_page_edit_plugin" instance.pk %}',
