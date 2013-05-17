@@ -46,7 +46,7 @@ class PageToolbar(CMSToolbar):
                         # Publish Menu
                         items.append(self.get_history_menu())
 
-                        if self.page.has_publish_permission(self.request):
+                        if self.page.has_publish_permission(self.request) and self.page.is_dirty():
                             items.append(self.get_publish_menu())
                         items.append(self.get_mode_switchers())
             items.append(self.get_language_menu())
@@ -112,7 +112,8 @@ class PageToolbar(CMSToolbar):
             _('Settings'),
             load_side_frame=True)
         )
-        menu_items.items.append(self.get_template_menu())
+        if self.toolbar.build_mode or self.toolbar.edit_mode:
+            menu_items.items.append(self.get_template_menu())
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_changelist'),
