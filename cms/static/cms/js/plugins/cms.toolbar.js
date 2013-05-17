@@ -64,6 +64,7 @@ $(document).ready(function () {
 			this.placeholders = $('.cms_placeholder');
 
 			this.lockToolbar = false;
+			this.minimized = false;
 			this.maximized = false;
 
 			// setup initial stuff
@@ -396,6 +397,8 @@ $(document).ready(function () {
 			var iframe = $('<iframe src="'+url+'" frameborder="0" style="background:#fff;" />');
 				iframe.hide();
 			var holder = this.modal.find('.cms_modal-frame');
+			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
+				contents.show();
 
 			// insure previous iframe is hidden
 			holder.find('iframe').hide();
@@ -655,16 +658,49 @@ $(document).ready(function () {
 
 		_minimizeModal: function () {
 			var trigger = this.modal.find('.cms_modal-collapse');
-				trigger.toggleClass('cms_modal-collapsed');
-
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
-				contents.toggle();
+
+			// cancel action if maximized
+			if(this.maximized) return false;
+
+			if(this.minimized === false) {
+				// minimize
+				trigger.addClass('cms_modal-collapsed');
+				contents.hide();
+
+				// save initial state
+				this.modal.data('css', {
+					'left': this.modal.css('left'),
+					'top': this.modal.css('top'),
+					'margin': this.modal.css('margin')
+				});
+
+				this.modal.css({
+					'left': this.toolbar.find('.cms_toolbar-left').outerWidth(true) + 50,
+					'top': 1,
+					'margin': 0
+				});
+
+				this.minimized = true;
+			} else {
+				// minimize
+				trigger.removeClass('cms_modal-collapsed');
+				contents.show();
+
+				// reattach css
+				this.modal.css(this.modal.data('css'));
+
+				this.minimized = false;
+			}
 		},
 
 		_maximizeModal: function () {
 			var container = this.modal.find('.cms_modal-body');
 			var trigger = this.modal.find('.cms_modal-maximize');
 			var btnCk = this.modal.find('iframe').contents().find('.cke_button__maximize');
+
+			// cancel action when minimized
+			if(this.minimized) return false;
 
 			if(this.maximized === false) {
 				// maximize
@@ -705,6 +741,7 @@ $(document).ready(function () {
 
 				$(window).unbind('resize.cms.modal');
 
+				// reattach css
 				this.modal.css(this.modal.data('css'));
 				container.css(container.data('css'));
 
@@ -716,6 +753,8 @@ $(document).ready(function () {
 		_startModalMove: function (initial) {
 			// cancel if maximized
 			if(this.maximized) return false;
+			// cancel action when minimized
+			if(this.minimized) return false;
 
 			var that = this;
 			var position = that.modal.position();
