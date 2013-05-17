@@ -1010,13 +1010,7 @@ class PageAdmin(ModelAdmin):
         """Redirecting preview function based on draft_id
         """
         page = get_object_or_404(Page, id=object_id)
-        attrs = "?preview=1"
-        if request.REQUEST.get('public', None):
-            if not page.publisher_public_id:
-                raise Http404()
-            page = page.publisher_public
-        else:
-            attrs += "&draft=1"
+        attrs = "?edit"
         language = request.REQUEST.get('language', None)
         if language:
             attrs += "&language=" + language

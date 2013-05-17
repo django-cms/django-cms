@@ -110,7 +110,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_change', args=[page.pk]),
             _('Settings'),
-            load_side_frame=True)
+            load_modal=True)
         )
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             menu_items.items.append(self.get_template_menu())
@@ -118,7 +118,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_changelist'),
             _('Move/add Pages'),
-            load_side_frame=True)
+            load_modal=True)
         )
         data = {
             'position': 'last-child',
@@ -127,7 +127,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             '%s?%s' % (reverse('admin:cms_page_add'), urllib.urlencode(data)),
             _('Add child page'),
-            load_side_frame=True)
+            load_modal=True)
         )
         data = {
             'position': 'last-child',
@@ -138,13 +138,13 @@ class PageToolbar(CMSToolbar):
             '%s?%s' % (reverse('admin:cms_page_add'),
             urllib.urlencode(data)),
             _('Add sibling page'),
-            load_side_frame=True)
+            load_modal=True)
         )
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_delete', args=(self.page.pk,)),
             _('Delete Page'),
-            load_side_frame=True)
+            load_modal=True)
         )
 
         return menu_items
@@ -191,7 +191,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_history', args=(self.page.pk,)),
             _('View History'),
-            load_side_frame=True)
+            load_modal=True)
         )
         return menu_items
 
