@@ -292,6 +292,7 @@ $(document).ready(function () {
 			// attach load event to iframe
 			iframe.bind('load', function () {
 				iframe.show();
+				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 			});
 
 			// cancel animation if sidebar is already shown
