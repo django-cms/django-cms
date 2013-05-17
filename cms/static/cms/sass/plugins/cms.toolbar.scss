@@ -31,46 +31,13 @@
 	.cms_toolbar-right { float:right; padding-right:32px; position:relative; z-index:10; }
 
 	.cms_toolbar-item { float:left; margin:0; }
+
 	.cms_toolbar-left .cms_toolbar-item { margin-left:10px; }
 	.cms_toolbar-right .cms_toolbar-item { margin-right:20px; }
 
-	// #TOOLBAR/logo#
-	.cms_toolbar-item-logo { margin:0 !important; }
-	.cms_toolbar-item-logo a { display:block; width:92px; height:20px; margin:5px 0; @include hide-text();
-		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left top;
-		&:hover, &:active, &:focus { background-position:left -20px; } }
-
-	// #TOOLBAR/form#
-	.cms_form-login { padding:3px 0 0 0; }
-	.cms_form-login {
-		label { float:left; cursor:pointer; padding-left:10px; }
-		input[type="text"], input[type="password"] { font-size:13px; line-height:13px; width:100px;
-			padding:3px 5px; margin:0; @include border-radius(3px);
-			color:$color-grey; border:1px solid lighten($color-grey, 45%);
-			@include box-shadow(0px 1px 0px white);
-
-			&:focus { border-color:$color-blue;
-				@include box-shadow(inset 0px 0px 2px $color-grey-10);
-				@include single-transition(outline 0.2s);
-			}
-		}
-		input[type="submit"] { font-size:12px; text-transform:uppercase; cursor:pointer;
-			padding:1px 15px 0; @include border-radius(3px);
-			color:white; border:1px solid darken($color-grey, 20%);
-			@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
-			@include background-image($gradient-dark);
-
-			&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
-			&:active, &:focus { background:darken($color-grey-70, 50%); }
-		}
-
-		.cms_error { color:$color-red; }
-		.cms_error input { border:1px solid $color-red; }
-	}
-
 	//##################################################################################################################
 	// #TOOLBAR/navigation#
-	.cms_toolbar-item_navigation {
+	.cms_toolbar-item-navigation {
 		li { float:left; position:relative; zoom:1; }
 		li a { float:left; padding:5px 10px; zoom:1; cursor:default; }
 		li ul { display:none; }
@@ -105,10 +72,10 @@
 			strong { color:white !important; }
 		}
 
-		.cms_toolbar-item_navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
+		.cms_toolbar-item-navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
 			border-bottom:1px solid $color-grey-10; }
 
-		.cms_toolbar-item_navigation-disabled {
+		.cms_toolbar-item-navigation-disabled {
 			a { cursor:default !important; @include opacity(0.2);
 				&:hover, &:active, &:focus { @include box-shadow(none); background:none !important;
 					color:black !important; } }
@@ -118,42 +85,44 @@
 
 	//##################################################################################################################
 	// #TOOLBAR/sidebar#
-	.cms_sideframe { display:none; position:fixed; left:0; top:0; z-index:999; width:0; height:100%; overflow:visible !important; }
-	.cms_sideframe-frame { position:relative; z-index:10; width:100%; height:100%; overflow:hidden; background:white; }
-	.cms_sideframe iframe { height:100%; width:100%; border:none; background:white; overflow:auto; }
+	.cms_sideframe {
+		display:none; position:fixed; left:0; top:0; z-index:999; width:0; height:100%; overflow:visible !important;
 
-	.cms_sideframe-resize { position:absolute; right:-2px; top:0; z-index:30; width:2px; height:100%; cursor:col-resize;
-		background:$color-grey-70; }
-		.cms_sideframe-shim { position:absolute; left:0; top:0; z-index:1; width:100%; height:100%;
-		background:transparent; }
-	.cms_sideframe-knob { width:6px; height:50px;
-		position:absolute; right:-2px; top:50%; margin-top:-15px; @include border-radius(3px);
-		background:$color-grey-70; }
+		.cms_sideframe-frame { position:relative; z-index:10; width:100%; height:100%; overflow:hidden; background:white; }
+		.cms_sideframe iframe { height:100%; width:100%; border:none; background:white; overflow:auto; }
 
-	.cms_sideframe-btn { position:absolute; right:-20px; top:50px; z-index:40; }
-	.cms_sideframe-btn {
-		div { cursor:pointer; width:20px; height:20px; margin-bottom:2px; @include border-radius(0 3px 3px 0);
-			background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat; }
-		div:hover { background-color:$color-grey-90; }
+		.cms_sideframe-resize { position:absolute; right:-2px; top:0; z-index:30; width:2px; height:100%; cursor:col-resize;
+			background:$color-grey-70; }
+			.cms_sideframe-shim { position:absolute; left:0; top:0; z-index:1; width:100%; height:100%;
+			background:transparent; }
+		.cms_sideframe-knob { width:6px; height:50px;
+			position:absolute; right:-2px; top:50%; margin-top:-15px; @include border-radius(3px);
+			background:$color-grey-70; }
 
-		.cms_sideframe-close { background-position:-80px -90px; }
-		.cms_sideframe-close:hover { background-position:-100px -90px; }
-		.cms_sideframe-hide { background-position:-101px -150px; }
-		.cms_sideframe-hide:hover { background-position:-121px -150px; }
-		.cms_sideframe-hidden { background-position:-60px -150px; }
-		.cms_sideframe-hidden:hover { background-position:-80px -150px; }
-		.cms_sideframe-maximize { background-position:-40px -91px; }
-		.cms_sideframe-maximize:hover { background-position:-60px -91px; }
-		.cms_sideframe-minimize { background-position:-60px -111px; }
-		.cms_sideframe-minimize:hover { background-position:-60px -91px; }
+		.cms_sideframe-btn { position:absolute; right:-20px; top:50px; z-index:40; }
+		.cms_sideframe-btn {
+			div { cursor:pointer; width:20px; height:20px; margin-bottom:2px; @include border-radius(0 3px 3px 0);
+				background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat; }
+			div:hover { background-color:$color-grey-90; }
 
-		.cms_sideframe-hide { border:5px solid $color-grey-70; border-left:none; border-right:none; }
+			.cms_sideframe-close { background-position:-80px -90px; }
+			.cms_sideframe-close:hover { background-position:-100px -90px; }
+			.cms_sideframe-hide { background-position:-101px -150px; }
+			.cms_sideframe-hide:hover { background-position:-121px -150px; }
+			.cms_sideframe-hidden { background-position:-60px -150px; }
+			.cms_sideframe-hidden:hover { background-position:-80px -150px; }
+			.cms_sideframe-maximize { background-position:-40px -91px; }
+			.cms_sideframe-maximize:hover { background-position:-60px -91px; }
+			.cms_sideframe-minimize { background-position:-60px -111px; }
+			.cms_sideframe-minimize:hover { background-position:-60px -91px; }
+
+			.cms_sideframe-hide { border:5px solid $color-grey-70; border-left:none; border-right:none; }
+		}
 	}
 
 	//##################################################################################################################
 	// #TOOLBAR/clipboard#
 	.cms_clipboard { position:absolute; left:0; top:130px; z-index:99;
-
 		p { pading:0; margin:0; }
 
 		ul li { margin:0 0 2px; }
@@ -202,8 +171,6 @@
 		.cms_messages-close:hover { background-position:-120px -90px; }
 	}
 	.cms_messages-error strong { color:$color-red; }
-
-	.cms_dialog-confirm { margin:0 15px 0 0; }
 
 	//##################################################################################################################
 	// #TOOLBAR/modal#
@@ -279,33 +246,112 @@
 		}
 
 		// buttons
-		.cms_modal-buttons { float:right; margin-right:20px; }
-		.cms_modal-btn { float:right; font-size:12px; cursor:pointer; padding:2px 10px; margin:3px 5px 3px 0; @include border-radius(3px);
-			color:$color-grey; border:1px solid $color-grey-10;
-			background:$color-grey-10; @include background-image($gradient-light);
-			@include box-shadow(inset lighten($color-grey-10, 5%) 0px 1px 0px);
-			&:hover, &:active, &:focus { background:$color-grey-10; border:1px solid $color-grey-10; @include box-shadow(none); }
-			&:active, &:focus { border:1px solid darken($color-grey-10, 10%); background:darken($color-grey-10, 10%); }
-		}
-		.cms_modal-btn-action {
-			color:white; border:1px solid adjust-hue($color-blue, 15deg) !important;
-			background:$color-blue; @include background-image($gradient-blue);
-			@include box-shadow(inset lighten($color-blue, 10%) 0px 1px 0px);
-			&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg); @include box-shadow(none); }
-			&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%); }
-		}
-		.cms_modal-btn-caution {
-			color:white; border:1px solid adjust-hue($color-red, 15deg) !important;
-			background:$color-red; @include background-image($gradient-red);
-			@include box-shadow(inset lighten($color-red, 20%) 0px 1px 0px);
-			&:hover, &:active, &:focus { background:adjust-hue($color-red, 15deg); @include box-shadow(none); }
-			&:active, &:focus { background:darken(adjust-hue($color-red, 15deg), 10%); }
+		.cms_modal-buttons {
+			float:right; margin-right:20px;
+			div { float:right; font-size:12px; cursor:pointer; padding:2px 10px; margin:3px 5px 3px 0; }
 		}
 	}
 
 	//##################################################################################################################
+	// #TOOLBAR/buttons#
+	// #TOOLBAR/buttons/styles#
+	.cms_btn { color:$color-grey; @include border-radius(3px);
+		border:1px solid $color-grey-10;
+		background:$color-grey-10; @include background-image($gradient-light);
+		@include box-shadow(inset lighten($color-grey-10, 5%) 0px 1px 0px);
+		&:hover, &:active, &:focus { background:$color-grey-10; border:1px solid $color-grey-10; @include box-shadow(none); }
+		&:active, &:focus { border:1px solid darken($color-grey-10, 10%); background:darken($color-grey-10, 10%); }
+	}
+
+	.cms_btn-inverse {
+		border-right:1px solid darken($color-grey-10, 10%); border-top:1px solid darken($color-grey-10, 10%); border-bottom:none !important;
+		@include box-shadow(inset 0px 1px 0px $color-grey-10);
+		background:darken($color-grey-5, 5%);
+		&:hover, &:active, &:focus { background-color:$color-grey-10; }
+	}
+
+	.cms_btn-dark { color:white;
+		border:1px solid darken($color-grey, 20%) !important; border-bottom:none !important;
+		@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
+		background:$color-grey; @include background-image($gradient-dark);
+		&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
+		&:active, &:focus { background:darken($color-grey-70, 50%); }
+	}
+
+	.cms_btn-highlight { color:white;
+		border:1px solid darken($color-orange, 5%) !important; border-bottom:none !important;
+		@include box-shadow(inset 0 1px 0 lighten($color-orange, 20%));
+		background:$color-orange; @include background-image($gradient-orange);
+		&:hover, &:active, &:focus { background:$color-orange; @include box-shadow(none); }
+		&:active, &:focus { background:darken($color-orange, 50%); }
+	}
+
+	.cms_btn-action { color:white;
+		border:1px solid adjust-hue($color-blue, 15deg) !important;
+		@include box-shadow(inset lighten($color-blue, 10%) 0px 1px 0px);
+		background:$color-blue; @include background-image($gradient-blue);
+		&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg); @include box-shadow(none); }
+		&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%); }
+	}
+	.cms_btn-caution {
+		color:white; border:1px solid adjust-hue($color-red, 15deg) !important;
+		@include box-shadow(inset lighten($color-red, 20%) 0px 1px 0px);
+		background:$color-red; @include background-image($gradient-red);
+		&:hover, &:active, &:focus { background:adjust-hue($color-red, 15deg); @include box-shadow(none); }
+		&:active, &:focus { background:darken(adjust-hue($color-red, 15deg), 10%); }
+	}
+
+	//##################################################################################################################
 	// #TOOLBAR/elements#
-	.cms_modal-loader { background:$color-window url('/static/cms/img/loader.gif') no-repeat center center !important; }
+	.cms_loader { background:$color-window url('/static/cms/img/loader.gif') no-repeat center center !important; }
+
+	// #TOOLBAR/logo#
+	.cms_toolbar-item-logo {
+		margin:0 !important;
+
+		a { display:block; width:92px; height:20px; margin:5px 0; @include hide-text();
+			background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left top;
+			&:hover, &:active, &:focus { background-position:left -20px; } }
+	}
+
+	// #TOOLBAR/form#
+	.cms_form-login {
+		padding:3px 0 0 0;
+
+		label { float:left; cursor:pointer; padding-left:10px; }
+		input[type="text"], input[type="password"] { font-size:13px; line-height:13px; width:100px;
+			padding:3px 5px; margin:0; @include border-radius(3px);
+			color:$color-grey; border:1px solid lighten($color-grey, 45%);
+			@include box-shadow(0px 1px 0px white);
+
+			&:focus { border-color:$color-blue;
+				@include box-shadow(inset 0px 0px 2px $color-grey-10);
+				@include single-transition(outline 0.2s);
+			}
+		}
+		input[type="submit"] { font-size:12px; text-transform:uppercase; cursor:pointer;
+			padding:1px 15px 0; @include border-radius(3px);
+			color:white; border:1px solid darken($color-grey, 20%);
+			@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
+			@include background-image($gradient-dark);
+
+			&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
+			&:active, &:focus { background:darken($color-grey-70, 50%); }
+		}
+
+		.cms_error { color:$color-red; }
+		.cms_error input { border:1px solid $color-red; }
+	}
+
+	// #TOOLBAR/buttongroups#
+	.cms_toolbar-item-buttons {
+		margin:4px 0 4px;
+
+		a { float:left; font-size:11px; line-height:11px; padding:5px 12px; }
+		a:first-child { @include border-radius(3px 0 0 3px); }
+		a:last-child { @include border-radius(0 3px 3px 0); }
+		a:only-child { @include border-radius(3px); }
+	}
 
 	// #TOOLBAR/toggler#
 	.cms_toolbar-trigger { position:fixed; right:0; top:0; z-index:999999;
@@ -320,31 +366,6 @@
 	 }
 	.cms_toolbar-trigger-expanded a { background-position:0 -40px;
 		&:hover, &:active, &:focus { background-position:-30px -40px; }
-	}
-
-	// #TOOLBAR/buttonss#
-	.cms_toolbar-item_buttons {
-		margin:4px 0 4px; @include border-radius(3px);
-		@include box-shadow(inset $color-grey-10 0px 1px 0px); color:black;
-
-		li { float:left; zoom:1; }
-		li a { float:left; zoom:1; font-size:11px; line-height:11px; padding:5px 12px; margin:0;
-			border-right:1px solid darken($color-grey-10, 10%); border-top:1px solid darken($color-grey-10, 10%);
-			background:darken($color-grey-5, 5%);
-			@include box-shadow(inset 0px 1px 0px $color-grey-10);
-			&:hover, &:active, &:focus { background-color:$color-grey-10; }
-		}
-
-		li.active a { color:white; border:1px solid darken($color-grey, 20%); border-bottom:none;
-			@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
-			@include background-image($gradient-dark);
-			&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
-			&:active, &:focus { background:darken($color-grey-70, 50%); }
-		}
-
-		li:first-child a { @include border-radius(3px 0 0 3px); border-left:1px solid darken($color-grey-10, 10%); }
-		li:last-child a { @include border-radius(0 3px 3px 0); }
-		li:only-child a { @include border-radius(3px); }
 	}
 
 	// #TOOLBAR/switch#
@@ -367,7 +388,6 @@
 		.cms_toolbar-item_switch-on { display:none; position:relative; top:-1px; }
 		.cms_toolbar-item_switch-off { display:inline; position:relative; top:-1px; }
 	}
-
 	.cms_toolbar-item_switch-active {
 		a {	padding:6px 28px 4px 14px; color:$color-green; }
 		.cms_toolbar-item_switch-knob { left:auto; right:2px;
@@ -377,7 +397,6 @@
 		.cms_toolbar-item_switch-on { display:inline; }
 		.cms_toolbar-item_switch-off { display:none; }
 	}
-
 	// highlight
 	.cms_toolbar-item_switch-highlight {
 		a {	color:$color-orange; }
@@ -421,7 +440,7 @@ only screen and (min-device-pixel-ratio:1.5) {
 	#cms_toolbar {
 		.cms_toolbar-item-logo a,
 		.cms_toolbar-trigger a,
-		.cms_modal-loader,
+		.cms_loader,
 		.cms_modal .cms_modal-collapse,
 		.cms_modal .cms_modal-close,
 		.cms_modal .cms_modal-resize,

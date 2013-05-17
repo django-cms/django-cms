@@ -69,7 +69,7 @@ CMS.$(document).ready(function () {
 			</form>
 			{% else %}
 
-			<ul class="cms_toolbar-item cms_toolbar-item_navigation">
+			<ul class="cms_toolbar-item cms_toolbar-item-navigation">
 				{% for item in request.toolbar.get_items %}
 					{% if not item.right %}{{ item.render }}{% endif %}
 				{% endfor %}
