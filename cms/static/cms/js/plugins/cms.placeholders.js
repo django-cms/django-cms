@@ -172,6 +172,7 @@ $(document).ready(function () {
 			var that = this;
 			var dropped = false;
 			var droparea = null;
+			var dropzone = null;
 
 			this.sortables.nestedSortable({
 				'items': '.cms_draggable',
@@ -200,7 +201,10 @@ $(document).ready(function () {
 					$('.cms_droppable-empty-wrapper').slideDown(200);
 					// ensure all menus are closed
 					$('.cms_dragitem .cms_submenu').hide();
+					// remove classes from empty dropzones
+					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
 				},
+
 				'stop': function (event, ui) {
 					that.dragging = false;
 					// hide empty
@@ -222,14 +226,17 @@ $(document).ready(function () {
 				'isAllowed': function(placeholder, placeholderParent, originalItem) {
 					// getting restriction array
 					var bounds = [];
-					var plugin = $('#cms_plugin-' + that.getId(originalItem));
-
-					var bar = placeholder.parent().prevAll('.cms_placeholder-bar').first();
-					var type = plugin.data('settings').plugin_type;
+					// save original state events
+					var original = $('#cms_plugin-' + that.getId(originalItem));
+					var type = original.data('settings').plugin_type;
+					// prepare variables for bound
+					var holder = placeholder.parent().prevAll('.cms_placeholder-bar').first();
+					var plugin = $('#cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
+					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
 					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
-					if(bar.length) bounds = bar.data('settings').plugin_restriction;
+					if(holder.length) bounds = holder.data('settings').plugin_restriction;
 
 					// if restrictions is still empty, proceed
 					that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;
@@ -245,6 +252,14 @@ $(document).ready(function () {
 				'tolerance': 'pointer',
 				'activeClass': 'cms_draggable-allowed',
 				'hoverClass': 'cms_draggable-hover-allowed',
+				'over': function (event) {
+					dropzone = $(event.target).parent().prev();
+					if(!that.state) $(event.target).addClass('cms_draggable-disallowed');
+				},
+				'out': function (event) {
+					dropzone = null;
+					$(event.target).removeClass('cms_draggable-disallowed');
+				},
 				'drop': function (event) {
 					dropped = true;
 					droparea = $(event.target).parent().nextAll('.cms_draggables').first();
