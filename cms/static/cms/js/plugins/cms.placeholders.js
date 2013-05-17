@@ -232,7 +232,7 @@ $(document).ready(function () {
 					if(bar.length) bounds = bar.data('settings').plugin_restriction;
 
 					// if restrictions is still empty, proceed
-					that.state = ($.inArray(type, bounds) !== -1) ? true : false;
+					that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;
 
 					return that.state;
 				}
