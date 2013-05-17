@@ -24,9 +24,7 @@ class PageManager(PublisherManager):
         return super(PageManager, self).drafts()
 
     def public(self):
-        return super(PageManager, self).public().exclude(
-            publisher_state=self.model.PUBLISHER_STATE_DELETE
-        )
+        return super(PageManager, self).public()
 
     # !IMPORTANT: following methods always return access to draft instances,
     # take care on what you do one them. use Page.objects.public() for accessing

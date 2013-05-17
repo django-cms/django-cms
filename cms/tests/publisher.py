@@ -154,6 +154,22 @@ class PublishingTests(TestCase):
         self.assertObjectExist(public, title_set__title=name)
         self.assertObjectExist(published, title_set__title=name)
 
+        page = Page.objects.get(pk=page.pk)
+
+        self.assertEqual(page.publisher_state, 0)
+
+    def test_publish_admin(self):
+        page = self.create_page("test_admin", published=False)
+        page.save()
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk]))
+            self.assertEqual(response.status_code, 302)
+        page = Page.objects.get(pk=page.pk)
+
+        self.assertEqual(page.publisher_state, 0)
+
+
     def test_publish_child_first(self):
         parent = self.create_page('parent', published=False)
         child = self.create_page('child', published=False, parent=parent)

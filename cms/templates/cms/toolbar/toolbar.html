@@ -16,6 +16,7 @@
 {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.placeholders.css" />{% endaddtoblock %}
 {% addtoblock "js" %}
 <script type="text/javascript">
+
 CMS.$(document).ready(function () {
 	// initialize toolbar and pass required options
 	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {
@@ -41,10 +42,11 @@ CMS.$(document).ready(function () {
 	CMS.API.Toolbar.showError('{{ request.toolbar.login_form.non_field_errors }}{% if request.toolbar.login_form.username.errors %}<div><strong>{% trans "Username" %}</strong> - {{ request.toolbar.login_form.username.errors }}</div>{% endif %}{% if request.toolbar.login_form.password.errors %}<div><strong>{% trans "Password" %}</strong> - {{ request.toolbar.login_form.password.errors }}</div>{% endif %}');
 	{% endif %}
 	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
-	{% if request.current_page.publisher_draft.is_dirty %}
+	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty %}
 	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'right');
 	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
 	{% endif %}
+
 });
 </script>
 {% endaddtoblock %}
