@@ -241,7 +241,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
 
         txt = Text.objects.all()[0]
-        self.assertTrue('id="plugin_obj_2"' in txt.body)
+        self.assertTrue('id="plugin_obj_%s"' % (txt.pk + 1) in txt.body)
 
 
     def test_add_text_plugin_empty_tag(self):
