@@ -91,8 +91,8 @@
 
 	.cms_dragitem { cursor:move; }
 	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
-	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/arrow-down-active.png') no-repeat 3px 7px; }
-	.cms_dragitem-collapsed { background:url('/static/cms/img/toolbar/arrow-down-collapsed.png') no-repeat 3px 6px; }
+	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -358px; }
+	.cms_dragitem-collapsed { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 2px -389px; }
 	.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
 		width:100%; height:100%;
 		@include opacity(0.6); }
@@ -122,15 +122,10 @@ only screen and (min--moz-device-pixel-ratio:1.5),
 only screen and (min-device-pixel-ratio:1.5) {
 
 	.cms_placeholder .cms_submenu, body .cms_submenu,
-	.cms_placeholder .cms_submenu-quicksearch, body .cms_submenu-quicksearch {
+	.cms_placeholder .cms_submenu-quicksearch, body .cms_submenu-quicksearch,
+	.cms_placeholder .cms_dragitem-collapsable, .cms_placeholder .cms_dragitem-collapsed {
 		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png');
 		background-size:190px; }
-
-	.cms_placeholder .cms_dragitem-collapsable,
-	body .cms_dragitem-collapsable { background-image:url('/static/cms/img/toolbar/arrow-down-active@2x.png'); background-size:16px; }
-	.cms_placeholder .cms_dragitem-collapsed,
-	body .cms_dragitem-collapsed { background-image:url('/static/cms/img/toolbar/arrow-down-collapsed@2x.png'); background-size:16px; }
-
 
 // end of retina
 }
