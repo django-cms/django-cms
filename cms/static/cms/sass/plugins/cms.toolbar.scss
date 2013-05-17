@@ -235,7 +235,7 @@
 			a:nth-child(10) { z-index:1; }
 
 			// custom styles
-			a span, .cms_modal-breadcrumb-title { float:left; padding:10px 15px; position:relative; z-index:120; color:$color-grey; }
+			a span, .cms_modal-breadcrumb-title { float:left; position:relative; z-index:120; color:$color-grey; }
 			.cms_modal-breadcrumb-title { padding:10px 20px 10px 15px;
 				border-right:1px solid $color-grey-10; @include border-radius(0px 0px 0px 5px);
 				background:white url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -113px -104px; @include hide-text(); }
@@ -243,10 +243,7 @@
 			a:hover { color:black; background-position:right -232px !important; }
 			a:hover span { color:black; background-color:white; }
 
-			.cms_modal-breadcrumb-last {
-				cursor:default;
-				span { color:$color-blue; padding-left:25px; }
-			}
+			.cms_modal-breadcrumb-last { cursor:default; span { color:$color-blue; } }
 		}
 
 		// buttons
