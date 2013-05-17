@@ -198,7 +198,7 @@ class PageToolbar(CMSToolbar):
     def get_publish_menu(self):
         page = self.page
         button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), _("Publish Changes"),
-                        extra_classes="cms_toolbar-publish", right=True)
+                        extra_classes="cms_btn-highlight", right=True)
         return button
 
     def get_admin_menu(self):
