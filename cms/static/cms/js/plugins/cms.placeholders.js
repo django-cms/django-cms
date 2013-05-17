@@ -50,10 +50,35 @@ $(document).ready(function () {
 				(e.type === 'mouseenter') ? that._showMenu($(this)) : that._hideMenu($(this));
 			});
 
-			// TODO we need to define the initial state and expanded behaviour
-			draggables.find('> .cms_dragitem-collapsable').bind('click', function (e) {
-				$(this).toggleClass('cms_dragitem-collapsed')
-					.parent().find('> ul').toggle();
+			// attach events to draggable
+			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
+				var el = $(this);
+				var id = that.getId($(this).parent());
+				var settings = CMS.API.Toolbar.getSettings();
+					settings.states = settings.states || [];
+				var index = settings.states.indexOf(id);
+				if(index != -1) settings.states.splice(settings.states.indexOf(id), 1);
+
+				if(el.hasClass('cms_dragitem-collapsed')) {
+					// show element
+					el.removeClass('cms_dragitem-collapsed').parent().find('> ul').show();
+				} else {
+					// hide element
+					el.addClass('cms_dragitem-collapsed').parent().find('> ul').hide();
+					settings.states.push(id);
+				}
+
+				// save settings
+				CMS.API.Toolbar.setSettings(settings);
+			});
+
+			// setting correct states
+			var states = CMS.API.Toolbar.getSettings().states;
+			// loop through the items
+			$.each(states, function (index, id) {
+				var el = $('#cms_draggable-' + id);
+					el.find('> ul').hide();
+					el.find('> div').addClass('cms_dragitem-collapsed');
 			});
 		},
 
@@ -142,10 +167,6 @@ $(document).ready(function () {
 				});
 			}, timeout);
 		},
-
-		_collapse: function () {},
-
-		_expand: function () {},
 
 		_drag: function () {
 			var that = this;

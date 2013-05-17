@@ -247,13 +247,18 @@ $(document).ready(function () {
 			(this.settings.toolbar === 'collapsed') ? this._showToolbar(speed) : this._hideToolbar(speed);
 		},
 
-		setSettings: function () {
-			// TODO should be done different
-			return localStorage.setItem('cms_cookie', JSON.stringify(this.settings));
+		setSettings: function (settings) {
+			// cancel if local storage is not available
+			if(!window.localStorage) return false;
+			// set settings
+			settings = $.extend({}, this.settings, settings);
+			return localStorage.setItem('cms_cookie', JSON.stringify(settings));
 		},
 
 		getSettings: function () {
-			// TODO should be done different (ie < 8)
+			// cancel if local storage is not available
+			if(!window.localStorage) return false;
+			// get settings
 			return JSON.parse(localStorage.getItem('cms_cookie'));
 		},
 
