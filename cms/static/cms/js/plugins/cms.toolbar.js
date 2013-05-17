@@ -144,21 +144,14 @@ $(document).ready(function () {
 			this.menu.bind('click', function () {
 				($(this).hasClass('cms_placeholders-menu-alternate')) ? that._enableEditMode(300) : that._enableDragMode(300);
 
-				// reset dragholders
-				$('.cms_draggable').removeClass('cms_draggable-selected');
-				$('.cms_plugin').removeClass('cms_plugin-active');
-
 				// attach active class to current element
 				var id = $(this).data('id');
-				var dragitem = $('#cms_draggable-' + id);
-				var plugin = $('#cms_plugin-' + id);
 
-				// reset classes
-				dragitem.addClass('cms_draggable-selected');
-				plugin.addClass('cms_plugin-active');
+				// set active state
+				that.setActive(id);
 
 				// set new position
-				var pos = plugin.position('body').top;
+				var pos = $('#cms_plugin-' + id).position('body').top;
 				var bound = $(window).height();
 				var offset = 200;
 				if(bound - pos <= 0) $(window).scrollTop(pos - offset);
@@ -299,6 +292,7 @@ $(document).ready(function () {
 			// attach load event to iframe
 			iframe.bind('load', function () {
 				iframe.show();
+				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 			});
 
 			// cancel animation if sidebar is already shown
@@ -474,6 +468,20 @@ $(document).ready(function () {
 					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			});
+		},
+
+		setActive: function (id) {
+			// reset active statesdragholders
+			$('.cms_draggable').removeClass('cms_draggable-selected');
+			$('.cms_plugin').removeClass('cms_plugin-active');
+
+			// attach active class to current element
+			var dragitem = $('#cms_draggable-' + id);
+			var plugin = $('#cms_plugin-' + id);
+
+			// set new classes
+			dragitem.addClass('cms_draggable-selected');
+			plugin.addClass('cms_plugin-active');
 		},
 
 		// private methods
