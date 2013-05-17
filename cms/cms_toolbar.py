@@ -3,7 +3,7 @@ import urllib
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.utils.i18n import get_language_objects, get_language_object
-from cms.toolbar.items import Item, List, Break, ButtonList
+from cms.toolbar.items import Item, List, Break, ButtonList, Button
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
 
@@ -197,11 +197,9 @@ class PageToolbar(CMSToolbar):
 
     def get_publish_menu(self):
         page = self.page
-        dirty = page.is_dirty()
-
-        switch = ButtonList(right=True)
-        switch.addItem(_("Publish now"), reverse('admin:cms_page_publish_page', args=[page.pk]), dirty)
-        return switch
+        button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), _("Publish Changes"),
+                        extra_classes="cms_toolbar-publish", right=True)
+        return button
 
     def get_admin_menu(self):
         """
@@ -218,7 +216,8 @@ class PageToolbar(CMSToolbar):
             Item(reverse('admin:cms_usersettings_change'), _('Settings'), load_side_frame=True))
         admin_items.items.append(Break())
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True,
-            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])}, active=True))
+                                      ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+                                      active=True))
         return admin_items
 
     def get_mode_switchers(self):

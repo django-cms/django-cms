@@ -35,7 +35,7 @@ class Item(BaseItem):
     template = "cms/toolbar/menu/item.html"
 
     def __init__(self, url, title, load_side_frame=False, ajax=False, ajax_data=None, active=False, question="",
-                 right=False, load_modal=True, disabled=False):
+                 right=False, load_modal=True, disabled=False, extra_classes=None):
         super(Item, self).__init__(right)
         if load_side_frame and ajax:
             raise Exception("load_side_frame and ajax can not both be True.")
@@ -48,6 +48,7 @@ class Item(BaseItem):
         self.question = question
         self.disabled = disabled
         self.ajax_data = ajax_data
+        self.extra_classes = extra_classes
 
     def get_context(self):
         mod = None
@@ -70,6 +71,7 @@ class Item(BaseItem):
             'question': self.question,
             'disabled': self.disabled,
             'data': data,
+            'extra_classes': self.extra_classes,
         }
 
     def __repr__(self):
@@ -94,7 +96,7 @@ class Dialog(BaseItem):
 
 
 class ButtonList(BaseItem):
-    template = "cms/toolbar/menu/buttons.html"
+    template = "cms/toolbar/menu/button_list.html"
 
     def __init__(self, right=False):
         super(ButtonList, self).__init__(right)
@@ -105,5 +107,15 @@ class ButtonList(BaseItem):
 
     def get_context(self):
         return {'items': self.items}
+
+
+class Button(Item):
+    template = "cms/toolbar/menu/button.html"
+
+
+    def get_context(self):
+        context = super(Button, self).get_context()
+        context['extra_classes'] = self.extra_classes
+        return context
 
 
