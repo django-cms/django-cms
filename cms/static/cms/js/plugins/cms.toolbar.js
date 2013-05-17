@@ -391,6 +391,8 @@ $(document).ready(function () {
 
 		closeMessage: function () {
 			this.messages.fadeOut(300);
+			// unlock toolbar
+			this.lockToolbar = false;
 		},
 
 		openModal: function (url, name, breadcrumb) {
