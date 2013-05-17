@@ -267,7 +267,7 @@
 		&:active, &:focus { border:1px solid darken($color-grey-10, 10%); background:darken($color-grey-10, 10%); }
 	}
 
-	.cms_btn-inverse {
+	.cms_btn-disabled {
 		border-right:1px solid darken($color-grey-10, 10%); border-top:1px solid darken($color-grey-10, 10%);
 		@include box-shadow(inset 0px 1px 0px $color-grey-10);
 		background:darken($color-grey-5, 5%);
