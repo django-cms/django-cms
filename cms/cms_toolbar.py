@@ -46,7 +46,7 @@ class PageToolbar(CMSToolbar):
                         # Publish Menu
                         items.append(self.get_history_menu())
 
-                        if self.page.has_publish_permission(self.request) and self.page.is_dirty():
+                        if self.page.has_publish_permission(self.request):
                             items.append(self.get_publish_menu())
                         items.append(self.get_mode_switchers())
             items.append(self.get_language_menu())
@@ -110,7 +110,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_change', args=[page.pk]),
             _('Settings'),
-            load_side_frame=True)
+            load_modal=True)
         )
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             menu_items.items.append(self.get_template_menu())
@@ -118,7 +118,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_changelist'),
             _('Move/add Pages'),
-            load_side_frame=True)
+            load_modal=True)
         )
         data = {
             'position': 'last-child',
@@ -127,7 +127,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             '%s?%s' % (reverse('admin:cms_page_add'), urllib.urlencode(data)),
             _('Add child page'),
-            load_side_frame=True)
+            load_modal=True)
         )
         data = {
             'position': 'last-child',
@@ -138,13 +138,13 @@ class PageToolbar(CMSToolbar):
             '%s?%s' % (reverse('admin:cms_page_add'),
             urllib.urlencode(data)),
             _('Add sibling page'),
-            load_side_frame=True)
+            load_modal=True)
         )
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_delete', args=(self.page.pk,)),
             _('Delete Page'),
-            load_side_frame=True)
+            load_modal=True)
         )
 
         return menu_items
@@ -191,14 +191,15 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_history', args=(self.page.pk,)),
             _('View History'),
-            load_side_frame=True)
+            load_modal=True)
         )
         return menu_items
 
     def get_publish_menu(self):
         page = self.page
         button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), _("Publish Changes"),
-                        extra_classes="cms_btn-action", right=True)
+                        extra_classes="cms_btn-action cms_btn-publish", right=True, disabled=not page.is_dirty(),
+                        active=page.is_dirty())
         return button
 
     def get_admin_menu(self):
