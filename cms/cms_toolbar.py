@@ -46,7 +46,7 @@ class PageToolbar(CMSToolbar):
                         # Publish Menu
                         items.append(self.get_history_menu())
 
-                        if self.page.has_publish_permission(self.request) and self.page.is_dirty():
+                        if self.page.has_publish_permission(self.request):
                             items.append(self.get_publish_menu())
                         items.append(self.get_mode_switchers())
             items.append(self.get_language_menu())
@@ -198,7 +198,7 @@ class PageToolbar(CMSToolbar):
     def get_publish_menu(self):
         page = self.page
         button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), _("Publish Changes"),
-                        extra_classes="cms_btn-highlight", right=True)
+                        extra_classes="cms_btn-highlight", right=True, disabled=not page.is_dirty(), active=page.is_dirty())
         return button
 
     def get_admin_menu(self):
