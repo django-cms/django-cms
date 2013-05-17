@@ -41,7 +41,7 @@ CMS.$(document).ready(function () {
 	CMS.API.Toolbar.showError('{{ request.toolbar.login_form.non_field_errors }}{% if request.toolbar.login_form.username.errors %}<div><strong>{% trans "Username" %}</strong> - {{ request.toolbar.login_form.username.errors }}</div>{% endif %}{% if request.toolbar.login_form.password.errors %}<div><strong>{% trans "Password" %}</strong> - {{ request.toolbar.login_form.password.errors }}</div>{% endif %}');
 	{% endif %}
 	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
-	{% if page.publisher_draft.is_dirty %}
+	{% if request.current_page.publisher_draft.is_dirty %}
 	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'right');
 	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
 	{% endif %}
