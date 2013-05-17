@@ -74,6 +74,8 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_delete')
             if not obj.has_publish_permission(request):
                 exclude.append('can_publish')
+            if not obj.has_set_navigation_permission(request):
+                exclude.append('can_set_navigation')
             if not obj.has_advanced_settings_permission(request):
                 exclude.append('can_change_advanced_settings')
             if not obj.has_move_page_permission(request):
@@ -95,7 +97,7 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
     verbose_name_plural = _("View restrictions")
     exclude = [
         'can_add', 'can_change', 'can_delete', 'can_view',
-        'can_publish', 'can_change_advanced_settings', 'can_move_page',
+        'can_publish', 'can_set_navigation', 'can_change_advanced_settings', 'can_move_page',
         'can_moderate', 'can_change_permissions'
     ]
 
@@ -122,8 +124,8 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
 
 
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
-    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_set_navigation', 'can_change_permissions']
+    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_set_navigation', 'can_change_permissions']
 
     form = GlobalPagePermissionAdminForm
 

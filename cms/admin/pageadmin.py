@@ -353,6 +353,10 @@ class PageAdmin(ModelAdmin):
                 fields = list(given_fieldsets[0][1]['fields'][2])
                 fields.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(fields)
+            if not obj.has_set_navigation_permission(request):
+                fields = list(given_fieldsets[0][1]['fields'][2])
+                fields.remove('in_navigation')
+                given_fieldsets[0][1]['fields'][2] = tuple(fields)
             placeholders_template = get_template_from_request(request, obj)
             for placeholder_name in self.get_fieldset_placeholders(placeholders_template):
                 name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
