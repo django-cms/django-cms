@@ -27,6 +27,6 @@ $gradient-toolbar: linear-gradient(top, lighten($color-grey, 58%) 0%, lighten($c
 $gradient-dark: linear-gradient(top, $color-grey, darken($color-grey, 20%));
 $gradient-blue: linear-gradient(top, adjust-hue($color-blue, 5deg), adjust-hue($color-blue, 15deg));
 $gradient-green: linear-gradient(top, lighten($color-green, 10%) 0%, saturate($color-green, 20%) 50%, saturate($color-green, 30%) 100%);
-$gradient-orange: linear-gradient(top, lighten($color-orange, 10%) 0%, saturate($color-orange, 20%) 50%, saturate($color-orange, 30%) 100%);
+$gradient-orange: linear-gradient(top, lighten($color-orange, 5%), $color-orange);
 $gradient-red: linear-gradient(top, adjust-hue($color-red, 5deg), adjust-hue($color-red, 15deg));
 $gradient-light: linear-gradient(top, lighten($color-grey-10, 5%), $color-grey-10);

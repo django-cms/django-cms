@@ -47,9 +47,9 @@ $(document).ready(function () {
 			this.toolbar.hide();
 			this.toolbarTrigger = this.container.find('.cms_toolbar-trigger');
 
-			this.navigations = this.container.find('.cms_toolbar-item_navigation');
-			this.buttons = this.container.find('.cms_toolbar-item_buttons');
-			this.modes = this.container.find('.cms_toolbar-item_buttons-group li a');
+			this.navigations = this.container.find('.cms_toolbar-item-navigation');
+			this.buttons = this.container.find('.cms_toolbar-item-buttons');
+			this.modes = this.container.find('.cms_toolbar-item-buttons-group a');
 			this.switcher = this.container.find('.cms_toolbar-item_switch');
 
 			this.body = $('html');
@@ -100,15 +100,15 @@ $(document).ready(function () {
 				// attach delegate event
 				item.find('li ul a').bind('click', function (e) {
 					e.preventDefault();
-					if(!$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')) that.delegate($(this));
+					if(!$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that.delegate($(this));
 				});
 				// remove events from first level
 				item.find('> li > a').bind('click', function (e) {
 					e.preventDefault();
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
-						&& !$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')
-						&& !$(this).parent().hasClass('cms_toolbar-item_navigation-disabled')) that.delegate($(this));
+						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')
+						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that.delegate($(this));
 				});
 
 				// handle states
@@ -318,7 +318,7 @@ $(document).ready(function () {
 
 			function insertHolder(iframe) {
 				// show iframe after animation
-				that.sideframe.find('.cms_sideframe-frame').addClass('cms_modal-loader');
+				that.sideframe.find('.cms_sideframe-frame').addClass('cms_loader');
 				holder.html(iframe);
 			}
 		},
@@ -420,7 +420,7 @@ $(document).ready(function () {
 
 			// show iframe after animation
 			setTimeout(function () {
-				that.modal.find('.cms_modal-body').addClass('cms_modal-loader');
+				that.modal.find('.cms_modal-body').addClass('cms_loader');
 				holder.html(iframe);
 			}, this.options.modalDuration);
 
@@ -442,7 +442,7 @@ $(document).ready(function () {
 				'width': this.options.modalWidth,
 				'height': this.options.modalHeight
 			});
-			this.modal.find('.cms_modal-body').removeClass('cms_modal-loader');
+			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 			this.modal.find('.cms_modal-maximize').removeClass('cms_modal-maximize-active');
 			this.maximized = false;
 
@@ -501,7 +501,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.modes.parent().removeClass('active').eq(0).addClass('active');
+			this.modes.removeClass('cms_btn-dark').eq(0).addClass('cms_btn-dark');
 			this.settings.mode = 'edit';
 
 			// hide clipboard if in edit mode
@@ -517,7 +517,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.modes.parent().removeClass('active').eq(1).addClass('active');
+			this.modes.removeClass('cms_btn-dark').eq(1).addClass('cms_btn-dark');
 			this.settings.mode = 'drag';
 
 			// show clipboard in build mode
@@ -586,7 +586,7 @@ $(document).ready(function () {
 				if(close) $(this).hide();
 			});
 			this.body.animate({ 'margin-left': 0 }, duration);
-			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_modal-loader');
+			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 			this.lockToolbar = false;
 		},
 
@@ -642,7 +642,7 @@ $(document).ready(function () {
 		_hideModal: function (speed) {
 			this.modal.fadeOut(speed);
 			this.modal.find('.cms_modal-frame iframe').remove();
-			this.modal.find('.cms_modal-body').removeClass('cms_modal-loader');
+			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 		},
 
 		_minimizeModal: function () {
@@ -796,7 +796,7 @@ $(document).ready(function () {
 			var that = this;
 			var row = iframe.contents().find('.submit-row');
 			var buttons = row.find('input, a');
-			var render = $('<div />');
+			var render = $('<span />');
 
 			// loop over input buttons
 			buttons.each(function (index, item) {
@@ -807,11 +807,11 @@ $(document).ready(function () {
 
 				// create helper variables
 				var title = item.attr('value') || item.text();
-				var cls = 'cms_modal-btn';
+				var cls = 'cms_btn';
 
 				// set additional css classes
-				if(item.hasClass('default')) cls = 'cms_modal-btn cms_modal-btn-action';
-				if(item.hasClass('deletelink')) cls = 'cms_modal-btn cms_modal-btn-caution';
+				if(item.hasClass('default')) cls = 'cms_btn cms_btn-action';
+				if(item.hasClass('deletelink')) cls = 'cms_btn cms_btn-caution';
 
 				// create the element
 				var el = $('<div class="'+cls+'" data-name="'+item.attr('name')+'" data-url="'+item.attr('href')+'">'+title+'</div>');
@@ -828,14 +828,13 @@ $(document).ready(function () {
 			});
 
 			// manually add cancel button at the end
-			var cancel = $('<div class="cms_modal-btn">'+this.options.lang.cancel+'</div>');
+			var cancel = $('<div class="cms_btn">'+this.options.lang.cancel+'</div>');
 				cancel.bind('click', function () {
 					that.closeModal();
 				});
 			render.append(cancel);
 
 			// unwrap helper and ide row
-			render.unwrap('<div>');
 			row.hide();
 
 			// render buttons
