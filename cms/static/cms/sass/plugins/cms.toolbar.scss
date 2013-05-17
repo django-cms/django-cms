@@ -200,7 +200,7 @@
 			background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left top; }
 		.cms_modal-collapse { right:40px; background-position:0 -70px; }
 		.cms_modal-collapse:hover, .cms_modal-collapse:active, .cms_modal-collapse:focus { background-position:-20px -70px; }
-		.cms_modal-collapsed { background-position:-80px -70px; }
+		.cms_modal-collapsed { background-position:-100px -70px; }
 		.cms_modal-collapsed:hover, .cms_modal-collapsed:active, .cms_modal-collapsed:focus { background-position:-100px -70px; }
 
 		.cms_modal-maximize { right:22px; background-position:0 -90px; }
@@ -235,7 +235,7 @@
 			a:nth-child(10) { z-index:1; }
 
 			// custom styles
-			a span, .cms_modal-breadcrumb-title { float:left; padding:10px 15px; position:relative; z-index:120; color:$color-grey; }
+			a span, .cms_modal-breadcrumb-title { float:left; position:relative; z-index:120; color:$color-grey; }
 			.cms_modal-breadcrumb-title { padding:10px 20px 10px 15px;
 				border-right:1px solid $color-grey-10; @include border-radius(0px 0px 0px 5px);
 				background:white url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -113px -104px; @include hide-text(); }
@@ -243,10 +243,7 @@
 			a:hover { color:black; background-position:right -232px !important; }
 			a:hover span { color:black; background-color:white; }
 
-			.cms_modal-breadcrumb-last {
-				cursor:default;
-				span { color:$color-blue; padding-left:25px; }
-			}
+			.cms_modal-breadcrumb-last { cursor:default; span { color:$color-blue; } }
 		}
 
 		// buttons
@@ -280,14 +277,6 @@
 		background:$color-grey; @include background-image($gradient-dark);
 		&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
 		&:active, &:focus { background:darken($color-grey-70, 50%); }
-	}
-
-	.cms_btn-highlight { color:white;
-		border:1px solid darken($color-orange, 5%) !important; border-bottom:none !important;
-		@include box-shadow(inset 0 1px 0 lighten($color-orange, 20%));
-		background:$color-orange; @include background-image($gradient-orange);
-		&:hover, &:active, &:focus { background:$color-orange; @include box-shadow(none); }
-		&:active, &:focus { background:darken($color-orange, 50%); }
 	}
 
 	.cms_btn-action { color:white;
@@ -403,11 +392,11 @@
 	}
 	// highlight
 	.cms_toolbar-item_switch-highlight {
-		a {	color:$color-orange; }
+		a {	color:$color-blue; }
 		.cms_toolbar-item_switch-knob {
-			border:1px solid lighten($color-orange, 10%); background:lighten($color-orange, 10%);
-			@include box-shadow(inset 0 1px 0 lighten($color-orange, 30%));
-			@include background-image($gradient-orange);
+			border:1px solid darken($color-blue, 10%); background:lighten($color-blue, 10%);
+			@include box-shadow(inset 0 1px 0 lighten($color-blue, 20%));
+			@include background-image($gradient-blue);
 		}
 	}
 
