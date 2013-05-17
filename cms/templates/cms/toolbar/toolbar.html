@@ -25,7 +25,7 @@ CMS.$(document).ready(function () {
 			'toolbar': 'expanded',
 			'mode': 'edit'
 		},
-		'clipboard': {{ request.toolbar.clipboard.pk }},
+		'clipboard': '{{ request.toolbar.clipboard.pk }}',
 		'lang': {
 			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
 			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
@@ -33,12 +33,14 @@ CMS.$(document).ready(function () {
 		}
 	});
 
-	// global accessor for placeholders
+	// initialize placeholder helpers
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
 
+	// initialize required API calls
 	{% if request.toolbar.login_form.errors %}
-	CMS.API.Toolbar.showError('{{ request.toolbar.login_form.non_field_errors }}{% if request.toolbar.login_form.username.errors %}{% trans "Username" %}: {{ request.toolbar.login_form.username.errors }}{% endif %}{% if request.toolbar.login_form.password.errors %}{% trans "Password" %}: {{ request.toolbar.login_form.password.errors }}{% endif %}');
+	CMS.API.Toolbar.showError('{{ request.toolbar.login_form.non_field_errors }}{% if request.toolbar.login_form.username.errors %}<div><strong>{% trans "Username" %}</strong> - {{ request.toolbar.login_form.username.errors }}</div>{% endif %}{% if request.toolbar.login_form.password.errors %}<div><strong>{% trans "Password" %}</strong> - {{ request.toolbar.login_form.password.errors }}</div>{% endif %}');
 	{% endif %}
+	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
 });
 </script>
 {% endaddtoblock %}
@@ -132,19 +134,12 @@ CMS.$(document).ready(function () {
 	{% endwith %}
 	{% endif %}
 
-	<!-- start: dialog -->
-	<div class="cms_dialog">
-		<div class="cms_dialog-title">{% trans "Notification" %}</div>
-		<div class="cms_dialog-inner">
-			<div class="cms_dialog-text"></div>
-			<div class="cms_dialog-buttons">
-				<a href="#" class="cms_dialog-cancel">{% trans "No" %}</a>
-				<a href="#" class="cms_dialog-confirm">{% trans "Yes" %}</a>
-				<a href="#" class="cms_dialog-accept">{% trans "Ok" %}</a>
-			</div>
-		</div>
+	<!-- start: messages -->
+	<div class="cms_messages">
+		<div class="cms_messages-close"></div>
+		<div class="cms_messages-inner"></div>
 	</div>
-	<!-- end: dialog -->
+	<!-- end: messages -->
 
 	<!-- start: modal -->
 	<div class="cms_modal">
