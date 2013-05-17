@@ -26,14 +26,18 @@
 #cms_toolbar {
 	.cms_toolbar { position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px;
 		border-bottom:1px solid $color-grey !important; background:$color-grey-5;
-		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2)); }
-	.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
-	.cms_toolbar-right { float:right; padding-right:32px; position:relative; z-index:10; }
+		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
 
-	.cms_toolbar-item { float:left; margin:0; }
+		.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
+		.cms_toolbar-right { float:right; padding-right:32px; position:relative; z-index:10; }
 
-	.cms_toolbar-left .cms_toolbar-item { margin-left:10px; }
-	.cms_toolbar-right .cms_toolbar-item { margin-right:20px; }
+		.cms_toolbar-left .cms_toolbar-item { margin-left:10px; }
+		.cms_toolbar-right .cms_toolbar-item { margin-right:20px; }
+
+		// items
+		.cms_toolbar-item { float:left; }
+		.cms_toolbar-item-buttons a { border-bottom:none !important; }
+	}
 
 	//##################################################################################################################
 	// #TOOLBAR/navigation#
@@ -264,7 +268,7 @@
 	}
 
 	.cms_btn-inverse {
-		border-right:1px solid darken($color-grey-10, 10%); border-top:1px solid darken($color-grey-10, 10%); border-bottom:none !important;
+		border-right:1px solid darken($color-grey-10, 10%); border-top:1px solid darken($color-grey-10, 10%);
 		@include box-shadow(inset 0px 1px 0px $color-grey-10);
 		background:darken($color-grey-5, 5%);
 		&:hover, &:active, &:focus { background-color:$color-grey-10; }
