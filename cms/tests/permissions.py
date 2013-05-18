@@ -10,6 +10,11 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 class PermissionCacheTests(SettingsOverrideTestCase):
     settings_overrides = {
         'CMS_PERMISSION': True,
+        'CMS_CACHE_DURATIONS': {
+            'menus': 3600,
+            'content': 3600,
+            'permissions': 3600,
+        }
     }
     
     def setUp(self):
