@@ -126,7 +126,7 @@
 
 	//##################################################################################################################
 	// #TOOLBAR/clipboard#
-	.cms_clipboard { position:absolute; left:0; top:130px; z-index:99;
+	.cms_clipboard { position:fixed; left:0; top:130px; z-index:99;
 		p { pading:0; margin:0; }
 
 		ul li { margin:0 0 2px; }
