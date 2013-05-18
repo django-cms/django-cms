@@ -405,8 +405,7 @@ class AdminFieldsetTests(CMSTestCase):
             experiment = AttributeObject()
             contribute_fieldsets(experiment)
         self.validate_attributes(control, experiment, ['fieldsets', 'general_fields'])
-        self.assertEqual(control.general_fields[0], ('title', 'page_title', 'menu_title'))
-        self.assertEqual(experiment.general_fields[0], ('title', 'page_title'))
+        self.assertEqual(control.general_fields[0], 'title')
 
     def test_no_softroot(self):
         with SettingsOverride(CMS_SOFTROOT=True):
