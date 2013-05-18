@@ -694,22 +694,17 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(Http404, self.admin_class.preview_page, request,
                               404)
         page = self.get_page()
-        page.unpublish()
-        with self.login_user_context(permless):
-            request = self.get_request('/?public=true')
-            self.assertRaises(Http404, self.admin_class.preview_page, request,
-                              page.pk)
         page.publish()
         base_url = page.get_absolute_url()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
             response = self.admin_class.preview_page(request, page.pk)
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?preview=1' % base_url)
+            self.assertEqual(response['Location'], '%s?edit' % base_url)
             request = self.get_request()
             response = self.admin_class.preview_page(request, page.pk)
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?preview=1&draft=1' % base_url)
+            self.assertEqual(response['Location'], '%s?edit' % base_url)
             site = Site.objects.create(domain='django-cms.org', name='django-cms')
             page.site = site
             page.save()
@@ -718,7 +713,7 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.preview_page(request, page.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'],
-                             'http://django-cms.org%s?preview=1&draft=1' % base_url)
+                             'http://django-cms.org%s?edit' % base_url)
 
     def test_too_many_plugins_global(self):
         conf = {
