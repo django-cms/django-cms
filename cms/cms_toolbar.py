@@ -13,7 +13,7 @@ from cms.utils.permissions import has_page_change_permission, get_user_sites_que
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 from menus.utils import DefaultLanguageChanger
 
 
@@ -110,16 +110,18 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_change', args=[page.pk]),
             _('Settings'),
-            load_modal=True)
-        )
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+            redirect_on_close_url='.',
+        ))
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             menu_items.items.append(self.get_template_menu())
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_changelist'),
             _('Move page'),
-            load_modal=True)
-        )
+            load_modal=True
+        ))
         data = {
             'position': 'last-child',
             'target': self.page.pk,
@@ -127,8 +129,9 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             '%s?%s' % (reverse('admin:cms_page_add'), urllib.urlencode(data)),
             _('Add child page'),
-            load_modal=True)
-        )
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+        ))
         data = {
             'position': 'last-child',
         }
@@ -138,14 +141,17 @@ class PageToolbar(CMSToolbar):
             '%s?%s' % (reverse('admin:cms_page_add'),
             urllib.urlencode(data)),
             _('Add sibling page'),
-            load_modal=True)
-        )
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+        ))
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_delete', args=(self.page.pk,)),
             _('Delete Page'),
-            load_modal=True)
-        )
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+            redirect_on_close_url='/',
+        ))
 
         return menu_items
 
