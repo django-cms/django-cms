@@ -218,10 +218,14 @@ $(document).ready(function () {
 						droparea.prepend(ui.item);
 						dropped = false;
 					}
+
 					// we pass the id to the updater which checks within the backend the correct place
 					var id = ui.item.attr('id').replace('cms_draggable-', '');
 					var plugin = $('#cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
+
+					// update clipboard entries
+					that._updateClipboard(ui.item);
 				},
 				'isAllowed': function(placeholder, placeholderParent, originalItem) {
 					// getting restriction array
@@ -268,6 +272,7 @@ $(document).ready(function () {
 		},
 
 		_clipboard: function () {
+			var that = this;
 			var remove = this.clipboard.find('.cms_clipboard-empty a');
 			var triggers = this.clipboard.find('.cms_clipboard-triggers a');
 			var containers = this.clipboard.find('.cms_clipboard-containers > li');
@@ -289,7 +294,10 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseleave') hide();
 
-				var el = containers.eq(triggers.index(this));
+				triggers = that.clipboard.find('.cms_clipboard-triggers a');
+				containers = that.clipboard.find('.cms_clipboard-containers > li');
+				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
+				var el = containers.eq(index);
 				// cancel if element is already open
 				if(el.data('open') === true) return false;
 
@@ -313,6 +321,26 @@ $(document).ready(function () {
 				timer = setTimeout(function () {
 					containers.stop().css({ 'margin-left': -position }).data('open', false);
 				}, speed);
+			}
+		},
+
+		_updateClipboard: function (item) {
+			// cancel if there is no clipboard available
+			if(!this.clipboard.length) return false;
+
+			var containers = this.clipboard.find('.cms_clipboard-containers .cms_draggable');
+			var triggers = this.clipboard.find('.cms_clipboard-triggers li');
+
+			var lengthContainers = containers.length;
+			var lengthTriggers = triggers.length;
+
+			// only proceed if the items are not in sync
+			if(lengthContainers === lengthTriggers) return false;
+
+			// set visible elements
+			triggers.hide();
+			for(var i = 0; i < lengthContainers; i++) {
+				triggers.eq(i).show();
 			}
 		},
 
@@ -501,6 +529,9 @@ $(document).ready(function () {
 			var placeholder_id = this._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_placeholder-bar').first());
 			var plugin_parent = this._getId(dragitem.parent().closest('.cms_draggable'));
 			var plugin_order = this._getIds(dragitem.siblings('.cms_draggable').andSelf());
+
+			// cancel here if we have no placeholder id
+			if(placeholder_id === false) return false;
 
 			// gather the data for ajax request
 			var data = {
