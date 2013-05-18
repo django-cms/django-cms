@@ -293,6 +293,8 @@
 		&:hover, &:active, &:focus { background:adjust-hue($color-red, 15deg); @include box-shadow(none); }
 		&:active, &:focus { background:darken(adjust-hue($color-red, 15deg), 10%); }
 	}
+	.cms_btn-publish { display:none; }
+	.cms_btn-publish-active { display:block; }
 
 	//##################################################################################################################
 	// #TOOLBAR/elements#
