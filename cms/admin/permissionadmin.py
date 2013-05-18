@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 
-PAGE_ADMIN_INLINES = []
+PERMISSION_ADMIN_INLINES = []
 
 
 class TabularInline(admin.TabularInline):
@@ -175,7 +175,7 @@ class GenericCmsPermissionAdmin(object):
 
 if get_cms_setting('PERMISSION'):
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
-    PAGE_ADMIN_INLINES.extend([
+    PERMISSION_ADMIN_INLINES.extend([
         ViewRestrictionInlineAdmin,
         PagePermissionInlineAdmin,
     ])

@@ -163,7 +163,8 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
   keeps the language.
 - language_chooser templatetag now only displays public languages, even when you are logged in as staff.
 - undo and redo functionality added in toolbar if django-reversion is installed.
-
+- apphooks not multilingual anymore
+- page admin split in 3 different for basic, advanced and permissions
 
 
 

@@ -98,7 +98,7 @@
 
 <div style="display: none;"><input type="hidden" name="language" value="{{language}}" id="id_language"/></div>
 
-{% if show_language_tabs %}
+{% if show_language_tabs and not show_permissions %}
 <div id="page_form_lang_tabs">
     {% for lang_code, lang_name in language_tabs %}
         <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
@@ -110,7 +110,7 @@
 
 
 <div id="lang_tab_content">
-{% if show_language_tabs %}
+{% if show_language_tabs and not show_permissions%}
 <h2 class="header"></h2>
 {% endif %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
@@ -132,7 +132,7 @@
 {% endfor %}
 
 
-{% if not add %}
+{% if show_permissions %}
 	{% if CMS_PERMISSION and can_change_permissions %}
 		<div class="inline-group">
 			<div class="tabular inline-related">

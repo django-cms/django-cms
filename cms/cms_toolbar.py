@@ -109,7 +109,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
         menu_items.items.append(Item(
             reverse('admin:cms_page_change', args=[page.pk]),
-            _('Settings'),
+            _('Basic Settings'),
             load_modal=True)
         )
         if self.toolbar.build_mode or self.toolbar.edit_mode:
@@ -138,6 +138,17 @@ class PageToolbar(CMSToolbar):
             '%s?%s' % (reverse('admin:cms_page_add'),
             urllib.urlencode(data)),
             _('Add sibling page'),
+            load_modal=True)
+        )
+        menu_items.items.append(Break())
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_advanced', args=[page.pk]),
+            _('Advanced Settings'),
+            load_modal=True)
+        )
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_permissions', args=[page.pk]),
+            _('Permissions'),
             load_modal=True)
         )
         menu_items.items.append(Break())
