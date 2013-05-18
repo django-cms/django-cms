@@ -3,7 +3,7 @@ Testing Your Extenstions
 ########################
 
 ************
-testing apps
+Testing Apps
 ************
 
 Your apps need testing, but in your live site they aren't in ``urls.py`` as they
@@ -28,7 +28,7 @@ And then in your tests you can plug this in with::
     from cms.test_utils.util.context_managers import SettingsOverride
     from cms.test_utils.testcases import CMSTestCase
 
-    class MyappTestCase(CMSTestCase):
+    class MyappTests(CMSTestCase):
 
         def test_myapp_page(self):
             with SettingsOverride(ROOT_URLCONF='myapp.tests.test_urls'):
@@ -40,7 +40,7 @@ the ``SettingsOverrideTestCase``::
 
     from cms.test_utils.testcases import SettingsOverrideTestCase
 
-    class MyappTestCase(SettingsOverrideTestCase):
+    class MyappTests(SettingsOverrideTestCase):
 
         settings_overrides = {'ROOT_URLCONF': 'myapp.tests.test_urls'}
 
@@ -49,9 +49,44 @@ the ``SettingsOverrideTestCase``::
             # rest of test as normal
 
 ***************
-testing plugins
+Testing Plugins
 ***************
 
-************
-testing menu
-************
+Plugins can just be created as objects and then have methods called on them.
+So you could do::
+
+    from django.test import TestCase
+    from myapp.cms_plugins import MyPlugin
+    from myapp.models import MyappPlugin as MyappPluginModel
+
+    class MypluginTests(TestCase):
+
+        def setUp(self):
+            self.plugin = MyPlugin()
+            self.plugin.save()
+
+        def test_plugin(self):
+            context = {'info': 'value'}
+            instance = MyappPluginModel(num_items=3)
+            rendered_html = self.plugin.render(context, instance, None)
+            self.assertIn('string', rendered_html)
+
+Sometimes you might want to add a placeholder - say to check how the plugin
+renders when it is in different size placeholders.  In that case you can create
+the placeholder directly and pass it in::
+
+    from django.test import TestCase
+    from cms.api import add_plugin
+    from myapp.cms_plugins import MyPlugin
+    from myapp.models import MyappPlugin as MyappPluginModel
+
+    class ImageSetTypePluginMixinContainerWidthTests(TestCase):
+        def setUp(self):
+            self.placeholder = Placeholder(slot=u"some_slot")
+            self.placeholder.save()
+            self.plugin = add_plugin(
+                self.placeholder,
+                u"MyPlugin",
+                u"en",
+                num_items=3,
+            )
