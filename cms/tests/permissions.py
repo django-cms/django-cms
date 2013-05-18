@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.contrib.sites.models import Site
-from cms.models import Page, PagePermission
+from cms.models import Page
 from cms.api import create_page, assign_user_to_page
 from cms.cache.permissions import (get_permission_cache, set_permission_cache,
                                    clear_user_permission_cache)
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.utils import get_cms_setting
 
 
 class PermissionCacheTests(SettingsOverrideTestCase):
