@@ -342,6 +342,9 @@ $(document).ready(function () {
 			for(var i = 0; i < lengthContainers; i++) {
 				triggers.eq(i).show();
 			}
+
+			// remove clipboard if empty
+			if(lengthContainers <= 0) this.clipboard.remove();
 		},
 
 		_preventEvents: function () {
