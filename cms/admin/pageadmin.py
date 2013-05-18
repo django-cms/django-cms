@@ -70,9 +70,9 @@ PUBLISH_COMMENT = "Publish"
 
 def contribute_fieldsets(cls):
     if get_cms_setting('MENU_TITLE_OVERWRITE'):
-        general_fields = [('title', 'page_title', 'menu_title')]
+        general_fields = ['title', 'page_title', 'menu_title']
     else:
-        general_fields = [('title', 'page_title')]
+        general_fields = ['title', 'page_title']
     general_fields += ['slug', 'meta_description', ('published', 'in_navigation')]
     additional_hidden_fields = []
     advanced_fields = ['reverse_id', 'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
@@ -679,7 +679,7 @@ class PageAdmin(ModelAdmin):
         except IndexError:
             return HttpResponseBadRequest("no previous revision found")
         previous_revision = previous_version.revision
-        previous_revision.revert()
+        previous_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = previous_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id
@@ -712,7 +712,7 @@ class PageAdmin(ModelAdmin):
         except IndexError:
             return HttpResponseBadRequest("no next revision found")
         next_revision = previous_version.revision
-        next_revision.revert()
+        next_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = next_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id

@@ -157,7 +157,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_items()
-        self.assertEqual(len(items), 5)
+        self.assertEqual(len(items), 6)
 
     def test_toolbar_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
