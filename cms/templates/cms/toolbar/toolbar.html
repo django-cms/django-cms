@@ -111,6 +111,7 @@ CMS.$(document).ready(function () {
 	</div>
 	<!-- end: sidebar -->
 
+	{% if request.toolbar.edit_mode or request.toolbar.build_mode %}
 	{% if request.toolbar.get_clipboard_plugins %}
 	{% with slot="clipbaord" %}
 	<!-- start: clipboard -->
@@ -138,6 +139,7 @@ CMS.$(document).ready(function () {
 	</div>
 	<!-- end: clipboard -->
 	{% endwith %}
+	{% endif %}
 	{% endif %}
 
 	<!-- start: messages -->
