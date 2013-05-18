@@ -274,7 +274,8 @@ $(document).ready(function () {
 				case 'modal':
 					this.openModal(
 						el.attr('href'),
-						el.attr('data-name'), [{
+						el.attr('data-name'),
+						[{
 							'title': el.attr('data-name'),
 							'url': el.attr('href')
 						}],
@@ -858,6 +859,7 @@ $(document).ready(function () {
 
 			// cancel if there is no breadcrumb)
 			if(!breadcrumb || breadcrumb.length <= 0) return false;
+			if(!breadcrumb[0].title) return false;
 
 			// load breadcrumb
 			$.each(breadcrumb, function (index, item) {
