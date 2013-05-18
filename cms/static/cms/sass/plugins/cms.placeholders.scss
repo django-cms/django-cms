@@ -121,11 +121,11 @@ only screen and (-o-min-device-pixel-ratio:3/2),
 only screen and (min--moz-device-pixel-ratio:1.5),
 only screen and (min-device-pixel-ratio:1.5) {
 
-	.cms_placeholder .cms_submenu, body .cms_submenu,
-	.cms_placeholder .cms_submenu-quicksearch, body .cms_submenu-quicksearch,
-	.cms_placeholder .cms_dragitem-collapsable, .cms_placeholder .cms_dragitem-collapsed {
-		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png');
-		background-size:190px; }
+	.cms_submenu, .cms_submenu-quicksearch
+	.cms_placeholder .cms_dragitem-collapsable, body .cms_dragitem-collapsable,
+	.cms_placeholder .cms_dragitem-collapsed, body .cms_dragitem-collapsed {
+		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png') !important;
+		background-size:190px !important; }
 
 // end of retina
 }
