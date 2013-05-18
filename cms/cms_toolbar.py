@@ -197,8 +197,12 @@ class PageToolbar(CMSToolbar):
 
     def get_publish_menu(self):
         page = self.page
+        classes = "cms_btn-action cms_btn-publish"
+        if page.is_dirty():
+            classes += " cms_btn-publish-active"
+
         button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), _("Publish Changes"),
-                        extra_classes="cms_btn-action cms_btn-publish", right=True, disabled=not page.is_dirty(),
+                        extra_classes=classes, ajax=True, right=True, disabled=not page.is_dirty(),
                         active=page.is_dirty())
         return button
 
@@ -228,8 +232,8 @@ class PageToolbar(CMSToolbar):
 
     def get_mode_switchers(self):
         switch = ButtonList(right=True)
-        switch.addItem(_("Edit"), "?edit", self.toolbar.build_mode)
-        switch.addItem(_("Build"), "?build", not self.toolbar.build_mode)
+        switch.addItem(_("Content"), "?edit", self.toolbar.build_mode)
+        switch.addItem(_("Structure"), "?build", not self.toolbar.build_mode)
         return switch
 
 
