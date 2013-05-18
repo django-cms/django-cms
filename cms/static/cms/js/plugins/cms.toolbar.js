@@ -518,7 +518,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.modes.removeClass('cms_btn-dark').eq(0).addClass('cms_btn-dark');
+			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
 			this.settings.mode = 'edit';
 
 			// hide clipboard if in edit mode
@@ -534,7 +534,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.modes.removeClass('cms_btn-dark').eq(1).addClass('cms_btn-dark');
+			this.modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
 			this.settings.mode = 'drag';
 
 			// show clipboard in build mode
