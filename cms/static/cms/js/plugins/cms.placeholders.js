@@ -287,7 +287,7 @@ $(document).ready(function () {
 			});
 
 			// add animation events
-			triggers.bind('click mouseenter mouseleave', function (e) {
+			triggers.bind('mouseenter mouseleave', function (e) {
 				e.preventDefault();
 				// clear timeout
 				clearTimeout(timer);
