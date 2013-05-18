@@ -17,7 +17,8 @@ $(document).ready(function () {
 			'debug': false, // not yet required
 			'settings': {
 				'toolbar': 'expanded', // expanded or collapsed
-				'mode': 'edit' // live, draft, edit or layout
+				'mode': 'edit', // live, draft, edit or layout
+				'states': []
 			},
 			'clipboard': null,
 			'sidebarDuration': 300,
