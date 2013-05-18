@@ -1,5 +1,5 @@
 <div class="cms_toolbar-item cms_toolbar-item-buttons{% if items|length > 1 %} cms_toolbar-item-buttons-group{% endif %}">
 	{% for button in items %}
-	<a href="{{ button.url }}" class="cms_btn{% if items|length > 1 %} cms_btn-disabled{% endif %}{% if button.active %} cms_btn-dark{% endif %}{% if button.disabled %} cms_btn-disabled{% endif %}{% if button.extra_classes %} {{ extra_classes }}{% endif %}">{{ button.name }}</a>
+	<a href="{{ button.url }}" class="cms_btn{% if items|length > 1 %} cms_btn-disabled{% endif %}{% if button.active %} cms_btn-active{% endif %}{% if button.disabled %} cms_btn-disabled{% endif %}{% if button.extra_classes %} {{ extra_classes }}{% endif %}">{{ button.name }}</a>
 	{% endfor %}
 </div>

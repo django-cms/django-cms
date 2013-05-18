@@ -20,6 +20,8 @@ $(document).ready(function () {
 				'mode': 'edit', // live, draft, edit or layout
 				'states': []
 			},
+			'preventSwitch': false,
+			'preventSwitchMessage': 'Switching is disabled.',
 			'clipboard': null,
 			'sidebarDuration': 300,
 			'sidebarWidth': 320,
@@ -67,6 +69,7 @@ $(document).ready(function () {
 			this.lockToolbar = false;
 			this.minimized = false;
 			this.maximized = false;
+			this.timer = function () {};
 
 			// setup initial stuff
 			this._setup();
@@ -335,6 +338,9 @@ $(document).ready(function () {
 			// add content to element
 			this.messages.find('.cms_messages-inner').html(msg);
 
+			// clear timeout
+			clearTimeout(this.timer);
+
 			// determine width
 			var that = this;
 			var width = this.messages.outerWidth(true);
@@ -385,7 +391,7 @@ $(document).ready(function () {
 				return false
 			}
 			// add delay to hide
-			setTimeout(function () {
+			this.timer = setTimeout(function () {
 				that.closeMessage();
 			}, delay || this.options.messageDelay);
 		},
@@ -518,7 +524,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.modes.removeClass('cms_btn-dark').eq(0).addClass('cms_btn-dark');
+			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
 			this.settings.mode = 'edit';
 
 			// hide clipboard if in edit mode
@@ -534,7 +540,7 @@ $(document).ready(function () {
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
-			this.modes.removeClass('cms_btn-dark').eq(1).addClass('cms_btn-dark');
+			this.modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
 			this.settings.mode = 'drag';
 
 			// show clipboard in build mode
@@ -550,6 +556,13 @@ $(document).ready(function () {
 			var knob = el.find('.cms_toolbar-item_switch-knob');
 			var duration = 300;
 
+			// prevent if switchopstion is passed
+			if(this.options.preventSwitch) {
+				this.openMessage(this.options.preventSwitchMessage, 'right');
+				return false;
+			}
+
+			// determin what to trigger
 			if(active) {
 				knob.animate({
 					'right': anchor.outerWidth(true) - (knob.outerWidth(true) + 2)

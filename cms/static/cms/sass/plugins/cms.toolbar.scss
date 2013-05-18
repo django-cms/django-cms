@@ -271,7 +271,7 @@
 		&:hover, &:active, &:focus { background-color:$color-grey-10; }
 	}
 
-	.cms_btn-dark { color:white;
+	.cms_btn-active { color:white;
 		border:1px solid darken($color-grey, 20%) !important; border-bottom:none !important;
 		@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
 		background:$color-grey; @include background-image($gradient-dark);
@@ -431,7 +431,7 @@
 	(-o-min-device-pixel-ratio: 5/4),
 	(-webkit-min-device-pixel-ratio: 1.25),
 	(min-resolution: 120dpi) {
-	
+
 	.cms_toolbar-item-navigation-children > a span,
 	.cms_sideframe-btn div,
 	.cms_clipboard ul a, .cms_clipboard-empty a,
