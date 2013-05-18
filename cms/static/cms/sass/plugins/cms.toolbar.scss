@@ -430,19 +430,20 @@ only screen and (-o-min-device-pixel-ratio:3/2),
 only screen and (min--moz-device-pixel-ratio:1.5),
 only screen and (min-device-pixel-ratio:1.5) {
 
-	#cms_toolbar {
-		.cms_toolbar-item-logo a,
-		.cms_toolbar-trigger a,
-		.cms_loader,
-		.cms_modal .cms_modal-collapse,
-		.cms_modal .cms_modal-close,
-		.cms_modal .cms_modal-resize,
-		.cms_modal .cms_modal-breadcrumb a,
-		.cms_placeholders-tooltip,
-		.cms_placeholders-menu {
-			background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png');
-			background-size:190px; }
-	}
+	.cms_toolbar-item-navigation-children > a span,
+	.cms_sideframe-btn div,
+	.cms_clipboard ul a, .cms_clipboard-empty a,
+	.cms_messages .cms_messages-close,
+	.cms_modal-collapse, .cms_modal-close, .cms_modal-maximize, .cms_modal-resize,
+	.cms_modal-breadcrumb a, .cms_modal-breadcrumb-title,
+	.cms_toolbar-item-logo a, .cms_toolbar-trigger a,
+	.cms_placeholders-tooltip, .cms_placeholders-menu {
+		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png') !important;
+		background-size:190px !important; }
+
+	.cms_loader {
+		background:url('/static/cms/img/loader.gif') !important;
+		background-size:32px !important; }
 
 // end of retina
 }
