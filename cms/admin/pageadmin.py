@@ -70,9 +70,9 @@ PUBLISH_COMMENT = "Publish"
 
 def contribute_fieldsets(cls):
     if get_cms_setting('MENU_TITLE_OVERWRITE'):
-        general_fields = [('title', 'page_title', 'menu_title')]
+        general_fields = ['title', 'page_title', 'menu_title']
     else:
-        general_fields = [('title', 'page_title')]
+        general_fields = ['title', 'page_title']
     general_fields += ['slug', 'meta_description', ('published', 'in_navigation')]
     additional_hidden_fields = []
     advanced_fields = ['reverse_id', 'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
