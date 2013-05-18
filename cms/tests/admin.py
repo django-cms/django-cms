@@ -20,6 +20,7 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 import django
 from django.contrib import admin
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission, AnonymousUser
 from django.contrib.sites.models import Site
@@ -598,6 +599,17 @@ class AdminTests(AdminTestsBase):
             page = self.reload(page)
             self.assertFalse(page.published)
 
+    def test_change_status_adds_log_entry(self):
+        page = self.get_page()
+        admin = self.get_admin()
+        with self.login_user_context(admin):
+            request = self.get_request(post_data={'no': 'data'})
+            self.assertFalse(LogEntry.objects.count())
+            response = self.admin_class.change_status(request, page.pk)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(1, LogEntry.objects.count())
+            self.assertEqual(page.pk, int(LogEntry.objects.all()[0].object_id))
+
     def test_change_innavigation(self):
         page = self.get_page()
         permless = self.get_permless()
@@ -939,7 +951,7 @@ class PluginPermissionTests(AdminTestsBase):
         request = self._get_change_page_request(user, page)
         page_admin = PageAdmin(Page, None)
         page_admin._current_page = page
-        # user has can_change_permission 
+        # user has can_change_permission
         # => must see the PagePermissionInline
         self.assertTrue(
             any(type(inline) is PagePermissionInlineAdmin
@@ -1079,8 +1091,8 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
     """
     System user count influences the size of the page edit page,
     but the users are only 2 times present on the page
-    
-    The test relates to extra=0 
+
+    The test relates to extra=0
     at PagePermissionInlineAdminForm and ViewRestrictionInlineAdmin
     """
 
