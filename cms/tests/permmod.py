@@ -58,28 +58,16 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         'CMS_PERMISSION': True,
     }
 
-    def _create_user(self, username, is_staff=True, is_superuser=False):
-        user = User(username=username, email=username+'@django-cms.org',
-                    is_staff=is_staff, is_active=True, is_superuser=is_superuser)
-        user.set_password(username)
-        user.save()
-        if is_staff and not is_superuser:
-            user.user_permissions.add(Permission.objects.get(codename='add_text'))
-            user.user_permissions.add(Permission.objects.get(codename='delete_text'))
-            user.user_permissions.add(Permission.objects.get(codename='change_text'))
-            user.user_permissions.add(Permission.objects.get(codename='publish_page'))
-
-            user.user_permissions.add(Permission.objects.get(codename='add_page'))
-            user.user_permissions.add(Permission.objects.get(codename='change_page'))
-            user.user_permissions.add(Permission.objects.get(codename='delete_page'))
-        return user
-
     def setUp(self):
         # create super user
-        self.user_super = self._create_user("super", is_superuser=True)
-        self.user_staff = self._create_user("staff")
-        self.user_master = self._create_user("master")
-        self.user_slave = self._create_user("slave")
+        self.user_super = self._create_user("super", is_staff=True,
+                                            is_superuser=True)
+        self.user_staff = self._create_user("staff", is_staff=True,
+                                            add_default_permissions=True)
+        self.user_master = self._create_user("master", is_staff=True,
+                                            add_default_permissions=True)
+        self.user_slave = self._create_user("slave", is_staff=True,
+                                            add_default_permissions=True)
         self.user_normal = self._create_user("normal", is_staff=False)
         self.user_normal.user_permissions.add(
             Permission.objects.get(codename='publish_page'))
