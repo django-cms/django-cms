@@ -13,7 +13,7 @@ from cms.utils.permissions import has_page_change_permission, get_user_sites_que
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext_lazy as _
 from menus.utils import DefaultLanguageChanger
 
 
