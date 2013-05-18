@@ -172,6 +172,7 @@ $(document).ready(function () {
 			var that = this;
 			var dropped = false;
 			var droparea = null;
+			var dropzone = null;
 
 			this.sortables.nestedSortable({
 				'items': '.cms_draggable',
@@ -200,7 +201,10 @@ $(document).ready(function () {
 					$('.cms_droppable-empty-wrapper').slideDown(200);
 					// ensure all menus are closed
 					$('.cms_dragitem .cms_submenu').hide();
+					// remove classes from empty dropzones
+					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
 				},
+
 				'stop': function (event, ui) {
 					that.dragging = false;
 					// hide empty
@@ -214,25 +218,32 @@ $(document).ready(function () {
 						droparea.prepend(ui.item);
 						dropped = false;
 					}
+
 					// we pass the id to the updater which checks within the backend the correct place
 					var id = ui.item.attr('id').replace('cms_draggable-', '');
 					var plugin = $('#cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
+
+					// update clipboard entries
+					that._updateClipboard(ui.item);
 				},
 				'isAllowed': function(placeholder, placeholderParent, originalItem) {
 					// getting restriction array
 					var bounds = [];
-					var plugin = $('#cms_plugin-' + that.getId(originalItem));
-
-					var bar = placeholder.parent().prevAll('.cms_placeholder-bar').first();
-					var type = plugin.data('settings').plugin_type;
+					// save original state events
+					var original = $('#cms_plugin-' + that.getId(originalItem));
+					var type = original.data('settings').plugin_type;
+					// prepare variables for bound
+					var holder = placeholder.parent().prevAll('.cms_placeholder-bar').first();
+					var plugin = $('#cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
+					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
 					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
-					if(bar.length) bounds = bar.data('settings').plugin_restriction;
+					if(holder.length) bounds = holder.data('settings').plugin_restriction;
 
 					// if restrictions is still empty, proceed
-					that.state = ($.inArray(type, bounds) !== -1) ? true : false;
+					that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;
 
 					return that.state;
 				}
@@ -245,6 +256,14 @@ $(document).ready(function () {
 				'tolerance': 'pointer',
 				'activeClass': 'cms_draggable-allowed',
 				'hoverClass': 'cms_draggable-hover-allowed',
+				'over': function (event) {
+					dropzone = $(event.target).parent().prev();
+					if(!that.state) $(event.target).addClass('cms_draggable-disallowed');
+				},
+				'out': function (event) {
+					dropzone = null;
+					$(event.target).removeClass('cms_draggable-disallowed');
+				},
 				'drop': function (event) {
 					dropped = true;
 					droparea = $(event.target).parent().nextAll('.cms_draggables').first();
@@ -253,6 +272,7 @@ $(document).ready(function () {
 		},
 
 		_clipboard: function () {
+			var that = this;
 			var remove = this.clipboard.find('.cms_clipboard-empty a');
 			var triggers = this.clipboard.find('.cms_clipboard-triggers a');
 			var containers = this.clipboard.find('.cms_clipboard-containers > li');
@@ -267,14 +287,17 @@ $(document).ready(function () {
 			});
 
 			// add animation events
-			triggers.bind('click mouseenter mouseleave', function (e) {
+			triggers.bind('mouseenter mouseleave', function (e) {
 				e.preventDefault();
 				// clear timeout
 				clearTimeout(timer);
 
 				if(e.type === 'mouseleave') hide();
 
-				var el = containers.eq(triggers.index(this));
+				triggers = that.clipboard.find('.cms_clipboard-triggers a');
+				containers = that.clipboard.find('.cms_clipboard-containers > li');
+				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
+				var el = containers.eq(index);
 				// cancel if element is already open
 				if(el.data('open') === true) return false;
 
@@ -298,6 +321,26 @@ $(document).ready(function () {
 				timer = setTimeout(function () {
 					containers.stop().css({ 'margin-left': -position }).data('open', false);
 				}, speed);
+			}
+		},
+
+		_updateClipboard: function (item) {
+			// cancel if there is no clipboard available
+			if(!this.clipboard.length) return false;
+
+			var containers = this.clipboard.find('.cms_clipboard-containers .cms_draggable');
+			var triggers = this.clipboard.find('.cms_clipboard-triggers li');
+
+			var lengthContainers = containers.length;
+			var lengthTriggers = triggers.length;
+
+			// only proceed if the items are not in sync
+			if(lengthContainers === lengthTriggers) return false;
+
+			// set visible elements
+			triggers.hide();
+			for(var i = 0; i < lengthContainers; i++) {
+				triggers.eq(i).show();
 			}
 		},
 
@@ -487,6 +530,9 @@ $(document).ready(function () {
 			var plugin_parent = this._getId(dragitem.parent().closest('.cms_draggable'));
 			var plugin_order = this._getIds(dragitem.siblings('.cms_draggable').andSelf());
 
+			// cancel here if we have no placeholder id
+			if(placeholder_id === false) return false;
+
 			// gather the data for ajax request
 			var data = {
 				'placeholder_id': placeholder_id,
@@ -513,6 +559,9 @@ $(document).ready(function () {
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			})
+
+			// show publish button
+			$('.cms_btn-publish').addClass('cms_btn-publish-active');
 		},
 
 		copyPlugin: function () {
