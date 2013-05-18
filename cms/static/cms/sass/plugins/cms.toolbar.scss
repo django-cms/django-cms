@@ -443,8 +443,8 @@ only screen and (min-device-pixel-ratio:1.5) {
 		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png') !important;
 		background-size:190px !important; }
 
-	.cms_loader {
-		background:url('/static/cms/img/loader.gif') !important;
+	#cms_toolbar .cms_loader {
+		background-image:url('/static/cms/img/loader@2x.gif') !important;
 		background-size:32px !important; }
 
 // end of retina
