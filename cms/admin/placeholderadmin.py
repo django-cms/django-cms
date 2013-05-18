@@ -28,7 +28,6 @@ class PlaceholderAdmin(ModelAdmin):
         css = {
             'all': [cms_static_url(path) for path in (
                 'css/rte.css',
-                'css/pages.css',
                 'css/change_form.css',
                 'css/jquery.dialog.css',
                 'css/plugin_editor.css',
@@ -42,7 +41,7 @@ class PlaceholderAdmin(ModelAdmin):
             'js/libs/jquery.ui.dialog.js',
             ]
         ]
-        
+
 
     def get_fieldsets(self, request, obj=None):
         """
