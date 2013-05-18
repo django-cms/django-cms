@@ -148,6 +148,27 @@ class ReversionTestCase(CMSTestCase):
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
             self.assertTrue(page.revision_id == 0)
+            self.assertEqual(2, CMSPlugin.objects.all().count())
+            placeholderpk = page.placeholders.filter(slot="body")[0].pk
+            plugin_data = {
+                'plugin_type': "TextPlugin",
+                'plugin_language': settings.LANGUAGES[0][0],
+                'placeholder_id': placeholderpk,
+                'plugin_parent': '',
+            }
+            response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+            self.assertEquals(response.status_code, 200)
+            # now edit the plugin
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content.split("edit-plugin/")[1].split("/")[0] + "/"
+            response = self.client.get(edit_url)
+            self.assertEquals(response.status_code, 200)
+            response = self.client.post(edit_url, {"body": "Hello World"})
+            self.assertEquals(response.status_code, 200)
+            self.assertEqual(3, CMSPlugin.objects.all().count())
+            response = self.client.post(undo_url)
+            response = self.client.post(undo_url)
+            self.assertEqual(2, CMSPlugin.objects.all().count())
+
 
     def test_recover(self):
         """
