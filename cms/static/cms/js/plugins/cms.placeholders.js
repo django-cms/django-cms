@@ -559,6 +559,9 @@ $(document).ready(function () {
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			})
+
+			// show publish button
+			$('.cms_btn-publish').addClass('cms_btn-publish-active');
 		},
 
 		copyPlugin: function () {
