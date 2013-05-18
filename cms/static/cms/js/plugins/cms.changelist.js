@@ -78,7 +78,7 @@
 				},
 				onchange: function(node){
 					url = $(node).find('a.title').attr("href");
-					window.location = url;
+                    window.top.location = url;
 				}
 			}
 		};
