@@ -105,16 +105,32 @@ class PageToolbar(CMSToolbar):
         """
         Builds the 'page menu'
         """
-        menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
+        menu_items = List("", _("Page"))
         menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
-        menu_items.items.append(Item(
+        settings_list = List("", _("Settings"), sub_level=True)
+
+        settings_list.items.append(Item(
             reverse('admin:cms_page_change', args=[page.pk]),
-            _('Basic Settings'),
+            _('Titles'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),
             redirect_on_close_url='.',
         )
         )
+        if self.page.published:
+            publish_title = _("Unpublish Page")
+
+        else:
+            publish_title = _("Publish Page")
+        settings_list.items.append(
+            Item(reverse("admin:cms_page_change_status", args=[self.page.pk]), publish_title, ajax=True))
+        if self.page.in_navigation:
+            nav_title = _("Hide in Navigation")
+        else:
+            nav_title = _("Display in Navigation")
+        settings_list.items.append(
+            Item(reverse("admin:cms_page_change_innavigation", args=[self.page.pk]), nav_title, ajax=True))
+        menu_items.items.append(settings_list)
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             menu_items.items.append(self.get_template_menu())
         menu_items.items.append(Break())
