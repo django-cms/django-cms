@@ -120,7 +120,7 @@ CMS.$(document).ready(function () {
 			<!-- maximum of 5 -->
 			<!-- delete link -->
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
-				{% if forloop.counter <= 5 %}
+				{% if not plugin.parent_id %}
 				<li><a href="#">{{ forloop.index }}</a></li>
 				{% endif %}
 			{% endfor %}

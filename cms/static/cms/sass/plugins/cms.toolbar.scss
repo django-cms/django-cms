@@ -144,6 +144,7 @@
 
 		// placeholders
 		.cms_clipboard-triggers { position:relative; z-index:999; }
+		.cms_clipboard-triggers li:nth-child(n+6) { display:none; }
 
 		.cms_clipboard-containers { position:absolute; top:0; left:-1px; z-index:99; width:0; }
 		.cms_clipboard-containers li { margin-left:-220px; width:190px; }
