@@ -79,17 +79,6 @@
 {% block content %}<div id="content-main">
 
 {% block object-tools %}
-{% if change %}{% if not is_popup %}
-  <ul class="object-tools">
-	{% if can_publish %}
-	<li><a href="publish/" class="publishlink">{% trans "Publish draft" %}</a></li>
-	<li><a href="preview/?language={{ language }}" class="previewdraftlink">{% trans "Preview draft" %}</a></li>
-	{% endif %}
-	{% if can_change and page.published and page.is_dirty %}<li><a href="revert/" class="revertlink">{% trans "Revert to public" %}</a></li>{% endif %}
-	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if page.publisher_public %}<li><a href="preview/?public=1&language={{ language }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
-  </ul>
-{% endif %}{% endif %}
 {% endblock %}
 
 

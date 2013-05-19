@@ -109,32 +109,33 @@ class PageAdmin(ModelAdmin):
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
-        url_patterns = patterns('',
-                                pat(r'copy-plugins/$', self.copy_plugins),
-                                pat(r'add-plugin/$', self.add_plugin),
-                                pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-                                pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
-                                pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
-                                pat(r'move-plugin/$', self.move_plugin),
-                                pat(r'^([0-9]+)/edit-title/$', self.edit_title),
-                                pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
-                                pat(r'^([0-9]+)/permission-settings/$', self.permissions),
-                                pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
-                                pat(r'^([0-9]+)/move-page/$', self.move_page),
-                                pat(r'^([0-9]+)/copy-page/$', self.copy_page),
-                                pat(r'^([0-9]+)/change-status/$', self.change_status),
-                                pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
-                                pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
-                                pat(r'^([0-9]+)/permissions/$', self.get_permissions),
-                                pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-                                pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
-                                pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
-                                pat(r'^([0-9]+)/undo/$', self.undo),
-                                pat(r'^([0-9]+)/redo/$', self.redo),
-                                pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
-                                pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
-                                pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
-                                pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
+        url_patterns = patterns(
+            '',
+            pat(r'copy-plugins/$', self.copy_plugins),
+            pat(r'add-plugin/$', self.add_plugin),
+            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
+            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
+            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
+            pat(r'move-plugin/$', self.move_plugin),
+            pat(r'^([0-9]+)/edit-title/$', self.edit_title),
+            pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
+            pat(r'^([0-9]+)/permission-settings/$', self.permissions),
+            pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
+            pat(r'^([0-9]+)/move-page/$', self.move_page),
+            pat(r'^([0-9]+)/copy-page/$', self.copy_page),
+            pat(r'^([0-9]+)/change-status/$', self.change_status),
+            pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
+            pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
+            pat(r'^([0-9]+)/permissions/$', self.get_permissions),
+            pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
+            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
+            pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
+            pat(r'^([0-9]+)/undo/$', self.undo),
+            pat(r'^([0-9]+)/redo/$', self.redo),
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
+            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
+            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
         url_patterns += super(PageAdmin, self).get_urls()
@@ -224,6 +225,8 @@ class PageAdmin(ModelAdmin):
             form = super(PageAdmin, self).get_form(request, obj, form=PagePermissionForm, **kwargs)
         else:
             form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
+        if 'language' in form.base_fields:
+            form.base_fields['language'].initial = language
         if obj:
             if "permission" in request.path:
                 self.inlines = PERMISSION_ADMIN_INLINES
@@ -250,8 +253,11 @@ class PageAdmin(ModelAdmin):
             ]:
                 if name in form.base_fields:
                     form.base_fields[name].initial = getattr(title_obj, name)
-            if title_obj.has_url_overwrite and 'overwrite_url' in form.base_fields:
-                form.base_fields['overwrite_url'].initial = title_obj.path
+            if 'overwrite_url' in form.base_fields:
+                if title_obj.has_url_overwrite:
+                    form.base_fields['overwrite_url'].initial = title_obj.path
+                else:
+                    form.base_fields['overwrite_url'].initial = ""
         else:
             self.inlines = []
             for name in ['slug', 'title']:
