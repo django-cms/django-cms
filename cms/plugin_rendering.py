@@ -34,11 +34,12 @@ class PluginContext(Context):
         if not processors:
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
-            self.update(processor(instance, placeholder))
+            self.update(processor(instance, placeholder, self))
         for processor in iterload_objects(get_cms_setting('PLUGIN_CONTEXT_PROCESSORS')):
-            self.update(processor(instance, placeholder))
+            self.update(processor(instance, placeholder, self))
         for processor in processors:
-            self.update(processor(instance, placeholder))
+            self.update(processor(instance, placeholder, self))
+
 
 def render_plugin(context, instance, placeholder, template, processors=None, current_app=None):
     """
@@ -66,7 +67,7 @@ def render_plugins(plugins, context, placeholder, processors=None):
     Renders a collection of plugins with the given context, using the appropriate processors
     for a given placeholder name, and returns a list containing a "rendered content" string
     for each plugin.
-    
+
     This is the main plugin rendering utility function, use this function rather than
     Plugin.render_plugin().
     """
@@ -88,7 +89,7 @@ def render_dragables(plugins, slot, request):
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"):
     """
-    Renders plugins for a placeholder on the given page using shallow copies of the 
+    Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
@@ -103,7 +104,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         template = None
     # Add extra context as defined in settings, but do not overwrite existing context variables,
     # since settings are general and database/template are specific
-    # TODO this should actually happen as a plugin context processor, but these currently overwrite 
+    # TODO this should actually happen as a plugin context processor, but these currently overwrite
     # existing context -- maybe change this order?
     slot = getattr(placeholder, 'slot', None)
     extra_context = {}

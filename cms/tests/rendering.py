@@ -25,9 +25,12 @@ def sample_plugin_processor(instance, placeholder, rendered_content, original_co
     )
 
 
-def sample_plugin_context_processor(instance, placeholder):
-    content = 'test_plugin_context_processor_ok|' + instance.body + '|' + placeholder.slot
-    return {'test_plugin_context_processor': content}
+def sample_plugin_context_processor(instance, placeholder, original_context):
+    content = 'test_plugin_context_processor_ok|' + instance.body + '|' + \
+        placeholder.slot + '|' + original_context['original_context_var']
+    return {
+        'test_plugin_context_processor': content,
+    }
 
 
 class RenderingTestCase(SettingsOverrideTestCase):
@@ -158,7 +161,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
                 CMS_PLUGIN_PROCESSORS=('cms.tests.rendering.sample_plugin_processor',),
                 CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.rendering.sample_plugin_context_processor',),
         ):
-            def test_passed_plugin_context_processor(instance, placeholder):
+            def test_passed_plugin_context_processor(instance, placeholder, context):
                 return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
 
             t = u'{% load cms_tags %}' + \
@@ -172,7 +175,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             r = "".join(c)
             self.assertEqual(r, u'1|' + self.test_data[
                 'text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
-                                self.test_data['text_main'] + '|main|test_plugin_processor_ok|' + self.test_data[
+                                self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' + self.test_data[
                                     'text_main'] + '|main|original_context_var_ok')
             plugin_rendering._standard_processors = {}
 
@@ -184,7 +187,6 @@ class RenderingTestCase(SettingsOverrideTestCase):
             u'|{% placeholder "main" %}|{% placeholder "empty" %}'
         r = self.render(t, self.test_page)
         self.assertEqual(r, u'|' + self.test_data['text_main'] + '|')
-
 
     def test_placeholder_extra_context(self):
         t = u'{% load cms_tags %}{% placeholder "extra_context" %}'
