@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
+from cms import compat
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.utils.i18n import get_language_objects, get_language_object
@@ -218,7 +219,8 @@ class PageToolbar(CMSToolbar):
             page_list.items.append(Item(reverse("admin:cms_page_add"), _('Add new page'), load_side_frame=True))
             admin_items.items.append(page_list)
         if self.request.user.has_perm('user.change_user'):
-            admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
+            if not compat.is_user_swapped:  # only add user menu if AUTH_USER_MODEL has not been swapped
+                admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
         self.get_sites_menu(admin_items.items)
         admin_items.items.append(Item(reverse('admin:index'), _('Administration'), load_side_frame=True))
         admin_items.items.append(Break())

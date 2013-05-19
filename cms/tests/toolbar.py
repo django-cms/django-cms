@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from cms.api import create_page
-from cms.compat import User
+from cms.compat import User, is_user_swapped
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -94,7 +94,10 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.get_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
-        self.assertEqual(len(items[0].get_context()['items']), 7)
+        if is_user_swapped:
+            self.assertEqual(len(items[0].get_context()['items']), 6)
+        else:
+            self.assertEqual(len(items[0].get_context()['items']), 7)
 
     def test_toolbar_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
