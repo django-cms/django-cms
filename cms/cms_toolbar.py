@@ -110,7 +110,10 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_change', args=[page.pk]),
             _('Basic Settings'),
-            load_modal=True)
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+            redirect_on_close_url='.',
+        )
         )
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             menu_items.items.append(self.get_template_menu())
@@ -118,8 +121,8 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_changelist'),
             _('Move page'),
-            load_modal=True)
-        )
+            load_modal=True
+        ))
         data = {
             'position': 'last-child',
             'target': self.page.pk,
@@ -127,8 +130,9 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             '%s?%s' % (reverse('admin:cms_page_add'), urllib.urlencode(data)),
             _('Add child page'),
-            load_modal=True)
-        )
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+        ))
         data = {
             'position': 'last-child',
         }
@@ -138,26 +142,31 @@ class PageToolbar(CMSToolbar):
             '%s?%s' % (reverse('admin:cms_page_add'),
             urllib.urlencode(data)),
             _('Add sibling page'),
-            load_modal=True)
-        )
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+        ))
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_advanced', args=[page.pk]),
             _('Advanced Settings'),
+            close_url=reverse('admin:cms_page_changelist'),
             load_modal=True, disabled=not page.has_advanced_settings_permission(self.request))
         )
         if get_cms_setting('PERMISSION'):
             menu_items.items.append(Item(
                 reverse('admin:cms_page_permissions', args=[page.pk]),
                 _('Permissions'),
-                load_modal=True, active=not page.has_change_permissions_permission(self.request))
-            )
-        menu_items.items.append(Break())
-        menu_items.items.append(Item(
-            reverse('admin:cms_page_delete', args=(self.page.pk,)),
-            _('Delete Page'),
-            load_modal=True)
-        )
+                load_modal=True, active=not page.has_change_permissions_permission(self.request),
+                close_url=reverse('admin:cms_page_changelist'),
+            ))
+            menu_items.items.append(Break())
+            menu_items.items.append(Item(
+                reverse('admin:cms_page_delete', args=(self.page.pk,)),
+                _('Delete Page'),
+                load_modal=True,
+                close_url=reverse('admin:cms_page_changelist'),
+                redirect_on_close_url='/',
+            ))
 
         return menu_items
 

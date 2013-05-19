@@ -66,18 +66,9 @@
         });
 
         // inline group loader
-        $('h2 a').click(function () {
-            // reqest content - do it this way, so we can save some time which
-            // this operation may need
-            var parent = $(this).parent().parent();
-            var pathHolder = $(parent).find('div.load');
-            if (pathHolder.length) {
-                var url = pathHolder.text();
-                // load just once
-                pathHolder.remove();
-                $(parent).find('div.loading').load(url);
-            }
-            return false;
+        $('div.loading').each(function () {
+            var url = $(this).attr("rel")
+            $(this).load(url);
         });
 
     });

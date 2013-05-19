@@ -272,10 +272,16 @@ $(document).ready(function () {
 
 			switch(target) {
 				case 'modal':
-					this.openModal(el.attr('href'), el.attr('data-name'), [{
-						'title': el.attr('data-name'),
-						'url': el.attr('href')
-					}]);
+					this.openModal(
+						el.attr('href'),
+						el.attr('data-name'),
+						[{
+							'title': el.attr('data-name'),
+							'url': el.attr('href')
+						}],
+						el.attr('data-close-url'),
+						el.attr('data-redirect-on-close-url')
+					);
 					break;
 				case 'message':
 					this.openMessage(el.attr('data-text'));
@@ -402,7 +408,7 @@ $(document).ready(function () {
 			this.lockToolbar = false;
 		},
 
-		openModal: function (url, name, breadcrumb) {
+		openModal: function (url, name, breadcrumb, close_url, redirect_on_close_url) {
 			// prepare iframe
 			var that = this;
 
@@ -425,6 +431,17 @@ $(document).ready(function () {
 
 				// than show
 				iframe.show();
+			});
+
+			// attach load event to check if we have to close the modal
+			iframe.load(function() {
+				if (this.contentWindow.location.pathname == close_url) {
+					if (redirect_on_close_url) {
+						window.location.href = redirect_on_close_url;
+					} else {
+						that.closeModal();
+					}
+				}
 			});
 
 			// show iframe after animation
@@ -842,6 +859,7 @@ $(document).ready(function () {
 
 			// cancel if there is no breadcrumb)
 			if(!breadcrumb || breadcrumb.length <= 0) return false;
+			if(!breadcrumb[0].title) return false;
 
 			// load breadcrumb
 			$.each(breadcrumb, function (index, item) {
