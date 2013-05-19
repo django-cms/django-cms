@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
 from urllib2 import unquote
-from cms.admin.dialog.forms import PermissionForm
 import warnings
 from django.template.response import TemplateResponse
 from django.contrib.admin.helpers import AdminForm
@@ -245,9 +244,14 @@ class PageAdmin(ModelAdmin):
                 'title',
                 'meta_description',
                 'menu_title',
-                'page_title']:
+                'page_title',
+                'redirect',
+                'application_urls'
+            ]:
                 if name in form.base_fields:
                     form.base_fields[name].initial = getattr(title_obj, name)
+            if title_obj.has_url_overwrite and 'overwrite_url' in form.base_fields:
+                form.base_fields['overwrite_url'].initial = title_obj.path
         else:
             self.inlines = []
             for name in ['slug', 'title']:
@@ -257,6 +261,9 @@ class PageAdmin(ModelAdmin):
         return form
 
     def advanced(self, request, object_id):
+        page = get_object_or_404(Page, pk=object_id)
+        if not page.has_advanced_settings_permission(request):
+            raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id)
 
     def permissions(self, request, object_id):

@@ -164,7 +164,7 @@
 		<input type="submit" name="_continue" value="{% trans 'Save and continue editing' %}" {{ onclick_attrib }}/>
 	</div>
 {% else %}
-	{% if not moderation_delete_request %}{% page_submit_row %}{% endif %}
+	{% page_submit_row %}
 {% endif %}
 
 {% if add %}

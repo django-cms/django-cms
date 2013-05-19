@@ -196,7 +196,8 @@ class TitleManager(PublisherManager):
 
         for name in base_fields:
             value = cleaned_data.get(name, None)
-            setattr(obj, name, value)
+            if value:
+                setattr(obj, name, value)
         if page.has_advanced_settings_permission(request):
             overwrite_url = cleaned_data.get('overwrite_url', None)
             obj.has_url_overwrite = bool(overwrite_url)

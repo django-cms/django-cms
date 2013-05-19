@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels, Title
@@ -172,6 +171,13 @@ class AdvancedSettingsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AdvancedSettingsForm, self).__init__(*args, **kwargs)
         self.fields['language'].widget = HiddenInput()
+        self.fields['site'].widget = HiddenInput()
+        site_id = self.fields['site'].initial
+
+        languages = get_language_tuple(site_id)
+        self.fields['language'].choices = languages
+        if not self.fields['language'].initial:
+            self.fields['language'].initial = get_language()
         if 'navigation_extenders' in self.fields:
             self.fields['navigation_extenders'].widget = forms.Select({},
                 [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
@@ -179,7 +185,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
 
     def clean(self):
-        cleaned_data = super(PageForm, self).clean()
+        cleaned_data = super(AdvancedSettingsForm, self).clean()
         if 'reverse_id' in self.fields:
             id = cleaned_data['reverse_id']
             site_id = cleaned_data['site']
@@ -199,13 +205,15 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Page
-        fields = ['reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders', 'application_urls']
+        fields = ['site', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'application_urls']
 
 
 class PagePermissionForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ['login_required', 'limit_visibility_in_menu']
+
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
     """
