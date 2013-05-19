@@ -544,7 +544,6 @@ register.tag(CMSToolbar)
 
 
 class CMSEditablePageTitle(InclusionTag):
-    # TODO: 3.0 make this more generic (not only for title)
     template = 'cms/toolbar/plugin_text_noedit.html'
     edit_template = 'cms/toolbar/plugin_text.html'
     name = 'show_editable_page_title'
