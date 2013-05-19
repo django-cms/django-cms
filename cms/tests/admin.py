@@ -3,7 +3,7 @@ from __future__ import with_statement
 from distutils.version import LooseVersion
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm
-from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter, PageAdmin
+from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin
 from cms.apphook_pool import apphook_pool, ApphookPool

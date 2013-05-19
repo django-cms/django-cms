@@ -73,17 +73,6 @@ class PageAdmin(ModelAdmin):
     change_list_template = "admin/cms/page/tree/base.html"
     list_filter = ['published', 'in_navigation', 'template', 'changed_by', 'soft_root']
 
-    add_fieldsets = [
-        (None, {
-            'fields': add_general_fields,
-            'classes': ('general',),
-        }),
-        (_('Hidden'), {
-            'fields': ['site', 'parent'],
-            'classes': ('hidden',),
-        }),
-    ]
-
     inlines = PERMISSION_ADMIN_INLINES
 
     class Media:
@@ -99,7 +88,6 @@ class PageAdmin(ModelAdmin):
             'js/plugins/jquery.ui.custom.js',
         ]
         ]
-
 
     def get_urls(self):
         """Get the admin urls
@@ -314,7 +302,6 @@ class PageAdmin(ModelAdmin):
         else:
             uhd_urls = []
         return {'unihandecode_lang': uhd_lang, 'unihandecode_urls': uhd_urls}
-
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
