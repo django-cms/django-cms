@@ -112,6 +112,12 @@ Undo and Redo
 
 If you have django-reversion installed you now have undo and redo directly in the toolbar.
 
+
+show_editable_page_title
+========================
+
+New ``show_editable_page_title`` to edit page title from the frontend.
+
 Plugins removed
 ===============
 
