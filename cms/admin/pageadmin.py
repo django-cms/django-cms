@@ -679,6 +679,14 @@ class PageAdmin(ModelAdmin):
         except IndexError:
             return HttpResponseBadRequest("no previous revision found")
         previous_revision = previous_version.revision
+        # clear all plugins
+        placeholders = page.placeholders.all()
+        placeholder_ids = []
+        for placeholder in placeholders:
+            placeholder_ids.append(placeholder.pk)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
+        plugins.delete()
+
         previous_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = previous_revision.pk
@@ -712,6 +720,14 @@ class PageAdmin(ModelAdmin):
         except IndexError:
             return HttpResponseBadRequest("no next revision found")
         next_revision = previous_version.revision
+        # clear all plugins
+        placeholders = page.placeholders.all()
+        placeholder_ids = []
+        for placeholder in placeholders:
+            placeholder_ids.append(placeholder.pk)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
+        plugins.delete()
+
         next_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = next_revision.pk

@@ -29,7 +29,7 @@ class PageToolbar(CMSToolbar):
         if toolbar.is_staff:
             # The 'Admin' Menu
             items.append(self.get_admin_menu())
-            self.get_sites_menu(items)
+
             if toolbar.request.current_page and is_app:
                 if self.request.current_page.publisher_is_draft:
                     self.page = request.current_page
@@ -58,9 +58,9 @@ class PageToolbar(CMSToolbar):
         else:
             sites = Site.objects.all()
         if len(sites) > 1:
-            menu_items = List("#", _("Sites"))
+            menu_items = List("#", _("Sites"), sub_level=True)
             menu_items.items.append(
-                Item(reverse("admin:sites_site_changelist"), _("Admin Sites"), load_side_frame=True))
+                Item(reverse("admin:sites_site_changelist"), _("Manage Sites"), load_side_frame=True))
             menu_items.items.append(Break())
             items.append(menu_items)
             current_site = Site.objects.get_current()
@@ -117,7 +117,7 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_changelist'),
-            _('Move/add Pages'),
+            _('Move page'),
             load_modal=True)
         )
         data = {
@@ -197,8 +197,12 @@ class PageToolbar(CMSToolbar):
 
     def get_publish_menu(self):
         page = self.page
+        classes = "cms_btn-action cms_btn-publish"
+        if page.is_dirty():
+            classes += " cms_btn-publish-active"
+
         button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), _("Publish Changes"),
-                        extra_classes="cms_btn-action cms_btn-publish", right=True, disabled=not page.is_dirty(),
+                        extra_classes=classes, ajax=True, right=True, disabled=not page.is_dirty(),
                         active=page.is_dirty())
         return button
 
@@ -206,15 +210,20 @@ class PageToolbar(CMSToolbar):
         """
         Builds the 'admin menu' (the one with the cogwheel)
         """
-        admin_items = List(reverse("admin:index"), _("Admin"))
+        admin_items = List(reverse("admin:index"), _("Site"))
         if self.can_change:
-            admin_items.items.append(Item(reverse("admin:cms_page_changelist"), _('Pages'), load_side_frame=True))
+            page_list = List(reverse("admin:cms_page_changelist"), _("Pages"), sub_level=True)
+            page_list.items.append(Item(reverse("admin:cms_page_changelist"), _('Manage pages'), load_side_frame=True))
+            page_list.items.append(Break())
+            page_list.items.append(Item(reverse("admin:cms_page_add"), _('Add new page'), load_side_frame=True))
+            admin_items.items.append(page_list)
         if self.request.user.has_perm('user.change_user'):
             admin_items.items.append(Item(reverse("admin:auth_user_changelist"), _('Users'), load_side_frame=True))
+        self.get_sites_menu(admin_items.items)
         admin_items.items.append(Item(reverse('admin:index'), _('Administration'), load_side_frame=True))
         admin_items.items.append(Break())
         admin_items.items.append(
-            Item(reverse('admin:cms_usersettings_change'), _('Settings'), load_side_frame=True))
+            Item(reverse('admin:cms_usersettings_change'), _('User settings'), load_side_frame=True))
         admin_items.items.append(Break())
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True,
                                       ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
@@ -223,8 +232,8 @@ class PageToolbar(CMSToolbar):
 
     def get_mode_switchers(self):
         switch = ButtonList(right=True)
-        switch.addItem(_("Edit"), "?edit", self.toolbar.build_mode)
-        switch.addItem(_("Build"), "?build", not self.toolbar.build_mode)
+        switch.addItem(_("Content"), "?edit", self.toolbar.build_mode)
+        switch.addItem(_("Structure"), "?build", not self.toolbar.build_mode)
         return switch
 
 

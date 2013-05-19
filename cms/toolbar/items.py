@@ -42,6 +42,8 @@ class Item(BaseItem):
         self.url = url
         self.load_modal = load_modal
         self.title = title
+        if load_side_frame or load_modal and not ajax:
+            self.title += "..."
         self.load_side_frame = load_side_frame
         self.ajax = ajax
         self.active = active
