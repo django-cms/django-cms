@@ -165,6 +165,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - undo and redo functionality added in toolbar if django-reversion is installed.
 - apphooks not multilingual anymore
 - page admin split in 3 different for basic, advanced and permissions
+- New show_editable_page_title templatetag to edit page title from the frontend
 
 
 

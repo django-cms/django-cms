@@ -14,7 +14,6 @@ from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
 from cms.plugins.link.models import Link
 from cms.plugins.picture.models import Picture
-from djangocms_text_ckeditor.html import extract_images
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
 from cms.plugins.twitter.models import TwitterRecentEntries
@@ -356,6 +355,8 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual(text_plugin_de.body, text_plugin_en.body)
 
+        # test subplugin copy
+        copy_plugins_to([link_plugin_en], ph_de, 'de')
 
     def test_remove_plugin_before_published(self):
         """

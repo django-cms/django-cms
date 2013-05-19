@@ -46,7 +46,7 @@ from cms.utils.i18n import get_language_list, get_language_tuple, get_language_o
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
-from cms.utils.permissions import has_global_page_permission
+from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
 from cms.plugins.utils import has_reached_plugin_limit
 
@@ -105,7 +105,7 @@ class PageAdmin(ModelAdmin):
             pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
             pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
-            pat(r'^([0-9]+)/edit-title/$', self.edit_title),
+            pat(r'^([0-9]+)/([a-z\-]+)/edit-title/$', self.edit_title),
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
             pat(r'^([0-9]+)/permission-settings/$', self.permissions),
             pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
@@ -1419,19 +1419,20 @@ class PageAdmin(ModelAdmin):
             return True
         return super(PageAdmin, self).lookup_allowed(key, *args, **kwargs)
 
-    def edit_title(self, request, page_id):
-        # TODO: 3.0 Permission checks
-        # TODO: 3.0 Reversion support
-        # TODO: 3.0 mark draft dirtyy
-        # TODO: 3.0 make generic
-        language = 'en'
+    def edit_title(self, request, page_id, language):
         title = Title.objects.get(page_id=page_id, language=language)
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
+        opts = Title._meta
+        if not has_generic_permission(title.page.pk, request.user, "change",
+                                      title.page.site.pk):
+            return HttpResponseForbidden(_("You do not have permission to edit this page"))
         if not cancel_clicked and request.method == 'POST':
             form = PageTitleForm(instance=title, data=request.POST)
             if form.is_valid():
                 form.save()
+                moderator.page_changed(title.page,
+                                       force_moderation_action=PageModeratorState.ACTION_CHANGED)
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=title)
@@ -1439,14 +1440,18 @@ class PageAdmin(ModelAdmin):
                                model_admin=self)
         media = self.media + admin_form.media
         context = {
+            'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'title': 'Title',
             'plugin': title.page,
             'plugin_id': title.page.id,
             'adminform': admin_form,
             'add': False,
             'is_popup': True,
-            'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
             'media': media,
+            'opts': opts,
+            'change': True,
+            'save_as': False,
+            'has_add_permission': False,
             'window_close_timeout': 10,
         }
         if cancel_clicked:

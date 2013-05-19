@@ -449,6 +449,8 @@ A **bad** example:
     </script>{% endaddtoblock %}
 
 
+.. _plugin-context-processors:
+
 
 Plugin Context Processors
 =========================
@@ -457,17 +459,18 @@ Plugin context processors are callables that modify all plugins' context before
 rendering. They are enabled using the :setting:`CMS_PLUGIN_CONTEXT_PROCESSORS`
 setting.
 
-A plugin context processor takes 2 arguments:
+A plugin context processor takes 3 arguments:
 
 * ``instance``: The instance of the plugin model
 * ``placeholder``: The instance of the placeholder this plugin appears in.
+* ``context``: The context that is in use, including the request.
 
 The return value should be a dictionary containing any variables to be added to
 the context.
 
 Example::
 
-    def add_verbose_name(instance, placeholder):
+    def add_verbose_name(instance, placeholder, context):
         '''
         This plugin context processor adds the plugin model's verbose_name to context.
         '''

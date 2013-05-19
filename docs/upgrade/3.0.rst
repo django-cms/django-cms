@@ -112,8 +112,22 @@ Undo and Redo
 
 If you have django-reversion installed you now have undo and redo directly in the toolbar.
 
+
+show_editable_page_title
+========================
+
+New ``show_editable_page_title`` to edit page title from the frontend.
+
 Plugins removed
 ===============
 
 We removed plugins from the core. Espacilly cms.plugins.text
 Find the new official CKEditor based Text Plugin at djangocms-text-ckeditor.
+
+Plugin Context Processors take an extra argument
+================================================
+
+:ref:`plugin-context-processors` have had an argument added so that the rest of
+the context is available to them.  So if you have existing Plugin Context
+Processors you will need to change their function signature to add the extra
+argument.

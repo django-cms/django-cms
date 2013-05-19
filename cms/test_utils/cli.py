@@ -80,6 +80,7 @@ def configure(db_url, **extra):
             'django.contrib.staticfiles',
             'django.contrib.messages',
             'cms',
+            'cms.stacks',
             'menus',
             'mptt',
             #'cms.plugins.text',

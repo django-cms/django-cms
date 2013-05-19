@@ -5,7 +5,7 @@ from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
-from cms.api import create_page, create_title, add_plugin
+from cms.api import create_page, create_title, add_plugin, assign_user_to_page
 from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -411,7 +411,6 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.get_moderation_states(request, page.pk)
             self.assertEqual(response.status_code, 200)
 
-
     def test_change_status(self):
         page = self.get_page()
         permless = self.get_permless()
@@ -621,6 +620,46 @@ class AdminTests(AdminTestsBase):
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
+    def test_edit_title_dirty_bit(self):
+        language = "en"
+        admin = self.get_admin()
+        page = create_page('A', 'nav_playground.html', language)
+        page_admin = PageAdmin(Page, None)
+        page_admin._current_page = page
+        page.publish()
+        draft_page = page.get_draft_object()
+        admin_url = reverse("admin:cms_page_edit_title", args=(
+            draft_page.pk, language
+        ))
+
+        post_data = {
+            'title': "A Title"
+        }
+        with self.login_user_context(admin):
+            response = self.client.post(admin_url, post_data)
+            draft_page = Page.objects.get(pk=page.pk).get_draft_object()
+            self.assertTrue(draft_page.is_dirty())
+
+    def test_edit_title_languages(self):
+        language = "en"
+        admin = self.get_admin()
+        page = create_page('A', 'nav_playground.html', language)
+        page_admin = PageAdmin(Page, None)
+        page_admin._current_page = page
+        page.publish()
+        draft_page = page.get_draft_object()
+        admin_url = reverse("admin:cms_page_edit_title", args=(
+            draft_page.pk, language
+        ))
+
+        post_data = {
+            'title': "A Title"
+        }
+        with self.login_user_context(admin):
+            response = self.client.post(admin_url, post_data)
+            draft_page = Page.objects.get(pk=page.pk).get_draft_object()
+            self.assertTrue(draft_page.is_dirty())
+
 
 class NoDBAdminTests(CMSTestCase):
     @property
@@ -800,6 +839,34 @@ class PluginPermissionTests(AdminTestsBase):
             any(type(inline) is PagePermissionInlineAdmin
                 for inline in page_admin.get_inline_instances(request,
                                                               page if not DJANGO_1_4 else None)))
+
+    def test_edit_title_is_allowed_for_staff_user(self):
+        """
+        We check here both the permission on a single page, and the global permissions
+        """
+        user = self._create_user('user', is_staff=True)
+        another_user = self._create_user('another_user', is_staff=True)
+
+        page = create_page('A', 'nav_playground.html', 'en')
+        admin_url = reverse("admin:cms_page_edit_title", args=(
+            page.pk, 'en'
+        ))
+        page_admin = PageAdmin(Page, None)
+        page_admin._current_page = page
+
+        self.client.login(username=user.username, password=user.username)
+        response = self.client.get(admin_url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+        assign_user_to_page(page, user, grant_all=True)
+        self.client.login(username=user.username, password=user.username)
+        response = self.client.get(admin_url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self._give_cms_permissions(another_user)
+        self.client.login(username=another_user.username, password=another_user.username)
+        response = self.client.get(admin_url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_plugin_add_returns_valid_pk_for_plugin(self):
         admin = self._get_admin()
