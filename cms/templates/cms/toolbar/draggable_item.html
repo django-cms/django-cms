@@ -10,7 +10,7 @@
 				<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
 				<li><a data-rel="edit" href="#">{% trans "Edit" %}</a></li>
 				<li><a data-rel="modal" href="{% url "admin:cms_page_delete_plugin" plugin.pk %}" data-name="{{ plugin.get_plugin_name }}">{% trans "Delete" %}</a></li>
-				<li><a data-rel="stack" href="#">{% trans "Stack" %}</a></li>
+				<li><a data-rel="modal" href="{% url "admin:stacks_stack_create_stack_from_plugin" placeholder_id=plugin.placeholder_id plugin_id=plugin.pk %}">{% trans "Create stack" %}</a></li>
 				{% plugin_child_classes plugin %}
 			</ul>
 			<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>

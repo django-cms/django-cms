@@ -1,11 +1,19 @@
 import uuid
+
 from django.db import models
-from cms.models.fields import PlaceholderField
 from django.utils.translation import ugettext_lazy as _
+
+from cms.models.fields import PlaceholderField
 from cms.models.pluginmodel import CMSPlugin
 
 
 class Stack(models.Model):
+    CREATION_BY_TEMPLATE = 'template'
+    CREATION_BY_CODE = 'code'
+    CREATION_METHODS = (
+        (CREATION_BY_TEMPLATE, _('by template')),
+        (CREATION_BY_TEMPLATE, _('by code')),
+    )
     name = models.CharField(
         verbose_name=_(u'stack name'), max_length=255, blank=True, default='',
         help_text=_(u'Descriptive name to identify this stack. Not displayed to users.'))
@@ -14,6 +22,11 @@ class Stack(models.Model):
         help_text=_(u'To render the stack in templates.'))
     content = PlaceholderField(
         slotname=u'stack_content', verbose_name=_(u'stack content'), related_name='stacks_contents')
+
+    creation_method = models.CharField(
+        verbose_name=('creation_method'), choices=CREATION_METHODS, default=CREATION_BY_CODE,
+        max_length=20, blank=True,
+    )
 
     class Meta:
         verbose_name = _(u'stack')
@@ -29,7 +42,7 @@ class Stack(models.Model):
 
 
 class StackLink(CMSPlugin):
-    stack = models.ForeignKey(Stack, verbose_name=_(u'stack'))
+    stack = models.ForeignKey(Stack, verbose_name=_(u'stack'), related_name='linked_plugins')
 
     def __unicode__(self):
         return self.stack.name

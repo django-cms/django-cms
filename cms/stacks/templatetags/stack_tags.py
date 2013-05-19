@@ -1,11 +1,10 @@
 from classytags.arguments import Argument
 from classytags.core import Tag, Options
 from django import template
-from django.utils.safestring import mark_safe
-from cms.plugin_rendering import render_plugins
-from cms.plugins.utils import get_plugins
-from stacks import models as stack_models
-from stacks.models import Stack
+
+from cms.plugin_rendering import render_placeholder
+
+from cms.stacks.models import Stack
 
 register = template.Library()
 
@@ -29,16 +28,8 @@ class StackNode(Tag):
         if isinstance(code, Stack):
             stack = code
         else:
-            stack, __ = stack_models.Stack.objects.get_or_create(code=code, defaults={'name': code})
-        # TODO: once we drop 2.3.x support we can just use the "render_plugin" templatetag
-        #       instead of rendering html here.
+            stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code, 'creation_method': Stack.CREATION_BY_TEMPLATE})
         placeholder = stack.content
-        plugins = get_plugins(context['request'], placeholder)
-        processors = ()
-        rendered_placeholder = mark_safe("".join(render_plugins(plugins, context, placeholder, processors)))
-        if varname:
-            context[varname] = rendered_placeholder
-            rendered_placeholder = u''
-        return rendered_placeholder
+        return render_placeholder(placeholder, context, name_fallback=code)
 
 register.tag(StackNode)
