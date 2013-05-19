@@ -103,6 +103,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
+            'cms.test_utils.project.customuserapp',
             'south',
             'reversion',
             'sekizai',
@@ -229,7 +230,8 @@ def configure(db_url, **extra):
         ROOT_URLCONF='cms.test_utils.cli',
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.MD5PasswordHasher',
-        )
+        ),
+        AUTH_USER_MODEL='customuserapp.User',
     )
     from django.utils.functional import empty
 
