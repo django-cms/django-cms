@@ -9,7 +9,8 @@
 			<li><span>{% trans "Settings" %}</span></li>
 			<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
 			<li><a data-rel="modal" href="{% url "admin:cms_page_clear_placeholder" placeholder.pk %}" data-name="{{ placeholder_label }}">{% trans "Empty" %}</a></li>
-			<li><a data-rel="modal" href="#">{% trans "Stack" %}</a></li>
+			<li><a data-rel="modal" href='{% url "admin:stacks_stack_create_stack" placeholder_id=placeholder.pk %}?_popup'>{% trans "Create Stack" %}</a></li>
+			<li><a data-rel="modal" href='{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'>{% trans "Insert Stack" %}</a></li>
 			{% for module in module_list %}
 			<li><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></li>
 			{% for p in module.list %}
@@ -36,7 +37,7 @@ CMS.$(document).ready(function () {
 			'add_plugin': '{{ placeholder.get_add_url }}',
 			'edit_plugin': '{{ placeholder.get_changelist_url }}',
 			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}',
-			'stack_plugin': ''
+			'stack_plugin': '{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'
 		}
 	});
 });
