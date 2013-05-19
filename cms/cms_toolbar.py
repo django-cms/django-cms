@@ -144,13 +144,14 @@ class PageToolbar(CMSToolbar):
         menu_items.items.append(Item(
             reverse('admin:cms_page_advanced', args=[page.pk]),
             _('Advanced Settings'),
-            load_modal=True)
+            load_modal=True, disabled=not page.has_advanced_settings_permission(self.request))
         )
-        menu_items.items.append(Item(
-            reverse('admin:cms_page_permissions', args=[page.pk]),
-            _('Permissions'),
-            load_modal=True)
-        )
+        if get_cms_setting('PERMISSION'):
+            menu_items.items.append(Item(
+                reverse('admin:cms_page_permissions', args=[page.pk]),
+                _('Permissions'),
+                load_modal=True, active=not page.has_change_permissions_permission(self.request))
+            )
         menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_delete', args=(self.page.pk,)),
