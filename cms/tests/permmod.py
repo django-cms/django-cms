@@ -3,6 +3,7 @@ from __future__ import with_statement
 import urllib
 from cms.api import (create_page, publish_page, add_plugin,
                      create_page_user, assign_user_to_page)
+from cms.compat import User
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                         ACCESS_PAGE_AND_DESCENDANTS)
@@ -14,7 +15,7 @@ from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
 
-from django.contrib.auth.models import User, Permission, AnonymousUser, Group
+from django.contrib.auth.models import Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse

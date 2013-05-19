@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.models import User
+from cms.compat import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings

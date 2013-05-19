@@ -2,8 +2,7 @@
 from __future__ import with_statement
 
 from cms.tests.menu_page_viewperm import ViewPermissionTests
-
-from django.contrib.auth.models import  User
+from cms.compat import User
 
 
 class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
