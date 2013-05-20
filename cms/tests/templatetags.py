@@ -16,7 +16,6 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.template import RequestContext, Context
-from unittest import TestCase
 from django.template.base import Template
 from django.utils.html import escape
 
