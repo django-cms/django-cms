@@ -11,7 +11,7 @@ from cms.management.commands.subcommands.list import plugin_report
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.models.placeholdermodel import Placeholder
-from cms.plugins.text.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"

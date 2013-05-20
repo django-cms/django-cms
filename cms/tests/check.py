@@ -5,7 +5,8 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
-from cms.plugins.text.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.api import add_plugin
 from django.test import TestCase
 
@@ -84,7 +85,17 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
 
     def test_cms_frontend_languages_deprecated(self):
         with SettingsOverride(CMS_FRONTEND_LANGUAGES=True):
-            self.assertCheck(True, warnings=1, errors=0 )
+            self.assertCheck(True, warnings=1, errors=0)
+
+    def test_copy_relations_fk_check(self):
+        """
+        this is ugly, feel free to come up with a better test
+        """
+        self.assertCheck(True, warnings=0, errors=0)
+        copy_rel = ArticlePluginModel.copy_relations
+        del ArticlePluginModel.copy_relations
+        self.assertCheck(True, warnings=1, errors=0)
+        ArticlePluginModel.copy_relations = copy_rel
 
 
 class CheckWithDatabaseTests(TestCase, CheckAssertMixin):

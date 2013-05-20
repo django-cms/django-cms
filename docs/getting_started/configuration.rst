@@ -187,7 +187,7 @@ The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
 configuration as vanilla Wymeditor. Therefore you will need to learn 
 how to configure that. The best thing to do is to head 
 over to the `Wymeditor examples page 
-<http://files.wymeditor.org/wymeditor/examples/>`_
+<http://files.wymeditor.org/wymeditor-1.0.0b2/examples/>`_
 in order to understand how Wymeditor works. 
 
 The :mod:`cms.plugins.text` plugin exposes several variables named
@@ -461,7 +461,7 @@ page. With this field you can overwrite the whole relative url of the page.
 CMS_MENU_TITLE_OVERWRITE
 ========================
 
-Default: ``False``
+Default: ``True``
 
 This adds a new "menu title" field beside the title field.
 
@@ -530,6 +530,33 @@ a certain page all users he creates can, in turn, only edit this page. Naturally
 he can limit the rights of the users he creates even further, allowing them to see
 only a subset of the pages to which he is allowed access.
 
+.. setting:: CMS_RAW_ID_USERS
+
+CMS_RAW_ID_USERS
+================
+
+Default: ``False``
+
+This setting only applies if :setting:`CMS_PERMISSION` is ``True``
+
+The "view restrictions" and "page permissions" inlines on the
+:class:`cms.models.Page` admin change forms can cause performance problems
+where there are many thousands of users being put into simple select boxes. If
+set to a positive integer, this setting forces the inlines on that page to use
+standard Django admin raw ID widgets rather than select boxes if the number of
+users in the system is greater than that number, dramatically improving
+performance.
+
+.. note:: Using raw ID fields in combination with ``limit_choices_to`` causes
+          errors due to excessively long URLs if you have many thousands of
+          users (the PKs are all included in the URL of the popup window). For
+          this reason, we only apply this limit if the number of users is
+          relatively small (fewer than 500). If the number of users we need to
+          limit to is greater than that, we use the usual input field instead
+          unless the user is a CMS superuser, in which case we bypass the
+          limit.  Unfortunately, this means that non-superusers won't see any
+          benefit from this setting.
+
 .. setting:: CMS_PUBLIC_FOR
 
 CMS_PUBLIC_FOR
@@ -551,29 +578,6 @@ Default: ``False`` for both
 This adds two new :class:`~django.db.models.DateTimeField` fields in the
 "advanced settings" tab of the page. With this option you can limit the time a
 page is published.
-
-.. setting:: CMS_SEO_FIELDS
-
-CMS_SEO_FIELDS
-==============
-
-Default: ``False``
-
-This adds a new "SEO Fields" fieldset to the page admin. You can set the
-Page Title, Meta Keywords and Meta Description in there.
-
-To access these fields in the template use:
-
-.. code-block:: html+django
-
-    {% load cms_tags %}
-    <head>
-        <title>{% page_attribute page_title %}</title>
-        <meta name="description" content="{% page_attribute meta_description %}"/>
-        <meta name="keywords" content="{% page_attribute meta_keywords %}"/>
-        ...
-        ...
-    </head>
 
 .. setting:: CMS_CACHE_DURATIONS
 
@@ -634,4 +638,19 @@ Example::
     :ref:`cache key prefixing <django:cache_key_prefixing>`
 
 
+.. setting::CMS_MAX_PAGE_PUBLISH_REVERSIONS
+
+CMS_MAX_PAGE_PUBLISH_REVERSIONS
+===============================
+
+Default: 25
+
+If `django-reversion`_ is installed everything you do with a page and all plugin changes will be saved in a revision.
+In the page admin there is a history button to revert to previous version of a page. In the past we had the problem
+with huge databases from the revision tables after some time. As a mitigation when you publish a page all revisions
+that are not publish revision will be deleted. This setting however declares how many publish revisions are saved in the
+database. By default the newest 25 publish revisions are kept and all other are deleted when you publish a page.
+If you set this to 0 all publish revisions are kept but you are responsible to keep the revision table small.
+
+.. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js

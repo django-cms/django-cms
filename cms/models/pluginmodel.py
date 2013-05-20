@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-import os
-import warnings
 from datetime import date
 
-from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
+import os
+import warnings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
+from django.utils import timezone, simplejson
 from django.utils.translation import ugettext_lazy as _
-
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
-from cms.utils import timezone, get_cms_setting
-
+from cms.utils import get_cms_setting
 from mptt.models import MPTTModel, MPTTModelBase
 
 
@@ -31,6 +31,7 @@ class PluginModelBase(MPTTModelBase):
     Metaclass for all CMSPlugin subclasses. This class should not be used for
     any other type of models.
     """
+
     def __new__(cls, name, bases, attrs):
         # remove RenderMeta from the plugin class
         attr_meta = attrs.pop('RenderMeta', None)
@@ -118,7 +119,7 @@ class CMSPlugin(MPTTModel):
             factory = deferred_class_factory
             for field in self._meta.fields:
                 if isinstance(self.__class__.__dict__.get(field.attname),
-                        DeferredAttribute):
+                              DeferredAttribute):
                     defers.append(field.attname)
                     if pk_val is None:
                         # The pk_val and model values are the same for all
@@ -135,6 +136,7 @@ class CMSPlugin(MPTTModel):
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
+
         return plugin_pool.get_plugin(self.plugin_type).name
 
     def get_short_description(self):
@@ -145,23 +147,26 @@ class CMSPlugin(MPTTModel):
 
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
+
         return plugin_pool.get_plugin(self.plugin_type)
 
     def get_plugin_instance(self, admin=None):
         plugin_class = self.get_plugin_class()
-        plugin = plugin_class(plugin_class.model, admin) # needed so we have the same signature as the original ModelAdmin
+        plugin = plugin_class(plugin_class.model,
+                              admin) # needed so we have the same signature as the original ModelAdmin
+        if hasattr(self, "_inst"):
+            return self._inst, plugin
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
-                instance = getattr(self, plugin.model.__name__.lower())
-                # could alternatively be achieved with:
-                # instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
+                instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
                 instance._render_meta = self._render_meta
             except (AttributeError, ObjectDoesNotExist):
                 instance = None
         else:
             instance = self
-        return instance, plugin
+        self._inst = instance
+        return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
@@ -172,6 +177,11 @@ class CMSPlugin(MPTTModel):
             current_app = context.current_app if context else None
             context = PluginContext(context, instance, placeholder, current_app=current_app)
             context = plugin.render(context, instance, placeholder_slot)
+            request = context.get('request', None)
+            page = None
+            if request:
+                page = request.current_page
+            context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
             if plugin.render_plugin:
                 template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
                 if not template:
@@ -188,7 +198,7 @@ class CMSPlugin(MPTTModel):
         else:  # django 1.0.2 compatibility
             today = date.today()
             return os.path.join(get_cms_setting('PAGE_MEDIA_PATH'),
-                str(today.year), str(today.month), str(today.day), filename)
+                                str(today.year), str(today.month), str(today.day), filename)
 
     @property
     def page(self):
@@ -225,10 +235,11 @@ class CMSPlugin(MPTTModel):
             super(CMSPlugin, self).save()
 
     def set_base_attr(self, plugin):
-        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght', 'position', 'tree_id']:
+        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght',
+            'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, plugin_trail):        
+    def copy_plugin(self, target_placeholder, target_language, plugin_trail):
         """
         Copy this plugin and return the new plugin.
         """
@@ -259,14 +270,14 @@ class CMSPlugin(MPTTModel):
             marker = plugin_trail.pop()
             # are we going up or down?
             level_difference = self.level - marker.level
-            if level_difference == 1: 
-                # going up; put the marker back
+            if level_difference == 1:
+            # going up; put the marker back
                 plugin_trail.append(marker)
             else:
                 # going down; remove more items from plugin_trail
                 if level_difference < 0:
                     plugin_trail[:] = plugin_trail[:level_difference]
-            # assign new_plugin.parent 
+                # assign new_plugin.parent
             new_plugin.parent = plugin_trail[-1]
             # new_plugin becomes the last item in the tree for the next round
             plugin_trail.append(new_plugin)
@@ -289,7 +300,7 @@ class CMSPlugin(MPTTModel):
             plugin_instance.position = new_plugin.position  # added to retain the position when creating a public copy of a plugin
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
-            plugin_instance.copy_relations(old_instance)   
+            plugin_instance.copy_relations(old_instance)
 
         return new_plugin
 
@@ -351,9 +362,26 @@ class CMSPlugin(MPTTModel):
         """
         return self.position + 1
 
+    def get_breadcrumb(self):
+        breadcrumb = []
+        if not self.parent_id:
+            breadcrumb.append({'title': unicode(self.get_plugin_name()),
+            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
+            return breadcrumb
+        for parent in self.get_ancestors(False, True):
+            breadcrumb.append({'title': unicode(parent.get_plugin_name()),
+            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
+        return breadcrumb
+
+    def get_breadcrumb_json(self):
+        result = simplejson.dumps(self.get_breadcrumb())
+        result = mark_safe(result)
+        return result
+
     def num_children(self):
         if self.child_plugin_instances:
             return len(self.child_plugin_instances)
+
 
 reversion_register(CMSPlugin)
 
@@ -364,13 +392,16 @@ def deferred_class_factory(model, attrs):
     being replaced with DeferredAttribute objects. The "pk_value" ties the
     deferred attributes to a particular instance of the model.
     """
+
     class Meta:
         pass
+
     setattr(Meta, "proxy", True)
     setattr(Meta, "app_label", model._meta.app_label)
 
     class RenderMeta:
         pass
+
     setattr(RenderMeta, "index", model._render_meta.index)
     setattr(RenderMeta, "total", model._render_meta.total)
     setattr(RenderMeta, "text_enabled", model._render_meta.text_enabled)
@@ -382,7 +413,7 @@ def deferred_class_factory(model, attrs):
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
 
     overrides = dict([(attr, DeferredAttribute(attr, model))
-            for attr in attrs])
+        for attr in attrs])
     overrides["Meta"] = RenderMeta
     overrides["RenderMeta"] = RenderMeta
     overrides["__module__"] = model.__module__

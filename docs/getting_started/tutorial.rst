@@ -59,7 +59,7 @@ To make your life easier, add the following at the top of the file::
     # -*- coding: utf-8 -*-
     import os
     gettext = lambda s: s
-    PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+    PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
 
 Add the following apps to your :setting:`django:INSTALLED_APPS`.
@@ -67,10 +67,12 @@ This includes django CMS itself as well as its dependenices and
 other highly recommended applications/libraries:
 
 * ``'cms'``, django CMS itself
+* ``'stacks'``, for reusable content
 * ``'mptt'``, utilities for implementing a modified pre-order traversal tree
 * ``'menus'``, helper for model independent hierarchical website navigation
 * ``'south'``, intelligent schema and data migrations
 * ``'sekizai'``, for javascript and css management
+
 
 Also add any (or all) of the following plugins, depending on your needs:
 
@@ -140,6 +142,7 @@ at the right position::
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
     )
 
 You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
@@ -491,5 +494,5 @@ with the different plugins provided out of the box and to build great websites!
 
 .. _South: http://south.aeracode.org/
 .. _TinyMCE: http://tinymce.moxiecode.com/
-.. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
+.. _official documentation: http://docs.djangoproject.com/en/1.5/topics/templates/
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms

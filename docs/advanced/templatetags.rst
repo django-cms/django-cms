@@ -185,7 +185,7 @@ Arguments:
   information)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
-``"page_title"``, ``"slug"``, ``"meta_description"``, ``"meta_keywords"``
+``"page_title"``, ``"slug"``, ``"meta_description"``
 (note that you can also supply that argument without quotes, but this is
 deprecated because the argument might also be a template variable).
 
@@ -245,6 +245,21 @@ Example::
 	
 Normally the children of plugins can be accessed via the ``child_plugins`` atrribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
+
+.. templatetag:: show_editable_page_title
+.. versionadded:: 3.0
+
+show_editable_page_title
+========================
+
+This templatetags enables editing the page title from the frontend.
+If in edit mode you can double click on the title and modify in an overlay window; if in live mode
+it fallbacks to ``page_attribute title``.
+
+Example::
+	{% load cms_tags %}
+	{% show_editable_page_title %}
+
 
 *****************
 Menu Templatetags
@@ -337,11 +352,25 @@ show_sub_menu
 =============
 
 Displays the sub menu of the current page (as a nested list).
-Takes one argument that specifies how many levels deep the submenu should be
-displayed. The template can be found at ``cms/sub_menu.html``::
+
+The first argument, ``levels`` (default=100), specifies how many levels deep the submenu should be
+displayed
+
+The second argument, ``root_level`` (default=None), specifies at what level, if any, the menu should root at.
+For example, if root_level is 0 the menu will start at that level regardless of what level the current page is on.
+
+The third argument, ``nephews`` (default=100), specifies how many levels of nephews (children of siblings) are show.
+
+The template can be found at ``cms/sub_menu.html``::
 
     <ul>
         {% show_sub_menu 1 %}
+    </ul>
+
+Rooted at level 0::
+
+    <ul>
+        {% show_sub_menu 1 0 %}
     </ul>
 
 Or with a custom template::
@@ -448,19 +477,10 @@ Toolbar Templatetags
 
 .. highlightlang:: html+django
 
-To use any of the following templatetags you first need to load them at the
-top of your template::
-
-    {% load cms_toolbar %}
-	
-.. templatetag:: cms_toolbar
-
-cms_toolbar
-===========
-
-The ``cms_toolbar`` templatetag will add the required css and javascript to the
-sekizai blocks in the base template. The templatetag has to be placed after the
-``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences within your HTML.
+The ``cms_toolbar`` templatetag is included in the ``cms_tags`` library and will add the 
+required css and javascript to the sekizai blocks in the base template. The templatetag 
+has to be placed after the ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences 
+within your HTML.
 
 Example::
 

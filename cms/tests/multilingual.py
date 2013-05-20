@@ -2,6 +2,8 @@
 from __future__ import with_statement
 import copy
 from cms.api import create_page, create_title, publish_page, add_plugin
+from cms.exceptions import LanguageError
+from cms.forms.utils import update_site_and_page_choices
 from cms.models import Title
 from cms.test_utils.testcases import (CMSTestCase, SettingsOverrideTestCase,
                                       URL_CMS_PAGE_ADD, 
@@ -193,6 +195,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 method='GET',
                 COOKIES={},
                 META={},
+                user=User(),
             )
             self.assertRaises(Http404, details, request, '')
 
@@ -222,6 +225,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 method='GET',
                 COOKIES={},
                 META={},
+                user=User(),
             )
 
             response = details(request, '')
@@ -249,3 +253,15 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             response = self.client.get("/de/")
             self.assertEquals(response.status_code, 200)
+
+    def test_no_english_defined(self):
+        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
+            CMS_LANGUAGES={
+                1:[
+                    {'code': 'de', 'name': 'German', 'public':True, 'fallbacks': []},
+                ]},
+            ):
+            try:
+                update_site_and_page_choices(lang='en-us')
+            except LanguageError:
+                self.fail("LanguageError raised")

@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-from cms.forms.utils import get_site_choices, get_page_choices
-from cms.models import Page, PageUser, Placeholder
-from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request, cms_static_url
-from django.conf import settings
+import copy
+
 from django.contrib.sites.models import Site
 from django.forms.widgets import Select, MultiWidget, Widget
 from django.template.context import RequestContext
@@ -11,8 +8,13 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-import copy
-from cms.templatetags.cms_admin import admin_static_url
+
+from cms.forms.utils import get_site_choices, get_page_choices
+from cms.models import Page, PageUser, Placeholder
+from cms.plugin_pool import plugin_pool
+from cms.utils import get_language_from_request, cms_static_url
+from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
+
 
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
@@ -90,7 +92,7 @@ class PageSelectWidget(MultiWidget):
 (function($) {
     var handleSiteChange = function(site_name, selected_id) {
         $("#id_%(name)s_1 optgroup").remove();
-        var myOptions = $("#id_%(name)s_2 optgroup[label=" + site_name + "]").clone();
+        var myOptions = $("#id_%(name)s_2 optgroup[label='" + site_name + "']").clone();
         $("#id_%(name)s_1").append(myOptions);
         $("#id_%(name)s_1").change();
     };
@@ -120,39 +122,6 @@ class PageSelectWidget(MultiWidget):
     
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
-    
-    
-class PluginEditor(Widget):
-    def __init__(self, attrs=None):
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
-        
-    class Media:
-        js = [cms_static_url(path) for path in (
-            'js/libs/jquery.ui.core.js',
-            'js/libs/jquery.ui.sortable.js',
-            'js/plugin_editor.js',
-        )]
-        css = {
-            'all': [cms_static_url(path) for path in (
-                'css/plugin_editor.css',
-            )]
-        }
-
-    def render(self, name, value, attrs=None):
-        
-        context = {
-            'plugin_list': self.attrs['list'],
-            'installed_plugins': self.attrs['installed'],
-            'copy_languages': self.attrs['copy_languages'],
-            'language': self.attrs['language'],
-            'show_copy': self.attrs['show_copy'],
-            'placeholder': self.attrs['placeholder'],
-        }
-        return mark_safe(render_to_string(
-            'admin/cms/page/widgets/plugin_editor.html', context))
 
 
 class UserSelectAdminWidget(Select):
@@ -171,50 +140,6 @@ class UserSelectAdminWidget(Select):
             add_url = '../../../cms/pageuser/add/'
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-            output.append(u'<img src="%simg/icon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (admin_static_url(), _('Add Another')))
+            output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
     
-    
-class PlaceholderPluginEditorWidget(PluginEditor):
-    attrs = {}
-    def __init__(self, request, filter_func):
-        self.request = request
-        self.filter_func = filter_func
-            
-    def __deepcopy__(self, memo):
-        obj = copy.copy(self)
-        obj.request = copy.copy(self.request)
-        obj.filter_func = self.filter_func
-        memo[id(self)] = obj
-        return obj
-        
-    def render(self, name, value, attrs=None):
-        try:
-            ph = Placeholder.objects.get(pk=value)
-        except Placeholder.DoesNotExist:
-            ph = None
-            context = {'add':True}
-        if ph:
-            plugin_list = ph.cmsplugin_set.filter(parent=None).order_by('position')
-            plugin_list = self.filter_func(self.request, plugin_list)
-            language = get_language_from_request(self.request)
-            copy_languages = []
-            if ph.actions.can_copy:
-                copy_languages = ph.actions.get_copy_languages(
-                    placeholder=ph,
-                    model=ph._get_attached_model(),
-                    fieldname=ph._get_attached_field_name()
-                )
-            context = {
-                'plugin_list': plugin_list,
-                'installed_plugins': plugin_pool.get_all_plugins(ph.slot, include_page_only=False),
-                'copy_languages': copy_languages, 
-                'language': language,
-                'show_copy': bool(copy_languages) and ph.actions.can_copy,
-                'urloverride': True,
-                'placeholder': ph,
-            }
-        #return mark_safe(render_to_string(
-        #    'admin/cms/page/widgets/plugin_editor.html', context))
-        return mark_safe(render_to_string(
-            'admin/cms/page/widgets/placeholder_editor.html', context, RequestContext(self.request)))

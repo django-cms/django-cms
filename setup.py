@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import os
 import cms
 
-        
+
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
@@ -28,7 +28,7 @@ setup(
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Django>=1.3.1,<1.5',
+        'Django>=1.4,<1.6',
         'django-classy-tags>=0.3.4.1',
         'south>=0.7.2',
         'html5lib',
@@ -36,15 +36,16 @@ setup(
         'django-sekizai>=0.7',
     ],
     tests_require=[
-        'django-reversion>=1.6',
+        'django-reversion>=1.6.6',
         'Pillow==1.7.7',
         'Sphinx==1.1.3',
         'Jinja2==2.6',
         'Pygments==1.5',
         'dj-database-url==0.2.1',
+        'django-hvad',
     ],
-    packages=find_packages(exclude=["project","project.*"]),
+    packages=find_packages(exclude=["project", "project.*"]),
     include_package_data=True,
-    zip_safe = False,
-    test_suite = 'runtests.main',
+    zip_safe=False,
+    test_suite='runtests.main',
 )

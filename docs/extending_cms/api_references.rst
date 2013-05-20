@@ -96,7 +96,7 @@ Functions and constants
     :param string overwrite_url: Overwritten path for this page
 
 
-.. function:: add_plugin(placeholder, plugin_type, language, position='last-child', **data)
+.. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
 
     Adds a plugin to a placeholder and returns it.
 
@@ -106,6 +106,7 @@ Functions and constants
     :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` subclass, must be a valid plugin
     :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
     :param string position: Position to add this plugin to the placeholder, must be a valid django-mptt position
+    :param target: Parent plugin. Must be plugin instance
     :param kwargs data: Data for the plugin type instance
 
 
@@ -137,25 +138,15 @@ Functions and constants
     :param boolean grant_all: Grant all permissions to the user
     
 
-.. function:: publish_page(page, user, approve=False)
+.. function:: publish_page(page, user)
 
-    Publishes a page and optionally approves that publication.
+    Publishes a page.
     
     :param page: The page to publish
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
-    :param boolean approve: Whether to approve the publication or not
-    
 
-.. function:: approve_page(page, user)
-
-    Approves a page.
-    
-    :param page: The page to approve
-    :type page: :class:`cms.models.pagemodel.Page` instance
-    :param user: The user that performs this action
-    :type user: :class:`django.contrib.auth.models.User` instance
 
 
 Example workflows

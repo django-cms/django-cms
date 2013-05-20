@@ -3,7 +3,7 @@
 Edit Toolbar middleware
 """
 from cms.plugin_pool import plugin_pool
-from cms.cms_toolbar import CMSToolbar
+from cms.toolbar.toolbar import CMSToolbar
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
@@ -26,6 +26,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     original_context.pop()
     return output
 
+
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
@@ -38,6 +39,14 @@ class ToolbarMiddleware(object):
         """
         if 'edit' in request.GET and not request.session.get('cms_edit', False):
             request.session['cms_edit'] = True
+            if request.session.get('cms_build', False):
+                request.session['cms_build'] = False
+        if 'edit_off' in request.GET and request.session.get('cms_edit', True):
+            request.session['cms_edit'] = False
+            if request.session.get('cms_build', False):
+                request.session['cms_build'] = False
+        if 'build' in request.GET and not request.session.get('cms_build', False):
+            request.session['cms_build'] = True
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):

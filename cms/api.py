@@ -106,7 +106,7 @@ def _verify_plugin_type(plugin_type):
 
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, redirect=None, meta_description=None,
-                meta_keywords=None, created_by='python-api', parent=None,
+                created_by='python-api', parent=None,
                 publication_date=None, publication_end_date=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
@@ -149,6 +149,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate parent
     if parent:
         assert isinstance(parent, Page)
+        parent = Page.objects.get(pk=parent.pk)
 
     # validate publication date
     if publication_date:
@@ -183,14 +184,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
         soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        published=published,
+        published=False, # will be published later
         template=template,
         site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
     )
-    if parent:
-        page.insert_at(parent, position)
+    page.insert_at(parent, position)
     page.save()
 
     create_title(
@@ -201,7 +201,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         apphook=application_urls,
         redirect=redirect,
         meta_description=meta_description,
-        meta_keywords=meta_keywords,
         page=page,
         overwrite_url=overwrite_url
     )
@@ -210,11 +209,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page.publish()
 
     del _thread_locals.user
-    return page
+    return page.reload()
     
 def create_title(language, title, page, menu_title=None, slug=None,
                  apphook=None, redirect=None, meta_description=None,
-                 meta_keywords=None, parent=None, overwrite_url=None):
+                 parent=None, overwrite_url=None):
     """
     Create a title.
     
@@ -246,7 +245,6 @@ def create_title(language, title, page, menu_title=None, slug=None,
         application_urls=application_urls,
         redirect=redirect,
         meta_description=meta_description,
-        meta_keywords=meta_keywords,
         page=page
     )
 
@@ -371,6 +369,7 @@ def publish_page(page, user):
     
     See docs/extending_cms/api_reference.rst for more info
     """
+    page = page.reload()
     class FakeRequest(object):
         def __init__(self, user):
             self.user = user

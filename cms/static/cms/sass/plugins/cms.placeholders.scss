@@ -1,0 +1,131 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//######################################################################################################################
+// #IMPORT SETTINGS#
+@import "partials/settings";
+
+//######################################################################################################################
+// #PLACEHOLDER
+.cms_placeholder { padding:5px 5px 0.1px; @include border-radius(3px); background:$color-grey-70; }
+.cms_placeholder-generic,
+.cms_plugin { display:inline-block; position:relative; }
+// .cms_plugin-active { outline:2px solid adjust-hue($color-blue, 15deg); }
+
+//######################################################################################################################
+// #PLACEHOLDER/bar#
+.cms_placeholder-bar {
+	font-size:13px; line-height:20px;
+	position:relative; left:0; top:0; z-index:9999;
+	@include border-radius(3px); background:$color-grey-70;
+
+	.cms_placeholder-title { font-size:12px; line-height:16px; text-transform:uppercase;
+		font-weight:500; padding:0 0 0 2px; height:20px;
+		color:white; @include text-shadow(0px 1px 0px black); }
+}
+
+//######################################################################################################################
+// #PLACEHOLDER/subnav#
+.cms_placeholder, body {
+	.cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer;
+		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -152px;
+		&:hover { background-position:-37px -152px; } }
+
+	.cms_submenu-lang { float:right; color:white; padding:0 5px; background:$color-grey-70; @include border-radius(3px); }
+	.cms_submenu-dropdown {
+		display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
+		min-width:140px; max-height:230px; overflow:auto;
+		border:1px solid $color-grey-10; background:white;
+		@include box-shadow(0 2px 2px $color-grey-10);
+
+		li { zoom:1; }
+		li a, span { display:block; font-size:12px; line-height:15px; text-align:left; padding:4px 8px 3px 8px; }
+
+		li a { color:black;
+			&:hover { color:white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
+			&:first-child { border-top:none; } }
+		li span { cursor:default; font-weight:bold; color:black;
+			border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }
+		li:first-child span { border-top:none; }
+	}
+
+	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:250px; z-index:1000;
+		cursor:default; text-align:right; height:25px; @include border-radius(0 0 3px 3px);
+		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
+	.cms_submenu-quicksearch label { cursor:pointer; padding-right:25px; }
+	.cms_submenu-quicksearch input { font-size:12px; color:white; text-align:right; -webkit-appearance:none;
+		width:111px; padding:2px 1px 2px 5px; border:none; background:none; }
+}
+//######################################################################################################################
+// #DRAGGABLES#
+.cms_placeholder, body { // we need body to overwrite cms_reset
+	.cms_draggables { list-style-type:none; padding:0; margin:0; }
+	.cms_draggables .cms_draggables { min-height:25px; }
+
+	// #DRAGGABLES/general#
+	.cms_draggable, .cms_droppable { list-style-type:none;
+		position:relative; left:0; top:0; z-index:99; @include border-radius(3px);
+		padding:4px 5px 3px 5px; margin:0 0 5px;
+
+		// levels
+		.cms_draggable { position:relative; z-index:99; white-space:nowrap;
+			border-color:$color-grey-10; background:white; }
+
+		// menu overwrites
+		.cms_submenu { display:none; margin-top:2px; }
+		.cms_submenu:hover { background-position:-17px -152px; }
+		.cms_submenu-dropdown { right:-1px; top:24px; }
+		.cms_submenu-quicksearch { top:258px; }
+	}
+
+	// #DRAGGABLES/specific#
+	.cms_draggable { z-index:100; color:black; border:1px solid $color-grey-5; background:$color-grey-5;
+		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); border-color:$color-grey-10; } }
+	.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
+
+	.cms_droppable-empty { font-size:11px; text-transform:uppercase;
+		padding-top:0; padding-bottom:0; }
+	.cms_droppable-empty-wrapper { display:none; }
+
+	.cms_dragitem { cursor:move; }
+	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
+	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 2px -389px; }
+	.cms_dragitem-collapsed { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -358px; }
+	.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
+		width:100%; height:100%;
+		@include opacity(0.6); }
+
+	// #DRAGGABLES/states#
+	.cms_draggable-selected { border:1px solid adjust-hue($color-blue, 15deg) !important;
+		background:adjust-hue($color-blue, 15deg) !important; @include background-image($gradient-blue  !important); }
+	.cms_draggable-selected .cms_dragitem,
+	.cms_draggable-selected .cms_dragitem strong { color:white; }
+
+	.cms_draggable-allowed, .cms_draggable-hover-allowed, .cms_draggable-placeholder {
+		color:lighten($color-green, 40%); border-color:lighten($color-green, 40%); }
+	.cms_draggable-hover-allowed, .cms_draggable-placeholder { color:white; background:rgba(102, 153, 51, 0.2); }
+	.cms_dragitem-success { border:1px solid lighten($color-green, 40%); background:lighten($color-green, 40%); }
+
+	.cms_draggable-disallowed, .cms_draggable-hover-disallowed {
+		color:saturate($color-red, 80%); border:1px dashed saturate($color-red, 80%);
+		background:rgba(255, 0, 0, 0.1); }
+}
+.cms_placeholder .cms_draggables .cms_draggable { margin-left:0 !important; }
+
+//##################################################
+// #RETINA#
+@media print,
+	(-o-min-device-pixel-ratio: 5/4),
+	(-webkit-min-device-pixel-ratio: 1.25),
+	(min-resolution: 120dpi) {
+
+	.cms_submenu, .cms_submenu-quicksearch
+	.cms_placeholder .cms_dragitem-collapsable, body .cms_dragitem-collapsable,
+	.cms_placeholder .cms_dragitem-collapsed, body .cms_dragitem-collapsed {
+		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png') !important;
+		background-size:190px !important; }
+
+// end of retina
+}
