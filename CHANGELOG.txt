@@ -117,3 +117,8 @@
 - Fixed a bug that could lead to slug clashes
 - Fixed page change form (jQuery and permissions)
 - Fixed placeholder field permission checks
+
+==== 2.3.7 (upcoming) ===
+
+- Fixed a bug in the cache handling of plugins using django-sekizai
+- Fixed a performance bug in the permission cache
