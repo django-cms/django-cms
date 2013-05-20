@@ -127,7 +127,11 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             page_a = create_page("pageA", "nav_playground.html", "en",
                                  created_by=self.user_super)
             assign_user_to_page(page_a, self.user_master,
+<<<<<<< HEAD
                 can_add=True, can_change=True, can_delete=True, can_publish=True,
+=======
+                can_add=True, can_change=True, can_delete=True, can_publish=True, can_set_navigation=True,
+>>>>>>> LUN-687 -- new changes ... navigation still posiible from page list view
                 can_move_page=True, can_moderate=True)
 
             # publish after creating all drafts

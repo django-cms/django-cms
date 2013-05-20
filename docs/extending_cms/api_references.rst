@@ -121,7 +121,11 @@ Functions and constants
     :param boolean grant_all: Grant all permissions to the user
 
 
+<<<<<<< HEAD
 .. function:: assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_add=False, can_change=False, can_delete=False, can_change_advanced_settings=False, can_publish=False, can_change_permissions=False, can_move_page=False, can_moderate=False, grant_all=False)
+=======
+.. function:: assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_add=False, can_change=False, can_delete=False, can_change_advanced_settings=False, can_publish=False, can_set_navigation=False, can_change_permissions=False, can_move_page=False, can_moderate=False, grant_all=False)
+>>>>>>> LUN-687 -- new changes ... navigation still posiible from page list view
 
     Assigns a user to a page and gives them some permissions. Returns the
     :class:`cms.models.permissionmodels.PagePermission` object that gets
