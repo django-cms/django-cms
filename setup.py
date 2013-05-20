@@ -19,7 +19,7 @@ setup(
     author="Patrick Lauber",
     author_email="digi@treepy.com",
     name='django-cms',
-    version='2.3.6',
+    version='2.3.7',
     description='An Advanced Django CMS',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     url='https://www.django-cms.org/',
@@ -32,7 +32,7 @@ setup(
         'south>=0.7.2',
         'html5lib',
         'django-mptt>=0.5.1,<0.5.3',
-        'django-sekizai>=0.6.1',
+        'django-sekizai>=0.7',
     ],
     tests_require=[
         'django-reversion==1.6',
