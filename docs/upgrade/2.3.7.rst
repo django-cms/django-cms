@@ -28,3 +28,12 @@ When a page is saved and cache is enabled, an explicit cache clear used to be
 called, causing performance issues when you have thousand of users on your
 website. This is no longer the case: cache is now versioned and as a result
 massive cache invalidation is not needed anymore
+
+Fix MPTT Management command backported
+=======================================
+
+Backported from 2.4 a management command for fixing MPTT tree data.
+
+The command can be run with::
+
+    manage.py cms fix-mptt
