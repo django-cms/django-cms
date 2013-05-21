@@ -342,7 +342,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     if grant_all and not global_permission:
         # shortcut to grant all permissions
         return assign_user_to_page(page, user, grant_on, True, True, True, True,
-                                   True, True, True, True, True)
+                                   True, True, True, True, True, True)
 
     data = {
         'can_add': can_add,
