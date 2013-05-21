@@ -38,8 +38,18 @@ Requirements
 Recommended
 ===========
 
-* `django-filer`_ with its `django CMS plugins`_, file and image management
-  application to use instead of some core plugins
+These packages are not *required*, but they provide useful functionality with
+minimal additional configuration and are well-proven.
+
+File and image handling
+-----------------------
+
+* `Django Filer`_ for file and image management 
+* `django CMS plugins`_, which provides plugins for use with Django Filer
+
+Revision management
+-------------------
+
 * `django-reversion`_ 1.6.6 (with Django 1.4.5), 1.7 (with Django 1.5)
   to support versions of your content (If using a different Django version
   it is a good idea to check the page `Compatible-Django-Versions`_ in the
@@ -48,10 +58,12 @@ Recommended
 
   .. note::
 
-    Since django CMS 2.4 we only save the latest 25 publish revisions anymore.
-    You can change this behavior with :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`.
+    As of django CMS 2.4, only the most recent 25 published revisions are
+    saved. You can change this behaviour if required with
+    :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`. Be aware that saved revisions
+    will cause your database size to increase.
 
-.. _django-filer: https://github.com/stefanfoulis/django-filer
+.. _Django Filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
@@ -101,15 +113,15 @@ On Mac OSX
 On Microsoft Windows
 ====================
 
-**TODO**.
+**TODO**
 
 *********
 Databases
 *********
 
 We recommend using `PostgreSQL`_ or `MySQL`_ with django CMS. Installing and
-maintaining database systems is outside the scope of this documentation, but is
-very well documented on the systems' respective websites.
+maintaining database systems is outside the scope of this documentation, but
+is very well documented on the systems' respective websites.
 
 To use django CMS efficiently, we recommend:
 
