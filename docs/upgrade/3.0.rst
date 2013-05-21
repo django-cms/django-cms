@@ -116,11 +116,13 @@ CMS_SEO_FIELDS
 * ``meta_description`` field's max_length is now 155 for optimal Google integration.
 * ``page_title`` is default on top
 * ``meta_keywords`` field has been removed, as it no longer serves any purpose
+            
 
 CMS_MENU_TITLE_OVERWRITE
 ========================
 
 New default is ``True``.
+          
 
 language_chooser
 ================
@@ -128,6 +130,7 @@ language_chooser
 The ``language_chooser`` templatetag now only displays languages that are
 public. Use the toolbar language chooser to change the language to non-public
 languages.
+       
 
 Undo and Redo
 =============
@@ -135,6 +138,13 @@ Undo and Redo
 If you have ``django-reversion`` installed you now have **undo** and **redo**
 options available directly in the toolbar. These can now revert *plugin*
 content as well as *page* content.
+
+
+show_editable_page_title
+========================
+
+New ``show_editable_page_title`` to edit page title from the frontend.
+                 
 
 Plugins removed
 ===============
@@ -148,3 +158,12 @@ The most significant of these removals is ``cms.plugins.text``.
 We provide ``djangocms-text-ckeditor``, a CKEditor-based Text Plugin. It's
 available from https://github.com/djangocms-text-ckeditor. You may of course
 use your preferred editor; others are available.  
+                        
+
+Plugin Context Processors take a new argument
+=============================================
+
+:ref:`plugin-context-processors` have had an argument added so that the rest
+of the context is available to them. So if you have existing Plugin Context
+Processors you will need to change their function signature to add the extra
+argument.

@@ -35,7 +35,8 @@ class Item(BaseItem):
     template = "cms/toolbar/menu/item.html"
 
     def __init__(self, url, title, load_side_frame=False, ajax=False, ajax_data=None, active=False, question="",
-                 right=False, load_modal=True, disabled=False, extra_classes=None):
+                 right=False, load_modal=True, disabled=False, extra_classes=None, close_url=None,
+                 redirect_on_close_url=False):
         super(Item, self).__init__(right)
         if load_side_frame and ajax:
             raise Exception("load_side_frame and ajax can not both be True.")
@@ -51,6 +52,8 @@ class Item(BaseItem):
         self.disabled = disabled
         self.ajax_data = ajax_data
         self.extra_classes = extra_classes
+        self.close_url = close_url
+        self.redirect_on_close_url = redirect_on_close_url
 
     def get_context(self):
         mod = None
@@ -74,6 +77,8 @@ class Item(BaseItem):
             'disabled': self.disabled,
             'data': data,
             'extra_classes': self.extra_classes,
+            'close_url': self.close_url,
+            'redirect_on_close_url': self.redirect_on_close_url,
         }
 
     def __repr__(self):

@@ -5,7 +5,11 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin
     """
     ptree = []
     plugins_ziplist = []
+    first = True
     for old_plugin in plugin_list:
+        if first:
+            old_plugin.parent = None
+            first = False
         if to_language:
             plugin_language = to_language
         else:
