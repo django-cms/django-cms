@@ -30,7 +30,7 @@ class PageToolbar(CMSToolbar):
             # The 'Admin' Menu
             items.append(self.get_admin_menu())
 
-            if toolbar.request.current_page and is_app:
+            if toolbar.request.current_page and toolbar.request.current_page.pk:
                 if self.request.current_page.publisher_is_draft:
                     self.page = request.current_page
                 else:
