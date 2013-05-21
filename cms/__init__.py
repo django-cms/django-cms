@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-__version__ = '2.3.5pbs.2'
+__version__ = '2.3.5pbs.3'
 
-# patch settings 
+# patch settings
 try:
     from django.conf import settings
     if 'cms' in settings.INSTALLED_APPS:
