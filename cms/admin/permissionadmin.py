@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.admin.forms import (GlobalPagePermissionAdminForm, 
+from cms.admin.forms import (GlobalPagePermissionAdminForm,
     PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm)
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
@@ -43,11 +43,11 @@ class PagePermissionInlineAdmin(TabularInline):
     classes = ['collapse', 'collapsed']
     exclude = ['can_view']
     extra = 0 # edit page load time boost
-    
+
     def queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
-        all permissions. Otherwise can user see only permissions for 
+        all permissions. Otherwise can user see only permissions for
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to itself)
         """
@@ -59,7 +59,7 @@ class PagePermissionInlineAdmin(TabularInline):
             return qs.filter(can_view=False)
         except NoPermissionsException:
             return self.objects.get_empty_query_set()
-    
+
     def get_formset(self, request, obj=None, **kwargs):
         """
         Some fields may be excluded here. User can change only
@@ -124,16 +124,16 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
     list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
     list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
-    
+
     form = GlobalPagePermissionAdminForm
-    
+
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'group__name')
-    
+
     exclude = []
-    
+
     list_display.append('can_change_advanced_settings')
     list_filter.append('can_change_advanced_settings')
-    
+
     if settings.CMS_MODERATOR:
         list_display.append('can_moderate')
         list_filter.append('can_moderate')
@@ -167,7 +167,7 @@ class GenericCmsPermissionAdmin(object):
             if fields:
                 fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
         return fieldsets
-    
+
     def _has_change_permissions_permission(self, request):
         """
         User is able to add/change objects only if he haves can change
@@ -178,11 +178,11 @@ class GenericCmsPermissionAdmin(object):
         except NoPermissionsException:
             return False
         return True
-    
+
     def has_add_permission(self, request):
         return self._has_change_permissions_permission(request) and \
             super(self.__class__, self).has_add_permission(request)
-    
+
     def has_change_permission(self, request, obj=None):
         return self._has_change_permissions_permission(request) and \
             super(self.__class__, self).has_change_permission(request, obj)

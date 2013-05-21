@@ -30,7 +30,7 @@
 								{% endif %}
 							{% endifequal %}
 						{% endif %}
-					</td>			
+					</td>
 					<td class="user">{{ permission.user|default_if_none:"-" }}</td>
 					<td class="group">{{ permission.group|default_if_none:"-" }}</td>
 					<td class="can_change">{{ permission.can_change|boolean_icon }}</td>
@@ -42,7 +42,7 @@
 					<td class="can_view">{{ permission.can_view|boolean_icon }}</td>
 					<td class="grant_on">{% if meta.0 %}{% trans 'All' %}
 						{% else %}{{ permission.get_grant_on_display }}
-					{% endif%}</td>			
+					{% endif%}</td>
 				</tr>
 			{% endfor %}
 		</tbody>
