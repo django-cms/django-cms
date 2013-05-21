@@ -23,25 +23,24 @@
 {% block field_sets %}
 	<fieldset class="module aligned {{ fieldset.classes }}">
 		{% csrf_token %}
-            {% for field in form %}
-	            {% if field.is_hidden %}
+			{% for field in form %}
+				{% if field.is_hidden %}
 					{{ field }}
-		        {% else %}
-	                <div class="form-row{% if field.field.name %} field-{{ field.name }}{% if field.errors %} errors{% endif %}{% endif %}">
-		                <div>
-		                {% if not field.is_hidden %}<label for="id_{{ field.name }}">{{ field.label }}</label>{% endif %}
-	                    {{ field }}
-	                    {% if field.help_text %}
-	                        <p class="help">{{ field.help_text|safe }}</p>
-	                    {% endif %}
-		                </div>
-	                </div>
-	            {% endif %}
-            {% endfor %}
+				{% else %}
+					<div class="form-row{% if field.field.name %} field-{{ field.name }}{% if field.errors %} errors{% endif %}{% endif %}">
+						<div>
+						{% if not field.is_hidden %}<label for="id_{{ field.name }}">{{ field.label }}</label>{% endif %}
+						{{ field }}
+						{% if field.help_text %}
+							<p class="help">{{ field.help_text|safe }}</p>
+						{% endif %}
+						</div>
+					</div>
+				{% endif %}
+			{% endfor %}
 	</fieldset>
 {% endblock %}
 {% block submit_buttons_bottom %}<div class="submit-row"><input type="submit" class="default" name="_save" value="{% trans 'Save' %}"/></div>{% endblock %}
 <script type="text/javascript"></script>
 </form>
 {% endblock %}
-
