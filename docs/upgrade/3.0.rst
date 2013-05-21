@@ -23,10 +23,10 @@ django CMS 3.0 introduces a new Frontend Editing system.
 In the new system, Placeholders and their Plugins are no longer managed in the
 Admin site, but only from the Frontend.
 
-In addition, the system now offer two editings views: 
+In addition, the system now offer two editing views: 
 
-*	**content** view, in which you edit plugins
-*	**structure** view, in which plugins can be added and rearranged
+* **content** view, for editing the configuration and content of plugins
+* **structure** view, in which plugins can be added and rearranged
 
 
 New Toolbar
@@ -34,10 +34,8 @@ New Toolbar
 
 The Toolbar's code has been simplified and its appearance refreshed. 
 
-The Toolbar now allows for adding and changing entries. The toolbar has now a
-built in language chooser for languages that are not public yet. A user
-settings module has been introduced to save the language of the staff user so
-the toolbar and admin interface stays the same even when switching languages.
+The Toolbar is now a more consistent management tool for adding and changing
+objects in a django CMS-based system.
 
 Creating Toolbar items for your own application
 -----------------------------------------------
@@ -98,6 +96,16 @@ Example::
                 Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "Change Category"))
         return render_to_response('sampleapp/category_view.html',
                                   RequestContext(request, {'category': cat}))
+ 
+
+Better multilingual editing
+===========================
+
+Improvements in the environment django CMS provides for managing a multi-lingual site include:
+
+* a built-in language chooser for languages that are not public yet 
+* configurable behaviour of the Admin site's language when switching between
+  languages of edited content
 
 
 CMS_SEO_FIELDS

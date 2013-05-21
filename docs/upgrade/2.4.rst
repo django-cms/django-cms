@@ -126,7 +126,7 @@ The command can be run with::
 Removed the MultilingualMiddleware
 ==================================
 
-We removed the MultilingualMiddleware. This removed rather unattractive
+We removed the MultilingualMiddleware. This removed rather some unattractive
 monkey-patching of the ``reverse()`` function as well. As a benefit we now
 support localization of urls and Apphook urls with standard Django helpers.
 
