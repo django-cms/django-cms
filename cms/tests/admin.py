@@ -838,7 +838,7 @@ class PluginPermissionTests(AdminTestsBase):
         codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
         user.user_permissions.add(Permission.objects.get(codename=codename))
 
-    def _give_page_permssion_rights(self, user):
+    def _give_page_permission_rights(self, user):
         self._give_permission(user, PagePermission, 'add')
         self._give_permission(user, PagePermission, 'change')
         self._give_permission(user, PagePermission, 'delete')
@@ -955,7 +955,7 @@ class PluginPermissionTests(AdminTestsBase):
         user = User(username='user', email='user@domain.com', password='user',
                     is_staff=True)
         user.save()
-        self._give_page_permssion_rights(user)
+        self._give_page_permission_rights(user)
         page = create_page('A', 'nav_playground.html', 'en')
         page_permission = PagePermission.objects.create(
             can_change_permissions=True, user=user, page=page)
