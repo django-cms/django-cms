@@ -42,19 +42,20 @@ class MiddlewareTestCase(CMSTestCase):
             self.assertEqual(result, FRENCH) # the session's language.
             
             
+            cookie_dict = {}
+            cookie_dict[settings.LANGUAGE_COOKIE_NAME] = FRENCH
+            
             request = AttributeObject(
                 path_info='whatever',
                 path='whatever',
-                COOKIES={
-                    'django_language': FRENCH,
-                },
+                COOKIES=cookie_dict,
                 META={},
             )
             result = middle.get_language_from_request(request)
             self.assertEqual(result, FRENCH) # the cookies language.
             
             # Now the following should revert to the default language (en)
-            request.COOKIES['django_language'] = ELVISH
+            request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = ELVISH
             result = middle.get_language_from_request(request)
             self.assertEqual(result, 'en') # The default
 
@@ -65,13 +66,15 @@ class MiddlewareTestCase(CMSTestCase):
         FRENCH = 'x-FRENCH'
         
         with SettingsOverride(CMS_LANGUAGES=((FRENCH, 'FRENCH'),)):
+
+            cookie_dict = {}
+            cookie_dict[settings.LANGUAGE_COOKIE_NAME] = FRENCH
+
             request = AttributeObject(
                 session={},
                 path_info='whatever',
                 path='whatever',
-                COOKIES={
-                    'django_language': FRENCH,
-                },
+                COOKIES=cookie_dict,
                 META = {},
                 LANGUAGE_CODE = FRENCH
             )
@@ -104,13 +107,14 @@ class MiddlewareTestCase(CMSTestCase):
 
         middle = MultilingualURLMiddleware()
 
+        cookie_dict = {}
+        cookie_dict[settings.LANGUAGE_COOKIE_NAME] = 'en'
+
         request = AttributeObject(
             session={},
             path_info='whatever',
             path='whatever',
-            COOKIES={
-                'django_language': 'en',
-            },
+            COOKIES=cookie_dict,
             META = {},
             LANGUAGE_CODE = 'en'
         )
@@ -124,9 +128,47 @@ class MiddlewareTestCase(CMSTestCase):
 
         response = middle.process_response(request,HttpResponseRedirect('%ssome-path/'%settings.STATIC_URL))
         self.assertTrue(response['Location'] == '%ssome-path/' %settings.STATIC_URL)
-        
+
 
         # Prefix
         response = middle.process_response(request,HttpResponseRedirect('/xx/some-path/'))
         self.assertTrue(response['Location'] == '/en/xx/some-path/')
 
+    def test_multilingual_middleware_custom_language_cookie_name(self):
+        middle = MultilingualURLMiddleware()
+
+        FRENCH = 'fr'
+        CUSTOM_COOKIE_NAME = 'test_lang_cookie'
+        
+        with SettingsOverride(
+                              CMS_LANGUAGES=((FRENCH, 'French'),("it", "Italian")), 
+                              CMS_FRONTEND_LANGUAGES=(FRENCH,),
+                              LANGUAGE_COOKIE_NAME=CUSTOM_COOKIE_NAME):
+
+            request = AttributeObject(
+                path_info='whatever',
+                path='whatever',
+                COOKIES={},
+                META={},
+            )
+
+            def _get_cookie_value(response, key):
+                """
+                Returns the value of a cookie from the response
+                """
+                return response.cookies[key].value
+
+            # check that the name for the language cookie is set correctly
+            # honoring the LANGUAGE_COOKIE_NAME
+            response = middle.process_response(request,
+                                            HttpResponseRedirect(request.path))
+            self.assertTrue(CUSTOM_COOKIE_NAME in response.cookies.keys())
+            self.assertFalse('django_language' in response.cookies.keys())
+            self.assertEqual(_get_cookie_value(response, CUSTOM_COOKIE_NAME),
+                             'en')
+
+            # check that the language is correctly read from the cookie
+            request.COOKIES[CUSTOM_COOKIE_NAME] = FRENCH
+
+            result = middle.get_language_from_request(request)
+            self.assertEqual(result, FRENCH)
