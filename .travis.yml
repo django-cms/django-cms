@@ -9,13 +9,17 @@ env:
     - DJANGO=test_requirements/django-1.5.txt DB='sqlite://localhost/:memory:'
     - DJANGO=test_requirements/django-1.5.txt DB='mysql://root@127.0.0.1/djangocms_test'
     - DJANGO=test_requirements/django-1.5.txt DB='postgres://postgres@127.0.0.1/djangocms_test'
+    - DJANGO=test_requirements/selenium-1.4.txt DB='sqlite://localhost/:memory:'
+    - DJANGO=test_requirements/selenium-1.5.txt DB='sqlite://localhost/:memory:'
 
 before_script:
   - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'create database djangocms_test;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi"
-  
+
 install:
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
     - pip install -q -r $DJANGO --use-mirrors
     - pip install -q mysql-python --use-mirrors
 script:

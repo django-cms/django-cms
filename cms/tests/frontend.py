@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.api import create_page
+from cms.models import Page
 from django.contrib.auth.models import User
 from django.utils.unittest.case import SkipTest, skipIf
 
@@ -26,8 +27,11 @@ class CMSLiveTests(LiveServerTestCase):
         super(CMSLiveTests, cls).tearDownClass()
 
 
-
 class ToolbarBasicTests(CMSLiveTests):
+
+    def tearDown(self):
+        Page.objects.all().delete()
+
     @skipIf(not WebDriver, 'Selenium not found or Django too old')
     def test_toolbar_login(self):
         create_page('Home', 'simple.html', 'en', published=True).publish()
@@ -39,10 +43,9 @@ class ToolbarBasicTests(CMSLiveTests):
         url = '%s/?edit' % self.live_server_url
         self.selenium.get(url)
         self.assertRaises(NoSuchElementException, self.selenium.find_element_by_class_name, 'cms_toolbar-item_logout')
-        self.selenium.find_element_by_class_name('cms_toolbar_icon-toggle').click()
-        username_input = self.selenium.find_element_by_id("cms_toolbar-item_login-username")
+        username_input = self.selenium.find_element_by_id("id_cms-username")
         username_input.send_keys('admin')
-        password_input = self.selenium.find_element_by_id("cms_toolbar-item_login-password")
+        password_input = self.selenium.find_element_by_id("id_cms-password")
         password_input.send_keys('admin')
         password_input.submit()
-        self.assertTrue(self.selenium.find_element_by_class_name('cms_toolbar-item_logout'))
+        self.assertTrue(self.selenium.find_element_by_class_name('cms_toolbar-item-navigation'))
