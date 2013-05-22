@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.api import create_page
+from cms.models import Page
 from django.contrib.auth.models import User
 from django.utils.unittest.case import SkipTest, skipIf
 
@@ -27,6 +28,10 @@ class CMSLiveTests(LiveServerTestCase):
 
 
 class ToolbarBasicTests(CMSLiveTests):
+
+    def tearDown(self):
+        Page.objects.all().delete()
+
     @skipIf(not WebDriver, 'Selenium not found or Django too old')
     def test_toolbar_login(self):
         create_page('Home', 'simple.html', 'en', published=True).publish()
