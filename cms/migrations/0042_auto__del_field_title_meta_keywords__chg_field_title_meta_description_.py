@@ -8,10 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Title.meta_keywords'
-        db.delete_column(u'cms_title', 'meta_keywords')
-
-
         # Changing field 'Title.meta_description'
         db.alter_column(u'cms_title', 'meta_description', self.gf('django.db.models.fields.TextField')(max_length=155, null=True))
         # Adding field 'Page.revision_id'
@@ -21,12 +17,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Adding field 'Title.meta_keywords'
-        db.add_column(u'cms_title', 'meta_keywords',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
-                      keep_default=False)
-
-
         # Changing field 'Title.meta_description'
         db.alter_column(u'cms_title', 'meta_description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True))
         # Deleting field 'Page.revision_id'
