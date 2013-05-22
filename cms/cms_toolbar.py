@@ -108,7 +108,8 @@ class PageToolbar(CMSToolbar):
         menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
         menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
         menu_items.items.append(Item(
-            reverse('admin:cms_page_change', args=[page.pk]),
+            '%s?language=%s' % (reverse('admin:cms_page_change', args=[page.pk]),
+            get_language_from_request(self.request)),
             _('Settings'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),
