@@ -378,6 +378,13 @@ class PagePermissionsPermissionManager(models.Manager):
         """
         return self.__get_id_list(user, site, "can_publish")
 
+    def get_set_navigation_id_list(self, user, site):
+        """
+        Give a list of page where the user has navigation rights or the string "All" if
+        the user has all rights.
+        """
+        return self.__get_id_list(user, site, "can_set_navigation")
+
     def get_change_id_list(self, user, site):
         """
         Give a list of page where the user has edit rights or the string "All" if

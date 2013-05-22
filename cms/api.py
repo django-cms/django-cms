@@ -330,7 +330,7 @@ def create_page_user(created_by, user,
 
 def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     can_add=False, can_change=False, can_delete=False,
-    can_change_advanced_settings=False, can_publish=False,
+    can_change_advanced_settings=False, can_publish=False, can_set_navigation=False,
     can_change_permissions=False, can_move_page=False, can_moderate=False,
     can_recover_page=True, can_view=False,
     grant_all=False, global_permission=False):
@@ -342,7 +342,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     if grant_all and not global_permission:
         # shortcut to grant all permissions
         return assign_user_to_page(page, user, grant_on, True, True, True, True,
-                                   True, True, True, True, True)
+                                   True, True, True, True, True, True)
 
     data = {
         'can_add': can_add,
@@ -350,6 +350,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         'can_delete': can_delete,
         'can_change_advanced_settings': can_change_advanced_settings,
         'can_publish': can_publish,
+        'can_set_navigation': can_set_navigation,
         'can_change_permissions': can_change_permissions,
         'can_move_page': can_move_page,
         'can_moderate': can_moderate,

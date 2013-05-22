@@ -66,6 +66,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
 
         'has_change_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
+        'has_set_navigation_permission': page.has_set_navigation_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
         'has_move_page_permission': has_move_page_permission,
         'has_add_page_permission': has_add_page_permission,

@@ -758,6 +758,9 @@ class Page(MPTTModel):
     def has_publish_permission(self, request):
         return self.has_generic_permission(request, "publish")
 
+    def has_set_navigation_permission(self, request):
+        return self.has_generic_permission(request, "set_navigation")
+
     def has_advanced_settings_permission(self, request):
         return self.has_generic_permission(request, "advanced_settings")
 

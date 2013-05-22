@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 PERMISSION_KEYS = [
     'can_change', 'can_add', 'can_delete',
-    'can_change_advanced_settings', 'can_publish',
+    'can_change_advanced_settings', 'can_publish', 'can_set_navigation'
     'can_change_permissions', 'can_move_page',
     'can_moderate', 'can_view']
 
