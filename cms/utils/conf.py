@@ -74,7 +74,7 @@ def get_media_root():
     return os.path.join(settings.MEDIA_ROOT, get_cms_setting('MEDIA_PATH'))
 
 
-@default('CMS_MEDIA_ROOT')
+@default('CMS_MEDIA_URL')
 def get_media_url():
     return urlparse.urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
 
