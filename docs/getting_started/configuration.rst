@@ -254,9 +254,9 @@ Example::
 ``CMS_LANGUAGES`` has different options where you can define how different
 languages behave, with granular control.
 
-On the first level you can define ``SITE_ID``s and default values. In the
-example above we define two sites. The first site has 3 languages (English,
-German and French) and the second site has only Dutch. 
+On the first level you can set values for each ``SITE_ID``. In the example
+above we define two sites. The first site has 3 languages (English, German and
+French) and the second site has only Dutch.
 
 The ``default`` node defines default behavior for all languages. You can
 overwrite the default settings with language-specific properties. For example
