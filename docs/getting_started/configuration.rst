@@ -113,7 +113,7 @@ plugins, as shown above with ``base.html content``.
 ``limits``
     Limit the number of plugins that can be placed inside this placeholder.
     Dictionary keys are plugin names and the values are their respective
-    limits. Special case: ``globa` - Limit the absolute number of plugins in
+    limits. Special case: ``global`` - Limit the absolute number of plugins in
     this placeholder regardless of type (takes precedence over the
     type-specific limits).
 
