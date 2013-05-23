@@ -145,8 +145,12 @@ Also, contributing to the documentation will earn you great respect from the
 core developers. You get good karma just like a test contributor, but you get
 double cookie points. Seriously. You rock.
 
-Section style
-=============
+Documentation markup
+====================
+
+
+Sections
+--------
 
 We use Python documentation conventions for section marking:
 
@@ -156,12 +160,21 @@ We use Python documentation conventions for section marking:
 * ``-``, for subsections
 * ``^``, for subsubsections
 * ``"``, for paragraphs
-
+ 
+Inline markup
+-------------
+              
+* use backticks - ````settings.py```` - for:
+    * literals
+    * filenames
+    * names of fields and other items in the Admin interface: 
+* use emphasis - ``*Home*`` around:
+    * the names of available options in the Admin
+    * values in or of fields 
 
 ************
 Translations
 ************
-
 
 For translators we have a `Transifex account
 <https://www.transifex.com/projects/p/django-cms/>`_ where you can translate
