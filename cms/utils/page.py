@@ -80,7 +80,7 @@ def check_title_slugs(page):
     cut/paste.
     """
     for title in page.title_set.all():
-        old_slug = title.slug
+        old_slug, old_path = title.slug, title.path
         title.slug = get_available_slug(title)
-        if title.slug != old_slug:
+        if title.slug != old_slug or title.path != old_path:
             title.save()

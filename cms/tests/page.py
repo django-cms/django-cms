@@ -351,16 +351,17 @@ class PagesTestCase(CMSTestCase):
             public_page3 = page3.publisher_public
             self.assertEqual(public_page3.get_absolute_url(),
                              self.get_pages_root() + page_data2['slug'] + "/" + page_data3['slug'] + "/")
-            # move page2 back to root and check path of 2 and 3
+            # set page2 as root and check path of 1 and 3
             response = self.client.post("/en/admin/cms/page/%s/move-page/" % page2.pk,
-                                        {"target": page1.pk, "position": "right"})
+                                        {"target": page1.pk, "position": "left"})
             self.assertEqual(response.status_code, 200)
             page1 = Page.objects.get(pk=page1.pk)
-            self.assertEqual(page1.get_path(), '')
+            self.assertEqual(page1.get_path(), page_data1['slug'])
             page2 = Page.objects.get(pk=page2.pk)
-            self.assertEqual(page2.get_path(), page_data2['slug'])
+            # Check that page2 is now at the root of the tree
+            self.assertEqual(page2.get_path(), '')
             page3 = Page.objects.get(pk=page3.pk)
-            self.assertEqual(page3.get_path(), page_data2['slug'] + "/" + page_data3['slug'])
+            self.assertEqual(page3.get_path(), page_data3['slug'])
 
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")

@@ -138,12 +138,13 @@ class Page(MPTTModel):
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
 
+        # readability counts :)
+        is_inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
+
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
 
-        if (position in ('left', 'right')
-        and not target.parent
-        and self.template == constants.TEMPLATE_INHERITANCE_MAGIC):
+        if (position in ('left', 'right') and not target.parent and is_inherited_template):
             self.template = self.get_template()
         self.move_to(target, position)
 
@@ -154,6 +155,8 @@ class Page(MPTTModel):
         self.save()  # always save the page after move, because of publisher
         # check the slugs
         page_utils.check_title_slugs(self)
+        # Make sure to update the slug and path of the target page.
+        page_utils.check_title_slugs(target)
 
         if self.publisher_public_id:
             # Ensure we have up to date mptt properties
