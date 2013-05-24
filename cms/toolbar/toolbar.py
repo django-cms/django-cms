@@ -39,6 +39,10 @@ class CMSToolbar(object):
             self.language = self.request.LANGUAGE_CODE
         else:
             self.language = settings.LANGUAGE_CODE
+
+        # We need to store the current language in case the user's preferred language is different.
+        self.current_language = self.language
+
         if self.is_staff:
             try:
                 user_settings = UserSettings.objects.get(user=self.request.user)
@@ -60,11 +64,12 @@ class CMSToolbar(object):
         """
         Get the CMS items on the toolbar
         """
-        try:
-            self.view_name = resolve(self.request.path).func.__module__
-        except Resolver404:
-            self.view_name = ""
-        with force_language(self.language):
+        with force_language(self.current_language):
+            try:
+                self.view_name = resolve(self.request.path).func.__module__
+            except Resolver404:
+                self.view_name = ""
+       
             toolbars = toolbar_pool.get_toolbars()
             items = []
             app_key = ""
