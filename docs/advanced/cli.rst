@@ -116,7 +116,7 @@ used moderation in the past.
 MPTT repair command
 *******************
 
-``cms mptt-repair``
+``cms fix-mptt``
 ===================
 
 Occasionally, the MPTT structure in which pages and plugins are held can

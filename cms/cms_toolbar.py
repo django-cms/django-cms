@@ -110,8 +110,9 @@ class PageToolbar(CMSToolbar):
         settings_list = List("", _("Settings"), sub_level=True)
 
         settings_list.items.append(Item(
-            reverse('admin:cms_page_change', args=[page.pk]),
-            _('Titles'),
+            '%s?language=%s' % (reverse('admin:cms_page_change', args=[page.pk]),
+            get_language_from_request(self.request)),
+            _('Page Infos'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),
             redirect_on_close_url='.',
