@@ -1,5 +1,5 @@
 from __future__ import with_statement
-from cms.api import create_page
+from cms.api import create_page, create_title
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -10,14 +10,14 @@ from django.test.client import RequestFactory
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
-    def get_page_request(self, page, user, path=None, edit=False):
-        path = page and page.get_absolute_url() or path
+    def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
+        path =  path or page and page.get_absolute_url()
         if edit:
             path += '?edit'
         request = RequestFactory().get(path)
         request.session = {}
         request.user = user
-        request.LANGUAGE_CODE = "en"
+        request.LANGUAGE_CODE = lang_code
         if edit:
             request.GET = {'edit': None}
         else:
@@ -184,4 +184,16 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(len(items), 2)
         self.assertEqual(len(items[0].get_context()['items']), 6)
 
-
+    def test_toolbar_button_consistency_staff(self):
+        """
+        Tests that the buttons remain even when the language changes.
+        """
+        user = self.get_staff()
+        cms_page = create_page('test-en', 'nav_playground.html', 'en',  published=True)
+        create_title('de', 'test-de', cms_page)
+        en_request = self.get_page_request(cms_page, user, edit=True)
+        en_toolbar = CMSToolbar(en_request)
+        self.assertEqual(len(en_toolbar.get_items()), 5)
+        de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
+        de_toolbar = CMSToolbar(de_request)
+        self.assertEqual(len(de_toolbar.get_items()), 5)
