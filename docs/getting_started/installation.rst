@@ -68,7 +68,7 @@ Revision management
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
-Using pip
+Using pip and virtualenv
 =========
 The following is an example requirements.txt file that can be used with pip:
 
