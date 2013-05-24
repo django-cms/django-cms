@@ -1097,6 +1097,7 @@ class Page(MPTTModel):
                 placeholder = Placeholder.objects.create(slot=placeholder_name)
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
+        return found
 
 
 def _reversion():
