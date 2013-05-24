@@ -6,7 +6,7 @@ import os
 from cms.api import create_page, create_title, add_plugin
 from cms.models.pagemodel import Page, Placeholder
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg, _show_placeholder_for_page
+from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg, _show_placeholder_for_page, _get_placeholder
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -206,6 +206,23 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             context['request'].current_page = page_3.publisher_public
             res = tpl.render(context)
             self.assertEqual(res, "/de/")
+
+    def test_create_placeholder_if_not_exist_in_template(self):
+        """
+        Tests that adding a new placeholder to a an exising page's template
+        creates the placeholder.
+        """
+        page = create_page('Test', 'col_two.html', 'en')
+        # I need to make it seem like the user added another plcaeholder to the SAME template.
+        page._template_cache = 'col_three.html'
+
+        class FakeRequest(object):
+            current_page = page
+            REQUEST = {'language': 'en'}
+
+        placeholder = _get_placeholder(page, page, dict(request=FakeRequest()), 'col_right')
+        db_placeholder = page.placeholders.get(slot='col_right')
+        self.assertEqual(placeholder.slot, 'col_right')
 
 
 class NoFixtureDatabaseTemplateTagTests(TestCase):
