@@ -1842,7 +1842,7 @@ msgstr ""
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Inherit from the parent page"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."

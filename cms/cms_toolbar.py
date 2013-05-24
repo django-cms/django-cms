@@ -30,7 +30,7 @@ class PageToolbar(CMSToolbar):
             # The 'Admin' Menu
             items.append(self.get_admin_menu())
 
-            if toolbar.request.current_page and is_app:
+            if toolbar.request.current_page and toolbar.request.current_page.pk:
                 if self.request.current_page.publisher_is_draft:
                     self.page = request.current_page
                 else:
@@ -108,7 +108,8 @@ class PageToolbar(CMSToolbar):
         menu_items = List(reverse("admin:cms_page_change", args=[page.pk]), _("Page"))
         menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
         menu_items.items.append(Item(
-            reverse('admin:cms_page_change', args=[page.pk]),
+            '%s?language=%s' % (reverse('admin:cms_page_change', args=[page.pk]),
+            get_language_from_request(self.request)),
             _('Settings'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),

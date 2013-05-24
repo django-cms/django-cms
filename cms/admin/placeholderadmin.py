@@ -12,6 +12,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import cms_static_url, get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.plugins.utils import has_reached_plugin_limit
+from cms.templatetags.cms_admin import admin_static_url
 from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
@@ -35,7 +36,7 @@ class PlaceholderAdmin(ModelAdmin):
             )]
         }
         js = [cms_static_url(path) for path in [
-            'js/jquery.min.js',
+            '%sjs/jquery.min.js' % admin_static_url(),
             'js/csrf.js',
             'js/plugins/jquery.query.js',
             'js/plugins/jquery.ui.custom.js',
