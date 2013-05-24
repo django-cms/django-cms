@@ -74,12 +74,13 @@ class PageForm(forms.ModelForm):
 
     class Meta:
         model = Page
-        fields = ["parent", "site"]
+        fields = ["parent", "site", 'template']
 
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)
         self.fields['parent'].widget = HiddenInput()
         self.fields['site'].widget = HiddenInput()
+        self.fields['template'].widget = HiddenInput()
         self.fields['language'].widget = HiddenInput()
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk

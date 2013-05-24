@@ -6,7 +6,7 @@ from django.core.urlresolvers import clear_url_caches
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.template import Template
 from cms.api import create_page
-from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_ADD
+from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_ADD, URL_CMS_PAGE_CHANGE_TEMPLATE
 
 
 class TestNoI18N(SettingsOverrideTestCase):
@@ -114,12 +114,6 @@ class TestNoI18N(SettingsOverrideTestCase):
             'template': 'nav_playground.html',
             'parent': '',
             'site': 1,
-            'pagepermission_set-TOTAL_FORMS': 0,
-            'pagepermission_set-INITIAL_FORMS': 0,
-            'pagepermission_set-MAX_NUM_FORMS': 0,
-            'pagepermission_set-2-TOTAL_FORMS': 0,
-            'pagepermission_set-2-INITIAL_FORMS': 0,
-            'pagepermission_set-2-MAX_NUM_FORMS': 0
         }
         # required only if user haves can_change_permission
         self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
@@ -128,6 +122,9 @@ class TestNoI18N(SettingsOverrideTestCase):
         self.client.login(username="test", password="test")
         response = self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
         page = Page.objects.all()[0]
+        response = self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
+        page = Page.objects.all()[0]
+
         plugin_data = {
             'plugin_type': "TextPlugin",
             'plugin_language': "en-us",

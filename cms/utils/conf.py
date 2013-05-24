@@ -86,8 +86,7 @@ def get_placeholder_frontend_editing():
 
 def get_templates():
     templates = list(getattr(settings, 'CMS_TEMPLATES', []))
-    if get_cms_setting('TEMPLATE_INHERITANCE'):
-        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
+    templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
 
 
