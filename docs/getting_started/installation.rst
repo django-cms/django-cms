@@ -68,6 +68,50 @@ Revision management
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
+Using pip and virtualenv
+=========
+The following is an example requirements.txt file that can be used with pip:
+
+::
+
+    Django==1.5.1 
+    django-cms==2.4.1
+    South==0.8               
+    flup==1.0.3.dev-20110405 
+    PIL==1.1.7               
+    django-filer==0.9.4      
+    cmsplugin-filer==0.9.5   
+    django-reversion==1.7
+    
+for Postgresql you would also add:
+
+::
+
+    psycopg2==2.5
+    
+and install libpq-dev (on Debian-based distro)
+
+for MySQL you would also add:
+
+::
+
+    mysql-python==1.2.4
+
+and install libmysqlclient-dev (on Debian-based distro)
+
+One example of a script to create a virtualenv Python environment (on a Debian-based distro) is as follows:
+
+.. code-block:: bash
+
+  #!/bin/sh
+  rm -rf env.bak
+  mv env env.bak
+  sudo easy_install pip
+  sudo pip install --upgrade pip
+  sudo pip install --upgrade virtualenv
+  virtualenv --distribute --no-site-packages env
+  env/bin/pip install --download-cache=~/.pip-cache -r requirements.txt
+
 On Ubuntu
 =========
 
