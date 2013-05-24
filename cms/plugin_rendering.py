@@ -86,8 +86,7 @@ def render_dragables(plugins, slot, request):
     return render_to_string("cms/toolbar/draggable.html", {'plugins':plugins, 'slot':slot, 'request':request})
 
 
-
-def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"):
+def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
@@ -96,7 +95,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context = context_to_copy
     context.push()
     request = context['request']
-    plugins = [plugin for plugin in get_plugins(request, placeholder)]
+    plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
     page = placeholder.page if placeholder else None
     if page:
         template = page.template
