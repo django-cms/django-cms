@@ -119,6 +119,14 @@ typically achieved in Django applications by using :class:`RequestContext`::
             'object': object,
         }, context_instance=RequestContext(request))
 
+If you want to render plugins from a specific language, you can use the tag
+like this:
+
+.. code-block:: html+django
+
+    {% load placeholder_tags %}
+
+    {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 
 *******************************
 Adding content to a placeholder
