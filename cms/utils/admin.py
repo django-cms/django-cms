@@ -84,7 +84,6 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'has_add_page_permission': has_add_page_permission,
         'has_add_on_same_level_permission': has_add_on_same_level_permission,
         'CMS_PERMISSION': get_cms_setting('PERMISSION'),
-        'CMS_SHOW_END_DATE': get_cms_setting('SHOW_END_DATE'),
     }
     return context
 
