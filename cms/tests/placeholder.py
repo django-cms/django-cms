@@ -204,6 +204,19 @@ class PlaceholderTestCase(CMSTestCase):
         rctx['placeholder'] = placeholder
         self.assertEqual(template.render(rctx).strip(), "test")
 
+    def test_placeholder_tag_language(self):
+        template = Template("{% load placeholder_tags %}{% render_placeholder placeholder language language %}")
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
+        request = self.get_request('/')
+        rctx = RequestContext(request)
+        rctx['placeholder'] = placeholder
+        rctx['language'] = 'en'
+        self.assertEqual(template.render(rctx).strip(), "English")
+        rctx['language'] = 'de'
+        self.assertEqual(template.render(rctx).strip(), "Deutsch")
+
     def test_placeholder_context_leaking(self):
         TEST_CONF = {'test': {'extra_context': {'width': 10}}}
         ph = Placeholder.objects.create(slot='test')
