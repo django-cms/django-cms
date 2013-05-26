@@ -186,7 +186,7 @@ def get_app_patterns():
     hooked_applications = {}
 
     # Loop over all titles with an application hooked to them
-    for title in title_qs.exclude(application_urls=None).exclude(application_urls='').select_related():
+    for title in title_qs.exclude(page__application_urls=None).exclude(page__application_urls='').select_related():
         path = title.path
         mix_id = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
         if mix_id in included:
@@ -196,7 +196,7 @@ def get_app_patterns():
             path += '/'
         if title.page_id not in hooked_applications:
             hooked_applications[title.page_id] = {}
-        app = apphook_pool.get_apphook(title.application_urls)
+        app = apphook_pool.get_apphook(title.page.application_urls)
         if app.app_name:
             inst_ns = title.page.reverse_id if title.page.reverse_id else app.app_name
             app_ns = app.app_name, inst_ns
