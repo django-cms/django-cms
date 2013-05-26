@@ -489,7 +489,6 @@ class PageAdmin(ModelAdmin):
             'app_label': app_label,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'CMS_SHOW_END_DATE': get_cms_setting('SHOW_END_DATE'),
-            'softroot': get_cms_setting('SOFTROOT'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,

@@ -122,10 +122,7 @@ class PublisherCommandTests(TestCase):
 
 class PublishingTests(TestCase):
 
-    settings_overrides = {'CMS_SHOW_START_DATE': False,
-                          'CMS_SHOW_END_DATE': False,
-                          # Necessary to trigger an error
-                          'USE_I18N': False}
+    settings_overrides = {'USE_I18N': False}
 
     def create_page(self, title=None, **kwargs):
         return create_page(title or self._testMethodName,

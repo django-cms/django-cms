@@ -49,20 +49,11 @@ class PageQuerySet(PublisherQuerySet):
             return self.exclude(id__in=exclude_list)
 
     def published(self, site=None):
-        pub = self.on_site(site).filter(published=True)
-
-        if get_cms_setting('SHOW_START_DATE'):
-            pub = pub.filter(
-                Q(publication_date__lt=timezone.now()) |
-                Q(publication_date__isnull=True)
-            )
-
-        if get_cms_setting('SHOW_END_DATE'):
-            pub = pub.filter(
-                Q(publication_end_date__gte=timezone.now()) |
-                Q(publication_end_date__isnull=True)
-            )
-
+        pub = self.on_site(site).filter(
+            published=True,
+            Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
+            Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
+        )
         return pub
 
     def expired(self):

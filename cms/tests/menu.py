@@ -1208,7 +1208,6 @@ class SoftrootTests(SettingsOverrideTestCase):
                 Instruments
     """
     settings_overrides = {
-        'CMS_SOFTROOT': True,
         'CMS_PERMISSION': False
     }
 

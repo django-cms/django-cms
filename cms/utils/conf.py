@@ -38,14 +38,8 @@ DEFAULTS = {
     'RAW_ID_USERS': False,
     'PUBLIC_FOR': 'all',
     'CONTENT_CACHE_DURATION': 60,
-    'SHOW_START_DATE': False,
-    'SHOW_END_DATE': False,
-    'URL_OVERWRITE': True,
-    'MENU_TITLE_OVERWRITE': True,
-    'REDIRECTS': False,
     'APPHOOKS': [],
     'TOOLBARS': [],
-    'SOFTROOT': False,
     'SITE_CHOICES_CACHE_KEY': 'CMS:site_choices',
     'PAGE_CHOICES_CACHE_KEY': 'CMS:page_choices',
     'MEDIA_PATH': 'cms/',
@@ -77,11 +71,6 @@ def get_media_root():
 @default('CMS_MEDIA_URL')
 def get_media_url():
     return urlparse.urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
-
-
-@default('PLACEHOLDER_FRONTEND_EDITING')
-def get_placeholder_frontend_editing():
-    return True
 
 
 def get_templates():
@@ -224,7 +213,6 @@ COMPLEX = {
     'MEDIA_ROOT': get_media_root,
     'MEDIA_URL': get_media_url,
     # complex because not prefixed by CMS_
-    'PLACEHOLDER_FRONTEND_EDITING': get_placeholder_frontend_editing,
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
