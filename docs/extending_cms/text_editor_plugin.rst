@@ -37,20 +37,69 @@ In particular:
 Let's build a text plugin
 *************************
 
+This example will build a WYMeditor-based django CMS plugin from scratch.
+Though the implementation details will be different for other editors, the
+principles will be the same.
+
 Name it
 =======
 
-Follow the naming convention already established. Call it
-``djangocms_text_<whatever>``.
+Follow the naming convention already established. This one's 
+``djangocms_text_wymeditor``.
+
 
 The model - ``Text(CMSPlugin)``
 ===============================
-                      
+
+Start with your model::
+
+    class Text(CMSPlugin):
+        body = models.TextField(_("body"))
+                                               
+
 The plugin class - ``TextPlugin(CMSPluginBase)``
 ================================================
 
+The plugin class applies a special widget to the form::
+
+    class TextPlugin(CMSPluginBase):
+        model = Text # refer back to the model
+
+        def get_form_class(self, request, plugins):
+            """
+            Returns a subclass of Form to be used by this plugin
+            """
+            # We avoid mutating the Form declared above by subclassing
+            class TextPluginForm(self.form):
+                pass
+            widget = WYMEditor(installed_plugins=plugins)
+            TextPluginForm.declared_fields["body"] = CharField(widget=widget, required=False)
+            return TextPluginForm
+
+
+The widget
+==========
+
+Now, we need to define the widget. The widget is going to render to a Django
+template, which itself will initialise the editor. So, in your widget class,
+you'll need something like::
+
+    def render_additions():
+        return mark_safe(render_to_string(
+            'cms/plugins/widgets/wymeditor.html', context))  
+
+Your widget class should have an inner ``Media`` class, in the WYMEditor case for:
+
+* jQuery
+* the main WYMeditor JS
+
+                    
 HTML and JavaScript
 ===================
 
 Now we have to integrate the business end of the text editor into the plugin;
 this will largely be the editor's HTML and JavaScript.
+
+One important thing to realise that the HTML files that are part of the editor
+itself *need to be treated as static assets, not as templates*. They are not
+Django templates; they need to be served, raw, to the JS that will use them.
