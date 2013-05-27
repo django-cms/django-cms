@@ -690,3 +690,27 @@ class PublishingTests(TestCase):
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
 
+    def test_publish_child_page_slug(self):
+        page_home = create_page("page_home", "nav_playground.html", "en")
+        page_internal = create_page("page_internal", "nav_playground.html", "en", parent=page_home)
+        page_nephew = create_page("page_nephew", "nav_playground.html", "en", parent=page_internal)
+
+        page_home.publish()
+        page_internal.publish()
+
+        self.assertEqual(page_home.get_absolute_url(), "/")
+        self.assertEqual(page_internal.get_absolute_url(), "/page_internal/")
+        self.assertEqual(page_nephew.get_absolute_url(), "/page_internal/page_nephew/")
+
+    def test_publish_nephew_page_slug(self):
+        page_home = create_page("page_home", "nav_playground.html", "en")
+        page_home.publish()
+        page_internal = create_page("page_internal", "nav_playground.html", "en", parent=page_home)
+        page_nephew = create_page("page_nephew", "nav_playground.html", "en", parent=page_internal)
+
+        page_internal.publish()
+        page_nephew.publish()
+
+        self.assertEqual(page_home.get_absolute_url(), "/")
+        self.assertEqual(page_internal.get_absolute_url(), "/page_internal/")
+        self.assertEqual(page_nephew.get_absolute_url(), "/page_internal/page_nephew/")
