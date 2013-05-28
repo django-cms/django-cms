@@ -258,13 +258,13 @@ class PageAdmin(ModelAdmin):
         page = get_object_or_404(Page, pk=object_id)
         if not page.has_advanced_settings_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
-        return self.change_view(request, object_id)
+        return self.change_view(request, object_id, {'title': _("Advanced Settings")})
 
     def permissions(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
         if not page.has_change_permissions_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
-        return self.change_view(request, object_id, {'show_permissions': True})
+        return self.change_view(request, object_id, {'show_permissions': True, 'title': _("Change Permissions")})
 
     def get_inline_instances(self, request, obj=None):
         if DJANGO_1_4:

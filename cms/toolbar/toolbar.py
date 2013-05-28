@@ -41,7 +41,7 @@ class CMSToolbar(object):
             self.language = settings.LANGUAGE_CODE
 
         # We need to store the current language in case the user's preferred language is different.
-        self.current_language = self.language
+        self.toolbar_language = self.language
 
         if self.is_staff:
             try:
@@ -52,7 +52,7 @@ class CMSToolbar(object):
                 placeholder.save()
                 user_settings.clipboard = placeholder
                 user_settings.save()
-            self.language = user_settings.language
+            self.toolbar_language = user_settings.language
             self.clipboard = user_settings.clipboard
 
     def get_clipboard_plugins(self):
@@ -64,7 +64,7 @@ class CMSToolbar(object):
         """
         Get the CMS items on the toolbar
         """
-        with force_language(self.current_language):
+        with force_language(self.toolbar_language):
             try:
                 self.view_name = resolve(self.request.path).func.__module__
             except Resolver404:

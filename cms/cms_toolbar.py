@@ -13,7 +13,7 @@ from cms.utils.permissions import has_page_change_permission, get_user_sites_que
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from menus.utils import DefaultLanguageChanger
 
 
@@ -107,31 +107,26 @@ class PageToolbar(CMSToolbar):
         """
         menu_items = List("", _("Page"))
         menu_items.items.append(Item("?edit", _('Edit Page'), disabled=self.toolbar.edit_mode, load_modal=False))
-        settings_list = List("", _("Settings"), sub_level=True)
-
-        settings_list.items.append(Item(
+        menu_items.items.append(Item(
             '%s?language=%s' % (reverse('admin:cms_page_change', args=[page.pk]),
             get_language_from_request(self.request)),
             _('Page Infos'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),
-            redirect_on_close_url='.',
-        )
-        )
-        if self.page.published:
-            publish_title = _("Unpublish Page")
+            redirect_on_close_url='.'
+        ))
 
-        else:
-            publish_title = _("Publish Page")
-        settings_list.items.append(
-            Item(reverse("admin:cms_page_change_status", args=[self.page.pk]), publish_title, ajax=True))
         if self.page.in_navigation:
             nav_title = _("Hide in Navigation")
         else:
             nav_title = _("Display in Navigation")
-        settings_list.items.append(
-            Item(reverse("admin:cms_page_change_innavigation", args=[self.page.pk]), nav_title, ajax=True))
-        menu_items.items.append(settings_list)
+        menu_items.items.append(Item(
+            reverse("admin:cms_page_change_innavigation", args=[self.page.pk]),
+            nav_title,
+            ajax=True,
+            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+        ))
+
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             menu_items.items.append(self.get_template_menu())
         menu_items.items.append(Break())
@@ -176,14 +171,24 @@ class PageToolbar(CMSToolbar):
                 load_modal=True, active=not page.has_change_permissions_permission(self.request),
                 close_url=reverse('admin:cms_page_changelist'),
             ))
-            menu_items.items.append(Break())
-            menu_items.items.append(Item(
-                reverse('admin:cms_page_delete', args=(self.page.pk,)),
-                _('Delete Page'),
-                load_modal=True,
-                close_url=reverse('admin:cms_page_changelist'),
-                redirect_on_close_url='/',
-            ))
+        menu_items.items.append(Break())
+        if self.page.published:
+            publish_title = _("Unpublish Page")
+        else:
+            publish_title = _("Publish Page")
+        menu_items.items.append(Item(
+            reverse("admin:cms_page_change_status", args=[self.page.pk]),
+            publish_title,
+            ajax=True,
+            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+        ))
+        menu_items.items.append(Item(
+            reverse('admin:cms_page_delete', args=(self.page.pk,)),
+            _('Delete Page'),
+            load_modal=True,
+            close_url=reverse('admin:cms_page_changelist'),
+            redirect_on_close_url='/',
+        ))
 
         return menu_items
 
@@ -238,8 +243,11 @@ class PageToolbar(CMSToolbar):
         classes = "cms_btn-action cms_btn-publish"
         if page.is_dirty():
             classes += " cms_btn-publish-active"
-
-        button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), _("Publish Changes"),
+        if self.page.published:
+            title = _("Publish Changes")
+        else:
+            title = _("Publish Page now")
+        button = Button(reverse('admin:cms_page_publish_page', args=[page.pk]), title,
                         extra_classes=classes, ajax=True, right=True, disabled=not page.is_dirty(),
                         active=page.is_dirty())
         return button

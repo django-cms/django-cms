@@ -25,7 +25,7 @@ class PagePermissionInlineAdmin(TabularInline):
     form = PagePermissionInlineAdminForm
     classes = ['collapse', 'collapsed']
     exclude = ['can_view']
-    extra = 0 # edit page load time boost
+    extra = 0  # edit page load time boost
 
     @classproperty
     def raw_id_fields(cls):
@@ -79,7 +79,7 @@ class PagePermissionInlineAdmin(TabularInline):
 
 
 class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
-    extra = 0 # edit page load time boost
+    extra = 0  # edit page load time boost
     form = ViewRestrictionInlineAdminForm
     verbose_name = _("View restriction")
     verbose_name_plural = _("View restrictions")
