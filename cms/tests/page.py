@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.utils import timezone
 
-from cms.admin.forms import PageForm
+from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
 from cms.models import Page, Title
@@ -220,10 +220,11 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             page_data['overwrite_url'] = '/hello/'
             page_data['has_url_overwrite'] = True
-            response = self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
+            response = self.client.post('/en/admin/cms/page/%s/advanced-settings/' % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_absolute_url(), '/en/hello/')
             title = Title.objects.all()[0]
+            page = page.reload()
             page.publish()
             page_data['title'] = 'new title'
             response = self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
@@ -604,7 +605,7 @@ class PagesTestCase(CMSTestCase):
                 'template': 'nav_playground.html',
                 'site': 1,
             }
-            form = PageForm(data)
+            form = AdvancedSettingsForm(data)
             self.assertFalse(form.is_valid())
             self.assertTrue('overwrite_url' in form.errors)
 

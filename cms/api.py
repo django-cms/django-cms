@@ -158,9 +158,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate publication end date
     if publication_end_date:
         assert isinstance(publication_end_date, datetime.date)
-        
-    # validate softroot
-    assert get_cms_setting('SOFTROOT') or not soft_root
     
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)

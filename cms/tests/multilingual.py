@@ -8,7 +8,7 @@ from cms.models import Title
 from cms.test_utils.testcases import (CMSTestCase, SettingsOverrideTestCase,
                                       URL_CMS_PAGE_ADD, 
                                       URL_CMS_PAGE, URL_CMS_PAGE_CHANGE,
-                                      URL_CMS_PAGE_CHANGE_LANGUAGE)
+                                      URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
@@ -88,7 +88,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
                                         page_data)
-            
+            response = self.client.post(URL_CMS_PAGE_PUBLISH % page.pk)
             page = page.reload()
             self.assertTrue(page.published)
             

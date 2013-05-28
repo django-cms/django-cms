@@ -2,8 +2,8 @@
 from __future__ import with_statement
 from distutils.version import LooseVersion
 from cms.admin.change_list import CMSChangeList
-from cms.admin.forms import PageForm
-from cms.admin.pageadmin import contribute_fieldsets, contribute_list_filter, PageAdmin
+from cms.admin.forms import PageForm, AdvancedSettingsForm
+from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
 from cms.apphook_pool import apphook_pool, ApphookPool
@@ -214,15 +214,13 @@ class AdminTestCase(AdminTestsBase):
                 'template': page.template,
                 'reverse_id': page.reverse_id,
             }
-            # required only if user haves can_change_permission
-            page_data['pagepermission_set-TOTAL_FORMS'] = 0
-            page_data['pagepermission_set-INITIAL_FORMS'] = 0
-            page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-            page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-            page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-            page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
+
 
         with self.login_user_context(admin):
+            resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page.pk, page_data,
+                                    follow=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertTemplateNotUsed(resp, 'admin/login.html')
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
                                     follow=True)
             self.assertEqual(resp.status_code, 200)
@@ -377,146 +375,6 @@ class AdminTestCase(AdminTestsBase):
         self.client.login(username='admin', password='admin')
         response = self.client.get('/en/admin/cms/page/1/?language=en')
         self.assertEqual(response.status_code, 404)
-
-
-class AdminFieldsetTests(CMSTestCase):
-    def validate_attributes(self, a, b, ignore=None):
-        attrs = ['advanced_fields', 'hidden_fields', 'general_fields',
-            'template_fields', 'additional_hidden_fields', 'fieldsets']
-        if not ignore:
-            ignore = []
-        for attr in attrs:
-            if attr in ignore:
-                continue
-            a_attr = getattr(a, attr)
-            b_attr = getattr(b, attr)
-            self.assertEqual(a_attr, b_attr)
-
-    def test_no_moderator(self):
-        control = AttributeObject()
-        contribute_fieldsets(control)
-        self.assertEqual(control.additional_hidden_fields, [])
-
-    def test_no_menu_title_overwrite(self):
-        with SettingsOverride(CMS_MENU_TITLE_OVERWRITE=True):
-            control = AttributeObject()
-            contribute_fieldsets(control)
-        with SettingsOverride(CMS_MENU_TITLE_OVERWRITE=False):
-            experiment = AttributeObject()
-            contribute_fieldsets(experiment)
-        self.validate_attributes(control, experiment, ['fieldsets', 'general_fields'])
-        self.assertEqual(control.general_fields[0], 'title')
-
-    def test_no_softroot(self):
-        with SettingsOverride(CMS_SOFTROOT=True):
-            control = AttributeObject()
-            contribute_fieldsets(control)
-        with SettingsOverride(CMS_SOFTROOT=False):
-            experiment = AttributeObject()
-            contribute_fieldsets(experiment)
-        self.validate_attributes(control, experiment, ['fieldsets', 'advanced_fields'])
-        self.assertTrue('soft_root' in control.advanced_fields)
-        self.assertFalse('soft_root' in experiment.advanced_fields)
-
-    def test_dates(self):
-        with SettingsOverride(CMS_SHOW_START_DATE=False, CMS_SHOW_END_DATE=False):
-            control = AttributeObject()
-            contribute_fieldsets(control)
-        with SettingsOverride(CMS_SHOW_START_DATE=True, CMS_SHOW_END_DATE=True):
-            experiment1 = AttributeObject()
-            contribute_fieldsets(experiment1)
-        with SettingsOverride(CMS_SHOW_START_DATE=True, CMS_SHOW_END_DATE=False):
-            experiment2 = AttributeObject()
-            contribute_fieldsets(experiment2)
-        with SettingsOverride(CMS_SHOW_START_DATE=False, CMS_SHOW_END_DATE=True):
-            experiment3 = AttributeObject()
-            contribute_fieldsets(experiment3)
-        self.validate_attributes(control, experiment1, ['fieldsets', 'general_fields'])
-        self.validate_attributes(control, experiment2, ['fieldsets', 'general_fields'])
-        self.validate_attributes(control, experiment3, ['fieldsets', 'general_fields'])
-        self.assertFalse(('publication_date', 'publication_end_date') in control.general_fields, control.general_fields)
-        self.assertTrue(('publication_date', 'publication_end_date') in experiment1.general_fields,
-                        experiment1.general_fields)
-        self.assertFalse(('publication_date', 'publication_end_date') in experiment2.general_fields,
-                         experiment2.general_fields)
-        self.assertFalse(('publication_date', 'publication_end_date') in experiment3.general_fields,
-                         experiment3.general_fields)
-        self.assertFalse('publication_end_date' in experiment1.general_fields, experiment1.general_fields)
-        self.assertFalse('publication_end_date' in experiment2.general_fields, experiment2.general_fields)
-        self.assertTrue('publication_end_date' in experiment3.general_fields, experiment3.general_fields)
-        self.assertFalse('publication_date' in experiment1.general_fields, experiment1.general_fields)
-        self.assertTrue('publication_date' in experiment2.general_fields, experiment2.general_fields)
-        self.assertFalse('publication_date' in experiment3.general_fields, experiment3.general_fields)
-
-    def test_url_overwrite(self):
-        with SettingsOverride(CMS_URL_OVERWRITE=False):
-            control = AttributeObject()
-            contribute_fieldsets(control)
-        with SettingsOverride(CMS_URL_OVERWRITE=True):
-            experiment = AttributeObject()
-            contribute_fieldsets(experiment)
-        self.validate_attributes(control, experiment, ['fieldsets', 'advanced_fields'])
-        self.assertFalse('overwrite_url' in control.advanced_fields, control.advanced_fields)
-        self.assertTrue('overwrite_url' in experiment.advanced_fields, experiment.advanced_fields)
-
-    def test_no_cms_enabled_menus(self):
-        control = AttributeObject()
-        contribute_fieldsets(control)
-        old_menus = menu_pool.menus.copy()
-        menu_pool.menus = {}
-        experiment = AttributeObject()
-        contribute_fieldsets(experiment)
-        menu_pool.menus = old_menus
-        self.validate_attributes(control, experiment, ['fieldsets', 'advanced_fields'])
-        self.assertTrue('navigation_extenders' in control.advanced_fields, control.advanced_fields)
-        self.assertFalse('navigation_extenders' in experiment.advanced_fields, experiment.advanced_fields)
-
-    def test_redirects(self):
-        with SettingsOverride(CMS_REDIRECTS=False):
-            control = AttributeObject()
-            contribute_fieldsets(control)
-        with SettingsOverride(CMS_REDIRECTS=True):
-            experiment = AttributeObject()
-            contribute_fieldsets(experiment)
-        self.validate_attributes(control, experiment, ['fieldsets', 'advanced_fields'])
-        self.assertFalse('redirect' in control.advanced_fields, control.advanced_fields)
-        self.assertTrue('redirect' in experiment.advanced_fields, experiment.advanced_fields)
-
-
-    def test_no_apphooks(self):
-        def func_true(self):
-            return True
-
-        def func_false(self):
-            return False
-
-        old_get_apphooks = apphook_pool.get_apphooks
-        apphook_pool.get_apphooks = MethodType(func_true, apphook_pool, ApphookPool)
-        control = AttributeObject()
-        contribute_fieldsets(control)
-        apphook_pool.get_apphooks = MethodType(func_false, apphook_pool, ApphookPool)
-        experiment = AttributeObject()
-        contribute_fieldsets(experiment)
-        self.validate_attributes(control, experiment, ['fieldsets', 'advanced_fields'])
-        self.assertTrue('application_urls' in control.advanced_fields, control.advanced_fields)
-        self.assertFalse('application_urls' in experiment.advanced_fields, control.advanced_fields)
-        apphook_pool.get_apphooks = old_get_apphooks
-
-
-class AdminListFilterTests(CMSTestCase):
-    def test_no_moderator(self):
-        control = AttributeObject()
-        contribute_list_filter(control)
-
-    def test_no_softroot(self):
-        with SettingsOverride(CMS_SOFTROOT=True):
-            control = AttributeObject()
-            contribute_list_filter(control)
-        with SettingsOverride(CMS_SOFTROOT=False):
-            experiment = AttributeObject()
-            contribute_list_filter(experiment)
-        self.assertTrue('soft_root' in control.list_filter, control.list_filter)
-        self.assertFalse('soft_root' in experiment.list_filter, experiment.list_filter)
 
 
 class AdminTests(AdminTestsBase):
@@ -1083,17 +941,16 @@ class AdminFormsTests(AdminTestsBase):
         dupe_id = 'p1'
         site = Site.objects.get_current()
         page1 = create_page('Page 1', 'nav_playground.html', 'en', reverse_id=dupe_id)
+        page2 = create_page('Page 2', 'nav_playground.html', 'en')
         # Assemble a bunch of data to test the page form
         page2_data = {
-            'title': 'Page 2',
-            'slug': 'page-2',
             'language': 'en',
             'site': site.pk,
-            'template': get_cms_setting('TEMPLATES')[0][0],
             'reverse_id': dupe_id,
         }
-        form = PageForm(data=page2_data, files=None)
+        form = AdvancedSettingsForm(data=page2_data, files=None)
         self.assertFalse(form.is_valid())
+
         # reverse_id is the only item that is in __all__ as every other field
         # has it's own clean method. Moving it to be a field error means
         # __all__ is now not available.
@@ -1104,27 +961,23 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual(1, len(form.errors['reverse_id']))
         self.assertEqual([u'A page with this reverse URL id exists already.'],
                          form.errors['reverse_id'])
-
+        page2_data['reverse_id'] = ""
+        form = AdvancedSettingsForm(data=page2_data, files=None)
+        self.assertTrue(form.is_valid())
         admin = self._get_guys(admin_only=True)
         # reset some of page2_data so we can use cms.api.create_page
-        page2_data['reverse_id'] = None
-        page2_data['site'] = site
-        page2 = create_page(**page2_data)
+        page2 = page2.reload()
+        page2.site = site
+        page2.save()
         with self.login_user_context(admin):
             # re-reset the page2_data for the admin form instance.
             page2_data['reverse_id'] = dupe_id
             page2_data['site'] = site.pk
-            # This is needed to avoid management form tampering errors.
-            page2_data['pagepermission_set-TOTAL_FORMS'] = 0
-            page2_data['pagepermission_set-INITIAL_FORMS'] = 0
-            page2_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-            page2_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-            page2_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-            page2_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
+
             # post to the admin change form for page 2, and test that the
             # reverse_id form row has an errors class. Django's admin avoids
             # collapsing these, so that the error is visible.
-            resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page2.pk, page2_data)
+            resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
             self.assertContains(resp, '<div class="form-row errors reverse_id">')
 
 
@@ -1151,7 +1004,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
             page.save()
             self._page = page
             with self.login_user_context(admin):
-                url = base.URL_CMS_PAGE_CHANGE % self._page.pk
+                url = base.URL_CMS_PAGE_PERMISSION_CHANGE % self._page.pk
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
                 old_response_size = len(response.content)
