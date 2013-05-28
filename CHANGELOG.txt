@@ -163,8 +163,15 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
   keeps the language.
 - language_chooser templatetag now only displays public languages, even when you are logged in as staff.
 - undo and redo functionality added in toolbar if django-reversion is installed.
+- page admin split in 3 different for basic, advanced and permissions
 - New show_editable_page_title templatetag to edit page title from the frontend
-
+- Removed PLACEHOLDER_FRONTEND_EDITING setting
+- Removed CMS_URL_OVERWRITE setting. Always enabled.
+- Removed CMS_MENU_TITLE_OVERWRITE settings. Always enabled.
+- Removed CMS_REDIRECTS. Always enabled.
+- Removed CMS_SOFTROOT. Always enabled.
+- Removed CMS_SHOW_START_DATE. Always enabled.
+- Removed CMS_SHOW_END_DATE. Always enabled.
 
 
 

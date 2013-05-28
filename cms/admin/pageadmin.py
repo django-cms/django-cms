@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 from distutils.version import LooseVersion
 from urllib2 import unquote
 import warnings
@@ -32,10 +31,9 @@ from django.views.decorators.http import require_POST
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
-from cms.admin.forms import PageForm, PageAddForm, PageTitleForm
-from cms.admin.permissionadmin import (PAGE_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
+from cms.admin.forms import PageForm, PageTitleForm, AdvancedSettingsForm, PagePermissionForm
+from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
-from cms.apphook_pool import apphook_pool
 from cms.exceptions import PluginLimitReached
 from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
     titlemodels
@@ -43,8 +41,7 @@ from cms.models.managers import PagePermissionsPermissionManager
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.templatetags.cms_admin import admin_static_url
-from cms.utils import copy_plugins, helpers, moderator, permissions, plugins, get_template_from_request, \
-    get_language_from_request, admin as admin_utils, cms_static_url
+from cms.utils import copy_plugins, helpers, moderator, permissions, get_language_from_request, admin as admin_utils, cms_static_url
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
@@ -52,7 +49,6 @@ from cms.utils.admin import jsonify_request
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
 from cms.plugins.utils import has_reached_plugin_limit
-from menus.menu_pool import menu_pool
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
@@ -68,94 +64,16 @@ else: # pragma: no cover
 PUBLISH_COMMENT = "Publish"
 
 
-def contribute_fieldsets(cls):
-    if get_cms_setting('MENU_TITLE_OVERWRITE'):
-        general_fields = ['title', 'page_title', 'menu_title']
-    else:
-        general_fields = ['title', 'page_title']
-    general_fields += ['slug', 'meta_description', ('published', 'in_navigation')]
-    additional_hidden_fields = []
-    advanced_fields = ['reverse_id', 'overwrite_url', 'redirect', 'login_required', 'limit_visibility_in_menu']
-    template_fields = ['template']
-    hidden_fields = ['site', 'parent']
-    if get_cms_setting('SOFTROOT'):
-        advanced_fields.append('soft_root')
-    if get_cms_setting('SHOW_START_DATE') and get_cms_setting('SHOW_END_DATE'):
-        general_fields.append(('publication_date', 'publication_end_date'))
-    elif get_cms_setting('SHOW_START_DATE'):
-        general_fields.append('publication_date')
-    elif get_cms_setting('SHOW_END_DATE'):
-        general_fields.append('publication_end_date')
-    if not get_cms_setting('URL_OVERWRITE'):
-        advanced_fields.remove("overwrite_url")
-    if not get_cms_setting('REDIRECTS'):
-        advanced_fields.remove('redirect')
-    if menu_pool.get_menus_by_attribute("cms_enabled", True):
-        advanced_fields.append("navigation_extenders")
-    if apphook_pool.get_apphooks():
-        advanced_fields.append("application_urls")
-
-    fieldsets = [
-        (None, {
-            'fields': general_fields,
-            'classes': ('general',),
-        }),
-        (_('Basic Settings'), {
-            'fields': template_fields,
-            'classes': ('low',),
-            'description': _('Note: This page reloads if you change the selection. Save it first.'),
-        }),
-        (_('Hidden'), {
-            'fields': hidden_fields + additional_hidden_fields,
-            'classes': ('hidden',),
-        }),
-        (_('Advanced Settings'), {
-            'fields': advanced_fields,
-            'classes': ('collapse',),
-        }),
-    ]
-    setattr(cls, 'fieldsets', fieldsets)
-    setattr(cls, 'advanced_fields', advanced_fields)
-    setattr(cls, 'hidden_fields', hidden_fields)
-    setattr(cls, 'general_fields', general_fields)
-    setattr(cls, 'template_fields', template_fields)
-    setattr(cls, 'additional_hidden_fields', additional_hidden_fields)
-
-
-def contribute_list_filter(cls):
-    list_filter = ['published', 'in_navigation', 'template', 'changed_by']
-    if get_cms_setting('SOFTROOT'):
-        list_filter.append('soft_root')
-    setattr(cls, 'list_filter', list_filter)
-
-
 class PageAdmin(ModelAdmin):
     form = PageForm
-    # TODO: add the new equivalent of 'cmsplugin__text__body' to search_fields'
     search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"
     recover_form_template = "admin/cms/page/history/recover_header.html"
-
-    exclude = []
-    mandatory_placeholders = (
-        'title', 'slug', 'parent', 'site', 'meta_description', 'page_title', 'menu_title')
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
+    list_filter = ['published', 'in_navigation', 'template', 'changed_by', 'soft_root']
 
-    # take care with changing fieldsets, get_fieldsets() method removes some
-    # fields depending on permissions, but its very static!!
-    add_fieldsets = [
-        (None, {
-            'fields': add_general_fields,
-            'classes': ('general',),
-        }),
-        (_('Hidden'), {
-            'fields': ['site', 'parent'],
-            'classes': ('hidden',),
-        }),
-    ]
-
-    inlines = PAGE_ADMIN_INLINES
+    inlines = PERMISSION_ADMIN_INLINES
 
     class Media:
         css = {
@@ -171,7 +89,6 @@ class PageAdmin(ModelAdmin):
         ]
         ]
 
-
     def get_urls(self):
         """Get the admin urls
         """
@@ -180,30 +97,33 @@ class PageAdmin(ModelAdmin):
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
-        url_patterns = patterns('',
-                                pat(r'copy-plugins/$', self.copy_plugins),
-                                pat(r'add-plugin/$', self.add_plugin),
-                                pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-                                pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
-                                pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
-                                pat(r'move-plugin/$', self.move_plugin),
-                                pat(r'^([0-9]+)/([a-z\-]+)/edit-title/$', self.edit_title),
-                                pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
-                                pat(r'^([0-9]+)/move-page/$', self.move_page),
-                                pat(r'^([0-9]+)/copy-page/$', self.copy_page),
-                                pat(r'^([0-9]+)/change-status/$', self.change_status),
-                                pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
-                                pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
-                                pat(r'^([0-9]+)/permissions/$', self.get_permissions),
-                                pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-                                pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
-                                pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
-                                pat(r'^([0-9]+)/undo/$', self.undo),
-                                pat(r'^([0-9]+)/redo/$', self.redo),
-                                pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
-                                pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
-                                pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
-                                pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
+        url_patterns = patterns(
+            '',
+            pat(r'copy-plugins/$', self.copy_plugins),
+            pat(r'add-plugin/$', self.add_plugin),
+            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
+            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
+            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
+            pat(r'move-plugin/$', self.move_plugin),
+            pat(r'^([0-9]+)/([a-z\-]+)/edit-title/$', self.edit_title),
+            pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
+            pat(r'^([0-9]+)/permission-settings/$', self.permissions),
+            pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
+            pat(r'^([0-9]+)/move-page/$', self.move_page),
+            pat(r'^([0-9]+)/copy-page/$', self.copy_page),
+            pat(r'^([0-9]+)/change-status/$', self.change_status),
+            pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
+            pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
+            pat(r'^([0-9]+)/permissions/$', self.get_permissions),
+            pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
+            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
+            pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
+            pat(r'^([0-9]+)/undo/$', self.undo),
+            pat(r'^([0-9]+)/redo/$', self.redo),
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
+            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
+            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
         url_patterns += super(PageAdmin, self).get_urls()
@@ -263,8 +183,6 @@ class PageAdmin(ModelAdmin):
             moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             revert_plugins(request, obj.version.pk, obj)
 
-        language = form.cleaned_data['language']
-
         if target is not None and position is not None:
             try:
                 target = self.model.objects.get(pk=target)
@@ -273,35 +191,14 @@ class PageAdmin(ModelAdmin):
             else:
                 obj.move_to(target, position)
 
-        Title.objects.set_or_create(
-            request,
-            obj,
-            form,
-            language,
-        )
-
-    def get_fieldsets(self, request, obj=None):
-        """
-        Add fieldsets of placeholders to the list of already existing
-        fieldsets.
-        """
-        #TODO: 3.0 one save
-        if obj: # edit
-            given_fieldsets = deepcopy(self.fieldsets)
-            if not obj.has_publish_permission(request):
-                fields = list(given_fieldsets[0][1]['fields'][2])
-                fields.remove('published')
-                given_fieldsets[0][1]['fields'][2] = tuple(fields)
-            advanced = given_fieldsets.pop(3)
-            if obj.has_advanced_settings_permission(request):
-                given_fieldsets.append(advanced)
-        else: # new page
-            given_fieldsets = deepcopy(self.add_fieldsets)
-
-        return given_fieldsets
-
-    def get_fieldset_placeholders(self, template):
-        return plugins.get_placeholders(template)
+        if not 'permission' in request.path:
+            language = form.cleaned_data['language']
+            Title.objects.set_or_create(
+                request,
+                obj,
+                form,
+                language,
+            )
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -310,62 +207,64 @@ class PageAdmin(ModelAdmin):
         """
         # TODO: 3.0 remove 2 save steps
         language = get_language_from_request(request, obj)
-
+        if "advanced" in request.path:
+            form = super(PageAdmin, self).get_form(request, obj, form=AdvancedSettingsForm, **kwargs)
+        elif "permission" in request.path:
+            form = super(PageAdmin, self).get_form(request, obj, form=PagePermissionForm, **kwargs)
+        else:
+            form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
+        if 'language' in form.base_fields:
+            form.base_fields['language'].initial = language
         if obj:
-            self.inlines = PAGE_ADMIN_INLINES
-            if not obj.has_publish_permission(request) and not 'published' in self.exclude:
-                self.exclude.append('published')
-            elif 'published' in self.exclude:
-                self.exclude.remove('published')
-
-            if not get_cms_setting('SOFTROOT') and 'soft_root' in self.exclude:
-                self.exclude.remove('soft_root')
-
-            form = super(PageAdmin, self).get_form(request, obj, **kwargs)
+            if "permission" in request.path:
+                self.inlines = PERMISSION_ADMIN_INLINES
+            else:
+                self.inlines = []
             version_id = None
-            versioned = False
             if "history" in request.path or 'recover' in request.path:
-                versioned = True
                 version_id = request.path.split("/")[-2]
-
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
                                               force_reload=True)
             except titlemodels.Title.DoesNotExist:
                 title_obj = EmptyTitle()
-            if form.base_fields['site'].initial is None:
+            if 'site' in form.base_fields and form.base_fields['site'].initial is None:
                 form.base_fields['site'].initial = obj.site
-            for name in ['slug',
+            for name in [
+                'slug',
                 'title',
-                'application_urls',
-                'redirect',
                 'meta_description',
                 'menu_title',
-                'page_title']:
-                form.base_fields[name].initial = getattr(title_obj, name)
-            if title_obj.overwrite_url:
-                form.base_fields['overwrite_url'].initial = title_obj.path
-            else:
-                form.base_fields['overwrite_url'].initial = ""
-            if get_cms_setting('TEMPLATES'):
-                selected_template = get_template_from_request(request, obj)
-                template_choices = list(get_cms_setting('TEMPLATES'))
-                form.base_fields['template'].choices = template_choices
-                form.base_fields['template'].initial = force_unicode(selected_template)
-
-            if not obj.has_advanced_settings_permission(request):
-                for field in self.advanced_fields:
-                    del form.base_fields[field]
+                'page_title',
+                'redirect',
+                'application_urls'
+            ]:
+                if name in form.base_fields:
+                    form.base_fields[name].initial = getattr(title_obj, name)
+            if 'overwrite_url' in form.base_fields:
+                if title_obj.has_url_overwrite:
+                    form.base_fields['overwrite_url'].initial = title_obj.path
+                else:
+                    form.base_fields['overwrite_url'].initial = ""
         else:
             self.inlines = []
-            form = PageAddForm
             for name in ['slug', 'title']:
                 form.base_fields[name].initial = u''
             form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
-            form.base_fields['template'].initial = get_cms_setting('TEMPLATES')[0][0]
-
         return form
+
+    def advanced(self, request, object_id):
+        page = get_object_or_404(Page, pk=object_id)
+        if not page.has_advanced_settings_permission(request):
+            raise PermissionDenied("No permission for editing advanced settings")
+        return self.change_view(request, object_id, {'title': _("Advanced Settings")})
+
+    def permissions(self, request, object_id):
+        page = get_object_or_404(Page, pk=object_id)
+        if not page.has_change_permissions_permission(request):
+            raise PermissionDenied("No permission for editing advanced settings")
+        return self.change_view(request, object_id, {'show_permissions': True, 'title': _("Change Permissions")})
 
     def get_inline_instances(self, request, obj=None):
         if DJANGO_1_4:
@@ -404,7 +303,6 @@ class PageAdmin(ModelAdmin):
             uhd_urls = []
         return {'unihandecode_lang': uhd_lang, 'unihandecode_urls': uhd_urls}
 
-
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         language = get_language_from_request(request)
@@ -428,17 +326,13 @@ class PageAdmin(ModelAdmin):
             # to determine whether a given object exists.
             obj = None
         else:
-            selected_template = get_template_from_request(request, obj)
-
             #activate(user_lang_set)
             context = {
-                'placeholders': self.get_fieldset_placeholders(selected_template),
                 'page': obj,
                 'CMS_PERMISSION': get_cms_setting('PERMISSION'),
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'can_change': obj.has_change_permission(request),
                 'can_change_permissions': obj.has_change_permissions_permission(request),
-                'can_publish': obj.has_publish_permission(request),
                 'show_delete_translation': len(obj.get_languages()) > 1,
                 'current_site_id': settings.SITE_ID,
             }
@@ -594,8 +488,6 @@ class PageAdmin(ModelAdmin):
             'root_path': reverse('admin:index'),
             'app_label': app_label,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-            'CMS_SHOW_END_DATE': get_cms_setting('SHOW_END_DATE'),
-            'softroot': get_cms_setting('SOFTROOT'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
             'DEBUG': settings.DEBUG,
             'site_languages': languages,
@@ -1570,8 +1462,5 @@ class PageAdmin(ModelAdmin):
             return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
         return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
 
-
-contribute_fieldsets(PageAdmin)
-contribute_list_filter(PageAdmin)
 
 admin.site.register(Page, PageAdmin)

@@ -73,7 +73,7 @@
 		</div>
 
 		<div class="col-published">{{ page.publication_date|date:"Y-m-d" }}</div>
-            {% if CMS_SHOW_END_DATE %}<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>{% endif %}
+            <div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>
 		<div class="col-view-perms">{{ page|is_restricted:request }}</div>
 
 

@@ -1,4 +1,5 @@
 {% load i18n sekizai_tags cms_js_tags cms_admin cms_tags %}{% load url from future %}
+{% language request.toolbar.toolbar_language %}
 {% addtoblock "js" %}
 <script type="text/javascript">
 	var _jQuery = window.jQuery || null;
@@ -177,3 +178,5 @@ CMS.$(document).ready(function () {
 	<div class="cms_placeholders-menu">&nbsp;</div>
 	<!-- end: placeholder -->
 </div>
+
+{% endlanguage %}

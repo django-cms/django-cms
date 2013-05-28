@@ -13,11 +13,12 @@
 {% endif %}
 <script type="text/javascript" src="{% admin_static_url %}js/urlify.js"></script>
 
-{% if add %}
+
 <script type="text/javascript">
-//<![CDATA[	
+//<![CDATA[
 
 	jQuery(document).ready(function (){
+        {% if add %}
         var title= jQuery('#id_title');
         var slug = jQuery('#id_slug');
 		if (title.length > 0 && slug.length > 0) {
@@ -31,15 +32,19 @@
 			title.keyup(update);
 			update();
 		}
+        {% endif %}
+        jQuery('input[type="hidden"]').each(function () {
+            jQuery(this).parent('.form-row').hide()
+        });
 	});
 
 //]]>
 </script>
-{% endif %}
+
 
 <style type="text/css">
 <!--
-.language_button { 
+.language_button {
 	font-weight:bold;
 	margin-bottom:-1px;
 	border-color:#ddd #aaa #ccc #ddd !important;
@@ -70,7 +75,7 @@
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
+     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo;
      {% if can_change %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo;
      {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original.get_title|truncatewords:"18" }}{% endif %}
 </div>
@@ -79,17 +84,6 @@
 {% block content %}<div id="content-main">
 
 {% block object-tools %}
-{% if change %}{% if not is_popup %}
-  <ul class="object-tools">
-	{% if can_publish %}
-	<li><a href="publish/" class="publishlink">{% trans "Publish draft" %}</a></li>
-	<li><a href="preview/?language={{ language }}" class="previewdraftlink">{% trans "Preview draft" %}</a></li>
-	{% endif %}
-	{% if can_change and page.published and page.is_dirty %}<li><a href="revert/" class="revertlink">{% trans "Revert to public" %}</a></li>{% endif %}
-	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if page.publisher_public %}<li><a href="preview/?public=1&language={{ language }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
-  </ul>
-{% endif %}{% endif %}
 {% endblock %}
 
 
@@ -98,19 +92,19 @@
 
 <div style="display: none;"><input type="hidden" name="language" value="{{language}}" id="id_language"/></div>
 
-{% if show_language_tabs %}
+{% if show_language_tabs and not show_permissions %}
 <div id="page_form_lang_tabs">
     {% for lang_code, lang_name in language_tabs %}
         <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
             class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
-            id="debutton" name="{{lang_code}}" value="{{lang_name}}" /> 
+            id="debutton" name="{{lang_code}}" value="{{lang_name}}" />
     {% endfor %}
 </div>
 {% endif %}
 
 
 <div id="lang_tab_content">
-{% if show_language_tabs %}
+{% if show_language_tabs and not show_permissions%}
 <h2 class="header"></h2>
 {% endif %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
@@ -132,14 +126,13 @@
 {% endfor %}
 
 
-{% if not add %}
+{% if show_permissions %}
 	{% if CMS_PERMISSION and can_change_permissions %}
 		<div class="inline-group">
 			<div class="tabular inline-related">
 				<fieldset id="inherited_permissions" class="module aligned collapse">
 				  <h2>{% trans 'All permissions' %}</h2>
-				  <div class="loading">{% trans 'Loading...' %}</div>
-				  <div class="load">./permissions/</div>
+				  <div class="loading" rel="../permissions/">{% trans 'Loading...' %}</div>
 				</fieldset>
 			</div>
 		</div>
@@ -149,8 +142,7 @@
         <div class="tabular inline-related">
             <fieldset id="page_states" class="module aligned collapse">
               <h2 class="load_remote">{% trans 'Page states' %}</h2>
-              <div class="loading">{% trans 'Loading...' %}</div>
-              <div class="load">./moderation-states/</div>
+              <div class="loading" rel="../moderation-states/">{% trans 'Loading...' %}</div>
             </fieldset>
         </div>
     </div>
@@ -164,7 +156,7 @@
 		<input type="submit" name="_continue" value="{% trans 'Save and continue editing' %}" {{ onclick_attrib }}/>
 	</div>
 {% else %}
-	{% if not moderation_delete_request %}{% page_submit_row %}{% endif %}
+	{% page_submit_row %}
 {% endif %}
 
 {% if add %}

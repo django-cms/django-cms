@@ -53,7 +53,7 @@ Functions and constants
     :param string slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
     :type apphook: string or :class:`cms.app_base.CMSApp` subclass
-    :param string redirect: URL redirect (only applicable if :setting:`CMS_REDIRECTS` is ``True``)
+    :param string redirect: URL redirect
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
     :param created_by: User that is creating this page
@@ -88,7 +88,7 @@ Functions and constants
     :param string slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
     :type apphook: string or :class:`cms.app_base.CMSApp` subclass
-    :param string redirect: URL redirect (only applicable if :setting:`CMS_REDIRECTS` is ``True``)
+    :param string redirect: URL redirect
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
     :param parent: Used for automated slug generation

@@ -280,12 +280,7 @@ menu becomes much more manageable:
 Using Soft Roots
 ================
 
-To enable the feature, ``settings.py`` requires:
-
-    CMS_SOFTROOT = True
-
-Mark a page as *soft root* in the 'Advanced' tab of the its settings 
-in the admin interface.
+Mark a page as *soft root* in the 'Advanced Settings' window of a page.
 
 ******************************
 Modifying & Extending the menu

@@ -7,10 +7,10 @@ from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+
 
 class Mock_PageSelectFormField(PageSelectFormField):
     def __init__(self, required=False):
@@ -19,6 +19,7 @@ class Mock_PageSelectFormField(PageSelectFormField):
         self.required = required
         self.error_messages = {}
         self.error_messages['invalid_page'] = 'Invalid_page'
+
 
 class FormsTestCase(CMSTestCase):
     def setUp(self):
@@ -39,7 +40,7 @@ class FormsTestCase(CMSTestCase):
     def test_get_site_choices_without_moderator_with_superuser(self):
         # boilerplate (creating a page)
         user_super = User(username="super", is_staff=True, is_active=True,
-            is_superuser=True)
+                          is_superuser=True)
         user_super.set_password("super")
         user_super.save()
         with self.login_user_context(user_super):
@@ -91,7 +92,7 @@ class FormsTestCase(CMSTestCase):
         page1 = create_page('Page 1', 'nav_playground.html', 'en', site=site)
         page2 = create_page('Page 2', 'nav_playground.html', 'de', site=site)
         page3 = create_page('Page 3', 'nav_playground.html', 'en',
-                     site=site, parent=page1)
+                            site=site, parent=page1)
         # enforce the choices to be casted to a list
         site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
         self.assertEqual(page_choices, [
@@ -122,9 +123,9 @@ class FormsTestCase(CMSTestCase):
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',
-                 'can_add_pageuser', 'can_change_pageuser',
-                 'can_delete_pageuser', 'can_add_pagepermission',
-                 'can_change_pagepermission', 'can_delete_pagepermission']
+            'can_add_pageuser', 'can_change_pageuser',
+            'can_delete_pageuser', 'can_add_pagepermission',
+            'can_change_pagepermission', 'can_delete_pagepermission']
         for name in names:
             self.assertTrue(puf.initial.get(name, False))
 

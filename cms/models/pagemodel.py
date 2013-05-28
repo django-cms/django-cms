@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 from cms import constants
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
 from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
@@ -62,7 +63,8 @@ class Page(MPTTModel):
     published = models.BooleanField(_("is published"), blank=True)
 
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
-                                help_text=_('The template used to render the content.'))
+                                help_text=_('The template used to render the content.'),
+                                default=TEMPLATE_INHERITANCE_MAGIC)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
 
     login_required = models.BooleanField(_("login required"), default=False)
@@ -810,8 +812,8 @@ class Page(MPTTModel):
             else:
                 # anonymous user, no restriction saved in database
                 return True
-            # Authenticated user
-        # Django wide auth perms "can_view" or cms auth perms "can_view"
+                # Authenticated user
+            # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
         return (request.user.has_perm(codename) or

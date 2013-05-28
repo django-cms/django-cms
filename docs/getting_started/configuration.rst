@@ -161,16 +161,6 @@ Example::
         'sampleapp.cms_app.SampleApp',
     )
 
-.. setting:: PLACEHOLDER_FRONTEND_EDITING
-
-PLACEHOLDER_FRONTEND_EDITING
-============================
-
-Default: ``True``
-
-If set to ``False``, frontend editing is not available for models using
-:class:`cms.models.fields.PlaceholderField`.
-
 ********************
 Editor configuration
 ********************
@@ -448,65 +438,6 @@ user under which Django will be running.
 URLs
 ****
 
-.. setting:: CMS_URL_OVERWRITE
-
-CMS_URL_OVERWRITE
-=================
-
-Default: ``True``
-
-This adds a new field ``url overwrite`` to the ``advanced settings`` tab of
-your page. With this field you can overwrite the whole relative url of the
-page.
-
-.. setting:: CMS_MENU_TITLE_OVERWRITE
-
-
-CMS_MENU_TITLE_OVERWRITE
-========================
-
-Default: ``True``
-
-This adds a new ``menu title`` field beside the title field.
-
-With this field you can overwrite the title that is displayed in the menu.
-
-To access the menu title in the template, use:
-
-.. code-block:: html+django
-
-    {{ page.get_menu_title }}
-
-.. setting:: CMS_REDIRECTS
-
-
-CMS_REDIRECTS
-=============
-
-Default: ``False``
-
-This adds a new ``redirect`` field to the ``advanced settings`` section of the
-page admin.
-
-You can set a url here to which visitors will be redirected when the page is
-accessed.
-
-Note: Don't use this too much. :mod:`django.contrib.redirects` is much more
-flexible, handy, and is designed exactly for this purpose.
-
-.. setting:: CMS_SOFTROOT
-
-CMS_SOFTROOT
-============
-
-Default: ``False``
-
-This adds a new "softroot" field to the "advanced settings" tab of the page. If
-a page is marked as softroot, menus for it and its descendants will use the
-softroot as their root.
-
-This is useful for large sites with deep page hierarchies usable.
-
 *****************
 Advanced Settings
 *****************
@@ -571,18 +502,6 @@ Default: ``all``
 
 Determines whether pages without any view restrictions are public by default or
 staff only. Possible values are ``all`` and ``staff``.
-
-.. setting:: CMS_SHOW_START_DATE
-.. setting:: CMS_SHOW_END_DATE
-
-CMS_SHOW_START_DATE & CMS_SHOW_END_DATE
-=======================================
-
-Default: ``False`` for both
-
-Adds two new :class:`~django.db.models.DateTimeField` fields in the
-"advanced settings" tab of the page. With this option you can limit the time a
-page is published.
 
 .. setting:: CMS_CACHE_DURATIONS
 

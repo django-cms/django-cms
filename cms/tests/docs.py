@@ -20,8 +20,9 @@ def has_no_internet():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('4.4.4.2', 80))
+        s.send("hello")
     except socket.error: # no internet
-        return  True
+        return True
     return False
 
 
