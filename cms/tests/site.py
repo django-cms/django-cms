@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import copy
 from django.test import Client
 from cms.api import create_page
 from cms.models import Page
+from cms.utils import get_cms_setting
 from cms.views import details
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -56,8 +58,12 @@ class SiteTestCase(CMSTestCase):
             self.assertEqual(Page.objects.drafts().on_site().count(), 1)
 
     def test_site_publish(self):
+        self._login_context.__exit__(None, None, None)
         pages = {"2": range(0, 5), "3": range(0, 5)}
-        with SettingsOverride(LANGUAGE_CODE="de"):
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        lang_settings[3][1]['public'] = True
+
+        with SettingsOverride(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="de"):
             with SettingsOverride(SITE_ID=self.site2.pk):
                 pages["2"][0] = create_page("page_2", "nav_playground.html", "de",
                                             site=self.site2)
@@ -103,5 +109,3 @@ class SiteTestCase(CMSTestCase):
                         page_url = page.get_absolute_url(language='de')
                     response = self.client.get(page_url)
                     self.assertEqual(response.status_code, 200)
-
-
