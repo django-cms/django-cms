@@ -5,6 +5,7 @@ from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import CMSPlugin
 from cms.models.pagemodel import Page
 from django.core.management.base import NoArgsCommand
+from django.db import transaction
 
 
 log = getLogger('cms.management.moderator')
@@ -25,7 +26,6 @@ class ModeratorOnCommand(NoArgsCommand):
         have the same plugins listed. If both versions exist and have content,
         the public page has precedence. Otherwise, the draft version is used.
         """
-        log.info('Reverting drafts to public versions')
         for page in Page.objects.public():
             if CMSPlugin.objects.filter(placeholder__page=page).count():
                 log.debug('Reverting page pk=%d' % (page.pk,))
