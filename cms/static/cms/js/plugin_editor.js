@@ -8,7 +8,7 @@
 	$(document).ready(function() {
 		// Add Plugin Handler
 		$('span.add-plugin').click(function(){
-		 var select = $(this).parent().children("select[name=plugins]");
+			var select = $(this).parent().children("select[name=plugins]");
 			var pluginvalue = select.attr('value');
 			var placeholder_id = $(this).parent().parent().data('id');
 			//var splits = window.location.href.split("/");
@@ -46,6 +46,7 @@
 
 		// Copy Plugins Handler
 		$('span.copy-plugins').click(function(){
+			var select = $(this).parent().children("select[name=plugins]");
 			var copy_from_language = $(this).parent().children("select[name=copy-plugins]").attr("value");
 			var placeholder = $(this).parent().parent().data('id');
 			var splits = window.location.href.split("/");
