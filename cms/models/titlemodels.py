@@ -62,7 +62,7 @@ class EmptyTitle(object):
     path = ""
     meta_description = ""
     redirect = ""
-    has_url_overwite = False
+    has_url_overwrite = False
     application_urls = ""
     menu_title = ""
     page_title = ""

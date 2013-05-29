@@ -203,7 +203,6 @@ def configure(db_url, **extra):
                 "name": "extra context"
             },
         },
-        CMS_SOFTROOT=True,
         CMS_PERMISSION=True,
         CMS_PUBLIC_FOR='all',
         CMS_CACHE_DURATIONS={
@@ -212,11 +211,6 @@ def configure(db_url, **extra):
             'permissions': 0,
         },
         CMS_APPHOOKS=[],
-        CMS_REDIRECTS=True,
-        CMS_MENU_TITLE_OVERWRITE=True,
-        CMS_URL_OVERWRITE=True,
-        CMS_SHOW_END_DATE=True,
-        CMS_SHOW_START_DATE=True,
         CMS_PLUGIN_PROCESSORS=tuple(),
         CMS_PLUGIN_CONTEXT_PROCESSORS=tuple(),
         CMS_SITE_CHOICES_CACHE_KEY='CMS:site_choices',
