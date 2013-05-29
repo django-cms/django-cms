@@ -14,6 +14,7 @@ from cms.tests.multilingual import *
 from cms.tests.navextender import *
 from cms.tests.nonroot import *
 from cms.tests.page import *
+from cms.tests.permissions import *
 from cms.tests.permmod import *
 from cms.tests.placeholder import *
 from cms.tests.plugins import *

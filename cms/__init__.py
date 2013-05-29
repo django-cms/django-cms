@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '2.3.5'
+__version__ = '2.3.7'
 
 # patch settings 
 try:
@@ -7,7 +7,7 @@ try:
     if 'cms' in settings.INSTALLED_APPS:
         from conf import patch_settings
         patch_settings()
-except ImportError: # pragma: no cover
+except: # pragma: no cover
     """
     This exception means that either the application is being built, or is
     otherwise installed improperly. Both make running patch_settings

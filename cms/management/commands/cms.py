@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.management.commands.subcommands.list import ListCommand
 from cms.management.commands.subcommands.moderator import ModeratorCommand
+from cms.management.commands.subcommands.mptt import FixMPTTCommand
 from cms.management.commands.subcommands.uninstall import UninstallCommand
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -22,6 +23,7 @@ class Command(SubcommandsCommand):
     subcommands = {
         'uninstall': UninstallCommand,
         'list': ListCommand,
+        'fix-mptt': FixMPTTCommand,
         'moderator': ModeratorCommand,
     }
     

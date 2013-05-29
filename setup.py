@@ -52,7 +52,7 @@ setup(
         'south>=0.7.2',
         'html5lib',
         'django-mptt>=0.5.1,<0.5.3',
-        'django-sekizai>=0.6.1',
+        'django-sekizai>=0.7',
     ],
     tests_require=[
         'django-reversion==1.6',

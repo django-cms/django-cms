@@ -109,7 +109,7 @@ class CMSChangeList(ChangeList):
         # tree using a stack now)
         pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
         
-        
+
         # Get lists of page IDs for which the current user has 
         # "permission to..." on the current site. 
         perm_edit_ids = Page.permissions.get_change_id_list(request.user, site)

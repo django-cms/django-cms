@@ -1,0 +1,39 @@
+###################
+2.3.7 release notes
+###################
+
+.. warning:: Upgrading from previous versions
+
+    2.3.7 now requires ``django-sekizai>=0.7`` (up from ``0.6.1``) due to a
+    cache-related fix backported from 2.4.
+    The correct ``django-sekizai`` version should be automatically installed
+    (if not already present), but please do check when upgrading.
+
+*******************
+What's new in 2.3.7
+*******************
+
+Cache-related plugin template fix
+=================================
+
+Plugin templates may suffer for incorrect caching when using django-sekizai
+(which may cause css and javascript files not to be served to the users).
+This backported fix resolve this, as the whole context is now saved in cache
+along with the rendered templates.
+
+Permissions cache performance issue fix backported
+==================================================
+
+When a page is saved and cache is enabled, an explicit cache clear used to be
+called, causing performance issues when you have thousand of users on your
+website. This is no longer the case: cache is now versioned and as a result
+massive cache invalidation is not needed anymore
+
+Fix MPTT Management command backported
+=======================================
+
+Backported from 2.4 a management command for fixing MPTT tree data.
+
+The command can be run with::
+
+    manage.py cms fix-mptt

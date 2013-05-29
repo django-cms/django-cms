@@ -3,7 +3,8 @@ from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext, 
     SettingsOverride)
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User, AnonymousUser, Permission
+from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template.context import Context
@@ -25,6 +26,7 @@ URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE_CHANGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE_CHANGE, "edit-plugin/")
 URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE_CHANGE, "remove-plugin/")
 URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
+URL_CMS_PAGE_CHANGE_STATUS = urljoin(URL_CMS_PAGE_CHANGE, "change-status/")
 
 
 class _Warning(object):
@@ -85,22 +87,54 @@ class CMSTestCase(testcases.TestCase):
     def login_user_context(self, user):
         return UserLoginContext(self, user)
 
+    def _create_user(self, username, is_staff=False, is_superuser=False,
+                     is_active=True, add_default_permissions=False, permissions=None):
+        """
+        Use this method to create users.
+
+        Default permissions on page and text plugin are added if creating a
+        non-superuser and `add_default_permissions` is set.
+
+        Set `permissions` parameter to an iterable of permission codes to add
+        custom permissios.
+        """
+        user = User(username=username, email=username+'@django-cms.org',
+                    is_staff=is_staff, is_active=is_active, is_superuser=is_superuser)
+        user.set_password(username)
+        user.save()
+        if is_staff and not is_superuser and add_default_permissions:
+            user.user_permissions.add(Permission.objects.get(codename='add_text'))
+            user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+            user.user_permissions.add(Permission.objects.get(codename='change_text'))
+
+            user.user_permissions.add(Permission.objects.get(codename='add_page'))
+            user.user_permissions.add(Permission.objects.get(codename='change_page'))
+            user.user_permissions.add(Permission.objects.get(codename='delete_page'))
+        if is_staff and not is_superuser and permissions:
+            for permission in permissions:
+                user.user_permissions.add(Permission.objects.get(codename=permission))
+        return user
+
     def get_superuser(self):
         try:
             admin = User.objects.get(username="admin")
         except User.DoesNotExist:
-            admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
-            admin.set_password("admin")
-            admin.save()
+            admin = self._create_user("admin", is_staff=True, is_superuser=True)
         return admin
 
     def get_staff_user_with_no_permissions(self):
         """
         Used in security tests
         """
-        staff = User(username="staff", is_staff=True, is_active=True)
-        staff.set_password("staff")
-        staff.save()
+        staff = self._create_user("staff", is_staff=True, is_superuser=False)
+        return staff
+
+    def get_staff_user_with_std_permissions(self):
+        """
+        This is a non superuser staff
+        """
+        staff = self._create_user("staff", is_staff=True, is_superuser=False,
+                                  add_permissions=True)
         return staff
     
     def get_new_page_data(self, parent_id=''):
