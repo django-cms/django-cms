@@ -46,30 +46,26 @@
 
 		// Copy Plugins Handler
 		$('span.copy-plugins').click(function(){
-			var select = $(this).parent().children("select[name=plugins]");
-			var copy_from_language = $(this).parent().children("select[name=copy-plugins]").attr("value");
-			var placeholder = $(this).parent().parent().data('id');
-			var splits = window.location.href.split("/");
-			var page_id = splits[splits.length-2];
+			var $me = $(this),
+				$select = $me.siblings("select[name=plugins]"),
+				copy_from_language = $me.siblings("select[name=copy-plugins]").val(),
+				placeholder = $me.parents('.plugin-list-holder').attr('id'),
+				splits = window.location.href.split("/"),
+				page_id = splits[splits.length-2],
+				to_language = $select.attr('data-language');
 
-			var to_language = $('input.language_button.selected').attr('name');
-
-			if (!to_language) {
-				to_language = $('input[name=language]').attr("value");
-			}
-
-			if (!to_language) {
-				//alert("Unable to determine the correct language for this plugin! Please report the bug!");
-			}
-
-			//var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
-			if ((copy_from_language) && (copy_from_language != "")) {
-			 var ul_list = $(this).parent().parent().children("ul.plugin-list");
+			if ((copy_from_language) && (copy_from_language !== "")) {
+				var $ul_list = $me.parent().siblings("ul.plugin-list");
 				$.ajax({
 					url: "copy-plugins/", dataType: "html", type: "POST",
-					data: { page_id: page_id, placeholder: placeholder, copy_from: copy_from_language, language: to_language },
+					data: {
+						page_id: page_id,
+						placeholder: placeholder,
+						copy_from: copy_from_language,
+						language: to_language
+					},
 					success: function(data) {
-						ul_list.empty().append(data);
+						$ul_list.empty().append(data);
 						setclickfunctions();
 					},
 					error: function(xhr) {
