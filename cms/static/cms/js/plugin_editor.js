@@ -8,21 +8,12 @@
 	$(document).ready(function() {
 		// Add Plugin Handler
 		$('span.add-plugin').click(function(){
-		 var select = $(this).parent().children("select[name=plugins]");
+			var select = $(this).parent().children("select[name=plugins]");
 			var pluginvalue = select.attr('value');
 			var placeholder_id = $(this).parent().parent().data('id');
 			//var splits = window.location.href.split("/");
 
-			var language = $('input.language_button.selected').attr('name');
-
-			if (!language) {
-				language = $('input[name=language]').attr("value");
-			}
-			// The new placeholder branch allows adding non-language plugins!
-			if (!language) {
-				//alert("Unable to determine the correct language for this plugin! Please report the bug!");
-			}
-
+			var language = select.attr('data-language');
 			var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
 			if (pluginvalue) {
 				var pluginname = select.children('[selected]').text();
@@ -52,19 +43,10 @@
 			var splits = window.location.href.split("/");
 			var page_id = splits[splits.length-2];
 
-			var to_language = $('input.language_button.selected').attr('name');
-
-			if (!to_language) {
-				to_language = $('input[name=language]').attr("value");
-			}
-
-			if (!to_language) {
-				//alert("Unable to determine the correct language for this plugin! Please report the bug!");
-			}
-
+			var to_language = select.attr('data-language');
 			//var target_div = $(this).parent().parent().parent().children('div.plugin-editor');
-			if ((copy_from_language) && (copy_from_language != "")) {
-			 var ul_list = $(this).parent().parent().children("ul.plugin-list");
+			if ((copy_from_language) && (copy_from_language !== "")) {
+				var ul_list = $(this).parent().parent().children("ul.plugin-list");
 				$.ajax({
 					url: "copy-plugins/", dataType: "html", type: "POST",
 					data: { page_id: page_id, placeholder: placeholder, copy_from: copy_from_language, language: to_language },
@@ -146,7 +128,7 @@
 				var splits = data.split(",");
 				id = splits.shift();
 				$("#plugin_"+id).remove();
-				$("#iframe_"+id).parent().html("<p>" + splits.join(",") + "</p>")
+				$("#iframe_"+id).parent().html("<p>" + splits.join(",") + "</p>");
 			}, "html");
 		}
 	}
@@ -180,8 +162,8 @@
 
 	hide_iframe = function (id, type, title, msg){
 		html = "<b>"+type+"</b>";
-		if( title != "" && title != null){
-			html += " [ "+title+ " ]"
+		if( title !== "" && title !== null){
+			html += " [ "+title+ " ]";
 		}
 		$('#plugin_'+id+" span.text").html(html);
 		$('#iframe_'+id).parent().html("<p>"+msg+"</p>");
@@ -189,6 +171,5 @@
 
 	removed_cancelled_plugin = function(plugin_id) {
 		$('#plugin_'+plugin_id).remove();
-	}
-
+	};
 })(jQuery);
