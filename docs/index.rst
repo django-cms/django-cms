@@ -14,9 +14,9 @@ Install
 *******
 
 .. warning::
-    Version 2.4 introduces some significant changes that **require** action if
+    Version 3.0 introduces some significant changes that **require** action if
     you are upgrading from a previous version. Please refer to
-    :ref:`Upgrading from previous versions <upgrade-to-2.4>`
+    :ref:`Upgrading from previous versions <upgrade-to-3.0>`
 
 
 .. toctree::
