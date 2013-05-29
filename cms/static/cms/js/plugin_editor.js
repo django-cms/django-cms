@@ -49,7 +49,7 @@
 			var $me = $(this),
 				$select = $me.siblings("select[name=plugins]"),
 				copy_from_language = $me.siblings("select[name=copy-plugins]").val(),
-				placeholder = $me.parents('.plugin-list-holder').attr('id'),
+				placeholder = $me.parents('.plugin-list-holder').data('id'),
 				splits = window.location.href.split("/"),
 				page_id = splits[splits.length-2],
 				to_language = $select.attr('data-language');
