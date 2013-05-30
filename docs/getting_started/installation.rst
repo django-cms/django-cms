@@ -44,8 +44,11 @@ minimal additional configuration and are well-proven.
 File and image handling
 -----------------------
 
-* `Django Filer`_ for file and image management 
-* `django CMS plugins`_, which provides plugins for use with Django Filer
+* `Django Filer`_ for file and image management
+* `django-filer plugins for django-cms`_, required to use Django Filer with django-cms
+
+.. _Django Filer: https://github.com/stefanfoulis/django-filer
+.. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
 
 Revision management
 -------------------
@@ -63,22 +66,46 @@ Revision management
     :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`. Be aware that saved revisions
     will cause your database size to increase.
 
-.. _Django Filer: https://github.com/stefanfoulis/django-filer
-.. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
-Using pip and virtualenv
+Installing in a virtualenv using pip
 =========
-The following is an example requirements.txt file that can be used with pip:
+
+Installing inside a `virtualenv`_ is the preferred way to install any Django installation. This should work on
+any platform where python in installed. The first step is to create the virtualenv:
+
+.. code-block:: bash
+
+  #!/bin/sh
+  sudo pip install --upgrade virtualenv
+  virtualenv --distribute --no-site-packages env
+
+You can switch to your virtualenv at the command line by typing:
+
+.. code-block:: bash
+
+  source env/bin/activate
+  
+Next, you can install packages one at a time using `pip`_, but we recommend using a `requirements.txt`_ file. The
+following is an example requirements.txt file that can be used with pip to install django-cms and its dependencies:
 
 ::
 
-    Django==1.5.1 
+    # Bare minimum
     django-cms==2.4.1
-    South==0.8               
-    flup==1.0.3.dev-20110405 
-    PIL==1.1.7               
+    PIL==1.1.7
+    
+    #These dependencies are brought in by django-cms, but if you want to lock-in their version, specify them
+    Django==1.5.1
+    django-classy-tags==0.4
+    South==0.8.1
+    html5lib==1.0b1
+    django-mptt==0.5.2
+    django-sekizai==0.7
+    six==1.3.0
+    
+    #Optional, recommended packages                
     django-filer==0.9.4      
     cmsplugin-filer==0.9.5   
     django-reversion==1.7
@@ -99,29 +126,25 @@ for MySQL you would also add:
 
 and install libmysqlclient-dev (on Debian-based distro)
 
-One example of a script to create a virtualenv Python environment (on a Debian-based distro) is as follows:
+One example of a script to create a virtualenv Python environment is as follows:
 
 .. code-block:: bash
 
   #!/bin/sh
-  rm -rf env.bak
-  mv env env.bak
-  sudo easy_install pip
-  sudo pip install --upgrade pip
-  sudo pip install --upgrade virtualenv
-  virtualenv --distribute --no-site-packages env
   env/bin/pip install --download-cache=~/.pip-cache -r requirements.txt
 
+.. _virtualenv: http://www.virtualenv.org
+.. _pip: http://www.pip-installer.org
+.. _requirements.txt: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
 
-On Ubuntu
+Installing globally on Ubuntu
 =========
 
 .. warning::
 
     The instructions here install certain packages, such as PIL, Django, South
     and django CMS globally, which is not recommended. We recommend you use
-    `virtualenv`_ instead. If you choose to do so, install Django,
-    django CMS and South inside a virtualenv.
+    `virtualenv`_ instead (see above).
 
 If you're using Ubuntu (tested with 10.10), the following should get you
 started:
@@ -148,17 +171,6 @@ This will install PIL and your database's driver globally.
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
-
-On Mac OSX
-==========
-
-**TODO** (Should setup everything up to but not including
-"pip install django-cms" like the above)
-
-On Microsoft Windows
-====================
-
-**TODO**
 
 *********
 Databases
