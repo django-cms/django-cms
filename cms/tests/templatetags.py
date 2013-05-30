@@ -251,7 +251,7 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
             self.assertIn('JAVASCRIPT', output)
 
     def test_show_placeholder_for_page_marks_output_safe(self):
-        from django.core.cache import cache;
+        from django.core.cache import cache
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
