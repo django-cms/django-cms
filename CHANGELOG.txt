@@ -157,3 +157,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Use --noinput convention for delete_orphaned_plugins command
 - added Testing docs
 - fixed more issues with only one language
+- locales updated
