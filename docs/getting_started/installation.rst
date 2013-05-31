@@ -94,7 +94,6 @@ following is an example requirements.txt file that can be used with pip to insta
 
     # Bare minimum
     django-cms==2.4.1
-    PIL==1.1.7
     
     #These dependencies are brought in by django-cms, but if you want to lock-in their version, specify them
     Django==1.5.1
@@ -106,6 +105,7 @@ following is an example requirements.txt file that can be used with pip to insta
     six==1.3.0
     
     #Optional, recommended packages                
+    Pillow==2.0.0
     django-filer==0.9.4      
     cmsplugin-filer==0.9.5   
     django-reversion==1.7
@@ -142,7 +142,7 @@ Installing globally on Ubuntu
 
 .. warning::
 
-    The instructions here install certain packages, such as PIL, Django, South
+    The instructions here install certain packages, such as Django, South
     and django CMS globally, which is not recommended. We recommend you use
     `virtualenv`_ instead (see above).
 
@@ -151,9 +151,9 @@ started:
 
 .. code-block:: bash
 
-    sudo aptitude install python2.6 python-setuptools python-imaging
+    sudo aptitude install python2.6 python-setuptools
     sudo easy_install pip
-    sudo pip install Django==1.5 django-cms south
+    sudo pip install Django==1.5 django-cms south Pillow
 
 Additionally, you need the Python driver for your selected database:
 
@@ -167,7 +167,7 @@ or
 
     sudo aptitude install python-mysql
 
-This will install PIL and your database's driver globally.
+This will install Django, django CMS, South, Pillow, and your database's driver globally.
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
