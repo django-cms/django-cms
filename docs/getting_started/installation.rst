@@ -142,7 +142,7 @@ Installing globally on Ubuntu
 
 .. warning::
 
-    The instructions here install certain packages, such as Django, South
+    The instructions here install certain packages, such as Django, South, Pillow
     and django CMS globally, which is not recommended. We recommend you use
     `virtualenv`_ instead (see above).
 
