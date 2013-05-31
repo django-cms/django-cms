@@ -4,15 +4,16 @@
 # 
 # Translators:
 # Marco Barberis <mbarberis@gmail.com>, 2011
+# brente <sbrentegani@gmail.com>, 2013
 # brente <sbrentegani@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2011-08-14 09:44-0500\n"
-"PO-Revision-Date: 2011-10-28 12:34+0000\n"
-"Last-Translator: Jonas Obrist <ojiidotch@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2013-04-29 09:50+0000\n"
+"Last-Translator: brente <sbrentegani@gmail.com>\n"
+"Language-Team: Italian (http://www.transifex.com/projects/p/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,7 +24,7 @@ msgstr ""
 msgid ""
 "Are you sure you want to change the %(field_name)s without saving the page "
 "first?"
-msgstr "Sei sicuro di voler modificare il campo %(field_name)s  senza salvare prima la pagina?"
+msgstr "Sei sicuro di voler modificare il campo %(field_name)s senza salvare prima la pagina?"
 
 #: static/cms/js/change_form.js:69
 msgid ""

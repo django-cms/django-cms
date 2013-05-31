@@ -139,13 +139,25 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added `cms.middleware.language.LanguageCookieMiddleware`
 - Added CMS_RAW_ID_USERS
 
-
 ==== 2.4.1 (2013-4-22)===
 
 - USE_I18N=False fixed
 - some frontend css stuff fixed
 - check_copy_relations fixed for abstract classes
 - non public frontend languages fixed
+
+==== 2.4.2 (2013-5-29)===
+
+- Apphook edit mode bugfix
+- Added option to render_placeholder tag to set language
+- Huge permission cache invalidation speed up
+- Doc improvements
+- css cleanup in PlaceholderAdmin
+- Log change of page status done via AJAX
+- Use --noinput convention for delete_orphaned_plugins command
+- added Testing docs
+- fixed more issues with only one language
+- locales updated
 
 ==== 3.0.0 (XXXXX) ===
 

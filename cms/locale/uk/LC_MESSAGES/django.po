@@ -4,14 +4,15 @@
 # 
 # Translators:
 # Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013
+# Max Power <yakudzam@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: divio.ch <developers@divio.ch>\n"
+"PO-Revision-Date: 2013-05-26 15:11+0000\n"
+"Last-Translator: Max Power <yakudzam@gmail.com>\n"
+"Language-Team: Ukrainian (http://www.transifex.com/projects/p/django-cms/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -92,15 +93,15 @@ msgstr "Заголовок"
 
 #: admin/forms.py:62
 msgid "The default title"
-msgstr ""
+msgstr "Назва за замовчуванням"
 
 #: admin/forms.py:63
 msgid "Slug"
-msgstr ""
+msgstr "Слаґ"
 
 #: admin/forms.py:64
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "Частина назви, що використовується у адресному рядку"
 
 #: admin/forms.py:65
 msgid "Language"
@@ -108,23 +109,23 @@ msgstr "Мова"
 
 #: admin/forms.py:66
 msgid "The current language of the content fields."
-msgstr ""
+msgstr "Теперішня мова полів контенту."
 
 #: admin/forms.py:113
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "Сторінка із таким скороченням вже існує"
 
 #: admin/forms.py:151
 msgid "Menu Title"
-msgstr ""
+msgstr "Назва меню"
 
 #: admin/forms.py:152
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Перезаписати те, що висвітлено в меню"
 
 #: admin/forms.py:153
 msgid "Page Title"
-msgstr ""
+msgstr "Назва сторінки"
 
 #: admin/forms.py:154
 msgid ""
@@ -133,7 +134,7 @@ msgstr ""
 
 #: admin/forms.py:155
 msgid "Application"
-msgstr "Прикладна програма"
+msgstr "Пристосунок"
 
 #: admin/forms.py:157
 msgid "Hook application to this page."
@@ -141,11 +142,11 @@ msgstr ""
 
 #: admin/forms.py:158
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Перезаписати "
 
 #: admin/forms.py:159
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Залиште це поле пустим, якщо використовується стандартний шлях."
 
 #: admin/forms.py:161
 msgid "Redirect"
@@ -153,11 +154,11 @@ msgstr "Перенаправлення"
 
 #: admin/forms.py:162
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Перенаправляє на цю "
 
 #: admin/forms.py:164
 msgid "A description of the page sometimes used by search engines."
-msgstr ""
+msgstr "Пояснення на сторінці часом використовують пошукові системи."
 
 #: admin/forms.py:166
 msgid "A list of comma seperated keywords sometimes used by search engines."
@@ -165,7 +166,7 @@ msgstr ""
 
 #: admin/forms.py:182
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Сторінка із таким резервним URL id вже існує."
 
 #: admin/forms.py:199 admin/forms.py:200 models/permissionmodels.py:39
 msgid "user"
@@ -187,7 +188,7 @@ msgstr "Може переглянути"
 
 #: admin/forms.py:268
 msgid "Please select user or group first."
-msgstr ""
+msgstr "Виберіть будь ласка спочатку користувача або групу."
 
 #: admin/forms.py:275 admin/forms.py:282 admin/forms.py:286
 #: templates/admin/cms/page/change_form.html:73
@@ -204,11 +205,11 @@ msgstr "Змінити"
 #: templates/admin/page_submit_line.html:5
 #: templates/admin/cms/page/menu_item.html:44
 msgid "Delete"
-msgstr "Вилучити"
+msgstr "Видалити"
 
 #: admin/forms.py:278
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "Відновити сторінки"
 
 #: admin/forms.py:305
 msgid "Notify user"
@@ -218,7 +219,7 @@ msgstr "Повідомити користувача"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
+msgstr "Надіслати повідомлення електронною поштою до користувача про зміну імені або пароля. Необхідна електронна адреса користувача."
 
 #: admin/forms.py:326
 msgid "New password"
@@ -248,7 +249,7 @@ msgstr ""
 
 #: admin/pageadmin.py:103
 msgid "Basic Settings"
-msgstr ""
+msgstr "Основні налаштування"
 
 #: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
@@ -260,11 +261,11 @@ msgstr "Прихований"
 
 #: admin/pageadmin.py:112
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Розширені налаштування"
 
 #: admin/pageadmin.py:119
 msgid "SEO Settings"
-msgstr ""
+msgstr "Налаштування власника"
 
 #: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
@@ -298,7 +299,7 @@ msgstr ""
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "Сторінка переміщена"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -322,7 +323,7 @@ msgstr ""
 #: admin/pageadmin.py:950
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Об'єкта %(name)s з основним ключем %(key)r не існує."
 
 #: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
@@ -420,7 +421,7 @@ msgstr ""
 
 #: admin/permissionadmin.py:130 models/permissionmodels.py:97
 msgid "Page permissions"
-msgstr ""
+msgstr "Дозволи сторінки"
 
 #: admin/permissionadmin.py:131
 msgid "User & Group permissions"
@@ -456,7 +457,7 @@ msgstr "Пароль"
 
 #: admin/dialog/forms.py:9
 msgid "Copy permissions"
-msgstr ""
+msgstr "Скопіювати дозволи"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
@@ -716,7 +717,7 @@ msgstr ""
 #: models/placeholdermodel.py:13 plugins/flash/models.py:9
 #: plugins/googlemap/models.py:36 plugins/video/models.py:13
 msgid "width"
-msgstr ""
+msgstr "ширина"
 
 #: models/pluginmodel.py:83
 msgid "position"
@@ -752,7 +753,7 @@ msgstr ""
 
 #: models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "слаґ"
 
 #: models/titlemodels.py:15
 msgid "Path"
@@ -764,7 +765,7 @@ msgstr ""
 
 #: models/titlemodels.py:17
 msgid "application"
-msgstr ""
+msgstr "Пристосунок"
 
 #: models/titlemodels.py:18
 msgid "redirect"
@@ -937,11 +938,11 @@ msgstr ""
 
 #: plugins/link/cms_plugins.py:12
 msgid "Link"
-msgstr ""
+msgstr "Посилання"
 
 #: plugins/link/models.py:10 plugins/snippet/models.py:12
 msgid "name"
-msgstr ""
+msgstr "ім’я"
 
 #: plugins/link/models.py:11 plugins/picture/models.py:21
 #: plugins/teaser/models.py:19
@@ -950,15 +951,15 @@ msgstr "посилання"
 
 #: plugins/link/models.py:12
 msgid "A link to a page has priority over a text link."
-msgstr ""
+msgstr "Посилання на сторінку має перевагу над тестовим посиланням."
 
 #: plugins/link/models.py:13
 msgid "mailto"
-msgstr ""
+msgstr "електронна адреса"
 
 #: plugins/link/models.py:13
 msgid "An email adress has priority over a text link."
-msgstr ""
+msgstr "Електронна адреса має перевагу над текстовим посиланням."
 
 #: plugins/link/models.py:14
 msgid "target"
@@ -966,7 +967,7 @@ msgstr "Ціль"
 
 #: plugins/link/models.py:15
 msgid "same window"
-msgstr ""
+msgstr "те саме вікно"
 
 #: plugins/link/models.py:16
 msgid "new window"
@@ -974,11 +975,11 @@ msgstr "нове вікно"
 
 #: plugins/link/models.py:17
 msgid "parent window"
-msgstr ""
+msgstr "батьківське вікно"
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
-msgstr ""
+msgstr "верхній фрейм"
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
@@ -986,11 +987,11 @@ msgstr ""
 
 #: plugins/picture/models.py:15
 msgid "left"
-msgstr ""
+msgstr "ліворуч"
 
 #: plugins/picture/models.py:16
 msgid "right"
-msgstr ""
+msgstr "праворуч"
 
 #: plugins/picture/models.py:17
 msgid "center"
@@ -1088,7 +1089,7 @@ msgstr "Текст"
 
 #: plugins/text/models.py:14
 msgid "body"
-msgstr ""
+msgstr "тіло"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
 msgid "Plugins"
@@ -1098,43 +1099,43 @@ msgstr "Плагіни"
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
 msgid "Please select a plugin type."
-msgstr ""
+msgstr "Виберіть будь ласка тип плаґіна."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:112
 msgid "Edit selected plugin"
-msgstr ""
+msgstr "Редагувати вибраний плаґін"
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
 msgid "Text editor does not support editing objects."
-msgstr ""
+msgstr "Текстовий редактор не підтримує редагування об'єктів."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
 msgid "No object selected."
-msgstr ""
+msgstr "Не вибрано жодного об’єкта."
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
 msgid "Text editor does not support inserting objects."
-msgstr ""
+msgstr "Текстовий редактор не підтримує вставку об'єктів. "
 
 #: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
 msgid "Not a plugin object"
-msgstr ""
+msgstr "Не вибрано жодного плагіна. "
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:108
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
 msgid "Available Plugins"
-msgstr ""
+msgstr "Доступні плаґіни"
 
 #: plugins/text/templates/cms/plugins/widgets/wymeditor.html:111
 msgid "Insert plugin"
-msgstr ""
+msgstr "Вставити плаґін"
 
 #: plugins/twitter/cms_plugins.py:10
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:30
@@ -1557,7 +1558,7 @@ msgstr ""
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
+msgstr "Користувач"
 
 #: templates/admin/cms/page/moderation_messages.html:7
 msgid "Message"
@@ -1840,7 +1841,7 @@ msgstr ""
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Наслідувати від батьківської сторінки"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
@@ -1852,7 +1853,7 @@ msgstr ""
 
 #: utils/page_resolver.py:165
 msgid "Invalid URL, use /my/url format."
-msgstr ""
+msgstr "Невірний URL, використовуйте формат /my/url ."
 
 #: utils/page_resolver.py:197
 #, python-format
