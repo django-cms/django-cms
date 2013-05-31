@@ -12,10 +12,9 @@ Requirements
 * `Python`_ 2.5 (or a higher release of 2.x).
 * `Django`_ 1.4.5, 1.5 or higher
 * `South`_ 0.7.2 or higher
-* `PIL`_ 1.1.6 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
 * `django-mptt`_ 0.5.2 (strict due to API compatibility issues)
-* `django-sekizai`_ 0.6.1 or higher
+* `django-sekizai`_ 0.7 or higher
 * `html5lib`_ 0.90 or higher
 * `django-i18nurls`_ (if using django 1.3.X)
 * An installed and working instance of one of the databases listed in the
@@ -27,7 +26,6 @@ Requirements
 
 .. _Python: http://www.python.org
 .. _Django: http://www.djangoproject.com
-.. _PIL: http://www.pythonware.com/products/pil/
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 .. _django-mptt: https://github.com/django-mptt/django-mptt
@@ -46,9 +44,11 @@ File and image handling
 
 * `Django Filer`_ for file and image management
 * `django-filer plugins for django-cms`_, required to use Django Filer with django-cms
+* `Pillow`_ (fork of PIL) for image manipulation
 
 .. _Django Filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
+.. _Pillow: https://github.com/python-imaging/Pillow
 
 Revision management
 -------------------
