@@ -110,8 +110,13 @@ instead:
 * ``'cmsplugin_filer_teaser'``
 * ``'cmsplugin_filer_video'``
 
+.. note::
+  See the `django-filer documentation <django-filer:installation_and_configuration>`_ and
+  `django CMS plugin documentation`_ for detailed installation information.
+
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django CMS plugin documentation: https://github.com/stefanfoulis/cmsplugin-filer#installation
 
 If you opt for the core plugins you should take care that directory to which
 the :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
