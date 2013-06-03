@@ -445,5 +445,6 @@ class CMSToolbar(InclusionTag):
 
     def get_context(self, context):
         context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
+        context['CSRF_COOKIE_NAME'] = settings.CSRF_COOKIE_NAME
         return context
 register.tag(CMSToolbar)

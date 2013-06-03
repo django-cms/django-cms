@@ -122,6 +122,7 @@ class CMSPluginBase(admin.ModelAdmin):
             'is_popup': True,
             'plugin': self.cms_plugin_instance,
             'CMS_MEDIA_URL': settings.CMS_MEDIA_URL,
+            'CSRF_COOKIE_NAME': settings.CSRF_COOKIE_NAME,
         })
         
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
