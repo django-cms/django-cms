@@ -12,7 +12,7 @@
 .cms_placeholder { padding:5px 5px 0.1px; @include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
 .cms_plugin { display:inline; position:relative; }
-// .cms_plugin-active { outline:2px solid adjust-hue($color-blue, 15deg); }
+.cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
 
 //######################################################################################################################
 // #PLACEHOLDER/bar#
@@ -30,12 +30,11 @@
 // #PLACEHOLDER/subnav#
 .cms_placeholder, body {
 	.cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer;
-		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -152px;
-		&:hover { background-position:-37px -152px; } }
+		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
 
 	.cms_submenu-lang { float:right; color:white; padding:0 5px; background:$color-grey-70; @include border-radius(3px); }
 	.cms_submenu-dropdown {
-		display:none; zoom:1; position:absolute; right:0; top:18px; z-index:999;
+		display:none; zoom:1; position:absolute; right:0; top:20px; z-index:999;
 		min-width:140px; max-height:230px; overflow:auto;
 		border:1px solid $color-grey-10; background:white;
 		@include box-shadow(0 2px 2px $color-grey-10);
@@ -51,12 +50,22 @@
 		li:first-child span { border-top:none; }
 	}
 
-	.cms_submenu-quicksearch { display:none; position:absolute; right:-1px; top:250px; z-index:1000;
-		cursor:default; text-align:right; height:25px; @include border-radius(0 0 3px 3px);
+	.cms_submenu-quicksearch { display:none; position:absolute; right:-5px; top:-5px; z-index:1000;
+		cursor:default; text-align:right; height:25px; @include border-radius(4px);
 		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
 	.cms_submenu-quicksearch label { cursor:pointer; padding-right:25px; }
 	.cms_submenu-quicksearch input { font-size:12px; color:white; text-align:right; -webkit-appearance:none;
-		width:111px; padding:2px 1px 2px 5px; border:none; background:none; }
+		width:109px; padding:3px 1px 1px 5px; border:none; background:none; }
+
+	// #TOOLBAR/menuswitcher#
+	.cms_switcher { display:none;
+		position:absolute; right:-31px; top:-1px;
+		width:20px; height:20px; padding:0; margin:0; cursor:pointer;
+		font-size:11px; line-height:11px; text-align:center; overflow:hidden; @include border-radius(0 3px 3px 0);
+		color:$color-grey; border:5px solid $color-grey-70;
+		background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left -170px;
+		&:hover { background-position:-40px -170px; }
+	}
 }
 //######################################################################################################################
 // #DRAGGABLES#
@@ -75,14 +84,17 @@
 
 		// menu overwrites
 		.cms_submenu { display:none; margin-top:2px; }
-		.cms_submenu:hover { background-position:-17px -152px; }
-		.cms_submenu-dropdown { right:-1px; top:24px; }
-		.cms_submenu-quicksearch { top:258px; }
+		.cms_submenu-dropdown { right:-1px; top:28px; }
+		.cms_submenu-quicksearch { right:0; top:2px; @include border-radius(0); height:26px; border-left:1px dotted $color-grey-10;
+			background:$color-grey-5 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -416px; }
+		.cms_submenu-quicksearch input { color:black; }
+
+		.cms_draggable .cms_submenu-quicksearch { background-color:white; }
 	}
 
 	// #DRAGGABLES/specific#
 	.cms_draggable { z-index:100; color:black; border:1px solid $color-grey-5; background:$color-grey-5;
-		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); border-color:$color-grey-10; } }
+		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); border-color:$color-grey-10; @include border-radius(0); } }
 	.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
 
 	.cms_droppable-empty { font-size:11px; text-transform:uppercase;
@@ -102,6 +114,8 @@
 		background:adjust-hue($color-blue, 15deg) !important; @include background-image($gradient-blue  !important); }
 	.cms_draggable-selected .cms_dragitem,
 	.cms_draggable-selected .cms_dragitem strong { color:white; }
+	.cms_draggable-selected .cms_draggable .cms_dragitem,
+	.cms_draggable-selected .cms_draggable .cms_dragitem strong { color:black; }
 
 	.cms_draggable-allowed, .cms_draggable-hover-allowed, .cms_draggable-placeholder {
 		color:lighten($color-green, 40%); border-color:lighten($color-green, 40%); }

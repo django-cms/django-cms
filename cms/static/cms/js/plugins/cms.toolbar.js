@@ -60,7 +60,7 @@ $(document).ready(function () {
 			this.messages = this.container.find('.cms_messages');
 			this.modal = this.container.find('.cms_modal');
 			this.tooltip = this.container.find('.cms_placeholders-tooltip');
-			this.menu = this.container.find('.cms_placeholders-menu');
+			this.menu = $('.cms_switcher');
 			this.bars = $('.cms_placeholder-bar');
 
 			this.plugins = $('.cms_plugin');
@@ -146,20 +146,14 @@ $(document).ready(function () {
 			});
 
 			// event for switching between edit and layout mode
-			this.menu.bind('click', function () {
-				($(this).hasClass('cms_placeholders-menu-alternate')) ? that._enableEditMode(300) : that._enableDragMode(300);
-
-				// attach active class to current element
-				var id = $(this).data('id');
+			this.menu.bind('click', function (e) {
+				e.stopPropagation();
 
 				// set active state
-				that.setActive(id);
+				that.setActive($(this).data('id'));
 
-				// set new position
-				var pos = $('#cms_plugin-' + id).position('body').top;
-				var bound = $(window).height();
-				var offset = 200;
-				if(bound - pos <= 0) $(window).scrollTop(pos - offset);
+				// show e dit mode
+				that._enableEditMode(300);
 			});
 
 			this.modes.eq(0).bind('click', function (e) {
@@ -514,6 +508,12 @@ $(document).ready(function () {
 			// set new classes
 			dragitem.addClass('cms_draggable-selected');
 			plugin.addClass('cms_plugin-active');
+
+			// set new position
+			var pos = plugin.position('body').top;
+			var bound = $(window).height();
+			var offset = 200;
+			if(bound - pos <= 0) $(window).scrollTop(pos - offset);
 		},
 
 		// private methods
@@ -547,6 +547,10 @@ $(document).ready(function () {
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
 
+			// set active element to online block
+			var active = this.plugins.filter('.cms_plugin-active');
+				active.css('display', 'inline-block');
+
 			if(!init) this.setSettings();
 		},
 
@@ -554,7 +558,7 @@ $(document).ready(function () {
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
 			this.placeholders.fadeIn(speed);
-			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
+			this.menu.hide();
 
 			// set active item
 			this.modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
