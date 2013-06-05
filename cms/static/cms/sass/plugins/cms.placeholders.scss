@@ -80,7 +80,9 @@
 
 		// levels
 		.cms_draggable { position:relative; z-index:99; white-space:nowrap;
-			border-color:$color-grey-10; background:white; }
+			border-color:$color-grey-10; background:white;
+			&:hover { border-color:$color-grey-20; }
+		}
 
 		// menu overwrites
 		.cms_submenu { display:none; margin-top:2px; }
@@ -94,7 +96,7 @@
 
 	// #DRAGGABLES/specific#
 	.cms_draggable { z-index:100; color:black; border:1px solid $color-grey-5; background:$color-grey-5;
-		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); border-color:$color-grey-10; @include border-radius(0); } }
+		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); @include border-radius(0); } }
 	.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
 
 	.cms_droppable-empty { font-size:11px; text-transform:uppercase;
@@ -110,10 +112,9 @@
 		@include opacity(0.6); }
 
 	// #DRAGGABLES/states#
-	.cms_draggable-selected { border:1px solid adjust-hue($color-blue, 15deg) !important;
-		background:adjust-hue($color-blue, 15deg) !important; @include background-image($gradient-blue  !important); }
+	.cms_draggable-selected {}
 	.cms_draggable-selected .cms_dragitem,
-	.cms_draggable-selected .cms_dragitem strong { color:white; }
+	.cms_draggable-selected .cms_dragitem strong { color:adjust-hue($color-blue, 15deg); }
 	.cms_draggable-selected .cms_draggable .cms_dragitem,
 	.cms_draggable-selected .cms_draggable .cms_dragitem strong { color:black; }
 
