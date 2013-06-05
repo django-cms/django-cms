@@ -515,6 +515,9 @@ $(document).ready(function () {
 			$('.cms_draggable').removeClass('cms_draggable-selected');
 			$('.cms_plugin').removeClass('cms_plugin-active');
 
+			// if false is provided, only remove classes
+			if(id === false) return false;
+
 			// attach active class to current element
 			var dragitem = $('#cms_draggable-' + id);
 			var plugin = $('#cms_plugin-' + id);
