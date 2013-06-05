@@ -164,6 +164,20 @@ $(document).ready(function () {
 				e.preventDefault();
 				that._enableDragMode(300);
 			});
+
+			// keyboard handling
+			$(document).bind('keydown', function (e) {
+				// check if we have an important focus
+				var fields = $('*:focus');
+				if(fields.length) return false;
+
+				// 32 = space
+				if(e.keyCode === 32 && that.settings.mode === 'drag') {
+					that._enableEditMode(300);
+				} else if(e.keyCode === 32 && that.settings.mode === 'edit') {
+					that._enableDragMode(300);
+				}
+			});
 		},
 
 		_eventsSidebar: function () {
@@ -536,7 +550,7 @@ $(document).ready(function () {
 
 		_enableEditMode: function (speed, init) {
 			this.bars.hide();
-			this.plugins.fadeIn(speed);
+			this.plugins.stop(true, true).fadeIn(speed);
 			this.placeholders.hide();
 			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
@@ -557,7 +571,7 @@ $(document).ready(function () {
 		_enableDragMode: function (speed, init) {
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
-			this.placeholders.fadeIn(speed);
+			this.placeholders.stop(true, true).fadeIn(speed);
 			this.menu.hide();
 
 			// set active item
