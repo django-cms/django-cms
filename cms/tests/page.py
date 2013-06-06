@@ -293,8 +293,8 @@ class PagesTestCase(CMSTestCase):
             req.REQUEST = {}
             
             actual_result = t.render(template.Context({"request": req}))
-            desired_result = "{0} changed on {1}".format(change_user, actual_result[-26:])
-            save_time = datetime.datetime.strptime(actual_result[-26:], "%Y-%m-%dT%H:%M:%S")
+            desired_result = "{0} changed on {1}".format(change_user, actual_result[-19:])
+            save_time = datetime.datetime.strptime(actual_result[-19:], "%Y-%m-%dT%H:%M:%S")
             
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
