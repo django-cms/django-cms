@@ -100,7 +100,7 @@ class Menu(ToolbarAPIMixin, BaseItem):
         self.csrf_token = csrf_token
 
     def __repr__(self):
-        return '<Menu:%s>' % self.name
+        return '<Menu:%s>' % unicode(self.name)
 
     def get_menu(self, key, verbose_name, position=LEFT):
         if key in self.menus:
@@ -126,7 +126,7 @@ class LinkItem(BaseItem):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<LinkItem:%s>' % self.name
+        return '<LinkItem:%s>' % unicode(self.name)
 
     def get_context(self):
         return {
@@ -153,7 +153,7 @@ class SideframeItem(BaseItem):
         self.close_on_url_change = close_on_url_change
 
     def __repr__(self):
-        return '<SideframeItem:%s>' % self.name
+        return '<SideframeItem:%s>' % unicode(self.name)
 
     def get_context(self):
         return {
@@ -183,7 +183,7 @@ class AjaxItem(BaseItem):
         self.question = question
 
     def __repr__(self):
-        return '<AjaxItem:%s>' % self.name
+        return '<AjaxItem:%s>' % unicode(self.name)
 
     def get_context(self):
         data = {}
@@ -216,7 +216,7 @@ class ModalItem(BaseItem):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<ModalItem:%s>' % self.name
+        return '<ModalItem:%s>' % unicode(self.name)
 
     def get_context(self):
         return {
