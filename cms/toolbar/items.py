@@ -284,19 +284,3 @@ class ButtonList(BaseItem):
             'buttons': self.buttons,
             'extra_classes': self.extra_classes
         }
-
-
-class Dialog(BaseItem):
-    template = "cms/toolbar/menu/dialog.html"
-
-    def __init__(self, url, title, question, right=False):
-        super(Dialog, self).__init__(right)
-        self.url = url
-        self.title = title
-        self.question = question
-
-    def __repr__(self):
-        return '<Dialog:%s>' % self.title
-
-    def get_context(self):
-        return {'url': self.url, 'title': self.title, 'question': self.question}
