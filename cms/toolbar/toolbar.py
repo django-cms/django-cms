@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.cms_toolbar import cms_toolbar
 from cms.models import UserSettings, Placeholder
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import force_language
@@ -28,6 +29,7 @@ class CMSToolbar(object):
     """
 
     def __init__(self, request):
+        self.items = None
         self.request = request
         self.login_form = CMSToolbarLoginForm(request=request)
         self.is_staff = self.request.user.is_staff
@@ -61,6 +63,12 @@ class CMSToolbar(object):
         return self.clipboard.get_plugins()
 
     def get_items(self):
+        if self.items is None:
+            self.items = []
+            self.populate()
+        return self.items
+
+    def populate(self):
         """
         Get the CMS items on the toolbar
         """
@@ -72,15 +80,19 @@ class CMSToolbar(object):
        
             toolbars = toolbar_pool.get_toolbars()
             items = []
+            callbacks = []
             app_key = ""
-            for key in toolbars:
+            for key, callback in toolbars.items():
                 app_name = ".".join(key.split(".")[:-2])
                 if app_name in self.view_name and len(key) > len(app_key):
                     app_key = key
-            for key in toolbars:
-                toolbar = toolbars[key]()
-                toolbar.insert_items(items, self, self.request, key == app_key)
-            return items
+                callbacks.append(callback)
+            # if the cms_toolbar is in use, ensure it's first
+            if cms_toolbar in callbacks:
+                callbacks.remove(cms_toolbar)
+                callbacks.insert(0, cms_toolbar)
+            for callback in callbacks:
+                callback(self, self.request, key == app_key, app_key)
 
     def request_hook(self):
         if self.request.method != 'POST':

@@ -31,18 +31,17 @@ class ToolbarPool(object):
         self.apps = {}
         self.discovered = False
 
-    def register(self, toolbar):
+    def register(self, callback):
         if self.block_register:
             return
-        from cms.toolbar_base import CMSToolbar
         # validate the app
-        if not issubclass(toolbar, CMSToolbar):
-            raise ImproperlyConfigured('CMS Toolbar must inherit '
-                                       'cms.toolbar_base.CMSToolbar, %r does not' % toolbar)
-        name = "%s.%s" % (toolbar.__module__, toolbar.__name__)
+        if not callable(callback):
+            raise ImproperlyConfigured("Toolbar callbacks must be callable, %r isn't." % callback)
+        name = "%s.%s" % (callback.__module__, callback.__name__)
         if name in self.toolbars.keys():
             raise ToolbarAlreadyRegistered, "[%s] a toolbar with this name is already registered" % name
-        self.toolbars[name] = toolbar
+        self.toolbars[name] = callback
+        return callback # return so it can be used as a decorator
 
     def get_toolbars(self):
         self.discover_toolbars()
