@@ -73,6 +73,14 @@ class CMSToolbar(ToolbarAPIMixin):
         else:
             self.left_items.append(item)
 
+    def remove_item(self, item):
+        if item in self.right_items:
+            self.right_items.remove(item)
+        elif item in self.left_items:
+            self.left_items.remove(item)
+        else:
+            raise KeyError("Item %r not found" % item)
+
     def get_menu(self, key, verbose_name, position=LEFT):
         if key in self.menus:
             return self.menus[key]
@@ -80,23 +88,6 @@ class CMSToolbar(ToolbarAPIMixin):
         self.menus[key] = menu
         self.add_item(menu)
         return menu
-
-    def add_switcher(self, left_name, left_url, right_name, right_url, active_item=LEFT, extra_classes=None, position=LEFT):
-        extra_classes = extra_classes or []
-        extra_classes.append('cms_toolbar-item-buttons-switcher')
-        item = self.add_button_list(extra_classes=extra_classes, position=position)
-        print self.edit_mode, self.build_mode, active_item is LEFT
-        item.add_button(
-            left_name, left_url,
-            active=active_item is LEFT,
-            disabled=active_item is not LEFT,
-        )
-        item.add_button(
-            right_name, right_url,
-            active=active_item is RIGHT,
-            disabled=active_item is not RIGHT,
-        )
-        return item
 
     def add_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None, position=LEFT):
         item = ButtonList(extra_classes=extra_wrapper_classes, position=position)

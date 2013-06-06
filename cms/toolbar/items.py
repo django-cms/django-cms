@@ -32,8 +32,14 @@ class ToolbarAPIMixin(object):
         self.items.append(item)
         return item
 
+    def remove_item(self, item):
+        if item in self.items:
+            self.items.remove(item)
+        else:
+            raise KeyError("Item %r not found" % item)
+
     def add_sideframe_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False,
-                 on_close=REFRESH, position=LEFT):
+                 on_close=None, position=LEFT):
         item = SideframeItem(name, url,
             active=active,
             disabled=disabled,
@@ -45,7 +51,7 @@ class ToolbarAPIMixin(object):
         self.add_item(item)
         return item
 
-    def add_modal_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False,
+    def add_modal_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True,
                  on_close=REFRESH, position=LEFT):
         item = ModalItem(name, url,
             active=active,
@@ -81,11 +87,6 @@ class ToolbarAPIMixin(object):
         self.add_item(item)
         return item
 
-    def add_break(self):
-        item = Break()
-        self.add_item(item)
-        return item
-
 
 class Menu(ToolbarAPIMixin, BaseItem):
     template = "cms/toolbar/menu/list.html"
@@ -109,6 +110,11 @@ class Menu(ToolbarAPIMixin, BaseItem):
         self.menus[key] = menu
         self.items.append(menu)
         return menu
+
+    def add_break(self):
+        item = Break()
+        self.add_item(item)
+        return item
 
     def get_items(self):
         return self.items
@@ -148,7 +154,7 @@ class LinkItem(BaseItem):
 class SideframeItem(BaseItem):
     template = "cms/toolbar/menu/sideframe_item.html"
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True,
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False,
                  on_close=REFRESH, position=LEFT):
         self.position = position
         self.name = name
@@ -235,10 +241,6 @@ class ModalItem(BaseItem):
             'close_on_url_change': self.close_on_url_change,
             'on_close': self.on_close,
         }
-
-
-class DialogItem(BaseItem):
-    template = "cms/toolbar/menu/dialog_item.html"
 
 
 class Break(BaseItem):
