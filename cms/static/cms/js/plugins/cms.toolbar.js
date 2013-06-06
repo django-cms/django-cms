@@ -169,12 +169,10 @@ $(document).ready(function () {
 			$(document).bind('keydown', function (e) {
 				// check if we have an important focus
 				var fields = $('*:focus');
-				if(fields.length) return false;
-
 				// 32 = space
-				if(e.keyCode === 32 && that.settings.mode === 'drag') {
+				if(e.keyCode === 32 && that.settings.mode === 'drag' && !fields.length) {
 					that._enableEditMode(300);
-				} else if(e.keyCode === 32 && that.settings.mode === 'edit') {
+				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
 					that._enableDragMode(300);
 				}
 			});
