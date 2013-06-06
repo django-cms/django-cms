@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from cms.cms_toolbar import cms_toolbar
+from cms.constants import LEFT, RIGHT
 from cms.models import UserSettings, Placeholder
+from cms.toolbar.items import Menu, ToolbarAPIMixin
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import force_language
 
@@ -9,6 +11,7 @@ from django import forms
 from django.contrib.auth import login, logout
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect
+from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -23,13 +26,14 @@ class CMSToolbarLoginForm(AuthenticationForm):
     def check_for_test_cookie(self): pass  # for some reason this test fails in our case. but login works.
 
 
-class CMSToolbar(object):
+class CMSToolbar(ToolbarAPIMixin):
     """
     The default CMS Toolbar
     """
 
     def __init__(self, request):
         self.items = None
+        self.menus = {}
         self.request = request
         self.login_form = CMSToolbarLoginForm(request=request)
         self.is_staff = self.request.user.is_staff
@@ -37,6 +41,7 @@ class CMSToolbar(object):
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        self.csrf_token = get_token(request)
         if settings.USE_I18N:
             self.language = self.request.LANGUAGE_CODE
         else:
@@ -56,6 +61,18 @@ class CMSToolbar(object):
                 user_settings.save()
             self.toolbar_language = user_settings.language
             self.clipboard = user_settings.clipboard
+
+    # Public API
+
+    def get_menu(self, key, verbose_name, position=LEFT):
+        if key in self.menus:
+            return self.menus[key]
+        menu = Menu(verbose_name, self.csrf_token, position=position)
+        self.menus[menu] = menu
+        self.items.append(menu)
+        return menu
+
+    # Internal API
 
     def get_clipboard_plugins(self):
         if not hasattr(self, "clipboard"):
@@ -79,7 +96,6 @@ class CMSToolbar(object):
                 self.view_name = ""
        
             toolbars = toolbar_pool.get_toolbars()
-            items = []
             callbacks = []
             app_key = ""
             for key, callback in toolbars.items():

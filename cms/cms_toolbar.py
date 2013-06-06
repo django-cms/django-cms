@@ -122,7 +122,7 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
             # advanced settings
             advanced_url = reverse('admin:cms_page_advanced', args=(current_page.pk,))
             advanced_disabled = not current_page.has_advanced_settings_permission(request) or not toolbar.edit_mode
-            current_page.add_modal_item(_('Advanced settings'), url=advanced_url, close_on_url_change=True,
+            current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, close_on_url_change=True,
                                         disabled=advanced_disabled)
             # permissions
             if permissions_active:
@@ -166,7 +166,7 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
                 revert_action = reverse('admin:cms_page_revert_page', args=(current_page.pk,))
                 revert_question = _('Are you sure you want to revert to live?')
                 history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
-                                           disbaled=not current_page.is_dirty())
+                                           disabled=not current_page.is_dirty())
                 history_menu.add_modal_item(_('View history'), url=reverse('admin:cms_page_history', args=(current_page.pk,)))
 
                 # publish button
@@ -179,8 +179,8 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
                     else:
                         title = _("Publish Page now")
                     publish_url = reverse('admin:cms_page_publish_page', args=(current_page.pk,))
-                    toolbar.add_ajax_button(title, url=publish_url, extra_classes=classes, position=RIGHT,
-                                            disabled=not current_page.is_dirty())
+                    toolbar.add_ajax_item(title, action=publish_url, extra_classes=classes, position=RIGHT,
+                                          disabled=not current_page.is_dirty())
 
                 # language menu
 
