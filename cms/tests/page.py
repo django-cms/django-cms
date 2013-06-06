@@ -280,11 +280,12 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             change_user = str(superuser)
-            before_change = datetime.now()
+            #some databases don't store microseconds, so move the start flag back by 1 second
+            before_change = datetime.now()+datetime.timedelta()+timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
-            t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-dTH:i:s.u' }}")
+            t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-d\TH:i:s' }}")
             req = HttpRequest()
             page.published = True
             page.save()
@@ -294,7 +295,7 @@ class PagesTestCase(CMSTestCase):
             
             actual_result = t.render(template.Context({"request": req}))
             desired_result = "{0} changed on {1}".format(change_user, actual_result[-26:])
-            save_time = datetime.strptime(actual_result[-26:], "%Y-%m-%dT%H:%M:%S.%f")
+            save_time = datetime.strptime(actual_result[-26:], "%Y-%m-%dT%H:%M:%S")
             
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
