@@ -110,8 +110,15 @@ class Menu(ToolbarAPIMixin, BaseItem):
         self.items.append(menu)
         return menu
 
+    def get_items(self):
+        return self.items
+
     def get_context(self):
-        return {'items': self.items, 'url': self.url, 'title': self.name, 'sub_level': self.sub_level}
+        return {
+            'items': self.get_items(),
+            'url': self.url,
+            'title': self.name,
+            'sub_level': self.sub_level}
 
 
 class LinkItem(BaseItem):
@@ -234,9 +241,49 @@ class DialogItem(BaseItem):
     template = "cms/toolbar/menu/dialog_item.html"
 
 
-
 class Break(BaseItem):
     template = "cms/toolbar/menu/break.html"
+
+
+class Button(object):
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None):
+        self.name = name
+        self.url = url
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
+
+    def __repr__(self):
+        return '<Button:%s>' % unicode(self.name)
+
+
+class ButtonList(BaseItem):
+    template = "cms/toolbar/menu/button_list.html"
+
+    def __init__(self, extra_classes=None, position=LEFT):
+        self.position = position
+        self.extra_classes = extra_classes or []
+        self.buttons = []
+
+    def add_item(self, item):
+        if not isinstance(item, Button):
+            raise ValueError("Expected instance of cms.toolbar.items.Button, got %r instead" % item)
+        self.buttons.append(item)
+
+    def add_button(self, name, url, active=False, disabled=False, extra_classes=None):
+        item = Button(name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes
+        )
+        self.buttons.append(item)
+        return item
+
+    def get_context(self):
+        return {
+            'buttons': self.buttons,
+            'extra_classes': self.extra_classes
+        }
 
 
 class Dialog(BaseItem):
@@ -253,29 +300,3 @@ class Dialog(BaseItem):
 
     def get_context(self):
         return {'url': self.url, 'title': self.title, 'question': self.question}
-
-
-class ButtonList(BaseItem):
-    template = "cms/toolbar/menu/button_list.html"
-
-    def __init__(self, right=False):
-        super(ButtonList, self).__init__(right)
-        self.items = []
-
-    def addItem(self, name, url, active=False):
-        self.items.append({'url': url, 'name': name, 'active': active})
-
-    def get_context(self):
-        return {'items': self.items}
-
-
-class Button(BaseItem):
-    template = "cms/toolbar/menu/button.html"
-
-
-    def get_context(self):
-        context = super(Button, self).get_context()
-        context['extra_classes'] = self.extra_classes
-        return context
-
-

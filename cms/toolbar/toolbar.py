@@ -2,7 +2,7 @@
 from cms.cms_toolbar import cms_toolbar
 from cms.constants import LEFT, RIGHT
 from cms.models import UserSettings, Placeholder
-from cms.toolbar.items import Menu, ToolbarAPIMixin
+from cms.toolbar.items import Menu, ToolbarAPIMixin, BaseItem, ButtonList
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import force_language
 
@@ -32,7 +32,8 @@ class CMSToolbar(ToolbarAPIMixin):
     """
 
     def __init__(self, request):
-        self.items = None
+        self.left_items = None
+        self.right_items = None
         self.menus = {}
         self.request = request
         self.login_form = CMSToolbarLoginForm(request=request)
@@ -64,13 +65,49 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Public API
 
+    def add_item(self, item):
+        if not isinstance(item, BaseItem):
+            raise ValueError("Items must be subclasses of cms.toolbar.items.BaseItem, %r isn't" % item)
+        if item.right:
+            self.right_items.append(item)
+        else:
+            self.left_items.append(item)
+
     def get_menu(self, key, verbose_name, position=LEFT):
         if key in self.menus:
             return self.menus[key]
         menu = Menu(verbose_name, self.csrf_token, position=position)
-        self.menus[menu] = menu
-        self.items.append(menu)
+        self.menus[key] = menu
+        self.add_item(menu)
         return menu
+
+    def add_switcher(self, left_name, left_url, right_name, right_url, active_item=LEFT, extra_classes=None, position=LEFT):
+        extra_classes = extra_classes or []
+        extra_classes.append('cms_toolbar-item-buttons-switcher')
+        item = self.add_button_list(extra_classes=extra_classes, position=position)
+        print self.edit_mode, self.build_mode, active_item is LEFT
+        item.add_button(
+            left_name, left_url,
+            active=active_item is LEFT,
+            disabled=active_item is not LEFT,
+        )
+        item.add_button(
+            right_name, right_url,
+            active=active_item is RIGHT,
+            disabled=active_item is not RIGHT,
+        )
+        return item
+
+    def add_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None, position=LEFT):
+        item = ButtonList(extra_classes=extra_wrapper_classes, position=position)
+        item.add_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes)
+        self.add_item(item)
+        return item
+
+    def add_button_list(self, extra_classes=None, position=None):
+        item = ButtonList(extra_classes=extra_classes, position=position)
+        self.add_item(item)
+        return item
 
     # Internal API
 
@@ -79,22 +116,27 @@ class CMSToolbar(ToolbarAPIMixin):
             return []
         return self.clipboard.get_plugins()
 
-    def get_items(self):
-        if self.items is None:
-            self.items = []
-            self.populate()
-        return self.items
+    def get_left_items(self):
+        self.populate()
+        return self.left_items
+
+    def get_right_items(self):
+        self.populate()
+        return self.right_items
 
     def populate(self):
         """
         Get the CMS items on the toolbar
         """
+        if self.right_items is not None and self.left_items is not None:
+            return
+        self.right_items = []
+        self.left_items = []
         with force_language(self.toolbar_language):
             try:
                 self.view_name = resolve(self.request.path).func.__module__
             except Resolver404:
                 self.view_name = ""
-       
             toolbars = toolbar_pool.get_toolbars()
             callbacks = []
             app_key = ""

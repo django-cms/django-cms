@@ -83,8 +83,9 @@ class ToolbarTests(ToolbarTestBase):
 
         items = toolbar.get_items()
         # Logo + edit-mode + admin-menu + logout
-        self.assertEqual(len(items), 2)
-        self.assertEqual(len(items[0].get_context()['items']), 6)
+        self.assertEqual(len(items), 2, items)
+        admin_items = toolbar.get_menu('admin', 'Test').get_items()
+        self.assertEqual(len(admin_items), 6, admin_items)
 
     def test_toolbar_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
