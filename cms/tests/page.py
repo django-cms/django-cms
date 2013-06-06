@@ -284,7 +284,7 @@ class PagesTestCase(CMSTestCase):
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
-            t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date|date:'Y-m-dTH:i:s.u' %}")
+            t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-dTH:i:s.u' }}")
             req = HttpRequest()
             page.published = True
             page.save()
@@ -297,6 +297,7 @@ class PagesTestCase(CMSTestCase):
             save_time = datetime.strptime(actual_result[-26:], "%Y-%m-%dT%H:%M:%S.%f")
             
             self.assertEqual(actual_result, desired_result)
+            # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
             self.assertTrue(before_change <= save_time)
             self.assertTrue(save_time <= after_change)
 
