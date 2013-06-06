@@ -274,14 +274,13 @@ class PagesTestCase(CMSTestCase):
             
     def test_page_obj_change_data_from_template_tags(self):
         from django import template
-        from datetime import datetime
 
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             change_user = str(superuser)
             #some databases don't store microseconds, so move the start flag back by 1 second
-            before_change = datetime.now()+datetime.timedelta()+timedelta(seconds=-1)
+            before_change = datetime.datetime.now()+datetime.timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
@@ -289,13 +288,13 @@ class PagesTestCase(CMSTestCase):
             req = HttpRequest()
             page.published = True
             page.save()
-            after_change = datetime.now()
+            after_change = datetime.datetime.now()
             req.current_page = page
             req.REQUEST = {}
             
             actual_result = t.render(template.Context({"request": req}))
             desired_result = "{0} changed on {1}".format(change_user, actual_result[-26:])
-            save_time = datetime.strptime(actual_result[-26:], "%Y-%m-%dT%H:%M:%S")
+            save_time = datetime.datetime.strptime(actual_result[-26:], "%Y-%m-%dT%H:%M:%S")
             
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
