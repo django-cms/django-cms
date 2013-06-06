@@ -680,13 +680,13 @@ class Page(MPTTModel):
         """
         get when this page was last updated
         """
-        return self.change_date
+        return self.changed_date
         
     def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get user who last changed this page
         """
-        return self.change_by
+        return self.changed_by
         
     def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
