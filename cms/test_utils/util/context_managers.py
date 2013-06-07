@@ -6,7 +6,7 @@ from django.template import context
 from django.utils.translation import get_language, activate
 from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp, _exists
-import StringIO
+from cms.utils.compat.string_io import StringIO
 import sys
 
 class NULL:
@@ -50,7 +50,7 @@ class SettingsOverride(object):
 class StdOverride(object):
     def __init__(self, std='out', buffer=None):
         self.std = std
-        self.buffer = buffer or StringIO.StringIO()
+        self.buffer = buffer or StringIO()
         
     def __enter__(self):
         setattr(sys, 'std%s' % self.std, self.buffer)

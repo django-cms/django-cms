@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from urlparse import urlparse
+from cms.utils.compat.urls import urlparse
 import re
 
 # checks validity of absolute / relative url

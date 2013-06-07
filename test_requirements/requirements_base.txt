@@ -1,7 +1,7 @@
 coverage==3.4
 unittest-xml-reporting==1.0.3
 sphinx
-Pillow==1.7.7
+Pillow==2.0
 django-classy-tags>=0.3.4.1
 South>=0.7.2
 html5lib>=0.90
@@ -9,7 +9,6 @@ django-mptt==0.5.2
 django-sekizai>=0.7
 argparse
 dj-database-url
-transifex-client
 djangocms-admin-style
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangcms-text-ckeditor
 -e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad

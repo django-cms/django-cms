@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.utils.encoding import force_unicode
+from cms.utils.compat.dj import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
@@ -15,7 +15,7 @@ from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
 from cms.utils.urlutils import any_path_re
 
-ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
+ADMIN_PAGE_RE_PATTERN = r'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
 
 

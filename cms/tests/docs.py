@@ -7,10 +7,7 @@ from sphinx.application import Sphinx
 import cms
 import os
 import socket
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from cms.utils.compat.string_io import StringIO
 
 ROOT_DIR = os.path.dirname(cms.__file__)
 DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, '..', 'docs'))
@@ -46,5 +43,5 @@ class DocsTestCase(CMSTestCase):
             try:
                 app.build()
             except:
-                print nullout.getvalue()
+                print(nullout.getvalue())
                 raise

@@ -12,7 +12,7 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
-from urlparse import urljoin
+from cms.utils.compat.urls import urljoin
 import sys
 import urllib
 import warnings
@@ -205,8 +205,8 @@ class CMSTestCase(testcases.TestCase):
         """
         for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
-            print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-                                    page.pk, page.lft, page.rght, page.tree_id)
+            print("%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
+                                    page.pk, page.lft, page.rght, page.tree_id))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -214,7 +214,7 @@ class CMSTestCase(testcases.TestCase):
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print "%s%s: %s" % (ident, node.title, attrs)
+                print("%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
         _rec(nodes)
 
@@ -223,14 +223,14 @@ class CMSTestCase(testcases.TestCase):
             return qs.get(**filter)
         except ObjectDoesNotExist:
             pass
-        raise self.failureException, "ObjectDoesNotExist raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist raised for filter %s" % filter)
 
     def assertObjectDoesNotExist(self, qs, **filter):
         try:
             qs.get(**filter)
         except ObjectDoesNotExist:
             return
-        raise self.failureException, "ObjectDoesNotExist not raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug

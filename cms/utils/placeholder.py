@@ -41,9 +41,7 @@ def get_page_from_placeholder_if_exists(placeholder):
 
 
 def validate_placeholder_name(name):
-    try:
-        name.decode('ascii')
-    except (UnicodeDecodeError, UnicodeEncodeError):
+    if not all(ord(char) < 128 for char in name):
         raise ImproperlyConfigured("Placeholder identifiers names may not "
                                    "contain non-ascii characters. If you wish your placeholder "
                                    "identifiers to contain non-ascii characters when displayed to "

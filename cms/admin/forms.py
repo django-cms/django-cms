@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from cms.apphook_pool import apphook_pool
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels, Title
@@ -130,12 +131,13 @@ class PageForm(forms.ModelForm):
                 title.save()
                 try:
                     is_valid_url(title.path, page)
-                except ValidationError, e:
+                except ValidationError:
+                    exc = sys.exc_info()[0]
                     title.slug = oldslug
                     title.save()
                     if 'slug' in cleaned_data:
                         del cleaned_data['slug']
-                    self._errors['slug'] = ErrorList(e.messages)
+                    self._errors['slug'] = ErrorList(exc.messages)
         return cleaned_data
 
     def clean_slug(self):
