@@ -12,9 +12,8 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
-from cms.utils.compat.urls import urljoin
+from cms.utils.compat.urls import urljoin, unquote
 import sys
-import urllib
 import warnings
 from cms.utils.permissions import set_current_user
 
@@ -268,7 +267,7 @@ class CMSTestCase(testcases.TestCase):
         return obj.__class__.objects.get(pk=obj.pk)
 
     def get_pages_root(self):
-        return urllib.unquote(reverse("pages-root"))
+        return unquote(reverse("pages-root"))
 
     def get_context(self, path=None):
         if not path:

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-import urllib
 from cms.api import (create_page, publish_page, add_plugin,
                      create_page_user, assign_user_to_page)
 from cms.models import Page, CMSPlugin, Title
@@ -13,6 +12,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
+from cms.utils.compat.urls import unquote
 
 from django.contrib.auth.models import User, Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
@@ -741,7 +741,7 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 class ModeratorSwitchCommandTest(CMSTestCase):
     def test_switch_moderator_on(self):
         with force_language("en"):
-            pages_root = urllib.unquote(reverse("pages-root"))
+            pages_root = unquote(reverse("pages-root"))
         page1 = create_page('page', 'nav_playground.html', 'en', published=True)
         call_command('cms', 'moderator', 'on')
         with force_language("en"):
@@ -751,7 +751,7 @@ class ModeratorSwitchCommandTest(CMSTestCase):
         
     def test_switch_moderator_off(self):
         with force_language("en"):
-            pages_root = urllib.unquote(reverse("pages-root"))
+            pages_root = unquote(reverse("pages-root"))
             page1 = create_page('page', 'nav_playground.html', 'en', published=True)
             path = page1.get_absolute_url()[len(pages_root):].strip('/')
             page2 = get_page_from_path(path)

@@ -43,7 +43,7 @@ class NormalTestRunner(DjangoTestSuiteRunner):
         super(NormalTestRunner, self).teardown_test_environment(**kwargs)
         if settings.TIME_TESTS:
             by_time = sorted(
-                    TIMINGS.iteritems(),
+                    TIMINGS.items(),
                     key=operator.itemgetter(1),
                     reverse=True)[:10]
             print("Ten slowest tests:")

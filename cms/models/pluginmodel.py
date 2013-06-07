@@ -16,6 +16,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
+from cms.utils.compat.dj import force_unicode
 from cms.utils import get_cms_setting
 from mptt.models import MPTTModel, MPTTModelBase
 
@@ -131,7 +132,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return (model_unpickle, (model, defers, factory), data)
 
     def __unicode__(self):
-        return unicode(self.id)
+        return force_unicode(self.id)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -141,7 +142,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
         if instance is not None:
-            return unicode(instance)
+            return force_unicode(instance)
         return _("<Empty>")
 
     def get_plugin_class(self):
@@ -223,7 +224,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         """
         instance, plugin = self.get_plugin_instance()
         if instance:
-            return unicode(plugin.icon_alt(instance))
+            return force_unicode(plugin.icon_alt(instance))
         else:
             return u''
 
@@ -364,12 +365,12 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     def get_breadcrumb(self):
         breadcrumb = []
         if not self.parent_id:
-            breadcrumb.append({'title': unicode(self.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
+            breadcrumb.append({'title': force_unicode(self.get_plugin_name()),
+            'url': force_unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
-            breadcrumb.append({'title': unicode(parent.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
+            breadcrumb.append({'title': force_unicode(parent.get_plugin_name()),
+            'url': force_unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
         return breadcrumb
 
     def get_breadcrumb_json(self):

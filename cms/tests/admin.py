@@ -543,7 +543,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "ok")
+            self.assertEqual(response.content, b"ok")
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.id, 'plugin_parent': ''})
@@ -553,7 +553,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.id, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "ok")
+            self.assertEqual(response.content, b"ok")
 
     def test_preview_page(self):
         permless = self.get_permless()

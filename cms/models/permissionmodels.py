@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from cms.models import Page
 from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
 from cms.utils.helpers import reversion_register
+from cms.utils.compat.dj import force_unicode
 
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
@@ -58,7 +59,7 @@ class AbstractPagePermission(models.Model):
         """Return audience by priority, so: All or User, Group
         """
         targets = filter(lambda item: item, (self.user, self.group,))
-        return ", ".join([unicode(t) for t in targets]) or 'No one'
+        return ", ".join([force_unicode(t) for t in targets]) or 'No one'
 
     def save(self, *args, **kwargs):
         if not self.user and not self.group:
@@ -98,8 +99,8 @@ class PagePermission(AbstractPagePermission):
         app_label = 'cms'
 
     def __unicode__(self):
-        page = self.page_id and unicode(self.page) or "None"
-        return "%s :: %s has: %s" % (page, self.audience, unicode(dict(ACCESS_CHOICES)[self.grant_on]))
+        page = self.page_id and force_unicode(self.page) or "None"
+        return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
 
 
 class PageUser(User):

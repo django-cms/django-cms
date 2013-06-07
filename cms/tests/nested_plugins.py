@@ -772,7 +772,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 edit_url = URL_CMS_MOVE_PLUGIN % page_one.id
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.content, u'ok')
+                self.assertEqual(response.content, b'ok')
                 # check if the plugin got moved
                 page_one = self.reload(page_one)
                 text_plugin_two = self.reload(text_plugin_two)

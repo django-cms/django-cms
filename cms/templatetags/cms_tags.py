@@ -10,6 +10,8 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils.compat.type_checks import string_types, int_types
+from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
@@ -33,7 +35,7 @@ def get_site_id(site):
     if site:
         if isinstance(site, Site):
             site_id = site.id
-        elif isinstance(site, int) or (isinstance(site, basestring) and site.isdigit()):
+        elif isinstance(site, int) or (isinstance(site, string_types) and site.isdigit()):
             site_id = int(site)
         else:
             site_id = settings.SITE_ID
@@ -78,9 +80,9 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         return request.current_page
     if isinstance(page_lookup, Page):
         return page_lookup
-    if isinstance(page_lookup, basestring):
+    if isinstance(page_lookup, string_types):
         page_lookup = {'reverse_id': page_lookup}
-    elif isinstance(page_lookup, (int, long)):
+    elif isinstance(page_lookup, int_types):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
@@ -321,7 +323,7 @@ class PluginChildClasses(InclusionTag):
             instance, plugin = plugin.get_plugin_instance()
             for child_class_name in plugin.get_child_classes(slot, page):
                 cls = plugin_pool.get_plugin(child_class_name)
-                child_plugin_classes.append((cls.__name__, unicode(cls.name)))
+                child_plugin_classes.append((cls.__name__, force_unicode(cls.name)))
         return {'plugin_classes': child_plugin_classes}
 
 register.tag(PluginChildClasses)
@@ -460,7 +462,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         if isinstance(cached_value, dict): # new style
             _restore_sekizai(context, cached_value['sekizai'])
             return {'content': mark_safe(cached_value['content'])}
-        elif isinstance(cached_value, basestring): # old style
+        elif isinstance(cached_value, string_types): # old style
             return {'content': mark_safe(cached_value)}
 
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
