@@ -335,7 +335,7 @@ class PageAdmin(ModelAdmin):
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'can_change': obj.has_change_permission(request),
                 'can_change_permissions': obj.has_change_permissions_permission(request),
-                'show_delete_translation': len(obj.get_languages()) > 1,
+                'show_delete_translation': len(list(obj.get_languages())) > 1,
                 'current_site_id': settings.SITE_ID,
             }
             context.update(extra_context or {})
@@ -382,7 +382,7 @@ class PageAdmin(ModelAdmin):
         context.update({
             'language': language,
             'language_tabs': languages,
-            'show_language_tabs': len(languages) > 1,
+             'show_language_tabs': len(list(languages)) > 1,
         })
         return context
 
@@ -848,7 +848,7 @@ class PageAdmin(ModelAdmin):
                     'key': escape(object_id)
                 })
 
-        if not len(obj.get_languages()) > 1:
+        if not len(list(obj.get_languages())) > 1:
             raise Http404(_('There only exists one translation for this page'))
 
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)

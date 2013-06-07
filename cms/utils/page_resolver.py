@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import urllib
 from cms.utils.moderator import use_draft
 import re
 
@@ -8,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.urls import unquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
@@ -125,7 +125,7 @@ def get_page_from_request(request, use_path=None):
         path = use_path
     else:
         path = request.path
-        pages_root = urllib.unquote(reverse("pages-root"))
+        pages_root = unquote(reverse("pages-root"))
         # otherwise strip off the non-cms part of the URL
         if 'django.contrib.admin' in settings.INSTALLED_APPS:
             admin_base = reverse('admin:index')
@@ -148,7 +148,7 @@ def get_page_from_request(request, use_path=None):
 def is_valid_url(url, instance, create_links=True, site=None):
     """ Checks for conflicting urls
     """
-    page_root = urllib.unquote(reverse("pages-root"))
+    page_root = unquote(reverse("pages-root"))
     if url and url != page_root:
         # Url sanity check via regexp
         if not any_path_re.match(url):

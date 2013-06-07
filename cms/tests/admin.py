@@ -366,10 +366,10 @@ class AdminTestCase(AdminTestsBase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         # should include both direct descendant pages
-        self.assertTrue('id="page_%s"' % second_level_page_top.pk in response.content)
-        self.assertTrue('id="page_%s"' % second_level_page_bottom.pk in response.content)
+        self.assertContains(response, 'id="page_%s"' % second_level_page_top.pk)
+        self.assertContains(response, 'id="page_%s"' % second_level_page_bottom.pk)
         # but not any further down the tree
-        self.assertFalse('id="page_%s"' % third_level_page.pk in response.content)
+        self.assertNotContains(response, 'id="page_%s"' % third_level_page.pk)
 
     def test_unihandecode_doesnt_break_404_in_admin(self):
         admin = self.get_superuser()

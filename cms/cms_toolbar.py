@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import urllib
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.utils.i18n import get_language_objects, get_language_object
 from cms.toolbar.items import Item, List, Break, ButtonList, Button
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils.compat.urls import urlencode
 
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -96,7 +96,7 @@ class PageToolbar(CMSToolbar):
                 menu_items.items.append(Break())
             menu_items.items.append(
                 Item(url, name, ajax=True,
-                     ajax_data={'template': path, 'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+                     ajax_data={'template': path, 'csrfmiddlewaretoken': str(csrf(self.request)['csrf_token'])},
                      active=active)
             )
         return menu_items
@@ -126,7 +126,7 @@ class PageToolbar(CMSToolbar):
             reverse("admin:cms_page_change_innavigation", args=[self.page.pk]),
             nav_title,
             ajax=True,
-            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+            ajax_data={'csrfmiddlewaretoken': str(csrf(self.request)['csrf_token'])},
             disabled=not self.toolbar.edit_mode
         ))
         menu_items.items.append(Break())
@@ -141,7 +141,7 @@ class PageToolbar(CMSToolbar):
             'target': self.page.pk,
         }
         menu_items.items.append(Item(
-            '%s?%s' % (reverse('admin:cms_page_add'), urllib.urlencode(data)),
+            '%s?%s' % (reverse('admin:cms_page_add'), urlencode(data)),
             _('Add child page'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),
@@ -154,7 +154,7 @@ class PageToolbar(CMSToolbar):
             data['target'] = self.page.parent_id
         menu_items.items.append(Item(
             '%s?%s' % (reverse('admin:cms_page_add'),
-            urllib.urlencode(data)),
+            urlencode(data)),
             _('Add sibling page'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),
@@ -186,7 +186,7 @@ class PageToolbar(CMSToolbar):
             reverse("admin:cms_page_change_status", args=[self.page.pk]),
             publish_title,
             ajax=True,
-            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+            ajax_data={'csrfmiddlewaretoken': str(csrf(self.request)['csrf_token'])},
             disabled=not self.toolbar.edit_mode,
         ))
         menu_items.items.append(Item(
@@ -220,7 +220,7 @@ class PageToolbar(CMSToolbar):
                 reverse('admin:cms_page_undo', args=[page.pk]),
                 _('Undo'),
                 ajax=True,
-                ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+                ajax_data={'csrfmiddlewaretoken': str(csrf(self.request)['csrf_token'])},
                 disabled=not has_undo)
             )
 
@@ -228,14 +228,14 @@ class PageToolbar(CMSToolbar):
                 reverse('admin:cms_page_redo', args=[page.pk]),
                 _('Redo'),
                 ajax=True,
-                ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+                ajax_data={'csrfmiddlewaretoken': str(csrf(self.request)['csrf_token'])},
                 disabled=not has_redo)
             )
             menu_items.items.append(Break())
         menu_items.items.append(Item(
             reverse('admin:cms_page_revert_page', args=[page.pk]),
             _('Revert to live'), ajax=True,
-            ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+            ajax_data={'csrfmiddlewaretoken': str(csrf(self.request)['csrf_token'])},
             question=_("Are you sure you want to revert to live?"),
             disabled=not dirty)
         )
@@ -280,7 +280,7 @@ class PageToolbar(CMSToolbar):
             Item(reverse('admin:cms_usersettings_change'), _('User settings'), load_side_frame=True))
         admin_items.items.append(Break())
         admin_items.items.append(Item(reverse("admin:logout"), _('Logout'), ajax=True,
-                                      ajax_data={'csrfmiddlewaretoken': unicode(csrf(self.request)['csrf_token'])},
+                                      ajax_data={'csrfmiddlewaretoken': str(csrf(self.request)['csrf_token'])},
                                       active=True))
         return admin_items
 

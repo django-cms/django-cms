@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
+from cms.utils.compat.metaclasses import with_metaclass
 
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
@@ -64,7 +65,7 @@ class PluginModelBase(MPTTModelBase):
         return new_class
 
 
-class CMSPlugin(MPTTModel):
+class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -76,8 +77,6 @@ class CMSPlugin(MPTTModel):
     2. Subclasses of CMSPlugin cannot define a "text" field.
 
     '''
-    __metaclass__ = PluginModelBase
-
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
+from cms.utils.compat.metaclasses import with_metaclass
 import re
 
 from cms.utils import get_cms_setting
@@ -82,8 +83,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-class CMSPluginBase(admin.ModelAdmin):
-    __metaclass__ = CMSPluginBaseMetaclass
+class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
 
