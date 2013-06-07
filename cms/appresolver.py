@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import sys
 from cms.apphook_pool import apphook_pool
+from cms.utils.compat import string_types
 from cms.utils.i18n import force_language, get_language_list
 from cms.models.pagemodel import Page
 
@@ -130,7 +131,7 @@ def _flatten_patterns(patterns):
 
 def get_app_urls(urls):
     for urlconf in urls:
-        if isinstance(urlconf, basestring):
+        if isinstance(urlconf, string_types):
             mod = import_module(urlconf)
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(

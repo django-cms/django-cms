@@ -36,7 +36,7 @@ class ModeratorOnCommand(NoArgsCommand):
             try:
                 page.publish()
                 log.debug('Published page pk=%d' % (page.pk,))
-            except Exception, e:
+            except Exception:
                 log.exception('Error publishing page pk=%d' % (page.pk,))
 
 

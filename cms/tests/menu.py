@@ -23,7 +23,7 @@ from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
-from django.utils.unittest.case import skipUnless
+from django.utils.unittest import skipUnless
 
 
 
