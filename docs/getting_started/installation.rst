@@ -61,8 +61,10 @@ Revision management
 
   .. note::
 
-    Since django CMS 2.4 we only save the latest 25 publish revisions anymore.
-    You can change this behavior with :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`.
+    As of django CMS 2.4, only the most recent 25 published revisions are
+    saved. You can change this behaviour if required with
+    :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`. Be aware that saved revisions
+    will cause your database size to increase.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
@@ -177,8 +179,8 @@ Databases
 *********
 
 We recommend using `PostgreSQL`_ or `MySQL`_ with django CMS. Installing and
-maintaining database systems is outside the scope of this documentation, but is
-very well documented on the systems' respective websites.
+maintaining database systems is outside the scope of this documentation, but
+is very well documented on the systems' respective websites.
 
 To use django CMS efficiently, we recommend:
 
