@@ -11,15 +11,16 @@
 # karim79 <karim@gorjux.net>, 2011
 # Marco Barberis <mbarberis@gmail.com>, 2011
 # Marco Bonetti <marco@cruncher.ch>, 2013
+# brente <sbrentegani@gmail.com>, 2013
 # brente <sbrentegani@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: divio.ch <developers@divio.ch>\n"
+"PO-Revision-Date: 2013-05-24 08:51+0000\n"
+"Last-Translator: brente <sbrentegani@gmail.com>\n"
+"Language-Team: Italian (http://www.transifex.com/projects/p/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -293,7 +294,7 @@ msgstr "Template invalido"
 #: admin/pageadmin.py:752
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "Template aggiornato a %s"
 
 #: admin/pageadmin.py:754
 msgid "The template was successfully changed"
@@ -306,7 +307,7 @@ msgstr "Errore! Non hai il permesso di spostare questa pagina. Ricarica la pagin
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "Pagina spostata"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -793,14 +794,14 @@ msgstr "sovrascrivere il titolo (tag html title)"
 #: plugins/utils.py:124
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Questo placeholder contiene già il numero massimo di plugin (%s)."
 
 #: plugins/utils.py:134
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "Questo placeholder contiene già il numero massimo contentito (%(limit)s) di plugin %(plugin_name)s."
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -1036,7 +1037,7 @@ msgstr "descrizione estesa"
 #: plugins/picture/models.py:31
 msgid ""
 "When user hovers above picture,        this text will appear in a popup."
-msgstr ""
+msgstr "Questo testo compare in un popup quando l'utente si posiziona sull'immagine."
 
 #: plugins/picture/models.py:33
 msgid "side"
@@ -1365,15 +1366,15 @@ msgstr "Home"
 
 #: templates/admin/cms/page/change_form.html:83
 msgid "Publish draft"
-msgstr ""
+msgstr "richiesta pubblicazione"
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Preview draft"
-msgstr ""
+msgstr "Anteprima bozza"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
-msgstr ""
+msgstr "Ripristina versione pubblica"
 
 #: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/revision_form.html:10
@@ -1811,7 +1812,7 @@ msgstr "App d'esempio"
 
 #: test_utils/project/sampleapp/cms_app.py:15
 msgid "Sample App 2"
-msgstr ""
+msgstr "App di Esempio 2"
 
 #: test_utils/project/sampleapp/cms_app.py:22
 msgid "Namespaced App"
@@ -1843,7 +1844,7 @@ msgstr "Menu2 statico"
 
 #: test_utils/project/sampleapp/urls.py:12
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"

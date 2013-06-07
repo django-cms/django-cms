@@ -3,7 +3,7 @@ from __future__ import with_statement
 import sys
 from cms.apphook_pool import apphook_pool
 from cms.utils.i18n import force_language, get_language_list
-from cms.utils.page_resolver import get_page_queryset
+from cms.models.pagemodel import Page
 
 from django.conf import settings
 from django.conf.urls import patterns
@@ -38,7 +38,7 @@ def applications_page_check(request, current_page=None, path=None):
         try:
             page_id = resolver.resolve_page_id(path)
             # yes, it is application page
-            page = get_page_queryset(request).get(id=page_id)
+            page = Page.objects.public().get(id=page_id)
             # If current page was matched, then we have some override for content
             # from cms, but keep current page. Otherwise return page to which was application assigned.
             return page

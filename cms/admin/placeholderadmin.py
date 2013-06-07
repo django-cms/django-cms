@@ -31,7 +31,7 @@ class PlaceholderAdmin(ModelAdmin):
     class Media:
         css = {
             'all': [cms_static_url(path) for path in (
-                'css/pages.css',
+                'css/rte.css',
                 'css/change_form.css',
                 'css/cms.base.css',
                 'css/plugin_editor.css',

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from itertools import chain
-
+from datetime import datetime
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
@@ -328,7 +328,7 @@ register.tag(PluginChildClasses)
 
 class PageAttribute(AsTag):
     """
-    This template node is used to output attribute from a page such
+    This template node is used to output an attribute from a page such
     as its title or slug.
 
     Synopsis
@@ -354,6 +354,8 @@ class PageAttribute(AsTag):
     - page_title
     - slug
     - meta_description
+    - changed_date
+    - changed_by
 
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
@@ -375,7 +377,9 @@ class PageAttribute(AsTag):
         "slug",
         "meta_description",
         "page_title",
-        "menu_title"
+        "menu_title",
+        "changed_date",
+        "changed_by",
     ]
 
     def get_value(self, context, name, page_lookup):
@@ -389,7 +393,10 @@ class PageAttribute(AsTag):
             return ''
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
-            return escape(func(language=lang, fallback=True))
+            ret_val = func(language=lang, fallback=True)
+            if not isinstance(ret_val, datetime):
+                ret_val = escape(ret_val)
+            return ret_val
         return ''
 
 

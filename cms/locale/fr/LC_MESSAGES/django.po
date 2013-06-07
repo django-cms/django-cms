@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Antoine Nguyen <tonio@ngyn.org>, 2011
-# Bertrand Bordage <bordage.bertrand@gmail.com>, 2012
+# Bertrand Bordage <bordage.bertrand@gmail.com>, 2012-2013
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012
 # charettes <charette.s@gmail.com>, 2011-2012
 # Chary titouan <>, 2011
@@ -17,9 +17,9 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-11 11:40+0000\n"
-"Last-Translator: Christophe kryskool <christophe.chauvet@gmail.com>\n"
-"Language-Team: divio.ch <developers@divio.ch>\n"
+"PO-Revision-Date: 2013-05-24 10:01+0000\n"
+"Last-Translator: Bertrand Bordage <bordage.bertrand@gmail.com>\n"
+"Language-Team: French (http://www.transifex.com/projects/p/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -104,11 +104,11 @@ msgstr "Le titre par défaut"
 
 #: admin/forms.py:63
 msgid "Slug"
-msgstr "Mots-clés"
+msgstr "“Slug”"
 
 #: admin/forms.py:64
 msgid "The part of the title that is used in the URL"
-msgstr "Mots-clés pour construire l'URL"
+msgstr "Partie du titre utilisée dans l'URL"
 
 #: admin/forms.py:65
 msgid "Language"
@@ -120,7 +120,7 @@ msgstr "Langue dans laquelle le contenu sera saisi."
 
 #: admin/forms.py:113
 msgid "Another page with this slug already exists"
-msgstr "Une page avec les mêmes mots-clés pour l'URL existe déjà"
+msgstr "Une autre page avec le même “slug” existe déjà"
 
 #: admin/forms.py:151
 msgid "Menu Title"
@@ -128,7 +128,7 @@ msgstr "Titre du menu"
 
 #: admin/forms.py:152
 msgid "Overwrite what is displayed in the menu"
-msgstr "Remplace le texte affiché dans le menu"
+msgstr "Écrase le titre affiché dans le menu"
 
 #: admin/forms.py:153
 msgid "Page Title"
@@ -137,7 +137,7 @@ msgstr "Titre de la page"
 #: admin/forms.py:154
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Titre de la page (dans votre navigateur, vos favoris…)"
+msgstr "Écrase le titre affiché dans l'onglet du navigateur et dans les favoris/marque-pages"
 
 #: admin/forms.py:155
 msgid "Application"
@@ -149,11 +149,11 @@ msgstr "Associer une application à cette page."
 
 #: admin/forms.py:158
 msgid "Overwrite URL"
-msgstr "Remplace l'URL"
+msgstr "Écrase l'URL"
 
 #: admin/forms.py:159
 msgid "Keep this field empty if standard path should be used."
-msgstr "Laissez ce champ vide pour utiliser l'adresse par défaut."
+msgstr "Laissez ce champ vide pour utiliser l'URL par défaut."
 
 #: admin/forms.py:161
 msgid "Redirect"
@@ -173,7 +173,7 @@ msgstr "Entrez une liste de mots clés séparés par des virgules, cela sera uti
 
 #: admin/forms.py:182
 msgid "A page with this reverse URL id exists already."
-msgstr "Une page avec cette URL existe déjà."
+msgstr "Une page avec cet identifiant existe déjà."
 
 #: admin/forms.py:199 admin/forms.py:200 models/permissionmodels.py:39
 msgid "user"
@@ -256,11 +256,11 @@ msgstr "Pour ajouter des permissions, il faut aussi les éditer !"
 
 #: admin/pageadmin.py:103
 msgid "Basic Settings"
-msgstr "Propriétés"
+msgstr "Paramètres basiques"
 
 #: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Note : cette page sera rechargée si vous changez la selection. Pensez à la sauver au préalable."
+msgstr "Note : cette page sera rechargée si vous changez la sélection. Pensez à la sauvegarder au préalable."
 
 #: admin/pageadmin.py:108 admin/pageadmin.py:159
 msgid "Hidden"
@@ -315,7 +315,7 @@ msgstr "Vous n'avez pas la permission de publier cette page"
 #: admin/pageadmin.py:868
 #, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr "La page \"%s\" a été publiée."
+msgstr "La page \"%s\" a été publiée correctement."
 
 #: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
 #: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
@@ -334,7 +334,7 @@ msgstr "L'objet %(name)s de clé primaire %(key)r n'existe pas."
 
 #: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
-msgstr "Il existe une seule traduction pour cette page"
+msgstr "Il n'existe qu'une seule traduction pour cette page"
 
 #: admin/pageadmin.py:985
 #, python-format
@@ -348,12 +348,12 @@ msgstr "Êtes-vous sûr(e) ?"
 #: admin/pageadmin.py:1063
 #, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr "La page \"%s\" a été dépubliée"
+msgstr "La page \"%s\" a été dépubliée correctement."
 
 #: admin/pageadmin.py:1065
 #, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr "La page \"%s\" a été publiée"
+msgstr "La page \"%s\" a été publiée correctement"
 
 #: admin/pageadmin.py:1083
 msgid "You do not have permission to change this page's in_navigation status"
@@ -518,7 +518,7 @@ msgstr "date de publication"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "Date de publication de la page. Son statut doit être à \"Publié\" pour une publication automatique."
+msgstr "Quand la page sera publiée. Son statut doit être \"Publié\" pour une publication automatique."
 
 #: models/pagemodel.py:53
 msgid "publication end date"
@@ -556,7 +556,7 @@ msgstr "menu attaché"
 
 #: models/pagemodel.py:62
 msgid "is published"
-msgstr "publié"
+msgstr "est publié(e)"
 
 #: models/pagemodel.py:64 plugins/snippet/models.py:14
 msgid "template"
@@ -760,7 +760,7 @@ msgstr "remplace le titre dans le menu"
 
 #: models/titlemodels.py:14
 msgid "slug"
-msgstr "mot-clé"
+msgstr "“slug”"
 
 #: models/titlemodels.py:15
 msgid "Path"
@@ -784,7 +784,7 @@ msgstr "description"
 
 #: models/titlemodels.py:20
 msgid "keywords"
-msgstr "mots clés"
+msgstr "mots-clés"
 
 #: models/titlemodels.py:21
 msgid "overwrite the title (html title tag)"
@@ -1373,7 +1373,7 @@ msgstr "Visualiser le brouillon"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
-msgstr "Basculer en mode public"
+msgstr "Revenir à la version publique"
 
 #: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/revision_form.html:10
@@ -1453,7 +1453,7 @@ msgstr "actions"
 
 #: templates/admin/cms/page/change_list_tree.html:10
 msgid "published"
-msgstr "publié"
+msgstr "publié(e)"
 
 #: templates/admin/cms/page/change_list_tree.html:11
 msgid "start"
@@ -1859,7 +1859,7 @@ msgstr "CMS - votre compte utilisateur a été modifié."
 
 #: utils/page_resolver.py:165
 msgid "Invalid URL, use /my/url format."
-msgstr "L'URL est invalide, utilisez le format /mot-cle/mot-cle."
+msgstr "L'URL est invalide, utilisez le format /mon/url."
 
 #: utils/page_resolver.py:197
 #, python-format

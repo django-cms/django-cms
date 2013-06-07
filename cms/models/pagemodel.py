@@ -676,6 +676,18 @@ class Page(MPTTModel):
             return self.get_title(language, True, version_id, force_reload)
         return menu_title
 
+    def get_changed_date(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get when this page was last updated
+        """
+        return self.changed_date
+        
+    def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get user who last changed this page
+        """
+        return self.changed_by
+        
     def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language

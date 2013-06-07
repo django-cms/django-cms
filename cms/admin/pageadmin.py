@@ -10,6 +10,7 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 import django
 from django.conf import settings
 from django.contrib import admin, messages
+from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
@@ -952,6 +953,13 @@ class PageAdmin(ModelAdmin):
                         messages.info(request, _('The page "%s" was successfully unpublished') % page)
                     else:
                         messages.info(request, _('The page "%s" was successfully published') % page)
+                    LogEntry.objects.log_action(
+                        user_id=request.user.id,
+                        content_type_id=ContentType.objects.get_for_model(Page).pk,
+                        object_id=page_id,
+                        object_repr=page.get_title(),
+                        action_flag=CHANGE,
+                    )
                 except RuntimeError:
                     exc = sys.exc_info()[1]
                     messages.error(request, exc.message)

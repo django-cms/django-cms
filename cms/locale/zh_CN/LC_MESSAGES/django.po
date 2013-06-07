@@ -5,14 +5,15 @@
 # Translators:
 # aaffdd11 <chenyuan328@gmail.com>, 2011
 # ofive <glacier_05@yahoo.com.cn>, 2011
+# Ryan Ouyang <ouyang.em@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
+"PO-Revision-Date: 2013-05-24 08:45+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: divio.ch <developers@divio.ch>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django-cms/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,7 +25,7 @@ msgstr ""
 
 #: cms_toolbar.py:71
 msgid "Revert"
-msgstr ""
+msgstr "还原"
 
 #: cms_toolbar.py:75
 msgid "Edit mode"
@@ -269,7 +270,7 @@ msgstr "SEO设置"
 
 #: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
-msgstr ""
+msgstr "您没有权限修改本页面"
 
 #: admin/pageadmin.py:650
 msgid "Database error"
@@ -277,29 +278,29 @@ msgstr "数据库错误"
 
 #: admin/pageadmin.py:743
 msgid "You do not have permission to change the template"
-msgstr ""
+msgstr "您没有权限修改本模板"
 
 #: admin/pageadmin.py:747
 msgid "Template not valid"
-msgstr ""
+msgstr "模板不可用"
 
 #: admin/pageadmin.py:752
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "模板已改成 %s"
 
 #: admin/pageadmin.py:754
 msgid "The template was successfully changed"
-msgstr ""
+msgstr "模板修改成功"
 
 #: admin/pageadmin.py:776
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
+msgstr "错误！您没有权限移动页面。请刷新页面"
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "页面已移动"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -308,7 +309,7 @@ msgstr "你没有权限发布此页"
 #: admin/pageadmin.py:868
 #, python-format
 msgid "The page \"%s\" was successfully published."
-msgstr ""
+msgstr "页面\"%s\"已经成功发布."
 
 #: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
 #: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
@@ -318,7 +319,7 @@ msgstr "您没有权限修改本页面"
 #: admin/pageadmin.py:914
 #, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr ""
+msgstr "页面\"%s\"已经成功还原."
 
 #: admin/pageadmin.py:950
 #, python-format
@@ -341,12 +342,12 @@ msgstr "您确认码？"
 #: admin/pageadmin.py:1063
 #, python-format
 msgid "The page \"%s\" was successfully unpublished"
-msgstr ""
+msgstr "页面\"%s\"已经未发布成功."
 
 #: admin/pageadmin.py:1065
 #, python-format
 msgid "The page \"%s\" was successfully published"
-msgstr ""
+msgstr "页面\"%s\"已经成功发布."
 
 #: admin/pageadmin.py:1083
 msgid "You do not have permission to change this page's in_navigation status"
@@ -354,7 +355,7 @@ msgstr "你没有权限修改这个页面的浏览模式"
 
 #: admin/pageadmin.py:1108
 msgid "You do not have permission to add a plugin"
-msgstr ""
+msgstr "你没有添加插件的权限"
 
 #: admin/pageadmin.py:1149 admin/pageadmin.py:1180
 msgid "Language must be set to a supported language!"
@@ -380,11 +381,11 @@ msgstr "复制%(language)s 插件到 %(placeholder)s"
 
 #: admin/pageadmin.py:1243
 msgid "This plugin is not saved in a revision"
-msgstr ""
+msgstr "该插件并未保存在修订版中"
 
 #: admin/pageadmin.py:1246 admin/pageadmin.py:1340
 msgid "You do not have permission to edit a plugin"
-msgstr ""
+msgstr "你没有权限编辑插件"
 
 #: admin/pageadmin.py:1306
 #, python-format
@@ -394,15 +395,15 @@ msgstr "%(plugin_name)s 插件在 %(placeholder)s 的位置 %(position)s 处被�
 
 #: admin/pageadmin.py:1371
 msgid "You do not have permission to move a plugin"
-msgstr ""
+msgstr "你没有权限移动插件"
 
 #: admin/pageadmin.py:1390
 msgid "Plugins were moved"
-msgstr ""
+msgstr "已移动的插件"
 
 #: admin/pageadmin.py:1403 admin/pageadmin.py:1412
 msgid "You do not have permission to remove a plugin"
-msgstr ""
+msgstr "你没有移除插件的权限"
 
 #: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
 #, python-format
@@ -786,14 +787,14 @@ msgstr "代用标题(HTML标题)"
 #: plugins/utils.py:124
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "当前位置已经到达插件(%s)允许的最大数量."
 
 #: plugins/utils.py:134
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "当前位置已经到达插件%(plugin_name)s允许的最大数量限制(%(limit)s)."
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -836,15 +837,15 @@ msgstr "谷歌地图"
 
 #: plugins/googlemap/cms_plugins.py:19
 msgid "Advanced"
-msgstr ""
+msgstr "高级"
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
-msgstr ""
+msgstr "在“px”或“%”之前必须是一个正整数。"
 
 #: plugins/googlemap/forms.py:26
 msgid "Must be a positive integer followed by “px”."
-msgstr ""
+msgstr "在“px”之前必须是一个正整数。"
 
 #: plugins/googlemap/models.py:10
 msgid "map title"
@@ -868,7 +869,7 @@ msgstr "附加内容"
 
 #: plugins/googlemap/models.py:19
 msgid "Displayed under address in the bubble."
-msgstr ""
+msgstr "在气泡提示中的地址下方显示."
 
 #: plugins/googlemap/models.py:21
 msgid "zoom level"
@@ -900,11 +901,11 @@ msgstr "路由计划"
 
 #: plugins/googlemap/models.py:37
 msgid "Plugin width (in pixels or percent)."
-msgstr ""
+msgstr "插件宽度(像素或百分比)."
 
 #: plugins/googlemap/models.py:39
 msgid "Plugin height (in pixels)."
-msgstr ""
+msgstr "插件高度(像素)."
 
 #: plugins/googlemap/models.py:47
 msgid "Map"
@@ -963,23 +964,23 @@ msgstr "E-mail邮箱地址优先文字链接"
 
 #: plugins/link/models.py:14
 msgid "target"
-msgstr ""
+msgstr "目标"
 
 #: plugins/link/models.py:15
 msgid "same window"
-msgstr ""
+msgstr "同窗口"
 
 #: plugins/link/models.py:16
 msgid "new window"
-msgstr ""
+msgstr "新窗口"
 
 #: plugins/link/models.py:17
 msgid "parent window"
-msgstr ""
+msgstr "父窗口"
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
-msgstr ""
+msgstr "顶级框"
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
@@ -1004,12 +1005,12 @@ msgstr "图像"
 
 #: plugins/picture/models.py:22
 msgid "If present, clicking on image will take user to link."
-msgstr ""
+msgstr "如果提供，该图片将可以被点击。"
 
 #: plugins/picture/models.py:24
 msgid ""
 "If present, clicking on image will take user         to specified page."
-msgstr ""
+msgstr "如果提供，点击该图片将可以跳转到特定页。"
 
 #: plugins/picture/models.py:26
 msgid "alternate text"
@@ -1020,7 +1021,7 @@ msgid ""
 "Specifies an alternate text for an image, if         the image cannot be "
 "displayed.<br />Is also used by search engines to         classify the "
 "image."
-msgstr ""
+msgstr "在图片无法显示时, 为图片设置一个替换文本<br />同时方便搜索引擎对图片进行分类."
 
 #: plugins/picture/models.py:30
 msgid "long description"
@@ -1029,7 +1030,7 @@ msgstr "详细描述"
 #: plugins/picture/models.py:31
 msgid ""
 "When user hovers above picture,        this text will appear in a popup."
-msgstr ""
+msgstr "当鼠标停留在图片上时, 这个文本将会在弹出框中显示."
 
 #: plugins/picture/models.py:33
 msgid "side"
@@ -1037,11 +1038,11 @@ msgstr "位置"
 
 #: plugins/picture/models.py:34
 msgid "Move image left, right or center."
-msgstr ""
+msgstr "按左中右移动图片."
 
 #: plugins/picture/models.py:51
 msgid "You can enter a Link or a Page, but not both."
-msgstr ""
+msgstr "你可以输入一个链接或一个页面, 但不同同时输入两个."
 
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
@@ -1330,7 +1331,7 @@ msgstr "登录到管理界面 <a href=\"%(login_url)s\">请点这里</a>。"
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "登录地址:%(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1358,15 +1359,15 @@ msgstr "首页"
 
 #: templates/admin/cms/page/change_form.html:83
 msgid "Publish draft"
-msgstr ""
+msgstr "发布请求"
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Preview draft"
-msgstr ""
+msgstr "预览草稿"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
-msgstr ""
+msgstr "还原为公开"
 
 #: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/revision_form.html:10
@@ -1622,7 +1623,7 @@ msgstr "不能保存该插件的历史版本！"
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Your changes to this plugin have not been saved."
-msgstr ""
+msgstr "您对该插件所做的改变尚未保存."
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1704,7 +1705,7 @@ msgstr "下"
 
 #: templates/cms/toolbar/toolbar.html:70
 msgid "Add child plugin"
-msgstr ""
+msgstr "添加子插件"
 
 #: templates/cms/toolbar/toolbar.html:73
 msgid "Move to placeholder"
@@ -1742,36 +1743,36 @@ msgstr "模板标签无法找到`%(page_lookup)s `所对应的页面。源请求
 
 #: test_utils/cli.py:106 test_utils/cli.py:116
 msgid "English"
-msgstr ""
+msgstr "英语"
 
 #: test_utils/cli.py:107 test_utils/cli.py:128 test_utils/cli.py:146
 msgid "French"
-msgstr ""
+msgstr "法语"
 
 #: test_utils/cli.py:108 test_utils/cli.py:122 test_utils/cli.py:140
 #: test_utils/cli.py:159
 msgid "German"
-msgstr ""
+msgstr "德语"
 
 #: test_utils/cli.py:109 test_utils/cli.py:133
 msgid "Brazilian Portuguese"
-msgstr ""
+msgstr "葡萄牙语"
 
 #: test_utils/cli.py:110 test_utils/cli.py:153
 msgid "Dutch"
-msgstr ""
+msgstr "荷兰语"
 
 #: test_utils/cli.py:169
 msgid "two columns"
-msgstr ""
+msgstr "两列"
 
 #: test_utils/cli.py:170
 msgid "three columns"
-msgstr ""
+msgstr "三列"
 
 #: test_utils/cli.py:171
 msgid "navigation examples"
-msgstr ""
+msgstr "导航示例"
 
 #: test_utils/cli.py:177
 msgid "sidebar column"
@@ -1787,55 +1788,55 @@ msgstr "background color"
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
 msgid "Test Plugin"
-msgstr ""
+msgstr "测试插件"
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
-msgstr ""
+msgstr "额外内容"
 
 #: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "文章"
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
-msgstr ""
+msgstr "样板程序"
 
 #: test_utils/project/sampleapp/cms_app.py:15
 msgid "Sample App 2"
-msgstr ""
+msgstr "样板程序2"
 
 #: test_utils/project/sampleapp/cms_app.py:22
 msgid "Namespaced App"
-msgstr ""
+msgstr "程序命名空间"
 
 #: test_utils/project/sampleapp/menu.py:16
 msgid "sample root page"
-msgstr ""
+msgstr "根页样板"
 
 #: test_utils/project/sampleapp/menu.py:17
 msgid "sample settings page"
-msgstr ""
+msgstr "设置页样板"
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
-msgstr ""
+msgstr "账户页样板"
 
 #: test_utils/project/sampleapp/menu.py:19
 msgid "sample my profile page"
-msgstr ""
+msgstr "个人资料页样板"
 
 #: test_utils/project/sampleapp/menu.py:31
 msgid "Static Menu"
-msgstr ""
+msgstr "静态菜单"
 
 #: test_utils/project/sampleapp/menu.py:47
 msgid "Static Menu2"
-msgstr ""
+msgstr "静态菜单2"
 
 #: test_utils/project/sampleapp/urls.py:12
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
 #: utils/conf.py:81
 msgid "Inherit the template of the nearest ancestor"
@@ -1860,7 +1861,7 @@ msgid ""
 msgid_plural ""
 "Pages %(pages)s have the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr[0] ""
+msgstr[0] "页%(pages)s与当前页\"%(instance)s\"具有相同的URL地址'%(url)s'."
 
 #~ msgid "delete req."
 #~ msgstr "deletion request"
