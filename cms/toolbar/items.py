@@ -89,7 +89,7 @@ class ToolbarAPIMixin(object):
 
 
 class Menu(ToolbarAPIMixin, BaseItem):
-    template = "cms/toolbar/menu/list.html"
+    template = "cms/toolbar/items/menu.html"
 
     def __init__(self, name, csrf_token, url='#', sub_level=False, position=LEFT):
         super(Menu, self).__init__(position)
@@ -128,7 +128,7 @@ class Menu(ToolbarAPIMixin, BaseItem):
 
 
 class LinkItem(BaseItem):
-    template = "cms/toolbar/menu/link_item.html"
+    template = "cms/toolbar/items/item_link.html"
 
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, position=LEFT):
         self.position = position
@@ -152,7 +152,7 @@ class LinkItem(BaseItem):
 
 
 class SideframeItem(BaseItem):
-    template = "cms/toolbar/menu/sideframe_item.html"
+    template = "cms/toolbar/items/item_sideframe.html"
 
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False,
                  on_close=REFRESH, position=LEFT):
@@ -181,7 +181,7 @@ class SideframeItem(BaseItem):
 
 
 class AjaxItem(BaseItem):
-    template = "cms/toolbar/menu/ajax_item.html"
+    template = "cms/toolbar/items/item_ajax.html"
 
     def __init__(self, name, action, csrf_token, data=None, active=False, disabled=False, extra_classes=None,
                  question=None, position=LEFT):
@@ -215,7 +215,7 @@ class AjaxItem(BaseItem):
 
 
 class ModalItem(BaseItem):
-    template = "cms/toolbar/menu/modal_item.html"
+    template = "cms/toolbar/items/item_modal.html"
 
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True,
                  on_close=REFRESH, position=LEFT):
@@ -244,7 +244,7 @@ class ModalItem(BaseItem):
 
 
 class Break(BaseItem):
-    template = "cms/toolbar/menu/break.html"
+    template = "cms/toolbar/items/break.html"
 
 
 class Button(object):
@@ -260,7 +260,7 @@ class Button(object):
 
 
 class ButtonList(BaseItem):
-    template = "cms/toolbar/menu/button_list.html"
+    template = "cms/toolbar/items/button_list.html"
 
     def __init__(self, extra_classes=None, position=LEFT):
         self.position = position
