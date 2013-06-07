@@ -57,12 +57,11 @@ CMS.$(document).ready(function () {
 	<!-- start: toolbar -->
 	<div class="cms_toolbar">
 		<div class="cms_toolbar-left">
-			<div class="cms_toolbar-item cms_toolbar-item-logo"><a href="/">{% trans "django CMS" %}</a></div>
+			{% include "cms/toolbar/items/logo.html" %}
 
 			{% if not user.is_authenticated %}
 			{% include "cms/toolbar/items/login.html" %}
 			{% else %}
-
 			<ul class="cms_toolbar-item cms_toolbar-item-navigation">
 				{% for item in request.toolbar.get_items %}
 					{% if not item.right %}{{ item.render }}{% endif %}
