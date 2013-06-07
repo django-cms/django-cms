@@ -85,6 +85,7 @@ class PageAdmin(ModelAdmin):
             )]
         }
         js = ['%sjs/jquery.min.js' % admin_static_url()] + [cms_static_url(path) for path in [
+            'js/plugins/jquery.globaljquery.js',
             'js/plugins/jquery.query.js',
             'js/plugins/jquery.ui.custom.js',
         ]
