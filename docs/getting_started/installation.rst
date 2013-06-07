@@ -47,7 +47,7 @@ File and image handling
 * `Pillow`_ (fork of PIL) for image manipulation
 
 .. _Django Filer: https://github.com/stefanfoulis/django-filer
-.. _django CMS plugins: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django-filer plugins for django-cms: https://github.com/stefanfoulis/cmsplugin-filer
 .. _Pillow: https://github.com/python-imaging/Pillow
 
 Revision management
