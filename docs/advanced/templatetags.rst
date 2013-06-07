@@ -185,7 +185,7 @@ Arguments:
   information)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
-``"page_title"``, ``"slug"``, ``"meta_description"``
+``"page_title"``, ``"slug"``, ``"meta_description"``, ``"changed_date"``, ``"changed_by"``
 (note that you can also supply that argument without quotes, but this is
 deprecated because the argument might also be a template variable).
 
