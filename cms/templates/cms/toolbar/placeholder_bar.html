@@ -5,6 +5,7 @@
 <div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar">
 	{% language request.toolbar.language %}
 	<div class="cms_submenu">
+		<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
 		<ul class="cms_submenu-dropdown">
 			<li><span>{% trans "Settings" %}</span></li>
 			<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
@@ -18,7 +19,6 @@
 			{% endfor %}
 			{% endfor %}
 		</ul>
-		<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
 	</div>
 	{% endlanguage %}
 

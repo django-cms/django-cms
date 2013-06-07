@@ -4,7 +4,9 @@
 <li id="cms_draggable-{{ plugin.pk }}" class="cms_draggable cms_reset{% if not plugin.child_plugin_instances %} cms_draggable-disabled{% endif %}">
 	<div class="cms_dragitem cms_dragitem-handler{% if plugin.child_plugin_instances %} cms_dragitem-collapsable{% endif %}">
 		{% language request.toolbar.language %}
+		<div class="cms_switcher"></div>
 		<div class="cms_submenu">
+			<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
 			<ul class="cms_submenu-dropdown">
 				<li><span>{% trans "Settings" %}</span></li>
 				<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
@@ -13,7 +15,6 @@
 				<li><a data-rel="modal" href="{% url "admin:stacks_stack_create_stack_from_plugin" placeholder_id=plugin.placeholder_id plugin_id=plugin.pk %}">{% trans "Create stack" %}</a></li>
 				{% plugin_child_classes plugin %}
 			</ul>
-			<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
 		</div>
 
 		{% if show_language %}<span class="cms_submenu-lang">{{ plugin.language }}</span>{% endif %}
