@@ -69,9 +69,9 @@ Revision management
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
-************
+************************************
 Installing in a virtualenv using pip
-************
+************************************
 
 Installing inside a `virtualenv`_ is the preferred way to install any Django installation. This should work on
 any platform where python in installed. The first step is to create the virtualenv:
