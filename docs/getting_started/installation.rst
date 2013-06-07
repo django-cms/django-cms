@@ -189,4 +189,3 @@ To use django CMS efficiently, we recommend:
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com
-.. _virtualenv: http://www.virtualenv.org/
