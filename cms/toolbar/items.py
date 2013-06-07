@@ -4,9 +4,17 @@ from cms.constants import RIGHT, LEFT, REFRESH
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import simplejson
+from django.utils.functional import Promise
 
 
 ItemSearchResult = namedtuple('ItemSearchResult', 'item index')
+
+
+def may_be_lazy(thing):
+    if isinstance(thing, Promise):
+        return thing._proxy____args[0]
+    else:
+        return thing
 
 
 class ToolbarAPIMixin(object):
@@ -47,7 +55,7 @@ class ToolbarAPIMixin(object):
         attr_items = attributes.items()
         notfound = object()
         for candidate in self._memo[item_type]:
-            if all(getattr(candidate, key, notfound) == value for key, value in attr_items):
+            if all(may_be_lazy(getattr(candidate, key, notfound)) == value for key, value in attr_items):
                 results.append(ItemSearchResult(candidate, self._item_position(candidate)))
         return results
 

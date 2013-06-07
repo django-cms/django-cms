@@ -9,6 +9,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import AnonymousUser, User, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils.functional import lazy
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
@@ -220,3 +221,10 @@ class ToolbarAPITests(TestCase):
         no_result = api.find_first(LinkItem, name='Third')
         self.assertEqual(no_result, None)
 
+    def test_find_item_lazy(self):
+        lazy_attribute = lazy(lambda x: x, str)('Test')
+        api = ToolbarAPIMixin()
+        api.add_link_item(lazy_attribute, None)
+        result = api.find_first(LinkItem, name='Test')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.index, 0)
