@@ -1,11 +1,13 @@
 from __future__ import with_statement
 from cms.api import create_page, create_title
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 
 from django.contrib.auth.models import AnonymousUser, User, Permission
+from django.test import TestCase
 from django.test.client import RequestFactory
 
 
@@ -198,3 +200,23 @@ class ToolbarTests(ToolbarTestBase):
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
+
+
+class ToolbarAPITests(TestCase):
+    def test_find_item(self):
+        api = ToolbarAPIMixin()
+        first = api.add_link_item('First', 'http://www.example.org')
+        second = api.add_link_item('Second', 'http://www.example.org')
+        all_links = api.find_items(LinkItem)
+        self.assertEqual(len(all_links), 2)
+        result = api.find_first(LinkItem, name='First')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.index, 0)
+        self.assertEqual(result.item, first)
+        result = api.find_first(LinkItem, name='Second')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.index, 1)
+        self.assertEqual(result.item, second)
+        no_result = api.find_first(LinkItem, name='Third')
+        self.assertEqual(no_result, None)
+

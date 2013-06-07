@@ -341,6 +341,19 @@ cms.toolbar.items
 
 .. module:: cms.toolbar.items
 
+
+.. class:: ItemSearchResult
+
+    Used for the find APIs in :class:`ToolbarMixin`.
+
+    .. attribute:: item
+
+        The item found.
+
+    .. attribute:: index
+
+        The index of the item.
+
 .. class:: ToolbarMixin
 
     Provides APIs shared between :class:`cms.toolbar.toolbar.CMSToolbar` and
@@ -355,6 +368,27 @@ cms.toolbar.items
 
     ``extra_classes`` should be either ``None`` or a list of class names as
     strings.
+
+    .. method:: add_item(item)
+
+        Adds the ``item`` to the toolbar or menu. ``item`` must be an instance
+        if :class:`BaseItem`.
+
+    .. method:: remove_item(item)
+
+        Removes ``item`` from the toolbar or menu. If the item can't be found,
+        a :exc:`KeyError` is raised.
+
+    .. method:: find_items(item_type, **attributes)
+
+        Returns a list of :class:`ItemSearchResult` objects matching all items
+        of ``item_type``, which must be a subclass of :class:`BaseItem`, where
+        all attributes in ``attributes`` match.
+
+    .. method:: find_first(item_type, **attributes)
+
+        Returns the first :class:`ItemSearchResult` that matches the search or
+        ``None``. The search strategy is the same as in :meth:`find_items`.
 
     .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=None, position=LEFT)
 
@@ -453,9 +487,10 @@ cms.toolbar.items
     Item that opens ``url`` in the modal.
 
 
-.. class:: Break
+.. class:: Break(identifier=None)
 
-    A visual break for menus.
+    A visual break for menus. ``identifier`` may be provided to make this item
+    searchable.
 
 
 .. class:: ButtonList(extra_classes=None, position=LEFT)

@@ -32,6 +32,7 @@ class CMSToolbar(ToolbarAPIMixin):
     """
 
     def __init__(self, request):
+        super(CMSToolbar, self).__init__()
         self.left_items = None
         self.right_items = None
         self.menus = {}
@@ -65,22 +66,6 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Public API
 
-    def add_item(self, item):
-        if not isinstance(item, BaseItem):
-            raise ValueError("Items must be subclasses of cms.toolbar.items.BaseItem, %r isn't" % item)
-        if item.right:
-            self.right_items.append(item)
-        else:
-            self.left_items.append(item)
-
-    def remove_item(self, item):
-        if item in self.right_items:
-            self.right_items.remove(item)
-        elif item in self.left_items:
-            self.left_items.remove(item)
-        else:
-            raise KeyError("Item %r not found" % item)
-
     def get_menu(self, key, verbose_name, position=LEFT):
         if key in self.menus:
             return self.menus[key]
@@ -101,6 +86,26 @@ class CMSToolbar(ToolbarAPIMixin):
         return item
 
     # Internal API
+
+    def _add_item(self, item):
+        if item.right:
+            self.right_items.append(item)
+        else:
+            self.left_items.append(item)
+
+    def _remove_item(self, item):
+        if item in self.right_items:
+            self.right_items.remove(item)
+        elif item in self.left_items:
+            self.left_items.remove(item)
+        else:
+            raise KeyError("Item %r not found" % item)
+
+    def _item_position(self, item):
+        if item.right:
+            return self.right_items.index(item)
+        else:
+            return self.left_items.index(item)
 
     def get_clipboard_plugins(self):
         if not hasattr(self, "clipboard"):

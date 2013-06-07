@@ -1,42 +1,65 @@
 import abc
+from collections import defaultdict, namedtuple
 from cms.constants import RIGHT, LEFT, REFRESH
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import simplejson
 
 
-class BaseItem(object):
-    __metaclass__ = abc.ABCMeta
-    template = abc.abstractproperty()
-
-    def __init__(self, position=LEFT):
-        self.position = position
-
-    @property
-    def right(self):
-        return self.position is RIGHT
-
-    def render(self):
-        return render_to_string(self.template, self.get_context())
-
-    def get_context(self):
-        return {}
+ItemSearchResult = namedtuple('ItemSearchResult', 'item index')
 
 
 class ToolbarAPIMixin(object):
     __metaclass__ = abc.ABCMeta
+    
+    def __init__(self):
+        self.items = []
+        self.menus = {}
+        self._memo = defaultdict(list)
 
-    def add_item(self, item):
-        if not isinstance(item, BaseItem):
-            raise ValueError("Items must be subclasses of cms.toolbar.items.BaseItem, %r isn't" % item)
+    def _memoize(self, item):
+        self._memo[item.__class__].append(item)
+
+    def _unmemoize(self, item):
+        self._memo[item.__class__].remove(item)
+
+    def _item_position(self, item):
+        return self.items.index(item)
+
+    def _add_item(self, item):
         self.items.append(item)
-        return item
 
-    def remove_item(self, item):
+    def _remove_item(self, item):
         if item in self.items:
             self.items.remove(item)
         else:
             raise KeyError("Item %r not found" % item)
+
+    def add_item(self, item):
+        if not isinstance(item, BaseItem):
+            raise ValueError("Items must be subclasses of cms.toolbar.items.BaseItem, %r isn't" % item)
+        self._add_item(item)
+        self._memoize(item)
+        return item
+
+    def find_items(self, item_type, **attributes):
+        results = []
+        attr_items = attributes.items()
+        notfound = object()
+        for candidate in self._memo[item_type]:
+            if all(getattr(candidate, key, notfound) == value for key, value in attr_items):
+                results.append(ItemSearchResult(candidate, self._item_position(candidate)))
+        return results
+
+    def find_first(self, item_type, **attributes):
+        try:
+            return self.find_items(item_type, **attributes)[0]
+        except IndexError:
+            return None
+
+    def remove_item(self, item):
+        self._remove_item(item)
+        self._unmemoize(item)
 
     def add_sideframe_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False,
                  on_close=None, position=LEFT):
@@ -88,13 +111,30 @@ class ToolbarAPIMixin(object):
         return item
 
 
+class BaseItem(object):
+    __metaclass__ = abc.ABCMeta
+    template = abc.abstractproperty()
+
+    def __init__(self, position=LEFT):
+        self.position = position
+
+    @property
+    def right(self):
+        return self.position is RIGHT
+
+    def render(self):
+        return render_to_string(self.template, self.get_context())
+
+    def get_context(self):
+        return {}
+
+
 class Menu(ToolbarAPIMixin, BaseItem):
     template = "cms/toolbar/items/menu.html"
 
     def __init__(self, name, csrf_token, url='#', sub_level=False, position=LEFT):
-        super(Menu, self).__init__(position)
-        self.items = []
-        self.menus = {}
+        ToolbarAPIMixin.__init__(self)
+        BaseItem.__init__(self, position)
         self.url = url
         self.name = name
         self.sub_level = sub_level
@@ -111,8 +151,8 @@ class Menu(ToolbarAPIMixin, BaseItem):
         self.items.append(menu)
         return menu
 
-    def add_break(self):
-        item = Break()
+    def add_break(self, identifier=None):
+        item = Break(identifier=identifier)
         self.add_item(item)
         return item
 
@@ -245,6 +285,9 @@ class ModalItem(BaseItem):
 
 class Break(BaseItem):
     template = "cms/toolbar/items/break.html"
+
+    def __init__(self, identifier=None):
+        self.identifier = identifier
 
 
 class Button(object):
