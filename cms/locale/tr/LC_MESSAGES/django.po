@@ -5,15 +5,18 @@
 # Translators:
 # bursoftbfc1681230474f25 <bursoft@gmail.com>, 2013
 # wavesofthought <cumhurkorkut@gmail.com>, 2013
+# mozgur <mozgurbayhan@gmail.com>, 2013
+# mozgur <mozgurbayhan@gmail.com>, 2013
 # Mustafa Arıcı <>, 2012
 # mustafaimer <mustafaimer@gmail.com>, 2011
 # suleyman <posta@suleymans.com>, 2011
+# Yasin YILMAZ <yasinyilmaz301@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
+"PO-Revision-Date: 2013-05-24 08:45+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django-cms/language/tr/)\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +38,7 @@ msgstr "Düzenleme modu"
 
 #: cms_toolbar.py:109
 msgid "django CMS"
-msgstr ""
+msgstr "django CMS"
 
 #: cms_toolbar.py:133 templates/admin/cms/page/menu_item.html:58
 #: templates/admin/cms/page/menu_item.html:71
@@ -56,11 +59,11 @@ msgstr "Sayfa Taşı/Ekle"
 
 #: cms_toolbar.py:184
 msgid "Add child page"
-msgstr ""
+msgstr "Torun sayfa ekle"
 
 #: cms_toolbar.py:190
 msgid "Add sibling page"
-msgstr ""
+msgstr "Kardeş sayfa ekle"
 
 #: cms_toolbar.py:196
 msgid "Delete Page"
@@ -84,7 +87,7 @@ msgstr "Geçmişi Gör"
 
 #: cms_toolbar.py:224
 msgid "Admin"
-msgstr ""
+msgstr "Yönetici"
 
 #: plugin_base.py:72
 msgid "Advanced options"
@@ -187,7 +190,7 @@ msgstr "Sayfa ekleme yetkisi aynı zamanda sayfa düzenleme yetkisi de gerektiri
 
 #: admin/forms.py:256
 msgid "can_view"
-msgstr ""
+msgstr "görebilir"
 
 #: admin/forms.py:268
 msgid "Please select user or group first."
@@ -272,7 +275,7 @@ msgstr "Arama Motoru (SEO) Ayarları"
 
 #: admin/pageadmin.py:638
 msgid "You do not have permission to change pages."
-msgstr ""
+msgstr "Sayfaları değiştirme yetkiniz yok"
 
 #: admin/pageadmin.py:650
 msgid "Database error"
@@ -302,7 +305,7 @@ msgstr ""
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "Sayfa taşındı"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -374,12 +377,12 @@ msgstr "Dil, kopyalanan dilden farklı olmalı!"
 
 #: admin/pageadmin.py:1188
 msgid "You do not have permission to add plugins"
-msgstr ""
+msgstr "Eklenti ekleyebilmek için izniniz yok."
 
 #: admin/pageadmin.py:1193
 #, python-format
 msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr ""
+msgstr "%(language)s eklentileri %(placeholder)s 'a kopyalandı"
 
 #: admin/pageadmin.py:1243
 msgid "This plugin is not saved in a revision"
@@ -387,40 +390,40 @@ msgstr ""
 
 #: admin/pageadmin.py:1246 admin/pageadmin.py:1340
 msgid "You do not have permission to edit a plugin"
-msgstr ""
+msgstr "Eklenti düzenleme yetkiniz yok"
 
 #: admin/pageadmin.py:1306
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr " %(placeholder)s 'da  %(position)s pozisyonundaki %(plugin_name)s eklentisi düzenlendi"
 
 #: admin/pageadmin.py:1371
 msgid "You do not have permission to move a plugin"
-msgstr ""
+msgstr "Eklenti taşıma yetkiniz yok."
 
 #: admin/pageadmin.py:1390
 msgid "Plugins were moved"
-msgstr ""
+msgstr "Eklentiler taşındı"
 
 #: admin/pageadmin.py:1403 admin/pageadmin.py:1412
 msgid "You do not have permission to remove a plugin"
-msgstr ""
+msgstr "Eklenti silme yetkiniz yok"
 
 #: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr ""
+msgstr " %(placeholder)s 'da  %(position)s pozisyonundaki %(plugin_name)s eklentisi silindi."
 
 #: admin/permissionadmin.py:75
 msgid "View restriction"
-msgstr ""
+msgstr "Kısıta bak"
 
 #: admin/permissionadmin.py:76
 msgid "View restrictions"
-msgstr ""
+msgstr "Kısıtlara bak"
 
 #: admin/permissionadmin.py:130 models/permissionmodels.py:97
 msgid "Page permissions"
@@ -436,15 +439,15 @@ msgstr "Sayfa yetki yönetimi"
 
 #: admin/placeholderadmin.py:190 admin/placeholderadmin.py:216
 msgid "You don't have permission to add content here."
-msgstr ""
+msgstr "Buraya içerik eklemeye yetkiniz yok."
 
 #: admin/placeholderadmin.py:212
 msgid "You don't have permission to add plugins"
-msgstr ""
+msgstr "Eklenti ekleme yetkiniz yok"
 
 #: admin/placeholderadmin.py:344
 msgid "You don't have permission to delete a plugin"
-msgstr ""
+msgstr "Eklenti silme yetkiniz yok"
 
 #: admin/useradmin.py:26
 msgid "User details"
@@ -464,11 +467,11 @@ msgstr "Kopyalama yetkileri"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
-msgstr ""
+msgstr "Geçerli bir site seç"
 
 #: forms/fields.py:20
 msgid "Select a valid page"
-msgstr ""
+msgstr "Geçerli bir sayfa seç"
 
 #: forms/widgets.py:176
 msgid "Add Another"
@@ -484,19 +487,19 @@ msgstr "değiştirildi"
 
 #: models/moderatormodels.py:37
 msgid "Page moderator state"
-msgstr ""
+msgstr "Sayfa yönetici durumu"
 
 #: models/moderatormodels.py:38
 msgid "Page moderator states"
-msgstr ""
+msgstr "Sayfa yönetici durumları"
 
 #: models/pagemodel.py:34
 msgid "for logged in users only"
-msgstr ""
+msgstr "sadece giriş yapmış kullanıcılar için"
 
 #: models/pagemodel.py:35
 msgid "for anonymous users only"
-msgstr ""
+msgstr "sadece anonim kullanıcılar için"
 
 #: models/pagemodel.py:45
 msgid "created by"
@@ -538,7 +541,7 @@ msgstr ""
 
 #: models/pagemodel.py:59
 msgid "id"
-msgstr ""
+msgstr "id"
 
 #: models/pagemodel.py:60
 msgid ""
@@ -548,7 +551,7 @@ msgstr ""
 
 #: models/pagemodel.py:61
 msgid "attached menu"
-msgstr ""
+msgstr "eklenmiş menü"
 
 #: models/pagemodel.py:62
 msgid "is published"
@@ -576,7 +579,7 @@ msgstr "giriş yapılmış olması gerekiyor"
 
 #: models/pagemodel.py:69
 msgid "menu visibility"
-msgstr ""
+msgstr "menü görünürlüğü"
 
 #: models/pagemodel.py:71
 msgid "limit when this page is visible in the menu"
@@ -659,7 +662,7 @@ msgstr "taşıyabilir"
 
 #: models/permissionmodels.py:50
 msgid "view restricted"
-msgstr ""
+msgstr "kısıtlanmışlara bak"
 
 #: models/permissionmodels.py:50
 msgid "frontend view restriction"
@@ -683,7 +686,7 @@ msgstr "siteler"
 
 #: models/permissionmodels.py:79
 msgid "Page global permission"
-msgstr ""
+msgstr "Evrensel sayfa izinleri"
 
 #: models/permissionmodels.py:80
 msgid "Pages global permissions"
@@ -715,7 +718,7 @@ msgstr "Kullanıcı grupları (sayfa)"
 
 #: models/placeholdermodel.py:12
 msgid "slot"
-msgstr ""
+msgstr "yuva"
 
 #: models/placeholdermodel.py:13 plugins/flash/models.py:9
 #: plugins/googlemap/models.py:36 plugins/video/models.py:13
@@ -741,7 +744,7 @@ msgstr "yaratma tarihi"
 
 #: models/pluginmodel.py:145
 msgid "<Empty>"
-msgstr ""
+msgstr "<Boş>"
 
 #: models/titlemodels.py:12 models/titlemodels.py:13 models/titlemodels.py:21
 #: plugins/file/models.py:25 plugins/teaser/models.py:9
@@ -756,7 +759,7 @@ msgstr "menüdeki başlığın üzerine yaz"
 
 #: models/titlemodels.py:14
 msgid "slug"
-msgstr ""
+msgstr "rumuz "
 
 #: models/titlemodels.py:15
 msgid "Path"
@@ -808,7 +811,7 @@ msgstr "dosya"
 
 #: plugins/file/templates/cms/plugins/file.html:6
 msgid "file missing!"
-msgstr ""
+msgstr "Dosya kayıp!"
 
 #: plugins/flash/cms_plugins.py:9
 msgid "Flash"
@@ -826,12 +829,12 @@ msgstr "yükseklik"
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
 msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
+msgstr "Flash eklentisi kayıp. Lütfen Adobe Flash Player'ın en son sürümünü indirin:"
 
 #: plugins/flash/templates/cms/plugins/flash.html:42
 #: plugins/video/templates/cms/plugins/video.html:62
 msgid "Get Adobe Flash Player"
-msgstr ""
+msgstr "Adobe Flash Player'ı indirin"
 
 #: plugins/googlemap/cms_plugins.py:10
 msgid "Google Map"
@@ -839,7 +842,7 @@ msgstr "Google Haritalar"
 
 #: plugins/googlemap/cms_plugins.py:19
 msgid "Advanced"
-msgstr ""
+msgstr "Gelişmiş"
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
@@ -903,11 +906,11 @@ msgstr "rota planlayıcı"
 
 #: plugins/googlemap/models.py:37
 msgid "Plugin width (in pixels or percent)."
-msgstr ""
+msgstr "Eklenti genişliği (piksel ya da yüzde)"
 
 #: plugins/googlemap/models.py:39
 msgid "Plugin height (in pixels)."
-msgstr ""
+msgstr "Eklenti yüksekliği (piksel)"
 
 #: plugins/googlemap/models.py:47
 msgid "Map"
@@ -915,7 +918,7 @@ msgstr "Harita"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:72
 msgid "Your address: "
-msgstr ""
+msgstr "Adresiniz:"
 
 #: plugins/googlemap/templates/cms/plugins/googlemap.html:74
 msgid "Calculate route"
@@ -970,7 +973,7 @@ msgstr "hedef"
 
 #: plugins/link/models.py:15
 msgid "same window"
-msgstr ""
+msgstr "aynı pencere"
 
 #: plugins/link/models.py:16
 msgid "new window"
@@ -982,7 +985,7 @@ msgstr "kapsayan"
 
 #: plugins/link/models.py:18
 msgid "topmost frame"
-msgstr ""
+msgstr "en üst kare"
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
@@ -998,7 +1001,7 @@ msgstr "sağ"
 
 #: plugins/picture/models.py:17
 msgid "center"
-msgstr ""
+msgstr "merkez"
 
 #: plugins/picture/models.py:20 plugins/teaser/models.py:10
 #: plugins/video/models.py:11
@@ -1040,7 +1043,7 @@ msgstr "yan"
 
 #: plugins/picture/models.py:34
 msgid "Move image left, right or center."
-msgstr ""
+msgstr "Resmi sola, sağa ya da merkeze taşı."
 
 #: plugins/picture/models.py:51
 msgid "You can enter a Link or a Page, but not both."
@@ -1049,7 +1052,7 @@ msgstr ""
 #: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
 #: plugins/snippet/models.py:32
 msgid "Snippet"
-msgstr ""
+msgstr "Kod parçacığı"
 
 #: plugins/snippet/cms_plugins.py:30
 #, python-format
@@ -1067,7 +1070,7 @@ msgstr "Kullanılacak şablonu (ör. \"snippets/plugin_xy.html\") girin."
 
 #: plugins/snippet/models.py:25
 msgid "Snippets"
-msgstr ""
+msgstr "Kod parçacıkları"
 
 #: plugins/teaser/cms_plugins.py:8
 msgid "Teaser"
@@ -1147,7 +1150,7 @@ msgstr "Twitter"
 
 #: plugins/twitter/cms_plugins.py:23
 msgid "Twitter Search"
-msgstr ""
+msgstr "Twitter araması"
 
 #: plugins/twitter/models.py:7
 msgid "twitter user"
@@ -1155,7 +1158,7 @@ msgstr "twitter kullanıcısı"
 
 #: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "count"
-msgstr ""
+msgstr "adet"
 
 #: plugins/twitter/models.py:8 plugins/twitter/models.py:17
 msgid "Number of entries to display"
@@ -1171,7 +1174,7 @@ msgstr "Eğer verilirse ipucu, Twitter hesabınıza bir bağlantı şeklinde gö
 
 #: plugins/twitter/models.py:16
 msgid "query"
-msgstr ""
+msgstr "sorgu"
 
 #: plugins/twitter/models.py:16
 msgid ""
@@ -1182,11 +1185,11 @@ msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
 msgid "we said,"
-msgstr ""
+msgstr "söylemiştik,"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:15
 msgid "we"
-msgstr ""
+msgstr "biz"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
 msgid "we were"
@@ -1194,15 +1197,15 @@ msgstr ""
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
 msgid "we replied to"
-msgstr ""
+msgstr "biz yanıtladık"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:18
 msgid "we were checking out"
-msgstr ""
+msgstr "kontrol ediyoruz"
 
 #: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
 msgid "loading tweets..."
-msgstr ""
+msgstr "tweetler yükleniyor..."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1228,11 +1231,11 @@ msgstr "görüntü"
 msgid ""
 "vimeo or youtube video url. Example: "
 "http://www.youtube.com/watch?v=-iJ7bs4mTUY"
-msgstr ""
+msgstr "vimeo veya youtube video url'si. Örneğin: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
 #: plugins/video/models.py:11
 msgid "preview image file"
-msgstr ""
+msgstr "Resim dosyasını önizle"
 
 #: plugins/video/models.py:16
 msgid "auto play"
@@ -1259,7 +1262,7 @@ msgstr "arkaplan rengi"
 #: plugins/video/models.py:26 plugins/video/models.py:27
 #: plugins/video/models.py:28 plugins/video/models.py:29
 msgid "Hexadecimal, eg ff00cc"
-msgstr ""
+msgstr "Onaltılık taban, örn ff00cc"
 
 #: plugins/video/models.py:23
 msgid "text color"
@@ -1328,12 +1331,12 @@ msgstr "Son değişiklikler"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Yönetim için <a href=\"%(login_url)s\">buraya</a> giriş yapınız."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "Giriş bağlantısı: %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1365,7 +1368,7 @@ msgstr ""
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Preview draft"
-msgstr ""
+msgstr "Taslağı önizle"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
@@ -1416,7 +1419,7 @@ msgstr "Bir hata oluştu. Lütfen sayfayı tekrar yükleyin."
 #: templates/admin/cms/page/change_list.html:89
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "Silinmiş %(name)s leri geri getir"
 
 #: templates/admin/cms/page/change_list.html:92
 #, python-format
@@ -1461,7 +1464,7 @@ msgstr "son"
 
 #: templates/admin/cms/page/change_list_tree.html:13
 msgid "restricted"
-msgstr ""
+msgstr "kısıtlı"
 
 #: templates/admin/cms/page/change_list_tree.html:14
 msgid "last changes"
@@ -1551,11 +1554,11 @@ msgstr "göster"
 
 #: templates/admin/cms/page/moderation_messages.html:4
 msgid "Action"
-msgstr ""
+msgstr "Eylem"
 
 #: templates/admin/cms/page/moderation_messages.html:5
 msgid "Created"
-msgstr ""
+msgstr "Oluşturuldu"
 
 #: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
@@ -1596,12 +1599,12 @@ msgstr "Taşıyabilir"
 
 #: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
-msgstr ""
+msgstr "Görebilir"
 
 #: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
 msgid "(global)"
-msgstr ""
+msgstr "(evrensel)"
 
 #: templates/admin/cms/page/permissions.html:26
 msgid "(current)"
@@ -1618,7 +1621,7 @@ msgstr ""
 #: templates/admin/cms/page/plugin_change_form.html:120
 #: templates/cms/toolbar/toolbar.html:29
 msgid "Cancel"
-msgstr ""
+msgstr "İptal"
 
 #: templates/admin/cms/page/plugin_forms_history.html:9
 msgid "An old revision of a plugin can not be saved!"
@@ -1626,7 +1629,7 @@ msgstr ""
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Your changes to this plugin have not been saved."
-msgstr ""
+msgstr "Bu eklenti üzerindeki değişiklikleriniz kaydedilmedi."
 
 #: templates/admin/cms/page/plugin_forms_ok.html:26
 msgid "Plugin saved successfully."
@@ -1660,7 +1663,7 @@ msgstr "Kopyalama seçeneklerin seç"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
 msgid "Generic"
-msgstr ""
+msgstr "Jenerik"
 
 #: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
 msgid "Add Plugin"
@@ -1688,7 +1691,7 @@ msgstr "Hiç eklenti yok. Yer tutucuya bir eklenti ekle."
 
 #: templates/cms/toolbar/placeholder.html:33
 msgid "Available plugins"
-msgstr ""
+msgstr "Uygun eklentiler"
 
 #: templates/cms/toolbar/toolbar.html:27
 msgid "The selected element can not be moved to the desired location."
@@ -1721,7 +1724,7 @@ msgstr "Kullanıcı adı"
 #: templates/cms/toolbar/items/login.html:10
 #: templates/cms/toolbar/items/login.html:12
 msgid "Login"
-msgstr ""
+msgstr "Giriş"
 
 #: templates/cms/toolbar/items/switcher.html:4
 msgid "Switch on/off"
@@ -1735,7 +1738,7 @@ msgstr ""
 #: templatetags/cms_tags.py:85
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "%(domain)s 'da sayfa bulunamadı"
 
 #: templatetags/cms_tags.py:86
 #, python-format
@@ -1799,7 +1802,7 @@ msgstr ""
 
 #: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "Makaleler"
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
@@ -1823,7 +1826,7 @@ msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
-msgstr ""
+msgstr "örnek hesap sayfası"
 
 #: test_utils/project/sampleapp/menu.py:19
 msgid "sample my profile page"

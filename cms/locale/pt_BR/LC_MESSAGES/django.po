@@ -7,12 +7,13 @@
 # felipemocruha <felipemocruha@gmail.com>, 2013
 # Juliano Fischer Naves <>, 2012
 # marcelo.both <marcelo.both@gmail.com>, 2012
+# rafa.trevisan <rafa.trevisan@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
 "POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-06 11:16+0000\n"
+"PO-Revision-Date: 2013-05-24 08:45+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -107,11 +108,11 @@ msgstr "A parte do título que é usada na URL"
 
 #: admin/forms.py:65
 msgid "Language"
-msgstr "Língua"
+msgstr "Idioma"
 
 #: admin/forms.py:66
 msgid "The current language of the content fields."
-msgstr "A língua atual para os campos de conteúdo."
+msgstr "O idioma atual dos campos de conteúdo."
 
 #: admin/forms.py:113
 msgid "Another page with this slug already exists"
@@ -140,7 +141,7 @@ msgstr "Aplicação"
 
 #: admin/forms.py:157
 msgid "Hook application to this page."
-msgstr "Associe aplicação para esta página."
+msgstr "Associe uma aplicação para esta página."
 
 #: admin/forms.py:158
 msgid "Overwrite URL"
@@ -160,7 +161,7 @@ msgstr "Redireciona para esta URL"
 
 #: admin/forms.py:164
 msgid "A description of the page sometimes used by search engines."
-msgstr "A descrição de uma página, as vezes utilizada por Sites de busca."
+msgstr "A descrição da página é às vezes utilizada por sites de busca."
 
 #: admin/forms.py:166
 msgid "A list of comma seperated keywords sometimes used by search engines."
@@ -178,7 +179,7 @@ msgstr "usuário"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr "A permissão para adicionar páginas requer também acesso aos filhos, ou descendentes, caso contrário a página adicionada não poderá ser modificada pelo seu criador."
+msgstr "A permissão para adicionar páginas requer também acesso aos filhos, ou descendentes, caso contrário, a página adicionada não poderá ser modificada pelo seu criador."
 
 #: admin/forms.py:229
 msgid "Add page permission also requires edit page permission."
@@ -211,7 +212,7 @@ msgstr "Excluir"
 
 #: admin/forms.py:278
 msgid "Recover (any) pages"
-msgstr "Recuperar (qualquer) página"
+msgstr "Recuperar (quaisquer) páginas"
 
 #: admin/forms.py:305
 msgid "Notify user"
@@ -221,7 +222,7 @@ msgstr "Notificar usuário"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "Enviar notificação por e-mail ao usuário sobre modificação no nome de usuário ou senha. Requere o e-mail do usuário"
+msgstr "Enviar notificação por e-mail ao usuário sobre modificação no seu nome de usuário ou senha. Requer o e-mail do usuário."
 
 #: admin/forms.py:326
 msgid "New password"
@@ -229,11 +230,11 @@ msgstr "Nova senha"
 
 #: admin/forms.py:328
 msgid "New password confirmation"
-msgstr "Nova confirmação da senha"
+msgstr "Confirmação de nova senha"
 
 #: admin/forms.py:347
 msgid "Email notification requires valid email address."
-msgstr "Notificações de e-mail requerem um endereço de e-mail válido."
+msgstr "Notificações por e-mail requerem um endereço de e-mail válido."
 
 #: admin/forms.py:349
 msgid ""
@@ -255,7 +256,7 @@ msgstr "Configurações Básicas"
 
 #: admin/pageadmin.py:106
 msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Atenção: Esta página é recarregada se você salvar a seleção. Salve-a primeiro."
+msgstr "Nota: Esta página é recarregada se você modificar a seleção. Salve-a primeiro."
 
 #: admin/pageadmin.py:108 admin/pageadmin.py:159
 msgid "Hidden"
@@ -288,7 +289,7 @@ msgstr "Template inválido."
 #: admin/pageadmin.py:752
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "Modificado template do %s"
 
 #: admin/pageadmin.py:754
 msgid "The template was successfully changed"
@@ -301,7 +302,7 @@ msgstr "Erro! Você não tem permissão para mover esta página. Por favor, reca
 
 #: admin/pageadmin.py:780
 msgid "Page moved"
-msgstr ""
+msgstr "Página movida"
 
 #: admin/pageadmin.py:866 admin/pageadmin.py:1054
 msgid "You do not have permission to publish this page"
@@ -325,7 +326,7 @@ msgstr "A página \"%s\" foi revertida com sucesso."
 #: admin/pageadmin.py:950
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Não existe nenhum objeto de '%(name)s' com chave primária %(key)s"
+msgstr "Não existe nenhum objeto de '%(name)s' com chave primária '%(key)r'"
 
 #: admin/pageadmin.py:956
 msgid "There only exists one translation for this page"
@@ -360,12 +361,12 @@ msgstr "Você não tem permissão para adicionar um plugin."
 
 #: admin/pageadmin.py:1149 admin/pageadmin.py:1180
 msgid "Language must be set to a supported language!"
-msgstr "a Língua deve ser definida para uma língua suportada pelo sistema!"
+msgstr "O idioma deve ser definido para um idioma suportado pelo sistema!"
 
 #: admin/pageadmin.py:1160
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr "Plugin %(plugin_name)s foi adicionado a %(placeholder)s"
+msgstr "Plugin '%(plugin_name)s' foi adicionado a '%(placeholder)s'"
 
 #: admin/pageadmin.py:1182
 msgid "Language must be different than the copied language!"
@@ -788,14 +789,14 @@ msgstr "sobrescrever o título (tag html 'title')"
 #: plugins/utils.py:124
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Este espaço reservado já tem o número máximo de plugins (%s)"
 
 #: plugins/utils.py:134
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "Este espaço reservado já tem o número máximo (%(limit)s) de plugins permitidos %(plugin_name)s."
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -1360,11 +1361,11 @@ msgstr "Início"
 
 #: templates/admin/cms/page/change_form.html:83
 msgid "Publish draft"
-msgstr ""
+msgstr "publicar solicitação"
 
 #: templates/admin/cms/page/change_form.html:84
 msgid "Preview draft"
-msgstr ""
+msgstr "Visualizar rascunho"
 
 #: templates/admin/cms/page/change_form.html:86
 msgid "Revert to public"
