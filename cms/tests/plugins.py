@@ -9,6 +9,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.plugins.inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.plugins.utils import get_plugins_for_page
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
@@ -546,7 +547,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.client.logout()
         response = self.client.get(page.get_absolute_url())
-        self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
+        self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content.decode('utf8'), response.content)
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = create_page('page to inherit from',
@@ -563,15 +564,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         empty_plugin.insert_at(None, position='last-child', save=True)
         other_page = create_page('other page', 'nav_playground.html', 'en', published=True)
         inherited_body = other_page.placeholders.get(slot="body")
-        inherit_plugin = InheritPagePlaceholder(
-            plugin_type='InheritPagePlaceholderPlugin',
-            placeholder=inherited_body,
-            position=1,
-            language='en',
-            from_page=inheritfrompage,
-            from_language='en'
-        )
-        inherit_plugin.insert_at(None, position='last-child', save=True)
+
+        add_plugin(inherited_body, InheritPagePlaceholderPlugin, 'en', position='last-child',
+                   from_page=inheritfrompage, from_language='en')
+
         add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
         # this should not fail, even if there in an empty plugin
         rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url()), width=200)
