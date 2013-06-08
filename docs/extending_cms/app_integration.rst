@@ -494,5 +494,5 @@ the :doc:`custom_plugins` section.
 Further reading
 ***************
 
-Your app might also want to integrate in the :doc:`extending_cms/toolbar` to
+Your app might also want to integrate in the :doc:`toolbar` to
 provide a more streamlined user experience for your admins.

@@ -53,7 +53,7 @@ object returned.
 When adding items, all arguments besides the name or identifier should be
 given as **keyword arguments** to ensure smoother upgrades.
 
-Following our :doc:`extending_cms/extending_examples`, let's add the poll app
+Following our :doc:`extending_examples`, let's add the poll app
 to the toolbar::
 
     from django.core.urlresolvers import reverse
