@@ -133,11 +133,12 @@ class CMSToolbar(ToolbarAPIMixin):
             return
         self.right_items = []
         self.left_items = []
-        with force_language(self.toolbar_language):
+        with force_language(self.language):
             try:
                 self.view_name = resolve(self.request.path).func.__module__
             except Resolver404:
                 self.view_name = ""
+        with force_language(self.toolbar_language):
             toolbars = toolbar_pool.get_toolbars()
             callbacks = []
             app_key = ""
