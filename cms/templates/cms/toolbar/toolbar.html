@@ -38,16 +38,12 @@ CMS.$(document).ready(function () {
 	// initialize placeholder helpers
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
 
-	// initialize required API calls
-	{% if request.toolbar.login_form.errors %}
-	CMS.API.Toolbar.showError('{{ request.toolbar.login_form.non_field_errors }}{% if request.toolbar.login_form.username.errors %}<div><strong>{% trans "Username" %}</strong> - {{ request.toolbar.login_form.username.errors }}</div>{% endif %}{% if request.toolbar.login_form.password.errors %}<div><strong>{% trans "Password" %}</strong> - {{ request.toolbar.login_form.password.errors }}</div>{% endif %}');
-	{% endif %}
 	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
-	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty %}
-	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'right');
+
+	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated  %}
+	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'center');
 	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
 	{% endif %}
-
 });
 </script>
 {% endaddtoblock %}
@@ -61,17 +57,11 @@ CMS.$(document).ready(function () {
 	<!-- start: toolbar -->
 	<div class="cms_toolbar">
 		<div class="cms_toolbar-left">
-			<div class="cms_toolbar-item cms_toolbar-item-logo"><a href="/">{% trans "django CMS" %}</a></div>
+			{% include "cms/toolbar/items/logo.html" %}
 
 			{% if not user.is_authenticated %}
-			<form class="cms_toolbar-item cms_form-login" method="post" action="?edit&amp;cms-toolbar-login=1">
-				{% csrf_token %}
-				<label{% if request.toolbar.login_form.username.errors %} class="cms_error"{% endif %}>{% trans "Username" %} {{ request.toolbar.login_form.username }}</label>
-				<label{% if request.toolbar.login_form.password.errors or request.toolbar.login_form.non_field_errors %} class="cms_error"{% endif %}>{% trans "Password" %} {{ request.toolbar.login_form.password }}</label>
-				<label><input type="submit" value="Login" /></label>
-			</form>
+			{% include "cms/toolbar/items/login.html" %}
 			{% else %}
-
 			<ul class="cms_toolbar-item cms_toolbar-item-navigation">
 				{% for item in request.toolbar.get_left_items %}
 					{{ item.render }}
