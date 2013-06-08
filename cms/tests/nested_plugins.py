@@ -176,8 +176,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_2.save()
 
         # plugin_2 should be plugin_1's only child 
-        # for a single item we use assertListEqual
-        self.assertListEqual(
+        # for a single item we use assertSequenceEqual
+        self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_1.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_2.pk)])
 
@@ -191,7 +191,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
         # plugin_2 & plugin_3 should be plugin_1's children
         # for multiple items we use assertSequenceEqual, because
-        # assertListEqual may re-order the list without warning
+        # assertSequenceEqual may re-order the list without warning
         self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_1.pk).get_children(),
             [
@@ -208,7 +208,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_4.save()
 
         # plugin_4 should be plugin_2's child
-        self.assertListEqual(
+        self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_2.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_4.pk)])
 
@@ -240,7 +240,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_6.save()
 
         # plugin_6 should be plugin_5's child
-        self.assertListEqual(
+        self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_5.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_6.pk)])
 
@@ -293,7 +293,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_9.save()
 
         # plugin_9 should be plugin_3's child
-        self.assertListEqual(
+        self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_3.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_9.pk)])
 
@@ -306,7 +306,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_10.save()
 
         # plugin_10 should be plugin_4's child
-        self.assertListEqual(
+        self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_4.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_10.pk)])
 
