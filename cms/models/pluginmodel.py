@@ -16,7 +16,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils import get_cms_setting
 from mptt.models import MPTTModel, MPTTModelBase
 
@@ -66,6 +66,7 @@ class PluginModelBase(MPTTModelBase):
         return new_class
 
 
+@python_2_unicode_compatible
 class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
@@ -131,7 +132,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             factory = lambda x, y: x
         return (model_unpickle, (model, defers, factory), data)
 
-    def __unicode__(self):
+    def __str__(self):
         return force_unicode(self.id)
 
     def get_plugin_name(self):

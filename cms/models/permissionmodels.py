@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site
 from cms.models import Page
 from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
 from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
@@ -68,6 +68,7 @@ class AbstractPagePermission(models.Model):
         return super(AbstractPagePermission, self).save(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
@@ -81,10 +82,11 @@ class GlobalPagePermission(AbstractPagePermission):
         verbose_name_plural = _('Pages global permissions')
         app_label = 'cms'
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s :: GLOBAL" % self.audience
 
 
+@python_2_unicode_compatible
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """
@@ -98,7 +100,7 @@ class PagePermission(AbstractPagePermission):
         verbose_name_plural = _('Page permissions')
         app_label = 'cms'
 
-    def __unicode__(self):
+    def __str__(self):
         page = self.page_id and force_unicode(self.page) or "None"
         return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
 

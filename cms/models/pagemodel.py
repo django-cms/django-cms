@@ -15,7 +15,7 @@ from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -28,6 +28,7 @@ from mptt.models import MPTTModel
 from os.path import join
 
 
+@python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
     A simple hierarchical page model
@@ -108,7 +109,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             'placeholders', 'lft', 'rght', 'tree_id',
             'parent']
 
-    def __unicode__(self):
+    def __str__(self):
         title = self.get_menu_title(fallback=True)
         if title is None:
             title = u""

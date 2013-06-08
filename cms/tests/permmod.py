@@ -138,7 +138,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             url = URL_CMS_PLUGIN_ADD
             response = self.client.post(url, post_data)
             self.assertEqual(response.status_code, 200)
-            return response.content
+            return response.content.decode('utf8')
 
     def test_super_can_add_page_to_root(self):
         with self.login_user_context(self.user_super):
@@ -199,7 +199,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # should be True user_master should have publish permissions for children as well
         publish_page(page, self.user_master)
         self.assertTrue(page.reload().published)
-        # user_master is moderator for top level page / but can't approve descendants?
+        # user_master is moderatocor for top level page / but can't approve descendants?
         # approve / publish as user_master
         # user master should be able to approve descendants
 

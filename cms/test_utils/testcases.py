@@ -15,6 +15,7 @@ from menus.menu_pool import menu_pool
 from cms.utils.compat.urls import urljoin, unquote
 import sys
 import warnings
+import json
 from cms.utils.permissions import set_current_user
 
 
@@ -54,7 +55,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     # Disable the per-module cache for every module otherwise if the warning
     # which the caller is expecting us to collect was already emitted it won't
     # be re-emitted by the call to f which happens below.
-    for v in sys.modules.itervalues():
+    for v in sys.modules.values():
         if v is not None:
             try:
                 v.__warningregistry__ = None
@@ -245,7 +246,8 @@ class CMSTestCase(testcases.TestCase):
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEquals(response.status_code, 200)
         # Altered to reflect the new django-js jsonified response messages
-        self.assertEquals(response.content, '{"status": 200, "content": "ok"}')
+        expected = {"status": 200, "content": "ok"}
+        self.assertEquals(json.loads(response.content.decode('utf8')), expected)
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)

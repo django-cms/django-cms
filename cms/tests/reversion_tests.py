@@ -63,7 +63,7 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEquals(response.status_code, 200)
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.split("edit-plugin/")[1].split("/")[0] + "/"
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0] + "/"
             response = self.client.get(edit_url)
             self.assertEquals(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
@@ -159,7 +159,7 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEquals(response.status_code, 200)
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.split("edit-plugin/")[1].split("/")[0] + "/"
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0] + "/"
             response = self.client.get(edit_url)
             self.assertEquals(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})

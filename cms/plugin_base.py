@@ -4,7 +4,7 @@ from cms.utils.compat.metaclasses import with_metaclass
 import re
 
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
 import django
@@ -83,6 +83,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
+@python_2_unicode_compatible
 class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
@@ -235,7 +236,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     def __repr__(self):
         return smart_str(self.name)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     #===========================================================================

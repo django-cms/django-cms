@@ -149,7 +149,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
 
             response = details(self.get_request(self.test_page), '')
             response.render()
-            r = self.strip_rendered(response.content)
+            r = self.strip_rendered(response.content.decode('utf8'))
             self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
 
     def test_processors(self):
