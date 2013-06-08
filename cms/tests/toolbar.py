@@ -1,5 +1,6 @@
 from __future__ import with_statement
 from cms.api import create_page, create_title
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
@@ -73,33 +74,34 @@ class ToolbarTestBase(SettingsOverrideTestCase):
 class ToolbarTests(ToolbarTestBase):
     settings_overrides = {'CMS_PERMISSION': False}
 
-    def test_toolbar_no_page_anon(self):
+    def test_no_page_anon(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         toolbar = CMSToolbar(request)
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 0)
 
-    def test_toolbar_no_page_staff(self):
+    def test_no_page_staff(self):
         request = self.get_page_request(None, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2, items)
-        admin_items = toolbar.get_menu('admin', 'Test').get_items()
+        admin_items = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 6, admin_items)
 
-    def test_toolbar_no_page_superuser(self):
+    def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
         toolbar = CMSToolbar(request)
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
-        self.assertEqual(len(items[0].get_context()['items']), 7)
+        admin_items = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        self.assertEqual(len(admin_items), 7, admin_items)
 
-    def test_toolbar_anon(self):
+    def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
         request = self.get_page_request(page, self.get_anon())
         toolbar = CMSToolbar(request)
@@ -107,7 +109,7 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 0)
 
-    def test_toolbar_nonstaff(self):
+    def test_nonstaff(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_nonstaff())
         toolbar = CMSToolbar(request)
@@ -115,7 +117,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + logout
         self.assertEqual(len(items), 0)
 
-    def test_toolbar_template_change_permission(self):
+    def test_template_change_permission(self):
         with SettingsOverride(CMS_PERMISSIONS=True):
             page = create_page('test', 'nav_playground.html', 'en', published=True)
             request = self.get_page_request(page, self.get_nonstaff())
@@ -123,7 +125,7 @@ class ToolbarTests(ToolbarTestBase):
             items = toolbar.get_left_items() + toolbar.get_right_items()
             self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
 
-    def test_toolbar_markup(self):
+    def test_markup(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -155,7 +157,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.show_toolbar)
 
-    def test_toolbar_publish_button(self):
+    def test_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_superuser(), edit=True)
         toolbar = CMSToolbar(request)
@@ -163,7 +165,7 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 6)
 
-    def test_toolbar_no_publish_button(self):
+    def test_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_staff(), edit=True)
         toolbar = CMSToolbar(request)
@@ -174,7 +176,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 5)
 
-    def test_toolbar_no_change_button(self):
+    def test_no_change_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         user = self.get_staff()
         user.user_permissions.all().delete()
@@ -185,10 +187,11 @@ class ToolbarTests(ToolbarTestBase):
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 2)
-        self.assertEqual(len(items[0].get_context()['items']), 6)
+        self.assertEqual(len(items), 2, items)
+        admin_items = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        self.assertEqual(len(admin_items), 6, admin_items)
 
-    def test_toolbar_button_consistency_staff(self):
+    def test_button_consistency_staff(self):
         """
         Tests that the buttons remain even when the language changes.
         """
