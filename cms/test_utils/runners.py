@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.test.simple import DjangoTestSuiteRunner
-from django.utils.unittest.suite import TestSuite
+from cms.utils.compat.dj import force_unicode
 import operator
 import time
+from django.utils.unittest import TestSuite
 
 
 TIMINGS = {}
@@ -13,7 +14,7 @@ def time_it(func):
         func(*args, **kwargs)
         end = time.time()
 
-        TIMINGS[unicode(func)] = end - start
+        TIMINGS[force_unicode(func)] = end - start
     return _inner
 
 
@@ -42,7 +43,7 @@ class NormalTestRunner(DjangoTestSuiteRunner):
         super(NormalTestRunner, self).teardown_test_environment(**kwargs)
         if settings.TIME_TESTS:
             by_time = sorted(
-                    TIMINGS.iteritems(),
+                    TIMINGS.items(),
                     key=operator.itemgetter(1),
                     reverse=True)[:10]
             print("Ten slowest tests:")

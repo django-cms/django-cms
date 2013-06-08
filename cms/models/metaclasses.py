@@ -12,9 +12,9 @@ class PageMetaClass(MPTTModelBase):
 
         if 'objects' in attrs:
             if not isinstance(attrs['objects'], PublisherManager):
-                raise ValueError, ("Model %s extends Publisher, " +
-                                   "so its 'objects' manager must be " +
-                                   "a subclass of publisher.PublisherManager") % (name,)
+                raise ValueError("Model %s extends Publisher, "
+                                 "so its 'objects' manager must be "
+                                 "a subclass of publisher.PublisherManager") % (name,)
         else:
             attrs['objects'] = PublisherManager()
 

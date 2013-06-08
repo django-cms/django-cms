@@ -866,7 +866,7 @@ class PageAdminTest(PageAdminTestBase):
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk, 'plugin_parent': ''})
                 response = admin.move_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit_on_plugin_move(self):
         admin = self.get_admin()
@@ -892,7 +892,7 @@ class PageAdminTest(PageAdminTestBase):
                 response = admin.move_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
-                                 "This placeholder already has the maximum number (1) of allowed Text plugins.")
+                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
 
 class NoAdminPageTests(CMSTestCase):

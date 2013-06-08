@@ -1,5 +1,6 @@
 from django.template.loader import render_to_string
 from django.utils import simplejson
+from cms.utils.compat.dj import force_unicode
 
 
 class BaseItem(object):
@@ -28,7 +29,7 @@ class List(BaseItem):
         return {'items': self.items, 'url': self.url, 'title': self.name, 'sub_level': self.sub_level}
 
     def __repr__(self):
-        return unicode(self.name)
+        return force_unicode(self.name)
 
 
 class Item(BaseItem):
@@ -82,7 +83,7 @@ class Item(BaseItem):
         }
 
     def __repr__(self):
-        return unicode(self.title)
+        return force_unicode(self.title)
 
 
 class Break(BaseItem):

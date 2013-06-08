@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
 import pprint
-import urlparse
+from cms.utils.compat.urls import urljoin
 from cms import constants
 from cms.exceptions import CMSDeprecationWarning
 from django.conf import settings
@@ -70,7 +70,7 @@ def get_media_root():
 
 @default('CMS_MEDIA_URL')
 def get_media_url():
-    return urlparse.urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
+    return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
 
 
 def get_templates():

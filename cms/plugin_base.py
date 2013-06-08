@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
+from cms.utils.compat.metaclasses import with_metaclass
 import re
 
 from cms.utils import get_cms_setting
+from cms.utils.compat.dj import force_unicode
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
 import django
 from django import forms
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
@@ -82,8 +83,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-class CMSPluginBase(admin.ModelAdmin):
-    __metaclass__ = CMSPluginBaseMetaclass
+class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
 
@@ -222,7 +222,7 @@ class CMSPluginBase(admin.ModelAdmin):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (unicode(self.name), unicode(instance))
+        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
 
     def get_child_classes(self, slot, page):
         from cms.plugin_pool import plugin_pool

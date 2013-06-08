@@ -2,7 +2,7 @@
 from cms.api import create_page
 from cms.models import Page
 from django.contrib.auth.models import User
-from django.utils.unittest.case import SkipTest, skipIf
+from django.utils.unittest import skipIf
 
 try:
     from selenium.webdriver.firefox.webdriver import WebDriver

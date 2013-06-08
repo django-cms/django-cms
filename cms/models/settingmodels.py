@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from cms.utils.compat.dj import force_unicode
 
 
 class UserSettings(models.Model):
@@ -17,6 +18,6 @@ class UserSettings(models.Model):
         app_label = 'cms'
 
     def __unicode__(self):
-        return unicode(self.user)
+        return force_unicode(self.user)
 
 

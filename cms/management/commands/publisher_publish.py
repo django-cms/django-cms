@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from django.core.management.base import NoArgsCommand, CommandError
+from cms.utils.compat.dj import force_unicode
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
@@ -26,17 +27,17 @@ class Command(NoArgsCommand):
         qs = Page.objects.drafts().filter(published=True)
         pages_total, pages_published = qs.count(), 0
         
-        print "\nPublishing public drafts....\n"
+        print("\nPublishing public drafts....\n")
         
         for i, page in enumerate(qs):
             m = " "
             if page.publish():
                 pages_published += 1
                 m = "*"
-            print "%d.\t%s  %s [%d]" % (i + 1, m, unicode(page), page.id) 
+            print("%d.\t%s  %s [%d]" % (i + 1, m, force_unicode(page), page.id))
         
-        print "\n"
-        print "=" * 40
-        print "Total:    ", pages_total
-        print "Published:", pages_published
+        print("\n")
+        print("=" * 40)
+        print("Total:    ", pages_total)
+        print("Published:", pages_published)
         

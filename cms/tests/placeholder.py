@@ -16,6 +16,7 @@ from cms.test_utils.project.placeholderapp.models import (Example1, TwoPlacehold
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
+from cms.utils.compat.dj import force_unicode
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
@@ -388,7 +389,7 @@ class PlaceholderModelTests(CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = unicode(ph)
+        result = force_unicode(ph)
         self.assertEqual(result, u'test')
 
     def test_excercise_get_attached_model(self):
@@ -471,7 +472,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 200)
                 response = admin.add_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit(self):
         placeholder = self.get_placeholder()
@@ -490,7 +491,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 response = admin.add_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
-                                 "This placeholder already has the maximum number (1) of allowed Text plugins.")
+                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()
@@ -516,7 +517,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
                 response = admin.move_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit_on_plugin_move(self):
         admin = self.get_admin()
@@ -539,7 +540,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 response = admin.move_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
-                                 "This placeholder already has the maximum number (1) of allowed Text plugins.")
+                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
