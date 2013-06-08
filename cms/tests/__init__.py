@@ -38,3 +38,4 @@ from cms.tests.nested_plugins import *
 from cms.tests.check import *
 from cms.tests.frontend import *
 from cms.tests.no_i18n import *
+from cms.tests.code_style import *

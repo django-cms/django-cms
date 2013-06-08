@@ -11,6 +11,7 @@ argparse
 dj-database-url
 transifex-client
 djangocms-admin-style
+pep8
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangcms-text-ckeditor
 -e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
