@@ -610,10 +610,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         from cms.models.titlemodels import Title
 
         if not hasattr(self, "all_languages"):
-            self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
-            self.all_languages = list(self.all_languages)
-            self.all_languages.sort()
-            self.all_languages = map(str, self.all_languages)
+            self.all_languages = list(sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
         return self.all_languages
 
     def get_cached_ancestors(self, ascending=True):
