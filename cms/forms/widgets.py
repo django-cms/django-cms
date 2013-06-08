@@ -20,6 +20,7 @@ class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
+
     def __init__(self, site_choices=None, page_choices=None, attrs=None):
         if attrs is not None:
             self.attrs = attrs.copy()
@@ -29,12 +30,12 @@ class PageSelectWidget(MultiWidget):
             site_choices, page_choices = get_site_choices(), get_page_choices()
         self.site_choices = site_choices
         self.choices = page_choices
-        widgets = (Select(choices=site_choices ),
+        widgets = (Select(choices=site_choices),
                    Select(choices=[('', '----')]),
-                   Select(choices=self.choices, attrs={'style': "display:none;"} ),
+                   Select(choices=self.choices, attrs={'style': "display:none;"}),
         )
         super(PageSelectWidget, self).__init__(widgets, attrs)
-    
+
     def decompress(self, value):
         """
         receives a page_id in value and returns the site_id and page_id
@@ -45,19 +46,19 @@ class PageSelectWidget(MultiWidget):
             site = page.site
             return [site.pk, page.pk, page.pk]
         site = Site.objects.get_current()
-        return [site.pk,None,None]
-    
+        return [site.pk, None, None]
+
     def _has_changed(self, initial, data):
         # THIS IS A COPY OF django.forms.widgets.Widget._has_changed()
         # (except for the first if statement)
-        
+
         """
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
         # the same as an empty string, if the data or inital value we get
         # is None, replace it w/ u''.
-        if data is None or (len(data)>=2 and data[1] in [None,'']):
+        if data is None or (len(data) >= 2 and data[1] in [None, '']):
             data_value = u''
         else:
             data_value = data
@@ -68,11 +69,11 @@ class PageSelectWidget(MultiWidget):
         if force_unicode(initial_value) != force_unicode(data_value):
             return True
         return False
-    
+
     def render(self, name, value, attrs=None):
         # THIS IS A COPY OF django.forms.widgets.MultiWidget.render()
         # (except for the last line)
-        
+
         # value is a list of values, each corresponding to a widget
         # in self.widgets.
         if not isinstance(value, list):
@@ -119,7 +120,7 @@ class PageSelectWidget(MultiWidget):
 })(django.jQuery);
 </script>''' % {'name': name})
         return mark_safe(self.format_output(output))
-    
+
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
 
@@ -132,8 +133,9 @@ class UserSelectAdminWidget(Select):
     Current user should be assigned to widget in form constructor as an user 
     attribute.
     """
+
     def render(self, name, value, attrs=None, choices=()):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]    
+        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + PageUser._meta.get_add_permission())):
             # append + icon
@@ -142,4 +144,3 @@ class UserSelectAdminWidget(Select):
                     (add_url, name))
             output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
-    

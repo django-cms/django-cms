@@ -11,13 +11,11 @@ class Migration(SchemaMigration):
         # Deleting field 'Page.moderator_state'
         db.delete_column('cms_page', 'moderator_state')
 
-
     def backwards(self, orm):
         # Adding field 'Page.moderator_state'
         db.add_column('cms_page', 'moderator_state',
                       self.gf('django.db.models.fields.SmallIntegerField')(default=0, blank=True),
                       keep_default=False)
-
 
     models = {
         'auth.group': {

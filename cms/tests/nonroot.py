@@ -17,7 +17,7 @@ class NonRootCase(CMSTestCase):
     urls = 'cms.test_utils.project.nonroot_urls'
 
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         u.set_password("test")
         u.save()
         with self.login_user_context(u):
@@ -80,6 +80,6 @@ class NonRootCase(CMSTestCase):
         language = 'en'
         with force_language("en"):
             pages_root = self.get_pages_root()
-            link = preview_link(self.page2,language=language)
-        self.assertEqual(link,'%s%s/' % (pages_root,self.page2.get_slug()))
-        self.assertEqual(link,'/en/content/page2/')
+            link = preview_link(self.page2, language=language)
+        self.assertEqual(link, '%s%s/' % (pages_root, self.page2.get_slug()))
+        self.assertEqual(link, '/en/content/page2/')

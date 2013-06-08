@@ -5,6 +5,7 @@ import html5lib
 DEFAULT_PARSER = html5lib.HTMLParser(tokenizer=sanitizer.HTMLSanitizer,
                                      tree=treebuilders.getTreeBuilder("dom"))
 
+
 def clean_html(data, full=True, parser=DEFAULT_PARSER):
     """
     Cleans HTML from XSS vulnerabilities using html5lib

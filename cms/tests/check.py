@@ -10,6 +10,7 @@ from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Artic
 from cms.api import add_plugin
 from django.test import TestCase
 
+
 class TestOutput(FileOutputWrapper):
     def __init__(self):
         super(TestOutput, self).__init__(None, None)
@@ -101,7 +102,7 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
 class CheckWithDatabaseTests(TestCase, CheckAssertMixin):
 
     def test_check_plugin_instances(self):
-        self.assertCheck(True, warnings=0, errors=0 )
+        self.assertCheck(True, warnings=0, errors=0)
 
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):

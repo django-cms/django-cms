@@ -12,7 +12,6 @@ from django.conf import settings
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
 
-
 APP_NAME = 'SampleApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 

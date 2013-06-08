@@ -9,7 +9,6 @@ from cms.models import Page
 from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
 from cms.utils.helpers import reversion_register
 
-
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
 ACCESS_PAGE = 1
@@ -57,7 +56,7 @@ class AbstractPagePermission(models.Model):
     def audience(self):
         """Return audience by priority, so: All or User, Group
         """
-        targets = filter(lambda item: item, (self.user, self.group,))
+        targets = filter(lambda item: item, (self.user, self.group, ))
         return ", ".join([unicode(t) for t in targets]) or 'No one'
 
     def save(self, *args, **kwargs):
@@ -122,6 +121,5 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
-
 
 reversion_register(PagePermission)

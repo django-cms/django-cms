@@ -11,7 +11,6 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-
 PERMISSION_ADMIN_INLINES = []
 
 
@@ -150,7 +149,7 @@ class GenericCmsPermissionAdmin(object):
                 if request.user.has_perm(opts.app_label + '.' + fn()):
                     fields.append('can_%s_%s' % (t, name))
             if fields:
-                fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
+                fieldsets.insert(2 + i, (title, {'fields': (fields, )}))
         return fieldsets
 
     def _has_change_permissions_permission(self, request):

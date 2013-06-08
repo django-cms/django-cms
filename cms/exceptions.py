@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 class PluginAlreadyRegistered(Exception):
     pass
@@ -54,16 +56,21 @@ class PublicIsUnmodifiable(Exception):
     pass
 
 
-class Deprecated(Exception): pass
+class Deprecated(Exception):
+    pass
 
 
-class DuplicatePlaceholderWarning(Warning): pass
+class DuplicatePlaceholderWarning(Warning):
+    pass
 
 
-class DontUsePageAttributeWarning(Warning): pass
+class DontUsePageAttributeWarning(Warning):
+    pass
 
 
-class CMSDeprecationWarning(Warning): pass
+class CMSDeprecationWarning(Warning):
+    pass
 
 
-class LanguageError(Exception): pass
+class LanguageError(Exception):
+    pass

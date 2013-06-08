@@ -6,6 +6,7 @@ import re
 APPEND_TO_SLUG = "-copy"
 COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d)*)?$')
 
+
 def is_valid_page_slug(page, parent, lang, slug, site, path=None):
     """Validates given slug depending on settings.
     """

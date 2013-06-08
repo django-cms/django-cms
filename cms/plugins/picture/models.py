@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from cms.models import CMSPlugin, Page
 from os.path import basename
 
+
 class Picture(CMSPlugin):
     """
     A Picture with or without a link.

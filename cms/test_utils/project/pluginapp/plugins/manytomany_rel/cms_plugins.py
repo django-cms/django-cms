@@ -7,7 +7,6 @@ from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Artic
 from cms.test_utils.project.pluginapp.models import Article
 
 
-
 class ArticlePlugin(CMSPluginBase):
     model = ArticlePluginModel
     name = _("Articles")
@@ -15,10 +14,10 @@ class ArticlePlugin(CMSPluginBase):
     admin_preview = False
 
     def render(self, context, instance, placeholder):
-        article_qs = Article.published_objects.all(section__name__in=instance.sections)        
-        context.update({'instance':instance,
-                        'article_qs':article_qs,
-                        'placeholder':placeholder})
+        article_qs = Article.published_objects.all(section__name__in=instance.sections)
+        context.update({'instance': instance,
+                        'article_qs': article_qs,
+                        'placeholder': placeholder})
         return context
-    
+
 plugin_pool.register_plugin(ArticlePlugin)

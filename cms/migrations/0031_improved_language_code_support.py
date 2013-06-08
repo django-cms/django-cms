@@ -11,12 +11,9 @@ class Migration(SchemaMigration):
         # Dummy migration
         pass
 
-
-
     def backwards(self, orm):
     # Dummy migration
         pass
-
 
     models = {
         'auth.group': {

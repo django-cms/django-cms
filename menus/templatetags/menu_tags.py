@@ -13,11 +13,11 @@ from django.utils.translation import get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
-
 register = template.Library()
 
 
-class NOT_PROVIDED: pass
+class NOT_PROVIDED:
+    pass
 
 
 def cut_after(node, levels, removed):
@@ -63,11 +63,11 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             final.append(node)
             node.parent = None
         if not node.ancestor and not node.selected and not node.descendant:
-            # cut inactive nodes to extra_inactive, but not of descendants of 
+            # cut inactive nodes to extra_inactive, but not of descendants of
             # the selected node
             cut_after(node, extra_inactive, removed)
         if node.level > to_level and node.parent:
-            # remove nodes that are too deep, but not nodes that are on 
+            # remove nodes that are too deep, but not nodes that are on
             # from_level (local root nodes)
             remove(node, removed)
         if node.selected:
@@ -129,7 +129,7 @@ class ShowMenu(InclusionTag):
         else:
         #new menu... get all the data so we can save a lot of queries
             nodes = menu_pool.get_nodes(request, namespace, root_id)
-            if root_id: # find the root id and cut the nodes
+            if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
                     node = id_nodes[0]
@@ -156,7 +156,6 @@ class ShowMenu(InclusionTag):
             context = {"template": template}
         return context
 
-
 register.tag(ShowMenu)
 
 
@@ -172,7 +171,6 @@ class ShowMenuBelowId(ShowMenu):
         Argument('namespace', default=None, required=False),
         Argument('next_page', default=None, required=False),
     )
-
 
 register.tag(ShowMenuBelowId)
 
@@ -241,7 +239,6 @@ class ShowSubMenu(InclusionTag):
         })
         return context
 
-
 register.tag(ShowSubMenu)
 
 
@@ -301,7 +298,6 @@ class ShowBreadcrumb(InclusionTag):
             'template': template})
         return context
 
-
 register.tag(ShowBreadcrumb)
 
 
@@ -320,7 +316,6 @@ def _current_language_marker(language, lang_code):
 
 def _short_language_marker(language, lang_code):
     return lang_code
-
 
 MARKERS = {
     'raw': _raw_language_marker,
@@ -372,7 +367,6 @@ class LanguageChooser(InclusionTag):
         })
         return context
 
-
 register.tag(LanguageChooser)
 
 
@@ -401,6 +395,5 @@ class PageLanguageUrl(InclusionTag):
             # use the default language changer
             url = DefaultLanguageChanger(request)(lang)
         return {'content': url}
-
 
 register.tag(PageLanguageUrl)

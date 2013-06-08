@@ -64,11 +64,10 @@ class ApphookPool(object):
         try:
             return self.apps[app_name]
         except KeyError:
-            # deprecated: return apphooks registered in db with urlconf name instead of apphook class name 
+            # deprecated: return apphooks registered in db with urlconf name instead of apphook class name
             for app in self.apps.values():
                 if app_name in app.urls:
                     return app
         raise ImproperlyConfigured('No registered apphook `%s` found.' % app_name)
-
 
 apphook_pool = ApphookPool()

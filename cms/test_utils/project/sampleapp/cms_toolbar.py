@@ -16,5 +16,4 @@ class CategoryToolbar(CMSToolbar):
                 cat_list.items.append(Item(reverse('admin:sampleapp_category_add'), _("Add Category")))
                 items.append(cat_list)
 
-
 toolbar_pool.register(CategoryToolbar)

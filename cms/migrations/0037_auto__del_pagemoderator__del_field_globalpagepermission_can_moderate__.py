@@ -39,7 +39,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.BooleanField')(default=True),
                       keep_default=False)
 
-
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},

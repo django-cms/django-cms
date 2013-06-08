@@ -242,7 +242,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         txt = Text.objects.all()[0]
         self.assertTrue('id="plugin_obj_%s"' % (txt.pk + 1) in txt.body)
 
-
     def test_add_text_plugin_empty_tag(self):
         """
         Test that you can add a text plugin
@@ -334,7 +333,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         text_plugin_de = ph_de.cmsplugin_set.get(parent=None).get_plugin_instance()[0]
         self.assertEqual(text_plugin_de.get_children().count(), 1)
         link_plugin_de = text_plugin_de.get_children().get().get_plugin_instance()[0]
-
 
         # check we have twice as many plugins as before
         self.assertEqual(CMSPlugin.objects.count(), 4)
@@ -904,7 +902,6 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(u'Articles Plugin 1', articles_plugin.title)
         self.assertEquals(self.section_count, articles_plugin.sections.count())
 
-
         # check publish box
         page = publish_page(page, self.super_user)
 
@@ -915,7 +912,6 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
         expected = [self.section_count for i in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
-
 
     def test_copy_plugin_with_m2m(self):
         page = create_page("page", "nav_playground.html", "en")
@@ -975,7 +971,6 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 class PluginsMetaOptionsTests(TestCase):
     ''' TestCase set for ensuring that bugs like #992 are caught '''
-
     # these plugins are inlined because, due to the nature of the #992
     # ticket, we cannot actually import a single file with all the
     # plugin variants in, because that calls __new__, at which point the
@@ -983,6 +978,7 @@ class PluginsMetaOptionsTests(TestCase):
 
     def test_meta_options_as_defaults(self):
         ''' handling when a CMSPlugin meta options are computed defaults '''
+
         # this plugin relies on the base CMSPlugin and Model classes to
         # decide what the app_label and db_table should be
         class TestPlugin(CMSPlugin):
@@ -990,10 +986,11 @@ class PluginsMetaOptionsTests(TestCase):
 
         plugin = TestPlugin()
         self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin')
-        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+        self.assertEqual(plugin._meta.app_label, 'tests')  # because it's inlined
 
     def test_meta_options_as_declared_defaults(self):
         ''' handling when a CMSPlugin meta options are declared as per defaults '''
+
         # here, we declare the db_table and app_label explicitly, but to the same
         # values as would be computed, thus making sure it's not a problem to
         # supply options.
@@ -1004,7 +1001,7 @@ class PluginsMetaOptionsTests(TestCase):
 
         plugin = TestPlugin2()
         self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin2')
-        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+        self.assertEqual(plugin._meta.app_label, 'tests')  # because it's inlined
 
     def test_meta_options_custom_app_label(self):
         ''' make sure customised meta options on CMSPlugins don't break things '''
@@ -1014,7 +1011,7 @@ class PluginsMetaOptionsTests(TestCase):
                 app_label = 'one_thing'
 
         plugin = TestPlugin3()
-        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin3') # because it's inlined
+        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin3')  # because it's inlined
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
     def test_meta_options_custom_db_table(self):
@@ -1026,7 +1023,7 @@ class PluginsMetaOptionsTests(TestCase):
 
         plugin = TestPlugin4()
         self.assertEqual(plugin._meta.db_table, 'or_another')
-        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+        self.assertEqual(plugin._meta.app_label, 'tests')  # because it's inlined
 
     def test_meta_options_custom_both(self):
         ''' We should be able to customise app_label and db_table together '''
@@ -1104,13 +1101,15 @@ class NoDatabasePluginTests(TestCase):
     def test_db_table_hack(self):
         # TODO: Django tests seem to leak models from test methods, somehow
         # we should clear django.db.models.loading.app_cache in tearDown.
-        plugin_class = PluginModelBase('TestPlugin', (CMSPlugin,), {'__module__': 'cms.tests.plugins'})
+        plugin_class = PluginModelBase('TestPlugin', (CMSPlugin, ), {'__module__': 'cms.tests.plugins'})
         self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin')
 
     def test_db_table_hack_with_mixin(self):
-        class LeftMixin: pass
+        class LeftMixin:
+            pass
 
-        class RightMixin: pass
+        class RightMixin:
+            pass
 
         plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin),
                                        {'__module__': 'cms.tests.plugins'})

@@ -24,14 +24,12 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('stacks', ['StackLink'])
 
-
     def backwards(self, orm):
         # Deleting model 'Stack'
         db.delete_table('stacks_stack')
 
         # Deleting model 'StackLink'
         db.delete_table('cmsplugin_stacklink')
-
 
     models = {
         'cms.cmsplugin': {

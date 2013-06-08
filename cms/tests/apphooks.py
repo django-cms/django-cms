@@ -13,8 +13,6 @@ from django.core.urlresolvers import clear_url_caches, reverse
 import sys
 from cms.models.pagemodel import Page
 
-
-
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
@@ -164,7 +162,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
@@ -177,7 +175,7 @@ class ApphooksTestCase(CMSTestCase):
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash and language prefix
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash and language prefix
             self.assertEquals(attached_to_page.pk, de_title.page.pk)
 
             response = self.client.get(path)
@@ -200,13 +198,13 @@ class ApphooksTestCase(CMSTestCase):
                 path = reverse('sample-settings')
                 request = self.get_request(path + '?edit')
                 request.LANGUAGE_CODE = 'en'
-                attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEquals(attached_to_page.pk, public_page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
                 request = self.get_request(path + '?edit')
                 request.LANGUAGE_CODE = 'de'
-                attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEquals(attached_to_page.pk, public_page.pk)
 
     def test_get_root_page_for_apphook_with_instance_namespace(self):
@@ -222,7 +220,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             apphook_pool.clear()
@@ -239,7 +237,7 @@ class ApphooksTestCase(CMSTestCase):
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page_id)
             apphook_pool.clear()
 
@@ -252,7 +250,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
@@ -272,7 +270,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
@@ -354,7 +352,7 @@ class ApphooksTestCase(CMSTestCase):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.third_urls_for_apphook_tests'):
             apphook_pool.clear()
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
-            home_page = create_page("home", "nav_playground.html", "en", created_by=superuser, published=True,)
+            home_page = create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
             apphook1_page = create_page("apphook1-page", "nav_playground.html", "en",
                 created_by=superuser, published=True, apphook="SampleApp")
             apphook2_page = create_page("apphook2-page", "nav_playground.html", "en",

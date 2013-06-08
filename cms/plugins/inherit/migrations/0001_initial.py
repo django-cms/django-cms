@@ -16,11 +16,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('inherit', ['InheritPagePlaceholder'])
 
-
     def backwards(self, orm):
         # Deleting model 'InheritPagePlaceholder'
         db.delete_table('cmsplugin_inheritpageplaceholder')
-
 
     models = {
         'cms.cmsplugin': {

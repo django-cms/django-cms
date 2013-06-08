@@ -21,7 +21,7 @@ class MenusFixture(object):
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
         with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
@@ -53,7 +53,7 @@ class ExtendedMenusFixture(object):
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
@@ -85,7 +85,7 @@ class SubMenusFixture(object):
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
         with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)

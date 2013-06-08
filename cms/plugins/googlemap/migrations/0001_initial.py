@@ -26,11 +26,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('googlemap', ['GoogleMap'])
 
-
     def backwards(self, orm):
         # Deleting model 'GoogleMap'
         db.delete_table('cmsplugin_googlemap')
-
 
     models = {
         'cms.cmsplugin': {

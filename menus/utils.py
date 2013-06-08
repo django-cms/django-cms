@@ -11,6 +11,7 @@ def mark_descendants(nodes):
         node.descendant = True
         mark_descendants(node.children)
 
+
 def cut_levels(nodes, level):
     """
     For cutting the nav_extender levels if you have a from_level in the navigation.
@@ -22,6 +23,7 @@ def cut_levels(nodes, level):
     for node in nodes:
         result += cut_levels(node.children, level)
     return result
+
 
 def find_selected(nodes):
     """
@@ -51,6 +53,7 @@ def set_language_changer(request, func):
     """
     request._language_changer = func
 
+
 def language_changer_decorator(language_changer):
     """
     A decorator wrapper for set_language_changer.
@@ -61,6 +64,7 @@ def language_changer_decorator(language_changer):
         def my_view_function(request, somearg):
             pass
     """
+
     def _decorator(func):
         def _wrapped(request, *args, **kwargs):
             set_language_changer(request, language_changer)
@@ -69,6 +73,7 @@ def language_changer_decorator(language_changer):
         _wrapped.__doc__ = func.__doc__
         return _wrapped
     return _decorator
+
 
 class DefaultLanguageChanger(object):
     def __init__(self, request):
@@ -107,6 +112,7 @@ class DefaultLanguageChanger(object):
                 return '/%s/' % lang
             else:
                 return "/"
+
 
 def simple_language_changer(func):
     warnings.warn("simple_language_changer is deprecated and will be removed in "

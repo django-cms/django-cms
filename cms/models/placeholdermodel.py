@@ -131,7 +131,7 @@ class Placeholder(models.Model):
             from cms.models.pagemodel import Page
             try:
                 self._page = Page.objects.get(placeholders=self)
-            except (Page.DoesNotExist, Page.MultipleObjectsReturned,):
+            except (Page.DoesNotExist, Page.MultipleObjectsReturned, ):
                 self._page = None
         return self._page
 

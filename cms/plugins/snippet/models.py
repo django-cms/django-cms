@@ -24,6 +24,7 @@ class Snippet(models.Model):
         verbose_name = _("Snippet")
         verbose_name_plural = _("Snippets")
 
+
 # Plugin model - just a pointer to Snippet
 class SnippetPtr(CMSPlugin):
     snippet = models.ForeignKey(Snippet)
@@ -31,13 +32,11 @@ class SnippetPtr(CMSPlugin):
     class Meta:
         verbose_name = _("Snippet")
 
-    search_fields = ('snippet__html',)
+    search_fields = ('snippet__html', )
 
     def __unicode__(self):
         # Return the referenced snippet's name rather than the default (ID #)
         return self.snippet.name
 
-
 # We don't both with SnippetPtr, since all the data is actually in Snippet
 reversion_register(Snippet)
-

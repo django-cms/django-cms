@@ -62,7 +62,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             'published': True,
             'in_navigation': True,
         }
-        page_a = create_page("page_a", **stdkwargs) # first page slug is /
+        page_a = create_page("page_a", **stdkwargs)  # first page slug is /
         page_b = create_page("page_b", **stdkwargs)
         page_c = create_page("page_c", **stdkwargs)
         page_d = create_page("page_d", **stdkwargs)
@@ -147,7 +147,6 @@ class ViewPermissionTests(SettingsOverrideTestCase):
                 group.save()
 
         self.assertEquals(11, User.objects.all().count())
-
 
     def _setup_view_restrictions(self):
         """
@@ -256,7 +255,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             'path': path,
             'session': {},
         }
-        return type('Request', (object,), attrs)
+        return type('Request', (object, ), attrs)
 
     def get_url_dict(self, pages, language='en'):
         return dict((page.get_absolute_url(language=language), page) for page in pages)
@@ -313,7 +312,6 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self.assertNotInMenu(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_d/"], user)
         self.assertNotInMenu(urls["/en/page_d/"], user)
-
 
     def test_menu_access_page_and_children_group_1(self):
         """
@@ -513,7 +511,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             'published': True,
             'in_navigation': True,
         }
-        page_1 = create_page("page_1", **stdkwargs) # first page slug is /
+        page_1 = create_page("page_1", **stdkwargs)  # first page slug is /
         page_2 = create_page("page_2", parent=page_1, **stdkwargs)
         page_3 = create_page("page_3", parent=page_2, **stdkwargs)
         page_4 = create_page("page_4", parent=page_3, **stdkwargs)
@@ -584,5 +582,3 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         self.assertViewAllowed(urls[url], user)
         url = "/en/page_5/page_6/"
         self.assertViewAllowed(urls[url], user)
-
-

@@ -13,11 +13,9 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='code', max_length=20),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'Stack.creation_method'
         db.delete_column('stacks_stack', 'creation_method')
-
 
     models = {
         'cms.cmsplugin': {

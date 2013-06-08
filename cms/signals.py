@@ -30,7 +30,6 @@ def update_plugin_positions(**kwargs):
             p.save()
         last += 1
 
-
 signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin, dispatch_uid="cms.plugin.update_position")
 
 
@@ -39,7 +38,6 @@ def update_title_paths(instance, **kwargs):
     """
     for title in instance.title_set.all():
         title.save()
-
 
 page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.update_path")
 
@@ -80,7 +78,6 @@ def pre_save_title(instance, raw, **kwargs):
     else:
         update_title(instance)
 
-
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
 
@@ -116,7 +113,6 @@ def post_save_title(instance, raw, created, **kwargs):
         del instance.tmp_application_urls
     if prevent_descendants:
         del instance.tmp_prevent_descendant_update
-
 
 signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title.postsave")
 

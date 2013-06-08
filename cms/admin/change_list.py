@@ -45,7 +45,7 @@ class CMSChangeList(ChangeList):
     treeview)
     """
     real_queryset = False
-    
+
     def __init__(self, request, *args, **kwargs):
         from cms.utils.plugins import current_site
         self._current_site = current_site(request)
@@ -55,11 +55,11 @@ class CMSChangeList(ChangeList):
         except:
             raise
         self.get_results(request)
-        
+
         if self._current_site:
             request.session['cms_admin_site'] = self._current_site.pk
         self.set_sites(request)
-        
+
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
@@ -70,24 +70,24 @@ class CMSChangeList(ChangeList):
         if request:
             site = self.current_site()
             permissions = Page.permissions.get_change_id_list(request.user, site)
-            
+
             if permissions != Page.permissions.GRANT_ALL:
                 qs = qs.filter(pk__in=permissions)
                 self.root_query_set = self.root_query_set.filter(pk__in=permissions)
             self.real_queryset = True
             qs = qs.filter(site=self._current_site)
         return qs
-    
+
     def is_filtered(self):
         from cms.utils.plugins import SITE_VAR
-        lookup_params = self.params.copy() # a dictionary of the query string
+        lookup_params = self.params.copy()  # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR):
             if i in lookup_params:
                 del lookup_params[i]
         if not lookup_params.items() and not self.query:
             return False
         return True
-    
+
     def get_results(self, request):
         if self.real_queryset:
             super(CMSChangeList, self).get_results(request)
@@ -95,28 +95,27 @@ class CMSChangeList(ChangeList):
                 self.full_result_count = self.result_count = self.root_query_set.count()
             else:
                 self.full_result_count = self.root_query_set.count()
-    
+
     def set_items(self, request):
         site = self.current_site()
-        # Get all the pages, ordered by tree ID (it's convenient to build the 
+        # Get all the pages, ordered by tree ID (it's convenient to build the
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
-        
-        
-        # Get lists of page IDs for which the current user has 
-        # "permission to..." on the current site. 
+        pages = self.get_query_set(request).drafts().order_by('tree_id', 'lft').select_related()
+
+        # Get lists of page IDs for which the current user has
+        # "permission to..." on the current site.
         perm_edit_ids = Page.permissions.get_change_id_list(request.user, site)
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
         perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user, site)
         perm_change_list_ids = Page.permissions.get_change_id_list(request.user, site)
-        
+
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
             pages = pages.filter(pk__in=perm_edit_ids)
-            #pages = pages.filter(pk__in=perm_change_list_ids)   
+            #pages = pages.filter(pk__in=perm_change_list_ids)
 
         root_pages = []
         pages = list(pages)
-        all_pages = pages[:] # That is, basically, a copy.
+        all_pages = pages[:]  # That is, basically, a copy.
         try:
             home_pk = Page.objects.drafts().get_home(site).pk
         except NoHomeFound:
@@ -170,12 +169,12 @@ class CMSChangeList(ChangeList):
                 else:
                     page.ancestors_ascending = []
                 page.home_pk_cache = home_pk
-            
+
             # Because 'children' is the reverse-FK accessor for the 'parent'
             # FK from Page->Page, we have to use wrong English here and set
             # an attribute called 'childrens'. We are aware that this is WRONG
             # but what should we do?
-            
+
             # If the queryset is filtered, do NOT set the 'childrens' attribute
             # since *ALL* pages will be in the 'root_pages' list and therefore
             # be displayed. (If the queryset is filtered, the result is not a
@@ -190,27 +189,26 @@ class CMSChangeList(ChangeList):
             page.all_languages = []
 
         titles = Title.objects.filter(page__in=ids)
-        insort = bisect.insort # local copy to avoid globals lookup in the loop
+        insort = bisect.insort  # local copy to avoid globals lookup in the loop
         for title in titles:
             page = ids[title.page_id]
             page.title_cache[title.language] = title
             if not title.language in page.all_languages:
                 insort(page.all_languages, title.language)
         self.root_pages = root_pages
-        
+
     def get_items(self):
         return self.root_pages
-    
+
     def set_sites(self, request):
         """Sets sites property to current instance - used in tree view for
         sites combo.
         """
         if get_cms_setting('PERMISSION'):
-            self.sites = get_user_sites_queryset(request.user)   
+            self.sites = get_user_sites_queryset(request.user)
         else:
             self.sites = Site.objects.all()
         self.has_access_to_multiple_sites = len(self.sites) > 1
-    
+
     def current_site(self):
         return self._current_site
-    

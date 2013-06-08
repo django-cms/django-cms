@@ -16,4 +16,3 @@ class TwoPagesFixture(object):
             create_title('de', 'erste', first)
             second = create_page('second', language='en', reverse_id='myreverseid', **defaults)
             create_title('de', 'zweite', second)
-            

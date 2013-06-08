@@ -24,7 +24,7 @@ from menus.menu_pool import menu_pool
 
 
 def get_permission_acessor(obj):
-    if isinstance(obj, (PageUser, User,)):
+    if isinstance(obj, (PageUser, User, )):
         rel_name = 'user_permissions'
     else:
         rel_name = 'permissions'
@@ -70,7 +70,6 @@ class PageForm(forms.ModelForm):
                                        max_length=155)
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
-
 
     class Meta:
         model = Page
@@ -227,7 +226,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(PagePermissionInlineAdminForm, self).__init__(*args, **kwargs)
-        user = get_current_user() # current user from threadlocals
+        user = get_current_user()  # current user from threadlocals
         sub_users = get_subordinate_users(user)
 
         limit_choices = True
@@ -268,7 +267,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         else:
             self.fields['user'].widget = UserSelectAdminWidget()
             self.fields['user'].queryset = sub_users
-            self.fields['user'].widget.user = user # assign current user
+            self.fields['user'].widget.user = user  # assign current user
 
         self.fields['group'].queryset = get_subordinate_groups(user)
 
@@ -285,7 +284,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to 
+            # page but after he does this, he will not have permissions to
             # access this page anymore, so avoid this
             raise forms.ValidationError(_("Add page permission requires also "
                                           "access to children, or descendants, otherwise added page "

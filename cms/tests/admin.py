@@ -284,7 +284,7 @@ class AdminTestCase(AdminTestsBase):
             page = create_page('test-page', 'nav_playground.html', 'en')
             response = pageadmin.change_template(request, page.pk)
             self.assertEqual(response.status_code, 403)
-        url = reverse('admin:cms_page_change_template', args=(page.pk,))
+        url = reverse('admin:cms_page_change_template', args=(page.pk, ))
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
             self.assertEqual(response.status_code, 400)
@@ -293,7 +293,7 @@ class AdminTestCase(AdminTestsBase):
 
     def test_get_permissions(self):
         page = create_page('test-page', 'nav_playground.html', 'en')
-        url = reverse('admin:cms_page_get_permissions', args=(page.pk,))
+        url = reverse('admin:cms_page_get_permissions', args=(page.pk, ))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'admin/login.html')
@@ -326,7 +326,7 @@ class AdminTestCase(AdminTestsBase):
             page_admin.list_display_links, page_admin.list_filter,
             page_admin.date_hierarchy, page_admin.search_fields,
             page_admin.list_select_related, page_admin.list_per_page]
-        if hasattr(page_admin, 'list_max_show_all'): # django 1.4
+        if hasattr(page_admin, 'list_max_show_all'):  # django 1.4
             cl_params.append(page_admin.list_max_show_all)
         cl_params.extend([page_admin.list_editable, page_admin])
         cl = CMSChangeList(*tuple(cl_params))
@@ -496,9 +496,9 @@ class AdminTests(AdminTestsBase):
 
     def test_revert_page_redirects(self):
         admin = self.get_admin()
-        self.page.publish() # Ensure public copy exists before reverting
+        self.page.publish()  # Ensure public copy exists before reverting
         with self.login_user_context(admin):
-            response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk,)))
+            response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk, )))
             self.assertEqual(response.status_code, 302)
             url = response['Location']
             self.assertTrue(url.endswith('?edit_off'))
@@ -714,7 +714,7 @@ class PluginPermissionTests(AdminTestsBase):
         self._give_permission(user, PagePermission, 'delete')
 
     def _get_change_page_request(self, user, page):
-        return type('Request', (object,), {
+        return type('Request', (object, ), {
             'user': user,
             'path': base.URL_CMS_PAGE_CHANGE % page.pk
         })
@@ -904,7 +904,7 @@ class AdminFormsTests(AdminTestsBase):
         user = AnonymousUser()
         user.is_superuser = True
         user.pk = 1
-        request = type('Request', (object,), {'user': user})
+        request = type('Request', (object, ), {'user': user})
         with SettingsOverride():
             data = {
                 'title': 'TestPage',
@@ -1040,4 +1040,3 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(foundcount, 2,
                                  "Username %s appeared %s times in response.content, expected 2 times" % (
                                      USER_NAME, foundcount))
-

@@ -6,6 +6,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
 
+
 class SettingsTests(CMSTestCase):
     def test_cms_templates_with_pathsep(self):
         from sekizai.context import SekizaiContext

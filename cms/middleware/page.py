@@ -14,6 +14,7 @@ class LazyPage(object):
                 request._current_page_cache = applications_page_check(request)
         return request._current_page_cache
 
+
 class LazyPageApp(object):
     def __get__(self, request, obj_type=None):
         if not hasattr(request, '_current_app_cache'):
@@ -23,6 +24,7 @@ class LazyPageApp(object):
                 app = apphook_pool.get_apphook(app_urls)
                 request._current_app_cache = page.reverse_id if page.reverse_id else app.app_name
         return request._current_app_cache
+
 
 class CurrentPageMiddleware(object):
     def process_request(self, request):

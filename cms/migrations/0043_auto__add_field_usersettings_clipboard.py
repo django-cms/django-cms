@@ -13,11 +13,9 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cms.Placeholder'], null=True, blank=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'UserSettings.clipboard'
         db.delete_column(u'cms_usersettings', 'clipboard_id')
-
 
     models = {
         u'auth.group': {

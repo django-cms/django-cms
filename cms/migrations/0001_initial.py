@@ -174,7 +174,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'Title', fields ['language', 'page']
         db.create_unique('cms_title', ['language', 'page_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'Title', fields ['language', 'page']
         db.delete_unique('cms_title', ['language', 'page_id'])
@@ -214,7 +213,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Title'
         db.delete_table('cms_title')
-
 
     models = {
         'auth.group': {

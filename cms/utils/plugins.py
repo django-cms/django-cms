@@ -138,7 +138,6 @@ def get_placeholders(template):
             clean_placeholders.append(placeholder)
     return clean_placeholders
 
-
 SITE_VAR = "site__exact"
 
 

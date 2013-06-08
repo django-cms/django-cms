@@ -10,11 +10,11 @@ from django.utils.translation import ugettext_lazy as _
 import os
 import warnings
 
-
 __all__ = ['get_cms_setting']
 
 
-class VERIFIED: pass # need a unique identifier for CMS_LANGUAGES
+class VERIFIED:
+    pass  # need a unique identifier for CMS_LANGUAGES
 
 
 def default(name):
@@ -28,7 +28,6 @@ def default(name):
         return wrapped
 
     return decorator
-
 
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
@@ -182,7 +181,7 @@ def _ensure_languages_settings(languages):
         verified_languages = _ensure_languages_settings_new(languages)
     else:
         verified_languages = _translate_legacy_languages_settings(languages)
-    verified_languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
+    verified_languages[VERIFIED] = True  # this will be busted by SettingsOverride and cause a re-check
     return verified_languages
 
 
@@ -206,7 +205,6 @@ def get_unihandecode_host():
         return host
     else:
         return host + '/'
-
 
 COMPLEX = {
     'CACHE_DURATIONS': get_cache_durations,

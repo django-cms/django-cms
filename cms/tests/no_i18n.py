@@ -101,7 +101,7 @@ class TestNoI18N(SettingsOverrideTestCase):
                     'cms.middleware.toolbar.ToolbarMiddleware',
                 ],
                 CMS_LANGUAGES={1: []},
-                LANGUAGES=(('en-us', 'English'),)):
+                LANGUAGES=(('en-us', 'English'), )):
             create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
             response = self.client.get('/', follow=False)
             self.assertEqual(response['Location'], 'http://testserver/foobar/')

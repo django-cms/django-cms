@@ -5,6 +5,7 @@ from cms.models import CMSPlugin
 import os
 from django.conf import settings
 
+
 class File(CMSPlugin):
     """
     Plugin for storing any type of file.
@@ -49,10 +50,12 @@ class File(CMSPlugin):
 
     def __unicode__(self):
         if self.title:
-            return self.title;
+            return self.title
+
         elif self.file:
             # added if, because it raised attribute error when file wasnt defined
-            return self.get_file_name();
+            return self.get_file_name()
+
         return "<empty>"
 
-    search_fields = ('title',)
+    search_fields = ('title', )

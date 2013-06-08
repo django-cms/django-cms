@@ -8,7 +8,6 @@ from cms.stacks.forms import StackInsertionForm
 from cms.stacks.models import Stack, StackLink
 from cms.tests.plugins import PluginsTestBaseCase
 
-
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
 
 
@@ -16,8 +15,7 @@ class StacksTestCase(PluginsTestBaseCase):
     def fill_placeholder(self, placeholder=None):
         if placeholder is None:
             placeholder = Placeholder(slot=u"some_slot")
-            placeholder.save() # a good idea, if not strictly necessary
-
+            placeholder.save()  # a good idea, if not strictly necessary
 
         # plugin in placeholder
         plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",

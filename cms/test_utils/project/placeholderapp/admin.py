@@ -28,7 +28,6 @@ class TwoPlaceholderExampleAdmin(PlaceholderAdmin, MixinAdmin):
 class MultilingualAdmin(TranslatableAdmin, PlaceholderAdmin):
     pass
 
-
 admin.site.register(Example1, ExampleAdmin)
 admin.site.register(TwoPlaceholderExample, TwoPlaceholderExampleAdmin)
 admin.site.register(MultilingualExample1, MultilingualAdmin)

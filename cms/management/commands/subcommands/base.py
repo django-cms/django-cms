@@ -3,7 +3,6 @@ from django.core.management.base import BaseCommand, CommandError
 import sys
 
 
-
 class SubcommandsCommand(BaseCommand):
     subcommands = {}
     command_name = ''

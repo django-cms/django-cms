@@ -53,7 +53,7 @@ class FormsTestCase(CMSTestCase):
         raised = False
         try:
             fake_field = Mock_PageSelectFormField(required=True)
-            data_list = (0, None) #(site_id, page_id) dsite-id is not used
+            data_list = (0, None)  # (site_id, page_id) dsite-id is not used
             fake_field.compress(data_list)
             self.fail('compress function didn\'t raise!')
         except forms.ValidationError:
@@ -62,7 +62,7 @@ class FormsTestCase(CMSTestCase):
 
     def test_compress_function_returns_none_when_not_required(self):
         fake_field = Mock_PageSelectFormField(required=False)
-        data_list = (0, None) #(site_id, page_id) dsite-id is not used
+        data_list = (0, None)  # (site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
         self.assertEquals(result, None)
 
@@ -82,7 +82,7 @@ class FormsTestCase(CMSTestCase):
             home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The actual test
             fake_field = Mock_PageSelectFormField()
-            data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
+            data_list = (0, home_page.pk)  # (site_id, page_id) dsite-id is not used
             result = fake_field.compress(data_list)
             self.assertEquals(home_page, result)
 
@@ -104,7 +104,6 @@ class FormsTestCase(CMSTestCase):
             ])
         ])
         self.assertEqual(site_choices, [(site.pk, site.name)])
-
 
     def test_superlazy_iterator_behaves_properly_for_sites(self):
         normal_result = get_site_choices()
@@ -128,5 +127,3 @@ class FormsTestCase(CMSTestCase):
             'can_change_pagepermission', 'can_delete_pagepermission']
         for name in names:
             self.assertTrue(puf.initial.get(name, False))
-
-

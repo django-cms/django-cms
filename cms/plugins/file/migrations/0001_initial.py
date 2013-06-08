@@ -16,11 +16,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('file', ['File'])
 
-
     def backwards(self, orm):
         # Deleting model 'File'
         db.delete_table('cmsplugin_file')
-
 
     models = {
         'cms.cmsplugin': {

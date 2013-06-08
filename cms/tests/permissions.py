@@ -11,7 +11,7 @@ class PermissionCacheTests(SettingsOverrideTestCase):
     settings_overrides = {
         'CMS_PERMISSION': True,
     }
-    
+
     def setUp(self):
         self.user_super = self._create_user("super", is_staff=True,
                                             is_superuser=True)
@@ -34,7 +34,7 @@ class PermissionCacheTests(SettingsOverrideTestCase):
         clear_user_permission_cache(self.user_normal)
         cached_permissions = get_permission_cache(self.user_normal, "can_change")
         self.assertIsNone(cached_permissions)
-    
+
     def test_cache_invalidation(self):
         """
         Test permission cache clearing on page save

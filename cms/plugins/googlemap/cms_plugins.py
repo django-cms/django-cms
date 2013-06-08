@@ -13,12 +13,12 @@ class GoogleMapPlugin(CMSPluginBase):
     form = GoogleMapForm
     fieldsets = (
         (None, {
-            'fields': ('title', 'address', ('zipcode', 'city',),
-                       'content', 'zoom', ('lat', 'lng'),),
+            'fields': ('title', 'address', ('zipcode', 'city', ),
+                       'content', 'zoom', ('lat', 'lng'), ),
         }),
         (_('Advanced'), {
             'fields': (('route_planer', 'route_planer_title'),
-                       ('width', 'height',),),
+                       ('width', 'height', ), ),
         }),
     )
 

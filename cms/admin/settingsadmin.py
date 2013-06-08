@@ -60,5 +60,4 @@ class SettingsAdmin(ModelAdmin):
         """
         return {}
 
-
 admin.site.register(UserSettings, SettingsAdmin)

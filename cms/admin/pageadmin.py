@@ -57,7 +57,7 @@ require_POST = method_decorator(require_POST)
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.admin import VersionAdmin as ModelAdmin
     from reversion import create_revision
-else: # pragma: no cover
+else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
 
     create_revision = lambda: lambda x: x
@@ -504,7 +504,6 @@ class PageAdmin(ModelAdmin):
             'admin/change_list.html'
         ], context, context_instance=RequestContext(request))
 
-
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
@@ -627,7 +626,6 @@ class PageAdmin(ModelAdmin):
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
         return HttpResponse("ok")
-
 
     @require_POST
     @create_revision()
@@ -1026,7 +1024,7 @@ class PageAdmin(ModelAdmin):
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             placeholder = parent.placeholder
             page = placeholder.page if placeholder else None
-            if not page: # Make sure we do have a page
+            if not page:  # Make sure we do have a page
                 raise Http404()
             position = request.POST.get('plugin_order', None)
             # placeholder (non-page) add-plugin
@@ -1156,7 +1154,7 @@ class PageAdmin(ModelAdmin):
 
         plugin_admin.cms_plugin_instance = cms_plugin
         try:
-            plugin_admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
+            plugin_admin.placeholder = cms_plugin.placeholder  # TODO: what for reversion..? should it be inst ...?
         except Placeholder.DoesNotExist:
             pass
         if request.method == "POST":
@@ -1285,7 +1283,7 @@ class PageAdmin(ModelAdmin):
                     break
                 x += 1
             if not found:
-                pass #TODO: fix this
+                pass  # TODO: fix this
                 #plugin.delete()
             else:
                 plugin.save()
@@ -1316,7 +1314,7 @@ class PageAdmin(ModelAdmin):
         (deleted_objects, perms_needed, protected) = get_deleted_objects(
             [plugin], opts, request.user, self.admin_site, using)
 
-        if request.POST: # The user has already confirmed the deletion.
+        if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
             obj_display = force_unicode(plugin)
@@ -1380,7 +1378,7 @@ class PageAdmin(ModelAdmin):
         (deleted_objects, perms_needed, protected) = get_deleted_objects(
             plugins, opts, request.user, self.admin_site, using)
         obj_display = force_unicode(placeholder)
-        if request.POST: # The user has already confirmed the deletion.
+        if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
 
@@ -1419,7 +1417,6 @@ class PageAdmin(ModelAdmin):
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
 
-
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
             return True
@@ -1442,7 +1439,7 @@ class PageAdmin(ModelAdmin):
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=title)
-        admin_form = AdminForm(form, fieldsets=[(None, {'fields': ('title',)})], prepopulated_fields={},
+        admin_form = AdminForm(form, fieldsets=[(None, {'fields': ('title', )})], prepopulated_fields={},
                                model_admin=self)
         media = self.media + admin_form.media
         context = {
@@ -1469,6 +1466,5 @@ class PageAdmin(ModelAdmin):
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
             return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
         return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
-
 
 admin.site.register(Page, PageAdmin)

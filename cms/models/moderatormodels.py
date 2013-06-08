@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models.managers import PageModeratorStateManager
 from cms.models.pagemodel import Page
 
-
 ################################################################################
 # Moderation
 ################################################################################

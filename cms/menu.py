@@ -42,7 +42,7 @@ def get_visible_pages(request, pages, site=None):
             continue
         if perm is not None and perm not in restricted_pages[perm.page.pk]:
             # affective restricted pages gathering
-            # using mptt functions 
+            # using mptt functions
             # add the page with the perm itself
             if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS]:
                 restricted_pages[perm.page.pk].append(perm)
@@ -90,7 +90,6 @@ def get_visible_pages(request, pages, site=None):
             not global_view_perms):
             return []
 
-
     def has_global_perm():
         if has_global_perm.cache < 0:
             has_global_perm.cache = 1 if request.user.has_perm('cms.view_page') else 0
@@ -133,7 +132,7 @@ def get_visible_pages(request, pages, site=None):
                         is_setting_public_staff and request.user.is_staff)
             ):
                 # authenticated user, no restriction and public for all
-                # or 
+                # or
                 # authenticated staff user, no restriction and public for staff
                 to_add = True
             # check group and user memberships to restricted pages
@@ -141,7 +140,7 @@ def get_visible_pages(request, pages, site=None):
                 to_add = True
             elif has_global_perm():
                 to_add = True
-        # anonymous user, no restriction  
+        # anonymous user, no restriction
         elif not is_restricted and is_setting_public_all:
             to_add = True
             # store it
@@ -198,7 +197,7 @@ def page_to_node(page, home, cut):
             app_name = page.get_application_urls(fallback=False)
         except Title.DoesNotExist:
             app_name = None
-        if app_name: # it means it is an apphook
+        if app_name:  # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
             for menu in app.menus:
                 extenders.append(menu.__name__)
@@ -269,7 +268,7 @@ class CMSMenu(Menu):
             langs.extend(get_fallback_languages(lang))
 
         titles = list(get_title_queryset(request).filter(page__in=ids, language__in=langs))
-        for title in titles: # add the title and slugs and some meta data
+        for title in titles:  # add the title and slugs and some meta data
             page = ids[title.page_id]
             page.title_cache[title.language] = title
 
@@ -277,7 +276,6 @@ class CMSMenu(Menu):
             if page.title_cache:
                 nodes.append(page_to_node(page, home, home_cut))
         return nodes
-
 
 menu_pool.register_menu(CMSMenu)
 
@@ -298,7 +296,7 @@ class NavExtender(Modifier):
                     if not ext in exts:
                         exts.append(ext)
                     for extnode in nodes:
-                        if extnode.namespace == ext and not extnode.parent_id:# if home has nav extenders but home is not visible
+                        if extnode.namespace == ext and not extnode.parent_id:  # if home has nav extenders but home is not visible
                             if node.attr.get("is_home", False) and not node.visible:
                                 extnode.parent_id = None
                                 extnode.parent_namespace = None
@@ -327,7 +325,6 @@ class NavExtender(Modifier):
         for node in removed:
             nodes.remove(node)
         return nodes
-
 
 menu_pool.register_modifier(NavExtender)
 
@@ -459,6 +456,5 @@ class SoftRootCutter(Modifier):
             if child != node:
                 self.find_and_remove_children(child, nodes)
         return nodes
-
 
 menu_pool.register_modifier(SoftRootCutter)

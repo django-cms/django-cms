@@ -169,7 +169,6 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(undo_url)
             self.assertEqual(2, CMSPlugin.objects.all().count())
 
-
     def test_recover(self):
         """
         Test that you can recover a page

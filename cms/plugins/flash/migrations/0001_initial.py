@@ -17,11 +17,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('flash', ['Flash'])
 
-
     def backwards(self, orm):
         # Deleting model 'Flash'
         db.delete_table('cmsplugin_flash')
-
 
     models = {
         'cms.cmsplugin': {

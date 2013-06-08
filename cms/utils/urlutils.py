@@ -4,7 +4,8 @@ from urlparse import urlparse
 import re
 
 # checks validity of absolute / relative url
-any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$') 
+any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
+
 
 def levelize_path(path):
     """Splits given path to list of paths removing latest level in each step.
@@ -20,6 +21,7 @@ def levelize_path(path):
         if sub_path:
             paths.append(sub_path)
     return paths
+
 
 def urljoin(*segments):
     """Joins url segments together and appends trailing slash if required.
@@ -39,13 +41,14 @@ def urljoin(*segments):
     cleaned_segments = map(lambda segment: unicode(segment).strip("/"), segments)
     nonempty_segments = filter(lambda segment: segment > "", cleaned_segments)
     url = ("/").join(nonempty_segments)
-    
+
     if segments[0].startswith("/") and not url.startswith("/"):
         url = "/" + url
-    
+
     if settings.APPEND_SLASH and not url.endswith("/"):
         url += "/"
     return url
+
 
 def is_media_request(request):
     """
@@ -58,4 +61,4 @@ def is_media_request(request):
                 return True
         else:
             return True
-    return False 
+    return False

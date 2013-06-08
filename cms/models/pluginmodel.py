@@ -153,10 +153,10 @@ class CMSPlugin(MPTTModel):
     def get_plugin_instance(self, admin=None):
         plugin_class = self.get_plugin_class()
         plugin = plugin_class(plugin_class.model,
-                              admin) # needed so we have the same signature as the original ModelAdmin
+                              admin)  # needed so we have the same signature as the original ModelAdmin
         if hasattr(self, "_inst"):
             return self._inst, plugin
-        if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
+        if plugin.model != self.__class__:  # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
                 instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
@@ -256,12 +256,12 @@ class CMSPlugin(MPTTModel):
         new_plugin.rght = None
         new_plugin.level = None
 
-        # In the block below, we use plugin_trail as a kind of breadcrumb trail 
-        # through the tree. 
+        # In the block below, we use plugin_trail as a kind of breadcrumb trail
+        # through the tree.
         #
         # we assign a parent to our new plugin
         if not self.parent:
-            # We're lucky; we don't need to find a parent. We'll just put 
+            # We're lucky; we don't need to find a parent. We'll just put
             # new_plugin into the plugin_trail for potential children to use,
             # and move on.
             plugin_trail[:] = [new_plugin]
@@ -382,7 +382,6 @@ class CMSPlugin(MPTTModel):
         if self.child_plugin_instances:
             return len(self.child_plugin_instances)
 
-
 reversion_register(CMSPlugin)
 
 
@@ -418,7 +417,7 @@ def deferred_class_factory(model, attrs):
     overrides["RenderMeta"] = RenderMeta
     overrides["__module__"] = model.__module__
     overrides["_deferred"] = True
-    return type(name, (model,), overrides)
+    return type(name, (model, ), overrides)
 
 # The above function is also used to unpickle model instances with deferred
 # fields.

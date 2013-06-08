@@ -16,11 +16,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('cms', ['UserSettings'])
 
-
     def backwards(self, orm):
         # Deleting model 'UserSettings'
         db.delete_table(u'cms_usersettings')
-
 
     models = {
         u'auth.group': {

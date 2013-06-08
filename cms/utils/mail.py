@@ -7,26 +7,28 @@ from django.contrib.sites.models import Site
 
 from cms.utils.urlutils import urljoin
 
+
 def send_mail(subject, txt_template, to, context=None, html_template=None, fail_silently=True):
     """
     Multipart message helper with template rendering.
     """
     site = Site.objects.get_current()
-    
+
     context = context or {}
     context.update({
         'login_url': "http://%s" % urljoin(site.domain, reverse('admin:index')),
         'title': subject,
     })
-    
+
     txt_body = render_to_string(txt_template, context)
-    
+
     message = EmailMultiAlternatives(subject=subject, body=txt_body, to=to)
-    
+
     if html_template:
         body = render_to_string(html_template, context)
         message.attach_alternative(body, 'text/html')
     message.send(fail_silently=fail_silently)
+
 
 def mail_page_user_change(user, created=False, password=""):
     """

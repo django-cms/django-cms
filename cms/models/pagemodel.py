@@ -623,7 +623,6 @@ class Page(MPTTModel):
             if not hasattr(self, "ancestors_descending"):
                 self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
-
     # ## Title object access
 
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
@@ -681,13 +680,13 @@ class Page(MPTTModel):
         get when this page was last updated
         """
         return self.changed_date
-        
+
     def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get user who last changed this page
         """
         return self.changed_by
-        
+
     def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language
@@ -1125,6 +1124,5 @@ def _reversion():
         follow=["title_set", "placeholders", "pagepermission_set"],
         exclude_fields=exclude_fields
     )
-
 
 _reversion()

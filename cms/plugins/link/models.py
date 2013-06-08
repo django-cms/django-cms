@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
 
+
 class Link(CMSPlugin):
     """
     A link to an other page or to an external website
@@ -21,4 +22,4 @@ class Link(CMSPlugin):
     def __unicode__(self):
         return self.name
 
-    search_fields = ('name',)
+    search_fields = ('name', )

@@ -45,6 +45,7 @@ class FileOutputWrapper(object):
         section(title): A context manager that starts a new section. For the
             Section API see FileSectionWrapper
     """
+
     def __init__(self, stdout, stderr):
         self.stdout = stdout
         self.stderr = stderr
@@ -121,6 +122,7 @@ class FileSectionWrapper(FileOutputWrapper):
         finish_warning(message): End this section with a warning
         finish_skip(message): End this (skipped) section
     """
+
     def __init__(self, wrapper):
         super(FileSectionWrapper, self).__init__(wrapper.stdout, wrapper.stderr)
         self.wrapper = wrapper
@@ -180,6 +182,7 @@ def check_sekizai(output):
         else:
             section.finish_error("Sekizai configuration has errors")
 
+
 @define_check
 def check_i18n(output):
     with output.section("Internationalization") as section:
@@ -190,6 +193,7 @@ def check_i18n(output):
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
                 section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
+
 
 @define_check
 def check_deprecated_settings(output):
@@ -213,15 +217,16 @@ def check_plugin_instances(output):
         for plugin_type in report:
             # warn about those that are not installed
             if not plugin_type["model"]:
-                section.error("%s has instances but is no longer installed" % plugin_type["type"] )
+                section.error("%s has instances but is no longer installed" % plugin_type["type"])
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
-                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))                
+                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
         else:
             section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
+
 
 @define_check
 def check_copy_relations(output):

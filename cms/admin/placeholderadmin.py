@@ -43,7 +43,6 @@ class PlaceholderAdmin(ModelAdmin):
         ]
         ]
 
-
     def get_fieldsets(self, request, obj=None):
         """
         Get fieldsets to enforce correct fieldsetting of placeholder fields
@@ -71,16 +70,16 @@ class PlaceholderAdmin(ModelAdmin):
                     fieldsets.remove((label, fieldset))
             for placeholder in placeholder_fields:
                 fieldsets.append((self.get_label_for_placeholder(placeholder), {
-                    'fields': (placeholder,),
-                    'classes': ('plugin-holder', 'plugin-holder-nopage',),
-                },))
+                    'fields': (placeholder, ),
+                    'classes': ('plugin-holder', 'plugin-holder-nopage', ),
+                }, ))
             return fieldsets
         fieldsets = []
         fieldsets.append((None, {'fields': [f for f in form.base_fields.keys() if not f in placeholder_fields]}))
         for placeholder in placeholder_fields:
             fieldsets.append((self.get_label_for_placeholder(placeholder), {
-                'fields': (placeholder,),
-                'classes': ('plugin-holder', 'plugin-holder-nopage',),
+                'fields': (placeholder, ),
+                'classes': ('plugin-holder', 'plugin-holder-nopage', ),
             }))
         readonly_fields = self.get_readonly_fields(request, obj)
         if readonly_fields:
@@ -178,9 +177,9 @@ class PlaceholderAdmin(ModelAdmin):
         # check if we got a placeholder (id)
         if placeholder_id:
             placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        else: # else get the parent_id
+        else:  # else get the parent_id
             parent_id = request.POST.get('parent_id', None)
-            if not parent_id: # if we get neither a placeholder nor a parent, bail out
+            if not parent_id:  # if we get neither a placeholder nor a parent, bail out
                 raise Http404
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             placeholder = parent.placeholder
@@ -286,7 +285,7 @@ class PlaceholderAdmin(ModelAdmin):
         if request.method != "POST":
             return HttpResponse(str("error"))
 
-        if 'plugin_id' in request.POST: # single plugin moving
+        if 'plugin_id' in request.POST:  # single plugin moving
             plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
 
             if 'placeholder_id' in request.POST:
@@ -309,7 +308,7 @@ class PlaceholderAdmin(ModelAdmin):
             plugin.position = position
             plugin.save()
         pos = 0
-        if 'ids' in request.POST: # multiple plugins/ reordering
+        if 'ids' in request.POST:  # multiple plugins/ reordering
             whitelisted_placeholders = []
             for id in request.POST['ids'].split("_"):
                 plugin = CMSPlugin.objects.get(pk=id)
@@ -334,7 +333,7 @@ class PlaceholderAdmin(ModelAdmin):
 
     @xframe_options_sameorigin
     def remove_plugin(self, request):
-        if request.method != "POST": # only allow POST
+        if request.method != "POST":  # only allow POST
             raise Http404
         plugin_id = request.POST['plugin_id']
         plugin = get_object_or_404(CMSPlugin, pk=plugin_id)

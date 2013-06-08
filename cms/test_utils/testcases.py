@@ -18,7 +18,6 @@ import urllib
 import warnings
 from cms.utils.permissions import set_current_user
 
-
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
 URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
@@ -85,7 +84,6 @@ class CMSTestCase(testcases.TestCase):
         self.create_fixtures()
         activate("en")
 
-
     def create_fixtures(self):
         pass
 
@@ -109,7 +107,7 @@ class CMSTestCase(testcases.TestCase):
         Set `permissions` parameter to an iterable of permission codes to add
         custom permissios.
         """
-        user = User(username=username, email=username+'@django-cms.org',
+        user = User(username=username, email=username + '@django-cms.org',
                     is_staff=is_staff, is_active=is_active, is_superuser=is_superuser)
         user.set_password(username)
         user.save()
@@ -168,10 +166,9 @@ class CMSTestCase(testcases.TestCase):
         self.counter = self.counter + 1
         return page_data
 
-    
     def get_new_page_data_dbfields(self, parent=None, site=None,
                                    language=None,
-                                   template='nav_playground.html',):
+                                   template='nav_playground.html', ):
         page_data = {
             'title': 'test page %d' % self.counter,
             'slug': 'test-page-%d' % self.counter,
@@ -182,8 +179,7 @@ class CMSTestCase(testcases.TestCase):
         }
         self.counter = self.counter + 1
         return page_data
-    
-    
+
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
         created from get_new_page_data so you can switch between test cases
@@ -198,7 +194,6 @@ class CMSTestCase(testcases.TestCase):
         page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         return page_data
-    
 
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.

@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from cms.test_utils.util.context_managers import TemporaryDirectory
 from django.core.management.base import CommandError
-from django.core.management.commands.compilemessages import (compile_messages, 
+from django.core.management.commands.compilemessages import (compile_messages,
     has_bom)
 from django.test.testcases import TestCase
 import os
@@ -11,6 +11,7 @@ import sys
 
 THIS_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'locale'))
+
 
 def compile_messages():
     basedirs = [os.path.join('conf', 'locale'), 'locale']
@@ -37,10 +38,10 @@ def compile_messages():
                     # command, so that we can take advantage of shell quoting, to
                     # quote any malicious characters/escaping.
                     # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
-                    if sys.platform == 'win32': # Different shell-variable syntax
-                        bits = ['msgfmt', '--check-format',  '-o',  pf + '.mo', pf + '.po']
+                    if sys.platform == 'win32':  # Different shell-variable syntax
+                        bits = ['msgfmt', '--check-format', '-o', pf + '.mo', pf + '.po']
                     else:
-                        bits = ['msgfmt', '--check-format',  '-o',  pf + '.mo', pf + '.po']
+                        bits = ['msgfmt', '--check-format', '-o', pf + '.mo', pf + '.po']
                     pipe = subprocess.Popen(bits, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stderr = pipe.communicate()[-1]
                     if pipe.returncode != 0:

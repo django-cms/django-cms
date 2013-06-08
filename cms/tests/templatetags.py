@@ -227,7 +227,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
 
 class NoFixtureDatabaseTemplateTagTests(TestCase):
     def test_cached_show_placeholder_sekizai(self):
-        from django.core.cache import cache;
+        from django.core.cache import cache
 
         cache.clear()
         from cms.test_utils import project

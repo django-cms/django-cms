@@ -10,7 +10,6 @@ from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
 
-
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
 
 
@@ -52,15 +51,15 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                     Text.objects.get(id=copy.id).body
                 )
 
-            # Now build a *tree* of the plugins, and match those - it's not 
-            # enough just to compare querysets as above; we should *also* check 
-            # that when we build a tree, the various nodes are assembled as we 
+            # Now build a *tree* of the plugins, and match those - it's not
+            # enough just to compare querysets as above; we should *also* check
+            # that when we build a tree, the various nodes are assembled as we
             # would expect. We will pump the trees into a pair of lists:
             original_plugins_list = []
             copied_plugins_list = []
 
-            # This function builds the tree of plugins, starting from its roots. 
-            # In that respect it's like many of the plugin tree-building 
+            # This function builds the tree of plugins, starting from its roots.
+            # In that respect it's like many of the plugin tree-building
             # routines elsewhere in the system.
             def plugin_list_from_tree(roots, plugin_list):
                 for plugin in roots:
@@ -72,14 +71,14 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             plugin_list_from_tree(original_plugins.filter(level=0), original_plugins_list)
             plugin_list_from_tree(copied_plugins.filter(level=0), copied_plugins_list)
 
-            # Check that each pair of items in the two lists match, in lots of 
+            # Check that each pair of items in the two lists match, in lots of
             # different ways
             for original, copy in zip(original_plugins_list, copied_plugins_list):
                 original_text_plugin = Text.objects.get(id=original.id)
                 copied_text_plugin = Text.objects.get(id=copy.id)
 
-                # This first one is a sanity test, just to prove that we aren't 
-                # simply comparing *exactly the same items* in all these tests. 
+                # This first one is a sanity test, just to prove that we aren't
+                # simply comparing *exactly the same items* in all these tests.
                 # It could happen...
                 self.assertNotEquals(original.id, copy.id)
                 self.assertEquals(
@@ -113,7 +112,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         # just in case the test method that called us wants it:
         return copied_placeholder
-
 
     def test_plugin_deep_nesting_and_copying(self):
         """
@@ -153,8 +151,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         """
 
         placeholder = Placeholder(slot=u"some_slot")
-        placeholder.save() # a good idea, if not strictly necessary
-
+        placeholder.save()  # a good idea, if not strictly necessary
 
         # plugin in placeholder
         plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",
@@ -162,8 +159,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         )
         plugin_1.save()
 
-        # IMPORTANT: plugins must be reloaded, before they can be assigned 
-        # as a parent. Otherwise, the MPTT structure doesn't seem to rebuild 
+        # IMPORTANT: plugins must be reloaded, before they can be assigned
+        # as a parent. Otherwise, the MPTT structure doesn't seem to rebuild
         # properly.
 
         # child of plugin_1
@@ -174,7 +171,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugin_2.parent = plugin_1
         plugin_2.save()
 
-        # plugin_2 should be plugin_1's only child 
+        # plugin_2 should be plugin_1's only child
         # for a single item we use assertItemsEqual
         self.assertItemsEqual(
             CMSPlugin.objects.get(id=plugin_1.pk).get_children(),
@@ -417,7 +414,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugin_7.save()
         self.copy_placeholders_and_check_results([placeholder, ])
 
-
     def test_nested_plugin_on_page(self):
         """
         Validate a textplugin with a nested link plugin
@@ -440,8 +436,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             link_plugin.name = u"django-cms Link"
             link_plugin.url = u"https://www.django-cms.org"
 
-            # as for some reason mptt does not 
-            # update the parent child relationship 
+            # as for some reason mptt does not
+            # update the parent child relationship
             # in the add_plugin method when a target present
             # but this is not the topic of the test
             link_plugin.parent = text_plugin
@@ -472,7 +468,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             self.assertEquals(text_plugin.get_descendants().exclude(placeholder=text_plugin.placeholder).count(), 0)
             post_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(post_add_plugin_count, 2)
-
 
     def test_copy_page_nested_plugin(self):
         """
@@ -631,10 +626,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             msg = u"plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
             self.assertEquals(count_plugins_copied, count_plugins_org, msg)
             # verify the body of text plugin with nested link plugin
-            # org to copied  
+            # org to copied
             org_nested_text_plugin = None
             # do this iteration to find the real text plugin with the attached link
-            # the inheritance mechanism for the cmsplugins works through 
+            # the inheritance mechanism for the cmsplugins works through
             # (tuple)get_plugin_instance()
             for x in org_placeholder_two_plugins:
                 if x.plugin_type == u"TextPlugin":
@@ -677,7 +672,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             msg = u"placeholder of the orginal plugin and copied plugin are the same"
             ok = ((org_placeholder.id != copied_placeholder.id))
             self.assertTrue(ok, msg)
-
 
     def test_copy_page_nested_plugin_moved_parent_plugin(self):
         """
@@ -766,8 +760,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 post_data = {
                     'placeholder_id': page_one_ph_three.id,
                     'plugin_id': text_plugin_two.id,
-                    'plugin_language':'en',
-                    'plugin_parent':'',
+                    'plugin_language': 'en',
+                    'plugin_parent': '',
                 }
                 edit_url = URL_CMS_MOVE_PLUGIN % page_one.id
                 response = self.client.post(edit_url, post_data)
@@ -864,10 +858,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             msg = u"plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
             self.assertEquals(count_plugins_copied, count_plugins_org, msg)
             # verify the body of text plugin with nested link plugin
-            # org to copied  
+            # org to copied
             org_nested_text_plugin = None
             # do this iteration to find the real text plugin with the attached link
-            # the inheritance mechanism for the cmsplugins works through 
+            # the inheritance mechanism for the cmsplugins works through
             # (tuple)get_plugin_instance()
             for x in org_placeholder_three_plugins:
                 if x.plugin_type == u"TextPlugin":

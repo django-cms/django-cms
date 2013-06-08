@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from cms.tests.admin import *
 from cms.tests.api import *
 from cms.tests.apphooks import *

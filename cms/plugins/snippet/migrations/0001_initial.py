@@ -24,14 +24,12 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('snippet', ['SnippetPtr'])
 
-
     def backwards(self, orm):
         # Deleting model 'Snippet'
         db.delete_table('snippet_snippet')
 
         # Deleting model 'SnippetPtr'
         db.delete_table('cmsplugin_snippetptr')
-
 
     models = {
         'cms.cmsplugin': {

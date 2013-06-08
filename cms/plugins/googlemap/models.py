@@ -40,7 +40,7 @@ class GoogleMap(CMSPlugin):
 
     def __unicode__(self):
         return u"%s (%s, %s %s)" % (self.get_title(), self.address,
-                                    self.zipcode, self.city,)
+                                    self.zipcode, self.city, )
 
     def get_title(self):
         if self.title is None:

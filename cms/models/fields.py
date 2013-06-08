@@ -16,7 +16,7 @@ class PlaceholderField(models.ForeignKey):
         self.default_width = default_width
         self.actions = actions()
         kwargs.update({'null': True})  # always allow Null
-        kwargs.update({'editable': False}) # never allow edits in admin
+        kwargs.update({'editable': False})  # never allow edits in admin
         super(PlaceholderField, self).__init__(Placeholder, **kwargs)
 
     def _get_new_placeholder(self):

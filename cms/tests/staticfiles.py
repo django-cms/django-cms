@@ -16,4 +16,3 @@ class StaticFilesTest(TestCase):
                 STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage'):
                 with StdoutOverride() as output:
                     management.call_command('collectstatic', interactive=False)
-

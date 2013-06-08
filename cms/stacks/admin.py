@@ -22,9 +22,9 @@ from cms.stacks.models import Stack
 
 class StackAdmin(PlaceholderAdmin):
     list_display = ('name', 'code', 'linked_plugins_count', 'creation_method')
-    search_fields = ('name', 'code',)
-    exclude = ('creation_method',)
-    list_filter = ('creation_method',)
+    search_fields = ('name', 'code', )
+    exclude = ('creation_method', )
+    list_filter = ('creation_method', )
 
     def queryset(self, request):
         return super(StackAdmin, self).queryset(request).annotate(linked_plugins_count=models.Count('linked_plugins'))
@@ -64,7 +64,7 @@ class StackAdmin(PlaceholderAdmin):
                 stack = form.save()
                 copy_plugins_to(plugin_list, stack.content)
                 stack.save()
-                return HttpResponse('OK') # TODO: close the window
+                return HttpResponse('OK')  # TODO: close the window
         return self.add_view(request)
 
     def create_stack_from_plugin(self, request, placeholder_id, plugin_id):

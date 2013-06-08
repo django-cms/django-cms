@@ -4,6 +4,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.tag
 def language(parser, token):
     try:
@@ -11,4 +12,3 @@ def language(parser, token):
     except ImportError:
         from i18nurls.templatetags.i18nurls import language
     return language(parser, token)
-

@@ -158,8 +158,8 @@ class RenderingTestCase(SettingsOverrideTestCase):
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
         """
         with SettingsOverride(
-                CMS_PLUGIN_PROCESSORS=('cms.tests.rendering.sample_plugin_processor',),
-                CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.rendering.sample_plugin_context_processor',),
+                CMS_PLUGIN_PROCESSORS=('cms.tests.rendering.sample_plugin_processor', ),
+                CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.rendering.sample_plugin_context_processor', ),
         ):
             def test_passed_plugin_context_processor(instance, placeholder, context):
                 return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
@@ -169,9 +169,9 @@ class RenderingTestCase(SettingsOverrideTestCase):
             instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
             instance.render_template = Template(t)
             context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance,
-                                    self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
+                                    self.test_placeholders['main'], processors=(test_passed_plugin_context_processor, ))
             plugin_rendering._standard_processors = {}
-            c = render_plugins((instance,), context, self.test_placeholders['main'])
+            c = render_plugins((instance, ), context, self.test_placeholders['main'])
             r = "".join(c)
             self.assertEqual(r, u'1|' + self.test_data[
                 'text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +

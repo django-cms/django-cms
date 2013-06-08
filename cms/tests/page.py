@@ -53,7 +53,6 @@ class PagesTestCase(CMSTestCase):
 
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-
             #self.assertEqual(Page.objects.all().count(), 2)
             #self.assertEqual(Title.objects.all().count(), 2)
 
@@ -103,7 +102,6 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-
             #page1 = Title.objects.get(slug=page_data['slug']).page
             # create page with the same page_data
 
@@ -232,7 +230,6 @@ class PagesTestCase(CMSTestCase):
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'new title')
 
-
     def test_meta_description_fields_from_admin(self):
         """
         Test that description and keywords tags can be set via the admin
@@ -270,8 +267,7 @@ class PagesTestCase(CMSTestCase):
             req.current_page = page
             req.REQUEST = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
-            
-            
+
     def test_page_obj_change_data_from_template_tags(self):
         from django import template
 
@@ -280,7 +276,7 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             change_user = str(superuser)
             #some databases don't store microseconds, so move the start flag back by 1 second
-            before_change = datetime.datetime.now()+datetime.timedelta(seconds=-1)
+            before_change = datetime.datetime.now() + datetime.timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
@@ -291,11 +287,11 @@ class PagesTestCase(CMSTestCase):
             after_change = datetime.datetime.now()
             req.current_page = page
             req.REQUEST = {}
-            
+
             actual_result = t.render(template.Context({"request": req}))
             desired_result = "{0} changed on {1}".format(change_user, actual_result[-19:])
             save_time = datetime.datetime.strptime(actual_result[-19:], "%Y-%m-%dT%H:%M:%S")
-            
+
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
             self.assertTrue(before_change <= save_time)
@@ -321,7 +317,6 @@ class PagesTestCase(CMSTestCase):
             self.copy_page(page_a, page_b_a)
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
-
 
     def test_language_change(self):
         superuser = self.get_superuser()
@@ -400,7 +395,6 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(child.get_template(), parent.get_template())
         child.move_page(parent, 'left')
         self.assertEqual(child.get_template(), parent.get_template())
-
 
     def test_add_placeholder(self):
         # create page
@@ -481,7 +475,6 @@ class PagesTestCase(CMSTestCase):
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
 
-
     def test_templates(self):
         """
         Test the inheritance magic for templates
@@ -516,7 +509,7 @@ class PagesTestCase(CMSTestCase):
         a page!
         """
         page = create_page("page", "nav_playground.html", "en")
-        page.rescan_placeholders() # create placeholders
+        page.rescan_placeholders()  # create placeholders
         placeholder = page.placeholders.all()[0]
         plugin_base = CMSPlugin(
             plugin_type='TextPlugin',
@@ -539,7 +532,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_get_page_from_request_on_non_cms_admin(self):
         request = self.get_request(
-            reverse('admin:sampleapp_category_change', args=(1,))
+            reverse('admin:sampleapp_category_change', args=(1, ))
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
@@ -547,7 +540,7 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_from_request_on_cms_admin(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(page.pk,))
+            reverse('admin:cms_page_change', args=(page.pk, ))
         )
         found_page = get_page_from_request(request)
         self.assertTrue(found_page)
@@ -555,7 +548,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_get_page_from_request_on_cms_admin_nopage(self):
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(1,))
+            reverse('admin:cms_page_change', args=(1, ))
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
@@ -563,7 +556,7 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_from_request_cached(self):
         mock_page = 'hello world'
         request = self.get_request(
-            reverse('admin:sampleapp_category_change', args=(1,))
+            reverse('admin:sampleapp_category_change', args=(1, ))
         )
         request._current_page_cache = mock_page
         page = get_page_from_request(request)
@@ -597,7 +590,7 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_from_request_on_cms_admin_with_editplugin(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(page.pk,)) + 'edit-plugin/42/'
+            reverse('admin:cms_page_change', args=(page.pk, )) + 'edit-plugin/42/'
         )
         found_page = get_page_from_request(request)
         self.assertTrue(found_page)
@@ -605,7 +598,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_get_page_from_request_on_cms_admin_with_editplugin_nopage(self):
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(1,)) + 'edit-plugin/42/'
+            reverse('admin:cms_page_change', args=(1, )) + 'edit-plugin/42/'
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
@@ -777,7 +770,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
     def test_plugin_loading_queries(self):
-        with SettingsOverride(CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'),)):
+        with SettingsOverride(CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), )):
             page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
             placeholders = list(page.placeholders.all())
             for i, placeholder in enumerate(placeholders):
@@ -856,15 +849,15 @@ class PageAdminTest(PageAdminTestBase):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # first
+                response = admin.move_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
                 request = self.get_post_request(
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # second
+                response = admin.move_plugin(request)  # second
                 self.assertEqual(response.status_code, 200)
                 request = self.get_post_request(
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # third
+                response = admin.move_plugin(request)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
 
@@ -885,11 +878,11 @@ class PageAdminTest(PageAdminTestBase):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # first
+                response = admin.move_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
                 request = self.get_post_request(
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # second
+                response = admin.move_plugin(request)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  "This placeholder already has the maximum number (1) of allowed Text plugins.")
@@ -956,7 +949,6 @@ class PageTreeTests(CMSTestCase):
 
         self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
         self.assertEqual(child.publisher_public.get_absolute_url(language='en'), '/en/father/child/')
-
 
     def test_move_node(self):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)

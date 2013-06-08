@@ -107,7 +107,7 @@ class PlaceholderTestCase(CMSTestCase):
             char_4='four'
         )
         ex.save()
-        response = self.client.get(reverse('admin:placeholderapp_example1_change', args=(ex.pk,)))
+        response = self.client.get(reverse('admin:placeholderapp_example1_change', args=(ex.pk, )))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
 
@@ -159,7 +159,7 @@ class PlaceholderTestCase(CMSTestCase):
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
-                reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
+                reverse('admin:placeholderapp_example1_change', args=(ex.pk, )),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
             self.assertContains(response, "/static/plugins/empty-image-file.png")
@@ -178,7 +178,7 @@ class PlaceholderTestCase(CMSTestCase):
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
-                reverse('admin:cms_page_change', args=(page.pk,)),
+                reverse('admin:cms_page_change', args=(page.pk, )),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
             self.assertContains(response, "/static/plugins/empty-image-file.png")
@@ -264,11 +264,11 @@ class PlaceholderTestCase(CMSTestCase):
         # First test the default (non-fallback) behavior)
         ## English page should have the text plugin
         content_en = render_placeholder(placeholder_en, context_en)
-        self.assertRegexpMatches(content_en,"^en body$")
+        self.assertRegexpMatches(content_en, "^en body$")
 
         ## Deutsch page should have no text
         content_de = render_placeholder(placeholder_en, context_de)
-        self.assertNotRegexpMatches(content_de,"^en body$")
+        self.assertNotRegexpMatches(content_de, "^en body$")
 
         conf = {
             'col_left': {
@@ -278,12 +278,12 @@ class PlaceholderTestCase(CMSTestCase):
         with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
             content_de = render_placeholder(placeholder_en, context_de)
-            self.assertRegexpMatches(content_de,"^en body$")
+            self.assertRegexpMatches(content_de, "^en body$")
 
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de,"^de body$")
+            self.assertRegexpMatches(content_de, "^de body$")
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
@@ -394,12 +394,12 @@ class PlaceholderModelTests(CMSTestCase):
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
         result = ph._get_attached_model()
-        self.assertEqual(result, None) # Simple PH - no model
+        self.assertEqual(result, None)  # Simple PH - no model
 
     def test_excercise_get_attached_field_name(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
         result = ph._get_attached_field_name()
-        self.assertEqual(result, None) # Simple PH - no field name
+        self.assertEqual(result, None)  # Simple PH - no field name
 
     def test_excercise_get_attached_models_notplugins(self):
         ex = Example1(
@@ -411,10 +411,10 @@ class PlaceholderModelTests(CMSTestCase):
         ex.save()
         ph = ex.placeholder
         result = list(ph._get_attached_models())
-        self.assertEqual(result, [Example1]) # Simple PH - Example1 model
+        self.assertEqual(result, [Example1])  # Simple PH - Example1 model
         add_plugin(ph, TextPlugin, 'en', body='en body')
         result = list(ph._get_attached_models())
-        self.assertEqual(result, [Example1]) # Simple PH still one Example1 model
+        self.assertEqual(result, [Example1])  # Simple PH still one Example1 model
 
     def test_excercise_get_attached_fields_notplugins(self):
         ex = Example1(
@@ -426,10 +426,10 @@ class PlaceholderModelTests(CMSTestCase):
         ex.save()
         ph = ex.placeholder
         result = [f.name for f in list(ph._get_attached_fields())]
-        self.assertEqual(result, ['placeholder']) # Simple PH - placeholder field name
+        self.assertEqual(result, ['placeholder'])  # Simple PH - placeholder field name
         add_plugin(ph, TextPlugin, 'en', body='en body')
         result = [f.name for f in list(ph._get_attached_fields())]
-        self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
+        self.assertEqual(result, ['placeholder'])  # Simple PH - still one placeholder field name
 
 
 class PlaceholderAdminTestBase(CMSTestCase):
@@ -465,11 +465,11 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
-                response = admin.add_plugin(request) # first
+                response = admin.add_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
-                response = admin.add_plugin(request) # second
+                response = admin.add_plugin(request)  # second
                 self.assertEqual(response.status_code, 200)
-                response = admin.add_plugin(request) # third
+                response = admin.add_plugin(request)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
 
@@ -485,9 +485,9 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
-                response = admin.add_plugin(request) # first
+                response = admin.add_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
-                response = admin.add_plugin(request) # second
+                response = admin.add_plugin(request)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  "This placeholder already has the maximum number (1) of allowed Text plugins.")
@@ -508,13 +508,13 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
-                response = admin.move_plugin(request) # first
+                response = admin.move_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
-                response = admin.move_plugin(request) # second
+                response = admin.move_plugin(request)  # second
                 self.assertEqual(response.status_code, 200)
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
-                response = admin.move_plugin(request) # third
+                response = admin.move_plugin(request)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
 
@@ -533,10 +533,10 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
-                response = admin.move_plugin(request) # first
+                response = admin.move_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
-                response = admin.move_plugin(request) # second
+                response = admin.move_plugin(request)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  "This placeholder already has the maximum number (1) of allowed Text plugins.")
@@ -641,7 +641,6 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         response = admin.add_plugin(request)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
-
     def test_plugin_edit_requires_permissions(self):
         """User wants to edit a plugin to the example app placeholder but has no permissions"""
         self._create_example()
@@ -726,7 +725,6 @@ class PlaceholderI18NTest(CMSTestCase):
         response = self.client.get('/de/admin/placeholderapp/multilingualexample1/1/')
         self.assertContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
-
     def test_no_tabs(self):
 
         ex = Example1(
@@ -756,5 +754,3 @@ class PlaceholderI18NTest(CMSTestCase):
 
         response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/1/')
         self.assertNotContains(response, """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
-
-

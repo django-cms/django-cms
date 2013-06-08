@@ -137,7 +137,7 @@ def details(request, slug):
         return HttpResponseRedirect('%s?%s=%s' % tup)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
-    # fill the context 
+    # fill the context
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)

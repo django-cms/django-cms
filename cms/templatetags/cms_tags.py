@@ -25,7 +25,6 @@ from django.utils.translation import ugettext_lazy as _, get_language
 import re
 from sekizai.helpers import Watcher, get_varname
 
-
 register = template.Library()
 
 
@@ -44,7 +43,6 @@ def get_site_id(site):
 
 def has_permission(page, request):
     return page.has_change_permission(request)
-
 
 register.filter(has_permission)
 
@@ -144,7 +142,6 @@ class PageUrl(InclusionTag):
         if url:
             return {'content': url}
         return {'content': ''}
-
 
 register.tag(PageUrl)
 
@@ -271,7 +268,6 @@ class Placeholder(Tag):
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
 
-
 register.tag(Placeholder)
 
 
@@ -293,12 +289,11 @@ class RenderPlugin(InclusionTag):
         if edit:
             from cms.middleware.toolbar import toolbar_plugin_processor
 
-            processors = (toolbar_plugin_processor,)
+            processors = (toolbar_plugin_processor, )
         else:
             processors = None
 
         return {'content': plugin.render_plugin(context, processors=processors)}
-
 
 register.tag(RenderPlugin)
 
@@ -325,6 +320,7 @@ class PluginChildClasses(InclusionTag):
         return {'plugin_classes': child_plugin_classes}
 
 register.tag(PluginChildClasses)
+
 
 class PageAttribute(AsTag):
     """
@@ -399,7 +395,6 @@ class PageAttribute(AsTag):
             return ret_val
         return ''
 
-
 register.tag(PageAttribute)
 
 
@@ -457,10 +452,10 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
         cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
         cached_value = cache.get(cache_key)
-        if isinstance(cached_value, dict): # new style
+        if isinstance(cached_value, dict):  # new style
             _restore_sekizai(context, cached_value['sekizai'])
             return {'content': mark_safe(cached_value['content'])}
-        elif isinstance(cached_value, basestring): # old style
+        elif isinstance(cached_value, basestring):  # old style
             return {'content': mark_safe(cached_value)}
 
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
@@ -506,7 +501,6 @@ class ShowPlaceholderById(InclusionTag):
             'site': site
         }
 
-
 register.tag(ShowPlaceholderById)
 register.tag('show_placeholder', ShowPlaceholderById)
 
@@ -518,7 +512,6 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
         kwargs['cache_result'] = False
         return kwargs
-
 
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
@@ -544,7 +537,6 @@ class CMSToolbar(InclusionTag):
 
     def get_context(self, context):
         return context
-
 
 register.tag(CMSToolbar)
 

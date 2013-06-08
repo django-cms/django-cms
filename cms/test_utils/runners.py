@@ -4,8 +4,8 @@ from django.utils.unittest.suite import TestSuite
 import operator
 import time
 
-
 TIMINGS = {}
+
 
 def time_it(func):
     def _inner(*args, **kwargs):
@@ -21,13 +21,12 @@ class TimingSuite(TestSuite):
     def addTest(self, test):
         test = time_it(test)
         super(TimingSuite, self).addTest(test)
-        
+
         
 class JenkinsTestRunner(DjangoTestSuiteRunner):
     def run_suite(self, suite, **kwargs):
         from xmlrunner import XMLTestRunner
         return XMLTestRunner(output=settings.JUNIT_OUTPUT_DIR).run(suite)
-
 
 
 class NormalTestRunner(DjangoTestSuiteRunner):
@@ -48,4 +47,3 @@ class NormalTestRunner(DjangoTestSuiteRunner):
             print("Ten slowest tests:")
             for func_name, timing in by_time:
                 print("{t:.2f}s {f}".format(f=func_name, t=timing))
-

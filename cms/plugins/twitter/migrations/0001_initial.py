@@ -27,14 +27,12 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('twitter', ['TwitterSearch'])
 
-
     def backwards(self, orm):
         # Deleting model 'TwitterRecentEntries'
         db.delete_table('cmsplugin_twitterrecententries')
 
         # Deleting model 'TwitterSearch'
         db.delete_table('cmsplugin_twittersearch')
-
 
     models = {
         'cms.cmsplugin': {

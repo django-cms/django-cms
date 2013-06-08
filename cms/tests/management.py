@@ -16,6 +16,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
 
+
 class ManagementTestCase(CMSTestCase):
 
     def test_list_apphooks(self):
@@ -130,7 +131,6 @@ class ManagementTestCase(CMSTestCase):
                 text_plugins_report["unsaved_instances"],
                 [instanceless_plugin])
 
-
     def test_delete_orphaned_plugins(self):
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
@@ -203,7 +203,6 @@ class ManagementTestCase(CMSTestCase):
             self.assertEqual(
                 len(text_plugins_report["unsaved_instances"]),
                 0)
-
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()

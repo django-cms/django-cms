@@ -3,6 +3,7 @@ from cms.plugin_base import CMSPluginBase
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+
 class EmptyPlugin(CMSPluginBase):
     name = _("Test Plugin")
     text_enabled = True

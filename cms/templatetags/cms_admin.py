@@ -14,7 +14,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 import django
 
-
 register = template.Library()
 
 if LooseVersion(django.get_version()) < LooseVersion('1.4'):
@@ -39,11 +38,9 @@ class ShowAdminMenu(InclusionTag):
         elif context.has_key('filtered'):
             filtered = context['filtered']
 
-
-
         # following function is newly used for getting the context per item (line)
         # if something more will be required, then get_admin_menu_item_context
-        # function have to be updated. 
+        # function have to be updated.
         # This is done because item can be reloaded after some action over ajax.
         context.update(get_admin_menu_item_context(request, page, filtered))
 
@@ -53,7 +50,6 @@ class ShowAdminMenu(InclusionTag):
         #    'no_children': no_children,
         #})
         return context
-
 
 register.tag(ShowAdminMenu)
 
@@ -74,11 +70,9 @@ class ShowLazyAdminMenu(InclusionTag):
         elif context.has_key('filtered'):
             filtered = context['filtered']
 
-
-
         # following function is newly used for getting the context per item (line)
         # if something more will be required, then get_admin_menu_item_context
-        # function have to be updated. 
+        # function have to be updated.
         # This is done because item can be reloaded after some action over ajax.
         context.update(get_admin_menu_item_context(request, page, filtered))
 
@@ -88,7 +82,6 @@ class ShowLazyAdminMenu(InclusionTag):
         #    'no_children': no_children,
         #})
         return context
-
 
 register.tag(ShowLazyAdminMenu)
 
@@ -115,7 +108,6 @@ class CleanAdminListFilter(InclusionTag):
                 unique_choices.append(choice)
                 query_string = choice['query_string']
         return {'title': spec.title, 'choices': unique_choices}
-
 
 register.tag(CleanAdminListFilter)
 
@@ -172,7 +164,6 @@ class RenderPlugin(InclusionTag):
     def get_context(self, context, plugin):
         return {'content': plugin.render_plugin(context, admin=True)}
 
-
 register.tag(RenderPlugin)
 
 
@@ -201,13 +192,11 @@ class PageSubmitRow(InclusionTag):
             'show_delete_translation': show_delete_translation
         }
 
-
 register.tag(PageSubmitRow)
 
 
 def in_filtered(seq1, seq2):
     return [x for x in seq1 if x in seq2]
-
 
 in_filtered = register.filter('in_filtered', in_filtered)
 
@@ -225,6 +214,5 @@ class CMSAdminIconBase(Tag):
 
     def render_tag(self, context):
         return CMS_ADMIN_ICON_BASE
-
 
 register.tag(CMSAdminIconBase)

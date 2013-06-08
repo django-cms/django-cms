@@ -12,6 +12,7 @@ refer to http://django-load.readthedocs.org/en/latest/index.html.
 from django.conf import settings
 from django.utils.importlib import import_module
 
+
 def get_module(app, modname, verbose, failfast):
     """
     Internal function to load a module from a single app.
@@ -28,7 +29,7 @@ def get_module(app, modname, verbose, failfast):
     if verbose:
         print "Loaded %r from %r" % (modname, app)
     return module
-        
+
 
 def load(modname, verbose=False, failfast=False):
     """
@@ -40,7 +41,7 @@ def load(modname, verbose=False, failfast=False):
     """
     for app in settings.INSTALLED_APPS:
         get_module(app, modname, verbose, failfast)
-        
+
 
 def iterload(modname, verbose=False, failfast=False):
     """
@@ -55,6 +56,7 @@ def iterload(modname, verbose=False, failfast=False):
         module = get_module(app, modname, verbose, failfast)
         if module:
             yield module
+
 
 def load_object(import_path):
     """
@@ -79,6 +81,7 @@ def load_object(import_path):
     module_name, object_name = import_path.rsplit('.', 1)
     module = import_module(module_name)
     return getattr(module, object_name)
+
 
 def iterload_objects(import_paths):
     """

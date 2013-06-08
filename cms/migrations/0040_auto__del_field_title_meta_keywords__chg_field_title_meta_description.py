@@ -11,7 +11,6 @@ class Migration(SchemaMigration):
         # Deleting field 'Title.meta_keywords'
         db.delete_column(u'cms_title', 'meta_keywords')
 
-
         # Changing field 'Title.meta_description'
         db.alter_column(u'cms_title', 'meta_description', self.gf('django.db.models.fields.TextField')(max_length=155, null=True))
 
@@ -20,7 +19,6 @@ class Migration(SchemaMigration):
         db.add_column(u'cms_title', 'meta_keywords',
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
                       keep_default=False)
-
 
         # Changing field 'Title.meta_description'
         db.alter_column(u'cms_title', 'meta_description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True))

@@ -15,13 +15,11 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.PositiveIntegerField')(default=0),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Changing field 'Title.meta_description'
         db.alter_column(u'cms_title', 'meta_description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True))
         # Deleting field 'Page.revision_id'
         db.delete_column(u'cms_page', 'revision_id')
-
 
     models = {
         u'auth.group': {

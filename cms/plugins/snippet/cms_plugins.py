@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.template.context import Context
 from models import SnippetPtr
 
+
 class SnippetPlugin(CMSPluginBase):
     model = SnippetPtr
     name = _("Snippet")
@@ -15,8 +16,8 @@ class SnippetPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         context.update({
-            'placeholder':placeholder,
-            'object':instance,
+            'placeholder': placeholder,
+            'object': instance,
         })
         try:
             if instance.snippet.template:

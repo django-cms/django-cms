@@ -25,7 +25,6 @@ class PageManager(PublisherManager):
 
     def public(self):
         return super(PageManager, self).public()
-
     # !IMPORTANT: following methods always return access to draft instances,
     # take care on what you do one them. use Page.objects.public() for accessing
     # the published page versions
@@ -212,7 +211,6 @@ class TitleManager(PublisherManager):
 ################################################################################
 # Permissions
 ################################################################################
-
 
 class BasicPagePermissionManager(models.Manager):
     """Global page permission manager accessible under objects.

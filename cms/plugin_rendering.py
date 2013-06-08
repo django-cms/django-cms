@@ -30,6 +30,7 @@ class PluginContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
+
     def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
         super(PluginContext, self).__init__(dict, current_app=current_app)
         if not processors:
@@ -63,6 +64,7 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
         content = processor(instance, placeholder, content, context)
     return content
 
+
 def render_plugins(plugins, context, placeholder, processors=None):
     """
     Renders a collection of plugins with the given context, using the appropriate processors
@@ -84,7 +86,7 @@ def render_plugins(plugins, context, placeholder, processors=None):
 
 
 def render_dragables(plugins, slot, request):
-    return render_to_string("cms/toolbar/draggable.html", {'plugins':plugins, 'slot':slot, 'request':request})
+    return render_to_string("cms/toolbar/draggable.html", {'plugins': plugins, 'slot': slot, 'request': request})
 
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None):
@@ -108,7 +110,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (len(plugins)==0 and placeholder and lang != get_default_language() and
+    if (len(plugins) == 0 and placeholder and lang != get_default_language() and
         get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
         fallbacks = get_fallback_languages(lang)
         for fallback_language in fallbacks:
@@ -135,10 +137,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     if (getattr(toolbar, 'edit_mode', False) and
         (not page or page.has_change_permission(request))):
-            edit = True
+        edit = True
     if edit:
         from cms.middleware.toolbar import toolbar_plugin_processor
-        processors = (toolbar_plugin_processor,)
+        processors = (toolbar_plugin_processor, )
     else:
         processors = None
 
@@ -150,9 +152,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         draggable_content = mark_safe(render_dragables(plugins, slot, request))
     content = mark_safe("".join(content))
 
-    result = render_to_string("cms/toolbar/placeholder.html", {'plugins':content, "bar":toolbar_content, "draggables":draggable_content, 'edit':edit})
+    result = render_to_string("cms/toolbar/placeholder.html", {'plugins': content, "bar": toolbar_content, "draggables": draggable_content, 'edit': edit})
     context.pop()
     return result
+
 
 def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool

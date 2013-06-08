@@ -19,6 +19,7 @@ except ImportError:
 # thread local support
 _thread_locals = local()
 
+
 def set_current_user(user):
     """
     Assigns current user from request to thread_locals, used by
@@ -26,11 +27,13 @@ def set_current_user(user):
     """
     _thread_locals.user = user
 
+
 def get_current_user():
     """
     Returns current user, or None
     """
     return getattr(_thread_locals, 'user', None)
+
 
 def has_page_add_permission(request):
     """
@@ -71,6 +74,7 @@ def has_page_add_permission(request):
             return True
     return False
 
+
 def has_any_page_change_permissions(request):
     from cms.utils.plugins import current_site
     if not request.user.is_authenticated():
@@ -81,6 +85,7 @@ def has_any_page_change_permissions(request):
             Q(user=request.user) |
             Q(group__in=request.user.groups.all())
         )).exists()
+
 
 def has_page_change_permission(request):
     """
@@ -117,7 +122,7 @@ def has_global_page_permission(request, site=None, **filters):
         request._cms_global_perms = {}
     key = tuple((k, v) for k, v in filters.iteritems())
     if site:
-        key = (('site', site.pk if hasattr(site, 'pk') else int(site)),) + key
+        key = (('site', site.pk if hasattr(site, 'pk') else int(site)), ) + key
     if key not in request._cms_global_perms:
         qs = GlobalPagePermission.objects.with_user(request.user).filter(**filters)
         if site:
@@ -163,6 +168,7 @@ def get_user_permission_level(user):
         raise NoPermissionsException
     return permission.page.level
 
+
 def get_subordinate_users(user):
     """
     Returns users queryset, containing all subordinate users to given user
@@ -204,7 +210,7 @@ def get_subordinate_users(user):
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:
-        # no permission so only staff and no page permissions 
+        # no permission so only staff and no page permissions
         qs = User.objects.distinct().filter(
                 Q(is_staff=True) &
                 Q(pageuser__created_by=user) &
@@ -220,6 +226,7 @@ def get_subordinate_users(user):
     )
     qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
     return qs
+
 
 def get_subordinate_groups(user):
     """
@@ -248,6 +255,7 @@ def get_subordinate_groups(user):
     )
     return qs
 
+
 def has_global_change_permissions_permission(request):
     opts = GlobalPagePermission._meta
     user = request.user
@@ -256,6 +264,7 @@ def has_global_change_permissions_permission(request):
         has_global_page_permission(request, can_change=True)):
         return True
     return False
+
 
 def has_generic_permission(page_id, user, attr, site):
     """
