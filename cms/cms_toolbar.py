@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, REFRESH, RIGHT, LEFT
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC, REFRESH, RIGHT
 from cms.exceptions import LanguageError
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_cms_setting, get_language_from_request
@@ -11,6 +11,20 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from menus.utils import DefaultLanguageChanger
+
+
+# Identifiers for search
+ADMIN_MENU_IDENTIFIER = 'admin-menu'
+TEMPLATE_MENU_BREAK = 'Template Menu Break'
+PAGE_MENU_FIRST_BREAK = 'Page Menu First Break'
+PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'
+PAGE_MENU_THIRD_BREAK = 'Page Menu Third Break'
+HISTORY_MENU_BREAK = 'History Menu Break'
+MANAGE_PAGES_BREAK = 'Manage Pages Break'
+ADMIN_SITES_BREAK = 'Admin Sites Break'
+ADMINISTRATION_BREAK = 'Administration Break'
+USER_SETTINGS_BREAK = 'User Settings Break'
+
 
 
 def add_page_menu(toolbar, current_page, permissions_active, request):
@@ -28,7 +42,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
         for path, name in get_cms_setting('TEMPLATES'):
             active = current_page.template == path
             if path == TEMPLATE_INHERITANCE_MAGIC:
-                templates_menu.add_break()
+                templates_menu.add_break(TEMPLATE_MENU_BREAK)
             templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active)
 
     # navigation toggle
@@ -38,7 +52,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
         nav_title = _("Display in nvagiation")
     nav_action = reverse('admin:cms_page_change_innavigation', args=(current_page.pk,))
     current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
-    current_page_menu.add_break()
+    current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
     # move pages
     current_page_menu.add_modal_item(_('Move page'), url=reverse('admin:cms_page_changelist'),
                                      disabled=not_edit_mode)
@@ -59,7 +73,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     sibling_url = '%s?%s' % (add_url, urllib.urlencode(sibling_data))
     current_page_menu.add_modal_item(_('Add sibling page'), url=sibling_url, close_on_url_change=True,
                                      disabled=not_edit_mode)
-    current_page_menu.add_break()
+    current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
     # advanced settings
     advanced_url = reverse('admin:cms_page_advanced', args=(current_page.pk,))
     advanced_disabled = not current_page.has_advanced_settings_permission(request) or not toolbar.edit_mode
@@ -71,7 +85,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
         permission_disabled = not toolbar.edit_mode or not current_page.has_change_permissions_permission(request)
         current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, close_on_url_change=True,
                                          disabled=permission_disabled)
-    current_page_menu.add_break()
+    current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
     # publisher
     if current_page.published:
         publish_title = _('Unpublish page')
@@ -104,7 +118,7 @@ def add_history_menu(toolbar, current_page):
         redo_action = reverse('admin:cms_page_redo', args=(current_page.pk,))
         history_menu.add_ajax_item(_('Undo'), action=undo_action, disabled=not has_undo)
         history_menu.add_ajax_item(_('Redo'), action=redo_action, disabled=not has_redo)
-        history_menu.add_break()
+        history_menu.add_break(HISTORY_MENU_BREAK)
     revert_action = reverse('admin:cms_page_revert_page', args=(current_page.pk,))
     revert_question = _('Are you sure you want to revert to live?')
     history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
@@ -134,7 +148,7 @@ def add_cms_menus(toolbar, current_page, permissions_active, request):
                 else:
                     title = _("Publish Page now")
                 publish_url = reverse('admin:cms_page_publish_page', args=(current_page.pk,))
-                toolbar.add_button(title, url=publish_url, extra_classes=classes, position=RIGHT,
+                toolbar.add_button(title, url=publish_url, extra_classes=classes, side=RIGHT,
                                    disabled=not current_page.is_dirty())
 
 
@@ -158,12 +172,12 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
     current_site = Site.objects.get_current()
 
     # the main admin menu
-    admin_menu = toolbar.get_menu('admin', _('Site'))
+    admin_menu = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
     # cms page admin
     if toolbar.can_change:
         pages_menu = admin_menu.get_menu('pages', _('Pages'))
         pages_menu.add_sideframe_item(_('Manage pages'), url=reverse("admin:cms_page_changelist"))
-        pages_menu.add_break()
+        pages_menu.add_break(MANAGE_PAGES_BREAK)
         pages_menu.add_sideframe_item(_('Add new page'), url=reverse("admin:cms_page_add"))
     # users
     if request.user.has_perm('user.change_user'):
@@ -176,15 +190,15 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
     if len(sites_queryset):
         sites_menu = admin_menu.get_menu('sites', _('Sites'))
         sites_menu.add_sideframe_item(_('Admin Sites'), url=reverse('admin:sites_site_changelist'))
-        sites_menu.add_break()
+        sites_menu.add_break(ADMIN_SITES_BREAK)
         for site in sites_queryset:
             sites_menu.add_link_item(site.name, url='http://%s' % site.domain, active=site.pk==current_site.pk)
     # admin
     admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
-    admin_menu.add_break()
+    admin_menu.add_break(ADMINISTRATION_BREAK)
     # cms users
     admin_menu.add_sideframe_item(_('User settings'), url=reverse('admin:cms_usersettings_change'))
-    admin_menu.add_break()
+    admin_menu.add_break(USER_SETTINGS_BREAK)
     # logout
     admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'), active=True)
 
@@ -204,6 +218,6 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         language_menu.add_link_item(language['name'], url=url, active=current_lang == language['code'])
     # edit switcher
     if toolbar.edit_mode:
-        switcher = toolbar.add_button_list('Mode Switcher', position=RIGHT, extra_classes=['cms_toolbar-item-buttons-group'])
+        switcher = toolbar.add_button_list('Mode Switcher', side=RIGHT, extra_classes=['cms_toolbar-item-buttons-group'])
         switcher.add_button(_("Content"), '?edit', active=not toolbar.build_mode, disabled=toolbar.build_mode)
         switcher.add_button(_("Structure"), '?build', active=toolbar.build_mode, disabled=not toolbar.build_mode)

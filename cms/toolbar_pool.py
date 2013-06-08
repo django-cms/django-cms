@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 class ToolbarPool(object):
     def __init__(self):
         self.toolbars = {}
+        self.reverse = {}
         self.discovered = False
         self.block_register = False
 
@@ -41,7 +42,11 @@ class ToolbarPool(object):
         if name in self.toolbars.keys():
             raise ToolbarAlreadyRegistered, "[%s] a toolbar with this name is already registered" % name
         self.toolbars[name] = callback
+        self.reverse[callback] = name
         return callback # return so it can be used as a decorator
+
+    def get_app_key(self, callback):
+        return self.reverse[callback]
 
     def get_toolbars(self):
         self.discover_toolbars()

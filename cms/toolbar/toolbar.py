@@ -66,32 +66,37 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Public API
 
-    def get_menu(self, key, verbose_name, position=LEFT):
+    def get_menu(self, key, verbose_name, side=LEFT, position=None):
         if key in self.menus:
             return self.menus[key]
-        menu = Menu(verbose_name, self.csrf_token, position=position)
+        menu = Menu(verbose_name, self.csrf_token, side=side)
         self.menus[key] = menu
-        self.add_item(menu)
+        self.add_item(menu, position=position)
         return menu
 
-    def add_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None, position=LEFT):
-        item = ButtonList(extra_classes=extra_wrapper_classes, position=position)
+    def add_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
+                   side=LEFT, position=None):
+        item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
         item.add_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes)
-        self.add_item(item)
+        self.add_item(item, position=position)
         return item
 
-    def add_button_list(self, identifier=None, extra_classes=None, position=None):
-        item = ButtonList(identifier, extra_classes=extra_classes, position=position)
-        self.add_item(item)
+    def add_button_list(self, identifier=None, extra_classes=None, side=LEFT, position=None):
+        item = ButtonList(identifier, extra_classes=extra_classes, side=side)
+        self.add_item(item, position=position)
         return item
 
     # Internal API
 
-    def _add_item(self, item):
+    def _add_item(self, item, position):
         if item.right:
-            self.right_items.append(item)
+            target = self.right_items
         else:
-            self.left_items.append(item)
+            target = self.left_items
+        if position is not None:
+            target.insert(position, item)
+        else:
+            target.append(item)
 
     def _remove_item(self, item):
         if item in self.right_items:
@@ -146,7 +151,8 @@ class CMSToolbar(ToolbarAPIMixin):
                 callbacks.remove(cms_toolbar)
                 callbacks.insert(0, cms_toolbar)
             for callback in callbacks:
-                callback(self, self.request, key == app_key, app_key)
+                callback_key = toolbar_pool.get_app_key(callback)
+                callback(self, self.request, callback_key == app_key, app_key)
 
     def request_hook(self):
         if self.request.method != 'POST':

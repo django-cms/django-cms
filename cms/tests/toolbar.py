@@ -197,10 +197,10 @@ class ToolbarTests(ToolbarTestBase):
         create_title('de', 'test-de', cms_page)
         en_request = self.get_page_request(cms_page, user, edit=True)
         en_toolbar = CMSToolbar(en_request)
-        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5, en_toolbar.get_left_items() + en_toolbar.get_right_items())
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
-        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5, )
 
 
 class ToolbarAPITests(TestCase):

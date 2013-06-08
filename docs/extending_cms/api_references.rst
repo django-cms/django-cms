@@ -263,6 +263,18 @@ cms.plugin_base
 cms.toolbar
 ***********
 
+
+All methods taking a ``side`` argument expect either
+:data:`cms.constants.LEFT` or :data:`cms.constants.RIGHT` for that
+argument.
+
+Methods accepting the ``position`` argument can insert items at a specific
+position. This can be either ``None`` to insert at the end, an integer
+index at which to insert the item, a :class:`cms.toolbar.items.ItemSearchResult` to insert
+it *before* that search result or a :class:`cms.toolbar.items.BaseItem` instance to insert
+it *before* that item.
+
+
 cms.toolbar.toolbar
 ===================
 
@@ -305,7 +317,9 @@ cms.toolbar.toolbar
 
         Language used by the toolbar.
 
-    .. method:: add_item(item)
+    .. method:: add_item(item, position=None)
+
+        Low level API to add items.
 
         Adds an item, which must be an instance of
         :class:`cms.toolbar.items.BaseItem`, to the toolbar.
@@ -313,24 +327,26 @@ cms.toolbar.toolbar
         This method should only be used for custom item classes, as all builtin
         item classes have higher level APIs.
 
+        Read above for information on ``position``.
+
     .. method:: remove_item(item)
 
         Removes an item from the toolbar or raises a :exc:`KeyError` if it's
         not found.
 
-    .. method:: get_menu(key. verbose_name, position=LEFT)
+    .. method:: get_menu(key. verbose_name, side=LEFT, position=NOne)
 
         If a menu with ``key`` already exists, this method will return that
         menu. Otherwise it will create a menu for that ``key`` with the given
-        ``verbose_name`` at ``position`` and return it.
+        ``verbose_name`` on ``side`` at ``position`` and return it.
 
-    .. method:: add_button(name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None, position=LEFT)
+    .. method:: add_button(name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None, side=LEFT, position=None)
 
         Adds a button to the toolbar. ``extra_wrapper_classes`` will be applied
         to the wrapping ``div`` while ``extra_classes`` are applied to the
         ``<a>``.
 
-    .. method:: add_button_list(extra_classes=None, position=None)
+    .. method:: add_button_list(extra_classes=None, side=LEFT, position=None)
 
         Adds an (empty) button list to the toolbar and returns it. See
         :class:`cms.toolbar.items.ButtonList` for further information.
@@ -359,20 +375,18 @@ cms.toolbar.items
     Provides APIs shared between :class:`cms.toolbar.toolbar.CMSToolbar` and
     :class:`Menu`.
 
-    All methods taking a ``position`` argument expect either
-    :data:`cms.constants.LEFT` or :data:`cms.constants.RIGHT` for that
-    argument.
-
     The ``active`` and ``disabled`` flags taken by all methods of this class
     specify the state of the item added.
 
     ``extra_classes`` should be either ``None`` or a list of class names as
     strings.
 
-    .. method:: add_item(item)
+    .. method:: add_item(item, position=None)
 
-        Adds the ``item`` to the toolbar or menu. ``item`` must be an instance
-        if :class:`BaseItem`.
+        Low level API to add items, adds the ``item`` to the toolbar or menu
+        and makes it searchable. ``item`` must be an instance of
+        :class:`BaseItem`. Read above for information about the ``position``
+        argument.
 
     .. method:: remove_item(item)
 
@@ -389,8 +403,10 @@ cms.toolbar.items
 
         Returns the first :class:`ItemSearchResult` that matches the search or
         ``None``. The search strategy is the same as in :meth:`find_items`.
+        Since positional insertion allows ``None``, it's safe to use the return
+        value of this method as the position argument to insertion APIs.
 
-    .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=None, position=LEFT)
+    .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=None, side=LEFT, position=None)
 
         Adds an item which opens ``url`` in the side frame and returns it.
 
@@ -401,7 +417,7 @@ cms.toolbar.items
         closes, :data:`cms.constants.REFRESH` to refresh the page when it
         closes or a URL to open once it closes.
 
-    .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=REFRESH, position=LEFT)
+    .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=REFRESH, side=LEFT, position=None)
 
         The same as :meth:`add_sideframe_item`, but opens the ``url`` in a
         modal dialog instead of the side frame.
@@ -409,11 +425,11 @@ cms.toolbar.items
         Note that the default values for ``close_on_url_change`` and
         ``on_close`` differ from :meth:`add_sideframe_item`.
 
-    .. method:: add_link_item(name, url, active=False, disabled=False, extra_classes=None, position=LEFT)
+    .. method:: add_link_item(name, url, active=False, disabled=False, extra_classes=None, side=LEFT, position=None)
 
         Adds an item that simply opens ``url`` and returns it.
 
-    .. method:: add_ajax_item(name, action, active=False, disabled=False, extra_classes=None, data=None, question=None, position=LEFT)
+    .. method:: add_ajax_item(name, action, active=False, disabled=False, extra_classes=None, data=None, question=None, side=LEFT, position=None)
 
         Adds an item which sends a POST request to ``action`` with ``data``.
         ``data`` should be ``None`` or a dictionary, the CSRF token will
@@ -421,6 +437,7 @@ cms.toolbar.items
 
         If ``question`` is set to a string, it will be asked before the
         request is sent to confirm the user wants to complete this action.
+
 
 .. class:: BaseItem(position)
 
@@ -430,7 +447,7 @@ cms.toolbar.items
 
         Must be set by subclasses and point to a Django template
 
-    .. attribute:: position
+    .. attribute:: side
 
         Must be either :data:`cms.constants.LEFT` or
         :data:`cms.constants.RIGHT`.
@@ -446,7 +463,7 @@ cms.toolbar.items
         Returns the context (as dictionary) for this item.
 
 
-.. class:: Menu(name, csrf_token, url='#', sub_level=False, position=LEFT)
+.. class:: Menu(name, csrf_token, url='#', sub_level=False, side=LEFT, position=None)
 
     The menu item class. Inherits :class:`ToolbarMixin` and provides the APIs
     documented on it.
@@ -456,33 +473,33 @@ cms.toolbar.items
 
     ``sub_level`` indicates whether this menu is a second level menu or not.
 
-    .. method:: get_menu(key, verbose_name, position=LEFT)
+    .. method:: get_menu(key, verbose_name, side=LEFT, position=None)
 
         The same as :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu` but adds
         the menu as a sub menu.
 
-    .. method:: add_break(identifier=None)
+    .. method:: add_break(identifier=None, position=None)
 
         Adds a visual break in the menu, useful for grouping items, and
         returns it. ``identifier`` may be used to make this item searchable.
 
 
-.. class:: LinkItem(name, url, active=False, disabled=False, extra_classes=None)
+.. class:: LinkItem(name, url, active=False, disabled=False, extra_classes=None, side=LEFT)
 
     Simple link item.
 
 
-.. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=REFRESH, position=LEFT)
+.. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=REFRESH, side=LEFT)
 
     Item that opens ``url`` in side frame.
 
 
-.. class:: AjaxItem(name, action, csrf_token, data=None, active=False, disabled=False, extra_classes=None, question=None, position=LEFT)
+.. class:: AjaxItem(name, action, csrf_token, data=None, active=False, disabled=False, extra_classes=None, question=None, side=LEFT)
 
     An item which posts ``data`` to ``action``.
 
 
-.. class:: ModalItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True on_close=REFRESH, position=LEFT)
+.. class:: ModalItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True on_close=REFRESH, side=LEFT)
 
     Item that opens ``url`` in the modal.
 
@@ -490,10 +507,11 @@ cms.toolbar.items
 .. class:: Break(identifier=None)
 
     A visual break for menus. ``identifier`` may be provided to make this item
-    searchable.
+    searchable. Since breaks can only be within menus, they have no ``side``
+    attribute.
 
 
-.. class:: ButtonList(identifier=None, extra_classes=None, position=LEFT)
+.. class:: ButtonList(identifier=None, extra_classes=None, side=LEFT)
 
     A list of one or more buttons.
 
@@ -501,7 +519,7 @@ cms.toolbar.items
 
     .. method:: add_item(item)
 
-        Adds ``item`` to the list of buttons. ``item`` must be an intance of
+        Adds ``item`` to the list of buttons. ``item`` must be an instance of
         :class:`Button`.
 
     .. method:: add_button(name, url, active=False, disabled=False, extra_classes=None)
