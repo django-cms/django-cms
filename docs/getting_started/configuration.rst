@@ -573,7 +573,7 @@ Example::
 CMS_MAX_PAGE_PUBLISH_REVERSIONS
 ===============================
 
-Default: 25
+Default: ``25``
 
 If `django-reversion`_ is installed everything you do with a page and all
 plugin changes will be saved in a revision. 
@@ -589,5 +589,18 @@ when you publish a page.
 If set to *0* all published revisions are kept, but you will need to ensure
 that the revision table does not grow excessively large.
 
+
+.. setting:: CMS_TOOLBARS
+
+CMS_TOOLBARS
+============
+
+Default: ``None``
+
+If defined, specifies the list of toolbar modifiers to be used to populate the
+toolbar as import paths.
+
+
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
+
