@@ -9,12 +9,13 @@ from djangocms_text_ckeditor.models import Text
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.compat.tests import UnittestCompatMixin
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
 
 
-class NestedPluginsTestCase(PluginsTestBaseCase):
+class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
     def copy_placeholders_and_check_results(self, placeholders):
         """
         This function is not itself a test; rather, it can be used by any test
@@ -175,8 +176,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugin_2.save()
 
         # plugin_2 should be plugin_1's only child 
-        # for a single item we use assertItemsEqual
-        self.assertItemsEqual(
+        # for a single item we use assertSameElements
+        self.assertSameElements(
             CMSPlugin.objects.get(id=plugin_1.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_2.pk)])
 
@@ -190,7 +191,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         # plugin_2 & plugin_3 should be plugin_1's children
         # for multiple items we use assertSequenceEqual, because
-        # assertItemsEqual may re-order the list without warning
+        # assertSameElements may re-order the list without warning
         self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_1.pk).get_children(),
             [
@@ -207,7 +208,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugin_4.save()
 
         # plugin_4 should be plugin_2's child
-        self.assertItemsEqual(
+        self.assertSameElements(
             CMSPlugin.objects.get(id=plugin_2.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_4.pk)])
 
@@ -239,7 +240,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugin_6.save()
 
         # plugin_6 should be plugin_5's child
-        self.assertItemsEqual(
+        self.assertSameElements(
             CMSPlugin.objects.get(id=plugin_5.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_6.pk)])
 
@@ -292,7 +293,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugin_9.save()
 
         # plugin_9 should be plugin_3's child
-        self.assertItemsEqual(
+        self.assertSameElements(
             CMSPlugin.objects.get(id=plugin_3.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_9.pk)])
 
@@ -305,7 +306,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
         plugin_10.save()
 
         # plugin_10 should be plugin_4's child
-        self.assertItemsEqual(
+        self.assertSameElements(
             CMSPlugin.objects.get(id=plugin_4.pk).get_children(),
             [CMSPlugin.objects.get(id=plugin_10.pk)])
 

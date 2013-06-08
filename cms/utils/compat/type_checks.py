@@ -1,6 +1,4 @@
-import sys
-
-PY2 = sys.version_info[0] == 2
+from cms.utils.compat import PY2
 
 if not PY2:
     string_types = (str, )

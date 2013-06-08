@@ -895,7 +895,7 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertEqual(response['content-type'], 'application/json')
-        pk = response.content.split("edit-plugin/")[1].split("/")[0]
+        pk = response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0]
         self.assertTrue(CMSPlugin.objects.filter(pk=int(pk)).exists())
 
 

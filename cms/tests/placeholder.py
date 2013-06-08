@@ -8,6 +8,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.link.cms_plugins import LinkPlugin
+from cms.utils.compat.tests import UnittestCompatMixin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
@@ -30,7 +31,7 @@ from django.template.context import Context, RequestContext
 from django.test import TestCase
 
 
-class PlaceholderTestCase(CMSTestCase):
+class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def setUp(self):
         u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         u.set_password("test")
@@ -269,7 +270,7 @@ class PlaceholderTestCase(CMSTestCase):
 
         ## Deutsch page should have no text
         content_de = render_placeholder(placeholder_en, context_de)
-        self.assertNotRegexpMatches(content_de,"^en body$")
+        self.assertNotRegex(content_de,"^en body$")
 
         conf = {
             'col_left': {

@@ -211,16 +211,16 @@ class PluginsTestCase(PluginsTestBaseCase):
                 }
             ]
         }
-        self.assertEquals(json.loads(response.content.decode('utf8')), expected)
+        output = json.loads(response.content.decode('utf8'))
+        self.assertEquals(output, expected)
         # now click cancel instead of editing
-        edit_url = response.content.split('"url": "')[1].split('"')[0]
-        response = self.client.get(edit_url)
+        response = self.client.get(output['url'])
         self.assertEquals(response.status_code, 200)
         data = {
             "body": "Hello World",
             "_cancel": True,
         }
-        response = self.client.post(edit_url, data)
+        response = self.client.post(output['url'], data)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(0, Text.objects.count())
 
@@ -674,7 +674,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(response.content.count('"position":'), 3)
+        self.assertEqual(response.content.decode('utf8').count('"position":'), 3)
         # assert copy success
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
