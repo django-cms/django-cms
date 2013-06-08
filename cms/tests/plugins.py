@@ -792,7 +792,7 @@ class FileSystemPluginTests(PluginsTestBaseCase):
             position=1,
             language=settings.LANGUAGE_CODE,
         )
-        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
+        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
         plugin.insert_at(None, position='last-child', save=True)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
