@@ -187,7 +187,7 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         sites_queryset = get_user_sites_queryset(request.user)
     else:
         sites_queryset = Site.objects.all()
-    if len(sites_queryset):
+    if len(sites_queryset) > 1:
         sites_menu = admin_menu.get_menu('sites', _('Sites'))
         sites_menu.add_sideframe_item(_('Admin Sites'), url=reverse('admin:sites_site_changelist'))
         sites_menu.add_break(ADMIN_SITES_BREAK)

@@ -17,4 +17,3 @@ def category_toolbar(toolbar, request, is_current_app, app_name):
     category_menu = admin_menu.get_menu('category', _('Category'), position=position)
     category_menu.add_sideframe_item(_('Categories'), url=reverse('admin:sampleapp_category_changelist'))
     category_menu.add_modal_item(_('Add Category'), url=reverse('admin:sampleapp_category_add'), close_on_url_change=True)
-    admin_menu.add_break(SAMPLEAPP_BREAK, position=category_menu)
