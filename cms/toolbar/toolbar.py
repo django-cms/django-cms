@@ -80,8 +80,8 @@ class CMSToolbar(ToolbarAPIMixin):
         self.add_item(item)
         return item
 
-    def add_button_list(self, extra_classes=None, position=None):
-        item = ButtonList(extra_classes=extra_classes, position=position)
+    def add_button_list(self, identifier=None, extra_classes=None, position=None):
+        item = ButtonList(identifier, extra_classes=extra_classes, position=position)
         self.add_item(item)
         return item
 

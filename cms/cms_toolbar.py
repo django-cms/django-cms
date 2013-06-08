@@ -204,6 +204,6 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         language_menu.add_link_item(language['name'], url=url, active=current_lang == language['code'])
     # edit switcher
     if toolbar.edit_mode:
-        switcher = toolbar.add_button_list(position=RIGHT, extra_classes=['cms_toolbar-item-buttons-group'])
+        switcher = toolbar.add_button_list('Mode Switcher', position=RIGHT, extra_classes=['cms_toolbar-item-buttons-group'])
         switcher.add_button(_("Content"), '?edit', active=not toolbar.build_mode, disabled=toolbar.build_mode)
         switcher.add_button(_("Structure"), '?build', active=toolbar.build_mode, disabled=not toolbar.build_mode)

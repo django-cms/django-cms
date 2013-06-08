@@ -160,7 +160,7 @@ class Menu(ToolbarAPIMixin, BaseItem):
         return menu
 
     def add_break(self, identifier=None):
-        item = Break(identifier=identifier)
+        item = Break(identifier)
         self.add_item(item)
         return item
 
@@ -313,10 +313,14 @@ class Button(object):
 class ButtonList(BaseItem):
     template = "cms/toolbar/items/button_list.html"
 
-    def __init__(self, extra_classes=None, position=LEFT):
+    def __init__(self, identifier=None, extra_classes=None, position=LEFT):
         self.position = position
         self.extra_classes = extra_classes or []
         self.buttons = []
+        self.identifier = identifier
+
+    def __repr__(self):
+        return '<ButtonList:%s>' % self.identifier
 
     def add_item(self, item):
         if not isinstance(item, Button):

@@ -461,10 +461,10 @@ cms.toolbar.items
         The same as :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu` but adds
         the menu as a sub menu.
 
-    .. method:: add_break()
+    .. method:: add_break(identifier=None)
 
         Adds a visual break in the menu, useful for grouping items, and
-        returns it.
+        returns it. ``identifier`` may be used to make this item searchable.
 
 
 .. class:: LinkItem(name, url, active=False, disabled=False, extra_classes=None)
@@ -493,9 +493,11 @@ cms.toolbar.items
     searchable.
 
 
-.. class:: ButtonList(extra_classes=None, position=LEFT)
+.. class:: ButtonList(identifier=None, extra_classes=None, position=LEFT)
 
     A list of one or more buttons.
+
+    The ``identifier`` may be provided to make this item searchable.
 
     .. method:: add_item(item)
 
