@@ -92,6 +92,7 @@ def flatten(nodes):
 
 
 class ShowMenu(InclusionTag):
+
     """
     render a nested list of all children of the pages
     - from_level: starting level
@@ -127,7 +128,7 @@ class ShowMenu(InclusionTag):
         if next_page:
             children = next_page.children
         else:
-        #new menu... get all the data so we can save a lot of queries
+        # new menu... get all the data so we can save a lot of queries
             nodes = menu_pool.get_nodes(request, namespace, root_id)
             if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
@@ -146,12 +147,12 @@ class ShowMenu(InclusionTag):
 
         try:
             context.update({'children': children,
-                'template': template,
-                'from_level': from_level,
-                'to_level': to_level,
-                'extra_inactive': extra_inactive,
-                'extra_active': extra_active,
-                'namespace': namespace})
+                            'template': template,
+                            'from_level': from_level,
+                            'to_level': to_level,
+                            'extra_inactive': extra_inactive,
+                            'extra_active': extra_active,
+                            'namespace': namespace})
         except:
             context = {"template": template}
         return context
@@ -176,6 +177,7 @@ register.tag(ShowMenuBelowId)
 
 
 class ShowSubMenu(InclusionTag):
+
     """
     show the sub menu of the current nav-node.
     - levels: how many levels deep
@@ -243,11 +245,12 @@ register.tag(ShowSubMenu)
 
 
 class ShowBreadcrumb(InclusionTag):
+
     """
     Shows the breadcrumb from the node that has the same url as the current request
-    
+
     - start level: after which level should the breadcrumb start? 0=home
-    - template: template used to render the breadcrumb 
+    - template: template used to render the breadcrumb
     """
     name = 'show_breadcrumb'
     template = 'menu/dummy.html'
@@ -295,7 +298,7 @@ class ShowBreadcrumb(InclusionTag):
         else:
             ancestors = []
         context.update({'ancestors': ancestors,
-            'template': template})
+                        'template': template})
         return context
 
 register.tag(ShowBreadcrumb)
@@ -326,6 +329,7 @@ MARKERS = {
 
 
 class LanguageChooser(InclusionTag):
+
     """
     Displays a language chooser
     - template: template used to render the language chooser
@@ -371,6 +375,7 @@ register.tag(LanguageChooser)
 
 
 class PageLanguageUrl(InclusionTag):
+
     """
     Displays the url of the current page in the defined language.
     You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.

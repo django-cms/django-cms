@@ -83,7 +83,7 @@ class AppRegexURLResolver(RegexURLResolver):
                 else:
                     try:
                         sub_match = pattern.resolve(new_path)
-                    except Resolver404, e:
+                    except Resolver404 as e:
                         if 'tried' in e.args[0]:
                             tried.extend([[pattern] + t for t in e.args[0]['tried']])
                         elif 'path' in e.args[0]:
@@ -92,7 +92,7 @@ class AppRegexURLResolver(RegexURLResolver):
                         if sub_match:
                             return pattern.page_id
                         tried.append(pattern.regex.pattern)
-            raise Resolver404, {'tried': tried, 'path': new_path}
+            raise Resolver404({'tried': tried, 'path': new_path})
 
 
 def recurse_patterns(path, pattern_list, page_id):
@@ -109,14 +109,14 @@ def recurse_patterns(path, pattern_list, page_id):
         if isinstance(pattern, RegexURLResolver):
             # this is an 'include', recurse!
             resolver = RegexURLResolver(regex, 'cms_appresolver',
-                pattern.default_kwargs, pattern.app_name, pattern.namespace)
+                                        pattern.default_kwargs, pattern.app_name, pattern.namespace)
             resolver.page_id = page_id
             # see lines 243 and 236 of urlresolvers.py to understand the next line
             resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id)
         else:
             # Re-do the RegexURLPattern with the new regular expression
             resolver = RegexURLPattern(regex, pattern.callback,
-                pattern.default_args, pattern.name)
+                                       pattern.default_args, pattern.name)
             resolver.page_id = page_id
         newpatterns.append(resolver)
     return newpatterns

@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class CategoryToolbar(CMSToolbar):
+
     def insert_items(self, items, toolbar, request, is_app):
         if toolbar.is_staff:
             items[0].items = [Item(reverse('admin:sampleapp_category_changelist'), _('Categories'),

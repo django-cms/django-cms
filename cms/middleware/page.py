@@ -4,6 +4,7 @@ from cms.apphook_pool import apphook_pool
 
 
 class LazyPage(object):
+
     def __get__(self, request, obj_type=None):
         from cms.utils.page_resolver import get_page_from_request
         if not hasattr(request, '_current_page_cache'):
@@ -16,6 +17,7 @@ class LazyPage(object):
 
 
 class LazyPageApp(object):
+
     def __get__(self, request, obj_type=None):
         if not hasattr(request, '_current_app_cache'):
             page = request.current_page
@@ -27,6 +29,7 @@ class LazyPageApp(object):
 
 
 class CurrentPageMiddleware(object):
+
     def process_request(self, request):
         request.__class__.current_page = LazyPage()
         request.__class__.current_app = LazyPageApp()

@@ -23,6 +23,7 @@ from django.contrib.auth.models import User, AnonymousUser
 
 
 class TemplatetagTests(TestCase):
+
     def test_get_site_id_from_nothing(self):
         with SettingsOverride(SITE_ID=10):
             self.assertEqual(10, get_site_id(None))
@@ -49,6 +50,7 @@ class TemplatetagTests(TestCase):
         script = '<script>alert("XSS");</script>'
 
         class FakePage(object):
+
             def get_page_title(self, *args, **kwargs):
                 return script
 
@@ -65,6 +67,7 @@ class TemplatetagTests(TestCase):
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
+
     def _getfirst(self):
         return Page.objects.public().get(title_set__title='first')
 
@@ -114,7 +117,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             request = self.get_request('/')
             self.assertRaises(Page.DoesNotExist,
                               _get_page_by_untyped_arg, {'pk': 1003}, request, 1
-            )
+                              )
             self.assertEqual(len(mail.outbox), 0)
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_do_email(self):
@@ -226,6 +229,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
 
 
 class NoFixtureDatabaseTemplateTagTests(TestCase):
+
     def test_cached_show_placeholder_sekizai(self):
         from django.core.cache import cache
 

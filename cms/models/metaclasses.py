@@ -7,14 +7,15 @@ from cms.publisher.options import PublisherOptions
 
 
 class PageMetaClass(MPTTModelBase):
+
     def __new__(cls, name, bases, attrs):
         super_new = super(PageMetaClass, cls).__new__
 
         if 'objects' in attrs:
             if not isinstance(attrs['objects'], PublisherManager):
-                raise ValueError, ("Model %s extends Publisher, " +
-                                   "so its 'objects' manager must be " +
-                                   "a subclass of publisher.PublisherManager") % (name, )
+                raise ValueError(("Model %s extends Publisher, " +
+                                  "so its 'objects' manager must be " +
+                                  "a subclass of publisher.PublisherManager") % (name, ))
         else:
             attrs['objects'] = PublisherManager()
 

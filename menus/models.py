@@ -3,6 +3,7 @@ from django.db import models
 
 
 class CacheKeyManager(models.Manager):
+
     def get_keys(self, site_id=None, language=None):
         ret = self.none()
         if not site_id and not language:
@@ -28,6 +29,7 @@ class CacheKeyManager(models.Manager):
 
 
 class CacheKey(models.Model):
+
     '''
     This is to store a "set" of cache keys in a fashion where it's accessible
     by multiple processes / machines.

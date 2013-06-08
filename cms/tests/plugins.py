@@ -50,6 +50,7 @@ class DumbFixturePlugin(CMSPluginBase):
 
 
 class PluginsTestBaseCase(CMSTestCase):
+
     def setUp(self):
         self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         self.super_user.set_password("test")
@@ -84,6 +85,7 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
+
     def _create_text_plugin_on_page(self, page):
         plugin_data = {
             'plugin_type': "TextPlugin",
@@ -179,13 +181,13 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(db_plugin_1.position, 1)
             self.assertEqual(text_plugin_2.position, 2)
             self.assertEqual(db_plugin_2.position, 2)
-            ## Finally we render the placeholder to test the actual content
+            # Finally we render the placeholder to test the actual content
             rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url()), None)
             self.assertEquals(rendered_placeholder, "I'm the firstI'm the second")
 
     def test_add_cancel_plugin(self):
         """
-        Test that you can cancel a new plugin before editing and 
+        Test that you can cancel a new plugin before editing and
         that the plugin is removed.
         """
         # add a new text plugin
@@ -545,7 +547,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         body = inheritfrompage.placeholders.get(slot="body")
         empty_plugin = CMSPlugin(
-            plugin_type='TextPlugin', # create an empty plugin
+            plugin_type='TextPlugin',  # create an empty plugin
             placeholder=body,
             position=1,
             language='en',
@@ -643,7 +645,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         page_data = self.get_new_page_data()
 
-        #create 2nd language page
+        # create 2nd language page
         page_data.update({
             'language': self.SECOND_LANG,
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
@@ -764,6 +766,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):
+
     def setUp(self):
         super(FileSystemPluginTests, self).setUp()
         call_command('collectstatic', interactive=False, verbosity=0, link=True)
@@ -796,6 +799,7 @@ class FileSystemPluginTests(PluginsTestBaseCase):
 
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
+
     def setUp(self):
         self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         self.super_user.set_password("test")
@@ -880,8 +884,8 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.content, '{"url": "/en/admin/cms/page/edit-plugin/%s/", "breadcrumb": ' % (
             CMSPlugin.objects.all()[0].pk) +
-                                            '[{"url": "/en/admin/cms/page/edit-plugin/%s/", "title": "Articles"}]}' % (
-                                                CMSPlugin.objects.all()[0].pk))
+            '[{"url": "/en/admin/cms/page/edit-plugin/%s/", "title": "Articles"}]}' % (
+            CMSPlugin.objects.all()[0].pk))
 
         # there should be only 1 plugin
         self.assertEquals(1, CMSPlugin.objects.all().count())
@@ -939,7 +943,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
         page_data = self.get_new_page_data()
 
-        #create 2nd language page
+        # create 2nd language page
         page_data.update({
             'language': self.SECOND_LANG,
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
@@ -970,6 +974,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 
 class PluginsMetaOptionsTests(TestCase):
+
     ''' TestCase set for ensuring that bugs like #992 are caught '''
     # these plugins are inlined because, due to the nature of the #992
     # ticket, we cannot actually import a single file with all the
@@ -995,6 +1000,7 @@ class PluginsMetaOptionsTests(TestCase):
         # values as would be computed, thus making sure it's not a problem to
         # supply options.
         class TestPlugin2(CMSPlugin):
+
             class Meta:
                 db_table = 'cmsplugin_testplugin2'
                 app_label = 'tests'
@@ -1007,6 +1013,7 @@ class PluginsMetaOptionsTests(TestCase):
         ''' make sure customised meta options on CMSPlugins don't break things '''
 
         class TestPlugin3(CMSPlugin):
+
             class Meta:
                 app_label = 'one_thing'
 
@@ -1018,6 +1025,7 @@ class PluginsMetaOptionsTests(TestCase):
         ''' make sure custom database table names are OK. '''
 
         class TestPlugin4(CMSPlugin):
+
             class Meta:
                 db_table = 'or_another'
 
@@ -1029,6 +1037,7 @@ class PluginsMetaOptionsTests(TestCase):
         ''' We should be able to customise app_label and db_table together '''
 
         class TestPlugin5(CMSPlugin):
+
             class Meta:
                 app_label = 'one_thing'
                 db_table = 'or_another'
@@ -1039,6 +1048,7 @@ class PluginsMetaOptionsTests(TestCase):
 
 
 class LinkPluginTestCase(PluginsTestBaseCase):
+
     def test_does_not_verify_existance_of_url(self):
         form = LinkForm(
             {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
@@ -1049,35 +1059,36 @@ class LinkPluginTestCase(PluginsTestBaseCase):
 
         Checking only for the values in the model"""
         form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test'})
+                         'url': 'http://www.nonexistant.test'})
         link = form.save()
         self.assertEquals(link.target, '')
 
     def test_open_in_blank_window(self):
         form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': '_blank'})
+                         'url': 'http://www.nonexistant.test', 'target': '_blank'})
         link = form.save()
         self.assertEquals(link.target, '_blank')
 
     def test_open_in_parent_window(self):
         form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': '_parent'})
+                         'url': 'http://www.nonexistant.test', 'target': '_parent'})
         link = form.save()
         self.assertEquals(link.target, '_parent')
 
     def test_open_in_top_window(self):
         form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': '_top'})
+                         'url': 'http://www.nonexistant.test', 'target': '_top'})
         link = form.save()
         self.assertEquals(link.target, '_top')
 
     def test_open_in_nothing_else(self):
         form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': 'artificial'})
+                         'url': 'http://www.nonexistant.test', 'target': 'artificial'})
         self.assertFalse(form.is_valid())
 
 
 class NoDatabasePluginTests(TestCase):
+
     def test_render_meta_is_unique(self):
         text = Text()
         link = Link()
@@ -1117,6 +1128,7 @@ class NoDatabasePluginTests(TestCase):
 
 
 class PicturePluginTests(PluginsTestBaseCase):
+
     def test_link_or_page(self):
         """Test a validator: you can enter a url or a page_link, but not both."""
 
@@ -1139,6 +1151,7 @@ class PicturePluginTests(PluginsTestBaseCase):
 
 
 class SimplePluginTests(TestCase):
+
     def test_simple_naming(self):
         class MyPlugin(CMSPluginBase):
             render_template = 'base.html'

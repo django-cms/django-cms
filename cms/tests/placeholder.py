@@ -30,6 +30,7 @@ from django.test import TestCase
 
 
 class PlaceholderTestCase(CMSTestCase):
+
     def setUp(self):
         u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         u.set_password("test")
@@ -74,7 +75,8 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'new_two', u'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
-        placeholders = self.assertWarns(DuplicatePlaceholderWarning, 'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.', get_placeholders, 'placeholder_tests/test_seven.html')
+        placeholders = self.assertWarns(
+            DuplicatePlaceholderWarning, 'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.', get_placeholders, 'placeholder_tests/test_seven.html')
         self.assertEqual(sorted(placeholders), sorted([u'one']))
 
     def test_placeholder_scanning_extend_outside_block(self):
@@ -153,9 +155,9 @@ class PlaceholderTestCase(CMSTestCase):
             )
             ex.save()
             ph1 = ex.placeholder
-            ###
+            #
             # add the test plugin
-            ###
+            #
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
@@ -172,9 +174,9 @@ class PlaceholderTestCase(CMSTestCase):
         with SettingsOverride(CMS_PERMISSION=False):
             page = create_page('page', 'col_two.html', 'en')
             ph1 = page.placeholders.get(slot='col_left')
-            ###
+            #
             # add the test plugin
-            ###
+            #
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
@@ -222,6 +224,7 @@ class PlaceholderTestCase(CMSTestCase):
         ph = Placeholder.objects.create(slot='test')
 
         class NoPushPopContext(Context):
+
             def push(self):
                 pass
 
@@ -253,6 +256,7 @@ class PlaceholderTestCase(CMSTestCase):
         add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
 
         class NoPushPopContext(Context):
+
             def push(self):
                 pass
             pop = push
@@ -262,11 +266,11 @@ class PlaceholderTestCase(CMSTestCase):
         context_de['request'] = self.get_request(language="de")
 
         # First test the default (non-fallback) behavior)
-        ## English page should have the text plugin
+        # English page should have the text plugin
         content_en = render_placeholder(placeholder_en, context_en)
         self.assertRegexpMatches(content_en, "^en body$")
 
-        ## Deutsch page should have no text
+        # Deutsch page should have no text
         content_de = render_placeholder(placeholder_en, context_de)
         self.assertNotRegexpMatches(content_de, "^en body$")
 
@@ -276,7 +280,7 @@ class PlaceholderTestCase(CMSTestCase):
             },
         }
         with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
-            ## Deutsch page should have no text
+            # Deutsch page should have no text
             content_de = render_placeholder(placeholder_en, context_de)
             self.assertRegexpMatches(content_de, "^en body$")
 
@@ -287,6 +291,7 @@ class PlaceholderTestCase(CMSTestCase):
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
+
     def test_placeholder_no_action(self):
         actions = PlaceholderNoAction()
         self.assertEqual(actions.get_copy_languages(), [])
@@ -364,6 +369,7 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
 
 
 class PlaceholderModelTests(CMSTestCase):
+
     def get_mock_user(self, superuser):
         return AttributeObject(
             is_superuser=superuser,
@@ -433,6 +439,7 @@ class PlaceholderModelTests(CMSTestCase):
 
 
 class PlaceholderAdminTestBase(CMSTestCase):
+
     def get_placeholder(self):
         return Placeholder.objects.create(slot='test')
 
@@ -578,6 +585,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
 
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
+
     def _testuser(self):
         u = User(username="test", is_staff=True, is_active=True, is_superuser=False)
         u.set_password("test")
@@ -671,6 +679,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
 
 
 class PlaceholderConfTests(TestCase):
+
     def test_get_all_plugins_single_page(self):
         page = create_page('page', 'col_two.html', 'en')
         placeholder = page.placeholders.get(slot='col_left')
@@ -706,6 +715,7 @@ class PlaceholderConfTests(TestCase):
 
 
 class PlaceholderI18NTest(CMSTestCase):
+
     def _testuser(self):
         u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         u.set_password("test")
@@ -732,7 +742,7 @@ class PlaceholderI18NTest(CMSTestCase):
             char_2='two',
             char_3='one',
             char_4='two',
-            )
+        )
         ex.save()
         user = self._testuser()
         self.client.login(username='test', password='test')
@@ -747,10 +757,11 @@ class PlaceholderI18NTest(CMSTestCase):
             char_2='two',
             char_3='one',
             char_4='two',
-            )
+        )
         ex.save()
         user = self._testuser()
         self.client.login(username='test', password='test')
 
         response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/1/')
-        self.assertNotContains(response, """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
+        self.assertNotContains(
+            response, """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")

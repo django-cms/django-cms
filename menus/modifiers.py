@@ -4,6 +4,7 @@ from menus.menu_pool import menu_pool
 
 
 class Marker(Modifier):
+
     """
     searches the current selected node and marks them.
     current_node: selected = True
@@ -55,6 +56,7 @@ class Marker(Modifier):
 
 
 class Level(Modifier):
+
     """
     marks all node levels
     """
@@ -84,6 +86,7 @@ class Level(Modifier):
 
 
 class AuthVisibility(Modifier):
+
     """
     Remove nodes that are login required or require a group
     """
@@ -93,9 +96,9 @@ class AuthVisibility(Modifier):
             return nodes
         final = []
         for node in nodes:
-            if (node.attr.get('visible_for_authenticated', True) and \
-                 request.user.is_authenticated()) or \
-                (node.attr.get('visible_for_anonymous', True) and \
+            if (node.attr.get('visible_for_authenticated', True) and
+                request.user.is_authenticated()) or \
+                (node.attr.get('visible_for_anonymous', True) and
                  not request.user.is_authenticated()):
                 final.append(node)
             else:

@@ -13,7 +13,7 @@ import copy
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
     '''
     This is an easier to test "inner loop" building the menu tree structure
-    for one menu (one language, one site) 
+    for one menu (one language, one site)
     '''
     done_nodes = {}  # Dict of node.id:Node
     final_nodes = []
@@ -66,6 +66,7 @@ def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
 
 
 class MenuPool(object):
+
     def __init__(self):
         self.menus = {}
         self.modifiers = []
@@ -107,14 +108,14 @@ class MenuPool(object):
 
     def _build_nodes(self, request, site_id):
         """
-        This is slow. Caching must be used. 
+        This is slow. Caching must be used.
         One menu is built per language and per site.
-        
+
         Namespaces: they are ID prefixes to avoid node ID clashes when plugging
         multiple trees together.
-        
+
         - We iterate on the list of nodes.
-        - We store encountered nodes in a dict (with namespaces): 
+        - We store encountered nodes in a dict (with namespaces):
             done_nodes[<namespace>][<node's id>] = node
         - When a node has a parent defined, we lookup that parent in done_nodes
             if it's found:

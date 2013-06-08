@@ -43,4 +43,5 @@ def get_model_queryset(model, request=None):
 # queryset helpers for basic models
 
 get_title_queryset = lambda request = None: Title.objects.all()  # not sure if we need to only grab public items here
-get_cmsplugin_queryset = lambda request = None: CMSPlugin.objects.all()  # CMSPlugin is no longer extending from Publisher
+get_cmsplugin_queryset = lambda request = None: CMSPlugin.objects.all(
+)  # CMSPlugin is no longer extending from Publisher

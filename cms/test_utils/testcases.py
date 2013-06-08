@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext,
-    SettingsOverride)
+                                                  SettingsOverride)
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser, Permission
 from django.contrib.sites.models import Site
@@ -38,6 +38,7 @@ URL_CMS_PLUGIN_HISTORY_EDIT = urljoin(URL_CMS_PAGE_HISTORY, "edit-plugin/")
 
 
 class _Warning(object):
+
     def __init__(self, message, category, filename, lineno):
         self.message = message
         self.category = category
@@ -49,7 +50,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     def showWarning(message, category, filename, lineno, file=None, line=None):
         assert isinstance(message, Warning)
         observeWarning(_Warning(
-                message.args[0], category, filename, lineno))
+            message.args[0], category, filename, lineno))
 
     # Disable the per-module cache for every module otherwise if the warning
     # which the caller is expecting us to collect was already emitted it won't
@@ -201,7 +202,7 @@ class CMSTestCase(testcases.TestCase):
         for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
             print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-                                    page.pk, page.lft, page.rght, page.tree_id)
+                                                                 page.pk, page.lft, page.rght, page.tree_id)
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -218,14 +219,14 @@ class CMSTestCase(testcases.TestCase):
             return qs.get(**filter)
         except ObjectDoesNotExist:
             pass
-        raise self.failureException, "ObjectDoesNotExist raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist raised for filter %s" % filter)
 
     def assertObjectDoesNotExist(self, qs, **filter):
         try:
             qs.get(**filter)
         except ObjectDoesNotExist:
             return
-        raise self.failureException, "ObjectDoesNotExist not raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug
@@ -321,18 +322,18 @@ class CMSTestCase(testcases.TestCase):
 
         # TODO: add check for siblings
         draft_siblings = list(page.get_siblings(True).filter(
-                publisher_is_draft=True
-            ).order_by('tree_id', 'parent', 'lft'))
+            publisher_is_draft=True
+        ).order_by('tree_id', 'parent', 'lft'))
         public_siblings = list(public_page.get_siblings(True).filter(
-                publisher_is_draft=False
-            ).order_by('tree_id', 'parent', 'lft'))
+            publisher_is_draft=False
+        ).order_by('tree_id', 'parent', 'lft'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1
                 continue
             self.assertEqual(sibling.id,
-                public_siblings[i - skip].publisher_draft.id)
+                             public_siblings[i - skip].publisher_draft.id)
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
@@ -343,7 +344,7 @@ class CMSTestCase(testcases.TestCase):
         first = warningsShown[0]
         for other in warningsShown[1:]:
             if ((other.message, other.category)
-                != (first.message, first.category)):
+                    != (first.message, first.category)):
                 self.fail("Can't handle different warnings")
         self.assertEqual(first.message, message)
         self.assertTrue(first.category is category)

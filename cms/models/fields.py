@@ -8,6 +8,7 @@ from django.utils.text import capfirst
 
 
 class PlaceholderField(models.ForeignKey):
+
     def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
         validate_placeholder_name(slotname)
         if kwargs.get('related_name', None) == '+':
@@ -21,7 +22,7 @@ class PlaceholderField(models.ForeignKey):
 
     def _get_new_placeholder(self):
         return Placeholder.objects.create(slot=self.slotname,
-            default_width=self.default_width)
+                                          default_width=self.default_width)
 
     def pre_save(self, model_instance, add):
         if not model_instance.pk:

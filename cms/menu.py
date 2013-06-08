@@ -2,7 +2,7 @@
 from collections import defaultdict
 from cms.apphook_pool import apphook_pool
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
-    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
+                                         ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
@@ -64,7 +64,7 @@ def get_visible_pages(request, pages, site=None):
     # no restriction applied at all
     if (not is_auth_user and
         is_setting_public_all and
-        not restricted_pages):
+            not restricted_pages):
         return [page.pk for page in pages]
 
     if site is None:
@@ -77,17 +77,17 @@ def get_visible_pages(request, pages, site=None):
         ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
         global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
 
-        #no page perms edge case - all visible
+        # no page perms edge case - all visible
         if ((is_setting_public_all or (
                 is_setting_public_staff and request.user.is_staff)) and
             not restricted_pages and
-            not global_view_perms):
+                not global_view_perms):
             return [page.pk for page in pages]
-        #no page perms edge case - none visible
+        # no page perms edge case - none visible
         elif (is_setting_public_staff and
-            not request.user.is_staff and
-            not restricted_pages and
-            not global_view_perms):
+              not request.user.is_staff and
+              not restricted_pages and
+              not global_view_perms):
             return []
 
     def has_global_perm():
@@ -161,8 +161,8 @@ def page_to_node(page, home, cut):
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
     attr = {'soft_root': page.soft_root,
-        'auth_required': page.login_required,
-        'reverse_id': page.reverse_id, }
+            'auth_required': page.login_required,
+            'reverse_id': page.reverse_id, }
 
     parent_id = page.parent_id
     # Should we cut the Node from its parents?
@@ -170,10 +170,10 @@ def page_to_node(page, home, cut):
         parent_id = None
 
     # possible fix for a possible problem
-    #if parent_id and not page.parent.get_calculated_status():
-    #    parent_id = None # ????
+    # if parent_id and not page.parent.get_calculated_status():
+    # parent_id = None # ????
 
-    if page.limit_visibility_in_menu == None:
+    if page.limit_visibility_in_menu is None:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
@@ -221,6 +221,7 @@ def page_to_node(page, home, cut):
 
 
 class CMSMenu(Menu):
+
     def get_nodes(self, request):
         page_queryset = get_page_queryset(request)
         site = Site.objects.get_current()
@@ -281,6 +282,7 @@ menu_pool.register_menu(CMSMenu)
 
 
 class NavExtender(Modifier):
+
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             return nodes
@@ -330,28 +332,29 @@ menu_pool.register_modifier(NavExtender)
 
 
 class SoftRootCutter(Modifier):
+
     """
     Ask evildmp/superdmp if you don't understand softroots!
-    
+
     Softroot description from the docs:
-    
+
         A soft root is a page that acts as the root for a menu navigation tree.
-    
+
         Typically, this will be a page that is the root of a significant new
         section on your site.
-    
+
         When the soft root feature is enabled, the navigation menu for any page
         will start at the nearest soft root, rather than at the real root of
         the site’s page hierarchy.
-    
+
         This feature is useful when your site has deep page hierarchies (and
         therefore multiple levels in its navigation trees). In such a case, you
         usually don’t want to present site visitors with deep menus of nested
         items.
-    
+
         For example, you’re on the page -Introduction to Bleeding-?, so the menu
         might look like this:
-    
+
             School of Medicine
                 Medical Education
                 Departments
@@ -377,12 +380,12 @@ class SoftRootCutter(Modifier):
                 Administration
                 Contact us
                 Impressum
-    
+
         which is frankly overwhelming.
-    
+
         By making -Department of Mediaeval Surgery-? a soft root, the menu
         becomes much more manageable:
-    
+
             Department of Mediaeval Surgery
                 Theory
                 Cures

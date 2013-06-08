@@ -181,11 +181,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         page.publish()
 
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-            CMS_LANGUAGES={
+                              CMS_LANGUAGES={
                 1: [
                     {'code': 'x-klingon', 'name': 'Klingon', 'public': True, 'fallbacks': []},
                     {'code': 'x-elvish', 'name': 'Elvish', 'public': True, 'fallbacks': []},
-               ]}):
+                ]}):
             from cms.views import details
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
@@ -207,12 +207,12 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         '''
         page = create_page("page1", "nav_playground.html", "en")
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-            CMS_LANGUAGES={
+                              CMS_LANGUAGES={
                 1: [
                     {'code': 'x-klingon', 'name': 'Klingon', 'public': True, 'fallbacks': []},
                     {'code': 'x-elvish', 'name': 'Elvish', 'public': True, 'fallbacks': ['x-klingon', 'en', ]},
-                    ]},
-            ):
+                ]},
+        ):
             create_title("x-klingon", "futla ak", page, slug=page.get_slug())
             page.publish()
             from cms.views import details
@@ -257,11 +257,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
 
     def test_no_english_defined(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
-            CMS_LANGUAGES={
+                              CMS_LANGUAGES={
                 1: [
                     {'code': 'de', 'name': 'German', 'public': True, 'fallbacks': []},
                 ]},
-            ):
+        ):
             try:
                 update_site_and_page_choices(lang='en-us')
             except LanguageError:

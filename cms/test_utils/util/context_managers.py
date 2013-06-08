@@ -15,12 +15,13 @@ class NULL:
 
 
 class SettingsOverride(object):
+
     """
     Overrides Django settings within a context and resets them to their inital
     values on exit.
-    
+
     Example:
-    
+
         with SettingsOverride(DEBUG=True):
             # do something
     """
@@ -50,6 +51,7 @@ class SettingsOverride(object):
 
 
 class StdOverride(object):
+
     def __init__(self, std='out', buffer=None):
         self.std = std
         self.buffer = buffer or StringIO.StringIO()
@@ -63,10 +65,11 @@ class StdOverride(object):
 
 
 class StdoutOverride(StdOverride):
+
     """
     This overrides Python's the standard output and redirects it to a StringIO
     object, so that on can test the output of the program.
-    
+
     example:
     lines = None
     with StdoutOverride() as buffer:
@@ -79,6 +82,7 @@ class StdoutOverride(StdOverride):
 
 
 class LanguageOverride(object):
+
     def __init__(self, language):
         self.newlang = language
 
@@ -91,6 +95,7 @@ class LanguageOverride(object):
 
 
 class TemporaryDirectory:
+
     """Create and return a temporary directory.  This has the same
     behavior as mkdtemp but can be used as a context manager.  For
     example:
@@ -117,6 +122,7 @@ class TemporaryDirectory:
 
 
 class UserLoginContext(object):
+
     def __init__(self, testcase, user):
         self.testcase = testcase
         self.user = user
@@ -136,9 +142,10 @@ class UserLoginContext(object):
 
 
 class ChangeModel(object):
+
     """
     Changes attributes on a model while within the context.
-    
+
     These changes *ARE* saved to the database for the context!
     """
 
@@ -164,6 +171,7 @@ class ChangeModel(object):
 
 
 class _AssertNumQueriesContext(object):
+
     def __init__(self, test_case, num, connection):
         self.test_case = test_case
         self.num = num

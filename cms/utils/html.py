@@ -9,7 +9,7 @@ DEFAULT_PARSER = html5lib.HTMLParser(tokenizer=sanitizer.HTMLSanitizer,
 def clean_html(data, full=True, parser=DEFAULT_PARSER):
     """
     Cleans HTML from XSS vulnerabilities using html5lib
-    
+
     If full is False, only the contents inside <body> will be returned (without
     the <body> tags).
     """

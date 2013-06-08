@@ -10,6 +10,7 @@ class PluginNotRegistered(Exception):
 
 
 class PluginLimitReached(Exception):
+
     """
     Gets triggered when a placeholder has reached it's plugin limit.
     """
@@ -41,16 +42,19 @@ class NoHomeFound(Exception):
 
 
 class PermissionsException(Exception):
+
     """Base permission exception
     """
 
 
 class NoPermissionsException(PermissionsException):
-    """Can be fired when some violate action is performed on permission system. 
+
+    """Can be fired when some violate action is performed on permission system.
     """
 
 
 class PublicIsUnmodifiable(Exception):
+
     """A method was invoked on the public copy, but is only valid for the
     draft version"""
     pass

@@ -20,7 +20,7 @@ def get_module(app, modname, verbose, failfast):
     module_name = '%s.%s' % (app, modname)
     try:
         module = import_module(module_name)
-    except ImportError, e:
+    except ImportError as e:
         if failfast:
             raise e
         elif verbose:
@@ -34,9 +34,9 @@ def get_module(app, modname, verbose, failfast):
 def load(modname, verbose=False, failfast=False):
     """
     Loads all modules with name 'modname' from all installed apps.
-    
+
     If verbose is True, debug information will be printed to stdout.
-    
+
     If failfast is True, import errors will not be surpressed.
     """
     for app in settings.INSTALLED_APPS:
@@ -47,9 +47,9 @@ def iterload(modname, verbose=False, failfast=False):
     """
     Loads all modules with name 'modname' from all installed apps and returns
     and iterator of those modules.
-    
+
     If verbose is True, debug information will be printed to stdout.
-    
+
     If failfast is True, import errors will not be surpressed.
     """
     for app in settings.INSTALLED_APPS:
@@ -62,15 +62,15 @@ def load_object(import_path):
     """
     Loads an object from an 'import_path', like in MIDDLEWARE_CLASSES and the
     likes.
-    
+
     Import paths should be: "mypackage.mymodule.MyObject". It then imports the
     module up until the last dot and tries to get the attribute after that dot
     from the imported module.
-    
+
     If the import path does not contain any dots, a TypeError is raised.
-    
+
     If the module cannot be imported, an ImportError is raised.
-    
+
     If the attribute does not exist in the module, a AttributeError is raised.
     """
     if '.' not in import_path:

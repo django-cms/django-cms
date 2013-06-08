@@ -4,6 +4,7 @@ from django.core.management.base import NoArgsCommand, CommandError
 
 
 class Command(NoArgsCommand):
+
     def handle_noargs(self, **options):
         """Create published public version of all published drafts.
         """

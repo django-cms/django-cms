@@ -10,6 +10,7 @@ import copy
 
 
 class InheritPagePlaceholderPlugin(CMSPluginBase):
+
     """
     Locates the plugins associated with the "from_page" of an InheritPagePlaceholder instance
     and renders those plugins sequentially
@@ -29,7 +30,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
         lang = instance.from_language
         request = context.get('request', None)
         if not lang:
-            if context.has_key('request'):
+            if 'request' in context:
                 lang = get_language_from_request(request)
             else:
                 lang = settings.LANGUAGE_CODE
@@ -67,6 +68,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
         # this is bit tricky, since i don't wont override add_view and
         # change_view
         class FakeForm(object):
+
             def __init__(self, Form, site):
                 self.Form = Form
                 self.site = site

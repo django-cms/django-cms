@@ -13,11 +13,13 @@ class StackInsertionForm(forms.Form):
         (INSERT_LINK, _('link')),
     )
     stack = forms.ModelChoiceField(label=_('stack'), required=True, queryset=Stack.objects.all())
-    insertion_type = forms.ChoiceField(label=_('insertion type'), choices=INSERTION_CHOICES, required=True, initial=INSERT_LINK)
+    insertion_type = forms.ChoiceField(
+        label=_('insertion type'), choices=INSERTION_CHOICES, required=True, initial=INSERT_LINK)
     language_code = forms.CharField(label=_('language code'), widget=forms.HiddenInput, required=True)
 
 
 class StackCreationForm(forms.ModelForm):
+
     class Meta:
         model = Stack
         exclude = 'content'

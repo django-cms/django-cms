@@ -27,6 +27,7 @@ def has_no_internet():
 
 
 class DocsTestCase(CMSTestCase):
+
     """
     Test docs building correctly for HTML
     """

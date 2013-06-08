@@ -10,7 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'File'
         db.create_table('cmsplugin_file', (
-            ('cmsplugin_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cms.CMSPlugin'], unique=True, primary_key=True)),
+            ('cmsplugin_ptr', self.gf('django.db.models.fields.related.OneToOneField')
+             (to=orm['cms.CMSPlugin'], unique=True, primary_key=True)),
             ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
         ))
@@ -29,8 +30,10 @@ class Migration(SchemaMigration):
             'language': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
             'level': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.CMSPlugin']", 'null': 'True', 'blank': 'True'}),
-            'placeholder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {
+                       'to': "orm['cms.CMSPlugin']", 'null': 'True', 'blank': 'True'}),
+            'placeholder':
+        ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
             'plugin_type': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
             'position': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
@@ -44,7 +47,8 @@ class Migration(SchemaMigration):
         },
         'file.file': {
             'Meta': {'object_name': 'File', 'db_table': "'cmsplugin_file'", '_ormbases': ['cms.CMSPlugin']},
-            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {
+                              'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         }

@@ -33,9 +33,9 @@ class ShowAdminMenu(InclusionTag):
     def get_context(self, context, page):
         request = context['request']
 
-        if context.has_key("cl"):
+        if "cl" in context:
             filtered = context['cl'].is_filtered()
-        elif context.has_key('filtered'):
+        elif 'filtered' in context:
             filtered = context['filtered']
 
         # following function is newly used for getting the context per item (line)
@@ -46,7 +46,7 @@ class ShowAdminMenu(InclusionTag):
 
         # this here is just context specific for menu rendering - items itself does
         # not use any of following variables
-        #context.update({
+        # context.update({
         #    'no_children': no_children,
         #})
         return context
@@ -65,9 +65,9 @@ class ShowLazyAdminMenu(InclusionTag):
     def get_context(self, context, page):
         request = context['request']
 
-        if context.has_key("cl"):
+        if "cl" in context:
             filtered = context['cl'].is_filtered()
-        elif context.has_key('filtered'):
+        elif 'filtered' in context:
             filtered = context['filtered']
 
         # following function is newly used for getting the context per item (line)
@@ -78,7 +78,7 @@ class ShowLazyAdminMenu(InclusionTag):
 
         # this here is just context specific for menu rendering - items itself does
         # not use any of following variables
-        #context.update({
+        # context.update({
         #    'no_children': no_children,
         #})
         return context
@@ -87,6 +87,7 @@ register.tag(ShowLazyAdminMenu)
 
 
 class CleanAdminListFilter(InclusionTag):
+
     """
     used in admin to display only these users that have actually edited a page
     and not everybody

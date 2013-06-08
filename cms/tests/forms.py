@@ -5,7 +5,7 @@ from cms.admin.forms import PageUserForm
 from cms.api import create_page, create_page_user
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
-    update_site_and_page_choices)
+                             update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -13,6 +13,7 @@ from django.core.cache import cache
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
+
     def __init__(self, required=False):
         # That's to have a proper mock object, without having to resort
         # to dirtier tricks. We want to test *just* compress here.
@@ -22,6 +23,7 @@ class Mock_PageSelectFormField(PageSelectFormField):
 
 
 class FormsTestCase(CMSTestCase):
+
     def setUp(self):
         cache.clear()
 
@@ -122,8 +124,8 @@ class FormsTestCase(CMSTestCase):
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',
-            'can_add_pageuser', 'can_change_pageuser',
-            'can_delete_pageuser', 'can_add_pagepermission',
-            'can_change_pagepermission', 'can_delete_pagepermission']
+                 'can_add_pageuser', 'can_change_pageuser',
+                 'can_delete_pageuser', 'can_add_pagepermission',
+                 'can_change_pagepermission', 'can_delete_pagepermission']
         for name in names:
             self.assertTrue(puf.initial.get(name, False))

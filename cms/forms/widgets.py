@@ -17,6 +17,7 @@ from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 
 
 class PageSelectWidget(MultiWidget):
+
     """A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
@@ -33,7 +34,7 @@ class PageSelectWidget(MultiWidget):
         widgets = (Select(choices=site_choices),
                    Select(choices=[('', '----')]),
                    Select(choices=self.choices, attrs={'style': "display:none;"}),
-        )
+                   )
         super(PageSelectWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):
@@ -51,7 +52,6 @@ class PageSelectWidget(MultiWidget):
     def _has_changed(self, initial, data):
         # THIS IS A COPY OF django.forms.widgets.Widget._has_changed()
         # (except for the first if statement)
-
         """
         Return True if data differs from initial.
         """
@@ -126,21 +126,23 @@ class PageSelectWidget(MultiWidget):
 
 
 class UserSelectAdminWidget(Select):
+
     """Special widget used in page permission inlines, because we have to render
     an add user (plus) icon, but point it somewhere else - to special user creation
     view, which is accessible only if user haves "add user" permissions.
-    
-    Current user should be assigned to widget in form constructor as an user 
+
+    Current user should be assigned to widget in form constructor as an user
     attribute.
     """
 
     def render(self, name, value, attrs=None, choices=()):
         output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]
-        if hasattr(self, 'user') and (self.user.is_superuser or \
-            self.user.has_perm(PageUser._meta.app_label + '.' + PageUser._meta.get_add_permission())):
+        if hasattr(self, 'user') and (self.user.is_superuser or
+                                      self.user.has_perm(PageUser._meta.app_label + '.' + PageUser._meta.get_add_permission())):
             # append + icon
             add_url = '../../../cms/pageuser/add/'
-            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
-                    (add_url, name))
-            output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
+            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' %
+                         (add_url, name))
+            output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' %
+                          (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))

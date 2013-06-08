@@ -2,7 +2,7 @@ from __future__ import with_statement
 from cms.test_utils.util.context_managers import TemporaryDirectory
 from django.core.management.base import CommandError
 from django.core.management.commands.compilemessages import (compile_messages,
-    has_bom)
+                                                             has_bom)
 from django.test.testcases import TestCase
 import os
 import shutil
@@ -23,7 +23,8 @@ def compile_messages():
     basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
 
     if not basedirs:
-        raise CommandError("This script should be run from the Django SVN tree or your project or app tree, or with the settings module specified.")
+        raise CommandError(
+            "This script should be run from the Django SVN tree or your project or app tree, or with the settings module specified.")
 
     for basedir in basedirs:
         for dirpath, dirnames, filenames in os.walk(basedir):
@@ -31,7 +32,8 @@ def compile_messages():
                 if f.endswith('.po'):
                     fn = os.path.join(dirpath, f)
                     if has_bom(fn):
-                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
+                        raise CommandError(
+                            "The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
                     pf = os.path.splitext(fn)[0]
                     # Store the names of the .mo and .po files in an environment
                     # variable, rather than doing a string replacement into the
@@ -50,6 +52,7 @@ def compile_messages():
 
 
 class PoTest(TestCase):
+
     def test_po_sanity(self):
         with TemporaryDirectory() as tmpdir:
             shutil.copytree(SOURCE_DIR, os.path.join(tmpdir, 'locale'))

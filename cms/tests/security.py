@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 
 
 class SecurityTests(CMSTestCase):
+
     """
     Test security issues by trying some naive requests to add/alter/delete data.
     """
@@ -181,7 +182,8 @@ class SecurityTests(CMSTestCase):
             plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
             # ACTUAL TEST STARTS HERE.
             data = {
-                "body": "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
+                "body":
+                "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
             }
             edit_url = '%s%s/' % (URL_CMS_PLUGIN_EDIT, plugin.pk)
             response = self.client.post(edit_url, data)

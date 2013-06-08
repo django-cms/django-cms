@@ -5,6 +5,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class TwoPagesFixture(object):
+
     def create_fixtures(self):
         defaults = {
             'template': 'nav_playground.html',

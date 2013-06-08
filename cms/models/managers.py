@@ -11,6 +11,7 @@ from django.db.models import Q
 
 
 class PageManager(PublisherManager):
+
     """Use draft() and public() methods for accessing the corresponding
     instances.
     """
@@ -97,7 +98,7 @@ class PageManager(PublisherManager):
             cmsplugin = plugin.model
             if hasattr(cmsplugin, 'search_fields'):
                 for field in cmsplugin.search_fields:
-                    qp |= Q(**{'placeholders__cmsplugin__%s__%s__icontains' % \
+                    qp |= Q(**{'placeholders__cmsplugin__%s__%s__icontains' %
                                (cmsplugin.__name__.lower(), field): q})
         if language:
             qt &= Q(title_set__language=language)
@@ -109,6 +110,7 @@ class PageManager(PublisherManager):
 
 
 class TitleManager(PublisherManager):
+
     def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back
@@ -208,11 +210,13 @@ class TitleManager(PublisherManager):
         obj.save()
         return obj
 
-################################################################################
+#
 # Permissions
-################################################################################
+#
+
 
 class BasicPagePermissionManager(models.Manager):
+
     """Global page permission manager accessible under objects.
 
     !IMPORTANT: take care, PagePermissionManager extends this manager
@@ -233,6 +237,7 @@ class BasicPagePermissionManager(models.Manager):
 
 
 class PagePermissionManager(BasicPagePermissionManager):
+
     """Page permission manager accessible under objects.
     """
 
@@ -345,6 +350,7 @@ class PagePermissionManager(BasicPagePermissionManager):
 
 
 class PagePermissionsPermissionManager(models.Manager):
+
     """Page permissions permission manager.
 
     !IMPORTANT: this actually points to Page model, not to PagePermission.
@@ -430,7 +436,7 @@ class PagePermissionsPermissionManager(models.Manager):
 
     def __get_id_list(self, user, site, attr):
         from cms.models import (GlobalPagePermission, PagePermission,
-            MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
+                                MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
 
         if attr != "can_view":
             if not user.is_authenticated() or not user.is_staff:
@@ -472,6 +478,7 @@ class PagePermissionsPermissionManager(models.Manager):
 
 
 class PageModeratorStateManager(models.Manager):
+
     def get_delete_actions(self):
         from cms.models import PageModeratorState
 

@@ -35,6 +35,7 @@ DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 
 class AdminTestsBase(CMSTestCase):
+
     @property
     def admin_class(self):
         return site._registry[Page]
@@ -66,6 +67,7 @@ class AdminTestsBase(CMSTestCase):
 
 
 class AdminTestCase(AdminTestsBase):
+
     def test_edit_does_not_reset_page_adv_fields(self):
         """
         Makes sure that if a non-superuser with no rights to edit advanced page
@@ -130,7 +132,7 @@ class AdminTestCase(AdminTestsBase):
                 'site': page.site.pk,
                 'template': page.template,
                 'reverse_id': page.reverse_id,
-                'pagepermission_set-TOTAL_FORMS': 0, # required only if user haves can_change_permission
+                'pagepermission_set-TOTAL_FORMS': 0,  # required only if user haves can_change_permission
                 'pagepermission_set-INITIAL_FORMS': 0,
                 'pagepermission_set-MAX_NUM_FORMS': 0,
                 'pagepermission_set-2-TOTAL_FORMS': 0,
@@ -216,7 +218,6 @@ class AdminTestCase(AdminTestsBase):
                 'reverse_id': page.reverse_id,
             }
 
-
         with self.login_user_context(admin):
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page.pk, page_data,
                                     follow=True)
@@ -245,8 +246,8 @@ class AdminTestCase(AdminTestsBase):
             self.assertRedirects(response, URL_CMS_PAGE)
             # TODO - The page should be marked for deletion, but nothing more
             # until publishing
-            #self.assertRaises(Page.DoesNotExist, self.reload, page)
-            #self.assertRaises(Page.DoesNotExist, self.reload, child)
+            # self.assertRaises(Page.DoesNotExist, self.reload, page)
+            # self.assertRaises(Page.DoesNotExist, self.reload, child)
 
     def test_search_fields(self):
         superuser = self.get_superuser()
@@ -323,9 +324,9 @@ class AdminTestCase(AdminTestsBase):
         page_admin = site._registry[Page]
 
         cl_params = [request, page_admin.model, page_admin.list_display,
-            page_admin.list_display_links, page_admin.list_filter,
-            page_admin.date_hierarchy, page_admin.search_fields,
-            page_admin.list_select_related, page_admin.list_per_page]
+                     page_admin.list_display_links, page_admin.list_filter,
+                     page_admin.date_hierarchy, page_admin.search_fields,
+                     page_admin.list_select_related, page_admin.list_per_page]
         if hasattr(page_admin, 'list_max_show_all'):  # django 1.4
             cl_params.append(page_admin.list_max_show_all)
         cl_params.extend([page_admin.list_editable, page_admin])
@@ -532,25 +533,25 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': 'invalid-placeholder'})
+                                                  'placeholder_id': 'invalid-placeholder'})
             self.assertRaises(ValueError, self.admin_class.move_plugin, request)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent': ''})
+                                                  'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent': ''})
+                                                  'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent': ''})
+                                                  'placeholder_id': placeholder.id, 'plugin_parent': ''})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent': ''})
+                                                  'placeholder_id': placeholder.id, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, "ok")
@@ -674,6 +675,7 @@ class AdminTests(AdminTestsBase):
 
 
 class NoDBAdminTests(CMSTestCase):
+
     @property
     def admin_class(self):
         return site._registry[Page]
@@ -686,6 +688,7 @@ class NoDBAdminTests(CMSTestCase):
 
 
 class PluginPermissionTests(AdminTestsBase):
+
     def setUp(self):
         self._page = create_page('test page', 'nav_playground.html', 'en')
         self._placeholder = self._page.placeholders.all()[0]
@@ -794,7 +797,7 @@ class PluginPermissionTests(AdminTestsBase):
         data = dict(plugin_id=plugin.id,
                     placeholder_id=self._placeholder.pk,
                     plugin_parent='',
-        )
+                    )
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
@@ -813,7 +816,7 @@ class PluginPermissionTests(AdminTestsBase):
                     source_language='en',
                     target_language='fr',
                     target_placeholder_id=self._placeholder.pk,
-        )
+                    )
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         # After he got the permissions, he can edit the plugin
@@ -835,7 +838,7 @@ class PluginPermissionTests(AdminTestsBase):
         # user has can_change_permission
         # => must see the PagePermissionInline
         self.assertTrue(
-            any(type(inline) is PagePermissionInlineAdmin
+            any(isinstance(inline, PagePermissionInlineAdmin)
                 for inline in page_admin.get_inline_instances(request,
                                                               page if not DJANGO_1_4 else None)))
 
@@ -848,7 +851,7 @@ class PluginPermissionTests(AdminTestsBase):
         page_admin._current_page = page
         # => PagePermissionInline is no longer visible
         self.assertFalse(
-            any(type(inline) is PagePermissionInlineAdmin
+            any(isinstance(inline, PagePermissionInlineAdmin)
                 for inline in page_admin.get_inline_instances(request,
                                                               page if not DJANGO_1_4 else None)))
 
@@ -900,6 +903,7 @@ class PluginPermissionTests(AdminTestsBase):
 
 
 class AdminFormsTests(AdminTestsBase):
+
     def test_clean_overwrite_url(self):
         user = AnonymousUser()
         user.is_superuser = True
@@ -994,6 +998,7 @@ class AdminFormsTests(AdminTestsBase):
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
+
     """
     System user count influences the size of the page edit page,
     but the users are only 2 times present on the page

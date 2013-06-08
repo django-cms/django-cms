@@ -40,6 +40,7 @@ VISIBILITY_STAFF = 2
 # Helpers/Internals
 #===============================================================================
 
+
 def _generate_valid_slug(source, parent, language):
     """
     Generate a valid slug for a page from source for the given language.
@@ -82,7 +83,7 @@ def _verify_plugin_type(plugin_type):
     (plugin_model, plugin_type)
     """
     if (hasattr(plugin_type, '__module__') and
-        issubclass(plugin_type, CMSPluginBase)):
+            issubclass(plugin_type, CMSPluginBase)):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
@@ -101,6 +102,7 @@ def _verify_plugin_type(plugin_type):
 # Public API
 #===============================================================================
 
+
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, redirect=None, meta_description=None,
                 created_by='python-api', parent=None,
@@ -111,7 +113,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 position="last-child", overwrite_url=None):
     """
     Create a CMS Page and it's title for the given language
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # ugly permissions hack
@@ -178,7 +180,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        published=False, # will be published later
+        published=False,  # will be published later
         template=template,
         site=site,
         login_required=login_required,
@@ -211,9 +213,9 @@ def create_title(language, title, page, menu_title=None, slug=None,
                  parent=None, overwrite_url=None):
     """
     Create a title.
-    
+
     Parent is only used if slug=None.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate page
@@ -255,7 +257,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """
     Add a plugin to a placeholder
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate placeholder
@@ -291,7 +293,7 @@ def create_page_user(created_by, user,
                      can_delete_pagepermission=True, grant_all=False):
     """
     Creates a page user.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     if grant_all:
@@ -334,7 +336,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
                         grant_all=False, global_permission=False):
     """
     Assigns given user to page, and gives him requested permissions.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     grant_all = grant_all and not global_permission
@@ -364,12 +366,13 @@ def publish_page(page, user):
     """
     Publish a page. This sets `page.published` to `True` and calls publish()
     which does the actual publishing.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     page = page.reload()
 
     class FakeRequest(object):
+
         def __init__(self, user):
             self.user = user
 

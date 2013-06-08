@@ -3,12 +3,13 @@ from django.conf import settings
 
 # modify reversions to match our needs if required...
 
+
 def reversion_register(model_class, fields=None, follow=(), format="json", exclude_fields=None):
-    """CMS interface to reversion api - helper function. Registers model for 
+    """CMS interface to reversion api - helper function. Registers model for
     reversion only if reversion is available.
-    
+
     Auto excludes publisher fields.
-     
+
     """
 
     # reversion's merely recommended, not required
@@ -64,9 +65,11 @@ def make_revision_with_plugins(obj, user=None, message=None):
                 plugin_instance, admin = plugin.get_plugin_instance()
                 if plugin_instance:
                     padapter = revision_manager.get_adapter(plugin_instance.__class__)
-                    revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
+                    revision_context.add_to_context(
+                        revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
                 bpadapter = revision_manager.get_adapter(plugin.__class__)
-                revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
+                revision_context.add_to_context(
+                    revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
 
 
 def find_placeholder_relation(obj):
@@ -74,6 +77,7 @@ def find_placeholder_relation(obj):
 
 
 class classproperty(object):
+
     """Like @property, but for classes, not just instances.
 
     Example usage:

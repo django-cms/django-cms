@@ -8,6 +8,7 @@ from cms.forms.utils import get_site_choices, get_page_choices
 
 
 class SuperLazyIterator(object):
+
     def __init__(self, func):
         self.func = func
 

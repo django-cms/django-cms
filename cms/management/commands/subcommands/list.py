@@ -29,8 +29,7 @@ def plugin_report():
     # ]
     plugin_report = []
     all_plugins = CMSPlugin.objects.order_by("plugin_type")
-    plugin_types = list(set(all_plugins.values_list("plugin_type", flat=True)))
-    plugin_types.sort()
+    plugin_types = sorted(set(all_plugins.values_list("plugin_type", flat=True)))
 
     for plugin_type in plugin_types:
         plugin = {}
@@ -54,7 +53,7 @@ def plugin_report():
 
     return plugin_report
 
-    
+
 class ListPluginsCommand(NoArgsCommand):
 
     help = 'Lists all plugins in CMSPlugin'
@@ -78,13 +77,13 @@ class ListPluginsCommand(NoArgsCommand):
 
             else:
                 self.stdout.write("  model      : %s.%s  \n" %
-                    (plugin_model.__module__, plugin_model.__name__))
+                                 (plugin_model.__module__, plugin_model.__name__))
                 if unsaved_instances:
                     self.stdout.write(self.style.ERROR("  ERROR      : %s unsaved instance(s) \n" % unsaved_instances))
 
             self.stdout.write("  instance(s): %s \n" % instances)
 
-                   
+
 class ListCommand(SubcommandsCommand):
     help = 'List commands'
     subcommands = {

@@ -21,7 +21,7 @@ urlpatterns = patterns('',
                            {'document_root': get_cms_setting('MEDIA_ROOT'), 'show_indexes': True}),
                        url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
 
-)
+                       )
 
 urlpatterns += staticfiles_urlpatterns()
 
@@ -29,4 +29,4 @@ urlpatterns += i18n_patterns('',
                              url(r'^admin/', include(admin.site.urls)),
                              url(r'^example/$', 'cms.test_utils.project.placeholderapp.views.example_view'),
                              url(r'^', include('cms.urls')),
-)
+                             )

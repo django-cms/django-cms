@@ -3,6 +3,7 @@ from django.utils import simplejson
 
 
 class BaseItem(object):
+
     def __init__(self, right=False):
         self.right = right
 

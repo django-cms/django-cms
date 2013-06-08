@@ -10,6 +10,7 @@ from django.test.client import RequestFactory
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
+
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
         path = path or page and page.get_absolute_url()
         if edit:

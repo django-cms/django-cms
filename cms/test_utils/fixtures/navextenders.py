@@ -6,10 +6,11 @@ from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class NavextendersFixture(object):
+
     def create_fixtures(self):
         """
         Tree from fixture:
-        
+
             page1
                 page2
                     page3

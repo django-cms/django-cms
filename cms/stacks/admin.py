@@ -43,10 +43,11 @@ class StackAdmin(PlaceholderAdmin):
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns('',
-            pat(r'create-stack/(?P<placeholder_id>\d+)/$', self.create_stack),
-            pat(r'create-stack/(?P<placeholder_id>\d+)/(?P<plugin_id>\d+)/$', self.create_stack_from_plugin),
-            pat(r'insert-stack/(?P<placeholder_id>\d+)/$', self.insert_stack),
-        )
+                                pat(r'create-stack/(?P<placeholder_id>\d+)/$', self.create_stack),
+                                pat(r'create-stack/(?P<placeholder_id>\d+)/(?P<plugin_id>\d+)/$',
+                                    self.create_stack_from_plugin),
+                                pat(r'insert-stack/(?P<placeholder_id>\d+)/$', self.insert_stack),
+                                )
         url_patterns += super(StackAdmin, self).get_urls()
         return url_patterns
 
@@ -86,7 +87,8 @@ class StackAdmin(PlaceholderAdmin):
                     'cancel': False,
                 }
                 if form.cleaned_data['insertion_type'] == StackInsertionForm.INSERT_LINK:
-                    cms_plugin = add_plugin(placeholder, StackPlugin, form.cleaned_data['language_code'], stack=form.cleaned_data['stack'])
+                    cms_plugin = add_plugin(placeholder, StackPlugin,
+                                            form.cleaned_data['language_code'], stack=form.cleaned_data['stack'])
                     context.update({
                         'plugin': cms_plugin,
                         "type": cms_plugin.get_plugin_name(),
@@ -95,7 +97,8 @@ class StackAdmin(PlaceholderAdmin):
                         'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
                     })
                 else:
-                    plugin_ziplist = copy_plugins_to(list(form.cleaned_data['stack'].content.get_plugins()), placeholder)
+                    plugin_ziplist = copy_plugins_to(list(
+                        form.cleaned_data['stack'].content.get_plugins()), placeholder)
                     # TODO: once we actually use the plugin context in the frontend, we have to support multiple plugins
                 return TemplateResponse(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return TemplateResponse(request, 'admin/stacks/insert_stack.html', {

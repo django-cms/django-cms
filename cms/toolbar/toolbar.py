@@ -24,6 +24,7 @@ class CMSToolbarLoginForm(AuthenticationForm):
 
 
 class CMSToolbar(object):
+
     """
     The default CMS Toolbar
     """

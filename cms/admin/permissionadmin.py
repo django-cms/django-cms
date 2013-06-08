@@ -37,13 +37,13 @@ class PagePermissionInlineAdmin(TabularInline):
     def queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
-        all permissions. Otherwise can user see only permissions for 
+        all permissions. Otherwise can user see only permissions for
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to itself)
         """
         # can see only permissions for users which are under him in tree
 
-        ### here a exception can be thrown
+        # here a exception can be thrown
         try:
             qs = PagePermission.objects.subordinate_to_user(request.user)
             return qs.filter(can_view=False)
@@ -69,7 +69,7 @@ class PagePermissionInlineAdmin(TabularInline):
             if not obj.has_move_page_permission(request):
                 exclude.append('can_move_page')
         formset_cls = super(PagePermissionInlineAdmin, self
-        ).get_formset(request, obj=None, exclude=exclude, *kwargs)
+                            ).get_formset(request, obj=None, exclude=exclude, *kwargs)
         qs = self.queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)
@@ -125,6 +125,7 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
 
 
 class GenericCmsPermissionAdmin(object):
+
     """
     Custom mixin for permission-enabled admin interfaces.
     """
@@ -165,11 +166,11 @@ class GenericCmsPermissionAdmin(object):
 
     def has_add_permission(self, request):
         return self._has_change_permissions_permission(request) and \
-               super(self.__class__, self).has_add_permission(request)
+            super(self.__class__, self).has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
         return self._has_change_permissions_permission(request) and \
-               super(self.__class__, self).has_change_permission(request, obj)
+            super(self.__class__, self).has_change_permission(request, obj)
 
 
 if get_cms_setting('PERMISSION'):

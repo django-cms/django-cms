@@ -18,8 +18,9 @@ DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
+
     """
-    Ensure the CMSPlugin subclasses have sane values and set some defaults if 
+    Ensure the CMSPlugin subclasses have sane values and set some defaults if
     they're not given.
     """
 
@@ -146,7 +147,7 @@ class CMSPluginBase(admin.ModelAdmin):
     def has_add_permission(self, request, *args, **kwargs):
         """Permission handling change - if user is allowed to change the page
         he must be also allowed to add/change/delete plugins..
-        
+
         Not sure if there will be plugin permission requirement in future, but
         if, then this must be changed.
         """
@@ -212,7 +213,7 @@ class CMSPluginBase(admin.ModelAdmin):
     def icon_src(self, instance):
         """
         Overwrite this if text_enabled = True
- 
+
         Return the URL for an image to be used for an icon for this
         plugin instance in a text editor.
         """

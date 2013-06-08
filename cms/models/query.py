@@ -10,6 +10,7 @@ from django.utils import timezone
 
 
 class PageQuerySet(PublisherQuerySet):
+
     def on_site(self, site=None):
         if not site:
             try:

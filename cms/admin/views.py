@@ -42,7 +42,7 @@ def revert_plugins(request, version_id, obj):
             plugin_list.append(obj)
         elif obj.__class__ == Page:
             pass
-            #page = obj #Page.objects.get(pk=obj.pk)
+            # page = obj #Page.objects.get(pk=obj.pk)
         elif obj.__class__ == Title:
             titles.append(obj)
         else:

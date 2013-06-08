@@ -24,6 +24,7 @@ DEFAULT_PLUGIN_PROCESSORS = (
 
 
 class PluginContext(Context):
+
     """
     This subclass of template.Context automatically populates itself using
     the processors defined in CMS_PLUGIN_CONTEXT_PROCESSORS.
@@ -111,7 +112,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
     if (len(plugins) == 0 and placeholder and lang != get_default_language() and
-        get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
+            get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
         fallbacks = get_fallback_languages(lang)
         for fallback_language in fallbacks:
             plugins = [plugin for plugin in get_plugins(request, placeholder, fallback_language)]
@@ -136,7 +137,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     toolbar = getattr(request, 'toolbar', None)
 
     if (getattr(toolbar, 'edit_mode', False) and
-        (not page or page.has_change_permission(request))):
+            (not page or page.has_change_permission(request))):
         edit = True
     if edit:
         from cms.middleware.toolbar import toolbar_plugin_processor
@@ -152,7 +153,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         draggable_content = mark_safe(render_dragables(plugins, slot, request))
     content = mark_safe("".join(content))
 
-    result = render_to_string("cms/toolbar/placeholder.html", {'plugins': content, "bar": toolbar_content, "draggables": draggable_content, 'edit': edit})
+    result = render_to_string("cms/toolbar/placeholder.html", {
+                              'plugins': content, "bar": toolbar_content, "draggables": draggable_content, 'edit': edit})
     context.pop()
     return result
 

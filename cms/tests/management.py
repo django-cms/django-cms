@@ -57,7 +57,7 @@ class ManagementTestCase(CMSTestCase):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                                     name="A Link", url="https://www.django-cms.org")
             self.assertEqual(
                 CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
                 2)
@@ -138,7 +138,7 @@ class ManagementTestCase(CMSTestCase):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                                     name="A Link", url="https://www.django-cms.org")
 
             instanceless_plugin = CMSPlugin(
                 language="en", plugin_type="TextPlugin")

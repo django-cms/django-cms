@@ -12,6 +12,7 @@ from django.test import TestCase
 
 
 class TestOutput(FileOutputWrapper):
+
     def __init__(self):
         super(TestOutput, self).__init__(None, None)
         self.section_wrapper = TestSectionOutput
@@ -24,6 +25,7 @@ class TestOutput(FileOutputWrapper):
 
 
 class TestSectionOutput(FileSectionWrapper):
+
     def write(self, message):
         pass
 
@@ -32,6 +34,7 @@ class TestSectionOutput(FileSectionWrapper):
 
 
 class CheckAssertMixin(object):
+
     def assertCheck(self, successful, **assertions):
         """
         asserts that checks are successful or not
@@ -45,6 +48,7 @@ class CheckAssertMixin(object):
 
 
 class CheckTests(unittest.TestCase, CheckAssertMixin):
+
     def test_test_confs(self):
         self.assertCheck(True, errors=0, warnings=0)
 
@@ -110,7 +114,7 @@ class CheckWithDatabaseTests(TestCase, CheckAssertMixin):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                                     name="A Link", url="https://www.django-cms.org")
 
             # create a CMSPlugin with an unsaved instance
             instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")

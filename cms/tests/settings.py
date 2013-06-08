@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 
 
 class SettingsTests(CMSTestCase):
+
     def test_cms_templates_with_pathsep(self):
         from sekizai.context import SekizaiContext
         with SettingsOverride(CMS_TEMPLATES=[('subdir/template.html', 'Subdir')], DEBUG=True, TEMPLATE_DEBUG=True):

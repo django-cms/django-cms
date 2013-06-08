@@ -21,6 +21,7 @@ CHECKERS = []
 
 
 class FileOutputWrapper(object):
+
     """
     Wraps two file-like objects (that support at the very least the 'write'
     method) into an API to be used by the check function further down in
@@ -109,6 +110,7 @@ class FileOutputWrapper(object):
 
 
 class FileSectionWrapper(FileOutputWrapper):
+
     """
     Used from FileOutputWrapper to report checks in a section.
 
@@ -168,7 +170,8 @@ def check_sekizai(output):
         if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
             section.success("Sekizai template context processor is installed")
         else:
-            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+            section.error(
+                "Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -192,7 +195,8 @@ def check_i18n(output):
             section.warn("Old style (tuple based) CMS_LANGUAGES, please switch to the new (dictionary based) style")
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
-                section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
+                section.warn(
+                    "Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
 
 
 @define_check
@@ -201,7 +205,8 @@ def check_deprecated_settings(output):
         found = False
         for deprecated in ['CMS_FLAT_URLS', 'CMS_MODERATOR']:
             if hasattr(settings, deprecated):
-                section.warn("Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated)
+                section.warn(
+                    "Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated)
                 found = True
         if not found:
             section.skip("No deprecated settings found")
@@ -220,12 +225,14 @@ def check_plugin_instances(output):
                 section.error("%s has instances but is no longer installed" % plugin_type["type"])
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
-                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
+                section.error("%s has %s unsaved instances" %
+                              (plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
         else:
-            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
+            section.finish_error(
+                "There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
 
 
 @define_check
@@ -260,7 +267,8 @@ def check_copy_relations(output):
         if not section.warnings:
             section.finish_success('All plugins have "copy_relations" method if needed.')
         else:
-            section.finish_success('Some plugins do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations')
+            section.finish_success(
+                'Some plugins do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations')
 
 
 def check(output):
@@ -292,7 +300,8 @@ def check(output):
         if output.errors:
             output.write_stderr_line(output.colorize('Please check the errors above', opts=['bold'], fg='red'))
         elif output.warnings:
-            output.write_stderr_line(output.colorize('Installation okay, but please check warnings above', opts=['bold'], fg='yellow'))
+            output.write_stderr_line(
+                output.colorize('Installation okay, but please check warnings above', opts=['bold'], fg='yellow'))
         else:
             output.write_line(output.colorize('Installation okay', opts=['bold'], fg='green'))
     return output.successful

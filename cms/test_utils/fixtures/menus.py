@@ -6,10 +6,11 @@ from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class MenusFixture(object):
+
     def create_fixtures(self):
         """
         Tree from fixture:
-            
+
             + P1
             | + P2
             |   + P3
@@ -35,10 +36,11 @@ class MenusFixture(object):
 
 
 class ExtendedMenusFixture(object):
+
     def create_fixtures(self):
         """
         Tree from fixture:
-            
+
             + P1
             | + P2
             |   + P3
@@ -70,16 +72,17 @@ class ExtendedMenusFixture(object):
 
 
 class SubMenusFixture(object):
+
     def create_fixtures(self):
         """
         Tree from fixture:
-            
+
             + P1
             | + P2
             |   + P3
             + P4
             | + P5
-            + P6 
+            + P6
               + P7 (not in menu)
               + P8
         """
@@ -99,6 +102,7 @@ class SubMenusFixture(object):
 
 
 class SoftrootFixture(object):
+
     def create_fixtures(self):
         """
         top
@@ -111,7 +115,7 @@ class SoftrootFixture(object):
                 bbb
                     333
                     444
-        
+
         # all in nav, published and NOT softroot
         """
         defaults = {

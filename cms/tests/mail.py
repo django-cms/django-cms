@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 
 class MailTestCase(CMSTestCase):
+
     def setUp(self):
         mail.outbox = []  # reset outbox
 

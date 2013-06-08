@@ -103,7 +103,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
                  "The URL of the request was: http://%(host)s%(path)s") \
-               % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
+            % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
@@ -189,6 +189,7 @@ def get_placeholder_content(context, request, current_page, name, inherit):
 
 
 class PlaceholderParser(Parser):
+
     def parse_blocks(self):
         for bit in getattr(self.kwargs['extra_bits'], 'value', self.kwargs['extra_bits']):
             if getattr(bit, 'value', bit.var.value) == 'or':
@@ -197,11 +198,13 @@ class PlaceholderParser(Parser):
 
 
 class PlaceholderOptions(Options):
+
     def get_parser_class(self):
         return PlaceholderParser
 
 
 class Placeholder(Tag):
+
     """
     This template node is used to output page content and
     is also used in the admin to dynamically generate input fields.
@@ -323,6 +326,7 @@ register.tag(PluginChildClasses)
 
 
 class PageAttribute(AsTag):
+
     """
     This template node is used to output an attribute from a page such
     as its title or slug.
@@ -356,8 +360,8 @@ class PageAttribute(AsTag):
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
-    
-    varname -- context variable name. Output will be added to template context as this variable. 
+
+    varname -- context variable name. Output will be added to template context as this variable.
     This argument is required to follow the 'as' keyword.
     """
     name = 'page_attribute'

@@ -26,7 +26,7 @@ class NonRootCase(CMSTestCase):
     def create_some_pages(self):
         """
         Creates the following structure:
-        
+
         + P1
         | + P2
         |   + P3
@@ -36,11 +36,11 @@ class NonRootCase(CMSTestCase):
         self.page1 = create_page("page1", "nav_playground.html", "en",
                                  published=True, in_navigation=True)
         self.page2 = create_page("page2", "nav_playground.html", "en",
-                          parent=self.page1, published=True, in_navigation=True)
+                                 parent=self.page1, published=True, in_navigation=True)
         self.page3 = create_page("page3", "nav_playground.html", "en",
-                          parent=self.page2, published=True, in_navigation=True)
+                                 parent=self.page2, published=True, in_navigation=True)
         self.page4 = create_page("page4", "nav_playground.html", "en",
-                                      published=True, in_navigation=True)
+                                 published=True, in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4]
         self.top_level_pages = [self.page1, self.page4]
         self.level1_pages = [self.page2]

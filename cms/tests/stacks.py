@@ -12,6 +12,7 @@ URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
 
 
 class StacksTestCase(PluginsTestBaseCase):
+
     def fill_placeholder(self, placeholder=None):
         if placeholder is None:
             placeholder = Placeholder(slot=u"some_slot")
@@ -20,7 +21,7 @@ class StacksTestCase(PluginsTestBaseCase):
         # plugin in placeholder
         plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",
                               body=u"01",
-        )
+                              )
         plugin_1.save()
 
         # IMPORTANT: plugins must be reloaded, before they can be assigned
@@ -30,7 +31,7 @@ class StacksTestCase(PluginsTestBaseCase):
         # child of plugin_1
         plugin_2 = add_plugin(placeholder, u"TextPlugin", u"en",
                               body=u"02",
-        )
+                              )
         plugin_1 = self.reload(plugin_1)
         plugin_2.parent = plugin_1
         plugin_2.save()
@@ -44,14 +45,16 @@ class StacksTestCase(PluginsTestBaseCase):
 
     def test_create_stack_from_placeholder(self):
         placeholder = self.fill_placeholder()
-        response = self.client.post(reverse('admin:stacks_stack_create_stack', kwargs={'placeholder_id': placeholder.pk}), data={'name': 'foo', 'code': 'bar'})
+        response = self.client.post(reverse('admin:stacks_stack_create_stack', kwargs={
+                                    'placeholder_id': placeholder.pk}), data={'name': 'foo', 'code': 'bar'})
         new_placeholder = Placeholder.objects.get(stacks_contents__code='bar')
         self.assertEqual(len(placeholder.get_plugins()), len(new_placeholder.get_plugins()))
 
     def test_create_stack_from_plugin(self):
         placeholder = self.fill_placeholder()
         plugin = placeholder.get_plugins().filter(parent=None).get()
-        response = self.client.post(reverse('admin:stacks_stack_create_stack_from_plugin', kwargs={'placeholder_id': placeholder.pk, 'plugin_id': plugin.pk}), data={'name': 'foo', 'code': 'bar'})
+        response = self.client.post(reverse('admin:stacks_stack_create_stack_from_plugin', kwargs={
+                                    'placeholder_id': placeholder.pk, 'plugin_id': plugin.pk}), data={'name': 'foo', 'code': 'bar'})
         new_placeholder = Placeholder.objects.get(stacks_contents__code='bar')
         self.assertEqual(len(placeholder.get_plugins()), len(new_placeholder.get_plugins()))
 
@@ -60,9 +63,12 @@ class StacksTestCase(PluginsTestBaseCase):
         stack = Stack.objects.create(name='foo', code='bar')
         self.fill_placeholder(stack.content)
         new_placeholder = Placeholder.objects.create(slot='some_other_slot')
-        response = self.client.post(reverse('admin:stacks_stack_insert_stack', kwargs={'placeholder_id': new_placeholder.pk}), data={'insertion_type': StackInsertionForm.INSERT_LINK, 'stack': stack.pk, 'language_code': 'en'})
+        response = self.client.post(reverse('admin:stacks_stack_insert_stack', kwargs={'placeholder_id': new_placeholder.pk}), data={
+                                    'insertion_type': StackInsertionForm.INSERT_LINK, 'stack': stack.pk, 'language_code': 'en'})
         self.assertEquals(len(new_placeholder.get_plugins()), 1)
-        self.assertEquals(len(StackLink.objects.get(placeholder=new_placeholder).stack.content.get_plugins()), len(placeholder.get_plugins()))
+        self.assertEquals(
+            len(StackLink.objects.get(placeholder=new_placeholder).stack.content.get_plugins()), len(placeholder.get_plugins()))
         another_new_placeholder = Placeholder.objects.create(slot='some_other_slot')
-        response = self.client.post(reverse('admin:stacks_stack_insert_stack', kwargs={'placeholder_id': another_new_placeholder.pk}), data={'insertion_type': StackInsertionForm.INSERT_COPY, 'stack': stack.pk, 'language_code': 'en'})
+        response = self.client.post(reverse('admin:stacks_stack_insert_stack', kwargs={'placeholder_id': another_new_placeholder.pk}), data={
+                                    'insertion_type': StackInsertionForm.INSERT_COPY, 'stack': stack.pk, 'language_code': 'en'})
         self.assertEquals(len(stack.content.get_plugins()), len(another_new_placeholder.get_plugins()))

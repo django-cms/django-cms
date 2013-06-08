@@ -38,6 +38,7 @@ class LinkPlugin(CMSPluginBase):
         # this is bit tricky, since i don't wont override add_view and
         # change_view
         class FakeForm(object):
+
             def __init__(self, Form, site):
                 self.Form = Form
                 self.site = site

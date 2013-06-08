@@ -27,9 +27,9 @@ class SnippetPlugin(CMSPluginBase):
             else:
                 t = template.Template(instance.snippet.html)
                 content = t.render(Context(context))
-        except template.TemplateDoesNotExist, e:
+        except template.TemplateDoesNotExist as e:
             content = _('Template %(template)s does not exist.') % {'template': instance.snippet.template}
-        except Exception, e:
+        except Exception as e:
             content = str(e)
         context.update({
             'content': mark_safe(content),

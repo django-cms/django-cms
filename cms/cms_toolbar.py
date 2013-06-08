@@ -18,6 +18,7 @@ from menus.utils import DefaultLanguageChanger
 
 
 class PageToolbar(CMSToolbar):
+
     def insert_items(self, items, toolbar, request, is_app):
         self.is_app = is_app
         self.request = request

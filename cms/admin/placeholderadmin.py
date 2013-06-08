@@ -158,7 +158,7 @@ class PlaceholderAdmin(ModelAdmin):
                                 pat(r'remove-plugin/$', self.remove_plugin),
                                 pat(r'move-plugin/$', self.move_plugin),
                                 pat(r'copy-plugins/$', self.copy_plugins),
-        )
+                                )
         return url_patterns + super(PlaceholderAdmin, self).get_urls()
 
     @xframe_options_sameorigin
@@ -190,7 +190,7 @@ class PlaceholderAdmin(ModelAdmin):
 
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language)
-        except PluginLimitReached, e:
+        except PluginLimitReached as e:
             return HttpResponseBadRequest(str(e))
 
         # actually add the plugin
@@ -299,7 +299,7 @@ class PlaceholderAdmin(ModelAdmin):
 
             try:
                 has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language)
-            except PluginLimitReached, e:
+            except PluginLimitReached as e:
                 return HttpResponseBadRequest(str(e))
 
             # plugin positions are 0 based, so just using count here should give us 'last_position + 1'

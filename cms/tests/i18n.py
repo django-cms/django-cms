@@ -12,12 +12,12 @@ class TestLanguages(SettingsOverrideTestCase):
                       ('es', 'Spanish')),
         'CMS_LANGUAGES': {
             1: [{'code': 'en',
-                  'name': 'English',
-                  'public': True},
-                 {'code': 'fr',
-                  'name': 'French',
-                  'public': False},
-            ],
+                         'name': 'English',
+                         'public': True},
+                {'code': 'fr',
+                         'name': 'French',
+                         'public': False},
+                ],
             'default': {
                 'public': True,
                 'hide_untranslated': False,
@@ -80,15 +80,15 @@ class TestLanguagesNoDefault(SettingsOverrideTestCase):
                       ('es', 'Spanish')),
         'CMS_LANGUAGES': {
             1: [{'code': 'en',
-                  'name': 'English',
-                  'public': True},
-                 {'code': 'fr',
-                  'name': 'French',
-                  'public': False},
-                 ],
+                         'name': 'English',
+                         'public': True},
+                {'code': 'fr',
+                         'name': 'French',
+                         'public': False},
+                ],
         },
         'SITE_ID': 1,
-        }
+    }
 
     def test_get_languages_default_site(self):
         result = i18n.get_languages()
@@ -129,7 +129,7 @@ class TestLanguagesNoDefault(SettingsOverrideTestCase):
             self.assertEqual(lang['public'], True)
             self.assertEqual(lang['hide_untranslated'], True)
 
-            
+
 class TestLanguageCodesEnUS(SettingsOverrideTestCase):
 
     settings_overrides = {
@@ -141,12 +141,12 @@ class TestLanguageCodesEnUS(SettingsOverrideTestCase):
                       ('es', 'Spanish')),
         'CMS_LANGUAGES': {
             1: [{'code': 'en-us',
-                  'name': 'English (US)',
-                  'public': True},
-                 {'code': 'fr-ca',
-                  'name': 'French (Canada)',
-                  'public': False},
-            ],
+                         'name': 'English (US)',
+                         'public': True},
+                {'code': 'fr-ca',
+                         'name': 'French (Canada)',
+                         'public': False},
+                ],
             'default': {
                 'public': True,
                 'hide_untranslated': False,
@@ -212,12 +212,12 @@ class TestLanguageCodesEnGB(SettingsOverrideTestCase):
                       ('es', 'Spanish')),
         'CMS_LANGUAGES': {
             1: [{'code': 'en-gb',
-                  'name': 'English (UK)',
-                  'public': True},
-                 {'code': 'fr-ca',
-                  'name': 'French (Canada)',
-                  'public': False},
-            ],
+                         'name': 'English (UK)',
+                         'public': True},
+                {'code': 'fr-ca',
+                         'name': 'French (Canada)',
+                         'public': False},
+                ],
             'default': {
                 'public': True,
                 'hide_untranslated': False,

@@ -4,6 +4,7 @@ from cms.models import CMSPlugin, Page
 
 
 class Teaser(CMSPlugin):
+
     """
     A Teaser
     """
@@ -17,7 +18,8 @@ class Teaser(CMSPlugin):
         null=True,
         limit_choices_to={'publisher_is_draft': True}
     )
-    url = models.CharField(_("link"), max_length=255, blank=True, null=True, help_text=_("If present image will be clickable."))
+    url = models.CharField(_("link"), max_length=255, blank=True,
+                           null=True, help_text=_("If present image will be clickable."))
     description = models.TextField(_("description"), blank=True, null=True)
 
     def __unicode__(self):

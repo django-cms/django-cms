@@ -18,7 +18,7 @@ def cache_tree_children(queryset):
     """
     For all items in the queryset, set the '_cached_children' attribute to a
     list. This attribute is in turn used by the 'get_children' method on the
-    item, which would otherwise (if '_cached_children' is not set) cause a 
+    item, which would otherwise (if '_cached_children' is not set) cause a
     database query.
 
     The queryset must be ordered by 'lft', or the function will put the children
@@ -38,6 +38,7 @@ def cache_tree_children(queryset):
 
 
 class CMSChangeList(ChangeList):
+
     """
     Renders a Changelist - In our case it looks like a tree - it's the list of
     *instances* in the Admin.
@@ -111,7 +112,7 @@ class CMSChangeList(ChangeList):
 
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
             pages = pages.filter(pk__in=perm_edit_ids)
-            #pages = pages.filter(pk__in=perm_change_list_ids)
+            # pages = pages.filter(pk__in=perm_change_list_ids)
 
         root_pages = []
         pages = list(pages)

@@ -3,6 +3,7 @@ from django.forms.models import BaseInlineFormSet
 
 
 class BaseInlineFormSetWithQuerySet(BaseInlineFormSet):
+
     """Overriden BaseInlineFormSet, so we can pass queryset to it instead of
     _default_manager, see django bug #11019 for more details.
     """

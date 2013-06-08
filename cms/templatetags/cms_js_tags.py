@@ -29,7 +29,7 @@ def bool(value):
     else:
         return 'false'
 
-   
+
 class JavascriptString(Tag):
     name = 'javascript_string'
 

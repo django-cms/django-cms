@@ -13,6 +13,7 @@ from cms.test_utils.util.context_managers import StdoutOverride
 
 
 class PublisherCommandTests(TestCase):
+
     """
     Tests for the publish command
     """
@@ -453,7 +454,7 @@ class PublishingTests(TestCase):
                 self.assertFalse(item.published)
                 self.assertFalse(item.publisher_public.published)
                 # Not sure what the proper state of these are after unpublish
-                #self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
+                # self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
                 self.assertTrue(page.is_dirty())
             else:
                 # The changes to the published subpages are simply that the
@@ -522,10 +523,10 @@ class PublishingTests(TestCase):
         self.assertEqual(home.get_absolute_url(), root + 'page/')
         self.assertEqual(home.get_public_object().get_absolute_url(), root + 'page/')
         # TODO: These assertions are failing
-        #self.assertEqual(child.get_absolute_url(), root+'page/child/')
-        #self.assertEqual(child.get_public_object().get_absolute_url(), root+'page/child/')
-        #self.assertEqual(child2.get_absolute_url(), root+'child/')
-        #self.assertEqual(child2.get_public_object().get_absolute_url(), root+'child/')
+        # self.assertEqual(child.get_absolute_url(), root+'page/child/')
+        # self.assertEqual(child.get_public_object().get_absolute_url(), root+'page/child/')
+        # self.assertEqual(child2.get_absolute_url(), root+'child/')
+        # self.assertEqual(child2.get_public_object().get_absolute_url(), root+'child/')
 
         home.publish()
         home = self.reload(home)

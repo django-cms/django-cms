@@ -31,6 +31,7 @@ from cms.utils.page import is_valid_page_slug
 
 
 class PagesTestCase(CMSTestCase):
+
     def test_add_page(self):
         """
         Test that the add admin page could be displayed via the admin
@@ -53,8 +54,8 @@ class PagesTestCase(CMSTestCase):
 
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            #self.assertEqual(Page.objects.all().count(), 2)
-            #self.assertEqual(Title.objects.all().count(), 2)
+            # self.assertEqual(Page.objects.all().count(), 2)
+            # self.assertEqual(Title.objects.all().count(), 2)
 
             title = Title.objects.drafts().get(slug=page_data['slug'])
             self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
@@ -102,7 +103,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            #page1 = Title.objects.get(slug=page_data['slug']).page
+            # page1 = Title.objects.get(slug=page_data['slug']).page
             # create page with the same page_data
 
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -275,12 +276,13 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             change_user = str(superuser)
-            #some databases don't store microseconds, so move the start flag back by 1 second
+            # some databases don't store microseconds, so move the start flag back by 1 second
             before_change = datetime.datetime.now() + datetime.timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
-            t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-d\TH:i:s' }}")
+            t = template.Template(
+                "{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-d\TH:i:s' }}")
             req = HttpRequest()
             page.published = True
             page.save()
@@ -293,7 +295,8 @@ class PagesTestCase(CMSTestCase):
             save_time = datetime.datetime.strptime(actual_result[-19:], "%Y-%m-%dT%H:%M:%S")
 
             self.assertEqual(actual_result, desired_result)
-            # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
+            # direct time comparisons are flaky, so we just check if the page's
+            # changed_date is within the time range taken by this test
             self.assertTrue(before_change <= save_time)
             self.assertTrue(save_time <= after_change)
 
@@ -795,6 +798,7 @@ class PagesTestCase(CMSTestCase):
 
 
 class PageAdminTestBase(CMSTestCase):
+
     """
     The purpose of this class is to provide some basic functionality
     to test methods of the Page admin.
@@ -831,6 +835,7 @@ class PageAdminTestBase(CMSTestCase):
 
 
 class PageAdminTest(PageAdminTestBase):
+
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()
         superuser = self.get_superuser()
@@ -907,6 +912,7 @@ class NoAdminPageTests(CMSTestCase):
 
 
 class PreviousFilteredSiblingsTests(CMSTestCase):
+
     def test_with_publisher(self):
         home = create_page('home', 'nav_playground.html', 'en', published=True)
         home.publish()
@@ -931,6 +937,7 @@ class PreviousFilteredSiblingsTests(CMSTestCase):
 
 
 class PageTreeTests(CMSTestCase):
+
     def test_rename_node(self):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
         home.publish()

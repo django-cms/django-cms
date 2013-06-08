@@ -5,10 +5,10 @@ from cms.api import (create_page, publish_page, add_plugin,
                      create_page_user, assign_user_to_page)
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
-                                        ACCESS_PAGE_AND_DESCENDANTS)
+                                         ACCESS_PAGE_AND_DESCENDANTS)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
-    SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD, CMSTestCase)
+                                      SettingsOverrideTestCase, URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
@@ -22,38 +22,39 @@ from django.db.models import Q
 
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
+
     """Permissions and moderator together
-    
+
     Fixtures contains 3 users and 1 published page and some other stuff
-    
+
     Users:
         1. `super`: superuser
         2. `master`: user with permissions to all applications
         3. `slave`: user assigned to page `slave-home`
-    
+
     Pages:
         1. `home`:
             - published page
             - master can do anything on its subpages, but not on home!
-            
+
         2. `master`:
             - published page
             - created by super
             - `master` can do anything on it and its descendants
             - subpages:
-        
+
         3.       `slave-home`:
                     - not published
                     - assigned slave user which can add/change/delete/
                       move/publish this page and its descendants
                     - `master` user want to moderate this page and all descendants
-                    
+
         4. `pageA`:
             - created by super
             - master can add/change/delete on it and descendants
     """
-    #TODO: Split this test case into one that tests publish functionality, and
-    #TODO: one that tests permission inheritance. This is too complex.
+    # TODO: Split this test case into one that tests publish functionality, and
+    # TODO: one that tests permission inheritance. This is too complex.
     settings_overrides = {
         'CMS_PERMISSION': True,
     }
@@ -65,7 +66,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.user_staff = self._create_user("staff", is_staff=True,
                                             add_default_permissions=True)
         self.user_master = self._create_user("master", is_staff=True,
-                                            add_default_permissions=True)
+                                             add_default_permissions=True)
         self.user_slave = self._create_user("slave", is_staff=True,
                                             add_default_permissions=True)
         self.user_normal = self._create_user("normal", is_staff=False)
@@ -95,7 +96,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             # slave page & slave user
 
             self.slave_page = create_page("slave-home", "nav_playground.html", "en",
-                              parent=self.master_page, created_by=self.user_super)
+                                          parent=self.master_page, created_by=self.user_super)
 
             assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
 
@@ -110,8 +111,8 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             page_a = create_page("pageA", "nav_playground.html", "en",
                                  created_by=self.user_super)
             assign_user_to_page(page_a, self.user_master,
-                can_add=True, can_change=True, can_delete=True, can_publish=True,
-                can_move_page=True)
+                                can_add=True, can_change=True, can_delete=True, can_publish=True,
+                                can_move_page=True)
 
             # publish after creating all drafts
             publish_page(self.home_page, self.user_super)
@@ -279,7 +280,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # parent was published, so subpage must be also published..
         self.assertNotEqual(subpage.publisher_public, None)
 
-        #check attributes
+        # check attributes
         self.check_published_page_attributes(page)
         self.check_published_page_attributes(subpage)
 
@@ -310,12 +311,12 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # published pages must also have the same tree_id
         self.assertEqual(page.publisher_public.tree_id, subpage.publisher_public.tree_id)
 
-        #check attributes
+        # check attributes
         self.check_published_page_attributes(page)
         self.check_published_page_attributes(subpage)
 
     def test_super_add_page_to_root(self):
-        """Create page which is not under moderation in root, and check if 
+        """Create page which is not under moderation in root, and check if
         some properties are correct.
         """
         # create page under root
@@ -476,7 +477,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             global_page = create_page("global", "nav_playground.html", "en",
                                       published=True)
             # Removed call since global page user doesn't have publish permission
-            #global_page = publish_page(global_page, user_global)
+            # global_page = publish_page(global_page, user_global)
             # it's allowed for the normal user to view the page
             assign_user_to_page(global_page, user_global,
                                 global_permission=True, can_view=True)
@@ -528,34 +529,35 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
 
 class PatricksMoveTest(SettingsOverrideTestCase):
+
     """
     Fixtures contains 3 users and 1 published page and some other stuff
-    
+
     Users:
         1. `super`: superuser
         2. `master`: user with permissions to all applications
         3. `slave`: user assigned to page `slave-home`
-    
+
     Pages:
         1. `home`:
             - published page
             - master can do anything on its subpages, but not on home!
-            
+
         2. `master`:
             - published page
             - crated by super
             - `master` can do anything on it and its descendants
             - subpages:
-        
+
         3.       `slave-home`:
                     - not published
                     - assigned slave user which can add/change/delete/
                       move/publish/moderate this page and its descendants
                     - `master` user want to moderate this page and all descendants
-                    
+
         4. `pageA`:
             - created by super
-            - master can add/change/delete on it and descendants 
+            - master can add/change/delete on it and descendants
     """
     settings_overrides = {
         'CMS_PERMISSION': True,
@@ -564,7 +566,7 @@ class PatricksMoveTest(SettingsOverrideTestCase):
     def setUp(self):
         # create super user
         self.user_super = User(username="super", is_staff=True, is_active=True,
-            is_superuser=True)
+                               is_superuser=True)
         self.user_super.set_password("super")
         self.user_super.save()
         with self.login_user_context(self.user_super):
@@ -576,9 +578,10 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             self.master_page = create_page("master", "nav_playground.html", "en")
 
             # create master user
-            self.user_master = User.objects.create(username="master", email="master@django-cms.org", password="master", is_staff=True)
+            self.user_master = User.objects.create(
+                username="master", email="master@django-cms.org", password="master", is_staff=True)
             self.user_master.user_permissions.add(Permission.objects.get(codename='publish_page'))
-            #self.user_master = create_page_user(self.user_super, master, grant_all=True)
+            # self.user_master = create_page_user(self.user_super, master, grant_all=True)
 
             # assign master user under home page
             assign_user_to_page(self.home_page, self.user_master,
@@ -589,12 +592,12 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             # slave page & slave user
 
             self.slave_page = create_page("slave-home", "nav_playground.html", "en",
-                              parent=self.master_page, created_by=self.user_super)
+                                          parent=self.master_page, created_by=self.user_super)
             slave = User(username='slave', email='slave@django-cms.org', is_staff=True, is_active=True)
             slave.set_password('slave')
             slave.save()
             self.user_slave = create_page_user(self.user_super, slave, can_add_page=True,
-                                        can_change_page=True, can_delete_page=True)
+                                               can_change_page=True, can_delete_page=True)
 
             assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
             # create page_a - sample page from master
@@ -602,8 +605,8 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             page_a = create_page("pageA", "nav_playground.html", "en",
                                  created_by=self.user_super)
             assign_user_to_page(page_a, self.user_master,
-                can_add=True, can_change=True, can_delete=True, can_publish=True,
-                can_move_page=True)
+                                can_add=True, can_change=True, can_delete=True, can_publish=True,
+                                can_move_page=True)
 
             # publish after creating all drafts
             publish_page(self.home_page, self.user_super)
@@ -653,33 +656,33 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
     def test_patricks_move(self):
         """
-        
+
         Tests permmod when moving trees of pages.
 
         1. build following tree (master node is approved and published)
-        
+
                  slave-home
                 /    |    \
                A     B     C
-                   /  \     
-                  D    E     
-                    /  |  \ 
-                   F   G   H               
+                   /  \
+                  D    E
+                    /  |  \
+                   F   G   H
 
         2. perform move operations:
             1. move G under C
             2. move E under G
-            
+
                  slave-home
                 /    |    \
                A     B     C
                    /        \
                   D          G
-                              \   
+                              \
                                E
                              /   \
-                            F     H       
-        
+                            F     H
+
         3. approve nodes in following order:
             1. approve H
             2. approve G
@@ -696,7 +699,8 @@ class PatricksMoveTest(SettingsOverrideTestCase):
         self.assertEqual(self.pg.parent_id, self.pc.pk)
         # Public page is under PC
         self.assertEqual(self.pg.publisher_public.parent_id, self.pc.publisher_public_id)
-        self.assertEqual(self.pg.publisher_public.parent.get_absolute_url(), self.pc.publisher_public.get_absolute_url())
+        self.assertEqual(self.pg.publisher_public.parent.get_absolute_url(),
+                         self.pc.publisher_public.get_absolute_url())
         self.assertEqual(self.pg.get_absolute_url(), self.pg.publisher_public.get_absolute_url())
         self.move_page(self.pe, self.pg)
         self.reload_pages()
@@ -730,6 +734,7 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
 
 class ModeratorSwitchCommandTest(CMSTestCase):
+
     def test_switch_moderator_on(self):
         with force_language("en"):
             pages_root = urllib.unquote(reverse("pages-root"))
@@ -929,7 +934,7 @@ class PagePermissionTests(PermissionTestsBase):
 
     PermissionTestsBase.settings_overrides['CMS_CACHE_DURATIONS'] = {
         'permissions': 360
-        }
+    }
 
     def test_page_permission_cache_invalidation(self):
         """user belongs to group which is given page_permission over page.

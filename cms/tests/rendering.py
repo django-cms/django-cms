@@ -100,7 +100,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         self.test_placeholders3 = {}
         for placeholder in p3.placeholders.all():
             self.test_placeholders3[placeholder.slot] = placeholder
-            # # Insert some test Text plugins
+            # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
                    body=self.test_data3['text_sub'])
         p3.publish()
@@ -175,8 +175,8 @@ class RenderingTestCase(SettingsOverrideTestCase):
             r = "".join(c)
             self.assertEqual(r, u'1|' + self.test_data[
                 'text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
-                                self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' + self.test_data[
-                                    'text_main'] + '|main|original_context_var_ok')
+                self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' + self.test_data[
+                    'text_main'] + '|main|original_context_var_ok')
             plugin_rendering._standard_processors = {}
 
     def test_placeholder(self):

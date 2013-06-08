@@ -9,8 +9,9 @@ from django.contrib.sites.models import Site
 
 
 class SiteTestCase(CMSTestCase):
+
     """Site framework specific test cases.
-    
+
     All stuff which is changing settings.SITE_ID for tests should come here.
     """
 
@@ -33,7 +34,7 @@ class SiteTestCase(CMSTestCase):
         self._login_context.__exit__(None, None, None)
 
     def test_site_framework(self):
-        #Test the site framework, and test if it's possible to disable it
+        # Test the site framework, and test if it's possible to disable it
         with SettingsOverride(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
 

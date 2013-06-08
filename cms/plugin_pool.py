@@ -10,6 +10,7 @@ import warnings
 
 
 class PluginPool(object):
+
     def __init__(self):
         self.plugins = {}
         self.discovered = False

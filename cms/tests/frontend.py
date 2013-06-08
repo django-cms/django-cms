@@ -14,6 +14,7 @@ except ImportError:
 
 
 class CMSLiveTests(LiveServerTestCase):
+
     @classmethod
     def setUpClass(cls):
         if WebDriver:

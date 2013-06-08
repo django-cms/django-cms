@@ -3,15 +3,17 @@ from cms.test_utils.util.mock import AttributeObject
 from django.http import HttpResponse
 from menus.templatetags.menu_tags import PageLanguageUrl
 from menus.utils import (simple_language_changer, find_selected,
-    language_changer_decorator)
+                         language_changer_decorator)
 
 
 class DumbPageLanguageUrl(PageLanguageUrl):
+
     def __init__(self):
         pass
 
 
 class MenuUtilsTests(CMSTestCase):
+
     def get_simple_view(self):
         def myview(request):
             return HttpResponse('')

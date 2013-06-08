@@ -6,6 +6,7 @@ from cms.utils import urlutils
 
 
 class UrlutilsTestCase(CMSTestCase):
+
     def test_levelize_path(self):
         path = '/application/item/new'
         output = ['/application/item/new', '/application/item', '/application']
