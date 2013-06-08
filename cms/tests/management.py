@@ -10,8 +10,9 @@ from cms.management.commands.subcommands.list import plugin_report
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.models.placeholdermodel import Placeholder
-from cms.utils.compat.string_io import StringIO
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from cms.utils.compat.string_io import StringIO
+
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"

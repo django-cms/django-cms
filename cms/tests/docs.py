@@ -9,6 +9,7 @@ import os
 import socket
 from cms.utils.compat.string_io import StringIO
 
+
 ROOT_DIR = os.path.dirname(cms.__file__)
 DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, '..', 'docs'))
 

@@ -27,17 +27,17 @@ class Command(NoArgsCommand):
         qs = Page.objects.drafts().filter(published=True)
         pages_total, pages_published = qs.count(), 0
         
-        print("\nPublishing public drafts....\n")
+        print(u"\nPublishing public drafts....\n")
         
         for i, page in enumerate(qs):
             m = " "
             if page.publish():
                 pages_published += 1
                 m = "*"
-            print("%d.\t%s  %s [%d]" % (i + 1, m, force_unicode(page), page.id))
+            print(u"%d.\t%s  %s [%d]" % (i + 1, m, force_unicode(page), page.id))
         
-        print("\n")
-        print("=" * 40)
-        print("Total:    ", pages_total)
-        print("Published:", pages_published)
+        print(u"\n")
+        print(u"=" * 40)
+        print(u"Total:     %s" % pages_total)
+        print(u"Published: %s" % pages_published)
         

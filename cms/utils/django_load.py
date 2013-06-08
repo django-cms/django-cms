@@ -24,11 +24,11 @@ def get_module(app, modname, verbose, failfast):
         if failfast:
             raise
         elif verbose:
-            print("Could not load %r from %r: %s" % (modname, app)) # changed
+            print(u"Could not load %r from %r: %s" % (modname, app)) # changed
             traceback.print_exc() # changed
         return None
     if verbose:
-        print("Loaded %r from %r" % (modname, app))
+        print(u"Loaded %r from %r" % (modname, app))
     return module
         
 

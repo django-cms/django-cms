@@ -205,7 +205,7 @@ class CMSTestCase(testcases.TestCase):
         """
         for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
-            print("%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
+            print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
                                     page.pk, page.lft, page.rght, page.tree_id))
 
     def print_node_structure(self, nodes, *extra):
@@ -214,7 +214,7 @@ class CMSTestCase(testcases.TestCase):
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print("%s%s: %s" % (ident, node.title, attrs))
+                print(u"%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
         _rec(nodes)
 

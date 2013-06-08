@@ -46,7 +46,7 @@ class NormalTestRunner(DjangoTestSuiteRunner):
                     TIMINGS.items(),
                     key=operator.itemgetter(1),
                     reverse=True)[:10]
-            print("Ten slowest tests:")
+            print(u"Ten slowest tests:")
             for func_name, timing in by_time:
-                print("{t:.2f}s {f}".format(f=func_name, t=timing))
+                print(u"{t:.2f}s {f}".format(f=func_name, t=timing))
 
