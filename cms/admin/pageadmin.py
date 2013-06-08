@@ -57,7 +57,7 @@ require_POST = method_decorator(require_POST)
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.admin import VersionAdmin as ModelAdmin
     from reversion import create_revision
-else: # pragma: no cover
+else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
 
     create_revision = lambda: lambda x: x
@@ -117,14 +117,14 @@ class PageAdmin(ModelAdmin):
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
-            pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
+            pat(r'^([0-9]+)/publish/$', self.publish_page),  # publish page
+            pat(r'^([0-9]+)/revert/$', self.revert_page),  # publish page
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
-            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
-            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
-            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
-            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
+            pat(r'^([0-9]+)/preview/$', self.preview_page),  # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants),  # menu html for page descendants
+            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template),  # copy dialog
         )
 
         url_patterns += super(PageAdmin, self).get_urls()
@@ -278,7 +278,7 @@ class PageAdmin(ModelAdmin):
             filtered_inlines = []
             for inline in inlines:
                 if (isinstance(inline, PagePermissionInlineAdmin)
-                and not isinstance(inline, ViewRestrictionInlineAdmin)):
+                   and not isinstance(inline, ViewRestrictionInlineAdmin)):
                     if "recover" in request.path or "history" in request.path:
                         # do not display permissions in recover mode
                         continue
@@ -327,7 +327,7 @@ class PageAdmin(ModelAdmin):
             # to determine whether a given object exists.
             obj = None
         else:
-            #activate(user_lang_set)
+            # activate(user_lang_set)
             context = {
                 'page': obj,
                 'CMS_PERMISSION': get_cms_setting('PERMISSION'),
@@ -504,7 +504,6 @@ class PageAdmin(ModelAdmin):
             'admin/change_list.html'
         ], context, context_instance=RequestContext(request))
 
-
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
@@ -628,7 +627,6 @@ class PageAdmin(ModelAdmin):
         rev_page.save()
         return HttpResponse("ok")
 
-
     @require_POST
     @create_revision()
     def change_template(self, request, object_id):
@@ -726,7 +724,7 @@ class PageAdmin(ModelAdmin):
                 site = Site.objects.get(pk=site)
             except (ObjectDoesNotExist, AssertionError):
                 return HttpResponse("error")
-                #context.update({'error': _('Page could not been moved.')})
+                # context.update({'error': _('Page could not been moved.')})
             else:
                 try:
                     kwargs = {
@@ -734,7 +732,7 @@ class PageAdmin(ModelAdmin):
                     }
                     page.copy_page(target, site, position, **kwargs)
                     return jsonify_request(HttpResponse("ok"))
-                except ValidationError, e:
+                except ValidationError as e:
                     return jsonify_request(HttpResponseBadRequest(e.messages))
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
@@ -749,7 +747,7 @@ class PageAdmin(ModelAdmin):
         }
         return render_to_response('admin/cms/page/moderation_messages.html', context)
 
-    #TODO: Make the change form buttons use POST
+    # TODO: Make the change form buttons use POST
     #@require_POST
     @transaction.commit_on_success
     @create_revision()
@@ -794,7 +792,7 @@ class PageAdmin(ModelAdmin):
             path = '%s?edit_off' % referrer.split('?')[0]
         return HttpResponseRedirect(path)
 
-    #TODO: Make the change form buttons use POST
+    # TODO: Make the change form buttons use POST
     #@require_POST
     @transaction.commit_on_success
     def revert_page(self, request, page_id):
@@ -929,7 +927,7 @@ class PageAdmin(ModelAdmin):
 
         if not site == page.site:
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
-            page.site.domain, url)
+                                     page.site.domain, url)
         return HttpResponseRedirect(url)
 
     @require_POST
@@ -958,10 +956,10 @@ class PageAdmin(ModelAdmin):
                         object_repr=page.get_title(),
                         action_flag=CHANGE,
                     )
-                except RuntimeError, e:
+                except RuntimeError as e:
                     messages.error(request, e.message)
             return admin_utils.render_admin_menu_item(request, page)
-        except ValidationError, e:
+        except ValidationError as e:
             return HttpResponseBadRequest(e.messages)
 
     @require_POST
@@ -981,7 +979,7 @@ class PageAdmin(ModelAdmin):
         """
         Get html for descendants of given page
         Used for lazy loading pages in cms.changelist.js
-        
+
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
         """
@@ -1014,7 +1012,7 @@ class PageAdmin(ModelAdmin):
         language = request.POST['plugin_language'] or get_language_from_request(request)
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language, template=page.get_template())
-        except PluginLimitReached, e:
+        except PluginLimitReached as e:
             return HttpResponseBadRequest(str(e))
             # page add-plugin
         if not parent_id:
@@ -1026,7 +1024,7 @@ class PageAdmin(ModelAdmin):
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             placeholder = parent.placeholder
             page = placeholder.page if placeholder else None
-            if not page: # Make sure we do have a page
+            if not page:  # Make sure we do have a page
                 raise Http404()
             position = request.POST.get('plugin_order', None)
             # placeholder (non-page) add-plugin
@@ -1156,7 +1154,7 @@ class PageAdmin(ModelAdmin):
 
         plugin_admin.cms_plugin_instance = cms_plugin
         try:
-            plugin_admin.placeholder = cms_plugin.placeholder # TODO: what for reversion..? should it be inst ...?
+            plugin_admin.placeholder = cms_plugin.placeholder  # TODO: what for reversion..? should it be inst ...?
         except Placeholder.DoesNotExist:
             pass
         if request.method == "POST":
@@ -1213,10 +1211,10 @@ class PageAdmin(ModelAdmin):
                 plugin_name = unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
                 message = _(
                     u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {
-                              'plugin_name': plugin_name,
-                              'position': cms_plugin.position,
-                              'placeholder': cms_plugin.placeholder.slot
-                          }
+                        'plugin_name': plugin_name,
+                        'position': cms_plugin.position,
+                        'placeholder': cms_plugin.placeholder.slot
+                    }
                 helpers.make_revision_with_plugins(page, request.user, message)
             saved_object = plugin_admin.saved_object
 
@@ -1266,7 +1264,7 @@ class PageAdmin(ModelAdmin):
             if page:
                 template = page.get_template()
             has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
-        except PluginLimitReached, e:
+        except PluginLimitReached as e:
             return HttpResponseBadRequest(str(e))
         plugin.placeholder = placeholder
         plugin.save()
@@ -1285,8 +1283,8 @@ class PageAdmin(ModelAdmin):
                     break
                 x += 1
             if not found:
-                pass #TODO: fix this
-                #plugin.delete()
+                pass  # TODO: fix this
+                # plugin.delete()
             else:
                 plugin.save()
 
@@ -1316,7 +1314,7 @@ class PageAdmin(ModelAdmin):
         (deleted_objects, perms_needed, protected) = get_deleted_objects(
             [plugin], opts, request.user, self.admin_site, using)
 
-        if request.POST: # The user has already confirmed the deletion.
+        if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
             obj_display = force_unicode(plugin)
@@ -1380,7 +1378,7 @@ class PageAdmin(ModelAdmin):
         (deleted_objects, perms_needed, protected) = get_deleted_objects(
             plugins, opts, request.user, self.admin_site, using)
         obj_display = force_unicode(placeholder)
-        if request.POST: # The user has already confirmed the deletion.
+        if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
 
@@ -1419,7 +1417,6 @@ class PageAdmin(ModelAdmin):
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
 
-
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
             return True
@@ -1442,7 +1439,7 @@ class PageAdmin(ModelAdmin):
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=title)
-        admin_form = AdminForm(form, fieldsets=[(None, {'fields': ('title',)})], prepopulated_fields={},
+        admin_form = AdminForm(form, fieldsets=[(None, {'fields': ('title', )})], prepopulated_fields={},
                                model_admin=self)
         media = self.media + admin_form.media
         context = {
@@ -1469,6 +1466,5 @@ class PageAdmin(ModelAdmin):
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
             return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
         return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
-
 
 admin.site.register(Page, PageAdmin)

@@ -54,15 +54,15 @@ def details(request, slug):
             attrs += '&draft=1'
         # Check that the language is in FRONTEND_LANGUAGES:
     if not current_language in user_languages:
-        #are we on root?
+        # are we on root?
         if not slug:
-            #redirect to supported language
+            # redirect to supported language
             languages = []
             for language in available_languages:
                 languages.append((language, language))
             if languages:
                 with SettingsOverride(LANGUAGES=languages, LANGUAGE_CODE=languages[0][0]):
-                    #get supported language
+                    # get supported language
                     new_language = get_language_from_request(request)
                     if new_language in get_public_languages():
                         with force_language(new_language):
@@ -118,7 +118,7 @@ def details(request, slug):
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
         if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
-        and not redirect_url.startswith('/%s/' % current_language)):
+           and not redirect_url.startswith('/%s/' % current_language)):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
@@ -137,7 +137,7 @@ def details(request, slug):
         return HttpResponseRedirect('%s?%s=%s' % tup)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
-    # fill the context 
+    # fill the context
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)

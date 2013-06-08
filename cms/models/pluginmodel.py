@@ -20,6 +20,7 @@ from mptt.models import MPTTModel, MPTTModelBase
 
 
 class BoundRenderMeta(object):
+
     def __init__(self, meta):
         self.index = 0
         self.total = 1
@@ -27,6 +28,7 @@ class BoundRenderMeta(object):
 
 
 class PluginModelBase(MPTTModelBase):
+
     """
     Metaclass for all CMSPlugin subclasses. This class should not be used for
     any other type of models.
@@ -65,6 +67,7 @@ class PluginModelBase(MPTTModelBase):
 
 
 class CMSPlugin(MPTTModel):
+
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -153,10 +156,10 @@ class CMSPlugin(MPTTModel):
     def get_plugin_instance(self, admin=None):
         plugin_class = self.get_plugin_class()
         plugin = plugin_class(plugin_class.model,
-                              admin) # needed so we have the same signature as the original ModelAdmin
+                              admin)  # needed so we have the same signature as the original ModelAdmin
         if hasattr(self, "_inst"):
             return self._inst, plugin
-        if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
+        if plugin.model != self.__class__:  # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
                 instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
@@ -236,7 +239,7 @@ class CMSPlugin(MPTTModel):
 
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght',
-            'position', 'tree_id']:
+                     'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
     def copy_plugin(self, target_placeholder, target_language, plugin_trail):
@@ -256,12 +259,12 @@ class CMSPlugin(MPTTModel):
         new_plugin.rght = None
         new_plugin.level = None
 
-        # In the block below, we use plugin_trail as a kind of breadcrumb trail 
-        # through the tree. 
+        # In the block below, we use plugin_trail as a kind of breadcrumb trail
+        # through the tree.
         #
         # we assign a parent to our new plugin
         if not self.parent:
-            # We're lucky; we don't need to find a parent. We'll just put 
+            # We're lucky; we don't need to find a parent. We'll just put
             # new_plugin into the plugin_trail for potential children to use,
             # and move on.
             plugin_trail[:] = [new_plugin]
@@ -366,11 +369,11 @@ class CMSPlugin(MPTTModel):
         breadcrumb = []
         if not self.parent_id:
             breadcrumb.append({'title': unicode(self.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
+                               'url': unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
             breadcrumb.append({'title': unicode(parent.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
+                               'url': unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
         return breadcrumb
 
     def get_breadcrumb_json(self):
@@ -381,7 +384,6 @@ class CMSPlugin(MPTTModel):
     def num_children(self):
         if self.child_plugin_instances:
             return len(self.child_plugin_instances)
-
 
 reversion_register(CMSPlugin)
 
@@ -413,12 +415,12 @@ def deferred_class_factory(model, attrs):
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
 
     overrides = dict([(attr, DeferredAttribute(attr, model))
-        for attr in attrs])
+                      for attr in attrs])
     overrides["Meta"] = RenderMeta
     overrides["RenderMeta"] = RenderMeta
     overrides["__module__"] = model.__module__
     overrides["_deferred"] = True
-    return type(name, (model,), overrides)
+    return type(name, (model, ), overrides)
 
 # The above function is also used to unpickle model instances with deferred
 # fields.

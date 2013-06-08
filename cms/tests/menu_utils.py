@@ -2,19 +2,23 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from django.http import HttpResponse
 from menus.templatetags.menu_tags import PageLanguageUrl
-from menus.utils import (simple_language_changer, find_selected, 
-    language_changer_decorator)
+from menus.utils import (simple_language_changer, find_selected,
+                         language_changer_decorator)
 
 
 class DumbPageLanguageUrl(PageLanguageUrl):
-    def __init__(self): pass
+
+    def __init__(self):
+        pass
+
 
 class MenuUtilsTests(CMSTestCase):
+
     def get_simple_view(self):
         def myview(request):
             return HttpResponse('')
         return myview
-    
+
     def test_simple_language_changer(self):
         func = self.get_simple_view()
         decorated_view = simple_language_changer(func)
@@ -47,7 +51,7 @@ class MenuUtilsTests(CMSTestCase):
         output = tag.get_context(fake_context, 'ja')
         url = output['content']
         self.assertEqual(url, '/ja/')
-        
+
     def test_language_changer_decorator(self):
         def lang_changer(lang):
             return "/%s/dummy/" % lang
@@ -63,8 +67,7 @@ class MenuUtilsTests(CMSTestCase):
         output = tag.get_context(fake_context, 'ja')
         url = output['content']
         self.assertEqual(url, '/ja/dummy/')
-        
-        
+
     def test_find_selected(self):
         subchild = AttributeObject()
         firstchild = AttributeObject(ancestor=True, children=[subchild])

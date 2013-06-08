@@ -19,10 +19,12 @@ class CMSToolbarLoginForm(AuthenticationForm):
         kwargs['prefix'] = kwargs.get('prefix', 'cms')
         super(CMSToolbarLoginForm, self).__init__(*args, **kwargs)
 
-    def check_for_test_cookie(self): pass  # for some reason this test fails in our case. but login works.
+    def check_for_test_cookie(self):
+        pass  # for some reason this test fails in our case. but login works.
 
 
 class CMSToolbar(object):
+
     """
     The default CMS Toolbar
     """
@@ -69,7 +71,7 @@ class CMSToolbar(object):
                 self.view_name = resolve(self.request.path).func.__module__
             except Resolver404:
                 self.view_name = ""
-       
+
             toolbars = toolbar_pool.get_toolbars()
             items = []
             app_key = ""

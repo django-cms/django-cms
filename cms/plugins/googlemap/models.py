@@ -4,6 +4,7 @@ from cms.models import CMSPlugin
 
 
 class GoogleMap(CMSPlugin):
+
     """
     A google maps integration
     """
@@ -15,8 +16,8 @@ class GoogleMap(CMSPlugin):
     city = models.CharField(_("city"), max_length=100)
 
     content = models.CharField(_("additional content"), max_length=255,
-                         blank=True,
-                         help_text=_('Displayed under address in the bubble.'))
+                               blank=True,
+                               help_text=_('Displayed under address in the bubble.'))
     ZOOM_LEVELS = map(lambda c: (c, str(c)), range(22))
     zoom = models.PositiveSmallIntegerField(_("zoom level"),
                                             choices=ZOOM_LEVELS, default=13)
@@ -29,18 +30,18 @@ class GoogleMap(CMSPlugin):
                               null=True, blank=True)
 
     route_planer_title = models.CharField(_("route planer title"),
-                               max_length=150, blank=True, null=True,
-                               default=_('Calculate your fastest way to here'))
+                                          max_length=150, blank=True, null=True,
+                                          default=_('Calculate your fastest way to here'))
     route_planer = models.BooleanField(_("route planer"), default=False)
 
     width = models.CharField(_('width'), max_length=6, default='100%',
-                           help_text=_('Plugin width (in pixels or percent).'))
+                             help_text=_('Plugin width (in pixels or percent).'))
     height = models.CharField(_('height'), max_length=6, default='400px',
                               help_text=_('Plugin height (in pixels).'))
 
     def __unicode__(self):
         return u"%s (%s, %s %s)" % (self.get_title(), self.address,
-                                    self.zipcode, self.city,)
+                                    self.zipcode, self.city, )
 
     def get_title(self):
         if self.title is None:

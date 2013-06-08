@@ -27,6 +27,7 @@ from os.path import join
 
 
 class Page(MPTTModel):
+
     """
     A simple hierarchical page model
     """
@@ -103,9 +104,9 @@ class Page(MPTTModel):
 
     class PublisherMeta:
         exclude_fields_append = ['id', 'publisher_is_draft', 'publisher_public',
-            'publisher_state', 'moderator_state',
-            'placeholders', 'lft', 'rght', 'tree_id',
-            'parent']
+                                 'publisher_state', 'moderator_state',
+                                 'placeholders', 'lft', 'rght', 'tree_id',
+                                 'parent']
 
     def __unicode__(self):
         title = self.get_menu_title(fallback=True)
@@ -531,7 +532,7 @@ class Page(MPTTModel):
         public = self.publisher_public
         public._copy_titles(self)
         if self.parent != (self.publisher_public.parent_id and
-            self.publisher_public.parent.publisher_draft):
+                           self.publisher_public.parent.publisher_draft):
             # We don't send the signals here
             self.move_to(public.parent.publisher_draft)
         public._copy_contents(self)
@@ -623,8 +624,7 @@ class Page(MPTTModel):
             if not hasattr(self, "ancestors_descending"):
                 self.ancestors_descending = list(self.get_ancestors(ascending))
             return self.ancestors_descending
-
-    # ## Title object access
+    # Title object access
 
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
         """Helper function for accessing wanted / current title.
@@ -681,13 +681,13 @@ class Page(MPTTModel):
         get when this page was last updated
         """
         return self.changed_date
-        
+
     def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get user who last changed this page
         """
         return self.changed_by
-        
+
     def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language
@@ -817,7 +817,7 @@ class Page(MPTTModel):
                 return (user_perm or generic_perm)
 
         else:
-            #anonymous user
+            # anonymous user
             if is_restricted or not get_cms_setting('PUBLIC_FOR') == 'all':
                 # anyonymous user, page has restriction and global access is permitted
                 return False
@@ -836,21 +836,21 @@ class Page(MPTTModel):
         if request.user.is_superuser:
             return True
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
-               self.has_generic_permission(request, "change")
+            self.has_generic_permission(request, "change")
 
     def has_delete_permission(self, request):
         opts = self._meta
         if request.user.is_superuser:
             return True
         return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
-               self.has_generic_permission(request, "delete")
+            self.has_generic_permission(request, "delete")
 
     def has_publish_permission(self, request):
         if request.user.is_superuser:
             return True
         opts = self._meta
         return request.user.has_perm(opts.app_label + '.' + "publish_page") and \
-               self.has_generic_permission(request, "publish")
+            self.has_generic_permission(request, "publish")
 
     has_moderate_permission = has_publish_permission
 
@@ -881,7 +881,7 @@ class Page(MPTTModel):
         """
         att_name = "permission_%s_cache" % perm_type
         if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
-            or request.user.pk != self.permission_user_cache.pk:
+                or request.user.pk != self.permission_user_cache.pk:
             from cms.utils.permissions import has_generic_permission
 
             self.permission_user_cache = request.user
@@ -1082,8 +1082,8 @@ class Page(MPTTModel):
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
             if self.level != obj.level or \
-                            public_parent != obj.parent or \
-                            public_prev_sib != prev_public_sibling:
+                public_parent != obj.parent or \
+                    public_prev_sib != prev_public_sibling:
                 if public_prev_sib:
                     obj.move_to(public_prev_sib, position="right")
                 elif public_parent:
@@ -1125,6 +1125,5 @@ def _reversion():
         follow=["title_set", "placeholders", "pagepermission_set"],
         exclude_fields=exclude_fields
     )
-
 
 _reversion()

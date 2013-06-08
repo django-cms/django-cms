@@ -5,7 +5,9 @@ from cms.models import CMSPlugin
 import os
 from django.conf import settings
 
+
 class File(CMSPlugin):
+
     """
     Plugin for storing any type of file.
 
@@ -27,8 +29,10 @@ class File(CMSPlugin):
     # CMS_ICON_EXTENSIONS and CMS_ICON_PATH are assumed to be plugin-specific, and not included in cms.settings
     # -- they are therefore imported from django.conf.settings
     ICON_EXTENSIONS = getattr(settings, "CMS_FILE_ICON_EXTENSIONS", ('gif', 'png'))
-    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", os.path.join(settings.STATIC_ROOT, "cms", "images", "file_icons"))
-    ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s/%s/%s/" % (settings.STATIC_URL, "cms", "images", "file_icons"))
+    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", os.path.join(
+        settings.STATIC_ROOT, "cms", "images", "file_icons"))
+    ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s/%s/%s/" %
+                       (settings.STATIC_URL, "cms", "images", "file_icons"))
 
     def get_icon_url(self):
         path_base = os.path.join(self.ICON_PATH, self.get_ext())
@@ -49,10 +53,12 @@ class File(CMSPlugin):
 
     def __unicode__(self):
         if self.title:
-            return self.title;
+            return self.title
+
         elif self.file:
             # added if, because it raised attribute error when file wasnt defined
-            return self.get_file_name();
+            return self.get_file_name()
+
         return "<empty>"
 
-    search_fields = ('title',)
+    search_fields = ('title', )

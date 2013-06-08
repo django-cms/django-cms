@@ -5,6 +5,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class TwoPagesFixture(object):
+
     def create_fixtures(self):
         defaults = {
             'template': 'nav_playground.html',
@@ -16,4 +17,3 @@ class TwoPagesFixture(object):
             create_title('de', 'erste', first)
             second = create_page('second', language='en', reverse_id='myreverseid', **defaults)
             create_title('de', 'zweite', second)
-            

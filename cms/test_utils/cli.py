@@ -198,7 +198,7 @@ def configure(db_url, **extra):
                 'name': gettext("right column")
             },
             'extra_context': {
-                "plugins": ('TextPlugin',),
+                "plugins": ('TextPlugin', ),
                 "extra_context": {"width": 250},
                 "name": "extra context"
             },

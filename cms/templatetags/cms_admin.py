@@ -14,7 +14,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 import django
 
-
 register = template.Library()
 
 if LooseVersion(django.get_version()) < LooseVersion('1.4'):
@@ -34,26 +33,23 @@ class ShowAdminMenu(InclusionTag):
     def get_context(self, context, page):
         request = context['request']
 
-        if context.has_key("cl"):
+        if "cl" in context:
             filtered = context['cl'].is_filtered()
-        elif context.has_key('filtered'):
+        elif 'filtered' in context:
             filtered = context['filtered']
-
-
 
         # following function is newly used for getting the context per item (line)
         # if something more will be required, then get_admin_menu_item_context
-        # function have to be updated. 
+        # function have to be updated.
         # This is done because item can be reloaded after some action over ajax.
         context.update(get_admin_menu_item_context(request, page, filtered))
 
         # this here is just context specific for menu rendering - items itself does
         # not use any of following variables
-        #context.update({
+        # context.update({
         #    'no_children': no_children,
         #})
         return context
-
 
 register.tag(ShowAdminMenu)
 
@@ -69,31 +65,29 @@ class ShowLazyAdminMenu(InclusionTag):
     def get_context(self, context, page):
         request = context['request']
 
-        if context.has_key("cl"):
+        if "cl" in context:
             filtered = context['cl'].is_filtered()
-        elif context.has_key('filtered'):
+        elif 'filtered' in context:
             filtered = context['filtered']
-
-
 
         # following function is newly used for getting the context per item (line)
         # if something more will be required, then get_admin_menu_item_context
-        # function have to be updated. 
+        # function have to be updated.
         # This is done because item can be reloaded after some action over ajax.
         context.update(get_admin_menu_item_context(request, page, filtered))
 
         # this here is just context specific for menu rendering - items itself does
         # not use any of following variables
-        #context.update({
+        # context.update({
         #    'no_children': no_children,
         #})
         return context
-
 
 register.tag(ShowLazyAdminMenu)
 
 
 class CleanAdminListFilter(InclusionTag):
+
     """
     used in admin to display only these users that have actually edited a page
     and not everybody
@@ -115,7 +109,6 @@ class CleanAdminListFilter(InclusionTag):
                 unique_choices.append(choice)
                 query_string = choice['query_string']
         return {'title': spec.title, 'choices': unique_choices}
-
 
 register.tag(CleanAdminListFilter)
 
@@ -172,7 +165,6 @@ class RenderPlugin(InclusionTag):
     def get_context(self, context, plugin):
         return {'content': plugin.render_plugin(context, admin=True)}
 
-
 register.tag(RenderPlugin)
 
 
@@ -201,13 +193,11 @@ class PageSubmitRow(InclusionTag):
             'show_delete_translation': show_delete_translation
         }
 
-
 register.tag(PageSubmitRow)
 
 
 def in_filtered(seq1, seq2):
     return [x for x in seq1 if x in seq2]
-
 
 in_filtered = register.filter('in_filtered', in_filtered)
 
@@ -225,6 +215,5 @@ class CMSAdminIconBase(Tag):
 
     def render_tag(self, context):
         return CMS_ADMIN_ICON_BASE
-
 
 register.tag(CMSAdminIconBase)

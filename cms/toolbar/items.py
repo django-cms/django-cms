@@ -3,6 +3,7 @@ from django.utils import simplejson
 
 
 class BaseItem(object):
+
     def __init__(self, right=False):
         self.right = right
 
@@ -22,7 +23,6 @@ class List(BaseItem):
         self.url = url
         self.name = name
         self.sub_level = sub_level
-
 
     def get_context(self):
         return {'items': self.items, 'url': self.url, 'title': self.name, 'sub_level': self.sub_level}
@@ -119,10 +119,7 @@ class ButtonList(BaseItem):
 class Button(Item):
     template = "cms/toolbar/menu/button.html"
 
-
     def get_context(self):
         context = super(Button, self).get_context()
         context['extra_classes'] = self.extra_classes
         return context
-
-

@@ -6,11 +6,11 @@ from django.core.management.base import LabelCommand
 
 
 class UninstallApphooksCommand(LabelCommand):
-    
+
     args = "APPHOK_NAME"
     label = 'apphook name (eg SampleApp)'
     help = 'Uninstalls (sets to null) specified apphooks for all pages'
-    
+
     def handle_label(self, label, **options):
         queryset = Title.objects.filter(application_urls=label)
         number_of_apphooks = queryset.count()
@@ -28,17 +28,18 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
                 self.stdout.write('%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
         else:
             self.stdout.write('no %r apphooks found\n' % label)
-            
+
+
 class UninstallPluginsCommand(LabelCommand):
 
     args = "PLUGIN_NAME"
     label = 'plugin name (eg SamplePlugin)'
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
-    
+
     def handle_label(self, label, **options):
         queryset = CMSPlugin.objects.filter(plugin_type=label)
         number_of_plugins = queryset.count()
-        
+
         if number_of_plugins > 0:
             if options.get('interactive'):
                 confirm = raw_input("""
@@ -50,7 +51,8 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
             queryset.delete()
             self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
-            self.stdout.write('no %r plugins found\n' % label)            
+            self.stdout.write('no %r plugins found\n' % label)
+
 
 class UninstallCommand(SubcommandsCommand):
     help = 'Uninstall commands'

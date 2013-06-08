@@ -5,6 +5,7 @@ from hvad.admin import TranslatableAdmin
 
 
 class MixinAdmin(admin.ModelAdmin):
+
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field
@@ -27,7 +28,6 @@ class TwoPlaceholderExampleAdmin(PlaceholderAdmin, MixinAdmin):
 
 class MultilingualAdmin(TranslatableAdmin, PlaceholderAdmin):
     pass
-
 
 admin.site.register(Example1, ExampleAdmin)
 admin.site.register(TwoPlaceholderExample, TwoPlaceholderExampleAdmin)

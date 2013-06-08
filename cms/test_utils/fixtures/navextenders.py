@@ -6,10 +6,11 @@ from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class NavextendersFixture(object):
+
     def create_fixtures(self):
         """
         Tree from fixture:
-        
+
             page1
                 page2
                     page3
@@ -18,7 +19,7 @@ class NavextendersFixture(object):
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
         with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('page1', published=True, in_navigation=True, **defaults)

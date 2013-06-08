@@ -6,6 +6,7 @@ from django.db import models
 from django.forms.widgets import Media
 from django.utils.translation import ugettext_lazy as _
 import operator
+from functools import reduce
 
 
 class Placeholder(models.Model):
@@ -131,7 +132,7 @@ class Placeholder(models.Model):
             from cms.models.pagemodel import Page
             try:
                 self._page = Page.objects.get(placeholders=self)
-            except (Page.DoesNotExist, Page.MultipleObjectsReturned,):
+            except (Page.DoesNotExist, Page.MultipleObjectsReturned, ):
                 self._page = None
         return self._page
 

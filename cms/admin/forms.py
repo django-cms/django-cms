@@ -24,7 +24,7 @@ from menus.menu_pool import menu_pool
 
 
 def get_permission_acessor(obj):
-    if isinstance(obj, (PageUser, User,)):
+    if isinstance(obj, (PageUser, User, )):
         rel_name = 'user_permissions'
     else:
         rel_name = 'permissions'
@@ -71,7 +71,6 @@ class PageForm(forms.ModelForm):
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
 
-
     class Meta:
         model = Page
         fields = ["parent", "site", 'template']
@@ -117,9 +116,9 @@ class PageForm(forms.ModelForm):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
         if self.instance and self.instance.published and page.title_set.count():
-            #Check for titles attached to the page makes sense only because
-            #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
-            #Looks like just a theoretical corner case
+            # Check for titles attached to the page makes sense only because
+            # AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
+            # Looks like just a theoretical corner case
             try:
                 title = page.get_title_obj(lang, fallback=False)
             except titlemodels.Title.DoesNotExist:
@@ -130,7 +129,7 @@ class PageForm(forms.ModelForm):
                 title.save()
                 try:
                     is_valid_url(title.path, page)
-                except ValidationError, e:
+                except ValidationError as e:
                     title.slug = oldslug
                     title.save()
                     if 'slug' in cleaned_data:
@@ -152,6 +151,7 @@ class PageForm(forms.ModelForm):
 
 
 class PublicationForm(forms.ModelForm):
+
     class Meta:
         model = Page
         fields = ["publication_date", "publication_end_date"]
@@ -181,7 +181,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['language'].initial = get_language()
         if 'navigation_extenders' in self.fields:
             self.fields['navigation_extenders'].widget = forms.Select({},
-                [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
+                       [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
 
@@ -207,27 +207,29 @@ class AdvancedSettingsForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ['site', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
-            'application_urls']
+                  'application_urls']
 
 
 class PagePermissionForm(forms.ModelForm):
+
     class Meta:
         model = Page
         fields = ['login_required', 'limit_visibility_in_menu']
 
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
+
     """
     Page permission inline admin form used in inline admin. Required, because
     user and group queryset must be changed. User can see only users on the same
-    level or under him in choosen page tree, and users which were created by him, 
+    level or under him in choosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
     page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
 
     def __init__(self, *args, **kwargs):
         super(PagePermissionInlineAdminForm, self).__init__(*args, **kwargs)
-        user = get_current_user() # current user from threadlocals
+        user = get_current_user()  # current user from threadlocals
         sub_users = get_subordinate_users(user)
 
         limit_choices = True
@@ -268,7 +270,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         else:
             self.fields['user'].widget = UserSelectAdminWidget()
             self.fields['user'].queryset = sub_users
-            self.fields['user'].widget.user = user # assign current user
+            self.fields['user'].widget.user = user  # assign current user
 
         self.fields['group'].queryset = get_subordinate_groups(user)
 
@@ -285,7 +287,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to 
+            # page but after he does this, he will not have permissions to
             # access this page anymore, so avoid this
             raise forms.ValidationError(_("Add page permission requires also "
                                           "access to children, or descendants, otherwise added page "
@@ -327,6 +329,7 @@ class ViewRestrictionInlineAdminForm(PagePermissionInlineAdminForm):
 
 
 class GlobalPagePermissionAdminForm(forms.ModelForm):
+
     def clean(self):
         super(GlobalPagePermissionAdminForm, self).clean()
         if not self.cleaned_data['user'] and not self.cleaned_data['group']:
@@ -335,6 +338,7 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
+
     """Generic form for User & Grup permissions in cms
     """
     can_add_page = forms.BooleanField(label=_('Add'), required=False, initial=True)
@@ -421,7 +425,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         return cleaned_data
 
     def save(self, commit=True):
-        """Create user, assign him to staff users, and create permissions for 
+        """Create user, assign him to staff users, and create permissions for
         him if required. Also assigns creator to user.
         """
         Super = self._password_change and PageUserForm or UserCreationForm
@@ -442,6 +446,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
 
 
 class PageUserGroupForm(GenericCmsPermissionForm):
+
     class Meta:
         model = PageUserGroup
         fields = ('name', )
@@ -474,6 +479,7 @@ class PageUserGroupForm(GenericCmsPermissionForm):
 
 
 class PageTitleForm(forms.ModelForm):
+
     class Meta:
         model = Title
         fields = ('title', )

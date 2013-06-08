@@ -1,4 +1,6 @@
+
 # -*- coding: utf-8 -*-
+
 
 def _skipIf(check, message=''):
     def _deco(meth):

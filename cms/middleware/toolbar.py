@@ -28,6 +28,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
 
 
 class ToolbarMiddleware(object):
+
     """
     Middleware to set up CMS Toolbar.
     """
@@ -53,4 +54,3 @@ class ToolbarMiddleware(object):
         response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
-

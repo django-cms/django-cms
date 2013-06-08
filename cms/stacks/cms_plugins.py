@@ -22,5 +22,4 @@ class StackPlugin(CMSPluginBase):
         })
         return context
 
-
 plugin_pool.register_plugin(StackPlugin)

@@ -21,15 +21,17 @@ def has_no_internet():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('4.4.4.2', 80))
         s.send("hello")
-    except socket.error: # no internet
+    except socket.error:  # no internet
         return True
     return False
 
 
 class DocsTestCase(CMSTestCase):
+
     """
     Test docs building correctly for HTML
     """
+
     @skipIf(has_no_internet(), "No internet")
     def test_html(self):
         nullout = StringIO()

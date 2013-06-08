@@ -13,11 +13,11 @@ from django.utils.translation import get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
-
 register = template.Library()
 
 
-class NOT_PROVIDED: pass
+class NOT_PROVIDED:
+    pass
 
 
 def cut_after(node, levels, removed):
@@ -63,11 +63,11 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             final.append(node)
             node.parent = None
         if not node.ancestor and not node.selected and not node.descendant:
-            # cut inactive nodes to extra_inactive, but not of descendants of 
+            # cut inactive nodes to extra_inactive, but not of descendants of
             # the selected node
             cut_after(node, extra_inactive, removed)
         if node.level > to_level and node.parent:
-            # remove nodes that are too deep, but not nodes that are on 
+            # remove nodes that are too deep, but not nodes that are on
             # from_level (local root nodes)
             remove(node, removed)
         if node.selected:
@@ -92,6 +92,7 @@ def flatten(nodes):
 
 
 class ShowMenu(InclusionTag):
+
     """
     render a nested list of all children of the pages
     - from_level: starting level
@@ -127,9 +128,9 @@ class ShowMenu(InclusionTag):
         if next_page:
             children = next_page.children
         else:
-        #new menu... get all the data so we can save a lot of queries
+        # new menu... get all the data so we can save a lot of queries
             nodes = menu_pool.get_nodes(request, namespace, root_id)
-            if root_id: # find the root id and cut the nodes
+            if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
                     node = id_nodes[0]
@@ -146,16 +147,15 @@ class ShowMenu(InclusionTag):
 
         try:
             context.update({'children': children,
-                'template': template,
-                'from_level': from_level,
-                'to_level': to_level,
-                'extra_inactive': extra_inactive,
-                'extra_active': extra_active,
-                'namespace': namespace})
+                            'template': template,
+                            'from_level': from_level,
+                            'to_level': to_level,
+                            'extra_inactive': extra_inactive,
+                            'extra_active': extra_active,
+                            'namespace': namespace})
         except:
             context = {"template": template}
         return context
-
 
 register.tag(ShowMenu)
 
@@ -173,11 +173,11 @@ class ShowMenuBelowId(ShowMenu):
         Argument('next_page', default=None, required=False),
     )
 
-
 register.tag(ShowMenuBelowId)
 
 
 class ShowSubMenu(InclusionTag):
+
     """
     show the sub menu of the current nav-node.
     - levels: how many levels deep
@@ -241,16 +241,16 @@ class ShowSubMenu(InclusionTag):
         })
         return context
 
-
 register.tag(ShowSubMenu)
 
 
 class ShowBreadcrumb(InclusionTag):
+
     """
     Shows the breadcrumb from the node that has the same url as the current request
-    
+
     - start level: after which level should the breadcrumb start? 0=home
-    - template: template used to render the breadcrumb 
+    - template: template used to render the breadcrumb
     """
     name = 'show_breadcrumb'
     template = 'menu/dummy.html'
@@ -298,9 +298,8 @@ class ShowBreadcrumb(InclusionTag):
         else:
             ancestors = []
         context.update({'ancestors': ancestors,
-            'template': template})
+                        'template': template})
         return context
-
 
 register.tag(ShowBreadcrumb)
 
@@ -321,7 +320,6 @@ def _current_language_marker(language, lang_code):
 def _short_language_marker(language, lang_code):
     return lang_code
 
-
 MARKERS = {
     'raw': _raw_language_marker,
     'native': _native_language_marker,
@@ -331,6 +329,7 @@ MARKERS = {
 
 
 class LanguageChooser(InclusionTag):
+
     """
     Displays a language chooser
     - template: template used to render the language chooser
@@ -372,11 +371,11 @@ class LanguageChooser(InclusionTag):
         })
         return context
 
-
 register.tag(LanguageChooser)
 
 
 class PageLanguageUrl(InclusionTag):
+
     """
     Displays the url of the current page in the defined language.
     You can set a language_changer function with the set_language_changer function in the utils.py if there is no page.
@@ -401,6 +400,5 @@ class PageLanguageUrl(InclusionTag):
             # use the default language changer
             url = DefaultLanguageChanger(request)(lang)
         return {'content': url}
-
 
 register.tag(PageLanguageUrl)

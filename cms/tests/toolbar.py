@@ -10,8 +10,9 @@ from django.test.client import RequestFactory
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
+
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
-        path =  path or page and page.get_absolute_url()
+        path = path or page and page.get_absolute_url()
         if edit:
             path += '?edit'
         request = RequestFactory().get(path)
@@ -189,7 +190,7 @@ class ToolbarTests(ToolbarTestBase):
         Tests that the buttons remain even when the language changes.
         """
         user = self.get_staff()
-        cms_page = create_page('test-en', 'nav_playground.html', 'en',  published=True)
+        cms_page = create_page('test-en', 'nav_playground.html', 'en', published=True)
         create_title('de', 'test-de', cms_page)
         en_request = self.get_page_request(cms_page, user, edit=True)
         en_toolbar = CMSToolbar(en_request)

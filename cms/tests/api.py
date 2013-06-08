@@ -25,6 +25,7 @@ def _grant_page_permission(user, codename):
 
 
 class PythonAPITests(TestCase):
+
     def _get_default_create_page_arguments(self):
         return {
             'title': 'Test',

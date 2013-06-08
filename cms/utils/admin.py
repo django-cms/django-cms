@@ -21,7 +21,6 @@ def jsonify_request(response):
     return HttpResponse(simplejson.dumps({'status': response.status_code, 'content': response.content}),
                         content_type="application/json")
 
-
 publisher_classes = {
     Page.PUBLISHER_STATE_DIRTY: "publisher_dirty",
     Page.PUBLISHER_STATE_PENDING: "publisher_pending",
@@ -38,20 +37,20 @@ def get_admin_menu_item_context(request, page, filtered=False):
 
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
-    #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
+    # slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
     if get_cms_setting('PERMISSION'):
-        # jstree metadata generator 
+        # jstree metadata generator
         md = []
 
-        #if not has_add_page_permission:
+        # if not has_add_page_permission:
         if not has_move_page_permission:
             md.append(('valid_children', False))
             md.append(('draggable', False))
         if md:
             # just turn it into simple javascript object
             metadata = "{" + ", ".join(map(lambda e: "%s: %s" % (e[0],
-            isinstance(e[1], bool) and str(e[1]) or e[1].lower() ), md)) + "}"
+                                                                 isinstance(e[1], bool) and str(e[1]) or e[1].lower()), md)) + "}"
 
     has_add_on_same_level_permission = False
     opts = Page._meta
@@ -68,7 +67,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site)
-        #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
+        # has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
     context = {
         'page': page,
         'site': site,
@@ -97,7 +96,7 @@ def render_admin_menu_item(request, page, template=None):
         template = "admin/cms/page/tree/menu_fragment.html"
 
     if not page.pk:
-        return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
+        return HttpResponse(NOT_FOUND_RESPONSE)  # Not found - tree will remove item
 
     # languages
     languages = get_language_list(page.site_id)

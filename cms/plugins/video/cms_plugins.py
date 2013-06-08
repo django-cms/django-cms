@@ -5,13 +5,14 @@ from cms.plugins.video import settings
 from cms.plugins.video.models import Video
 from cms.plugins.video.forms import VideoForm
 
+
 class VideoPlugin(CMSPluginBase):
     model = Video
     name = _("Video")
     form = VideoForm
-    
+
     render_template = "cms/plugins/video.html"
-    
+
     general_fields = [
         ('movie', 'movie_url'),
         'image',
@@ -31,7 +32,7 @@ class VideoPlugin(CMSPluginBase):
         'buttonovercolor',
         'buttonhighlightcolor',
     ]
-    
+
     fieldsets = [
         (None, {
             'fields': general_fields,
@@ -41,15 +42,15 @@ class VideoPlugin(CMSPluginBase):
         fieldsets += [
             (_('Color Settings'), {
                 'fields': color_fields,
-                'classes': ('collapse',),
+                'classes': ('collapse', ),
             }),
         ]
-        
+
     def render(self, context, instance, placeholder):
         context.update({
             'object': instance,
-            'placeholder':placeholder,
+            'placeholder': placeholder,
         })
         return context
-    
+
 plugin_pool.register_plugin(VideoPlugin)

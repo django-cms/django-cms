@@ -16,9 +16,11 @@ from django.utils.translation import get_language
 
 APP_RESOLVERS = []
 
+
 def clear_app_resolvers():
     global APP_RESOLVERS
     APP_RESOLVERS = []
+
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application.
@@ -46,6 +48,7 @@ def applications_page_check(request, current_page=None, path=None):
             # Raised if the page is not managed by an apphook
             pass
     return None
+
 
 class AppRegexURLResolver(RegexURLResolver):
 
@@ -80,7 +83,7 @@ class AppRegexURLResolver(RegexURLResolver):
                 else:
                     try:
                         sub_match = pattern.resolve(new_path)
-                    except Resolver404, e:
+                    except Resolver404 as e:
                         if 'tried' in e.args[0]:
                             tried.extend([[pattern] + t for t in e.args[0]['tried']])
                         elif 'path' in e.args[0]:
@@ -89,7 +92,7 @@ class AppRegexURLResolver(RegexURLResolver):
                         if sub_match:
                             return pattern.page_id
                         tried.append(pattern.regex.pattern)
-            raise Resolver404, {'tried': tried, 'path': new_path}
+            raise Resolver404({'tried': tried, 'path': new_path})
 
 
 def recurse_patterns(path, pattern_list, page_id):
@@ -106,17 +109,18 @@ def recurse_patterns(path, pattern_list, page_id):
         if isinstance(pattern, RegexURLResolver):
             # this is an 'include', recurse!
             resolver = RegexURLResolver(regex, 'cms_appresolver',
-                pattern.default_kwargs, pattern.app_name, pattern.namespace)
+                                        pattern.default_kwargs, pattern.app_name, pattern.namespace)
             resolver.page_id = page_id
             # see lines 243 and 236 of urlresolvers.py to understand the next line
             resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id)
         else:
             # Re-do the RegexURLPattern with the new regular expression
             resolver = RegexURLPattern(regex, pattern.callback,
-                pattern.default_args, pattern.name)
+                                       pattern.default_args, pattern.name)
             resolver.page_id = page_id
         newpatterns.append(resolver)
     return newpatterns
+
 
 def _flatten_patterns(patterns):
     flat = []
@@ -126,6 +130,7 @@ def _flatten_patterns(patterns):
         else:
             flat.append(pattern)
     return flat
+
 
 def get_app_urls(urls):
     for urlconf in urls:
@@ -176,7 +181,6 @@ def get_app_patterns():
     except Site.DoesNotExist:
         current_site = None
     included = []
-
     # we don't have a request here so get_page_queryset() can't be used,
     # so use public() queryset.
     # This can be done because url patterns are used just in frontend

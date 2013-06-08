@@ -10,7 +10,7 @@ else:
 
 urlpatterns = [
     # Public pages
-    url(r'^$', details, {'slug':''}, name='pages-root'),
+    url(r'^$', details, {'slug': ''}, name='pages-root'),
     reg,
 ]
 
@@ -20,6 +20,6 @@ if apphook_pool.get_apphooks():
     """
     from cms.appresolver import get_app_patterns
     urlpatterns = get_app_patterns() + urlpatterns
-    #urlpatterns = (dynamic_app_regex_url_resolver, ) + urlpatterns
-    
+    # urlpatterns = (dynamic_app_regex_url_resolver, ) + urlpatterns
+
 urlpatterns = patterns('', *urlpatterns)

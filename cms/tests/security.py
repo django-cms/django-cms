@@ -8,25 +8,27 @@ from django.core.urlresolvers import reverse
 
 
 class SecurityTests(CMSTestCase):
+
     """
     Test security issues by trying some naive requests to add/alter/delete data.
     """
+
     def get_data(self):
         page = create_page("page", "nav_playground.html", "en")
         placeholder = page.placeholders.get(slot='body')
         superuser = self.get_superuser()
         staff = self.get_staff_user_with_no_permissions()
         return page, placeholder, superuser, staff
-    
+
     def test_add(self):
         """
         Test adding a plugin to a *PAGE*.
         """
         page, placeholder, superuser, staff = self.get_data()
         plugin_data = {
-            'plugin_type':"TextPlugin",
-            'language':settings.LANGUAGES[0][0],
-            'placeholder':page.placeholders.get(slot="body").pk,
+            'plugin_type': "TextPlugin",
+            'language': settings.LANGUAGES[0][0],
+            'placeholder': page.placeholders.get(slot="body").pk,
         }
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # log the user out and post the plugin data to the cms add-plugin URL.
@@ -41,7 +43,7 @@ class SecurityTests(CMSTestCase):
         # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
-        
+
     def test_edit(self):
         """
         Test editing a *PAGE* plugin
@@ -53,7 +55,7 @@ class SecurityTests(CMSTestCase):
             'plugin_id': plugin.pk,
             'body': 'newbody',
         }
-        self.assertEqual(plugin.body, 'body') # check the body is as expected.
+        self.assertEqual(plugin.body, 'body')  # check the body is as expected.
         # log the user out, try to edit the plugin
         self.client.logout()
         url = URL_CMS_PLUGIN_EDIT + '%s/' % plugin.pk
@@ -69,7 +71,7 @@ class SecurityTests(CMSTestCase):
         self.assertEqual(response.status_code, 403)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
-    
+
     def test_delete(self):
         """
         Test deleting a *PAGE* plugin
@@ -97,16 +99,16 @@ class SecurityTests(CMSTestCase):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
-        
+
     def test_add_ph(self):
         """
         Test adding a *NON PAGE* plugin
         """
         page, placeholder, superuser, staff = self.get_data()
         plugin_data = {
-            'plugin_type':"TextPlugin",
-            'language':settings.LANGUAGES[0][0],
-            'placeholder':page.placeholders.get(slot="body").pk,
+            'plugin_type': "TextPlugin",
+            'language': settings.LANGUAGES[0][0],
+            'placeholder': page.placeholders.get(slot="body").pk,
         }
         url = reverse('admin:placeholderapp_example1_add_plugin')
         self.assertEqual(CMSPlugin.objects.count(), 0)
@@ -122,14 +124,14 @@ class SecurityTests(CMSTestCase):
         # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
-    
+
     def test_edit_ph(self):
         """
         Test editing a *NON PAGE* plugin
         """
         page, placeholder, superuser, staff = self.get_data()
         plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
-        url = reverse('admin:placeholderapp_example1_edit_plugin', args=(plugin.pk,))
+        url = reverse('admin:placeholderapp_example1_edit_plugin', args=(plugin.pk, ))
         plugin_data = {
             'body': 'newbody',
             'language': 'en',
@@ -151,7 +153,7 @@ class SecurityTests(CMSTestCase):
         self.assertEqual(response.status_code, 403)
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
-    
+
     def test_delete_ph(self):
         page, placeholder, superuser, staff = self.get_data()
         plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
@@ -173,14 +175,15 @@ class SecurityTests(CMSTestCase):
         # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 1)
-        
+
     def test_text_plugin_xss(self):
         page, placeholder, superuser, staff = self.get_data()
         with self.login_user_context(superuser):
             plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
             # ACTUAL TEST STARTS HERE.
             data = {
-                "body": "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
+                "body":
+                "<div onload='do_evil_stuff();'>divcontent</div><a href='javascript:do_evil_stuff()'>acontent</a>"
             }
             edit_url = '%s%s/' % (URL_CMS_PLUGIN_EDIT, plugin.pk)
             response = self.client.post(edit_url, data)

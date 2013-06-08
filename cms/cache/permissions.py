@@ -16,8 +16,10 @@ def get_cache_key(user, key):
     return "%s:permission:%s:%s" % (
         get_cms_setting('CACHE_PREFIX'), user.username, key)
 
+
 def get_cache_version_key():
-    return "%s:permission:version" % (get_cms_setting('CACHE_PREFIX'),)
+    return "%s:permission:version" % (get_cms_setting('CACHE_PREFIX'), )
+
 
 def get_cache_version():
     version = cache.get(get_cache_version_key())
@@ -41,8 +43,8 @@ def set_permission_cache(user, key, value):
     # store this key, so we can clean it when required
     cache_key = get_cache_key(user, key)
     cache.set(cache_key, value,
-            get_cms_setting('CACHE_DURATIONS')['permissions'],
-            version=get_cache_version())
+              get_cms_setting('CACHE_DURATIONS')['permissions'],
+              version=get_cache_version())
 
 
 def clear_user_permission_cache(user):
@@ -59,4 +61,4 @@ def clear_permission_cache():
         cache.incr(get_cache_version_key())
     else:
         cache.set(get_cache_version_key(), 2,
-                get_cms_setting('CACHE_DURATIONS')['permissions'])
+                  get_cms_setting('CACHE_DURATIONS')['permissions'])

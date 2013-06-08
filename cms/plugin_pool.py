@@ -8,7 +8,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import warnings
 
+
 class PluginPool(object):
+
     def __init__(self):
         self.plugins = {}
         self.discovered = False
@@ -88,7 +90,7 @@ class PluginPool(object):
                 include_plugin = False
             if include_plugin:
                 final_plugins.append(plugin)
-                
+
         if final_plugins:
             plugins = final_plugins
 
@@ -98,7 +100,7 @@ class PluginPool(object):
 
     def get_text_enabled_plugins(self, placeholder, page):
         plugins = self.get_all_plugins(placeholder, page)
-        plugins +=self.get_all_plugins(placeholder, page, 'text_only_plugins')
+        plugins += self.get_all_plugins(placeholder, page, 'text_only_plugins')
         final = []
         for plugin in plugins:
             if plugin.text_enabled:
@@ -113,6 +115,4 @@ class PluginPool(object):
         self.discover_plugins()
         return self.plugins[name]
 
-
 plugin_pool = PluginPool()
-

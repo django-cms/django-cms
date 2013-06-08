@@ -8,12 +8,13 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models.managers import PageModeratorStateManager
 from cms.models.pagemodel import Page
 
-
-################################################################################
+#
 # Moderation
-################################################################################
+#
+
 
 class PageModeratorState(models.Model):
+
     """PageModeratorState memories all actions made on page.
     Page can be in only one advanced state.
     """

@@ -7,6 +7,7 @@ import warnings
 
 
 class ApphookPool(object):
+
     def __init__(self):
         self.apps = {}
         self.discovered = False
@@ -15,7 +16,7 @@ class ApphookPool(object):
     def discover_apps(self):
         if self.discovered:
             return
-            #import all the modules
+            # import all the modules
         apphooks = get_cms_setting('APPHOOKS')
         if apphooks:
             self.block_register = True
@@ -45,7 +46,7 @@ class ApphookPool(object):
                           "but the 'menus' attribute is empty, did you make a typo?")
         name = app.__name__
         if name in self.apps.keys():
-            raise AppAlreadyRegistered, "[%s] a cms app with this name is already registered" % name
+            raise AppAlreadyRegistered("[%s] a cms app with this name is already registered" % name)
         self.apps[name] = app
 
     def get_apphooks(self):
@@ -64,11 +65,10 @@ class ApphookPool(object):
         try:
             return self.apps[app_name]
         except KeyError:
-            # deprecated: return apphooks registered in db with urlconf name instead of apphook class name 
+            # deprecated: return apphooks registered in db with urlconf name instead of apphook class name
             for app in self.apps.values():
                 if app_name in app.urls:
                     return app
         raise ImproperlyConfigured('No registered apphook `%s` found.' % app_name)
-
 
 apphook_pool = ApphookPool()

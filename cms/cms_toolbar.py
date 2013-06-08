@@ -18,6 +18,7 @@ from menus.utils import DefaultLanguageChanger
 
 
 class PageToolbar(CMSToolbar):
+
     def insert_items(self, items, toolbar, request, is_app):
         self.is_app = is_app
         self.request = request
@@ -87,7 +88,7 @@ class PageToolbar(CMSToolbar):
 
     def get_template_menu(self):
         menu_items = List("#", _("Template"), sub_level=True)
-        url = reverse('admin:cms_page_change_template', args=(self.page.pk,))
+        url = reverse('admin:cms_page_change_template', args=(self.page.pk, ))
         for path, name in get_cms_setting('TEMPLATES'):
             active = False
             if self.page.template == path:
@@ -190,7 +191,7 @@ class PageToolbar(CMSToolbar):
             disabled=not self.toolbar.edit_mode,
         ))
         menu_items.items.append(Item(
-            reverse('admin:cms_page_delete', args=(self.page.pk,)),
+            reverse('admin:cms_page_delete', args=(self.page.pk, )),
             _('Delete Page'),
             load_modal=True,
             close_url=reverse('admin:cms_page_changelist'),
@@ -240,7 +241,7 @@ class PageToolbar(CMSToolbar):
             disabled=not dirty)
         )
         menu_items.items.append(Item(
-            reverse('admin:cms_page_history', args=(self.page.pk,)),
+            reverse('admin:cms_page_history', args=(self.page.pk, )),
             _('View History'),
             load_modal=True)
         )
@@ -289,6 +290,5 @@ class PageToolbar(CMSToolbar):
         switch.addItem(_("Content"), "?edit", self.toolbar.build_mode)
         switch.addItem(_("Structure"), "?build", not self.toolbar.build_mode)
         return switch
-
 
 toolbar_pool.register(PageToolbar)

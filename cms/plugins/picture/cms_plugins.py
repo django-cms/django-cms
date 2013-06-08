@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.plugins.picture.models import Picture
 from django.conf import settings
 
+
 class PicturePlugin(CMSPluginBase):
     model = Picture
     name = _("Picture")

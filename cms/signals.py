@@ -30,7 +30,6 @@ def update_plugin_positions(**kwargs):
             p.save()
         last += 1
 
-
 signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin, dispatch_uid="cms.plugin.update_position")
 
 
@@ -39,7 +38,6 @@ def update_title_paths(instance, **kwargs):
     """
     for title in instance.title_set.all():
         title.save()
-
 
 page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.update_path")
 
@@ -80,7 +78,6 @@ def pre_save_title(instance, raw, **kwargs):
     else:
         update_title(instance)
 
-
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
 
@@ -94,7 +91,7 @@ def post_save_title(instance, raw, created, **kwargs):
             page__rght__lt=instance.page.rght,
             page__tree_id__exact=instance.page.tree_id,
             language=instance.language,
-            has_url_overwrite=False, # TODO: what if child has no url overwrite?
+            has_url_overwrite=False,  # TODO: what if child has no url overwrite?
         ).order_by('page__tree_id', 'page__parent', 'page__lft')
 
         for descendant_title in descendant_titles:
@@ -117,7 +114,6 @@ def post_save_title(instance, raw, created, **kwargs):
     if prevent_descendants:
         del instance.tmp_prevent_descendant_update
 
-
 signals.post_save.connect(post_save_title, sender=Title, dispatch_uid="cms.title.postsave")
 
 
@@ -125,7 +121,7 @@ def post_save_user(instance, raw, created, **kwargs):
     """Signal called when new user is created, required only when CMS_PERMISSION.
     Assigns creator of the user to PageUserInfo model, so we know who had created
     this user account.
-    
+
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
@@ -140,11 +136,11 @@ def post_save_user(instance, raw, created, **kwargs):
 
 
 def post_save_user_group(instance, raw, created, **kwargs):
-    """The same like post_save_user, but for Group, required only when 
+    """The same like post_save_user, but for Group, required only when
     CMS_PERMISSION.
     Assigns creator of the group to PageUserGroupInfo model, so we know who had
     created this user account.
-    
+
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user

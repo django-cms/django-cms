@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 
 class ToolbarPool(object):
+
     def __init__(self):
         self.toolbars = {}
         self.discovered = False
@@ -14,7 +15,7 @@ class ToolbarPool(object):
     def discover_toolbars(self):
         if self.discovered:
             return
-            #import all the modules
+            # import all the modules
         toolbars = get_cms_setting('TOOLBARS')
         if toolbars:
             self.block_register = True
@@ -41,7 +42,7 @@ class ToolbarPool(object):
                                        'cms.toolbar_base.CMSToolbar, %r does not' % toolbar)
         name = "%s.%s" % (toolbar.__module__, toolbar.__name__)
         if name in self.toolbars.keys():
-            raise ToolbarAlreadyRegistered, "[%s] a toolbar with this name is already registered" % name
+            raise ToolbarAlreadyRegistered("[%s] a toolbar with this name is already registered" % name)
         self.toolbars[name] = toolbar
 
     def get_toolbars(self):

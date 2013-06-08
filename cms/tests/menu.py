@@ -6,11 +6,11 @@ from cms.api import create_page
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
-    SoftrootFixture, ExtendedMenusFixture)
+from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
+                                           SoftrootFixture, ExtendedMenusFixture)
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride,
-    LanguageOverride)
+                                                  LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
@@ -24,7 +24,6 @@ from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 from django.utils.unittest.case import skipUnless
-
 
 
 class BaseMenuTest(SettingsOverrideTestCase):
@@ -57,10 +56,12 @@ class BaseMenuTest(SettingsOverrideTestCase):
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
 
+
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
+
     """
     Tree from fixture:
-        
+
         + P1
         | + P2
         |   + P3
@@ -73,15 +74,16 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
           + P7
           + P8
     """
+
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
-    
+
     def get_level(self, num):
         return Page.objects.public().filter(level=num)
 
     def get_all_pages(self):
         return Page.objects.public()
-    
+
     def test_menu_failfast_on_invalid_usage(self):
         context = self.get_context()
         context['child'] = self.get_page(1)
@@ -96,8 +98,8 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         tpl.render(context)
         nodes = context["children"]
         # P2 is the selected node
-        self.assertTrue(nodes[0].selected) 
-        # Should include P10 but not P11 
+        self.assertTrue(nodes[0].selected)
+        # Should include P10 but not P11
         self.assertEqual(len(nodes[1].children), 1)
         self.assertFalse(nodes[1].children[0].children)
 
@@ -110,9 +112,10 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
 
 
 class FixturesMenuTests(MenusFixture, BaseMenuTest):
+
     """
     Tree from fixture:
-        
+
         + P1
         | + P2
         |   + P3
@@ -122,15 +125,16 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
           + P7
           + P8
     """
+
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
-    
+
     def get_level(self, num):
         return Page.objects.public().filter(level=num)
-    
+
     def get_all_pages(self):
         return Page.objects.public()
-    
+
     def test_menu_failfast_on_invalid_usage(self):
         context = self.get_context()
         context['child'] = self.get_page(1)
@@ -241,7 +245,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         for node in nodes:
             self.assertEqual(len(node.children), 0)
 
-
     def test_only_level_one(self):
         context = self.get_context()
         # test standard show_menu
@@ -251,7 +254,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), len(self.get_level(1)))
         for node in nodes:
             self.assertEqual(len(node.children), 0)
-
 
     def test_only_level_one_active(self):
         context = self.get_context()
@@ -312,7 +314,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # P2 is selected
         self.assertTrue(nodes[0].children[0].selected)
 
-        
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
@@ -433,11 +434,11 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_submenu_from_non_menu_page(self):
         """
         Here's the structure bit we're interested in:
-        
+
         + P6 (not in menu)
           + P7
           + P8
-          
+
         When we render P6, there should be a menu entry for P7 and P8 if the
         tag parameters are "1 XXX XXX XXX"
         """
@@ -466,7 +467,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # Must use the drafts to find the parent when calling create_page
         parent = Page.objects.drafts().get(title_set__title='P3')
         invisible_page = create_page("invisible", "nav_playground.html", "en",
-            parent=parent, published=True, in_navigation=False)
+                                     parent=parent, published=True, in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context)
@@ -483,10 +484,11 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
 
 class MenuTests(BaseMenuTest):
+
     def test_build_nodes_inner_for_worst_case_menu(self):
         '''
             Tests the worst case scenario
-            
+
             node5
              node4
               node3
@@ -520,8 +522,8 @@ class MenuTests(BaseMenuTest):
 
     def test_build_nodes_inner_for_circular_menu(self):
         '''
-        TODO: 
-            To properly handle this test we need to have a circular dependency 
+        TODO:
+            To properly handle this test we need to have a circular dependency
             detection system.
             Go nuts implementing it :)
         '''
@@ -530,11 +532,11 @@ class MenuTests(BaseMenuTest):
     def test_build_nodes_inner_for_broken_menu(self):
         '''
             Tests a broken menu tree (non-existing parent)
-            
+
             node5
              node4
               node3
-              
+
             <non-existant>
              node2
               node1
@@ -592,9 +594,10 @@ class MenuTests(BaseMenuTest):
 
 
 class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
+
     """
     Tree in fixture (as taken from issue 662):
-    
+
         top
             root
                 aaa
@@ -605,15 +608,15 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
                 bbb
                     333
                     444
-    
+
     In the fixture, all pages are "in_navigation", "published" and
     NOT-"soft_root".
-    
+
     What is a soft root?
-    
+
         If a page is a soft root, it becomes the root page in the menu if
         we are currently on or under that page.
-        
+
         If we are above that page, the children of this page are not shown.
     """
     settings_overrides = {
@@ -629,7 +632,7 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
     def assertTreeQuality(self, a, b, *attrs):
         """
         Checks that the node-lists a and b are the same for attrs.
-        
+
         This is recursive over the tree
         """
         msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
@@ -645,13 +648,13 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
     def test_top_not_in_nav(self):
         """
         top: not in navigation
-        
+
         tag: show_menu 0 100 0 100
-        
+
         context shared: current page is aaa
         context 1: root is NOT a softroot
         context 2: root IS a softroot
-        
+
         expected result: the two node-trees should be equal
         """
         top = self.get_page('top')
@@ -678,13 +681,13 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
     def test_top_in_nav(self):
         """
         top: in navigation
-        
+
         tag: show_menu 0 100 0 100
-        
+
         context shared: current page is aaa
         context 1: root is NOT a softroot
         context 2: root IS a softroot
-        
+
         expected result 1:
             0:top
                1:root
@@ -716,8 +719,8 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
                         AttributeObject(title='111', level=3, children=[
                             AttributeObject(title='ccc', level=4, children=[
                                 AttributeObject(title='ddd', level=5, children=[])
-                            ])
-                        ]),
+                                ])
+                            ]),
                         AttributeObject(title='222', level=3, children=[])
                     ]),
                     AttributeObject(title='bbb', level=2, children=[])
@@ -740,7 +743,7 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
                     AttributeObject(title='111', level=2, children=[
                         AttributeObject(title='ccc', level=3, children=[
                             AttributeObject(title='ddd', level=4, children=[])
-                        ])
+                            ])
                     ]),
                     AttributeObject(title='222', level=2, children=[])
                 ]),
@@ -751,6 +754,7 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
 
 
 class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
+
     """
     Tree from fixture:
 
@@ -763,6 +767,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
           + P7 (not in menu)
           + P8
     """
+
     def test_show_submenu(self):
         page = self.get_page(6)
         subpage = self.get_page(8)
@@ -791,13 +796,15 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
 
+
 class ShowMenuBelowIdTests(BaseMenuTest):
+
     def test_not_in_navigation(self):
         """
         Test for issue 521
-        
+
         Build the following tree:
-        
+
             A
             |-B
               |-C
@@ -806,7 +813,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
         b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
+                        published=True, in_navigation=True)
         c = create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
@@ -827,9 +834,9 @@ class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation_num_queries(self):
         """
         Test for issue 521
-        
+
         Build the following tree:
-        
+
             A
             |-B
               |-C
@@ -838,9 +845,9 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
         b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
-        create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
+        create_page('C', 'nav_playground.html', 'en', parent=b,
+                    published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
 
@@ -872,7 +879,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             'REQUEST': {},
             'session': {},
         }
-        return type('Request', (object,), attrs)
+        return type('Request', (object, ), attrs)
 
     def test_public_for_all_staff(self):
         request = self.get_request()
@@ -952,7 +959,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             """
             The query is:
             PagePermission query for affected pages
-            
+
             global is not executed because it's lazy
             """
             get_visible_pages(request, pages, site)
@@ -991,11 +998,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             with self.assertNumQueries(2):
                 """
                 The queries are:
-                PagePermission count query 
+                PagePermission count query
                 GlobalpagePermission count query
                 """
                 get_visible_pages(request, pages, site)
-                #print connection.queries
+                # print connection.queries
 
     def test_authed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
@@ -1140,29 +1147,31 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             """
             get_visible_pages(request, pages, site)
 
+
 class SoftrootTests(SettingsOverrideTestCase):
+
     """
     Ask evildmp/superdmp if you don't understand softroots!
-    
+
     Softroot description from the docs:
-    
+
         A soft root is a page that acts as the root for a menu navigation tree.
-    
+
         Typically, this will be a page that is the root of a significant new
         section on your site.
-    
+
         When the soft root feature is enabled, the navigation menu for any page
         will start at the nearest soft root, rather than at the real root of
         the site’s page hierarchy.
-    
+
         This feature is useful when your site has deep page hierarchies (and
         therefore multiple levels in its navigation trees). In such a case, you
         usually don’t want to present site visitors with deep menus of nested
         items.
-    
+
         For example, you’re on the page “Introduction to Bleeding”, so the menu
         might look like this:
-    
+
             School of Medicine
                 Medical Education
                 Departments
@@ -1188,12 +1197,12 @@ class SoftrootTests(SettingsOverrideTestCase):
                 Administration
                 Contact us
                 Impressum
-    
+
         which is frankly overwhelming.
-    
+
         By making “Department of Mediaeval Surgery” a soft root, the menu
         becomes much more manageable:
-    
+
             Department of Mediaeval Surgery
                 Theory
                 Cures
@@ -1214,15 +1223,15 @@ class SoftrootTests(SettingsOverrideTestCase):
     def test_basic_home(self):
         """
         Given the tree:
-        
+
         |- Home
         | |- Projects (SOFTROOT)
         | | |- django CMS
         | | |- django Shop
         | |- People
-        
+
         Expected menu when on "Home" (0 100 100 100):
-        
+
         |- Home
         | |- Projects (SOFTROOT)
         | | |- django CMS
@@ -1264,15 +1273,15 @@ class SoftrootTests(SettingsOverrideTestCase):
     def test_basic_projects(self):
         """
         Given the tree:
-        
+
         |- Home
         | |- Projects (SOFTROOT)
         | | |- django CMS
         | | |- django Shop
         | |- People
-        
+
         Expected menu when on "Projects" (0 100 100 100):
-        
+
         |- Projects (SOFTROOT)
         | |- django CMS
         | |- django Shop
@@ -1307,15 +1316,15 @@ class SoftrootTests(SettingsOverrideTestCase):
     def test_basic_djangocms(self):
         """
         Given the tree:
-        
+
         |- Home
         | |- Projects (SOFTROOT)
         | | |- django CMS
         | | |- django Shop
         | |- People
-        
+
         Expected menu when on "django CMS" (0 100 100 100):
-        
+
         |- Projects (SOFTROOT)
         | |- django CMS
         | |- django Shop
@@ -1350,15 +1359,15 @@ class SoftrootTests(SettingsOverrideTestCase):
     def test_basic_people(self):
         """
         Given the tree:
-        
+
         |- Home
         | |- Projects (SOFTROOT)
         | | |- django CMS
         | | |- django Shop
         | |- People
-        
+
         Expected menu when on "People" (0 100 100 100):
-        
+
         |- Home
         | |- Projects (SOFTROOT)
         | | |- django CMS

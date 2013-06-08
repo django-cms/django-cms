@@ -16,6 +16,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
 
+
 class ManagementTestCase(CMSTestCase):
 
     def test_list_apphooks(self):
@@ -56,7 +57,7 @@ class ManagementTestCase(CMSTestCase):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                                     name="A Link", url="https://www.django-cms.org")
             self.assertEqual(
                 CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
                 2)
@@ -130,7 +131,6 @@ class ManagementTestCase(CMSTestCase):
                 text_plugins_report["unsaved_instances"],
                 [instanceless_plugin])
 
-
     def test_delete_orphaned_plugins(self):
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
@@ -138,7 +138,7 @@ class ManagementTestCase(CMSTestCase):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                                     name="A Link", url="https://www.django-cms.org")
 
             instanceless_plugin = CMSPlugin(
                 language="en", plugin_type="TextPlugin")
@@ -203,7 +203,6 @@ class ManagementTestCase(CMSTestCase):
             self.assertEqual(
                 len(text_plugins_report["unsaved_instances"]),
                 0)
-
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()

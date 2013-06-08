@@ -20,6 +20,7 @@ from reversion.models import Revision, Version, VERSION_CHANGE
 
 
 class BasicReversionTestCase(CMSTestCase):
+
     def setUp(self):
         u = User(username="test", is_staff=True, is_active=True,
                  is_superuser=True)
@@ -40,6 +41,7 @@ class BasicReversionTestCase(CMSTestCase):
 
 
 class ReversionTestCase(CMSTestCase):
+
     def setUp(self):
         u = User(username="test", is_staff=True, is_active=True,
                  is_superuser=True)
@@ -169,7 +171,6 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(undo_url)
             self.assertEqual(2, CMSPlugin.objects.all().count())
 
-
     def test_recover(self):
         """
         Test that you can recover a page
@@ -231,6 +232,7 @@ class ReversionTestCase(CMSTestCase):
 
 
 class ReversionFileFieldTests(CMSTestCase):
+
     def tearDown(self):
         shutil.rmtree(join(settings.MEDIA_ROOT, 'fileapp'))
 

@@ -12,6 +12,7 @@ from django.db import transaction
 
 
 class SettingsAdmin(ModelAdmin):
+
     def get_urls(self):
         from django.conf.urls import patterns, url
 
@@ -59,6 +60,5 @@ class SettingsAdmin(ModelAdmin):
         Return empty perms dict thus hiding the model from admin index.
         """
         return {}
-
 
 admin.site.register(UserSettings, SettingsAdmin)

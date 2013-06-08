@@ -17,7 +17,7 @@ class NonRootCase(CMSTestCase):
     urls = 'cms.test_utils.project.nonroot_urls'
 
     def setUp(self):
-        u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
+        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         u.set_password("test")
         u.save()
         with self.login_user_context(u):
@@ -26,7 +26,7 @@ class NonRootCase(CMSTestCase):
     def create_some_pages(self):
         """
         Creates the following structure:
-        
+
         + P1
         | + P2
         |   + P3
@@ -36,11 +36,11 @@ class NonRootCase(CMSTestCase):
         self.page1 = create_page("page1", "nav_playground.html", "en",
                                  published=True, in_navigation=True)
         self.page2 = create_page("page2", "nav_playground.html", "en",
-                          parent=self.page1, published=True, in_navigation=True)
+                                 parent=self.page1, published=True, in_navigation=True)
         self.page3 = create_page("page3", "nav_playground.html", "en",
-                          parent=self.page2, published=True, in_navigation=True)
+                                 parent=self.page2, published=True, in_navigation=True)
         self.page4 = create_page("page4", "nav_playground.html", "en",
-                                      published=True, in_navigation=True)
+                                 published=True, in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4]
         self.top_level_pages = [self.page1, self.page4]
         self.level1_pages = [self.page2]
@@ -80,6 +80,6 @@ class NonRootCase(CMSTestCase):
         language = 'en'
         with force_language("en"):
             pages_root = self.get_pages_root()
-            link = preview_link(self.page2,language=language)
-        self.assertEqual(link,'%s%s/' % (pages_root,self.page2.get_slug()))
-        self.assertEqual(link,'/en/content/page2/')
+            link = preview_link(self.page2, language=language)
+        self.assertEqual(link, '%s%s/' % (pages_root, self.page2.get_slug()))
+        self.assertEqual(link, '/en/content/page2/')

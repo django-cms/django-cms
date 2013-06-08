@@ -7,11 +7,14 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
+
 class SiteTestCase(CMSTestCase):
+
     """Site framework specific test cases.
-    
+
     All stuff which is changing settings.SITE_ID for tests should come here.
     """
+
     def setUp(self):
         self.assertEqual(Site.objects.all().count(), 1)
         with SettingsOverride(SITE_ID=1):
@@ -30,9 +33,8 @@ class SiteTestCase(CMSTestCase):
     def tearDown(self):
         self._login_context.__exit__(None, None, None)
 
-
     def test_site_framework(self):
-        #Test the site framework, and test if it's possible to disable it
+        # Test the site framework, and test if it's possible to disable it
         with SettingsOverride(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
 
@@ -52,5 +54,3 @@ class SiteTestCase(CMSTestCase):
         with SettingsOverride(SITE_ID=self.site2.pk):
             # without param
             self.assertEqual(Page.objects.drafts().on_site().count(), 1)
-
-

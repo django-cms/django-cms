@@ -3,6 +3,7 @@ from django.db import models
 import reversion
 from reversion.revisions import RegistrationError, VersionAdapter
 
+
 def register_draft_only(model_class, fields, follow, format):
     """
     version of the reversion register function that only registers drafts and
@@ -15,7 +16,7 @@ def register_draft_only(model_class, fields, follow, format):
 
     # Ensure the parent model of proxy models is registered.
     if (model_class._meta.proxy and
-        not revision_manager.is_registered(model_class._meta.parents.keys()[0])):
+            not revision_manager.is_registered(model_class._meta.parents.keys()[0])):
         raise RegistrationError(
             '%r is a proxy model, and its parent has not been registered with'
             'Reversion.' % model_class)

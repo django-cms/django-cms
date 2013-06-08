@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin_id=None):
     """
@@ -16,7 +18,7 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin
             plugin_language = old_plugin.language
             # do the simple copying
         new_plugin = old_plugin.copy_plugin(to_placeholder, plugin_language,
-                                            ptree) # note that ptree comes back modified
+                                            ptree)  # note that ptree comes back modified
         plugins_ziplist.append((new_plugin, old_plugin))
         # this magic is needed for advanced plugins like Text Plugins that can have
     # nested plugins and need to update their content based on the new plugins.

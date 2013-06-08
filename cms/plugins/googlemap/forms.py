@@ -10,6 +10,7 @@ CSS_HEIGHT_RE = re.compile(r'^\d+px$')
 
 
 class GoogleMapForm(ModelForm):
+
     class Meta:
         model = GoogleMap
 
@@ -23,5 +24,5 @@ class GoogleMapForm(ModelForm):
                     _(u'Must be a positive integer followed by “px” or “%”.')])
             if height and not CSS_HEIGHT_RE.match(height):
                 self._errors['height'] = self.error_class([
-                           _(u'Must be a positive integer followed by “px”.')])
+                                                          _(u'Must be a positive integer followed by “px”.')])
         return cleaned_data

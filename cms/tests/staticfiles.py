@@ -13,7 +13,6 @@ class StaticFilesTest(TestCase):
         # don't contain any broken links.
         with TemporaryDirectory() as tmpdir:
             with SettingsOverride(STATIC_ROOT=tmpdir,
-                STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage'):
+                                  STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage'):
                 with StdoutOverride() as output:
                     management.call_command('collectstatic', interactive=False)
-

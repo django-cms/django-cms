@@ -25,7 +25,6 @@ from django.utils.translation import ugettext_lazy as _, get_language
 import re
 from sekizai.helpers import Watcher, get_varname
 
-
 register = template.Library()
 
 
@@ -44,7 +43,6 @@ def get_site_id(site):
 
 def has_permission(page, request):
     return page.has_change_permission(request)
-
 
 register.filter(has_permission)
 
@@ -105,7 +103,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
                  "The URL of the request was: http://%(host)s%(path)s") \
-               % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
+            % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
@@ -144,7 +142,6 @@ class PageUrl(InclusionTag):
         if url:
             return {'content': url}
         return {'content': ''}
-
 
 register.tag(PageUrl)
 
@@ -192,6 +189,7 @@ def get_placeholder_content(context, request, current_page, name, inherit):
 
 
 class PlaceholderParser(Parser):
+
     def parse_blocks(self):
         for bit in getattr(self.kwargs['extra_bits'], 'value', self.kwargs['extra_bits']):
             if getattr(bit, 'value', bit.var.value) == 'or':
@@ -200,11 +198,13 @@ class PlaceholderParser(Parser):
 
 
 class PlaceholderOptions(Options):
+
     def get_parser_class(self):
         return PlaceholderParser
 
 
 class Placeholder(Tag):
+
     """
     This template node is used to output page content and
     is also used in the admin to dynamically generate input fields.
@@ -271,7 +271,6 @@ class Placeholder(Tag):
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
 
-
 register.tag(Placeholder)
 
 
@@ -293,12 +292,11 @@ class RenderPlugin(InclusionTag):
         if edit:
             from cms.middleware.toolbar import toolbar_plugin_processor
 
-            processors = (toolbar_plugin_processor,)
+            processors = (toolbar_plugin_processor, )
         else:
             processors = None
 
         return {'content': plugin.render_plugin(context, processors=processors)}
-
 
 register.tag(RenderPlugin)
 
@@ -326,7 +324,9 @@ class PluginChildClasses(InclusionTag):
 
 register.tag(PluginChildClasses)
 
+
 class PageAttribute(AsTag):
+
     """
     This template node is used to output an attribute from a page such
     as its title or slug.
@@ -360,8 +360,8 @@ class PageAttribute(AsTag):
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
-    
-    varname -- context variable name. Output will be added to template context as this variable. 
+
+    varname -- context variable name. Output will be added to template context as this variable.
     This argument is required to follow the 'as' keyword.
     """
     name = 'page_attribute'
@@ -398,7 +398,6 @@ class PageAttribute(AsTag):
                 ret_val = escape(ret_val)
             return ret_val
         return ''
-
 
 register.tag(PageAttribute)
 
@@ -457,10 +456,10 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
         cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
         cached_value = cache.get(cache_key)
-        if isinstance(cached_value, dict): # new style
+        if isinstance(cached_value, dict):  # new style
             _restore_sekizai(context, cached_value['sekizai'])
             return {'content': mark_safe(cached_value['content'])}
-        elif isinstance(cached_value, basestring): # old style
+        elif isinstance(cached_value, basestring):  # old style
             return {'content': mark_safe(cached_value)}
 
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
@@ -506,7 +505,6 @@ class ShowPlaceholderById(InclusionTag):
             'site': site
         }
 
-
 register.tag(ShowPlaceholderById)
 register.tag('show_placeholder', ShowPlaceholderById)
 
@@ -518,7 +516,6 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
         kwargs['cache_result'] = False
         return kwargs
-
 
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
@@ -544,7 +541,6 @@ class CMSToolbar(InclusionTag):
 
     def get_context(self, context):
         return context
-
 
 register.tag(CMSToolbar)
 

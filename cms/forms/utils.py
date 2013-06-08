@@ -27,19 +27,19 @@ def update_site_and_page_choices(lang=None):
         page[title.language] = title
         pages[title.page.site.pk][title.page.pk] = page
         sites[title.page.site.pk] = title.page.site.name
-    
+
     site_choices = []
     page_choices = [('', '----')]
-    
+
     try:
         fallbacks = i18n.get_fallback_languages(lang)
     except LanguageError:
         fallbacks = []
     language_order = [lang] + fallbacks
-    
+
     for sitepk, sitename in sites.items():
         site_choices.append((sitepk, sitename))
-        
+
         site_page_choices = []
         for titles in pages[sitepk].values():
             title = None
@@ -49,17 +49,18 @@ def update_site_and_page_choices(lang=None):
                     break
             if not title:
                 continue
-            
+
             indent = u"&nbsp;&nbsp;" * title.page.level
             page_title = mark_safe(u"%s%s" % (indent, title.title))
             site_page_choices.append((title.page.pk, page_title))
-            
+
         page_choices.append((sitename, site_page_choices))
 
     # We set it to 1 day here because we actively invalidate this cache.
     cache.set(SITE_CHOICES_KEY, site_choices, 86400)
     cache.set(PAGE_CHOICES_KEY, page_choices, 86400)
     return site_choices, page_choices
+
 
 def get_site_choices(lang=None):
     lang = lang or i18n.get_current_language()
@@ -68,6 +69,7 @@ def get_site_choices(lang=None):
         site_choices, page_choices = update_site_and_page_choices(lang)
     return site_choices
 
+
 def get_page_choices(lang=None):
     lang = lang or i18n.get_current_language()
     page_choices = cache.get(get_page_cache_key(lang))
@@ -75,14 +77,18 @@ def get_page_choices(lang=None):
         site_choices, page_choices = update_site_and_page_choices(lang)
     return page_choices
 
+
 def _get_key(prefix, lang):
     return "%s-%s" % (prefix, lang)
+
 
 def get_site_cache_key(lang):
     return _get_key(get_cms_setting('SITE_CHOICES_CACHE_KEY'), lang)
 
+
 def get_page_cache_key(lang):
     return _get_key(get_cms_setting('PAGE_CHOICES_CACHE_KEY'), lang)
+
 
 def _clean_many(prefix):
     keys = []
@@ -93,8 +99,10 @@ def _clean_many(prefix):
         keys = [_get_key(prefix, settings.LANGUAGE_CODE)]
     cache.delete_many(keys)
 
+
 def clean_site_choices_cache(sender, **kwargs):
     _clean_many(get_cms_setting('SITE_CHOICES_CACHE_KEY'))
+
 
 def clean_page_choices_cache(sender, **kwargs):
     _clean_many(get_cms_setting('PAGE_CHOICES_CACHE_KEY'))

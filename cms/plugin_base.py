@@ -8,7 +8,6 @@ from cms.models import CMSPlugin
 import django
 from django import forms
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
@@ -17,11 +16,14 @@ from django.utils.translation import ugettext_lazy as _
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
+
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
+
     """
-    Ensure the CMSPlugin subclasses have sane values and set some defaults if 
+    Ensure the CMSPlugin subclasses have sane values and set some defaults if
     they're not given.
     """
+
     def __new__(cls, name, bases, attrs):
         super_new = super(CMSPluginBaseMetaclass, cls).__new__
         parents = [base for base in bases if isinstance(base, CMSPluginBaseMetaclass)]
@@ -36,22 +38,22 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 "either CMSPlugin or a subclass of CMSPlugin. %r on %r is not."
                 % (new_plugin.model, new_plugin)
             )
-        # validate the template:
+            # validate the template:
         if not hasattr(new_plugin, 'render_template'):
             raise ImproperlyConfigured(
                 "CMSPluginBase subclasses must have a render_template attribute"
             )
-        # Set the default form
+            # Set the default form
         if not new_plugin.form:
             form_meta_attrs = {
                 'model': new_plugin.model,
                 'exclude': ('position', 'placeholder', 'language', 'plugin_type')
             }
             form_attrs = {
-                'Meta': type('Meta', (object,), form_meta_attrs)
+                'Meta': type('Meta', (object, ), form_meta_attrs)
             }
-            new_plugin.form = type('%sForm' % name, (ModelForm,), form_attrs)
-        # Set the default fieldsets
+            new_plugin.form = type('%sForm' % name, (ModelForm, ), form_attrs)
+            # Set the default fieldsets
         if not new_plugin.fieldsets:
             basic_fields = []
             advanced_fields = []
@@ -59,7 +61,8 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 if not f.auto_created and f.editable:
                     if hasattr(f, 'advanced'):
                         advanced_fields.append(f.name)
-                    else: basic_fields.append(f.name)
+                    else:
+                        basic_fields.append(f.name)
             if advanced_fields:
                 new_plugin.fieldsets = [
                     (
@@ -71,12 +74,12 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                     (
                         _('Advanced options'),
                         {
-                            'fields' : advanced_fields,
-                            'classes' : ('collapse',)
+                            'fields': advanced_fields,
+                            'classes': ('collapse', )
                         }
                     )
                 ]
-        # Set default name
+            # Set default name
         if not new_plugin.name:
             new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
         return new_plugin
@@ -106,7 +109,7 @@ class CMSPluginBase(admin.ModelAdmin):
     child_classes = None
 
     opts = {}
-    module = None #track in which module/application belongs
+    module = None  # track in which module/application belongs
 
     def __init__(self, model=None, admin_site=None):
         if admin_site:
@@ -118,7 +121,6 @@ class CMSPluginBase(admin.ModelAdmin):
         self.cms_plugin_instance = None
         self.placeholder = None
         self.page = None
-
 
     def render(self, context, instance, placeholder):
         context['instance'] = instance
@@ -145,11 +147,12 @@ class CMSPluginBase(admin.ModelAdmin):
     def has_add_permission(self, request, *args, **kwargs):
         """Permission handling change - if user is allowed to change the page
         he must be also allowed to add/change/delete plugins..
-        
+
         Not sure if there will be plugin permission requirement in future, but
         if, then this must be changed.
         """
         return self.cms_plugin_instance.has_change_permission(request)
+
     has_delete_permission = has_change_permission = has_add_permission
 
     def save_model(self, request, obj, form, change):
@@ -193,8 +196,8 @@ class CMSPluginBase(admin.ModelAdmin):
         self.object_successfully_changed = True
         if not DJANGO_1_4:
             post_url_continue = reverse('admin:cms_page_edit_plugin',
-                    args=(obj._get_pk_val(),),
-                    current_app=self.admin_site.name)
+                                        args=(obj._get_pk_val(), ),
+                                        current_app=self.admin_site.name)
             kwargs.setdefault('post_url_continue', post_url_continue)
         return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
 
@@ -210,7 +213,7 @@ class CMSPluginBase(admin.ModelAdmin):
     def icon_src(self, instance):
         """
         Overwrite this if text_enabled = True
- 
+
         Return the URL for an image to be used for an icon for this
         plugin instance in a text editor.
         """
@@ -226,6 +229,7 @@ class CMSPluginBase(admin.ModelAdmin):
 
     def get_child_classes(self, slot, page):
         from cms.plugin_pool import plugin_pool
+
         if self.child_classes:
             return self.child_classes
         else:
@@ -238,7 +242,7 @@ class CMSPluginBase(admin.ModelAdmin):
     def __unicode__(self):
         return self.name
 
-    #===========================================================================
+        #===========================================================================
     # Deprecated APIs
     #===========================================================================
 
@@ -247,7 +251,6 @@ class CMSPluginBase(admin.ModelAdmin):
         raise Deprecated(
             "CMSPluginBase.pluginmedia is deprecated in favor of django-sekizai"
         )
-
 
     def get_plugin_media(self, request, context, plugin):
         raise Deprecated(
