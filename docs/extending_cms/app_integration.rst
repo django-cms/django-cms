@@ -488,3 +488,11 @@ the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to
 the :doc:`custom_plugins` section.
+
+
+***************
+Further reading
+***************
+
+Your app might also want to integrate in the :doc:`extending_cms/toolbar` to
+provide a more streamlined user experience for your admins.
