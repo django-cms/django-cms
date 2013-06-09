@@ -381,6 +381,16 @@ cms.toolbar.items
     ``extra_classes`` should be either ``None`` or a list of class names as
     strings.
 
+    .. attribute:: URL_CHANGE
+
+        Constant to be used with ``close_on_url`` to automatically close when
+        the URL of the frame changes.
+
+    .. attribute:: REFRESH_PAGE
+
+        Constant to be used with ``on_close`` to refresh the current page when
+        the frame is closed.
+
     .. method:: add_item(item, position=None)
 
         Low level API to add items, adds the ``item`` to the toolbar or menu
@@ -406,23 +416,24 @@ cms.toolbar.items
         Since positional insertion allows ``None``, it's safe to use the return
         value of this method as the position argument to insertion APIs.
 
-    .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=None, side=LEFT, position=None)
+    .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url=None, on_close=None, side=LEFT, position=None)
 
         Adds an item which opens ``url`` in the side frame and returns it.
 
-        If ``close_on_url_change`` is set to ``True`` the side frame will close
-        once the URL in the side frame changes.
+        If ``close_on_url`` is set to :attr:`URL_CHANGE` the side frame will close
+        once the URL in the side frame changes. If it's set to a string, it will
+        close when the side frame URL is the same as the specified string.
 
         ``on_close`` can be set to ``None`` to do nothing when the side frame
-        closes, :data:`cms.constants.REFRESH` to refresh the page when it
+        closes, :attr:`REFRESH_PAGE` to refresh the page when it
         closes or a URL to open once it closes.
 
-    .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=REFRESH, side=LEFT, position=None)
+    .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=None, side=LEFT, position=None)
 
         The same as :meth:`add_sideframe_item`, but opens the ``url`` in a
         modal dialog instead of the side frame.
 
-        Note that the default values for ``close_on_url_change`` and
+        Note that the default values for ``close_on_url`` and
         ``on_close`` differ from :meth:`add_sideframe_item`.
 
     .. method:: add_link_item(name, url, active=False, disabled=False, extra_classes=None, side=LEFT, position=None)
@@ -492,7 +503,7 @@ cms.toolbar.items
     Simple link item.
 
 
-.. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=REFRESH, side=LEFT)
+.. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url=None, on_close=None, side=LEFT)
 
     Item that opens ``url`` in side frame.
 
@@ -502,7 +513,7 @@ cms.toolbar.items
     An item which posts ``data`` to ``action``.
 
 
-.. class:: ModalItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True on_close=REFRESH, side=LEFT)
+.. class:: ModalItem(name, url, active=False, disabled=False, extra_classes=None, close_on_url=URL_CHANGE on_close=None, side=LEFT)
 
     Item that opens ``url`` in the modal.
 

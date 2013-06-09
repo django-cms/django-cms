@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, REFRESH, RIGHT
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC, RIGHT
 from cms.exceptions import LanguageError
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_cms_setting, get_language_from_request
@@ -34,7 +34,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     current_page_menu.add_link_item(_('Edit Page'), disabled=toolbar.edit_mode, url='?edit')
     page_info_url = reverse('admin:cms_page_change', args=(current_page.pk,))
     current_page_menu.add_modal_item(_('Page info'), url=page_info_url, disabled=not_edit_mode,
-                                     close_on_url_change=True, on_close=REFRESH)
+                                     close_on_url=toolbar.URL_CHANGE, on_close=toolbar.REFRESH_PAGE)
     if toolbar.build_mode or toolbar.edit_mode:
         # add templates
         templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
@@ -63,7 +63,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
         'target': current_page.pk,
     }
     child_url = '%s?%s' % (add_url, urllib.urlencode(child_data))
-    current_page_menu.add_modal_item(_('Add child page'), url=child_url, close_on_url_change=True,
+    current_page_menu.add_modal_item(_('Add child page'), url=child_url, close_on_url=toolbar.URL_CHANGE,
                                      disabled=not_edit_mode)
     sibling_data = {
         'position': 'last-child',
@@ -71,19 +71,19 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     if current_page.parent_id:
         sibling_data['target'] = current_page.parent_id
     sibling_url = '%s?%s' % (add_url, urllib.urlencode(sibling_data))
-    current_page_menu.add_modal_item(_('Add sibling page'), url=sibling_url, close_on_url_change=True,
+    current_page_menu.add_modal_item(_('Add sibling page'), url=sibling_url, close_on_url=toolbar.URL_CHANGE,
                                      disabled=not_edit_mode)
     current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
     # advanced settings
     advanced_url = reverse('admin:cms_page_advanced', args=(current_page.pk,))
     advanced_disabled = not current_page.has_advanced_settings_permission(request) or not toolbar.edit_mode
-    current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, close_on_url_change=True,
+    current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, close_on_url=toolbar.URL_CHANGE,
                                 disabled=advanced_disabled)
     # permissions
     if permissions_active:
         permissions_url = reverse('admin:cms_page_permissions', args=(current_page.pk,))
         permission_disabled = not toolbar.edit_mode or not current_page.has_change_permissions_permission(request)
-        current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, close_on_url_change=True,
+        current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, close_on_url=toolbar.URL_CHANGE,
                                          disabled=permission_disabled)
     current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
     # publisher
@@ -95,7 +95,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
     # delete
     delete_url = reverse('admin:cms_page_delete', args=(current_page.pk,))
-    current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url_change=True,
+    current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url=toolbar.URL_CHANGE,
                                      on_close='/', disabled=not_edit_mode)
 
 
