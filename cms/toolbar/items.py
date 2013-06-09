@@ -261,7 +261,7 @@ class AjaxItem(BaseItem):
     def get_context(self):
         data = {}
         data.update(self.data)
-        data[settings.CSRF_COOKIE_NAME] = self.csrf_token
+        data['csrfmiddlewaretoken'] = self.csrf_token
         data = json.dumps(data)
         return {
             'action': self.action,
