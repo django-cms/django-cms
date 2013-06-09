@@ -468,12 +468,16 @@ class ShowPlaceholderById(InclusionTag):
         return _show_placeholder_for_page(**self.get_kwargs(*args, **kwargs))
 
     def get_kwargs(self, context, placeholder_name, reverse_id, lang, site):
+        cache_result = True
+        if 'preview' in context['request'].GET:
+            cache_result = False
         return {
             'context': context,
             'placeholder_name': placeholder_name,
             'page_lookup': reverse_id,
             'lang': lang,
-            'site': site
+            'site': site,
+            'cache_result': cache_result
         }
 
 
