@@ -391,6 +391,14 @@ cms.toolbar.items
         Constant to be used with ``on_close`` to refresh the current page when
         the frame is closed.
 
+    .. attribute:: LEFT
+
+        Constant to be used with ``side``.
+
+    .. attribute:: RIGHT
+
+        Constant to be used with ``side``.
+
     .. method:: add_item(item, position=None)
 
         Low level API to add items, adds the ``item`` to the toolbar or menu

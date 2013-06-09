@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, RIGHT
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_cms_setting, get_language_from_request
@@ -148,7 +148,7 @@ def add_cms_menus(toolbar, current_page, permissions_active, request):
                 else:
                     title = _("Publish Page now")
                 publish_url = reverse('admin:cms_page_publish_page', args=(current_page.pk,))
-                toolbar.add_button(title, url=publish_url, extra_classes=classes, side=RIGHT,
+                toolbar.add_button(title, url=publish_url, extra_classes=classes, side=toolbar.RIGHT,
                                    disabled=not current_page.is_dirty())
 
 
@@ -215,6 +215,6 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         language_menu.add_link_item(language['name'], url=url, active=current_lang == language['code'])
     # edit switcher
     if toolbar.edit_mode and toolbar.can_change:
-        switcher = toolbar.add_button_list('Mode Switcher', side=RIGHT, extra_classes=['cms_toolbar-item-cms-mode-switcher'])
+        switcher = toolbar.add_button_list('Mode Switcher', side=toolbar.RIGHT, extra_classes=['cms_toolbar-item-cms-mode-switcher'])
         switcher.add_button(_("Content"), '?edit', active=not toolbar.build_mode, disabled=toolbar.build_mode)
         switcher.add_button(_("Structure"), '?build', active=toolbar.build_mode, disabled=not toolbar.build_mode)

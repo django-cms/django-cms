@@ -2,7 +2,6 @@ import abc
 import json
 from collections import defaultdict, namedtuple
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
-from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.functional import Promise
 
@@ -21,6 +20,8 @@ class ToolbarAPIMixin(object):
     __metaclass__ = abc.ABCMeta
     REFRESH_PAGE = REFRESH_PAGE
     URL_CHANGE = URL_CHANGE
+    LEFT = LEFT
+    RIGHT = RIGHT
     
     def __init__(self):
         self.items = []
