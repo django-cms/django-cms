@@ -49,7 +49,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     if current_page.in_navigation:
         nav_title = _("Hide in navigation")
     else:
-        nav_title = _("Display in nvagiation")
+        nav_title = _("Display in navigation")
     nav_action = reverse('admin:cms_page_change_innavigation', args=(current_page.pk,))
     current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
     current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
