@@ -133,7 +133,7 @@ def add_cms_menus(toolbar, current_page, permissions_active, request):
     else:
         has_global_current_page_change_permission = False
     # check if user has page edit permission
-    if has_global_current_page_change_permission or toolbar.can_change  :
+    if has_global_current_page_change_permission or toolbar.can_change:
         add_page_menu(toolbar, current_page, permissions_active, request)
         if toolbar.edit_mode:
             # history menu
