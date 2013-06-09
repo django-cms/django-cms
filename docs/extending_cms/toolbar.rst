@@ -38,6 +38,8 @@ These functions must accept four parameters:
 Modifier functions have no return value. The register function can be used as a
 decorator.
 
+The modifier function will only be called if the current user is a staff user.
+
 A simple example, registering a modifier that does nothing::
 
     from cms.toolbar_pool import toolbar_pool
