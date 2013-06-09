@@ -1,9 +1,8 @@
 import abc
 import json
 from collections import defaultdict, namedtuple
-from cms.constants import RIGHT, LEFT, REFRESH
 from cms.utils.compat.dj import force_unicode
-from django.conf import settings
+from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 from django.template.loader import render_to_string
 from django.utils.functional import Promise
 
@@ -20,6 +19,10 @@ def may_be_lazy(thing):
 
 class ToolbarAPIMixin(object):
     __metaclass__ = abc.ABCMeta
+    REFRESH_PAGE = REFRESH_PAGE
+    URL_CHANGE = URL_CHANGE
+    LEFT = LEFT
+    RIGHT = RIGHT
     
     def __init__(self):
         self.items = []
@@ -79,26 +82,26 @@ class ToolbarAPIMixin(object):
         self._remove_item(item)
         self._unmemoize(item)
 
-    def add_sideframe_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False,
+    def add_sideframe_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=None,
                  on_close=None, side=LEFT, position=None):
         item = SideframeItem(name, url,
             active=active,
             disabled=disabled,
             extra_classes=extra_classes,
-            close_on_url_change=close_on_url_change,
+            close_on_url=close_on_url,
             on_close=on_close,
             side=side,
         )
         self.add_item(item, position=position)
         return item
 
-    def add_modal_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True,
-                 on_close=REFRESH, side=LEFT, position=None):
+    def add_modal_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=URL_CHANGE,
+                 on_close=REFRESH_PAGE, side=LEFT, position=None):
         item = ModalItem(name, url,
             active=active,
             disabled=disabled,
             extra_classes=extra_classes,
-            close_on_url_change=close_on_url_change,
+            close_on_url=close_on_url,
             on_close=on_close,
             side=side,
         )
@@ -215,8 +218,8 @@ class LinkItem(BaseItem):
 class SideframeItem(BaseItem):
     template = "cms/toolbar/items/item_sideframe.html"
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False,
-                 on_close=REFRESH, side=LEFT):
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=None,
+                 on_close=None, side=LEFT):
         super(SideframeItem, self).__init__(side)
         self.name = name
         self.url = url
@@ -224,7 +227,7 @@ class SideframeItem(BaseItem):
         self.disabled = disabled
         self.extra_classes = extra_classes or []
         self.on_close = on_close
-        self.close_on_url_change = close_on_url_change
+        self.close_on_url = close_on_url
 
     def __repr__(self):
         return '<SideframeItem:%s>' % force_unicode(self.name)
@@ -237,7 +240,7 @@ class SideframeItem(BaseItem):
             'disabled': self.disabled,
             'extra_classes': self.extra_classes,
             'on_close': self.on_close,
-            'close_on_url_change': self.close_on_url_change,
+            'close_on_url': self.close_on_url,
         }
 
 
@@ -278,15 +281,15 @@ class AjaxItem(BaseItem):
 class ModalItem(BaseItem):
     template = "cms/toolbar/items/item_modal.html"
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=True,
-                 on_close=REFRESH, side=LEFT):
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=URL_CHANGE,
+                 on_close=None, side=LEFT):
         super(ModalItem, self).__init__(side)
         self.name = name
         self.url = url
         self.active = active
         self.disabled = disabled
         self.extra_classes = extra_classes or []
-        self.close_on_url_change = close_on_url_change
+        self.close_on_url = close_on_url
         self.on_close = on_close
 
     def __repr__(self):
@@ -299,7 +302,7 @@ class ModalItem(BaseItem):
             'active': self.active,
             'disabled': self.disabled,
             'extra_classes': self.extra_classes,
-            'close_on_url_change': self.close_on_url_change,
+            'close_on_url': self.close_on_url,
             'on_close': self.on_close,
         }
 
