@@ -231,3 +231,12 @@ class ToolbarAPITests(TestCase):
         result = api.find_first(LinkItem, name='Test')
         self.assertNotEqual(result, None)
         self.assertEqual(result.index, 0)
+
+    def test_not_is_staff(self):
+        request = RequestFactory().get('/en/?edit')
+        request.session = {}
+        request.LANGUAGE_CODE = 'en'
+        request.user = AnonymousUser()
+        toolbar = CMSToolbar(request)
+        self.assertEqual(len(toolbar.get_left_items()), 0)
+        self.assertEqual(len(toolbar.get_right_items()), 0)

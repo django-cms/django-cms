@@ -10,8 +10,6 @@ SAMPLEAPP_BREAK = 'Sample App Break'
 
 @toolbar_pool.register
 def category_toolbar(toolbar, request, is_current_app, app_name):
-    if not toolbar.is_staff:
-        return
     admin_menu = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
     position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
     category_menu = admin_menu.get_menu('category', _('Category'), position=position)

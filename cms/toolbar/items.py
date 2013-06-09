@@ -146,27 +146,18 @@ class BaseItem(object):
         return {}
 
 
-class Menu(ToolbarAPIMixin, BaseItem):
+class SubMenu(ToolbarAPIMixin, BaseItem):
     template = "cms/toolbar/items/menu.html"
+    sub_level = True
 
-    def __init__(self, name, csrf_token, url='#', sub_level=False, side=LEFT):
+    def __init__(self, name, csrf_token, side=LEFT):
         ToolbarAPIMixin.__init__(self)
         BaseItem.__init__(self, side)
-        self.url = url
         self.name = name
-        self.sub_level = sub_level
         self.csrf_token = csrf_token
 
     def __repr__(self):
         return '<Menu:%s>' % unicode(self.name)
-
-    def get_menu(self, key, verbose_name, side=LEFT, position=None):
-        if key in self.menus:
-            return self.menus[key]
-        menu = Menu(verbose_name, self.csrf_token, sub_level=True, side=side)
-        self.menus[key] = menu
-        self.add_item(menu, position=position)
-        return menu
 
     def add_break(self, identifier=None, position=None):
         item = Break(identifier)
@@ -179,9 +170,21 @@ class Menu(ToolbarAPIMixin, BaseItem):
     def get_context(self):
         return {
             'items': self.get_items(),
-            'url': self.url,
             'title': self.name,
-            'sub_level': self.sub_level}
+            'sub_level': self.sub_level
+        }
+
+
+class Menu(SubMenu):
+    sub_level = False
+
+    def get_menu(self, key, verbose_name, side=LEFT, position=None):
+        if key in self.menus:
+            return self.menus[key]
+        menu = SubMenu(verbose_name, self.csrf_token, side=side)
+        self.menus[key] = menu
+        self.add_item(menu, position=position)
+        return menu
 
 
 class LinkItem(BaseItem):

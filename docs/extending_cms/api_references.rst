@@ -463,7 +463,7 @@ cms.toolbar.items
         Returns the context (as dictionary) for this item.
 
 
-.. class:: Menu(name, csrf_token, url='#', sub_level=False, side=LEFT, position=None)
+.. class:: Menu(name, csrf_token, side=LEFT, position=None)
 
     The menu item class. Inherits :class:`ToolbarMixin` and provides the APIs
     documented on it.
@@ -471,17 +471,20 @@ cms.toolbar.items
     The ``csrf_token`` must be set as this class provides high level APIs to
     add items to it.
 
-    ``sub_level`` indicates whether this menu is a second level menu or not.
-
     .. method:: get_menu(key, verbose_name, side=LEFT, position=None)
 
         The same as :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu` but adds
-        the menu as a sub menu.
+        the menu as a sub menu and returns a :class:`SubMenu`.
 
     .. method:: add_break(identifier=None, position=None)
 
         Adds a visual break in the menu, useful for grouping items, and
         returns it. ``identifier`` may be used to make this item searchable.
+
+
+.. class:: SubMenu(name, csrf_token, side=LEFT, position=None)
+
+    Same as :class:`Menu` but without the :meth:`Menu.get_menu` method.
 
 
 .. class:: LinkItem(name, url, active=False, disabled=False, extra_classes=None, side=LEFT)

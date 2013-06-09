@@ -154,9 +154,6 @@ def add_cms_menus(toolbar, current_page, permissions_active, request):
 
 @toolbar_pool.register
 def cms_toolbar(toolbar, request, is_current_app, current_app_name):
-    if not toolbar.is_staff:
-        return
-
     toolbar.can_change = request.current_page and request.current_page.has_change_permission(request)
     permissions_active = get_cms_setting('PERMISSION')
 

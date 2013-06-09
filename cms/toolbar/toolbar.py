@@ -136,6 +136,9 @@ class CMSToolbar(ToolbarAPIMixin):
             return
         self.right_items = []
         self.left_items = []
+        # never populate the toolbar on is_staff=False
+        if not self.is_staff:
+            return
         with force_language(self.language):
             try:
                 self.view_name = resolve(self.request.path).func.__module__
