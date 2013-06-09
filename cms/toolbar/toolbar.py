@@ -43,7 +43,6 @@ class CMSToolbar(ToolbarAPIMixin):
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
-        self.csrf_token = get_token(request)
         if settings.USE_I18N:
             self.language = self.request.LANGUAGE_CODE
         else:
@@ -64,9 +63,13 @@ class CMSToolbar(ToolbarAPIMixin):
             self.toolbar_language = user_settings.language
             self.clipboard = user_settings.clipboard
 
+    @property
+    def csrf_token(self):
+        return get_token(self.request)
+
     # Public API
 
-    def get_menu(self, key, verbose_name, side=LEFT, position=None):
+    def get_or_create_menu(self, key, verbose_name, side=LEFT, position=None):
         if key in self.menus:
             return self.menus[key]
         menu = Menu(verbose_name, self.csrf_token, side=side)
@@ -133,6 +136,9 @@ class CMSToolbar(ToolbarAPIMixin):
             return
         self.right_items = []
         self.left_items = []
+        # never populate the toolbar on is_staff=False
+        if not self.is_staff:
+            return
         with force_language(self.language):
             try:
                 self.view_name = resolve(self.request.path).func.__module__
