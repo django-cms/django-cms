@@ -22,8 +22,8 @@ loaded, but requires you to specify them all manually. The other is to create
 :setting:`CMS_TOOLBARS` is not set (or set to ``None``).
 
 If you use the automated way, your ``cms_toolbar.py`` file should contain
-functions that modify the toolbar using :meth:`toolbar_pool.register`. These
-functions must accept four parameters: The toolbar object, the current request,
+functions that modify the toolbar using :meth:`cms.toolbar_pool.toolbar_pool.register`.
+These functions must accept four parameters: The toolbar object, the current request,
 a flag indicating whether the current request is handled by the same app as the
 function is in and the name of the app used for the current request. Modifier
 functions have no return value. The register function can be used as a

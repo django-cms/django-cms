@@ -43,7 +43,6 @@ class CMSToolbar(ToolbarAPIMixin):
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
-        self.csrf_token = get_token(request)
         if settings.USE_I18N:
             self.language = self.request.LANGUAGE_CODE
         else:
@@ -63,6 +62,10 @@ class CMSToolbar(ToolbarAPIMixin):
                 user_settings.save()
             self.toolbar_language = user_settings.language
             self.clipboard = user_settings.clipboard
+
+    @property
+    def csrf_token(self):
+        return get_token(self.request)
 
     # Public API
 
