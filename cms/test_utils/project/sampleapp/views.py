@@ -15,7 +15,7 @@ def sample_view(request, **kw):
 def category_view(request, id):
     cat = Category.objects.get(pk=id)
     if request.user.is_staff:
-        category_menu = request.toolbar.get_menu('category', _('Category'))
+        category_menu = request.toolbar.get_or_create_menu('category', _('Category'))
         change_url = reverse('admin:sampleapp_category_change', args=(cat.pk,))
         category_menu.add_modal_item(_("Change Category"), url=change_url, close_on_url_change=True)
     return render_to_response('sampleapp/category_view.html',

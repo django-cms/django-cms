@@ -30,14 +30,14 @@ USER_SETTINGS_BREAK = 'User Settings Break'
 def add_page_menu(toolbar, current_page, permissions_active, request):
     # menu for current page
     not_edit_mode = not toolbar.edit_mode
-    current_page_menu = toolbar.get_menu('page', _('Page'))
+    current_page_menu = toolbar.get_or_create_menu('page', _('Page'))
     current_page_menu.add_link_item(_('Edit Page'), disabled=toolbar.edit_mode, url='?edit')
     page_info_url = reverse('admin:cms_page_change', args=(current_page.pk,))
     current_page_menu.add_modal_item(_('Page info'), url=page_info_url, disabled=not_edit_mode,
                                      close_on_url_change=True, on_close=REFRESH)
     if toolbar.build_mode or toolbar.edit_mode:
         # add templates
-        templates_menu = current_page_menu.get_menu('templates', _('Templates'))
+        templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
         action = reverse('admin:cms_page_change_template', args=(current_page.pk,))
         for path, name in get_cms_setting('TEMPLATES'):
             active = current_page.template == path
@@ -101,7 +101,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
 
 def add_history_menu(toolbar, current_page):
     # history menu
-    history_menu = toolbar.get_menu('history', _('History'))
+    history_menu = toolbar.get_or_create_menu('history', _('History'))
     if 'reversion' in settings.INSTALLED_APPS:
         import reversion
         from reversion.models import Revision
@@ -169,10 +169,10 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
     current_site = Site.objects.get_current()
 
     # the main admin menu
-    admin_menu = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
+    admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
     # cms page admin
     if toolbar.can_change:
-        pages_menu = admin_menu.get_menu('pages', _('Pages'))
+        pages_menu = admin_menu.get_or_create_menu('pages', _('Pages'))
         pages_menu.add_sideframe_item(_('Manage pages'), url=reverse("admin:cms_page_changelist"))
         pages_menu.add_break(MANAGE_PAGES_BREAK)
         pages_menu.add_sideframe_item(_('Add new page'), url=reverse("admin:cms_page_add"))
@@ -185,7 +185,7 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
     else:
         sites_queryset = Site.objects.all()
     if len(sites_queryset) > 1:
-        sites_menu = admin_menu.get_menu('sites', _('Sites'))
+        sites_menu = admin_menu.get_or_create_menu('sites', _('Sites'))
         sites_menu.add_sideframe_item(_('Admin Sites'), url=reverse('admin:sites_site_changelist'))
         sites_menu.add_break(ADMIN_SITES_BREAK)
         for site in sites_queryset:
@@ -208,7 +208,7 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         current_lang = get_language_object(get_language_from_request(request), current_site.pk)
     except LanguageError:
         current_lang = None
-    language_menu = toolbar.get_menu('language', _('Language'))
+    language_menu = toolbar.get_or_create_menu('language', _('Language'))
     language_changer = getattr(request, '_language_changer', DefaultLanguageChanger(request))
     for language in get_language_objects(current_site.pk):
         url = language_changer(language['code'])

@@ -334,7 +334,7 @@ cms.toolbar.toolbar
         Removes an item from the toolbar or raises a :exc:`KeyError` if it's
         not found.
 
-    .. method:: get_menu(key. verbose_name, side=LEFT, position=NOne)
+    .. method:: get_or_create_menu(key. verbose_name, side=LEFT, position=NOne)
 
         If a menu with ``key`` already exists, this method will return that
         menu. Otherwise it will create a menu for that ``key`` with the given
@@ -471,9 +471,9 @@ cms.toolbar.items
     The ``csrf_token`` must be set as this class provides high level APIs to
     add items to it.
 
-    .. method:: get_menu(key, verbose_name, side=LEFT, position=None)
+    .. method:: get_or_create_menu(key, verbose_name, side=LEFT, position=None)
 
-        The same as :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu` but adds
+        The same as :meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu` but adds
         the menu as a sub menu and returns a :class:`SubMenu`.
 
     .. method:: add_break(identifier=None, position=None)
@@ -484,7 +484,7 @@ cms.toolbar.items
 
 .. class:: SubMenu(name, csrf_token, side=LEFT, position=None)
 
-    Same as :class:`Menu` but without the :meth:`Menu.get_menu` method.
+    Same as :class:`Menu` but without the :meth:`Menu.get_or_create_menu` method.
 
 
 .. class:: LinkItem(name, url, active=False, disabled=False, extra_classes=None, side=LEFT)

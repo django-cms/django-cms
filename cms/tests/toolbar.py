@@ -88,7 +88,7 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2, items)
-        admin_items = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 6, admin_items)
 
     def test_no_page_superuser(self):
@@ -98,7 +98,7 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
-        admin_items = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_anon(self):
@@ -188,7 +188,7 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 2, items)
-        admin_items = toolbar.get_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 6, admin_items)
 
     def test_button_consistency_staff(self):

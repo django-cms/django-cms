@@ -69,7 +69,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Public API
 
-    def get_menu(self, key, verbose_name, side=LEFT, position=None):
+    def get_or_create_menu(self, key, verbose_name, side=LEFT, position=None):
         if key in self.menus:
             return self.menus[key]
         menu = Menu(verbose_name, self.csrf_token, side=side)
