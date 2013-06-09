@@ -312,7 +312,17 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # P2 is selected
         self.assertTrue(nodes[0].children[0].selected)
 
-        
+    def test_show_submenu_template(self):
+        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 1 'menu/dummy.html' %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P2 is the selected node
+        self.assertTrue(nodes[0].selected)
+        # Should include P10 but not P11
+        self.assertEqual(len(nodes[1].children), 1)
+        self.assertFalse(nodes[1].children[0].children)
+
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
