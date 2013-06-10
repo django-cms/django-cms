@@ -12,7 +12,7 @@ from menus.menu_pool import menu_pool
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
 
-# fired when some of nodes (Title) with applications gets saved
+# fired when some of nodes (Page) with applications gets saved
 application_post_changed = Signal(providing_args=["instance"])
 
 # fired after page gets published - copied to public model - there may be more
@@ -67,10 +67,8 @@ def pre_save_title(instance, raw, **kwargs):
         menu_pool.clear(instance.page.site_id)
     if instance.id and not hasattr(instance, "tmp_path"):
         instance.tmp_path = None
-        instance.tmp_application_urls = None
         try:
-            instance.tmp_path, instance.tmp_application_urls = \
-                Title.objects.filter(pk=instance.id).values_list('path', 'application_urls')[0]
+            instance.tmp_path = Title.objects.filter(pk=instance.id).values_list('path')[0][0]
         except IndexError:
             pass  # no Titles exist for this page yet
 
@@ -101,7 +99,7 @@ def post_save_title(instance, raw, created, **kwargs):
             descendant_title.path = ''  # just reset path
             descendant_title.tmp_prevent_descendant_update = True
             descendant_title.save()
-    # remove temporary attributes
+        # remove temporary attributes
     if hasattr(instance, 'tmp_path'):
         del instance.tmp_path
     if prevent_descendants:
@@ -260,6 +258,7 @@ def post_revision(instances, **kwargs):
             page.save()
             return
 
+
 if get_cms_setting('PERMISSION'):
     signals.pre_save.connect(pre_save_user, sender=User)
     signals.pre_delete.connect(pre_delete_user, sender=User)
@@ -284,4 +283,5 @@ if get_cms_setting('PERMISSION'):
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.models import post_revision_commit
+
     post_revision_commit.connect(post_revision)

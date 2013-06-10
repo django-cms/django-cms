@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.management.commands.subcommands.base import SubcommandsCommand
+from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugin_pool import plugin_pool
@@ -10,7 +11,7 @@ class ListApphooksCommand(NoArgsCommand):
     
     help = 'Lists all apphooks in pages'
     def handle_noargs(self, **options):
-        urls = Title.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
+        urls = Page.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
         for url in urls:
             self.stdout.write('%s\n' % url)
             

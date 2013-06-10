@@ -238,7 +238,6 @@ class PageAdmin(ModelAdmin):
                 'menu_title',
                 'page_title',
                 'redirect',
-                'application_urls'
             ]:
                 if name in form.base_fields:
                     form.base_fields[name].initial = getattr(title_obj, name)

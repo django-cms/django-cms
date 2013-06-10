@@ -219,6 +219,7 @@ class Page(MPTTModel):
         target.soft_root = self.soft_root
         target.reverse_id = self.reverse_id
         target.navigation_extenders = self.navigation_extenders
+        target.application_urls = self.application_urls
         target.template = self.template
         target.site_id = self.site_id
 
@@ -707,7 +708,7 @@ class Page(MPTTModel):
         """
         get application urls conf for application hook
         """
-        return self.get_title_obj_attribute("application_urls", language, fallback, version_id, force_reload)
+        return self.application_urls
 
     def get_redirect(self, language=None, fallback=True, version_id=None, force_reload=False):
         """

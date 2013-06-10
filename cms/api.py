@@ -140,12 +140,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
     
-    # validate and normalize apphook 
-    if apphook:
-        application_urls = _verify_apphook(apphook)
-    else:
-        application_urls = None
-    
     # validate parent
     if parent:
         assert isinstance(parent, Page)

@@ -10,15 +10,16 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, \
     RegexURLPattern
-from django.db.models import Q
 from django.utils.importlib import import_module
 from django.utils.translation import get_language
 
 APP_RESOLVERS = []
 
+
 def clear_app_resolvers():
     global APP_RESOLVERS
     APP_RESOLVERS = []
+
 
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application.
@@ -30,7 +31,7 @@ def applications_page_check(request, current_page=None, path=None):
         # We should get in this branch only if an apphook is active on /
         # This removes the non-CMS part of the URL.
         path = request.path.replace(reverse('pages-root'), '', 1)
-    # check if application resolver can resolve this
+        # check if application resolver can resolve this
     for lang in get_language_list():
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
@@ -47,8 +48,8 @@ def applications_page_check(request, current_page=None, path=None):
             pass
     return None
 
-class AppRegexURLResolver(RegexURLResolver):
 
+class AppRegexURLResolver(RegexURLResolver):
     def __init__(self, *args, **kwargs):
         self.page_id = None
         self.url_patterns_dict = {}
@@ -106,17 +107,18 @@ def recurse_patterns(path, pattern_list, page_id):
         if isinstance(pattern, RegexURLResolver):
             # this is an 'include', recurse!
             resolver = RegexURLResolver(regex, 'cms_appresolver',
-                pattern.default_kwargs, pattern.app_name, pattern.namespace)
+                                        pattern.default_kwargs, pattern.app_name, pattern.namespace)
             resolver.page_id = page_id
             # see lines 243 and 236 of urlresolvers.py to understand the next line
             resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id)
         else:
             # Re-do the RegexURLPattern with the new regular expression
             resolver = RegexURLPattern(regex, pattern.callback,
-                pattern.default_args, pattern.name)
+                                       pattern.default_args, pattern.name)
             resolver.page_id = page_id
         newpatterns.append(resolver)
     return newpatterns
+
 
 def _flatten_patterns(patterns):
     flat = []
@@ -126,6 +128,7 @@ def _flatten_patterns(patterns):
         else:
             flat.append(pattern)
     return flat
+
 
 def get_app_urls(urls):
     for urlconf in urls:
@@ -144,7 +147,7 @@ def get_patterns_for_title(path, title):
     Resolve the urlconf module for a path+title combination
     Returns a list of url objects.
     """
-    app = apphook_pool.get_apphook(title.application_urls)
+    app = apphook_pool.get_apphook(title.page.application_urls)
     patterns = []
     for pattern_list in get_app_urls(app.urls):
         if path and not path.endswith('/'):
@@ -171,6 +174,7 @@ def get_app_patterns():
     the title path and then included into the cms url patterns.
     """
     from cms.models import Title
+
     try:
         current_site = Site.objects.get_current()
     except Site.DoesNotExist:
@@ -188,7 +192,7 @@ def get_app_patterns():
     # Loop over all titles with an application hooked to them
     for title in title_qs.exclude(page__application_urls=None).exclude(page__application_urls='').select_related():
         path = title.path
-        mix_id = "%s:%s:%s" % (path + "/", title.application_urls, title.language)
+        mix_id = "%s:%s:%s" % (path + "/", title.page.application_urls, title.language)
         if mix_id in included:
             # don't add the same thing twice
             continue
@@ -205,7 +209,7 @@ def get_app_patterns():
         with force_language(title.language):
             hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title))
         included.append(mix_id)
-    # Build the app patterns to be included in the cms urlconfs
+        # Build the app patterns to be included in the cms urlconfs
     app_patterns = []
     for page_id in hooked_applications.keys():
         resolver = None

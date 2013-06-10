@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import sys
+
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import (applications_page_check, clear_app_resolvers,
@@ -10,9 +12,6 @@ from cms.tests.menu_utils import DumbPageLanguageUrl
 from cms.utils.i18n import force_language
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches, reverse
-import sys
-from cms.models.pagemodel import Page
-
 
 
 APP_NAME = 'SampleApp'
@@ -21,7 +20,6 @@ APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
 class ApphooksTestCase(CMSTestCase):
-
     def setUp(self):
         clear_app_resolvers()
         clear_url_caches()
@@ -64,15 +62,15 @@ class ApphooksTestCase(CMSTestCase):
         apphook_pool.clear()
         superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("home", "nav_playground.html", "en",
-                            created_by=superuser, published=True)
+                           created_by=superuser, published=True)
         create_title('de', page.get_title(), page)
         child_page = create_page("child_page", "nav_playground.html", "en",
-                        created_by=superuser, published=True, parent=page)
+                                 created_by=superuser, published=True, parent=page)
         create_title('de', child_page.get_title(), child_page)
         child_child_page = create_page("child_child_page", "nav_playground.html",
-            "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
-            reverse_id=reverse_id)
-        create_title("de", child_child_page.get_title(), child_child_page, apphook=apphook)
+                                       "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
+                                       reverse_id=reverse_id)
+        create_title("de", child_child_page.get_title(), child_child_page)
 
         child_child_page.publish()
         # publisher_public is set to draft on publish, issue with onetoone reverse
@@ -128,7 +126,7 @@ class ApphooksTestCase(CMSTestCase):
                                      created_by=superuser, published=True, apphook="", slug='blankapp')
             english_title = page.title_set.all()[0]
             self.assertEquals(english_title.language, 'en')
-            create_title("de", "aphooked-page-de", page, apphook="SampleApp")
+            create_title("de", "aphooked-page-de", page)
             self.assertTrue(page.publish())
             self.assertTrue(blank_page.publish())
             with force_language("en"):
@@ -145,8 +143,8 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
             page = create_page("apphooked-page", "nav_playground.html", "en",
-                created_by=superuser, published=True, apphook="SampleApp")
-            create_title("de", "aphooked-page-de", page, apphook="SampleApp")
+                               created_by=superuser, published=True, apphook="SampleApp")
+            create_title("de", "aphooked-page-de", page)
             self.assertTrue(page.publish())
 
             self.reload_urls()
@@ -190,8 +188,8 @@ class ApphooksTestCase(CMSTestCase):
     def test_get_page_for_apphook_on_preview_or_edit(self):
         superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("home", "nav_playground.html", "en",
-                            created_by=superuser, published=True, apphook=APP_NAME)
-        create_title('de', page.get_title(), page, apphook=APP_NAME)
+                           created_by=superuser, published=True, apphook=APP_NAME)
+        create_title('de', page.get_title(), page)
         page.publish()
         public_page = page.get_public_object()
 
@@ -354,11 +352,11 @@ class ApphooksTestCase(CMSTestCase):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.third_urls_for_apphook_tests'):
             apphook_pool.clear()
             superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
-            home_page = create_page("home", "nav_playground.html", "en", created_by=superuser, published=True,)
+            home_page = create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
             apphook1_page = create_page("apphook1-page", "nav_playground.html", "en",
-                created_by=superuser, published=True, apphook="SampleApp")
+                                        created_by=superuser, published=True, apphook="SampleApp")
             apphook2_page = create_page("apphook2-page", "nav_playground.html", "en",
-                created_by=superuser, published=True, apphook="SampleApp2")
+                                        created_by=superuser, published=True, apphook="SampleApp2")
 
             reverse('sample-root')
             reverse('sample2-root')
@@ -367,7 +365,6 @@ class ApphooksTestCase(CMSTestCase):
 
 
 class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
-
     settings_overrides = {'ROOT_URLCONF': 'cms.test_utils.project.second_urls_for_apphook_tests'}
 
     def setUp(self):
@@ -394,13 +391,13 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
         page.publish()
 
         child_page = create_page("child_page", "nav_playground.html", "en",
-                     created_by=superuser, parent=page)
+                                 created_by=superuser, parent=page)
         create_title('de', child_page.get_title(), child_page)
         child_page.publish()
 
         child_child_page = create_page("child_child_page", "nav_playground.html",
-            "en", created_by=superuser, parent=child_page, apphook='SampleApp')
-        create_title("de", '%s_de' % child_child_page.get_title(), child_child_page, apphook='SampleApp')
+                                       "en", created_by=superuser, parent=child_page, apphook='SampleApp')
+        create_title("de", '%s_de' % child_child_page.get_title(), child_child_page)
         child_child_page.publish()
 
         # publisher_public is set to draft on publish, issue with onetoone reverse

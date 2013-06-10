@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from StringIO import StringIO
+from cms.models import Page
 from django.core import management
 
 from cms.test_utils.testcases import CMSTestCase
@@ -16,14 +17,14 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
 
-class ManagementTestCase(CMSTestCase):
 
+class ManagementTestCase(CMSTestCase):
     def test_list_apphooks(self):
         out = StringIO()
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
-            self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 1)
+            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
             command = cms.Command()
             command.stdout = out
             command.handle("list", "apphooks", interactive=False)
@@ -41,12 +42,12 @@ class ManagementTestCase(CMSTestCase):
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
-            self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 1)
+            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
             command = cms.Command()
             command.stdout = out
             command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
             self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
-            self.assertEqual(Title.objects.filter(application_urls=APPHOOK).count(), 0)
+            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
 
     def test_list_plugins(self):
         out = StringIO()
@@ -56,7 +57,7 @@ class ManagementTestCase(CMSTestCase):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                                     name="A Link", url="https://www.django-cms.org")
             self.assertEqual(
                 CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
                 2)
@@ -138,7 +139,7 @@ class ManagementTestCase(CMSTestCase):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                                     name="A Link", url="https://www.django-cms.org")
 
             instanceless_plugin = CMSPlugin(
                 language="en", plugin_type="TextPlugin")
