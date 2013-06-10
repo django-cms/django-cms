@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
-from cms.toolbar.items import ToolbarAPIMixin, LinkItem
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -240,3 +240,12 @@ class ToolbarAPITests(TestCase):
         toolbar = CMSToolbar(request)
         self.assertEqual(len(toolbar.get_left_items()), 0)
         self.assertEqual(len(toolbar.get_right_items()), 0)
+
+    def test_item_search_result(self):
+        item = object()
+        result = ItemSearchResult(item, 2)
+        self.assertEqual(result.item, item)
+        self.assertEqual(int(result), 2)
+        result += 2
+        self.assertEqual(result.item, item)
+        self.assertEqual(result.index, 4)

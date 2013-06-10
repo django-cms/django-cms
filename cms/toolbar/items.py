@@ -6,7 +6,20 @@ from django.template.loader import render_to_string
 from django.utils.functional import Promise
 
 
-ItemSearchResult = namedtuple('ItemSearchResult', 'item index')
+
+class ItemSearchResult(object):
+    def __init__(self, item, index):
+        self.item = item
+        self.index = index
+
+    def __add__(self, other):
+        return ItemSearchResult(self.item, self.index + other)
+
+    def __sub__(self, other):
+        return ItemSearchResult(self.item, self.index - other)
+
+    def __int__(self):
+        return self.index
 
 
 def may_be_lazy(thing):
@@ -48,6 +61,9 @@ class ToolbarAPIMixin(object):
             self.items.remove(item)
         else:
             raise KeyError("Item %r not found" % item)
+
+    def get_item_count(self):
+        return len(self.items)
 
     def add_item(self, item, position=None):
         if not isinstance(item, BaseItem):
