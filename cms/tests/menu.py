@@ -108,6 +108,14 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[1].children), 1)
         self.assertEqual(len(nodes[1].children[0].children), 1)
 
+    def test_show_submenu_template_root_level_none_no_nephew_limit(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # default nephew limit, P2 and P9 in the nodes list
+        self.assertEqual(len(nodes), 2)
+
 
 class FixturesMenuTests(MenusFixture, BaseMenuTest):
     """
@@ -312,16 +320,17 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # P2 is selected
         self.assertTrue(nodes[0].children[0].selected)
 
-    def test_show_submenu_template(self):
-        context = self.get_context(path=self.get_page(2).get_absolute_url())
-        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 1 'menu/dummy.html' %}")
+    def test_show_submenu_template_root_level_none(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 1 %}")
         tpl.render(context)
         nodes = context["children"]
-        # P2 is the selected node
-        self.assertTrue(nodes[0].selected)
-        # Should include P10 but not P11
-        self.assertEqual(len(nodes[1].children), 1)
-        self.assertFalse(nodes[1].children[0].children)
+        # First node is P2 (P1 children) thus not selected
+        self.assertFalse(nodes[0].selected)
+        # nephew limit of 1, so only P2 is the nodes list
+        self.assertEqual(len(nodes), 1)
+        # P3 is a child of P2, but not in nodes list
+        self.assertTrue(nodes[0].children)
 
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())
