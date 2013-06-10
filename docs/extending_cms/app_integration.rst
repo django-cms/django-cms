@@ -490,65 +490,9 @@ For a detailed explanation on how to write custom plugins please head over to
 the :doc:`custom_plugins` section.
 
 
-*******
-Toolbar
-*******
+***************
+Further reading
+***************
 
-
-To add a toolbar items for you app create a `cms_toolbar.py` in your app.
-
-Example::
-
-    from cms.toolbar.items import List, Item
-    from cms.toolbar_base import CMSToolbar
-    from cms.toolbar_pool import toolbar_pool
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import ugettext_lazy as _
-
-
-    class CategoryToolbar(CMSToolbar):
-        def insert_items(self, items, toolbar, request, is_app):
-            if request.user.is_staff:
-                items[0].items = [Item(reverse('admin:sampleapp_category_changelist'), _('Categories'),
-                                       load_side_frame=True)] + items[0].items
-                if is_app:
-                    cat_list = List(reverse('admin:sampleapp_category_changelist'), _('Category'))
-                    cat_list.items.append(Item(reverse('admin:sampleapp_category_add'), _("Add Category")))
-                    items.append(cat_list)
-
-
-    toolbar_pool.register(CategoryToolbar)
-
-
-You extend CMSToolbar and register it with the toolbar_pool.
-In the `insert_items()` function you receive some parameters:
-
-- items
-
-    The current toolbar items. Add new items to this list that extend `cms.toolbar.items.BaseItem`. You can find most
-    used item types in `cms.toolbar.items`.
-
-- toolbar
-
-    The instance of the toolbar.
-
-- request
-
-    The current request
-
-- is_app
-
-    Is the current url mapped to this app? True if yes.
-
-
-If you want to add items based on the current view you can do this in the view itself.
-
-Example::
-
-    def category_view(request, id):
-        cat = Category.objects.get(pk=id)
-        if request.user.is_staff:
-            request.toolbar.items[1].items.append(
-                Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "Change Category"))
-        return render_to_response('sampleapp/category_view.html',
-                                  RequestContext(request, {'category': cat}))
+Your app might also want to integrate in the :doc:`toolbar` to
+provide a more streamlined user experience for your admins.

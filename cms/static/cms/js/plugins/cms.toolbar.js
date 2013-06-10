@@ -52,7 +52,7 @@ $(document).ready(function () {
 
 			this.navigations = this.container.find('.cms_toolbar-item-navigation');
 			this.buttons = this.container.find('.cms_toolbar-item-buttons');
-			this.modes = this.container.find('.cms_toolbar-item-buttons-group a');
+			this.modes = this.container.find('.cms_toolbar-item-cms-mode-switcher a');
 			this.switcher = this.container.find('.cms_toolbar-item_switch');
 
 			this.body = $('html');

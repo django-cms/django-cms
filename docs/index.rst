@@ -77,6 +77,7 @@ Extending the CMS
     extending_cms/app_integration
     extending_cms/api_references
     extending_cms/placeholders
+    extending_cms/toolbar
     extending_cms/searchdocs
     extending_cms/fields
     extending_cms/testing
