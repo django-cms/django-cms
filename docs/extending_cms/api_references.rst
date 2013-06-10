@@ -360,7 +360,8 @@ cms.toolbar.items
 
 .. class:: ItemSearchResult
 
-    Used for the find APIs in :class:`ToolbarMixin`.
+    Used for the find APIs in :class:`ToolbarMixin`. Supports addition and
+    subtraction of numbers. Can be cast to an integer.
 
     .. attribute:: item
 
@@ -398,6 +399,10 @@ cms.toolbar.items
     .. attribute:: RIGHT
 
         Constant to be used with ``side``.
+
+    .. method:: get_item_count
+
+        Returns the number of items in the toolbar or menu.
 
     .. method:: add_item(item, position=None)
 
