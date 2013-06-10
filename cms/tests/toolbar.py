@@ -1,12 +1,16 @@
 from __future__ import with_statement
 from cms.api import create_page, create_title
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 
 from django.contrib.auth.models import AnonymousUser, User, Permission
+from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils.functional import lazy
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
@@ -70,56 +74,58 @@ class ToolbarTestBase(SettingsOverrideTestCase):
 class ToolbarTests(ToolbarTestBase):
     settings_overrides = {'CMS_PERMISSION': False}
 
-    def test_toolbar_no_page_anon(self):
+    def test_no_page_anon(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         toolbar = CMSToolbar(request)
 
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 0)
 
-    def test_toolbar_no_page_staff(self):
+    def test_no_page_staff(self):
         request = self.get_page_request(None, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
 
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
-        self.assertEqual(len(items), 2)
-        self.assertEqual(len(items[0].get_context()['items']), 6)
+        self.assertEqual(len(items), 2, items)
+        admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        self.assertEqual(len(admin_items), 6, admin_items)
 
-    def test_toolbar_no_page_superuser(self):
+    def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
         toolbar = CMSToolbar(request)
 
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
-        self.assertEqual(len(items[0].get_context()['items']), 7)
+        admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        self.assertEqual(len(admin_items), 7, admin_items)
 
-    def test_toolbar_anon(self):
+    def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
         request = self.get_page_request(page, self.get_anon())
         toolbar = CMSToolbar(request)
 
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 0)
 
-    def test_toolbar_nonstaff(self):
+    def test_nonstaff(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_nonstaff())
         toolbar = CMSToolbar(request)
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + logout
         self.assertEqual(len(items), 0)
 
-    def test_toolbar_template_change_permission(self):
+    def test_template_change_permission(self):
         with SettingsOverride(CMS_PERMISSIONS=True):
             page = create_page('test', 'nav_playground.html', 'en', published=True)
             request = self.get_page_request(page, self.get_nonstaff())
             toolbar = CMSToolbar(request)
-            items = toolbar.get_items()
+            items = toolbar.get_left_items() + toolbar.get_right_items()
             self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
 
-    def test_toolbar_markup(self):
+    def test_markup(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -151,26 +157,26 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.show_toolbar)
 
-    def test_toolbar_publish_button(self):
+    def test_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_superuser(), edit=True)
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.edit_mode)
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 6)
 
-    def test_toolbar_no_publish_button(self):
+    def test_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_staff(), edit=True)
         toolbar = CMSToolbar(request)
         self.assertTrue(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
         self.assertTrue(toolbar.edit_mode)
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 5)
 
-    def test_toolbar_no_change_button(self):
+    def test_no_change_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         user = self.get_staff()
         user.user_permissions.all().delete()
@@ -179,12 +185,13 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
 
-        items = toolbar.get_items()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 2)
-        self.assertEqual(len(items[0].get_context()['items']), 6)
+        self.assertEqual(len(items), 2, items)
+        admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        self.assertEqual(len(admin_items), 6, admin_items)
 
-    def test_toolbar_button_consistency_staff(self):
+    def test_button_consistency_staff(self):
         """
         Tests that the buttons remain even when the language changes.
         """
@@ -193,7 +200,52 @@ class ToolbarTests(ToolbarTestBase):
         create_title('de', 'test-de', cms_page)
         en_request = self.get_page_request(cms_page, user, edit=True)
         en_toolbar = CMSToolbar(en_request)
-        self.assertEqual(len(en_toolbar.get_items()), 5)
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
-        self.assertEqual(len(de_toolbar.get_items()), 5)
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5, )
+
+
+class ToolbarAPITests(TestCase):
+    def test_find_item(self):
+        api = ToolbarAPIMixin()
+        first = api.add_link_item('First', 'http://www.example.org')
+        second = api.add_link_item('Second', 'http://www.example.org')
+        all_links = api.find_items(LinkItem)
+        self.assertEqual(len(all_links), 2)
+        result = api.find_first(LinkItem, name='First')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.index, 0)
+        self.assertEqual(result.item, first)
+        result = api.find_first(LinkItem, name='Second')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.index, 1)
+        self.assertEqual(result.item, second)
+        no_result = api.find_first(LinkItem, name='Third')
+        self.assertEqual(no_result, None)
+
+    def test_find_item_lazy(self):
+        lazy_attribute = lazy(lambda x: x, str)('Test')
+        api = ToolbarAPIMixin()
+        api.add_link_item(lazy_attribute, None)
+        result = api.find_first(LinkItem, name='Test')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.index, 0)
+
+    def test_not_is_staff(self):
+        request = RequestFactory().get('/en/?edit')
+        request.session = {}
+        request.LANGUAGE_CODE = 'en'
+        request.user = AnonymousUser()
+        toolbar = CMSToolbar(request)
+        self.assertEqual(len(toolbar.get_left_items()), 0)
+        self.assertEqual(len(toolbar.get_right_items()), 0)
+
+    def test_item_search_result(self):
+        item = object()
+        result = ItemSearchResult(item, 2)
+        self.assertEqual(result.item, item)
+        self.assertEqual(int(result), 2)
+        result += 2
+        self.assertEqual(result.item, item)
+        self.assertEqual(result.index, 4)
