@@ -171,8 +171,10 @@ $(document).ready(function () {
 				var fields = $('*:focus');
 				// 32 = space
 				if(e.keyCode === 32 && that.settings.mode === 'drag' && !fields.length) {
+					e.preventDefault();
 					that._enableEditMode(300);
 				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
+					e.preventDefault();
 					that._enableDragMode(300);
 				}
 			});
