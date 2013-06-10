@@ -68,7 +68,7 @@ def _verify_apphook(apphook):
     """
     Verifies the apphook given is valid and returns the normalized form (name)
     """
-    if hasattr(apphook, '__module__') and  issubclass(apphook, CMSApp):
+    if hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         apphook_pool.discover_apps()
         assert apphook in apphook_pool.apps.values()
         return apphook.__name__
@@ -170,7 +170,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
     
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
-    
+    # validate and normalize apphook
+    if apphook:
+        application_urls = _verify_apphook(apphook)
+    else:
+        application_urls = None
+
     page = Page(
         created_by=created_by,
         changed_by=created_by,
@@ -183,6 +188,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         navigation_extenders=navigation_extenders,
         published=False, # will be published later
         template=template,
+        application_urls=application_urls,
         site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
@@ -195,7 +201,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         title=title,
         menu_title=menu_title,
         slug=slug,
-        apphook=application_urls,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
@@ -209,7 +214,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     return page.reload()
     
 def create_title(language, title, page, menu_title=None, slug=None,
-                 apphook=None, redirect=None, meta_description=None,
+                 redirect=None, meta_description=None,
                  parent=None, overwrite_url=None):
     """
     Create a title.
@@ -228,18 +233,12 @@ def create_title(language, title, page, menu_title=None, slug=None,
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
         
-    # validate and normalize apphook 
-    if apphook:
-        application_urls = _verify_apphook(apphook)
-    else:
-        application_urls = None
-    
+
     title = Title.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,
         slug=slug,
-        application_urls=application_urls,
         redirect=redirect,
         meta_description=meta_description,
         page=page

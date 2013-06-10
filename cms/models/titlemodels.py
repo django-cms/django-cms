@@ -19,7 +19,6 @@ class Title(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)

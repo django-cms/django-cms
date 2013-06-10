@@ -185,6 +185,6 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Removed CMS_SHOW_START_DATE. Always enabled.
 - Removed CMS_SHOW_END_DATE. Always enabled.
 - Added (optional) language fallback for placeholders.
-
+- moved apphooks from title to page model so we need to add them only once.
 
 

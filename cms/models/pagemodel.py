@@ -71,7 +71,7 @@ class Page(MPTTModel):
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
-
+    application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)

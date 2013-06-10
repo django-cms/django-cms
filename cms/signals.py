@@ -100,20 +100,10 @@ def post_save_title(instance, raw, created, **kwargs):
         for descendant_title in descendant_titles:
             descendant_title.path = ''  # just reset path
             descendant_title.tmp_prevent_descendant_update = True
-            if descendant_title.application_urls:
-                application_changed = True
             descendant_title.save()
-
-    if not prevent_descendants and \
-            (instance.application_urls != getattr(instance, 'tmp_application_urls', None) or application_changed):
-        # fire it if we have some application linked to this page or some descendant
-        application_post_changed.send(sender=Title, instance=instance)
-
     # remove temporary attributes
     if hasattr(instance, 'tmp_path'):
         del instance.tmp_path
-    if hasattr(instance, 'tmp_application_urls'):
-        del instance.tmp_application_urls
     if prevent_descendants:
         del instance.tmp_prevent_descendant_update
 
@@ -193,6 +183,8 @@ def post_save_page(instance, **kwargs):
             for title in page.title_set.all():
                 update_title(title)
                 title.save()
+    if instance.old_page is None or instance.old_page.application_urls != instance.application_urls:
+        application_post_changed.send(sender=Page, instance=instance)
 
 
 def update_placeholders(instance, **kwargs):
