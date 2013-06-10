@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.api import create_page
+from cms.models import Page
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils.unittest import skipIf
@@ -38,6 +39,9 @@ class CMSLiveTests(LiveServerTestCase):
         if hasattr(cls, 'display'):
             cls.display.stop()
         super(CMSLiveTests, cls).tearDownClass()
+
+    def tearDown(self):
+        Page.objects.all().delete() # not 100% sure why this is needed, but it is
 
     def stop_server(self):
         if hasattr(self, 'server_thread'):
