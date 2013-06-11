@@ -539,6 +539,7 @@ class CMSToolbar(InclusionTag):
             return ''
         language = request.toolbar.language
         with force_language(language):
+            request.toolbar.populate()
             content = super(CMSToolbar, self).render(context)
         return content
 
