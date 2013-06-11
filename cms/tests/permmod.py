@@ -199,7 +199,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # should be True user_master should have publish permissions for children as well
         publish_page(page, self.user_master)
         self.assertTrue(page.reload().published)
-        # user_master is moderatocor for top level page / but can't approve descendants?
+        # user_master is moderator for top level page / but can't approve descendants?
         # approve / publish as user_master
         # user master should be able to approve descendants
 
