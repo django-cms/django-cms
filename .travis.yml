@@ -19,7 +19,7 @@ before_script:
 install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
-    - if [ $TRAVIS_PYTHON_VERSION == '3.3' ]; then BASE='django'; else BASE='selenium'; fi && pip install -q -r "test_requirements/$BASE-$DJANGO" --use-mirrors
+    - if [ $TRAVIS_PYTHON_VERSION == '3.3' ]; then BASE='django'; else BASE='selenium'; fi && pip install -q -r "test_requirements/$BASE-$DJANGO.txt" --use-mirrors
     - if [ $DB == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python --use-mirrors; fi
 script:
     python runtests.py --db $DB
