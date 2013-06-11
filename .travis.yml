@@ -1,7 +1,8 @@
 language: python
 python:
-    - "2.6"
-    - "2.7"
+    - 2.6
+    - 2.7
+    - 3.3
 env:
     - DJANGO=test_requirements/django-1.4.txt DB='sqlite://localhost/:memory:'
     - DJANGO=test_requirements/django-1.4.txt DB='mysql://root@127.0.0.1/djangocms_test'
@@ -34,3 +35,14 @@ notifications:
         - "irc.freenode.org#django-cms"
         - "irc.freenode.org#django-cms-sprint"
 
+
+matrix:
+  exclude:
+    - python: 3.3
+      env: DJANGO=test_requirements/django-1.4.txt DB='postgres://postgres@127.0.0.1/djangocms_test'
+    - python: 3.3
+      env: DJANGO=test_requirements/django-1.4.txt DB='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.3
+      env: DJANGO=test_requirements/selenium-1.4.txt DB='sqlite://localhost/:memory:'
+    - python: 3.3
+      env: DJANGO=test_requirements/django-1.4.txt DB='sqlite://localhost/:memory:'
