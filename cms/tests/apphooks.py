@@ -4,8 +4,7 @@ import sys
 
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import (applications_page_check, clear_app_resolvers,
-    get_app_patterns)
+from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
@@ -162,7 +161,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
@@ -175,7 +174,8 @@ class ApphooksTestCase(CMSTestCase):
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash and language prefix
+            attached_to_page = applications_page_check(request,
+                                                       path=path[1:])  # strip leading slash and language prefix
             self.assertEquals(attached_to_page.pk, de_title.page.pk)
 
             response = self.client.get(path)
@@ -198,13 +198,13 @@ class ApphooksTestCase(CMSTestCase):
                 path = reverse('sample-settings')
                 request = self.get_request(path + '?edit')
                 request.LANGUAGE_CODE = 'en'
-                attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEquals(attached_to_page.pk, public_page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
                 request = self.get_request(path + '?edit')
                 request.LANGUAGE_CODE = 'de'
-                attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEquals(attached_to_page.pk, public_page.pk)
 
     def test_get_root_page_for_apphook_with_instance_namespace(self):
@@ -215,12 +215,13 @@ class ApphooksTestCase(CMSTestCase):
             with force_language("en"):
                 path = reverse('namespaced_app_ns:sample-root')
                 path_instance = reverse('instance_ns:sample-root')
+                normal = reverse('sample-root')
             self.assertEquals(path, path_instance)
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             apphook_pool.clear()
@@ -237,7 +238,7 @@ class ApphooksTestCase(CMSTestCase):
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page_id)
             apphook_pool.clear()
 
@@ -246,11 +247,10 @@ class ApphooksTestCase(CMSTestCase):
             en_title = self.create_base_structure(NS_APP_NAME, 'en')
             with force_language("en"):
                 path = reverse('namespaced_app_ns:current-app')
-
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
@@ -270,7 +270,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
-            attached_to_page = applications_page_check(request, path=path[1:]) # strip leading slash
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
             self.assertEquals(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
@@ -400,7 +400,7 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
         create_title("de", '%s_de' % child_child_page.get_title(), child_child_page)
         child_child_page.publish()
 
-        # publisher_public is set to draft on publish, issue with onetoone reverse
+        # publisher_public is set to draft on publish, issue with one to one reverse
         child_child_page = self.reload(child_child_page)
         with force_language("en"):
             path = reverse('extra_first')

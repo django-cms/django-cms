@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 """
 Also used in cms.tests.ApphooksTestCase
