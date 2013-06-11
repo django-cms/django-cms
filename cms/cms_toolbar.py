@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
+from cms import compat
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.toolbar_pool import toolbar_pool

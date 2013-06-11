@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin
+from cms.compat import User
 from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin
 from cms.models.pagemodel import Page

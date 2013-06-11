@@ -2,9 +2,10 @@
 from __future__ import with_statement
 
 from django.contrib.sites.models import Site
-from django.contrib.auth.models import AnonymousUser, User, Group
+from django.contrib.auth.models import AnonymousUser, Group
 
 from cms.api import create_page
+from cms.compat import User
 from cms.menu import get_visible_pages
 from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE

@@ -4,6 +4,7 @@ from cms.middleware.toolbar import ToolbarMiddleware
 from django.test import RequestFactory, TestCase
 import os
 from cms.api import create_page, create_title, add_plugin
+from cms.compat import User
 from cms.models.pagemodel import Page, Placeholder
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg, _show_placeholder_for_page, _get_placeholder
@@ -19,7 +20,7 @@ from django.http import HttpRequest
 from django.template import RequestContext, Context
 from django.template.base import Template
 from django.utils.html import escape
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 
 
 class TemplatetagTests(TestCase):

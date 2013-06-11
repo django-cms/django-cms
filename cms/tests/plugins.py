@@ -3,6 +3,7 @@ from __future__ import with_statement
 import datetime
 
 from cms.api import create_page, publish_page, add_plugin
+from cms.compat import User
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
@@ -29,7 +30,6 @@ from cms.utils.copy_plugins import copy_plugins_to
 from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
