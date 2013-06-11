@@ -179,7 +179,7 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         pages_menu.add_sideframe_item(_('Add new page'), url=reverse("admin:cms_page_add"))
     # users
     if request.user.has_perm('user.change_user'):
-        admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
+        admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:"+settings.AUTH_USER_MODEL.replace('.','_').lower()+"_changelist"))
     # sites menu
     if permissions_active:
         sites_queryset = get_user_sites_queryset(request.user)
