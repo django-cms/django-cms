@@ -197,8 +197,10 @@ class ShowSubMenu(InclusionTag):
     )
 
     def get_context(self, context, levels, root_level, nephews, template):
-        if root_level:
-            root_level = int(root_level)
+        # Django 1.4 doesn't accept 'None' as a tag value and resolve to ''
+        # So we need to force it to None again
+        if not root_level and root_level != 0:
+            root_level = None
         try:
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']
