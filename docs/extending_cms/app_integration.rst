@@ -293,8 +293,26 @@ You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 :class:`CategoryMenu` both attached to the same page.
 
 
-Application and instance namespaces
------------------------------------
+Attaching an Application multiple times
+---------------------------------------
+
+If you want to attach an application multiple times to different pages you have 2 possibilities.
+
+1. Give every application its own namespace in the advanced settings of a page.
+2. Define an ``app_name`` attribute on the CMSApp class.
+
+The problem is that if you only define a namespace you need to have multiple templates per attached app.
+
+For example::
+
+    {% url 'my_view' %}
+
+Will not work anymore when you namespace an app. You will need to do something like::
+
+    {% url 'my_namespace:my_view' %}
+
+The problem is now if you attach apps to multiple pages your namespace will change.
+The solution for this problem are application namespaces.
 
 If you'd like to use application namespaces to reverse the URLs related to
 your app, you can assign a value to the `app_name` attribute of your app
@@ -307,7 +325,13 @@ hook like this::
 
     apphook_pool.register(MyNamespacedApphook)
 
-As seen for Language Namespaces, you can reverse namespaced apps similarly:
+
+.. note::
+    If you do that you will need to give the app a unique namespace in the advanced settings of the page.
+    You can then either reverse for the namespace(to target different apps) or the app_name (to target links inside the
+    same app).
+
+You can reverse namespaced apps similarly:
 
 .. code-block:: html+django
 
@@ -323,15 +347,6 @@ templatetag:
         {% url myapp_namespace:app_main %}
     {% endlanguage %}
 
-What makes namespaced app hooks really interesting is the fact that you can
-hook them up to more than one page and reverse their URLs by using their
-instance namespace. Django CMS takes the value of the `reverse_id` field
-assigned to a page and uses it as instance namespace for the app hook.
-
-To reverse the URLs you now have two different ways: explicitly by defining
-the instance namespace, or implicitely by specifiyng the application namespace
-and letting the `url` templatetag resolving the correct application instance
-by looking at the currently set `current_app` value.
 
 .. note::
 
