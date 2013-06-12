@@ -198,12 +198,13 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
     # logout
     admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'), active=True)
     # check if we're in the CMS or on an apphook root
-    path = current_page.get_path()
-    if settings.APPEND_SLASH:
-        path = "%s/" % path
-    if current_page and request.path.endswith(path):
-        add_cms_menus(toolbar, current_page, permissions_active, request)
-        # language menu
+    if current_page:
+        path = current_page.get_path()
+        if settings.APPEND_SLASH:
+            path = "%s/" % path
+        if request.path.endswith(path):
+            add_cms_menus(toolbar, current_page, permissions_active, request)
+            # language menu
     try:
         current_lang = get_language_object(get_language_from_request(request), current_site.pk)
     except LanguageError:

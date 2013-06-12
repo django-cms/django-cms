@@ -201,11 +201,7 @@ def get_app_patterns():
         if title.page_id not in hooked_applications:
             hooked_applications[title.page_id] = {}
         app = apphook_pool.get_apphook(title.page.application_urls)
-        if app.app_name:
-            inst_ns = title.page.reverse_id if title.page.reverse_id else app.app_name
-            app_ns = app.app_name, inst_ns
-        else:
-            app_ns = None, None
+        app_ns = app.app_name, title.page.application_namespace
         with force_language(title.language):
             hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title))
         included.append(mix_id)

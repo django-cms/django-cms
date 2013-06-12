@@ -57,7 +57,7 @@ class ApphooksTestCase(CMSTestCase):
             if module in sys.modules:
                 del sys.modules[module]
 
-    def create_base_structure(self, apphook, title_langs, reverse_id=None):
+    def create_base_structure(self, apphook, title_langs, namespace=None):
         apphook_pool.clear()
         superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("home", "nav_playground.html", "en",
@@ -68,7 +68,7 @@ class ApphooksTestCase(CMSTestCase):
         create_title('de', child_page.get_title(), child_page)
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
-                                       reverse_id=reverse_id)
+                                       apphook_namespace=namespace)
         create_title("de", child_child_page.get_title(), child_child_page)
 
         child_child_page.publish()
@@ -213,9 +213,12 @@ class ApphooksTestCase(CMSTestCase):
 
             self.reload_urls()
             with force_language("en"):
+
+                path1 = reverse("example_app:example")
+                path2 = reverse("example1:example")
+                path3 = reverse("example2:example")
                 path = reverse('namespaced_app_ns:sample-root')
                 path_instance = reverse('instance_ns:sample-root')
-                normal = reverse('sample-root')
             self.assertEquals(path, path_instance)
 
             request = self.get_request(path)
@@ -244,7 +247,7 @@ class ApphooksTestCase(CMSTestCase):
 
     def test_get_sub_page_for_apphook_with_implicit_current_app(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
-            en_title = self.create_base_structure(NS_APP_NAME, 'en')
+            en_title = self.create_base_structure(NS_APP_NAME, 'en', 'namespaced_app_ns')
             with force_language("en"):
                 path = reverse('namespaced_app_ns:current-app')
             request = self.get_request(path)
@@ -276,7 +279,7 @@ class ApphooksTestCase(CMSTestCase):
             response = self.client.get(path)
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/app.html')
-            self.assertContains(response, 'instance_ns')
+            self.assertContains(response, 'namespaced_app_ns')
             self.assertContains(response, path)
 
             apphook_pool.clear()

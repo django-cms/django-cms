@@ -72,6 +72,7 @@ class Page(MPTTModel):
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
+    application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
@@ -96,6 +97,7 @@ class Page(MPTTModel):
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
         )
+        unique_together = (("publisher_is_draft", "application_namespace"),)
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('tree_id', 'lft')
@@ -220,6 +222,7 @@ class Page(MPTTModel):
         target.reverse_id = self.reverse_id
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
+        target.application_namespace = self.application_namespace
         target.template = self.template
         target.site_id = self.site_id
 
@@ -353,7 +356,8 @@ class Page(MPTTModel):
 
         if self.reverse_id == "":
             self.reverse_id = None
-
+        if self.application_namespace == "":
+            self.application_namespace = None
         from cms.utils.permissions import _thread_locals
 
         user = getattr(_thread_locals, "user", None)
@@ -682,13 +686,13 @@ class Page(MPTTModel):
         get when this page was last updated
         """
         return self.changed_date
-        
+
     def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get user who last changed this page
         """
         return self.changed_by
-        
+
     def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language
@@ -826,7 +830,7 @@ class Page(MPTTModel):
                 # anonymous user, no restriction saved in database
                 return True
                 # Authenticated user
-            # Django wide auth perms "can_view" or cms auth perms "can_view"
+                # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
         return (request.user.has_perm(codename) or
