@@ -9,7 +9,7 @@ outline the steps necessary for you to follow the :doc:`tutorial`.
 Requirements
 ************
 
-* `Python`_ 2.5 (or a higher release of 2.x).
+* `Python`_ 2.5 (or a higher release of 2.x), or 3.3.
 * `Django`_ 1.4.5, 1.5 or higher
 * `South`_ 0.7.2 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher

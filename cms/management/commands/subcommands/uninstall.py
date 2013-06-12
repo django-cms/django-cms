@@ -3,6 +3,7 @@ from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from django.core.management.base import LabelCommand
+from cms.utils.compat.input import raw_input
 
 
 class UninstallApphooksCommand(LabelCommand):
@@ -25,9 +26,9 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
                 confirm = 'yes'
             if confirm == 'yes':
                 queryset.update(application_urls=None)
-                self.stdout.write('%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
+                self.stdout.write(u'%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
         else:
-            self.stdout.write('no %r apphooks found\n' % label)
+            self.stdout.write(u'no %r apphooks found\n' % label)
             
 class UninstallPluginsCommand(LabelCommand):
 
@@ -48,9 +49,9 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
             else:
                 confirm = 'yes'
             queryset.delete()
-            self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
+            self.stdout.write(u'%d %r plugins uninstalled\n' % (number_of_plugins, label))
         else:
-            self.stdout.write('no %r plugins found\n' % label)            
+            self.stdout.write(u'no %r plugins found\n' % label)
 
 class UninstallCommand(SubcommandsCommand):
     help = 'Uninstall commands'

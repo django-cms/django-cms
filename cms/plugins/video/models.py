@@ -1,9 +1,12 @@
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
 from cms.plugins.video import settings
 from os.path import basename
 
+
+@python_2_unicode_compatible
 class Video(CMSPlugin):
     # player settings
     movie = models.FileField(_('movie file'), upload_to=CMSPlugin.get_media_path, help_text=_('use .flv file or h264 encoded video file'), blank=True, null=True)
@@ -29,7 +32,7 @@ class Video(CMSPlugin):
     buttonhighlightcolor = models.CharField(_('button highlight color'), max_length=6, default=settings.VIDEO_BUTTON_HIGHLIGHT_COLOR, help_text=_('Hexadecimal, eg ff00cc'))
     
         
-    def __unicode__(self):
+    def __str__(self):
         if self.movie:
             name = self.movie.path
         else:

@@ -3,7 +3,7 @@ from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils import get_language_from_request
 from cms.plugin_pool import plugin_pool
 from django.utils.translation import ugettext_lazy as _
-from models import InheritPagePlaceholder
+from .models import InheritPagePlaceholder
 from django.conf import settings
 from cms.plugins.inherit.forms import InheritForm
 import copy

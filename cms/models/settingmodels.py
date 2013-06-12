@@ -3,8 +3,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class UserSettings(models.Model):
     user = models.ForeignKey(User, editable=False)
     language = models.CharField(_("Language"), max_length=10, choices=settings.LANGUAGES,
@@ -16,7 +18,7 @@ class UserSettings(models.Model):
         verbose_name_plural = _('user settings')
         app_label = 'cms'
 
-    def __unicode__(self):
-        return unicode(self.user)
+    def __str__(self):
+        return force_unicode(self.user)
 
 

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-import urllib
 
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.utils.i18n import force_language, get_language_objects
+from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.urls import unquote
 from django import template
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -205,9 +206,9 @@ class ShowSubMenu(InclusionTag):
         children = []
         # adjust root_level so we cut before the specified level, not after
         include_root = False
-        if root_level > 0:
+        if root_level is not None and root_level > 0:
             root_level -= 1
-        elif root_level == 0:
+        elif root_level is not None and root_level == 0:
             include_root = True
         for node in nodes:
             if root_level is None:
@@ -282,7 +283,7 @@ class ShowBreadcrumb(InclusionTag):
         for node in nodes:
             if node.selected:
                 selected = node
-            if node.get_absolute_url() == urllib.unquote(reverse("pages-root")):
+            if node.get_absolute_url() == unquote(reverse("pages-root")):
                 home = node
         if selected and selected != home:
             node = selected
@@ -311,11 +312,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return unicode(ugettext(language))
+        return force_unicode(ugettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return unicode(ugettext(language))
+    return force_unicode(ugettext(language))
 
 
 def _short_language_marker(language, lang_code):

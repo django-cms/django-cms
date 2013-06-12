@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-import urllib
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
+from cms.utils.i18n import get_language_objects, get_language_object
+from django.contrib.sites.models import Site
+from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils.compat.urls import urlencode
 from cms.toolbar_pool import toolbar_pool
-from cms.utils import get_cms_setting, get_language_from_request
-from cms.utils.i18n import get_language_object, get_language_objects
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from menus.utils import DefaultLanguageChanger
@@ -62,7 +62,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
         'position': 'last-child',
         'target': current_page.pk,
     }
-    child_url = '%s?%s' % (add_url, urllib.urlencode(child_data))
+    child_url = '%s?%s' % (add_url, urlencode(child_data))
     current_page_menu.add_modal_item(_('Add child page'), url=child_url, close_on_url=toolbar.URL_CHANGE,
                                      disabled=not_edit_mode)
     sibling_data = {
@@ -70,7 +70,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     }
     if current_page.parent_id:
         sibling_data['target'] = current_page.parent_id
-    sibling_url = '%s?%s' % (add_url, urllib.urlencode(sibling_data))
+    sibling_url = '%s?%s' % (add_url, urlencode(sibling_data))
     current_page_menu.add_modal_item(_('Add sibling page'), url=sibling_url, close_on_url=toolbar.URL_CHANGE,
                                      disabled=not_edit_mode)
     current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
