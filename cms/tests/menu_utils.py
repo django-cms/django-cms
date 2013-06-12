@@ -22,7 +22,7 @@ class MenuUtilsTests(CMSTestCase):
         self.assertEqual(func.__name__, decorated_view.__name__)
         request = self.get_request('/', 'en')
         response = decorated_view(request)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
         fake_context = {'request': request}
         tag = DumbPageLanguageUrl()
         output = tag.get_context(fake_context, 'en')
@@ -38,7 +38,7 @@ class MenuUtilsTests(CMSTestCase):
         self.assertEqual(view.__name__, view.__name__)
         request = self.get_request('/en/', 'en')
         response = view(request)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
         fake_context = {'request': request}
         tag = DumbPageLanguageUrl()
         output = tag.get_context(fake_context, 'en')
@@ -54,7 +54,7 @@ class MenuUtilsTests(CMSTestCase):
         decorated_view = language_changer_decorator(lang_changer)(self.get_simple_view())
         request = self.get_request('/some/path/', 'en')
         response = decorated_view(request)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
         fake_context = {'request': request}
         tag = DumbPageLanguageUrl()
         output = tag.get_context(fake_context, 'en')

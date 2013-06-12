@@ -4,9 +4,9 @@ from cms.plugin_base import CMSPluginBase
 from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_placeholder_conf
+from cms.utils.compat.dj import force_unicode
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-import warnings
 
 class PluginPool(object):
     def __init__(self):
@@ -64,8 +64,8 @@ class PluginPool(object):
 
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         self.discover_plugins()
-        plugins = self.plugins.values()[:]
-        plugins.sort(key=lambda obj: unicode(obj.name))
+        plugins = list(self.plugins.values())
+        plugins.sort(key=lambda obj: force_unicode(obj.name))
         final_plugins = []
         if page:
             template = page.get_template()
@@ -93,7 +93,7 @@ class PluginPool(object):
             plugins = final_plugins
 
         # plugins sorted by modules
-        plugins = sorted(plugins, key=lambda obj: unicode(obj.module))
+        plugins = sorted(plugins, key=lambda obj: force_unicode(obj.module))
         return plugins
 
     def get_text_enabled_plugins(self, placeholder, page):

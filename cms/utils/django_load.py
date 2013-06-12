@@ -9,6 +9,7 @@ documentet clearly within this file with comments.
 For documentation on how to use the functions described in this file, please
 refer to http://django-load.readthedocs.org/en/latest/index.html.
 """
+import traceback # changed
 from django.conf import settings
 from django.utils.importlib import import_module
 
@@ -19,14 +20,15 @@ def get_module(app, modname, verbose, failfast):
     module_name = '%s.%s' % (app, modname)
     try:
         module = import_module(module_name)
-    except ImportError, e:
+    except ImportError:
         if failfast:
-            raise e
+            raise
         elif verbose:
-            print "Could not load %r from %r: %s" % (modname, app, e)
+            print(u"Could not load %r from %r: %s" % (modname, app)) # changed
+            traceback.print_exc() # changed
         return None
     if verbose:
-        print "Loaded %r from %r" % (modname, app)
+        print(u"Loaded %r from %r" % (modname, app))
     return module
         
 

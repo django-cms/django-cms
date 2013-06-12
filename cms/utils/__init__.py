@@ -3,17 +3,10 @@
 from cms import constants
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_default_language, get_language_list, get_language_code
-from distutils.version import LooseVersion
 from django.conf import settings
 from django.core.files.storage import get_storage_class
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.utils.functional import LazyObject
-import django
 import os
-import urllib
 
 
 def get_template_from_request(request, obj=None, no_current_page=False):

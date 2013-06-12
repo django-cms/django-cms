@@ -6,11 +6,13 @@ from django.template import context
 from django.utils.translation import get_language, activate
 from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp, _exists
-import StringIO
 import sys
+from cms.utils.compat.string_io import StringIO
+
 
 class NULL:
     pass
+
 
 class SettingsOverride(object):
     """
@@ -50,7 +52,7 @@ class SettingsOverride(object):
 class StdOverride(object):
     def __init__(self, std='out', buffer=None):
         self.std = std
-        self.buffer = buffer or StringIO.StringIO()
+        self.buffer = buffer or StringIO()
         
     def __enter__(self):
         setattr(sys, 'std%s' % self.std, self.buffer)

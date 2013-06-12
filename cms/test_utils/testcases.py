@@ -12,10 +12,10 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
-from urlparse import urljoin
+from cms.utils.compat.urls import urljoin, unquote
 import sys
-import urllib
 import warnings
+import json
 from cms.utils.permissions import set_current_user
 
 
@@ -55,7 +55,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     # Disable the per-module cache for every module otherwise if the warning
     # which the caller is expecting us to collect was already emitted it won't
     # be re-emitted by the call to f which happens below.
-    for v in sys.modules.itervalues():
+    for v in sys.modules.values():
         if v is not None:
             try:
                 v.__warningregistry__ = None
@@ -205,8 +205,8 @@ class CMSTestCase(testcases.TestCase):
         """
         for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
-            print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-                                    page.pk, page.lft, page.rght, page.tree_id)
+            print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
+                                    page.pk, page.lft, page.rght, page.tree_id))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -214,7 +214,7 @@ class CMSTestCase(testcases.TestCase):
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print "%s%s: %s" % (ident, node.title, attrs)
+                print(u"%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
         _rec(nodes)
 
@@ -223,14 +223,14 @@ class CMSTestCase(testcases.TestCase):
             return qs.get(**filter)
         except ObjectDoesNotExist:
             pass
-        raise self.failureException, "ObjectDoesNotExist raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist raised for filter %s" % filter)
 
     def assertObjectDoesNotExist(self, qs, **filter):
         try:
             qs.get(**filter)
         except ObjectDoesNotExist:
             return
-        raise self.failureException, "ObjectDoesNotExist not raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug
@@ -246,7 +246,8 @@ class CMSTestCase(testcases.TestCase):
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEquals(response.status_code, 200)
         # Altered to reflect the new django-js jsonified response messages
-        self.assertEquals(response.content, '{"status": 200, "content": "ok"}')
+        expected = {"status": 200, "content": "ok"}
+        self.assertEquals(json.loads(response.content.decode('utf8')), expected)
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
@@ -268,7 +269,7 @@ class CMSTestCase(testcases.TestCase):
         return obj.__class__.objects.get(pk=obj.pk)
 
     def get_pages_root(self):
-        return urllib.unquote(reverse("pages-root"))
+        return unquote(reverse("pages-root"))
 
     def get_context(self, path=None):
         if not path:

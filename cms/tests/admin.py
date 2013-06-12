@@ -366,10 +366,10 @@ class AdminTestCase(AdminTestsBase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         # should include both direct descendant pages
-        self.assertTrue('id="page_%s"' % second_level_page_top.pk in response.content)
-        self.assertTrue('id="page_%s"' % second_level_page_bottom.pk in response.content)
+        self.assertContains(response, 'id="page_%s"' % second_level_page_top.pk)
+        self.assertContains(response, 'id="page_%s"' % second_level_page_bottom.pk)
         # but not any further down the tree
-        self.assertFalse('id="page_%s"' % third_level_page.pk in response.content)
+        self.assertNotContains(response, 'id="page_%s"' % third_level_page.pk)
 
     def test_unihandecode_doesnt_break_404_in_admin(self):
         admin = self.get_superuser()
@@ -543,7 +543,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "ok")
+            self.assertEqual(response.content, b"ok")
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.id, 'plugin_parent': ''})
@@ -553,7 +553,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.id, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "ok")
+            self.assertEqual(response.content, b"ok")
 
     def test_preview_page(self):
         permless = self.get_permless()
@@ -895,7 +895,7 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertEqual(response['content-type'], 'application/json')
-        pk = response.content.split("edit-plugin/")[1].split("/")[0]
+        pk = response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0]
         self.assertTrue(CMSPlugin.objects.filter(pk=int(pk)).exists())
 
 

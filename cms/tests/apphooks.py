@@ -7,6 +7,7 @@ from cms.appresolver import (applications_page_check, clear_app_resolvers,
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
+from cms.utils.compat.type_checks import string_types
 from cms.utils.i18n import force_language
 from django.contrib.auth.models import User
 from django.core.urlresolvers import clear_url_caches, reverse
@@ -78,7 +79,7 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, basestring):
+        if isinstance(title_langs, string_types):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
             titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]

@@ -413,21 +413,20 @@ class PagesTestCase(CMSTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
-        f = open(path, 'r')
-        old = f.read()
-        f.close()
-        new = old.replace(
-            '<!-- SECOND_PLACEHOLDER -->',
-            '{% placeholder second_placeholder %}'
-        )
-        f = open(path, 'w')
-        f.write(new)
-        f.close()
-        response = self.client.get(url)
-        self.assertEqual(200, response.status_code)
-        f = open(path, 'w')
-        f.write(old)
-        f.close()
+        with open(path, 'r') as fobj:
+            old = fobj.read()
+        try:
+            new = old.replace(
+                '<!-- SECOND_PLACEHOLDER -->',
+                '{% placeholder second_placeholder %}'
+            )
+            with open(path, 'w') as fobj:
+                fobj.write(new)
+            response = self.client.get(url)
+            self.assertEqual(200, response.status_code)
+        finally:
+            with open(path, 'w') as fobj:
+                fobj.write(old)
 
     def test_sitemap_login_required_pages(self):
         """
@@ -866,7 +865,7 @@ class PageAdminTest(PageAdminTestBase):
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk, 'plugin_parent': ''})
                 response = admin.move_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit_on_plugin_move(self):
         admin = self.get_admin()
@@ -892,7 +891,7 @@ class PageAdminTest(PageAdminTestBase):
                 response = admin.move_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
-                                 "This placeholder already has the maximum number (1) of allowed Text plugins.")
+                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
 
 class NoAdminPageTests(CMSTestCase):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+import json
 
 from cms.api import create_page, publish_page, add_plugin
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
@@ -8,6 +9,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.plugins.inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.plugins.utils import get_plugins_for_page
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
@@ -80,7 +82,7 @@ class PluginsTestBaseCase(CMSTestCase):
         return request
 
     def get_response_pk(self, response):
-        return int(response.content.split("/edit-plugin/")[1].split("/")[0])
+        return int(response.content.decode('utf8').split("/edit-plugin/")[1].split("/")[0])
 
 
 class PluginsTestCase(PluginsTestBaseCase):
@@ -157,7 +159,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             created_plugin_id)
         response = self.client.get(history_url)
         self.assertEquals(response.status_code, 200)
-        self.assertIn('Hello Foo', response.content)
+        self.assertIn('Hello Foo', response.content.decode('utf8'))
 
     def test_plugin_order(self):
         """
@@ -200,19 +202,26 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content,
-                          '{"url": "/en/admin/cms/page/edit-plugin/%s/",' % CMSPlugin.objects.all()[0].pk +
-                          ' "breadcrumb": [{"url": "/en/admin/cms/page/edit-plugin/%s/", "title": "Text"}]}' %
-                          CMSPlugin.objects.all()[0].pk)
+        pk = CMSPlugin.objects.all()[0].pk
+        expected =  {
+            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "breadcrumb": [
+                {
+                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "title": "Text"
+                }
+            ]
+        }
+        output = json.loads(response.content.decode('utf8'))
+        self.assertEquals(output, expected)
         # now click cancel instead of editing
-        edit_url = response.content.split('"url": "')[1].split('"')[0]
-        response = self.client.get(edit_url)
+        response = self.client.get(output['url'])
         self.assertEquals(response.status_code, 200)
         data = {
             "body": "Hello World",
             "_cancel": True,
         }
-        response = self.client.post(edit_url, data)
+        response = self.client.post(output['url'], data)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(0, Text.objects.count())
 
@@ -538,7 +547,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.client.logout()
         response = self.client.get(page.get_absolute_url())
-        self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content, response.content)
+        self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content.decode('utf8'), response.content)
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = create_page('page to inherit from',
@@ -555,15 +564,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         empty_plugin.insert_at(None, position='last-child', save=True)
         other_page = create_page('other page', 'nav_playground.html', 'en', published=True)
         inherited_body = other_page.placeholders.get(slot="body")
-        inherit_plugin = InheritPagePlaceholder(
-            plugin_type='InheritPagePlaceholderPlugin',
-            placeholder=inherited_body,
-            position=1,
-            language='en',
-            from_page=inheritfrompage,
-            from_language='en'
-        )
-        inherit_plugin.insert_at(None, position='last-child', save=True)
+
+        add_plugin(inherited_body, InheritPagePlaceholderPlugin, 'en', position='last-child',
+                   from_page=inheritfrompage, from_language='en')
+
         add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
         # this should not fail, even if there in an empty plugin
         rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url()), width=200)
@@ -666,7 +670,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(response.content.count('"position":'), 3)
+        self.assertEqual(response.content.decode('utf8').count('"position":'), 3)
         # assert copy success
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
@@ -792,7 +796,7 @@ class FileSystemPluginTests(PluginsTestBaseCase):
             position=1,
             language=settings.LANGUAGE_CODE,
         )
-        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", "content"), False)
+        plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
         plugin.insert_at(None, position='last-child', save=True)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
@@ -843,11 +847,17 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content,
-                          '{"url": "/en/admin/cms/page/edit-plugin/%s/", "breadcrumb": ' % (
-                              CMSPlugin.objects.all()[0].pk) +
-                          '[{"url": "/en/admin/cms/page/edit-plugin/%s/", "title": "Articles"}]}' % (
-                              CMSPlugin.objects.all()[0].pk))
+        pk = CMSPlugin.objects.all()[0].pk
+        expected = {
+            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "breadcrumb": [
+                {
+                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "title": "Articles"
+                }
+            ]
+        }
+        self.assertEquals(json.loads(response.content.decode('utf8')), expected)
         # now edit the plugin
         edit_url = URL_CMS_PLUGIN_EDIT + str(CMSPlugin.objects.all()[0].pk) + "/"
         response = self.client.get(edit_url)
@@ -880,10 +890,17 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, '{"url": "/en/admin/cms/page/edit-plugin/%s/", "breadcrumb": ' % (
-            CMSPlugin.objects.all()[0].pk) +
-                                            '[{"url": "/en/admin/cms/page/edit-plugin/%s/", "title": "Articles"}]}' % (
-                                                CMSPlugin.objects.all()[0].pk))
+        pk = CMSPlugin.objects.all()[0].pk
+        expected = {
+            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "breadcrumb": [
+                {
+                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "title": "Articles"
+                }
+            ]
+        }
+        self.assertEquals(json.loads(response.content.decode('utf8')), expected)
 
         # there should be only 1 plugin
         self.assertEquals(1, CMSPlugin.objects.all().count())
@@ -963,7 +980,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(response.content.count('"position":'), 1)
+        self.assertEqual(response.content.decode('utf8').count('"position":'), 1)
         # assert copy success
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)
