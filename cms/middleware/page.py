@@ -15,19 +15,7 @@ class LazyPage(object):
         return request._current_page_cache
 
 
-class LazyPageApp(object):
-    def __get__(self, request, obj_type=None):
-        if not hasattr(request, '_current_app_cache'):
-            page = request.current_page
-            if page and page.application_namespace:
-                request._current_app_cache = page.application_namespace
-            else:
-                request._current_app_cache = None
-        return request._current_app_cache
-
-
 class CurrentPageMiddleware(object):
     def process_request(self, request):
         request.__class__.current_page = LazyPage()
-        request.__class__.current_app = LazyPageApp()
         return None

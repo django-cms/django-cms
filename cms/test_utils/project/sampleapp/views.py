@@ -8,7 +8,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def sample_view(request, **kw):
-    response_kwargs = {'current_app': resolve(request.path).namespace, 'dict_': kw}
+    app = resolve(request.path).namespace
+    kw['app'] = app
+    response_kwargs = {'current_app': app, 'dict_': kw}
     context = RequestContext(request, **response_kwargs)
     return render_to_response("sampleapp/home.html", context_instance=context)
 
