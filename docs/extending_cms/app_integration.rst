@@ -331,7 +331,18 @@ hook like this::
     You can then either reverse for the namespace(to target different apps) or the app_name (to target links inside the
     same app).
 
-You can reverse namespaced apps similarly:
+If you use app namespace you will need to give all your view ``context`` a ``current_app``::
+
+  def my_view(request):
+      current_app = resolve(request.path).namespace
+      context = RequestContext(request, current_app=current_app)
+      return render_to_response("my_templace.html", context_instance=context)
+
+.. note::
+    You need to set the current_app explicitly in all your view contexts as django does not allow an other way of doing
+    this.
+
+You can reverse namespaced apps similarly and it "knows" in which app instance it is:
 
 .. code-block:: html+django
 
@@ -359,9 +370,10 @@ as an argument. You can do so by looking up the `current_app` attribute of
 the request instance::
 
     def myviews(request):
-        ...
+        current_app = resolve(request.path).namespace
+
         reversed_url = reverse('myapp_namespace:app_main',
-                current_app=request.current_app)
+                current_app=current_app)
         ...
 
 Or, if you are rendering a plugin, of the context instance::
@@ -369,8 +381,9 @@ Or, if you are rendering a plugin, of the context instance::
     class MyPlugin(CMSPluginBase):
         def render(self, context, instance, placeholder):
             ...
+            current_app = resolve(request.path).namespace
             reversed_url = reverse('myapp_namespace:app_main',
-                    current_app=context.current_app)
+                    current_app=current_app)
             ...
 
 

@@ -5,6 +5,7 @@ import sys
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
+from cms.models import Title
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
@@ -60,6 +61,7 @@ class ApphooksTestCase(CMSTestCase):
     def create_base_structure(self, apphook, title_langs, namespace=None):
         apphook_pool.clear()
         superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        self.superuser = superuser
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser, published=True)
         create_title('de', page.get_title(), page)
@@ -101,7 +103,7 @@ class ApphooksTestCase(CMSTestCase):
 
     def test_implicit_apphooks(self):
         """
-        Test implicit apphook loading with INSTALLED_APPS + cms_app.py
+        Test implicit apphook loading with INSTALLED_APPS cms_app.py
         """
 
         apps = ['cms.test_utils.project.sampleapp']
@@ -213,7 +215,6 @@ class ApphooksTestCase(CMSTestCase):
 
             self.reload_urls()
             with force_language("en"):
-
                 path1 = reverse("example_app:example")
                 path2 = reverse("example1:example")
                 path3 = reverse("example2:example")
@@ -264,6 +265,38 @@ class ApphooksTestCase(CMSTestCase):
 
             apphook_pool.clear()
 
+    def test_get_i18n_apphook_with_explicit_current_app(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+            titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
+            public_de_title = titles[1]
+            de_title = Title.objects.get(page=public_de_title.page.publisher_draft, language="de")
+            de_title.slug = "de"
+            de_title.save()
+            de_title.page.publish()
+
+            page2 = create_page("page2", "nav_playground.html",
+                                "en", created_by=self.superuser, published=True, parent=de_title.page.parent,
+                                apphook=NS_APP_NAME,
+                                apphook_namespace="instance_2")
+            de_title2 = create_title("de", "de_title", page2, slug="slug")
+
+            page2.publish()
+            clear_app_resolvers()
+            clear_url_caches()
+
+            if APP_MODULE in sys.modules:
+                del sys.modules[APP_MODULE]
+
+            self.reload_urls()
+            with force_language("de"):
+                path = reverse('namespaced_app_ns:current-app', current_app="instance_1")
+                path = reverse('namespaced_app_ns:current-app', current_app="instance_2")
+                path = reverse('namespaced_app_ns:current-app')
+            with force_language("en"):
+                path = reverse('namespaced_app_ns:current-app', current_app="instance_1")
+                path = reverse('namespaced_app_ns:current-app', current_app="instance_2")
+                path = reverse('namespaced_app_ns:current-app')
+
     def test_get_sub_page_for_apphook_with_explicit_current_app(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
@@ -279,7 +312,7 @@ class ApphooksTestCase(CMSTestCase):
             response = self.client.get(path)
             self.assertEquals(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/app.html')
-            self.assertContains(response, 'namespaced_app_ns')
+            self.assertContains(response, 'instance_ns')
             self.assertContains(response, path)
 
             apphook_pool.clear()
