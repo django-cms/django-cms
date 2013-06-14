@@ -6,44 +6,6 @@
             new_slug = false;
         }
 
-        if (window.location.href.split("history").length == 1 && window.location.href.split("recover").length == 1) {
-            $.each(["template"], function (i, label) {
-                var select = $('select#id_' + label);
-                select.change(function () {
-                    var changed = $("#id_slug")[0]._changed;
-
-                    if ($("#id_title")[0]._changed) {
-                        changed = true;
-                    }
-                    var pub = $("#id_published");
-                    if (pub.length) {
-                        if (pub[0]._changed) {
-                            changed = true;
-                        }
-                    }
-                    if ($('iframe').length) {
-                        changed = true;
-                    }
-                    var answer = '';
-                    var array = window.location.href.split('?');
-                    var query = $.query.set(label, this.options[this.selectedIndex].value).toString();
-                    if (changed) {
-                        var question = gettext("Are you sure you want to change the %(field_name)s without saving the page first?");
-                        answer = confirm(interpolate(question, {
-                            field_name: select.prev().text().slice(0, -1)
-                        }, true));
-                    } else {
-                        answer = true;
-                    }
-
-                    if (answer) {
-                        window.location.href = array[0] + query;
-                    }
-
-                });
-            });
-        }
-
         $("#id_title").focus();
         $("#id_slug").change(function () {
             this._changed = true;
@@ -106,5 +68,4 @@
             window.location = url;
         }
     }
-})
-    (jQuery);
+})(django.jQuery);

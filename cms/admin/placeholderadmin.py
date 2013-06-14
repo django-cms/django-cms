@@ -37,13 +37,6 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = [cms_static_url(path) for path in [
-            '%sjs/jquery.min.js' % admin_static_url(),
-            'js/csrf.js',
-            'js/plugins/jquery.query.js',
-            'js/plugins/jquery.ui.custom.js',
-        ]
-        ]
 
 
     def get_fieldsets(self, request, obj=None):
