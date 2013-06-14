@@ -6,7 +6,6 @@ from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
-from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -16,7 +15,6 @@ from djangocms_text_ckeditor.models import Text
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 import django
 from django.contrib import admin
@@ -28,8 +26,6 @@ from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
-from menus.menu_pool import menu_pool
-from types import MethodType
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
@@ -171,12 +167,13 @@ class AdminTestCase(AdminTestsBase):
         page.save()
         title = page.get_title_obj()
         title.has_url_overwrite = True
-        title.application_urls = APPLICATION_URLS
-        title.save()
 
+        title.save()
+        page.application_urls = APPLICATION_URLS
+        page.save()
         self.assertEqual(page.get_title(), OLD_PAGE_NAME)
         self.assertEqual(page.reverse_id, REVERSE_ID)
-        self.assertEqual(title.application_urls, APPLICATION_URLS)
+        self.assertEqual(page.application_urls, APPLICATION_URLS)
 
         # The user edits the page (change the page name for ex.)
         page_data = {
@@ -200,12 +197,10 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(resp.status_code, 200)
             self.assertTemplateNotUsed(resp, 'admin/login.html')
             page = Page.objects.get(pk=page.pk)
-
             self.assertEqual(page.get_title(), NEW_PAGE_NAME)
             self.assertEqual(page.reverse_id, REVERSE_ID)
+            self.assertEqual(page.application_urls, APPLICATION_URLS)
             title = page.get_title_obj()
-            self.assertEqual(title.application_urls, APPLICATION_URLS)
-
             # The admin edits the page (change the page name for ex.)
             page_data = {
                 'title': OLD_PAGE_NAME,
@@ -215,7 +210,6 @@ class AdminTestCase(AdminTestsBase):
                 'template': page.template,
                 'reverse_id': page.reverse_id,
             }
-
 
         with self.login_user_context(admin):
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page.pk, page_data,
@@ -230,8 +224,7 @@ class AdminTestCase(AdminTestsBase):
 
             self.assertEqual(page.get_title(), OLD_PAGE_NAME)
             self.assertEqual(page.reverse_id, REVERSE_ID)
-            title = page.get_title_obj()
-            self.assertEqual(title.application_urls, '')
+            self.assertEqual(page.application_urls, '')
 
     def test_delete(self):
         admin = self.get_superuser()

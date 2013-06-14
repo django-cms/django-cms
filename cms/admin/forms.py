@@ -108,7 +108,6 @@ class PageForm(forms.ModelForm):
         try:
             site = self.cleaned_data.get('site', Site.objects.get_current())
         except Site.DoesNotExist:
-            site = None
             raise ValidationError("No site found for current settings.")
 
         if parent and parent.site != site:
@@ -197,19 +196,30 @@ class AdvancedSettingsForm(forms.ModelForm):
                         pk=self.instance.pk).count():
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
+        apphook = cleaned_data['application_urls']
+        namespace = cleaned_data['application_namespace']
+        if apphook:
+            apphook_pool.discover_apps()
+            if apphook_pool.apps[apphook].app_name and not namespace:
+                self._errors['application_urls'] = ErrorList(
+                    [_('You selected an apphook with an "app_name". You must enter a namespace.')])
+        if namespace and not apphook:
+            self._errors['application_namespace'] = ErrorList(
+                [_("If you enter a namespace you need an application url as well.")])
         return cleaned_data
 
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:
             url = self.cleaned_data['overwrite_url']
             is_valid_url(url, self.instance)
-            # TODO: Check what happens if 'overwrite_url' is NOT in self.fields
             return url
 
     class Meta:
         model = Page
-        fields = ['site', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
-            'application_urls']
+        fields = [
+            'site', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'application_urls', 'application_namespace'
+        ]
 
 
 class PagePermissionForm(forms.ModelForm):
@@ -298,8 +308,8 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # TODO: finish this, but is it really required? might be nice to have
 
         # check if permissions assigned in cms are correct, and display
-        # a message if not - correctness mean: if user has add permisson to
-        # page, but he does'nt have auth permissions to add page object,
+        # a message if not - correctness mean: if user has add permission to
+        # page, but he doesn't have auth permissions to add page object,
         # display warning
         return self.cleaned_data
 
