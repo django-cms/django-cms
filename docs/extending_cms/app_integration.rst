@@ -293,6 +293,7 @@ You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 :class:`CategoryMenu` both attached to the same page.
 
 .. _multi_apphook:
+
 Attaching an Application multiple times
 ---------------------------------------
 

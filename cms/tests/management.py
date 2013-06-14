@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.models import Page
 from django.core import management
 
 from cms.test_utils.testcases import CMSTestCase
@@ -8,7 +9,6 @@ from cms.api import create_page, add_plugin
 from cms.management.commands import cms
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.titlemodels import Title
 from cms.models.placeholdermodel import Placeholder
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from cms.utils.compat.string_io import StringIO
