@@ -2,7 +2,7 @@
 // in the admin is fixed
 // TODO: Indentation is broken in this file.
 
-(function($){
+var csrfSetup = function($){
 
 $.ajaxSetup({
 				beforeSend: function (xhr, settings) {
@@ -87,4 +87,10 @@ settings.csrfTokenSet = true;
 }
 });
 };
-})(jQuery);
+}
+
+if (window.django){
+    csrfSetup(django.jQuery);
+}else{
+    csrfSetup($)
+}
