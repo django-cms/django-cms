@@ -18,7 +18,7 @@ def configure(db_url, **extra):
         DB = {}
     defaults = dict(
         CACHE_BACKEND='locmem:///',
-        DEBUG=False,
+        DEBUG=True,
         TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
         DATABASES={
