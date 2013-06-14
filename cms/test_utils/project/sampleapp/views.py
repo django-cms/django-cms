@@ -26,7 +26,10 @@ def category_view(request, id):
 
 
 def extra_view(request, **kw):
-    context = RequestContext(request, kw)
+    app = resolve(request.path).namespace
+    kw['app'] = app
+    response_kwargs = {'current_app': app, 'dict_': kw}
+    context = RequestContext(request, **response_kwargs)
     return render_to_response("sampleapp/extra.html", context)
 
 

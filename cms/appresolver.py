@@ -93,7 +93,7 @@ class AppRegexURLResolver(RegexURLResolver):
             raise Resolver404, {'tried': tried, 'path': new_path}
 
 
-def recurse_patterns(path, pattern_list, page_id):
+def recurse_patterns(path, pattern_list, page_id, default_args=None):
     """
     Recurse over a list of to-be-hooked patterns for a given path prefix
     """
@@ -109,12 +109,19 @@ def recurse_patterns(path, pattern_list, page_id):
             resolver = RegexURLResolver(regex, 'cms_appresolver',
                                         pattern.default_kwargs, pattern.app_name, pattern.namespace)
             resolver.page_id = page_id
+            # include default_args
+            args = pattern.default_kwargs
+            if default_args:
+                args.update(default_args)
             # see lines 243 and 236 of urlresolvers.py to understand the next line
-            resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id)
+            resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args)
         else:
             # Re-do the RegexURLPattern with the new regular expression
+            args = pattern.default_args
+            if default_args:
+                args.update(default_args)
             resolver = RegexURLPattern(regex, pattern.callback,
-                                       pattern.default_args, pattern.name)
+                                       args, pattern.name)
             resolver.page_id = page_id
         newpatterns.append(resolver)
     return newpatterns

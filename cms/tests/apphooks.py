@@ -297,6 +297,18 @@ class ApphooksTestCase(CMSTestCase):
                 path = reverse('namespaced_app_ns:current-app', current_app="instance_2")
                 path = reverse('namespaced_app_ns:current-app')
 
+    def test_apphook_include_extra_parameters(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+            titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
+            with force_language("en"):
+                path = reverse('namespaced_app_ns:extra_second')
+            request = self.get_request(path)
+            request.LANGUAGE_CODE = 'en'
+            response = self.client.get(path)
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'sampleapp/extra.html')
+            self.assertContains(response, 'someopts')
+
     def test_get_sub_page_for_apphook_with_explicit_current_app(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
