@@ -40,7 +40,7 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to staff users.
 
 
-.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, redirect=None, meta_description=None, meta_keywords=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
+.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, meta_keywords=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
 
     Creates a :class:`cms.models.pagemodel.Page` instance and returns it. Also
     creates a :class:`cms.models.titlemodel.Title` instance for the specified
@@ -53,6 +53,7 @@ Functions and constants
     :param string slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
     :type apphook: string or :class:`cms.app_base.CMSApp` subclass
+    :param string apphook_namespace: Name of the apphook namespace
     :param string redirect: URL redirect
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
@@ -76,7 +77,7 @@ Functions and constants
     :param string overwrite_url: Overwritten path for this page
 
 
-.. function:: create_title(language, title, page, menu_title=None, slug=None, apphook=None, redirect=None, meta_description=None, meta_keywords=None, parent=None)
+.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, meta_keywords=None, parent=None)
     
     Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
 
@@ -86,8 +87,6 @@ Functions and constants
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param string menu_title: Menu title for this page
     :param string slug: Slug for the page, by default uses a slugified version of *title*
-    :param apphook: Application to hook on this page, must be a valid apphook
-    :type apphook: string or :class:`cms.app_base.CMSApp` subclass
     :param string redirect: URL redirect
     :param string meta_description: Description of this page for SEO
     :param string meta_keywords: Keywords for this page for SEO
