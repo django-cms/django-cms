@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import PlaceholderNoAction
 from django.core.urlresolvers import reverse
@@ -8,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 import operator
 
 
+@python_2_unicode_compatible
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
@@ -15,7 +17,7 @@ class Placeholder(models.Model):
     class Meta:
         app_label = 'cms'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slot
 
     def get_add_url(self):

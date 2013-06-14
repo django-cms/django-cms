@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from cms import constants
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
 from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
@@ -14,6 +15,7 @@ from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -26,11 +28,11 @@ from mptt.models import MPTTModel
 from os.path import join
 
 
-class Page(MPTTModel):
+@python_2_unicode_compatible
+class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
     A simple hierarchical page model
     """
-    __metaclass__ = PageMetaClass
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
@@ -109,11 +111,11 @@ class Page(MPTTModel):
             'placeholders', 'lft', 'rght', 'tree_id',
             'parent']
 
-    def __unicode__(self):
+    def __str__(self):
         title = self.get_menu_title(fallback=True)
         if title is None:
             title = u""
-        return unicode(title)
+        return force_unicode(title)
 
     def __repr__(self):
         # This is needed to solve the infinite recursion when
@@ -183,7 +185,7 @@ class Page(MPTTModel):
             title.page = target
             title.save()
         if old_titles:
-            from titlemodels import Title
+            from .titlemodels import Title
 
             Title.objects.filter(id__in=old_titles.values()).delete()
 
@@ -613,10 +615,7 @@ class Page(MPTTModel):
         from cms.models.titlemodels import Title
 
         if not hasattr(self, "all_languages"):
-            self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
-            self.all_languages = list(self.all_languages)
-            self.all_languages.sort()
-            self.all_languages = map(str, self.all_languages)
+            self.all_languages = list(sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
         return self.all_languages
 
     def get_cached_ancestors(self, ascending=True):

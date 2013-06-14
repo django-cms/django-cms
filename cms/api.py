@@ -7,6 +7,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied, ValidationError
 from cms.utils.i18n import get_language_list
@@ -69,8 +70,8 @@ def _verify_apphook(apphook, namespace):
     apphook_pool.discover_apps()
     if hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         assert apphook in apphook_pool.apps.values()
-        apphook_name = apphook.__name__
-    elif isinstance(apphook, basestring):
+        return apphook.__name__
+    elif isinstance(apphook, string_types):
         apphook_pool.discover_apps()
         assert apphook in apphook_pool.apps
         apphook_name = apphook
@@ -91,7 +92,7 @@ def _verify_plugin_type(plugin_type):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
-    elif isinstance(plugin_type, basestring):
+    elif isinstance(plugin_type, string_types):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
         except KeyError:

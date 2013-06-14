@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.utils import simplejson
 from django.contrib.sites.models import Site
 
 from cms.models import Page
 from cms.utils import permissions, get_language_from_request, get_language_list, get_cms_setting
 from cms.utils.permissions import has_global_page_permission
+from django.utils.encoding import smart_str
 
 NOT_FOUND_RESPONSE = "NotFound"
 
@@ -18,7 +20,8 @@ def jsonify_request(response):
          * status: original response status code
          * content: original response content
     """
-    return HttpResponse(simplejson.dumps({'status': response.status_code, 'content': response.content}),
+    content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
+    return HttpResponse(json.dumps(content),
                         content_type="application/json")
 
 

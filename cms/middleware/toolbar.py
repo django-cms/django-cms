@@ -4,6 +4,7 @@ Edit Toolbar middleware
 """
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.compat.dj import force_unicode
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
@@ -15,7 +16,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         instance, plugin = instance.get_plugin_instance()
         for child_class_name in plugin.get_child_classes(placeholder, original_context['request'].current_page):
             cls = plugin_pool.get_plugin(child_class_name)
-            child_plugin_classes.append((cls.__name__, unicode(cls.name)))
+            child_plugin_classes.append((cls.__name__, force_unicode(cls.name)))
     data = {
         'instance': instance,
         'rendered_content': rendered_content,

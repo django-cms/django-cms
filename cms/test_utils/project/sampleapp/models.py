@@ -1,14 +1,17 @@
 from cms.models.fields import PlaceholderField
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.core.urlresolvers import reverse
 from django.db import models
 import mptt
 
+
+@python_2_unicode_compatible
 class Category(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True)
     name = models.CharField(max_length=20)
     description = PlaceholderField('category_description', 600)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     def get_absolute_url(self):

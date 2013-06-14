@@ -1,4 +1,5 @@
 import uuid
+from cms.utils.compat.dj import python_2_unicode_compatible
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -7,6 +8,7 @@ from cms.models.fields import PlaceholderField
 from cms.models.pluginmodel import CMSPlugin
 
 
+@python_2_unicode_compatible
 class Stack(models.Model):
     CREATION_BY_TEMPLATE = 'template'
     CREATION_BY_CODE = 'code'
@@ -32,7 +34,7 @@ class Stack(models.Model):
         verbose_name = _(u'stack')
         verbose_name_plural = _(u'stacks')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def clean(self):
@@ -41,8 +43,9 @@ class Stack(models.Model):
             self.code = u'stack-%s' % uuid.uuid4()
 
 
+@python_2_unicode_compatible
 class StackLink(CMSPlugin):
     stack = models.ForeignKey(Stack, verbose_name=_(u'stack'), related_name='linked_plugins')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.stack.name

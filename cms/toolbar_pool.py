@@ -40,7 +40,7 @@ class ToolbarPool(object):
             raise ImproperlyConfigured("Toolbar callbacks must be callable, %r isn't." % callback)
         name = "%s.%s" % (callback.__module__, callback.__name__)
         if name in self.toolbars.keys():
-            raise ToolbarAlreadyRegistered, "[%s] a toolbar with this name is already registered" % name
+            raise ToolbarAlreadyRegistered("[%s] a toolbar with this name is already registered" % name)
         self.toolbars[name] = callback
         self.reverse[callback] = name
         return callback # return so it can be used as a decorator

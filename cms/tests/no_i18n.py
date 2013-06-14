@@ -132,7 +132,7 @@ class TestNoI18N(SettingsOverrideTestCase):
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD[3:], plugin_data)
         self.assertEquals(response.status_code, 200)
-        created_plugin_id = int(response.content.split("/edit-plugin/")[1].split("/")[0])
+        created_plugin_id = int(response.content.decode('utf8').split("/edit-plugin/")[1].split("/")[0])
         self.assertEquals(created_plugin_id, CMSPlugin.objects.all()[0].pk)
         # now edit the plugin
         edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)

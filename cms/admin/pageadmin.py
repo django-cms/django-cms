@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
-from urllib2 import unquote
+import sys
 import warnings
 from django.template.response import TemplateResponse
 from django.contrib.admin.helpers import AdminForm
 from django.utils import simplejson
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from cms.utils.conf import get_cms_setting
-from cms.utils.helpers import find_placeholder_relation
 
 import django
 from django.conf import settings
@@ -25,11 +23,14 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import (escape, force_escape, escapejs)
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
+from cms.utils.conf import get_cms_setting
+from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.urls import unquote
+from cms.utils.helpers import find_placeholder_relation
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import PageForm, PageTitleForm, AdvancedSettingsForm, PagePermissionForm
@@ -333,7 +334,7 @@ class PageAdmin(ModelAdmin):
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'can_change': obj.has_change_permission(request),
                 'can_change_permissions': obj.has_change_permissions_permission(request),
-                'show_delete_translation': len(obj.get_languages()) > 1,
+                'show_delete_translation': len(list(obj.get_languages())) > 1,
                 'current_site_id': settings.SITE_ID,
             }
             context.update(extra_context or {})
@@ -380,7 +381,7 @@ class PageAdmin(ModelAdmin):
         context.update({
             'language': language,
             'language_tabs': languages,
-            'show_language_tabs': len(languages) > 1,
+             'show_language_tabs': len(list(languages)) > 1,
         })
         return context
 
@@ -733,8 +734,9 @@ class PageAdmin(ModelAdmin):
                     }
                     page.copy_page(target, site, position, **kwargs)
                     return jsonify_request(HttpResponse("ok"))
-                except ValidationError, e:
-                    return jsonify_request(HttpResponseBadRequest(e.messages))
+                except ValidationError:
+                    exc = sys.exc_info()[1]
+                    return jsonify_request(HttpResponseBadRequest(exc.messages))
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
@@ -845,7 +847,7 @@ class PageAdmin(ModelAdmin):
                     'key': escape(object_id)
                 })
 
-        if not len(obj.get_languages()) > 1:
+        if not len(list(obj.get_languages())) > 1:
             raise Http404(_('There only exists one translation for this page'))
 
         titleobj = get_object_or_404(Title, page__id=object_id, language=language)
@@ -957,11 +959,13 @@ class PageAdmin(ModelAdmin):
                         object_repr=page.get_title(),
                         action_flag=CHANGE,
                     )
-                except RuntimeError, e:
-                    messages.error(request, e.message)
+                except RuntimeError:
+                    exc = sys.exc_info()[1]
+                    messages.error(request, exc.message)
             return admin_utils.render_admin_menu_item(request, page)
-        except ValidationError, e:
-            return HttpResponseBadRequest(e.messages)
+        except ValidationError:
+            exc = sys.exc_info()[1]
+            return HttpResponseBadRequest(exc.messages)
 
     @require_POST
     def change_innavigation(self, request, page_id):
@@ -1013,8 +1017,9 @@ class PageAdmin(ModelAdmin):
         language = request.POST['plugin_language'] or get_language_from_request(request)
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language, template=page.get_template())
-        except PluginLimitReached, e:
-            return HttpResponseBadRequest(str(e))
+        except PluginLimitReached:
+            exc = sys.exc_info()
+            return HttpResponseBadRequest(str(exc))
             # page add-plugin
         if not parent_id:
 
@@ -1049,12 +1054,12 @@ class PageAdmin(ModelAdmin):
         plugin.save()
 
         if 'reversion' in settings.INSTALLED_APPS and page:
-            plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
+            plugin_name = force_unicode(plugin_pool.get_plugin(plugin_type).name)
             message = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
                 'plugin_name': plugin_name, 'placeholder': placeholder}
             helpers.make_revision_with_plugins(page, request.user, message)
         response = {
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[plugin.pk])),
+            'url': force_unicode(reverse("admin:cms_page_edit_plugin", args=[plugin.pk])),
             'breadcrumb': plugin.get_breadcrumb(),
         }
         return HttpResponse(simplejson.dumps(response), content_type='application/json')
@@ -1183,13 +1188,13 @@ class PageAdmin(ModelAdmin):
             }
             instance = cms_plugin.get_plugin_instance()[0]
             if instance:
-                context['name'] = unicode(instance)
+                context['name'] = force_unicode(instance)
             else:
                 # cancelled before any content was added to plugin
                 cms_plugin.delete()
                 context.update({
                     "deleted": True,
-                    'name': unicode(cms_plugin),
+                    'name': force_unicode(cms_plugin),
                 })
             return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
 
@@ -1209,7 +1214,7 @@ class PageAdmin(ModelAdmin):
 
             # if reversion is installed, save version of the page plugins
             if 'reversion' in settings.INSTALLED_APPS and page:
-                plugin_name = unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
+                plugin_name = force_unicode(plugin_pool.get_plugin(cms_plugin.plugin_type).name)
                 message = _(
                     u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {
                               'plugin_name': plugin_name,
@@ -1223,7 +1228,7 @@ class PageAdmin(ModelAdmin):
                 'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
                 'plugin': saved_object,
                 'is_popup': True,
-                'name': unicode(saved_object),
+                'name': force_unicode(saved_object),
                 "type": saved_object.get_plugin_name(),
                 'plugin_id': plugin_id,
                 'icon': force_escape(saved_object.get_instance_icon_src()),
@@ -1265,8 +1270,9 @@ class PageAdmin(ModelAdmin):
             if page:
                 template = page.get_template()
             has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
-        except PluginLimitReached, e:
-            return HttpResponseBadRequest(str(e))
+        except PluginLimitReached:
+            exc = sys.exc_info()[1]
+            return HttpResponseBadRequest(str(exc))
         plugin.placeholder = placeholder
         plugin.save()
         for child in plugin.get_descendants():
@@ -1322,7 +1328,7 @@ class PageAdmin(ModelAdmin):
             self.log_deletion(request, plugin, obj_display)
             plugin.delete()
 
-            plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+            plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
                 'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
             if page:
@@ -1339,7 +1345,7 @@ class PageAdmin(ModelAdmin):
                     helpers.make_revision_with_plugins(page, request.user, comment)
                     return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
 
-        plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+        plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": plugin_name}

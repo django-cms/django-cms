@@ -63,7 +63,7 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEquals(response.status_code, 200)
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.split("edit-plugin/")[1].split("/")[0] + "/"
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0] + "/"
             response = self.client.get(edit_url)
             self.assertEquals(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
@@ -159,7 +159,7 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEquals(response.status_code, 200)
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.split("edit-plugin/")[1].split("/")[0] + "/"
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0] + "/"
             response = self.client.get(edit_url)
             self.assertEquals(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
@@ -223,7 +223,7 @@ class ReversionTestCase(CMSTestCase):
                 page = Page.objects.all()[0]
                 page_pk = page.pk
                 self.assertEquals(Revision.objects.all().count(), 5)
-                for x in xrange(10):
+                for x in range(10):
                     publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
                     response = self.client.get(publish_url)
                     self.assertEquals(response.status_code, 302)
@@ -235,10 +235,11 @@ class ReversionFileFieldTests(CMSTestCase):
         shutil.rmtree(join(settings.MEDIA_ROOT, 'fileapp'))
 
     def test_file_persistence(self):
+        content = b'content1'
         with reversion.create_revision():
             # add a file instance
             file1 = FileModel()
-            file1.test_file.save('file1.txt', SimpleUploadedFile('file1.txt', 'content1'), False)
+            file1.test_file.save('file1.txt', SimpleUploadedFile('file1.txt', content), False)
             file1.save()
             # manually add a revision because we use the explicit way
             # django-cms uses too.
@@ -257,4 +258,4 @@ class ReversionFileFieldTests(CMSTestCase):
 
         # reload the reverted instance and check for its content
         file1 = FileModel.objects.all()[0]
-        self.assertEqual(file1.test_file.file.read(), 'content1')
+        self.assertEqual(file1.test_file.file.read(), content)

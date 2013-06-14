@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -7,6 +8,7 @@ from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
 
 
+@python_2_unicode_compatible
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
@@ -28,7 +30,7 @@ class Title(models.Model):
         unique_together = (('language', 'page'),)
         app_label = 'cms'
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s (%s, %s)" % (self.title, self.slug, self.language)
 
     def update_path(self):

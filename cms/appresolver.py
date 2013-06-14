@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import sys
 from cms.apphook_pool import apphook_pool
+from cms.utils.compat.type_checks import string_types
 from cms.utils.i18n import force_language, get_language_list
 from cms.models.pagemodel import Page
 
 from django.conf import settings
-from django.conf.urls.defaults import patterns
+from django.conf.urls import patterns
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import RegexURLResolver, Resolver404, reverse, \
@@ -81,16 +83,17 @@ class AppRegexURLResolver(RegexURLResolver):
                 else:
                     try:
                         sub_match = pattern.resolve(new_path)
-                    except Resolver404, e:
-                        if 'tried' in e.args[0]:
-                            tried.extend([[pattern] + t for t in e.args[0]['tried']])
-                        elif 'path' in e.args[0]:
-                            tried.extend([[pattern] + t for t in e.args[0]['path']])
+                    except Resolver404:
+                        exc = sys.exc_info()[0]
+                        if 'tried' in exc.args[0]:
+                            tried.extend([[pattern] + t for t in exc.args[0]['tried']])
+                        elif 'path' in exc.args[0]:
+                            tried.extend([[pattern] + t for t in exc.args[0]['path']])
                     else:
                         if sub_match:
                             return pattern.page_id
                         tried.append(pattern.regex.pattern)
-            raise Resolver404, {'tried': tried, 'path': new_path}
+            raise Resolver404({'tried': tried, 'path': new_path})
 
 
 def recurse_patterns(path, pattern_list, page_id, default_args=None):
@@ -139,7 +142,7 @@ def _flatten_patterns(patterns):
 
 def get_app_urls(urls):
     for urlconf in urls:
-        if isinstance(urlconf, basestring):
+        if isinstance(urlconf, string_types):
             mod = import_module(urlconf)
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(

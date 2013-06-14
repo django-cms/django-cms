@@ -1,6 +1,7 @@
 import abc
 import json
 from collections import defaultdict, namedtuple
+from cms.utils.compat.dj import force_unicode
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 from django.template.loader import render_to_string
 from django.utils.functional import Promise
@@ -176,7 +177,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
         self.csrf_token = csrf_token
 
     def __repr__(self):
-        return '<Menu:%s>' % unicode(self.name)
+        return '<Menu:%s>' % force_unicode(self.name)
 
     def add_break(self, identifier=None, position=None):
         item = Break(identifier)
@@ -218,7 +219,7 @@ class LinkItem(BaseItem):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<LinkItem:%s>' % unicode(self.name)
+        return '<LinkItem:%s>' % force_unicode(self.name)
 
     def get_context(self):
         return {
@@ -245,7 +246,7 @@ class SideframeItem(BaseItem):
         self.close_on_url = close_on_url
 
     def __repr__(self):
-        return '<SideframeItem:%s>' % unicode(self.name)
+        return '<SideframeItem:%s>' % force_unicode(self.name)
 
     def get_context(self):
         return {
@@ -275,7 +276,7 @@ class AjaxItem(BaseItem):
         self.question = question
 
     def __repr__(self):
-        return '<AjaxItem:%s>' % unicode(self.name)
+        return '<AjaxItem:%s>' % force_unicode(self.name)
 
     def get_context(self):
         data = {}
@@ -308,7 +309,7 @@ class ModalItem(BaseItem):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<ModalItem:%s>' % unicode(self.name)
+        return '<ModalItem:%s>' % force_unicode(self.name)
 
     def get_context(self):
         return {
@@ -338,7 +339,7 @@ class Button(object):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<Button:%s>' % unicode(self.name)
+        return '<Button:%s>' % force_unicode(self.name)
 
 
 class ButtonList(BaseItem):
