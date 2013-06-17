@@ -34,9 +34,9 @@ def main():
                     usr.is_staff = True
                     usr.is_active = True
                     usr.save()
-                    print
-                    print "A admin user (username: admin, password: admin) has been created."
-                    print
+                    print('')
+                    print("A admin user (username: admin, password: admin) has been created.")
+                    print('')
             from django.contrib.staticfiles.management.commands import runserver
             rs = runserver.Command()
             rs.stdout = sys.stdout

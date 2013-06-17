@@ -3,7 +3,7 @@ from cms.api import create_page
 from cms.models import Page
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 try:
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -26,7 +26,7 @@ class CMSLiveTests(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         if Display:
-            cls.display = Display(visible=0, size=(800, 600))
+            cls.display = Display(visible=0 , size=(800, 600))
             cls.display.start()
         if WebDriver:
             cls.selenium = WebDriver()

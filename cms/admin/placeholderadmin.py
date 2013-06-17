@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from copy import deepcopy
 from django.utils import simplejson
 
@@ -11,6 +12,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import cms_static_url, get_cms_setting
 from cms.utils.permissions import has_plugin_permission
+from cms.utils.compat.dj import force_unicode
 from cms.plugins.utils import has_reached_plugin_limit
 from cms.templatetags.cms_admin import admin_static_url
 from django.contrib.admin import ModelAdmin
@@ -35,13 +37,6 @@ class PlaceholderAdmin(ModelAdmin):
                 'css/plugin_editor.css',
             )]
         }
-        js = [cms_static_url(path) for path in [
-            '%sjs/jquery.min.js' % admin_static_url(),
-            'js/csrf.js',
-            'js/plugins/jquery.query.js',
-            'js/plugins/jquery.ui.custom.js',
-        ]
-        ]
 
 
     def get_fieldsets(self, request, obj=None):
@@ -191,8 +186,9 @@ class PlaceholderAdmin(ModelAdmin):
 
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language)
-        except PluginLimitReached, e:
-            return HttpResponseBadRequest(str(e))
+        except PluginLimitReached:
+            exc = sys.exc_info()[1]
+            return HttpResponseBadRequest(str(exc))
 
         # actually add the plugin
         plugin = CMSPlugin(language=language, plugin_type=plugin_type,
@@ -241,13 +237,13 @@ class PlaceholderAdmin(ModelAdmin):
             }
             instance = cms_plugin.get_plugin_instance()[0]
             if instance:
-                context['name'] = unicode(instance)
+                context['name'] = force_unicode(instance)
             else:
                 # cancelled before any content was added to plugin
                 cms_plugin.delete()
                 context.update({
                     "deleted": True,
-                    'name': unicode(cms_plugin),
+                    'name': force_unicode(cms_plugin),
                 })
             return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
 
@@ -270,7 +266,7 @@ class PlaceholderAdmin(ModelAdmin):
                 'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
                 'plugin': saved_object,
                 'is_popup': True,
-                'name': unicode(saved_object),
+                'name': force_unicode(saved_object),
                 "type": saved_object.get_plugin_name(),
                 'plugin_id': plugin_id,
                 'icon': force_escape(saved_object.get_instance_icon_src()),
@@ -300,8 +296,9 @@ class PlaceholderAdmin(ModelAdmin):
 
             try:
                 has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language)
-            except PluginLimitReached, e:
-                return HttpResponseBadRequest(str(e))
+            except PluginLimitReached:
+                exc = sys.exc_info()[1]
+                return HttpResponseBadRequest(str(exc))
 
             # plugin positions are 0 based, so just using count here should give us 'last_position + 1'
             position = CMSPlugin.objects.filter(placeholder=placeholder).count()
@@ -344,7 +341,7 @@ class PlaceholderAdmin(ModelAdmin):
             return HttpResponseForbidden(_("You don't have permission to delete a plugin"))
 
         plugin.delete_with_public()
-        plugin_name = unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+        plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
         comment = _(u"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {
             'plugin_name': plugin_name, 'position': plugin.position, 'placeholder': plugin.placeholder}
         return HttpResponse("%s,%s" % (plugin_id, comment))

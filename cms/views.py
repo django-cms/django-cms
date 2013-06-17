@@ -38,10 +38,11 @@ def details(request, slug):
     current_language = get_language_from_request(request)
     # Check that the current page is available in the desired (current) language
     available_languages = []
-    page_languages = page.get_languages()
-    user_languages = get_public_languages()
+    page_languages = list(page.get_languages())
     if hasattr(request, 'user') and request.user.is_staff:
         user_languages = get_language_list()
+    else:
+        user_languages = get_public_languages()
     for frontend_lang in user_languages:
         if frontend_lang in page_languages:
             available_languages.append(frontend_lang)
@@ -109,7 +110,6 @@ def details(request, slug):
                 pattern_list += urlpatterns
             urlpatterns = patterns('', *pattern_list)
             try:
-                context.current_app = page.reverse_id if page.reverse_id else app.app_name
                 view, args, kwargs = resolve('/', tuple(urlpatterns))
                 return view(request, *args, **kwargs)
             except Resolver404:

@@ -7,7 +7,6 @@
 {{ block.super }}
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
-
 {% if not add %}
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_form.js"></script>
 {% endif %}
@@ -16,11 +15,11 @@
 
 <script type="text/javascript">
 //<![CDATA[
-
-	jQuery(document).ready(function (){
+(function ($) {
+	$(document).ready(function (){
         {% if add %}
-        var title= jQuery('#id_title');
-        var slug = jQuery('#id_slug');
+        var title= $('#id_title');
+        var slug = $('#id_slug');
 		if (title.length > 0 && slug.length > 0) {
 			var update = function(){
 				var value = title.val();
@@ -33,10 +32,12 @@
 			update();
 		}
         {% endif %}
-        jQuery('input[type="hidden"]').each(function () {
-            jQuery(this).parent('.form-row').hide()
+        $('input[type="hidden"]').each(function () {
+            $(this).parent('.form-row').hide()
         });
 	});
+
+})(django.jQuery);
 
 //]]>
 </script>

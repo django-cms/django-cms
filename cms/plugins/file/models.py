@@ -1,3 +1,4 @@
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.storage import default_storage
@@ -5,6 +6,8 @@ from cms.models import CMSPlugin
 import os
 from django.conf import settings
 
+
+@python_2_unicode_compatible
 class File(CMSPlugin):
     """
     Plugin for storing any type of file.
@@ -30,6 +33,14 @@ class File(CMSPlugin):
     ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", os.path.join(settings.STATIC_ROOT, "cms", "images", "file_icons"))
     ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s/%s/%s/" % (settings.STATIC_URL, "cms", "images", "file_icons"))
 
+    def __str__(self):
+        if self.title:
+            return self.title;
+        elif self.file:
+            # added if, because it raised attribute error when file wasnt defined
+            return self.get_file_name();
+        return "<empty>"
+
     def get_icon_url(self):
         path_base = os.path.join(self.ICON_PATH, self.get_ext())
         url_base = '%s%s' % (self.ICON_URL, self.get_ext())
@@ -46,13 +57,5 @@ class File(CMSPlugin):
 
     def get_ext(self):
         return os.path.splitext(self.get_file_name())[1][1:].lower()
-
-    def __unicode__(self):
-        if self.title:
-            return self.title;
-        elif self.file:
-            # added if, because it raised attribute error when file wasnt defined
-            return self.get_file_name();
-        return "<empty>"
 
     search_fields = ('title',)

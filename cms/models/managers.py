@@ -170,7 +170,6 @@ class TitleManager(PublisherManager):
             'menu_title'
         ]
         advanced_fields = [
-            'application_urls',
             'redirect',
         ]
         cleaned_data = form.cleaned_data
