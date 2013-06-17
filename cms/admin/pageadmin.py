@@ -2,6 +2,7 @@
 from distutils.version import LooseVersion
 import sys
 from cms.admin.placeholderadmin import BasePlaceholderAdmin
+from cms.plugin_pool import plugin_pool
 from django.contrib.admin.helpers import AdminForm
 
 import django
@@ -18,7 +19,7 @@ from django.db import router, transaction
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
-from django.template.defaultfilters import (escape  )
+from django.template.defaultfilters import escape
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
@@ -47,15 +48,16 @@ DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:
+    from reversion.admin import VersionAdmin as ModelAdmin
     from reversion import create_revision
-else: # pragma: no cover
-
+else:  # pragma: no cover
+    from django.contrib.admin import ModelAdmin
     create_revision = lambda: lambda x: x
 
 PUBLISH_COMMENT = "Publish"
 
 
-class PageAdmin(BasePlaceholderAdmin):
+class PageAdmin(BasePlaceholderAdmin, ModelAdmin):
     form = PageForm
     search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"
@@ -96,14 +98,14 @@ class PageAdmin(BasePlaceholderAdmin):
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
-            pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
+            pat(r'^([0-9]+)/publish/$', self.publish_page),  # publish page
+            pat(r'^([0-9]+)/revert/$', self.revert_page),  # publish page
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
-            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
-            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
-            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
-            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
+            pat(r'^([0-9]+)/preview/$', self.preview_page),  # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants),  # menu html for page descendants
+            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template),  # copy dialog
         )
 
         url_patterns += super(PageAdmin, self).get_urls()
@@ -420,6 +422,134 @@ class PageAdmin(BasePlaceholderAdmin):
             pass
         return False
 
+    def has_add_plugin_permission(self, request, placeholder, plugin_type):
+        if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
+            return False
+        page = placeholder.page
+        if page and not page.has_change_permission(request):
+            return False
+        if page and not page.publisher_is_draft:
+            return False
+        return True
+
+    def has_copy_plugin_permission(self, request, source_placeholder, target_placeholder, plugins):
+        source_page = source_placeholder.page
+        if source_page and not source_page.has_change_permission(request):
+            return False
+        target_page = target_placeholder.page
+        if target_page and not target_page.has_change_permission(request):
+            return False
+        if target_page and not target_page.publisher_is_draft:
+            return False
+        for plugin in plugins:
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
+                return False
+        return True
+
+    def has_change_plugin_permission(self, request, plugin):
+        page = plugin.placeholder.page if plugin.placeholder else None
+        if page and not page.has_change_permission(request):
+            return False
+        if page and not page.publisher_is_draft:
+            return False
+        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
+            return False
+        return True
+
+    def has_move_plugin_permission(self, request, plugin, target_placeholder):
+        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
+            return False
+        page = plugin.placeholder.page
+        if page and not page.has_change_permission(request):
+            return False
+        if page and not page.publisher_is_draft:
+            return False
+        return True
+
+    def has_delete_plugin_permission(self, request, plugin):
+        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
+            return False
+        page = plugin.placeholder.page
+        if page:
+            if not page.publisher_is_draft:
+                return False
+            if not page.has_change_permission(request):
+                return False
+        return True
+
+    def has_clear_placeholder_permission(self, request, placeholder):
+        page = placeholder.page if placeholder else None
+        if page:
+            if not page.publisher_is_draft:
+                return False
+            if not page.has_change_permission(request):
+                return False
+        return True
+
+    def post_add_plugin(self, request, placeholder, plugin):
+        if 'reversion' in settings.INSTALLED_APPS and placeholder.page:
+            plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+            message = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
+                'plugin_name': plugin_name, 'placeholder': placeholder}
+            helpers.make_revision_with_plugins(placeholder.page, request.user, message)
+
+    def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
+        page = target_placeholder.page
+        if page and "reversion" in settings.INSTALLED_APPS:
+            message = _(u"Copied plugins to %(placeholder)s") % {'placeholder': target_placeholder}
+            helpers.make_revision_with_plugins(page, request.user, message)
+
+    def post_edit_plugin(self, request, plugin):
+        page = plugin.placeholder.page
+        if page:
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+
+            # if reversion is installed, save version of the page plugins
+            if 'reversion' in settings.INSTALLED_APPS and page:
+                plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+                message = _(
+                    u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {
+                              'plugin_name': plugin_name,
+                              'position': plugin.position,
+                              'placeholder': plugin.placeholder.slot
+                          }
+                helpers.make_revision_with_plugins(page, request.user, message)
+
+    def post_move_plugin(self, request, plugin):
+        page = plugin.placeholder.page
+        if page and 'reversion' in settings.INSTALLED_APPS:
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+            helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
+
+    def post_delete_plugin(self, request, plugin):
+        plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+        page = plugin.placeholder.page
+        if page:
+            page.save()
+            comment = _("%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted.") % {
+                'plugin_name': plugin_name,
+                'position': plugin.position,
+                'placeholder': plugin.placeholder,
+            }
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+            if 'reversion' in settings.INSTALLED_APPS:
+                helpers.make_revision_with_plugins(page, request.user, comment)
+
+    def post_clear_placeholder(self, request, placeholder):
+        page = placeholder.page
+        if page:
+            page.save()
+            comment = _('All plugins in the placeholder "%(name)s" were deleted.') % {
+                'name': force_unicode(placeholder)
+            }
+            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
+            if 'reversion' in settings.INSTALLED_APPS:
+                helpers.make_revision_with_plugins(page, request.user, comment)
+
+    def get_placeholder_template(self, request, placeholder):
+        page = placeholder.page
+        return page.get_template()
+
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
         from django.contrib.admin.views.main import ERROR_FLAG
@@ -483,7 +613,6 @@ class PageAdmin(BasePlaceholderAdmin):
             'admin/change_list.html'
         ], context, context_instance=RequestContext(request))
 
-
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
             raise PermissionDenied
@@ -525,7 +654,7 @@ class PageAdmin(BasePlaceholderAdmin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    @require_POST
+    @method_decorator(require_POST)
     def undo(self, request, object_id):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
@@ -566,7 +695,7 @@ class PageAdmin(BasePlaceholderAdmin):
         rev_page.save()
         return HttpResponse("ok")
 
-    @require_POST
+    @method_decorator(require_POST)
     def redo(self, request, object_id):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
@@ -606,7 +735,6 @@ class PageAdmin(BasePlaceholderAdmin):
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
         return HttpResponse("ok")
-
 
     @require_POST
     @create_revision()
@@ -1044,5 +1172,6 @@ class PageAdmin(BasePlaceholderAdmin):
     def clear_placeholder(self, *args, **kwargs):
         with create_revision():
             return super(PageAdmin, self).clear_placeholder(*args, **kwargs)
+
 
 admin.site.register(Page, PageAdmin)
