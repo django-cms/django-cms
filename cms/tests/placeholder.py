@@ -130,7 +130,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
         response = self.client.post(reverse('admin:placeholderapp_twoplaceholderexample_move_plugin'), {
-            'placeholder': ph2.slot,
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
             'plugin_order': [str(p.pk) for p in [ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3]]
@@ -557,7 +556,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request(data)
                 response = admin.add_plugin(request)
                 self.assertEqual(response.status_code, 200)
-                plugin_id = int(response.content.split('/", "breadcrumb')[0].split("/")[-1])
+                plugin_id = int(str(response.content).split('/", "breadcrumb')[0].split("/")[-1])
                 data = {
                     'body': 'Hello World',
                 }
