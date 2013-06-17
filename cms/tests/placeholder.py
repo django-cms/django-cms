@@ -460,8 +460,8 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         admin = self.get_admin()
         data = {
             'plugin_type': 'LinkPlugin',
-            'placeholder': placeholder.pk,
-            'language': 'en',
+            'placeholder_id': placeholder.pk,
+            'plugin_language': 'en',
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
@@ -480,8 +480,8 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         admin = self.get_admin()
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': placeholder.pk,
-            'language': 'en',
+            'placeholder_id': placeholder.pk,
+            'plugin_language': 'en',
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
@@ -548,8 +548,8 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         admin = self.get_admin()
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': placeholder.pk,
-            'language': 'en',
+            'placeholder_id': placeholder.pk,
+            'plugin_language': 'en',
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
@@ -557,7 +557,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request(data)
                 response = admin.add_plugin(request)
                 self.assertEqual(response.status_code, 200)
-                plugin_id = int(response.content)
+                plugin_id = int(response.content.split('/", "breadcrumb')[0].split("/")[-1])
                 data = {
                     'body': 'Hello World',
                 }
@@ -610,8 +610,8 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
     def _post_request(self, user):
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': self._placeholder.pk,
-            'language': 'en',
+            'placeholder_id': self._placeholder.pk,
+            'plugin_language': 'en',
         }
         request = self.get_post_request(data)
         request.user = self.reload(user)

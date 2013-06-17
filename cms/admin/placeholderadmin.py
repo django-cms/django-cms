@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import simplejson
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from cms.exceptions import PluginLimitReached, PluginConsistencyError
+from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
@@ -33,7 +33,7 @@ from cms.utils import copy_plugins, permissions, get_language_from_request
 from cms.utils.i18n import get_language_list
 
 
-class BasePlaceholderAdmin(ModelAdmin):
+class PlaceholderAdmin(ModelAdmin):
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
@@ -52,7 +52,7 @@ class BasePlaceholderAdmin(ModelAdmin):
             pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         )
-        return url_patterns + super(BasePlaceholderAdmin, self).get_urls()
+        return url_patterns + super(PlaceholderAdmin, self).get_urls()
 
     def has_add_plugin_permission(self, request, placeholder, plugin_type):
         if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
@@ -116,14 +116,18 @@ class BasePlaceholderAdmin(ModelAdmin):
         pass
 
     def get_placeholder_template(self, request, placeholder):
-        page = placeholder.page
-        return page.get_template()
+        pass
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
     def add_plugin(self, request):
         """
-        Could be either a page or a parent - if it's a parent we get the page via parent.
+        POST request should have the following data:
+
+        - placeholder_id
+        - plugin_type
+        - plugin_language
+        - plugin_parent (optional)
         """
         plugin_type = request.POST['plugin_type']
 
@@ -142,9 +146,8 @@ class BasePlaceholderAdmin(ModelAdmin):
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language,
                                      template=self.get_placeholder_template(request, placeholder))
-        except PluginLimitReached:
-            exc = sys.exc_info()
-            return HttpResponseBadRequest(str(exc))
+        except PluginLimitReached as er:
+            return HttpResponseBadRequest(er)
             # page add-plugin
         if not parent_id:
 
@@ -175,7 +178,9 @@ class BasePlaceholderAdmin(ModelAdmin):
         plugin.save()
         self.post_add_plugin(request, placeholder, plugin)
         response = {
-            'url': force_unicode(reverse("admin:cms_page_edit_plugin", args=[plugin.pk])),
+            'url': force_unicode(
+                reverse("admin:%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                        args=[plugin.pk])),
             'breadcrumb': plugin.get_breadcrumb(),
         }
         return HttpResponse(simplejson.dumps(response), content_type='application/json')
@@ -283,9 +288,16 @@ class BasePlaceholderAdmin(ModelAdmin):
     @method_decorator(require_POST)
     @xframe_options_sameorigin
     def move_plugin(self, request):
+        """
+        POST request with following parameters:
+        -plugin_id
+        -placeholder_id
+        -plugin_parent (optional)
+        -plugin_order (array, optional)
+        """
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
-        parent_id = request.POST['plugin_parent']
+        parent_id = request.POST.get('plugin_parent', None)
         if not parent_id:
             parent_id = None
         else:
@@ -303,9 +315,8 @@ class BasePlaceholderAdmin(ModelAdmin):
         try:
             template = self.get_placeholder_template(request, placeholder)
             has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
-        except PluginLimitReached:
-            exc = sys.exc_info()[1]
-            return HttpResponseBadRequest(str(exc))
+        except PluginLimitReached as er:
+            return HttpResponseBadRequest(er)
         plugin.placeholder = placeholder
         plugin.save()
         for child in plugin.get_descendants():
@@ -404,7 +415,7 @@ class BasePlaceholderAdmin(ModelAdmin):
                                 current_app=self.admin_site.name)
 
 
-class PlaceholderAdmin(BasePlaceholderAdmin):
+class LanguageTabsAdmin(ModelAdmin):
     render_placeholder_language_tabs = True
     change_form_template = 'admin/placeholders/placeholder/change_form.html'
 

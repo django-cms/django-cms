@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
 import sys
-from cms.admin.placeholderadmin import BasePlaceholderAdmin
+from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
 from django.contrib.admin.helpers import AdminForm
 
@@ -52,12 +52,13 @@ if 'reversion' in settings.INSTALLED_APPS:
     from reversion import create_revision
 else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
+
     create_revision = lambda: lambda x: x
 
 PUBLISH_COMMENT = "Publish"
 
 
-class PageAdmin(BasePlaceholderAdmin, ModelAdmin):
+class PageAdmin(PlaceholderAdmin, ModelAdmin):
     form = PageForm
     search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"
@@ -98,14 +99,14 @@ class PageAdmin(BasePlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/publish/$', self.publish_page),  # publish page
-            pat(r'^([0-9]+)/revert/$', self.revert_page),  # publish page
+            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
+            pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
-            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
-            pat(r'^([0-9]+)/preview/$', self.preview_page),  # copy dialog
-            pat(r'^([0-9]+)/descendants/$', self.descendants),  # menu html for page descendants
-            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template),  # copy dialog
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
+            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
+            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
         url_patterns += super(PageAdmin, self).get_urls()
@@ -654,7 +655,7 @@ class PageAdmin(BasePlaceholderAdmin, ModelAdmin):
 
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
-    @method_decorator(require_POST)
+    @require_POST
     def undo(self, request, object_id):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
@@ -695,7 +696,7 @@ class PageAdmin(BasePlaceholderAdmin, ModelAdmin):
         rev_page.save()
         return HttpResponse("ok")
 
-    @method_decorator(require_POST)
+    @require_POST
     def redo(self, request, object_id):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')

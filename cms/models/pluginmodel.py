@@ -278,7 +278,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
                 # going down; remove more items from plugin_trail
                 if level_difference < 0:
                     plugin_trail[:] = plugin_trail[:level_difference]
-                # assign new_plugin.parent
+                    # assign new_plugin.parent
             new_plugin.parent = plugin_trail[-1]
             # new_plugin becomes the last item in the tree for the next round
             plugin_trail.append(new_plugin)
@@ -364,14 +364,25 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return self.position + 1
 
     def get_breadcrumb(self):
+        models = self.placeholder._get_attached_models()
+        if models:
+            model = models[0]
+        else:
+            from cms.models import Page
+
+            model = Page
         breadcrumb = []
         if not self.parent_id:
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()),
-            'url': force_unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
+                'url': force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                            args=[self.pk]))})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
             breadcrumb.append({'title': force_unicode(parent.get_plugin_name()),
-            'url': force_unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
+                'url': force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                            args=[parent.pk]))})
         return breadcrumb
 
     def get_breadcrumb_json(self):
