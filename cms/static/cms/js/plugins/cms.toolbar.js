@@ -15,11 +15,6 @@ $(document).ready(function () {
 		options: {
 			'csrf': '',
 			'debug': false, // not yet required
-			'settings': {
-				'toolbar': 'expanded', // expanded or collapsed
-				'mode': 'edit', // live, draft, edit or layout
-				'states': []
-			},
 			'preventSwitch': false,
 			'preventSwitchMessage': 'Switching is disabled.',
 			'clipboard': null,
@@ -37,13 +32,29 @@ $(document).ready(function () {
 			'lang': {
 				'confirm': 'Yes',
 				'cancel': 'Cancel'
+			},
+			'settings': {
+				'version': '3.0.beta1', // this is required to flush storage on new releases
+				'toolbar': 'expanded', // expanded or collapsed
+				'mode': 'edit', // live, draft, edit or layout
+				'states': [],
+				'sideframe': {
+					'url': null,
+					'hidden': false,
+					'maximized': false
+				},
+				'modal': {
+					'url': null,
+					'hidden': false,
+					'maximized': false
+				}
 			}
 		},
 
 		initialize: function (container, options) {
 			this.container = $(container);
 			this.options = $.extend(true, {}, this.options, options);
-			this.settings = this.options.settings;
+			this.settings = this.getSettings() || this.setSettings(this.options.settings);
 
 			// class variables
 			this.toolbar = this.container.find('.cms_toolbar');
@@ -80,14 +91,26 @@ $(document).ready(function () {
 
 		// initial methods
 		_setup: function () {
-			// set correct settings
-			if(this.getSettings() === null) this.setSettings();
-			this.settings = this.getSettings();
+			// reset settings if version does not match
+			if(this.settings.version !== this.options.settings.version) this.resetSettings();
 
 			// setup toolbar visibility, we need to reverse the options to set the correct state
 			(this.settings.toolbar === 'expanded') ? this._showToolbar(0, true) : this._hideToolbar(0, true);
 			// setup toolbar mode
 			(this.settings.mode === 'drag') ? this._enableDragMode(300, true) : this._enableEditMode(300, true);
+
+			// load initial states
+			this._load();
+		},
+
+		_load: function () {
+			// check if we should show the sideframe
+			if(this.settings.sideframe.url) {
+				this.openSideframe(this.settings.sideframe.url);
+			}
+			if(this.settings.sideframe.hidden) {
+				this.sideframe.find('.cms_sideframe-hide').trigger('click');
+			}
 		},
 
 		_events: function () {
@@ -190,12 +213,13 @@ $(document).ready(function () {
 
 			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
 				if($(this).hasClass('cms_sideframe-hidden')) {
-					$(this).removeClass('cms_sideframe-hidden');
+					that.settings.sideframe.hidden = false;
 					that._showSideframe(that.options.sidebarWidth);
 				} else {
-					$(this).addClass('cms_sideframe-hidden');
+					that.settings.sideframe.hidden = true;
 					that._hideSideframe();
 				}
+				that.setSettings();
 			});
 
 			this.sideframe.find('.cms_sideframe-maximize').bind('click', function () {
@@ -263,7 +287,7 @@ $(document).ready(function () {
 			// cancel if local storage is not available
 			if(!window.localStorage) return false;
 			// set settings
-			settings = $.extend({}, this.settings, settings);
+			settings = $.extend(true, {}, this.settings, settings);
 			return localStorage.setItem('cms_cookie', JSON.stringify(settings));
 		},
 
@@ -274,9 +298,22 @@ $(document).ready(function () {
 			return JSON.parse(localStorage.getItem('cms_cookie'));
 		},
 
+		resetSettings: function () {
+			// cancel if local storage is not available
+			if(!window.localStorage) return false;
+			// reset settings
+			localStorage.removeItem('cms_cookie');
+			this.setSettings(this.options.settings);
+			// enforce reload to apply changes
+			CMS.API.Helpers.reloadBrowser();
+		},
+
 		delegate: function (el) {
 			// save local vars
 			var target = el.attr('data-rel');
+
+			// reset states
+			this.reset();
 
 			switch(target) {
 				case 'modal':
@@ -305,7 +342,16 @@ $(document).ready(function () {
 			}
 		},
 
-		openSideframe: function (url, maximized) {
+		reset: function () {
+			// reset sideframe settings
+			this.settings.sideframe = {
+				'url': null,
+				'hidden': false,
+				'minimized': false
+			};
+		},
+
+		openSideframe: function (url) {
 			// prepare iframe
 			var that = this;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
@@ -324,14 +370,14 @@ $(document).ready(function () {
 				// sidebar is already open
 				insertHolder(iframe);
 				// reanimate the frame
-				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width, maximized);
+				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width);
 			} else {
 				// load iframe after frame animation is done
 				setTimeout(function () {
 					insertHolder(iframe);
 				}, this.options.sidebarDuration);
 				// display the frame
-				this._showSideframe(width, maximized);
+				this._showSideframe(width);
 			}
 
 			function insertHolder(iframe) {
@@ -339,10 +385,22 @@ $(document).ready(function () {
 				that.sideframe.find('.cms_sideframe-frame').addClass('cms_loader');
 				holder.html(iframe);
 			}
+
+			// save url in settings
+			this.settings.sideframe.url = url;
+			this.setSettings();
 		},
 
 		closeSideframe: function () {
 			this._hideSideframe(true);
+
+			// remove url in settings
+			this.settings.sideframe = {
+				'url': null,
+				'hidden': false,
+				'maximized': false
+			};
+			this.setSettings();
 		},
 
 		openMessage: function (msg, dir, error, delay) {
@@ -632,20 +690,33 @@ $(document).ready(function () {
 		},
 
 		_showSideframe: function (width, maximized) {
+			// add class
+			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
+
 			if(maximized) {
+				this.sideframe.find('.cms_sideframe-maximize').addClass('cms_sideframe-minimize');
+				this.sideframe.find('.cms_sideframe-hide').hide();
 				this.sideframe.animate({ 'width': $(window).width() }, 0);
 				this.body.animate({ 'margin-left': 0 }, 0);
 				// invert icon position
 				this.sideframe.find('.cms_sideframe-btn').css('right', -2);
-			} else {
+			}
+			if(this.settings.sideframe.hidden) {
+				this._hideSideframe();
+			}
+			if(!this.settings.sideframe.hidden && !maximized) {
 				this.sideframe.animate({ 'width': width }, this.options.sidebarDuration);
 				this.body.animate({ 'margin-left': width }, this.options.sidebarDuration);
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
+
 			this.lockToolbar = true;
 		},
 
 		_hideSideframe: function (close) {
+			// add class
+			this.sideframe.find('.cms_sideframe-hide').addClass('cms_sideframe-hidden');
+
 			var duration = this.options.sidebarDuration;
 			// remove the iframe
 			if(close && this.sideframe.width() <= 0) duration = 0;
@@ -655,6 +726,7 @@ $(document).ready(function () {
 			});
 			this.body.animate({ 'margin-left': 0 }, duration);
 			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
+
 			this.lockToolbar = false;
 		},
 
