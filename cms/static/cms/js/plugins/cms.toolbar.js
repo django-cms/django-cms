@@ -286,7 +286,6 @@ $(document).ready(function () {
 			// cancel if local storage is not available
 			if(!window.localStorage) return false;
 			// set settings
-			console.log(this.settings.sideframe);
 			settings = $.extend(true, {}, this.settings, settings);
 			return localStorage.setItem('cms_cookie', JSON.stringify(settings));
 		},
@@ -728,6 +727,9 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
 			this.sideframe.find('.cms_sideframe-hide').show();
 
+			// hide scrollbar
+			this.body.css('overflow', 'auto');
+
 			// reset to first state
 			this._showSideframe(this.options.sidebarWidth);
 		},
@@ -735,6 +737,9 @@ $(document).ready(function () {
 		_maximizeSideframe: function () {
 			this.sideframe.find('.cms_sideframe-maximize').addClass('cms_sideframe-minimize');
 			this.sideframe.find('.cms_sideframe-hide').hide();
+
+			// reset scrollbar
+			this.body.css('overflow', 'hidden');
 
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
 			// do custom animation
