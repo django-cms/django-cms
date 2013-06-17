@@ -133,7 +133,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'placeholder': ph2.slot,
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
-            'ids': "_".join([str(p.pk) for p in [ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3]])
+            'plugin_order': [str(p.pk) for p in [ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3]]
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
