@@ -270,8 +270,8 @@ class PagesTestCase(CMSTestCase):
             req.current_page = page
             req.REQUEST = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
-            
-            
+
+
     def test_page_obj_change_data_from_template_tags(self):
         from django import template
 
@@ -291,11 +291,11 @@ class PagesTestCase(CMSTestCase):
             after_change = datetime.datetime.now()
             req.current_page = page
             req.REQUEST = {}
-            
+
             actual_result = t.render(template.Context({"request": req}))
             desired_result = "{0} changed on {1}".format(change_user, actual_result[-19:])
             save_time = datetime.datetime.strptime(actual_result[-19:], "%Y-%m-%dT%H:%M:%S")
-            
+
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
             self.assertTrue(before_change <= save_time)
