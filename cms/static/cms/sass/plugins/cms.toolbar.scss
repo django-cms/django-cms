@@ -22,9 +22,10 @@
 
 //######################################################################################################################
 // #TOOLBAR#
+
 #cms_toolbar { position:absolute; left:0; top:0; z-index:9999999; width:100%; }
 #cms_toolbar {
-	.cms_toolbar { position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px;
+	.cms_toolbar { position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
 		border-bottom:1px solid $color-grey !important; background:$color-grey-5;
 		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
 
@@ -39,12 +40,18 @@
 		.cms_toolbar-item-buttons a { border-bottom:none !important; }
 	}
 
+	// do some responsive magic
+	@media only screen and (max-width: 800px) {
+		.cms_toolbar-right { display:none; }
+	}
+
 	//##################################################################################################################
 	// #TOOLBAR/navigation#
 	.cms_toolbar-item-navigation {
 		li { float:left; position:relative; zoom:1; }
 		li a { float:left; padding:5px 10px; zoom:1; cursor:default; }
 		li ul { display:none; }
+		> li:first-child > a span { font-weight:600; line-height:12px; }
 
 		// hover effect
 		.cms_toolbar-item-navigation-hover {

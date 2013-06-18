@@ -370,6 +370,9 @@ $(document).ready(function () {
 				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 				// than show
 				iframe.show();
+				// save url in settings
+				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
+				that.setSettings();
 			});
 
 			// cancel animation if sidebar is already shown
@@ -392,10 +395,6 @@ $(document).ready(function () {
 				that.sideframe.find('.cms_sideframe-frame').addClass('cms_loader');
 				holder.html(iframe);
 			}
-
-			// save url in settings
-			this.settings.sideframe.url = url;
-			this.setSettings();
 		},
 
 		closeSideframe: function () {
@@ -740,9 +739,14 @@ $(document).ready(function () {
 
 			// reset to first state
 			this._showSideframe(this.options.sidebarWidth);
+
+			// remove event
+			$(window).unbind('resize.cms');
 		},
 
 		_maximizeSideframe: function () {
+			var that = this;
+
 			this.sideframe.find('.cms_sideframe-maximize').addClass('cms_sideframe-minimize');
 			this.sideframe.find('.cms_sideframe-hide').hide();
 
@@ -755,6 +759,10 @@ $(document).ready(function () {
 			this.body.animate({ 'margin-left': 0 }, 0);
 			// invert icon position
 			this.sideframe.find('.cms_sideframe-btn').css('right', -2);
+			// attach resize event
+			$(window).bind('resize.cms', function () {
+				that.sideframe.css('width', $(window).width());
+			});
 		},
 
 		_startSideframeResize: function () {
