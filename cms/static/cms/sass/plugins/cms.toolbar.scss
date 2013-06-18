@@ -169,7 +169,7 @@
 	//##################################################################################################################
 	// #TOOLBAR/dialog#
 	.cms_messages { display:none; position:fixed; z-index:9999; top:30px;
-		width:300px; min-height:20px; margin:0; padding:6px 10px 4px 10px; background:rgba(black, 0.74);
+		width:300px; min-height:20px; margin:0; padding:6px 10px; background:rgba(black, 0.74);
 		@include border-radius(0 0 3px 3px);
 		color:white; font-size:12px; line-height:16px; font-weight:200;
 		* { color:white; font-size:12px; line-height:16px; font-weight:200; }
