@@ -476,7 +476,7 @@ $(document).ready(function () {
 			this.lockToolbar = false;
 		},
 
-		openModal: function (url, name, breadcrumb, close_url, redirect_on_close_url) {
+		openModal: function (url, name, breadcrumb) {
 			// prepare iframe
 			var that = this;
 
@@ -499,7 +499,8 @@ $(document).ready(function () {
 				var messages = iframe.contents().find('.messagelist li');
 				if(messages.length) that.openMessage(messages.eq(0).text());
 				messages.remove();
-				// determine if we should close the modal
+				// determine if we should close the modal or reload
+				if(messages.length && that.enforceReload) window.location.href = '/'; // redirect to home
 				if(messages.length && that.enforceClose) {
 					that.closeModal();
 					return false;
@@ -1014,6 +1015,18 @@ $(document).ready(function () {
 			var row = iframe.contents().find('.submit-row');
 			var buttons = row.find('input, a');
 			var render = $('<span />');
+
+			// if there are no buttons, try again
+			if(!buttons.length) {
+				row = iframe.contents().find('form');
+				buttons = row.find('input[type="submit"]');
+				buttons.attr('name', '_save')
+					.addClass('deletelink')
+					.hide();
+				this.enforceReload = true;
+			} else {
+				this.enforceReload = false;
+			}
 
 			// loop over input buttons
 			buttons.each(function (index, item) {
