@@ -14,6 +14,7 @@ $(document).ready(function () {
 
 		options: {
 			'csrf': '',
+			'authenticated': false,
 			'debug': false, // not yet required
 			'preventSwitch': false,
 			'preventSwitchMessage': 'Switching is disabled.',
@@ -26,8 +27,9 @@ $(document).ready(function () {
 			'modalHeight': 400,
 			'urls': {
 				'settings': '', // url to save settings
-				'css_modal': '/static/cms/css/plugins/cms.toolbar.dialog.css',
-				'css_sideframe': '/static/cms/css/plugins/cms.toolbar.sideframe.css'
+				'static': '/static/',
+				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css',
+				'css_sideframe': 'cms/css/plugins/cms.toolbar.sideframe.css'
 			},
 			'lang': {
 				'confirm': 'Yes',
@@ -104,6 +106,8 @@ $(document).ready(function () {
 		},
 
 		_load: function () {
+			// reset some settings if not authenticated
+			if(!this.options.authenticated) this.reset();
 			// check if we should show the sideframe
 			if(this.settings.sideframe.url) {
 				this.openSideframe(this.settings.sideframe.url);
@@ -360,8 +364,12 @@ $(document).ready(function () {
 
 			// attach load event to iframe
 			iframe.bind('load', function () {
-				iframe.show();
+				// after iframe is loaded append css
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_sideframe + '" />'));
+				// remove loader
 				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
+				// than show
+				iframe.show();
 			});
 
 			// cancel animation if sidebar is already shown
@@ -489,7 +497,7 @@ $(document).ready(function () {
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_modal + '" />'));
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_modal + '" />'));
 
 				// set modal buttons
 				that._setModalButtons($(this));
@@ -1062,7 +1070,7 @@ $(document).ready(function () {
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.css_modal + '" />'));
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_modal + '" />'));
 
 				// than show
 				iframe.show();

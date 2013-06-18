@@ -1,0 +1,35 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//##################################################
+// #IMPORT SETTINGS#
+@import "partials/settings";
+
+//##################################################
+// #SIDEFRAME#
+#header { display:none; }
+#container { padding-top:30px; }
+#container .breadcrumbs { display:block; background:$color-grey !important; }
+
+.change-form #content { margin-top:0; }
+
+.submit-row { padding:10px 10px 5px !important; }
+
+.submit-row input.default, .object-tools .addlink {
+	font-weight:200 !important; padding:5px 12px !important; margin:0 0 5px !important;
+	border:1px solid adjust-hue($color-blue, 15deg) !important;
+	@include background-image($gradient-blue !important);
+	@include box-shadow(inset lighten($color-blue, 20%) 0px 1px 0px !important);
+	&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg) !important; @include box-shadow(none !important); }
+	&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%) !important; }
+}
+.object-tools .recoverlink, .submit-row input {
+	color:white !important; font-weight:200 !important; padding:5px 12px !important; margin:0 0 5px !important;
+	border:1px solid adjust-hue($color-grey, 20%) !important; border-bottom:none !important;
+	@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%) !important);
+	@include background-image($gradient-dark !important);
+	&:hover, &:active, &:focus { background:$color-grey-70 !important; @include box-shadow(none !important); }
+	&:active, &:focus { background:darken($color-grey-70, 50%) !important; }
+}
