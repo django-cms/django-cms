@@ -12,11 +12,18 @@
 #header { display:none; }
 #container { padding-top:30px; }
 #container .breadcrumbs { display:block; background:$color-grey !important; }
+#content { padding-top:5px; }
 
 .change-form #content { margin-top:0; }
 
-.submit-row { padding:10px 10px 5px !important; }
+#page_form_lang_tabs {
+	.language_button { background:#ccc !important; }
+	.language_button.selected { color:black !important; background:white !important; text-shadow:none !important; }
+	.language_button.notfilled { color:#bbb !important; }
+}
+#content-main #lang_tab_content .header { background:white !important; }
 
+.submit-row { padding:10px 10px 5px !important; }
 .submit-row input.default, .object-tools .addlink {
 	font-weight:200 !important; padding:5px 12px !important; margin-bottom:5px !important;
 	border:1px solid adjust-hue($color-blue, 15deg) !important;
