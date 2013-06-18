@@ -571,7 +571,7 @@ $(document).ready(function () {
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
 				'success': function () {
-					window.location.reload();
+					CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
 					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
