@@ -147,3 +147,22 @@ code instead in your views::
 
 
 Details can be found here: :ref:`multi_apphook`
+
+PlaceholderAdmin
+================
+
+PlaceholderAdmin has no language tabs anymore and the plugin editor is gone. The plugin API has changed
+and is now more consistent. PageAdmin uses the same API as PlaceholderAdmin now. If your APP talked with
+the Plugin API directly be sure to read the code and the changed parameters.
+If you use PlaceholderFields you still need the PlaceholderAdmin as it delivers the API for editing the
+plugins and the placeholders.
+
+The workflow in the future should look like this:
+
+1. Create new Model Instances via Toolbar entry or via admin.
+2. Go to the view that represents the model instance and add content via frontend editing.
+
+
+
+
+

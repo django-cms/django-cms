@@ -5,7 +5,7 @@ from cms.utils import get_language_from_request
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
-from cms.utils.placeholder import get_placeholder_conf, get_page_from_placeholder_if_exists
+from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.i18n import get_fallback_languages, get_default_language
 from django.template import Template, Context
 from django.template.defaultfilters import title
@@ -31,6 +31,7 @@ class PluginContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
+
     def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
         super(PluginContext, self).__init__(dict, current_app=current_app)
         if not processors:
@@ -64,6 +65,7 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
         content = processor(instance, placeholder, content, context)
     return content
 
+
 def render_plugins(plugins, context, placeholder, processors=None):
     """
     Renders a collection of plugins with the given context, using the appropriate processors
@@ -85,7 +87,7 @@ def render_plugins(plugins, context, placeholder, processors=None):
 
 
 def render_dragables(plugins, slot, request):
-    return render_to_string("cms/toolbar/draggable.html", {'plugins':plugins, 'slot':slot, 'request':request})
+    return render_to_string("cms/toolbar/draggable.html", {'plugins': plugins, 'slot': slot, 'request': request})
 
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None):
@@ -94,6 +96,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
+
     context = context_to_copy
     context.push()
     request = context['request']
@@ -102,21 +105,21 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         template = page.template
     else:
         template = None
-    # It's kind of duplicate of the similar call in `get_plugins`, but it's required
+        # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work
     if not lang:
         lang = get_language_from_request(request)
     plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (len(plugins)==0 and placeholder and lang != get_default_language() and
-        get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
+    if (len(plugins) == 0 and placeholder and lang != get_default_language() and
+            get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
         fallbacks = get_fallback_languages(lang)
         for fallback_language in fallbacks:
             plugins = [plugin for plugin in get_plugins(request, placeholder, fallback_language)]
             if plugins:
                 break
-    # Add extra context as defined in settings, but do not overwrite existing context variables,
+        # Add extra context as defined in settings, but do not overwrite existing context variables,
     # since settings are general and database/template are specific
     # TODO this should actually happen as a plugin context processor, but these currently overwrite
     # existing context -- maybe change this order?
@@ -136,9 +139,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     if (getattr(toolbar, 'edit_mode', False) and
         (not page or page.has_change_permission(request))):
-            edit = True
+        edit = True
     if edit:
         from cms.middleware.toolbar import toolbar_plugin_processor
+
         processors = (toolbar_plugin_processor,)
     else:
         processors = None
@@ -151,12 +155,16 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         draggable_content = mark_safe(render_dragables(plugins, slot, request))
     content = mark_safe("".join(content))
 
-    result = render_to_string("cms/toolbar/placeholder.html", {'plugins':content, "bar":toolbar_content, "draggables":draggable_content, 'edit':edit})
+    result = render_to_string("cms/toolbar/placeholder.html",
+                              {'plugins': content, "bar": toolbar_content, "draggables": draggable_content,
+                              'edit': edit})
     context.pop()
     return result
 
+
 def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
+
     request = context['request']
     page = placeholder.page if placeholder else None
     if not page:
