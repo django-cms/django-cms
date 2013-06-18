@@ -76,7 +76,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'new_two', u'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
-        placeholders = self.assertWarns(DuplicatePlaceholderWarning, 'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.', get_placeholders, 'placeholder_tests/test_seven.html')
+        placeholders = self.assertWarns(DuplicatePlaceholderWarning,
+                                        'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
+                                        get_placeholders, 'placeholder_tests/test_seven.html')
         self.assertEqual(sorted(placeholders), sorted([u'one']))
 
     def test_placeholder_scanning_extend_outside_block(self):
@@ -132,11 +134,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         response = self.client.post(reverse('admin:placeholderapp_twoplaceholderexample_move_plugin'), {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
-            'plugin_order': [str(p.pk) for p in [ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3]]
+            'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
-        self.assertEqual([ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3], list(ph2.cmsplugin_set.order_by('position')))
+        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
 
     def test_nested_plugin_escapejs(self):
         """
@@ -256,7 +258,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         class NoPushPopContext(Context):
             def push(self):
                 pass
+
             pop = push
+
         context_en = NoPushPopContext()
         context_en['request'] = self.get_request(language="en")
         context_de = NoPushPopContext()
@@ -265,11 +269,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         # First test the default (non-fallback) behavior)
         ## English page should have the text plugin
         content_en = render_placeholder(placeholder_en, context_en)
-        self.assertRegexpMatches(content_en,"^en body$")
+        self.assertRegexpMatches(content_en, "^en body$")
 
         ## Deutsch page should have no text
         content_de = render_placeholder(placeholder_en, context_de)
-        self.assertNotRegex(content_de,"^en body$")
+        self.assertNotRegex(content_de, "^en body$")
 
         conf = {
             'col_left': {
@@ -279,12 +283,12 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
             content_de = render_placeholder(placeholder_en, context_de)
-            self.assertRegexpMatches(content_de,"^en body$")
+            self.assertRegexpMatches(content_de, "^en body$")
 
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de,"^de body$")
+            self.assertRegexpMatches(content_de, "^de body$")
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
@@ -715,7 +719,6 @@ class PlaceholderI18NTest(CMSTestCase):
         return u
 
     def test_hvad_tabs(self):
-
         ex = MultilingualExample1(
             char_1='one',
             char_2='two',
@@ -729,13 +732,12 @@ class PlaceholderI18NTest(CMSTestCase):
 
 
     def test_no_tabs(self):
-
         ex = Example1(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
-            )
+        )
         ex.save()
         user = self._testuser()
         self.client.login(username='test', password='test')
@@ -744,18 +746,18 @@ class PlaceholderI18NTest(CMSTestCase):
         self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_placeholder_tabs(self):
-
         ex = TwoPlaceholderExample(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
-            )
+        )
         ex.save()
         user = self._testuser()
         self.client.login(username='test', password='test')
 
         response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/1/')
-        self.assertNotContains(response, """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
+        self.assertNotContains(response,
+                               """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
 
 

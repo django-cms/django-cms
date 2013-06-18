@@ -303,7 +303,6 @@ class PlaceholderAdmin(ModelAdmin):
         else:
             parent_id = int(parent_id)
         order = request.POST.getlist("plugin_order[]")
-
         if not self.has_move_plugin_permission(request, plugin, placeholder):
             return HttpResponseForbidden(_("You have no permission to move this plugin"))
         if plugin.parent_id != parent_id:
