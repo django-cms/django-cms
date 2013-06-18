@@ -6,7 +6,7 @@ $(document).ready(function () {
 	/*!
 	 * Toolbar
 	 * @version: 2.0.0
-	 * @description: Adds toolbar, sidebar, messages and modal
+	 * @description: Adds toolbar, sideframe, messages and modal
 	 */
 	CMS.Toolbar = new CMS.Class({
 
@@ -19,8 +19,8 @@ $(document).ready(function () {
 			'preventSwitch': false,
 			'preventSwitchMessage': 'Switching is disabled.',
 			'clipboard': null,
-			'sidebarDuration': 300,
-			'sidebarWidth': 320,
+			'sideframeDuration': 300,
+			'sideframeWidth': 320,
 			'messageDelay': 2000,
 			'modalDuration': 300,
 			'modalWidth': 800,
@@ -159,7 +159,7 @@ $(document).ready(function () {
 			});
 
 			// module events
-			this._eventsSidebar();
+			this._eventsSideframe();
 			this._eventsModal();
 
 			// stopper events
@@ -204,7 +204,7 @@ $(document).ready(function () {
 			});
 		},
 
-		_eventsSidebar: function () {
+		_eventsSideframe: function () {
 			var that = this;
 
 			// attach close event
@@ -216,7 +216,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
 				if($(this).hasClass('cms_sideframe-hidden')) {
 					that.settings.sideframe.hidden = false;
-					that._showSideframe(that.options.sidebarWidth);
+					that._showSideframe(that.options.sideframeWidth);
 				} else {
 					that.settings.sideframe.hidden = true;
 					that._hideSideframe();
@@ -360,7 +360,7 @@ $(document).ready(function () {
 			var holder = this.sideframe.find('.cms_sideframe-frame');
 			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
 				iframe.hide();
-			var width = this.options.sidebarWidth;
+			var width = this.options.sideframeWidth;
 
 			// attach load event to iframe
 			iframe.bind('load', function () {
@@ -375,9 +375,9 @@ $(document).ready(function () {
 				that.setSettings();
 			});
 
-			// cancel animation if sidebar is already shown
+			// cancel animation if sideframe is already shown
 			if(this.sideframe.is(':visible')) {
-				// sidebar is already open
+				// sideframe is already open
 				insertHolder(iframe);
 				// reanimate the frame
 				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width);
@@ -385,7 +385,7 @@ $(document).ready(function () {
 				// load iframe after frame animation is done
 				setTimeout(function () {
 					insertHolder(iframe);
-				}, this.options.sidebarDuration);
+				}, this.options.sideframeDuration);
 				// display the frame
 				this._showSideframe(width);
 			}
@@ -606,7 +606,7 @@ $(document).ready(function () {
 		},
 
 		_hideToolbar: function (speed, init) {
-			// cancel if sidebar is active
+			// cancel if sideframe is active
 			if(this.lockToolbar) return false;
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
@@ -705,8 +705,8 @@ $(document).ready(function () {
 			if(this.settings.sideframe.maximized) this._maximizeSideframe();
 			// otherwise do normal behaviour
 			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-				this.sideframe.animate({ 'width': width }, this.options.sidebarDuration);
-				this.body.animate({ 'margin-left': width }, this.options.sidebarDuration);
+				this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
+				this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
 
@@ -717,7 +717,7 @@ $(document).ready(function () {
 			// add class
 			this.sideframe.find('.cms_sideframe-hide').addClass('cms_sideframe-hidden');
 
-			var duration = this.options.sidebarDuration;
+			var duration = this.options.sideframeDuration;
 			// remove the iframe
 			if(close && this.sideframe.width() <= 0) duration = 0;
 			if(close) this.sideframe.find('iframe').remove();
@@ -738,7 +738,7 @@ $(document).ready(function () {
 			this.body.css('overflow', 'auto');
 
 			// reset to first state
-			this._showSideframe(this.options.sidebarWidth);
+			this._showSideframe(this.options.sideframeWidth);
 
 			// remove event
 			$(window).unbind('resize.cms');
