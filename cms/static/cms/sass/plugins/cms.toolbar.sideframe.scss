@@ -21,7 +21,7 @@
 	.language_button.selected { color:black !important; background:white !important; text-shadow:none !important; }
 	.language_button.notfilled { color:#bbb !important; }
 }
-#content-main #lang_tab_content .header { background:white !important; }
+#content-main #lang_tab_content .header { background:white !important; margin-top:-1px; }
 
 .submit-row { padding:10px 10px 5px !important; }
 .submit-row input.default, .object-tools .addlink {
