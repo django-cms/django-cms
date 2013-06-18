@@ -275,10 +275,6 @@ $(document).ready(function () {
 				e.preventDefault();
 				that.closeModal();
 			});
-			this.modal.find('.cms_modal-save').bind('click', function (e) {
-				e.preventDefault();
-				that._saveModal();
-			});
 		},
 
 		// public methods
@@ -458,7 +454,7 @@ $(document).ready(function () {
 				default:
 					this.messages.css({
 						'left': '50%',
-						'margin-left': -(width / 2)
+						'margin-left': -(320 / 2)
 					});
 					this.messages.animate({ 'top': top });
 			}
@@ -490,30 +486,43 @@ $(document).ready(function () {
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
 				contents.show();
 
+			// set correct title
+			var title = this.modal.find('.cms_modal-title');
+				title.html(name || '&nbsp;');
+
 			// insure previous iframe is hidden
 			holder.find('iframe').hide();
 
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
+				// show messages in toolbar if provided
+				var messages = iframe.contents().find('.messagelist li');
+				if(messages.length) that.openMessage(messages.eq(0).text());
+				messages.remove();
+				// determine if we should close the modal
+				if(messages.length && that.enforceClose) {
+					that.closeModal();
+					return false;
+				}
+
 				// after iframe is loaded append css
 				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_modal + '" />'));
 
 				// set modal buttons
 				that._setModalButtons($(this));
 
+				// set title of not provided
+				var innerTitle = iframe.contents().find('#content h1:eq(0)');
+				if(name === undefined) {
+					title.html(innerTitle.text());
+				}
+				innerTitle.remove();
+
 				// than show
 				iframe.show();
-			});
 
-			// attach load event to check if we have to close the modal
-			iframe.load(function() {
-				if (this.contentWindow.location.pathname == close_url) {
-					if (redirect_on_close_url) {
-						window.location.href = redirect_on_close_url;
-					} else {
-						that.closeModal();
-					}
-				}
+				// append ready state
+				iframe.data('ready', true);
 			});
 
 			// show iframe after animation
@@ -521,10 +530,6 @@ $(document).ready(function () {
 				that.modal.find('.cms_modal-body').addClass('cms_loader');
 				holder.html(iframe);
 			}, this.options.modalDuration);
-
-			// set correct title
-			var title = this.modal.find('.cms_modal-title');
-				title.html(name || '&nbsp;');
 
 			// insure modal is not maximized
 			if(this.modal.find('.cms_modal-collapsed').length) this._minimizeModal();
@@ -1033,6 +1038,16 @@ $(document).ready(function () {
 
 						var anchor = row.find('a[href="'+$(this).attr('data-url')+'"]');
 						if(anchor.length) iframe.attr('src', iframe.attr('src') + anchor.attr('href'));
+
+						// trigger only when blue action buttons are triggered
+						if(item.hasClass('default') || item.hasClass('deletelink')) {
+							that.enforceClose = true;
+						} else {
+							that.enforceClose = false;
+						}
+
+						// hide iframe again
+						that.modal.find('iframe').hide();
 					});
 
 				// append element
@@ -1051,10 +1066,6 @@ $(document).ready(function () {
 
 			// render buttons
 			this.modal.find('.cms_modal-buttons').html(render);
-		},
-
-		_saveModal: function () {
-			this.modal.find('iframe').contents().find('form').submit();
 		},
 
 		_changeModalContent: function (el) {
