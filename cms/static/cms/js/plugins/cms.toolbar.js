@@ -88,7 +88,6 @@ $(document).ready(function () {
 
 		// initial methods
 		_setup: function () {
-			console.log(this.settings);
 			// reset settings if version does not match
 			if(this.settings.version !== this.options.settings.version) this.resetSettings();
 
@@ -485,6 +484,12 @@ $(document).ready(function () {
 		},
 
 		openModal: function (url, name, breadcrumb) {
+			// reset breadcrumb
+			this.modal.find('.cms_modal-breadcrumb-items').html('');
+
+			// empty buttons
+			this.modal.find('.cms_modal-buttons').html('');
+
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
 				contents.show();
 
@@ -510,9 +515,6 @@ $(document).ready(function () {
 
 			// we need to render the breadcrumb
 			this._setModalBreadcrumb(breadcrumb);
-
-			// empty buttons
-			this.modal.find('.cms_modal-buttons').html('');
 
 			// display modal
 			this._showModal(this.options.modalDuration);
@@ -922,12 +924,15 @@ $(document).ready(function () {
 		},
 
 		_startModalResize: function (initial) {
+			// cancel if in fullscreen
+			if(this.maximized) return false;
+			// continue
 			var that = this;
 			var container = this.modal.find('.cms_modal-body');
 			var width = container.width();
 			var height = container.height();
 			var modalLeft = this.modal.position().left;
-			var modalTop = this.modal.position().top;
+			var modalTop = this.modal.position().top - 47; // TODO need to figure out why -47
 
 			this.modal.find('.cms_modal-shim').show();
 
@@ -937,7 +942,7 @@ $(document).ready(function () {
 
 				var w = width - (mvX * 2);
 				var h = height - (mvY * 2);
-				var max = that.modal.find('.cms_modal-breadcrumb').outerWidth(true) + that.modal.find('.cms_modal-buttons').outerWidth(true);
+				var max = 680;
 
 				// add some limits
 				if(w <= max || h <= 100) return false;
