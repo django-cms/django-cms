@@ -312,13 +312,7 @@ $(document).ready(function () {
 
 			switch(target) {
 				case 'modal':
-					this.openModal(
-						el.attr('href'),
-						el.attr('data-name'),
-						[],
-						el.attr('data-close-url'),
-						el.attr('data-redirect-on-close-url')
-					);
+					this.openModal(el.attr('href'), el.attr('data-name'));
 					break;
 				case 'message':
 					this.openMessage(el.attr('data-text'));
@@ -482,6 +476,7 @@ $(document).ready(function () {
 
 		openModal: function (url, name, breadcrumb) {
 			// reset breadcrumb
+			this.modal.find('.cms_modal-breadcrumb').hide();
 			this.modal.find('.cms_modal-breadcrumb-items').html('');
 
 			// empty buttons
