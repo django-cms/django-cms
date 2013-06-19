@@ -629,7 +629,7 @@ $(document).ready(function () {
 				if(e.type === 'keyup') {
 					clearTimeout(that.timer);
 					// cancel if we have less than x keys
-					if($(this).val().length < this.keyBound) return false;
+					if($(this).val().length < that.keyBound) return false;
 					that.timer = setTimeout(function () {
 						that._searchSubnav(nav, $(e.currentTarget).val());
 					}, 100);
