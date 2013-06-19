@@ -448,7 +448,8 @@ $(document).ready(function () {
 			});
 
 			// update plugin position
-			this.container.bind('cms.placeholder.update', function () {
+			this.container.bind('cms.placeholder.update', function (e) {
+				e.stopPropagation();
 				that.movePlugin();
 			});
 
