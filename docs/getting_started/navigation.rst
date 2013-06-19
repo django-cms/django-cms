@@ -112,7 +112,11 @@ will start at that level regardless of what level the current page is on.
 The third argument, ``nephews`` (default=100), specifies how many levels of
 nephews (children of siblings) are shown.
 
-The template can be found at ``cms/sub_menu.html``::
+Fourth argument, ``template`` (default=menu/sub_menu.html), is the template
+used by the tag; if you want to use a different template you **must** supply
+default values for ``root_level`` and ``nephews``.
+
+Examples::
 
     <ul>
         {% show_sub_menu 1 %}
@@ -127,7 +131,7 @@ Rooted at level 0::
 Or with a custom template::
 
     <ul>
-        {% show_sub_menu 1 "myapp/submenu.html" %}
+        {% show_sub_menu 1 None 100 "myapp/submenu.html" %}
     </ul>
 
 
