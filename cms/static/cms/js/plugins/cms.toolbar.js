@@ -472,60 +472,10 @@ $(document).ready(function () {
 		},
 
 		openModal: function (url, name, breadcrumb) {
-			// prepare iframe
-			var that = this;
-
-			var iframe = $('<iframe src="'+url+'" frameborder="0" style="background:#fff;" />');
-				iframe.hide();
-			var holder = this.modal.find('.cms_modal-frame');
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
 				contents.show();
 
-			// set correct title
-			var title = this.modal.find('.cms_modal-title');
-				title.html(name || '&nbsp;');
-
-			// insure previous iframe is hidden
-			holder.find('iframe').hide();
-
-			// attach load event for iframe to prevent flicker effects
-			iframe.bind('load', function () {
-				// show messages in toolbar if provided
-				var messages = iframe.contents().find('.messagelist li');
-				if(messages.length) that.openMessage(messages.eq(0).text());
-				messages.remove();
-				// determine if we should close the modal or reload
-				if(messages.length && that.enforceReload) window.location.href = '/'; // redirect to home
-				if(messages.length && that.enforceClose) {
-					that.closeModal();
-					return false;
-				}
-
-				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_modal + '" />'));
-
-				// set modal buttons
-				that._setModalButtons($(this));
-
-				// set title of not provided
-				var innerTitle = iframe.contents().find('#content h1:eq(0)');
-				if(name === undefined) {
-					title.html(innerTitle.text());
-				}
-				innerTitle.remove();
-
-				// than show
-				iframe.show();
-
-				// append ready state
-				iframe.data('ready', true);
-			});
-
-			// show iframe after animation
-			setTimeout(function () {
-				that.modal.find('.cms_modal-body').addClass('cms_loader');
-				holder.html(iframe);
-			}, this.options.modalDuration);
+			this._loadModalContent(url, name);
 
 			// insure modal is not maximized
 			if(this.modal.find('.cms_modal-collapsed').length) this._minimizeModal();
@@ -1076,9 +1026,63 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-buttons').html(render);
 		},
 
-		_changeModalContent: function (el) {
+		_loadModalContent: function (url, name) {
 			var that = this;
 
+			// now refresh the content
+			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
+				iframe.hide();
+			var holder = this.modal.find('.cms_modal-frame');
+
+			// set correct title
+			var title = this.modal.find('.cms_modal-title');
+				title.html(name);
+
+			// insure previous iframe is hidden
+			holder.find('iframe').hide();
+
+			// attach load event for iframe to prevent flicker effects
+			iframe.bind('load', function () {
+				// show messages in toolbar if provided
+				var messages = iframe.contents().find('.messagelist li');
+					if(messages.length) that.openMessage(messages.eq(0).text());
+					messages.remove();
+
+				// determine if we should close the modal or reload
+				if(messages.length && that.enforceReload) window.location.href = '/'; // redirect to home
+				if(messages.length && that.enforceClose) {
+					that.closeModal();
+					return false;
+				}
+
+				// after iframe is loaded append css
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_modal + '" />'));
+
+				// set title of not provided
+				var innerTitle = iframe.contents().find('#content h1:eq(0)');
+				if(name === undefined) {
+					if(title.text().replace(/^\s+|\s+$/g, '') === '') title.html(innerTitle.text());
+				}
+				innerTitle.remove();
+
+				// set modal buttons
+				that._setModalButtons($(this));
+
+				// than show
+				iframe.show();
+
+				// append ready state
+				iframe.data('ready', true);
+			});
+
+			// inject
+			setTimeout(function () {
+				that.modal.find('.cms_modal-body').addClass('cms_loader');
+				holder.html(iframe);
+			}, this.options.modalDuration);
+		},
+
+		_changeModalContent: function (el) {
 			if(el.hasClass('cms_modal-breadcrumb-last')) return false;
 
 			var parents = el.parent().find('a');
@@ -1086,25 +1090,7 @@ $(document).ready(function () {
 
 			el.addClass('cms_modal-breadcrumb-last');
 
-			// now refresh the content
-			var iframe = $('<iframe src="'+el.attr('href')+'" class="" frameborder="0" />');
-				iframe.hide();
-			var holder = this.modal.find('.cms_modal-frame');
-
-			// insure previous iframe is hidden
-			holder.find('iframe').hide();
-
-			// attach load event for iframe to prevent flicker effects
-			iframe.bind('load', function () {
-				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_modal + '" />'));
-
-				// than show
-				iframe.show();
-			});
-
-			// inject
-			holder.html(iframe);
+			this._loadModalContent(el.attr('href'));
 
 			// update title
 			this.modal.find('.cms_modal-title').text(el.text());
