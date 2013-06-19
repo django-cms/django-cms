@@ -106,7 +106,7 @@ $(document).ready(function () {
 			if(!this.options.authenticated) this.reset();
 			// check if we should show the sideframe
 			if(this.settings.sideframe.url) {
-				this.openSideframe(this.settings.sideframe.url);
+				this.openSideframe(this.settings.sideframe.url, false);
 			}
 		},
 
@@ -212,7 +212,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
 				if($(this).hasClass('cms_sideframe-hidden')) {
 					that.settings.sideframe.hidden = false;
-					that._showSideframe(that.options.sideframeWidth);
+					that._showSideframe(that.options.sideframeWidth, true);
 				} else {
 					that.settings.sideframe.hidden = true;
 					that._hideSideframe();
@@ -328,7 +328,7 @@ $(document).ready(function () {
 					this.openMessage(el.attr('data-text'));
 					break;
 				case 'sideframe':
-					this.openSideframe(el.attr('href'));
+					this.openSideframe(el.attr('href'), true);
 					break;
 				case 'ajax':
 					this.openAjax(el.attr('href'), el.attr('data-post'));
@@ -347,7 +347,7 @@ $(document).ready(function () {
 			};
 		},
 
-		openSideframe: function (url) {
+		openSideframe: function (url, animate) {
 			// prepare iframe
 			var that = this;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
@@ -381,14 +381,14 @@ $(document).ready(function () {
 				// sideframe is already open
 				insertHolder(iframe);
 				// reanimate the frame
-				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width);
+				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width, animate);
 			} else {
 				// load iframe after frame animation is done
 				setTimeout(function () {
 					insertHolder(iframe);
 				}, this.options.sideframeDuration);
 				// display the frame
-				this._showSideframe(width);
+				this._showSideframe(width, animate);
 			}
 
 			function insertHolder(iframe) {
@@ -656,7 +656,7 @@ $(document).ready(function () {
 			}, duration);
 		},
 
-		_showSideframe: function (width) {
+		_showSideframe: function (width, animate) {
 			// add class
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
 
@@ -666,8 +666,14 @@ $(document).ready(function () {
 			if(this.settings.sideframe.maximized) this._maximizeSideframe();
 			// otherwise do normal behaviour
 			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-				this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
-				this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
+				if(animate) {
+					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
+					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
+				} else {
+					console.log('show');
+					this.sideframe.animate({ 'width': width }, 0);
+					this.body.animate({ 'margin-left': width }, 0);
+				}
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
 
@@ -702,7 +708,7 @@ $(document).ready(function () {
 			this.body.css('overflow', 'auto');
 
 			// reset to first state
-			this._showSideframe(this.options.sideframeWidth);
+			this._showSideframe(this.options.sideframeWidth, true);
 
 			// remove event
 			$(window).unbind('resize.cms');
