@@ -88,6 +88,7 @@ $(document).ready(function () {
 
 		// initial methods
 		_setup: function () {
+			console.log(this.settings);
 			// reset settings if version does not match
 			if(this.settings.version !== this.options.settings.version) this.resetSettings();
 
@@ -282,7 +283,8 @@ $(document).ready(function () {
 			if(!window.localStorage) return false;
 			// set settings
 			settings = $.extend(true, {}, this.settings, settings);
-			return localStorage.setItem('cms_cookie', JSON.stringify(settings));
+			localStorage.setItem('cms_cookie', JSON.stringify(settings))
+			return settings;
 		},
 
 		getSettings: function () {
