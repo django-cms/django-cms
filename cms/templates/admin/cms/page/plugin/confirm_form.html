@@ -31,7 +31,7 @@ jQuery(document).ready(function ($) {
 	// TODO: context should be passed through the backend
 	var context = {
 		'window': window,
-		'timeout': {{ window_close_timeout|default:0 }},
+		'timeout': {{ window_close_timeout|default:1000 }},
 		'plugin_id': '{{ plugin_id }}', // used for everything
 		'plugin_type': '{{ type }}', // used for hide_iframe
 		'plugin_name': '{{ name }}', // used for hide_iframe
