@@ -361,6 +361,14 @@ $(document).ready(function () {
 				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 				// than show
 				iframe.show();
+				// if a message is triggerd, refresh
+				var messages = iframe.contents().find('.messagelist li');
+				if(messages.length || that.enforceReload) {
+					that.enforceReload = true;
+				} else {
+					that.enforceReload = false;
+				}
+
 				// save url in settings
 				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
 				that.setSettings();
@@ -677,6 +685,9 @@ $(document).ready(function () {
 			});
 			this.body.animate({ 'margin-left': 0 }, duration);
 			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
+
+			// should we reload
+			if(this.enforceReload) CMS.API.Helpers.reloadBrowser();
 
 			this.lockToolbar = false;
 		},
