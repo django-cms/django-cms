@@ -22,10 +22,15 @@ CMS.$(document).ready(function () {
 	// initialize toolbar and pass required options
 	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {
 		'csrf': '{{ csrf_token }}',
-		'debug': true,
+		'authenticated': {% if user.is_authenticated %}true{% else %}false{% endif %},
+		'debug': {% if debug %}true{% else %}false{% endif %},
 		'settings': {
 			'toolbar': 'expanded',
 			'mode': 'edit'
+		},
+		'urls': {
+			'settings': '',
+			'static': {{ STATIC_URL }}
 		},
 		'clipboard': '{{ request.toolbar.clipboard.pk }}',
 		'lang': {

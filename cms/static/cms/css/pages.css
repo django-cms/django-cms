@@ -156,8 +156,7 @@ div#sitemap a:hover{text-decoration:underline;}
 div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li, #sitemap ul{ display:block; }
 
-#sitemap li .cont{ display:block; background:url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px; }
-#sitemap .cont:hover { background-position: 0px -100px !important; }
+#sitemap li .cont{ display:block; }
 
 #sitemap li .col1 .title, #sitemap li .col1 .success{
 	display:block;
@@ -219,20 +218,16 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-draft,
 #sitemap li .col-view-perms,
 #sitemap li .col-creator{
-	border-left:1px solid #DEDEDC;
-	text-align:center;
+	border-left:1px solid #fafafa;
+	text-align:left;
 	height:28px;
 	width:auto;
 	line-height:28px;
 	float:left;
 	display:block;
-	background-color:#fff;
 	padding-left:3px;
 	padding-right:3px;
 	white-space:nowrap;
-	filter: alpha(opacity=70);
-	-moz-opacity: 0.70;
-	opacity: 0.70;
 }
 
 #sitemap li .col-softroot,
@@ -240,7 +235,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	background:none;
 	border:none;
 	width:auto;
-	text-align:right;
+	text-align:left;
 	padding-right:5px;
 }
 
@@ -251,12 +246,6 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 #sitemap li .col-published a, #sitemap li .col-published input, #sitemap li .col-published label{ vertical-align:middle;}
 #sitemap li .col-draft a, #sitemap li .col-draft span{vertical-align:middle; margin-top:0;}
 #sitemap li  .col-navigation img{vertical-align:middle;}
-
-#sitemap li .col-view-perms { text-align: center;}
-#sitemap li .col-draft {text-align: right;}
-#sitemap li .col-lastchange, 
-#sitemap li .col-published {text-align: left;}
-
 
 #sitemap li a.move {
 	width:18px;
@@ -309,15 +298,6 @@ div#sitemap ul.header, div#sitemap ul.header li{
 	margin:0px;
 	padding:0px;
 }
-div#sitemap ul.header li{
-	background:#E1E1E1 url(../images/nav-bg.gif) repeat-x scroll left top;
-	border-bottom:1px solid #DDDDDD;
-	color:#666666;
-	font-size:11px;
-	padding:2px 0px 2px 5px;
-	font-weight:bold;
-	height:auto;
-}
 * html div#sitemap ul.header li{height:16px;}
 
 
@@ -341,21 +321,16 @@ div#sitemap ul.header li{
 	border:none;
 	background:none;
 	line-height:14px;
-	text-align: center;
+	text-align: left;
 }
 #sitemap ul.header li .cont:hover{}
 
-#sitemap .cont:hover a,
-#sitemap .cont:hover .col-language,
-#sitemap .cont:hover .col-language a{color:#fff;}
-
-#sitemap .cont:hover .col1 .title{ background-position:0px -40px;}
 #sitemap .cont:hover .col1 a.changelink{display:inline;}
 
 #sitemap li#dragged{
 	min-width:500px;
 }
-#sitemap li#dragged .cont{
+≈ li#dragged .cont{
 	border-top: 1px solid #DEDEDC;
 	border-right: 1px solid #DEDEDC;
 }
@@ -381,8 +356,9 @@ div#sitemap ul.header li{
 /* changelist filter */
 #toolbar{height:23px;}
 #changelist-filter-button{
-	background:url(../images/changelist-filter-button-bg.jpg) no-repeat 0 0;
-	border-left:1px solid #DDDDDD;
+	background:#fafafa;
+	border-left:1px solid #ddd;
+	border-bottom:1px solid #ddd;
 	margin:0;
 	position:absolute;
 	right:0;
@@ -397,10 +373,6 @@ div#sitemap ul.header li{
 }
 * html #changelist-filter-button{margin-right:-1px;}
 * html #changelist #toolbar{height:23px;overflow:hidden;}
-
-#changelist-filter-button:hover{background-position:0px -50px;}
-.activ-filter #changelist-filter-button{background-position:0px -100px; color:#fff;}
-.activ-filter #changelist-filter-button:hover{background-position:0px -100px;}
 
 #changelist-filter{top:30px;}
 #changelist-filter h2{	display:none;}
@@ -454,23 +426,55 @@ div#sitemap ul.header li{
 #sitemap li .col-lastchange .state-icon.app { background-position: -600px -60px; } 
 
 /* moderation - changed */
-#sitemap li .cont.publisher_pending { background-position: 0px -500px; }
 
 /* moderation - requires approval */
-#sitemap li .cont.publisher_dirty { background-position: 0px -300px; }
 #sitemap li .cont.publisher_dirty .col-draft span.state { color: #ff6600; }
 
-/* moderation - approved */
-#sitemap li .cont.moderatorstate10 {} 
-
 /* moderation - you should approve */
-#sitemap li .cont.publisher_draft { background-position: 0px -400px; }
 #sitemap li .cont.publisher_draft .col-draft span.state { color: #44ad41; }
- 
 
 /* softroot icon */
 #sitemap li .col-softroot span.icon { background-position: -80px 0px; }
 
-
 /* loading message */
-#loader-message { position: fixed; top: 0px; right: 0px; padding: 4px 8px; background-color: #f1f8ff; display: none;}
+#loader-message { position: fixed; top: 0px; right: 0px; padding: 4px 8px; background-color: #f1f8ff; display: none; }
+
+/* overwrites */
+#content-main .tree .tree-default li.last { background-color:transparent !important; }
+.cms-tree { padding-bottom:0 !important; margin-bottom:-5px !important; border:1px solid #dededc;
+	background:#fefefe; }
+.moveable > div { background:white;
+	border-bottom:none !important; }
+.header { position:relative; top:1px; }
+.header .col1 { font-size:10px !important; }
+.header .col2 > div { position:relative; left:-5px; font-size:10px !important; }
+.col1 > div { text-align:center !important; }
+.col2 > div { text-align:center !important; }
+
+#sitemap .tree ul.tree-default { margin:0 0 0 3px !important; }
+#sitemap .tree ul.tree-default ul { margin:0 !important; }
+
+#sitemap .tree .cont { border-top:1px solid #dededc !important; }
+#sitemap .tree ul .open.moveable > .cont { border-bottom:1px solid #dededc !important; }
+#sitemap .tree ul .open.moveable ul .cont { border-top:none !important; border-bottom:1px solid #dededc !important; }
+
+div#sitemap ul.header li{
+	background:#fefefe;
+	border-bottom:1px solid #DDDDDD;
+	color:#666666;
+	font-size:11px;
+	padding:5px 0px 4px 5px;
+	font-weight:400;
+	height:auto;
+}
+
+.col-navigation input, .col-published input { display:none; }
+
+/* hover states */
+#sitemap .cont:hover { background:#fafafa; }
+#sitemap li .cont.publisher_draft { background:#fafafa; }
+#sitemap li .cont.publisher_draft:hover { background:#f5f5f5; }
+#sitemap li .cont.publisher_pending { background:#f3fbfe; }
+#sitemap li .cont.publisher_pending:hover { background:#e6f6fd; }
+#sitemap li .cont.publisher_dirty { background:#f3fbfe; }
+#sitemap li .cont.publisher_dirty:hover { background:#e6f6fd; }
