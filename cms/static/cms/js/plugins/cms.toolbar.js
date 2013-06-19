@@ -44,11 +44,6 @@ $(document).ready(function () {
 					'url': null,
 					'hidden': false,
 					'maximized': false
-				},
-				'modal': {
-					'url': null,
-					'hidden': false,
-					'maximized': false
 				}
 			}
 		},
