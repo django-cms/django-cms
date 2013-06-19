@@ -431,6 +431,9 @@ $(document).ready(function () {
 					that.closeMessage();
 				});
 
+			// set top to 0 if toolbar is collapsed
+			if(this.settings.toolbar === 'collapsed') top = 0;
+
 			// set correct position and show
 			this.messages.css('top', -height).show();
 
@@ -562,6 +565,9 @@ $(document).ready(function () {
 		_showToolbar: function (speed, init) {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
+			// set messages top to toolbar height
+			this.messages.css('top', 31);
+			// set new settings
 			this.settings.toolbar = 'expanded';
 			if(!init) this.setSettings();
 		},
@@ -572,6 +578,9 @@ $(document).ready(function () {
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideUp(speed);
+			// set messages top to 0
+			this.messages.css('top', 0);
+			// set new settings
 			this.settings.toolbar = 'collapsed';
 			if(!init) this.setSettings();
 		},
