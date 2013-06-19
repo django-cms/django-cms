@@ -255,6 +255,7 @@ class Placeholder(Tag):
         if not 'request' in context:
             return ''
         request = context['request']
+        request.placeholder_detected = True
         if width:
             context.update({'width': width})
 
@@ -452,6 +453,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
 
     if not request:
         return {'content': ''}
+    request.placeholder_detected = True
     if lang is None:
         lang = get_language_from_request(request)
 

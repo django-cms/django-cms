@@ -24,12 +24,18 @@ class StackNode(Tag):
         if not code:
             # an empty string was passed in or the variable is not available in the context
             return ''
-        # TODO: caching?
+            # TODO: caching?
+        request = context.get('request', False)
+        if not request:
+            return ''
+        request.placeholder_detected = True
         if isinstance(code, Stack):
             stack = code
         else:
-            stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code, 'creation_method': Stack.CREATION_BY_TEMPLATE})
+            stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code,
+            'creation_method': Stack.CREATION_BY_TEMPLATE})
         placeholder = stack.content
         return render_placeholder(placeholder, context, name_fallback=code)
+
 
 register.tag(StackNode)

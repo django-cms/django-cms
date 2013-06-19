@@ -22,5 +22,6 @@ class RenderPlaceholder(Tag):
             return ''
         if not placeholder:
             return ''
+        request.placeholder_detected = True
         return safe(placeholder.render(context, width, lang=language))
 register.tag(RenderPlaceholder)

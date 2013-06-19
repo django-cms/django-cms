@@ -78,7 +78,6 @@
 </style>
 </head>
 <body>
-{% cms_toolbar %}
 <div id="main">
 <p style="float:right">
     {% if user.is_authenticated %}
@@ -160,5 +159,6 @@
 </div>
 
 {% render_block "js" %}
+{% cms_toolbar %}
 </body>
 </html>
