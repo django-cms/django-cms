@@ -362,7 +362,7 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
-			this.keyBound = 3;
+			this.keyBound = 1;
 
 			// bind data element to the container
 			this.container.data('settings', this.options);
