@@ -777,7 +777,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
 
 			$(document).bind('mousemove.cms', function (e) {
-				if(e.clientX <= 3) e.clientX = 3;
+				if(e.clientX <= 320) e.clientX = 320;
 
 				that.sideframe.css('width', e.clientX);
 				that.body.css('margin-left', e.clientX);
