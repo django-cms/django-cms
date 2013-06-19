@@ -43,7 +43,7 @@ def assign_plugins(request, placeholders, lang=None):
                     break
                     # get all plugins for the given placeholders
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
-        'placeholder', 'tree_id', 'lft')
+        'placeholder', 'tree_id', 'level')
     plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
