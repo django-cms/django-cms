@@ -315,10 +315,7 @@ $(document).ready(function () {
 					this.openModal(
 						el.attr('href'),
 						el.attr('data-name'),
-						[{
-							'title': el.attr('data-name'),
-							'url': el.attr('href')
-						}],
+						[],
 						el.attr('data-close-url'),
 						el.attr('data-redirect-on-close-url')
 					);
