@@ -47,8 +47,7 @@
 	p { padding:0; margin:0 0 15px; }
 	img { max-width:100%; }
 	</style>
-
-</head>
+ </head>
 <body id="{% block tpl_id %}none{% endblock %}" class="{{ LANGUAGE_CODE }}">
 <div id="page" class="container_16 ">
 	<div id="header">
@@ -78,7 +77,8 @@
 	</div>
 </div>
 
-{% cms_toolbar %}
+
 	{% render_block "js" %}
+{% cms_toolbar %}
 </body>
 </html> 

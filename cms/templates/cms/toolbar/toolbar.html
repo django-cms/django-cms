@@ -17,8 +17,6 @@
 {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.placeholders.css" />{% endaddtoblock %}
 {% addtoblock "js" %}
 <script type="text/javascript">
-
-CMS.$(document).ready(function () {
 	// initialize toolbar and pass required options
 	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {
 		'csrf': '{{ csrf_token }}',
@@ -34,6 +32,8 @@ CMS.$(document).ready(function () {
 			'cancel': {% javascript_string %}{% trans "Cancel" %}{% end_javascript_string %}
 		}
 	});
+CMS.$(document).ready(function () {
+
 
 	// initialize placeholder helpers
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
