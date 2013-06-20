@@ -237,7 +237,7 @@ class SideframeItem(BaseItem):
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=None,
                  on_close=None, side=LEFT):
         super(SideframeItem, self).__init__(side)
-        self.name = name
+        self.name = "%s ..." % force_unicode(name)
         self.url = url
         self.active = active
         self.disabled = disabled
@@ -300,7 +300,7 @@ class ModalItem(BaseItem):
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=URL_CHANGE,
                  on_close=None, side=LEFT):
         super(ModalItem, self).__init__(side)
-        self.name = name
+        self.name = "%s ..." % force_unicode(name)
         self.url = url
         self.active = active
         self.disabled = disabled

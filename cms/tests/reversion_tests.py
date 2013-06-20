@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import shutil
-
+from cms.admin import pageadmin
+from django.contrib import admin
 from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from djangocms_text_ckeditor.models import Text
@@ -63,7 +64,8 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEquals(response.status_code, 200)
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0] + "/"
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[
+                0] + "/"
             response = self.client.get(edit_url)
             self.assertEquals(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
@@ -159,7 +161,8 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEquals(response.status_code, 200)
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0] + "/"
+            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[
+                0] + "/"
             response = self.client.get(edit_url)
             self.assertEquals(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
@@ -168,7 +171,6 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(undo_url)
             response = self.client.post(undo_url)
             self.assertEqual(2, CMSPlugin.objects.all().count())
-
 
     def test_recover(self):
         """
