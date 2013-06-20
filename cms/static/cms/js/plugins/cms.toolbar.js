@@ -88,7 +88,6 @@ $(document).ready(function () {
 
 		// initial methods
 		_setup: function () {
-			console.log(this.settings);
 			// reset settings if version does not match
 			if(this.settings.version !== this.options.settings.version) this.resetSettings();
 
@@ -106,7 +105,7 @@ $(document).ready(function () {
 			if(!this.options.authenticated) this.reset();
 			// check if we should show the sideframe
 			if(this.settings.sideframe.url) {
-				this.openSideframe(this.settings.sideframe.url);
+				this.openSideframe(this.settings.sideframe.url, false);
 			}
 		},
 
@@ -212,7 +211,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
 				if($(this).hasClass('cms_sideframe-hidden')) {
 					that.settings.sideframe.hidden = false;
-					that._showSideframe(that.options.sideframeWidth);
+					that._showSideframe(that.options.sideframeWidth, true);
 				} else {
 					that.settings.sideframe.hidden = true;
 					that._hideSideframe();
@@ -283,13 +282,16 @@ $(document).ready(function () {
 			if(!window.localStorage) return false;
 			// set settings
 			settings = $.extend(true, {}, this.settings, settings);
-			localStorage.setItem('cms_cookie', JSON.stringify(settings))
+			// save inside local storage
+			localStorage.setItem('cms_cookie', JSON.stringify(settings));
+
 			return settings;
 		},
 
 		getSettings: function () {
 			// cancel if local storage is not available
 			if(!window.localStorage) return false;
+
 			// get settings
 			return JSON.parse(localStorage.getItem('cms_cookie'));
 		},
@@ -313,22 +315,13 @@ $(document).ready(function () {
 
 			switch(target) {
 				case 'modal':
-					this.openModal(
-						el.attr('href'),
-						el.attr('data-name'),
-						[{
-							'title': el.attr('data-name'),
-							'url': el.attr('href')
-						}],
-						el.attr('data-close-url'),
-						el.attr('data-redirect-on-close-url')
-					);
+					this.openModal(el.attr('href'), el.attr('data-name'));
 					break;
 				case 'message':
 					this.openMessage(el.attr('data-text'));
 					break;
 				case 'sideframe':
-					this.openSideframe(el.attr('href'));
+					this.openSideframe(el.attr('href'), true);
 					break;
 				case 'ajax':
 					this.openAjax(el.attr('href'), el.attr('data-post'));
@@ -347,7 +340,7 @@ $(document).ready(function () {
 			};
 		},
 
-		openSideframe: function (url) {
+		openSideframe: function (url, animate) {
 			// prepare iframe
 			var that = this;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
@@ -381,14 +374,14 @@ $(document).ready(function () {
 				// sideframe is already open
 				insertHolder(iframe);
 				// reanimate the frame
-				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width);
+				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width, animate);
 			} else {
 				// load iframe after frame animation is done
 				setTimeout(function () {
 					insertHolder(iframe);
 				}, this.options.sideframeDuration);
 				// display the frame
-				this._showSideframe(width);
+				this._showSideframe(width, animate);
 			}
 
 			function insertHolder(iframe) {
@@ -430,6 +423,9 @@ $(document).ready(function () {
 				close.bind('click', function () {
 					that.closeMessage();
 				});
+
+			// set top to 0 if toolbar is collapsed
+			if(this.settings.toolbar === 'collapsed') top = 0;
 
 			// set correct position and show
 			this.messages.css('top', -height).show();
@@ -482,6 +478,13 @@ $(document).ready(function () {
 		},
 
 		openModal: function (url, name, breadcrumb) {
+			// reset breadcrumb
+			this.modal.find('.cms_modal-breadcrumb').hide();
+			this.modal.find('.cms_modal-breadcrumb-items').html('');
+
+			// empty buttons
+			this.modal.find('.cms_modal-buttons').html('');
+
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
 				contents.show();
 
@@ -507,9 +510,6 @@ $(document).ready(function () {
 
 			// we need to render the breadcrumb
 			this._setModalBreadcrumb(breadcrumb);
-
-			// empty buttons
-			this.modal.find('.cms_modal-buttons').html('');
 
 			// display modal
 			this._showModal(this.options.modalDuration);
@@ -562,6 +562,9 @@ $(document).ready(function () {
 		_showToolbar: function (speed, init) {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
+			// set messages top to toolbar height
+			this.messages.css('top', 31);
+			// set new settings
 			this.settings.toolbar = 'expanded';
 			if(!init) this.setSettings();
 		},
@@ -572,6 +575,9 @@ $(document).ready(function () {
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideUp(speed);
+			// set messages top to 0
+			this.messages.css('top', 0);
+			// set new settings
 			this.settings.toolbar = 'collapsed';
 			if(!init) this.setSettings();
 		},
@@ -656,7 +662,7 @@ $(document).ready(function () {
 			}, duration);
 		},
 
-		_showSideframe: function (width) {
+		_showSideframe: function (width, animate) {
 			// add class
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
 
@@ -666,8 +672,14 @@ $(document).ready(function () {
 			if(this.settings.sideframe.maximized) this._maximizeSideframe();
 			// otherwise do normal behaviour
 			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-				this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
-				this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
+				if(animate) {
+					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
+					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
+				} else {
+					console.log('show');
+					this.sideframe.animate({ 'width': width }, 0);
+					this.body.animate({ 'margin-left': width }, 0);
+				}
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
 
@@ -702,7 +714,7 @@ $(document).ready(function () {
 			this.body.css('overflow', 'auto');
 
 			// reset to first state
-			this._showSideframe(this.options.sideframeWidth);
+			this._showSideframe(this.options.sideframeWidth, true);
 
 			// remove event
 			$(window).unbind('resize.cms');
@@ -907,12 +919,15 @@ $(document).ready(function () {
 		},
 
 		_startModalResize: function (initial) {
+			// cancel if in fullscreen
+			if(this.maximized) return false;
+			// continue
 			var that = this;
 			var container = this.modal.find('.cms_modal-body');
 			var width = container.width();
 			var height = container.height();
 			var modalLeft = this.modal.position().left;
-			var modalTop = this.modal.position().top;
+			var modalTop = this.modal.position().top - 47; // TODO need to figure out why -47
 
 			this.modal.find('.cms_modal-shim').show();
 
@@ -922,7 +937,7 @@ $(document).ready(function () {
 
 				var w = width - (mvX * 2);
 				var h = height - (mvY * 2);
-				var max = that.modal.find('.cms_modal-breadcrumb').outerWidth(true) + that.modal.find('.cms_modal-buttons').outerWidth(true);
+				var max = 680;
 
 				// add some limits
 				if(w <= max || h <= 100) return false;
