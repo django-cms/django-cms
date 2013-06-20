@@ -927,7 +927,7 @@ $(document).ready(function () {
 			var width = container.width();
 			var height = container.height();
 			var modalLeft = this.modal.position().left;
-			var modalTop = this.modal.position().top - 47; // TODO need to figure out why -47
+			var modalTop = this.modal.position().top;
 
 			this.modal.find('.cms_modal-shim').show();
 
