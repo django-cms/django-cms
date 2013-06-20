@@ -240,7 +240,7 @@ Example::
         'default': {
             'fallbacks': ['en', 'de', 'fr'],
             'redirect_on_fallback':True,
-            'public': False,
+            'public': True,
             'hide_untranslated': False,
         }
     }
