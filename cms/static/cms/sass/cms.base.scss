@@ -20,6 +20,29 @@ iframe.rte { width:100%; border:1px #ccc solid; }
 .rte-toolbar a, .rte-toolbar a img { border:0; }
 form .rte-toolbar p { float:left; margin:0; padding:0; padding-right:5px; }
 
+//##################################################
+// #TABS#
+.language_button {
+	font-weight:bold;
+	margin-bottom:-1px;
+	border-color:#ddd #aaa #ccc #ddd !important;
+	border:1px;
+	background:#fff;
+}
+
+#lang_tab_content h2.header {
+	margin:0;
+	padding:2px 5px 3px 5px;
+	font-size:11px;
+	text-align:left;
+	font-weight:bold;
+	background:#7ca0c7;
+	color:#fff;
+}
+
+.notfilled {
+    color: #808080 !important;
+}
 
 //##################################################
 // #TYNIMCE#

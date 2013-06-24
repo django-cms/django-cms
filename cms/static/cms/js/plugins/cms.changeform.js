@@ -1,5 +1,41 @@
+/*##################################################|*/
+/* #CMS# */
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+
+	// hide rows when hidden input fields are added
+	$('input[type="hidden"]').each(function () {
+		$(this).parent('.form-row').hide()
+	});
+
+	// set slugify for titles
+	var title= $('#id_title');
+	var slug = $('#id_slug');
+	if (title.length > 0 && slug.length > 0) {
+		var update = function(){
+			var value = title.val();
+			if (window.UNIHANDECODER){
+				value = UNIHANDECODER.decode(value);
+			}
+			slug.val(URLify(value, 64));
+		};
+		title.keyup(update);
+		update();
+	}
+
+});
+})(CMS.$);
+
+
+
+
 (function ($) {
     $(document).ready(function () {
+
+
+
+
         var new_slug = true;
         var slug = $('#id_slug')
         if (slug.length && slug[0].value) {

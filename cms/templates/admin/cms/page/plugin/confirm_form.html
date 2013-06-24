@@ -43,7 +43,7 @@ jQuery(document).ready(function ($) {
 	// determing if we are inside the current window or in a popup
 	var CMS = CMS || window.parent.CMS;
 	// save current plugin
-	CMS.API.Helpers.savePlugin(type, context)
+	CMS.API.Helpers.reloadBrowser(context.timeout);
 });
 </script>
 {% endblock %}
