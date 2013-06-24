@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
+from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
@@ -53,7 +54,34 @@ if 'reversion' in settings.INSTALLED_APPS:
 else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
 
-    create_revision = lambda: lambda x: x
+    class ReversionContext(object):
+        def __enter__(self):
+            yield
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        def __call__(self, func):
+            """Allows this revision context to be used as a decorator."""
+            @wraps(func)
+            def do_revision_context(*args, **kwargs):
+                self.__enter__()
+                exception = False
+                try:
+                    try:
+                        return func(*args, **kwargs)
+                    except:
+                        exception = True
+                        if not self.__exit__(*sys.exc_info()):
+                            raise
+                finally:
+                    if not exception:
+                        self.__exit__(None, None, None)
+            return do_revision_context
+
+
+    def create_revision():
+        return ReversionContext()
 
 PUBLISH_COMMENT = "Publish"
 
@@ -1160,7 +1188,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     def edit_plugin(self, *args, **kwargs):
         with create_revision():
-            return super(PageAdmin, self).edit_plugin(*args, **kwargs)
+           return super(PageAdmin, self).edit_plugin(*args, **kwargs)
 
     def move_plugin(self, *args, **kwargs):
         with create_revision():
