@@ -5,6 +5,7 @@ from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
@@ -154,11 +155,11 @@ register.tag('page_id_url', PageUrl)
 
 
 def _get_placeholder(current_page, page, context, name):
-    from cms.utils.plugins import get_placeholders
-
     placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
     if page.pk in placeholder_cache:
-        return placeholder_cache[page.pk].get(name, None)
+        placeholder = placeholder_cache[page.pk].get(name, None)
+        if placeholder:
+            return placeholder
     placeholder_cache[page.pk] = {}
     placeholders = page.rescan_placeholders().values()
     assign_plugins(context['request'], placeholders, get_language())
@@ -166,7 +167,11 @@ def _get_placeholder(current_page, page, context, name):
         placeholder_cache[page.pk][placeholder.slot] = placeholder
         placeholder.page = page
     current_page._tmp_placeholders_cache = placeholder_cache
-    return placeholder_cache[page.pk].get(name, None)
+    placeholder = placeholder_cache[page.pk].get(name, None)
+    if page.application_urls and not placeholder:
+        raise PlaceholderNotFound(
+            '"%s" placeholder not found in an apphook application. Please use stacks instead.' % name)
+    return placeholder
 
 
 def get_placeholder_content(context, request, current_page, name, inherit):
@@ -326,7 +331,9 @@ class PluginChildClasses(InclusionTag):
                 child_plugin_classes.append((cls.__name__, force_unicode(cls.name)))
         return {'plugin_classes': child_plugin_classes}
 
+
 register.tag(PluginChildClasses)
+
 
 class PageAttribute(AsTag):
     """
@@ -567,5 +574,6 @@ class CMSEditablePageTitle(InclusionTag):
     def get_context(self, context):
 
         return context
+
 
 register.tag(CMSEditablePageTitle)
