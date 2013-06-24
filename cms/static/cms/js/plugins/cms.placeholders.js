@@ -362,7 +362,7 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
-			this.keyBound = 3;
+			this.keyBound = 1;
 
 			// bind data element to the container
 			this.container.data('settings', this.options);
@@ -448,7 +448,8 @@ $(document).ready(function () {
 			});
 
 			// update plugin position
-			this.container.bind('cms.placeholder.update', function () {
+			this.container.bind('cms.placeholder.update', function (e) {
+				e.stopPropagation();
 				that.movePlugin();
 			});
 
@@ -628,7 +629,7 @@ $(document).ready(function () {
 				if(e.type === 'keyup') {
 					clearTimeout(that.timer);
 					// cancel if we have less than x keys
-					if($(this).val().length < this.keyBound) return false;
+					if($(this).val().length < that.keyBound) return false;
 					that.timer = setTimeout(function () {
 						that._searchSubnav(nav, $(e.currentTarget).val());
 					}, 100);

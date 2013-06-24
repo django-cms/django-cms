@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
 import urllib
 from cms import compat
+=======
+>>>>>>> upstream/develop
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
+from cms.utils.i18n import get_language_objects, get_language_object
+from django.contrib.sites.models import Site
+from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils.compat.urls import urlencode
 from cms.toolbar_pool import toolbar_pool
-from cms.utils import get_cms_setting, get_language_from_request
-from cms.utils.i18n import get_language_object, get_language_objects
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from menus.utils import DefaultLanguageChanger
@@ -25,7 +29,6 @@ MANAGE_PAGES_BREAK = 'Manage Pages Break'
 ADMIN_SITES_BREAK = 'Admin Sites Break'
 ADMINISTRATION_BREAK = 'Administration Break'
 USER_SETTINGS_BREAK = 'User Settings Break'
-
 
 
 def add_page_menu(toolbar, current_page, permissions_active, request):
@@ -63,7 +66,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
         'position': 'last-child',
         'target': current_page.pk,
     }
-    child_url = '%s?%s' % (add_url, urllib.urlencode(child_data))
+    child_url = '%s?%s' % (add_url, urlencode(child_data))
     current_page_menu.add_modal_item(_('Add child page'), url=child_url, close_on_url=toolbar.URL_CHANGE,
                                      disabled=not_edit_mode)
     sibling_data = {
@@ -71,7 +74,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     }
     if current_page.parent_id:
         sibling_data['target'] = current_page.parent_id
-    sibling_url = '%s?%s' % (add_url, urllib.urlencode(sibling_data))
+    sibling_url = '%s?%s' % (add_url, urlencode(sibling_data))
     current_page_menu.add_modal_item(_('Add sibling page'), url=sibling_url, close_on_url=toolbar.URL_CHANGE,
                                      disabled=not_edit_mode)
     current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
@@ -79,7 +82,7 @@ def add_page_menu(toolbar, current_page, permissions_active, request):
     advanced_url = reverse('admin:cms_page_advanced', args=(current_page.pk,))
     advanced_disabled = not current_page.has_advanced_settings_permission(request) or not toolbar.edit_mode
     current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, close_on_url=toolbar.URL_CHANGE,
-                                disabled=advanced_disabled)
+                                     disabled=advanced_disabled)
     # permissions
     if permissions_active:
         permissions_url = reverse('admin:cms_page_permissions', args=(current_page.pk,))
@@ -133,7 +136,7 @@ def add_cms_menus(toolbar, current_page, permissions_active, request):
         has_global_current_page_change_permission = has_page_change_permission(request)
     else:
         has_global_current_page_change_permission = False
-    # check if user has page edit permission
+        # check if user has page edit permission
     if has_global_current_page_change_permission or toolbar.can_change:
         add_page_menu(toolbar, current_page, permissions_active, request)
         if toolbar.edit_mode:
@@ -177,10 +180,9 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         pages_menu.add_sideframe_item(_('Manage pages'), url=reverse("admin:cms_page_changelist"))
         pages_menu.add_break(MANAGE_PAGES_BREAK)
         pages_menu.add_sideframe_item(_('Add new page'), url=reverse("admin:cms_page_add"))
-    # users
+        # users
     if request.user.has_perm('user.change_user'):
         admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:"+settings.AUTH_USER_MODEL.replace('.','_').lower()+"_changelist"))
-    # sites menu
     if permissions_active:
         sites_queryset = get_user_sites_queryset(request.user)
     else:
@@ -190,8 +192,8 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
         sites_menu.add_sideframe_item(_('Admin Sites'), url=reverse('admin:sites_site_changelist'))
         sites_menu.add_break(ADMIN_SITES_BREAK)
         for site in sites_queryset:
-            sites_menu.add_link_item(site.name, url='http://%s' % site.domain, active=site.pk==current_site.pk)
-    # admin
+            sites_menu.add_link_item(site.name, url='http://%s' % site.domain, active=site.pk == current_site.pk)
+            # admin
     admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
     admin_menu.add_break(ADMINISTRATION_BREAK)
     # cms users
@@ -199,12 +201,14 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
     admin_menu.add_break(USER_SETTINGS_BREAK)
     # logout
     admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'), active=True)
-
-
-    # check if we're in the CMS
-    if current_page and is_current_app:
-        add_cms_menus(toolbar, current_page, permissions_active, request)
-    # language menu
+    # check if we're in the CMS or on an apphook root
+    if current_page:
+        path = current_page.get_path()
+        if settings.APPEND_SLASH:
+            path = "%s/" % path
+        if request.path.endswith(path):
+            add_cms_menus(toolbar, current_page, permissions_active, request)
+            # language menu
     try:
         current_lang = get_language_object(get_language_from_request(request), current_site.pk)
     except LanguageError:
@@ -214,8 +218,9 @@ def cms_toolbar(toolbar, request, is_current_app, current_app_name):
     for language in get_language_objects(current_site.pk):
         url = language_changer(language['code'])
         language_menu.add_link_item(language['name'], url=url, active=current_lang == language['code'])
-    # edit switcher
+        # edit switcher
     if toolbar.edit_mode and toolbar.can_change:
-        switcher = toolbar.add_button_list('Mode Switcher', side=toolbar.RIGHT, extra_classes=['cms_toolbar-item-cms-mode-switcher'])
+        switcher = toolbar.add_button_list('Mode Switcher', side=toolbar.RIGHT,
+                                           extra_classes=['cms_toolbar-item-cms-mode-switcher'])
         switcher.add_button(_("Content"), '?edit', active=not toolbar.build_mode, disabled=toolbar.build_mode)
         switcher.add_button(_("Structure"), '?build', active=toolbar.build_mode, disabled=not toolbar.build_mode)

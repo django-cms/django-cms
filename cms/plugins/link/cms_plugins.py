@@ -4,7 +4,7 @@ from django.conf import settings
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugins.link.forms import LinkForm
-from models import Link
+from .models import Link
 
 class LinkPlugin(CMSPluginBase):
     model = Link

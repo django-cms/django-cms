@@ -24,7 +24,7 @@ from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
-from django.utils.unittest.case import skipUnless
+from django.utils.unittest import skipUnless
 
 
 
@@ -108,6 +108,14 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         # should now include both P10 and P11
         self.assertEqual(len(nodes[1].children), 1)
         self.assertEqual(len(nodes[1].children[0].children), 1)
+
+    def test_show_submenu_template_root_level_none_no_nephew_limit(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # default nephew limit, P2 and P9 in the nodes list
+        self.assertEqual(len(nodes), 2)
 
 
 class FixturesMenuTests(MenusFixture, BaseMenuTest):
@@ -313,7 +321,18 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # P2 is selected
         self.assertTrue(nodes[0].children[0].selected)
 
-        
+    def test_show_submenu_template_root_level_none(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # First node is P2 (P1 children) thus not selected
+        self.assertFalse(nodes[0].selected)
+        # nephew limit of 1, so only P2 is the nodes list
+        self.assertEqual(len(nodes), 1)
+        # P3 is a child of P2, but not in nodes list
+        self.assertTrue(nodes[0].children)
+
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")

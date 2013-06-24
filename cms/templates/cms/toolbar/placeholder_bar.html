@@ -8,10 +8,10 @@
 		<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
 		<ul class="cms_submenu-dropdown">
 			<li><span>{% trans "Settings" %}</span></li>
-			<li><a data-rel="copy" href="#">{% trans "Copy" %}</a></li>
-			<li><a data-rel="modal" href="{% url "admin:cms_page_clear_placeholder" placeholder.pk %}" data-name="{{ placeholder_label }}">{% trans "Empty" %}</a></li>
-			<li><a data-rel="modal" href='{% url "admin:stacks_stack_create_stack" placeholder_id=placeholder.pk %}?_popup'>{% trans "Create Stack" %}</a></li>
-			<li><a data-rel="modal" href='{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'>{% trans "Insert Stack" %}</a></li>
+			<li><a data-rel="copy" href="#">{% trans "Copy all" %}</a></li>
+			<li><a data-rel="modal" href="{% url "admin:cms_page_clear_placeholder" placeholder.pk %}" data-name="{{ placeholder_label }}">{% trans "Empty all" %}</a></li>
+			<li><a data-rel="modal" href='{% url "admin:stacks_stack_create_stack" placeholder_id=placeholder.pk %}?_popup'>{% trans "Create stack" %}</a></li>
+			<li><a data-rel="modal" href='{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'>{% trans "Insert stack" %}</a></li>
 			{% for module in module_list %}
 			<li><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></li>
 			{% for p in module.list %}

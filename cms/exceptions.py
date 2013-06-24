@@ -67,3 +67,6 @@ class CMSDeprecationWarning(Warning): pass
 
 
 class LanguageError(Exception): pass
+
+
+class PluginConsistencyError(Exception): pass

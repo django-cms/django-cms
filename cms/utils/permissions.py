@@ -116,7 +116,7 @@ def has_global_page_permission(request, site=None, **filters):
         return True
     if not hasattr(request, '_cms_global_perms'):
         request._cms_global_perms = {}
-    key = tuple((k, v) for k, v in filters.iteritems())
+    key = tuple((k, v) for k, v in filters.items())
     if site:
         key = (('site', site.pk if hasattr(site, 'pk') else int(site)),) + key
     if key not in request._cms_global_perms:

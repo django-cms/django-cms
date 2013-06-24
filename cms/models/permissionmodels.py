@@ -10,6 +10,7 @@ from cms.compat import User
 from cms.models import Page
 from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
 from cms.utils.helpers import reversion_register
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
@@ -60,7 +61,7 @@ class AbstractPagePermission(models.Model):
         """Return audience by priority, so: All or User, Group
         """
         targets = filter(lambda item: item, (self.user, self.group,))
-        return ", ".join([unicode(t) for t in targets]) or 'No one'
+        return ", ".join([force_unicode(t) for t in targets]) or 'No one'
 
     def save(self, *args, **kwargs):
         if not self.user and not self.group:
@@ -69,6 +70,7 @@ class AbstractPagePermission(models.Model):
         return super(AbstractPagePermission, self).save(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
@@ -82,10 +84,11 @@ class GlobalPagePermission(AbstractPagePermission):
         verbose_name_plural = _('Pages global permissions')
         app_label = 'cms'
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s :: GLOBAL" % self.audience
 
 
+@python_2_unicode_compatible
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """
@@ -99,9 +102,9 @@ class PagePermission(AbstractPagePermission):
         verbose_name_plural = _('Page permissions')
         app_label = 'cms'
 
-    def __unicode__(self):
-        page = self.page_id and unicode(self.page) or "None"
-        return "%s :: %s has: %s" % (page, self.audience, unicode(dict(ACCESS_CHOICES)[self.grant_on]))
+    def __str__(self):
+        page = self.page_id and force_unicode(self.page) or "None"
+        return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
 
 
 class PageUser(User):

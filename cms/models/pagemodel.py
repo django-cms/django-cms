@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from cms import constants
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
 from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
@@ -14,6 +15,7 @@ from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -26,11 +28,11 @@ from mptt.models import MPTTModel
 from os.path import join
 
 
-class Page(MPTTModel):
+@python_2_unicode_compatible
+class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
     A simple hierarchical page model
     """
-    __metaclass__ = PageMetaClass
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
@@ -71,7 +73,8 @@ class Page(MPTTModel):
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
-
+    application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
+    application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
@@ -96,6 +99,7 @@ class Page(MPTTModel):
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
         )
+        unique_together = (("publisher_is_draft", "application_namespace"),)
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('tree_id', 'lft')
@@ -107,11 +111,11 @@ class Page(MPTTModel):
             'placeholders', 'lft', 'rght', 'tree_id',
             'parent']
 
-    def __unicode__(self):
+    def __str__(self):
         title = self.get_menu_title(fallback=True)
         if title is None:
             title = u""
-        return unicode(title)
+        return force_unicode(title)
 
     def __repr__(self):
         # This is needed to solve the infinite recursion when
@@ -181,7 +185,7 @@ class Page(MPTTModel):
             title.page = target
             title.save()
         if old_titles:
-            from titlemodels import Title
+            from .titlemodels import Title
 
             Title.objects.filter(id__in=old_titles.values()).delete()
 
@@ -219,6 +223,8 @@ class Page(MPTTModel):
         target.soft_root = self.soft_root
         target.reverse_id = self.reverse_id
         target.navigation_extenders = self.navigation_extenders
+        target.application_urls = self.application_urls
+        target.application_namespace = self.application_namespace
         target.template = self.template
         target.site_id = self.site_id
 
@@ -352,7 +358,8 @@ class Page(MPTTModel):
 
         if self.reverse_id == "":
             self.reverse_id = None
-
+        if self.application_namespace == "":
+            self.application_namespace = None
         from cms.utils.permissions import _thread_locals
 
         user = getattr(_thread_locals, "user", None)
@@ -608,10 +615,7 @@ class Page(MPTTModel):
         from cms.models.titlemodels import Title
 
         if not hasattr(self, "all_languages"):
-            self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
-            self.all_languages = list(self.all_languages)
-            self.all_languages.sort()
-            self.all_languages = map(str, self.all_languages)
+            self.all_languages = list(sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
         return self.all_languages
 
     def get_cached_ancestors(self, ascending=True):
@@ -681,13 +685,13 @@ class Page(MPTTModel):
         get when this page was last updated
         """
         return self.changed_date
-        
+
     def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get user who last changed this page
         """
         return self.changed_by
-        
+
     def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language
@@ -707,7 +711,7 @@ class Page(MPTTModel):
         """
         get application urls conf for application hook
         """
-        return self.get_title_obj_attribute("application_urls", language, fallback, version_id, force_reload)
+        return self.application_urls
 
     def get_redirect(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
@@ -825,7 +829,7 @@ class Page(MPTTModel):
                 # anonymous user, no restriction saved in database
                 return True
                 # Authenticated user
-            # Django wide auth perms "can_view" or cms auth perms "can_view"
+                # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
         return (request.user.has_perm(codename) or

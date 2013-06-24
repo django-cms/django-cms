@@ -1,7 +1,10 @@
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
 
+
+@python_2_unicode_compatible
 class Teaser(CMSPlugin):
     """
     A Teaser
@@ -19,7 +22,7 @@ class Teaser(CMSPlugin):
     url = models.CharField(_("link"), max_length=255, blank=True, null=True, help_text=_("If present image will be clickable."))
     description = models.TextField(_("description"), blank=True, null=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.title
     
     search_fields = ('description',)

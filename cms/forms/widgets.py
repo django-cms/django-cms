@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.forms.widgets import Select, MultiWidget, Widget
 from django.template.context import RequestContext
 from django.template.loader import render_to_string
-from django.utils.encoding import force_unicode
+from cms.utils.compat.dj import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 

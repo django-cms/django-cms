@@ -17,7 +17,6 @@ from djangocms_text_ckeditor.models import Text
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 import django
 from django.contrib import admin
@@ -29,8 +28,6 @@ from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
-from menus.menu_pool import menu_pool
-from types import MethodType
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
@@ -172,12 +169,13 @@ class AdminTestCase(AdminTestsBase):
         page.save()
         title = page.get_title_obj()
         title.has_url_overwrite = True
-        title.application_urls = APPLICATION_URLS
-        title.save()
 
+        title.save()
+        page.application_urls = APPLICATION_URLS
+        page.save()
         self.assertEqual(page.get_title(), OLD_PAGE_NAME)
         self.assertEqual(page.reverse_id, REVERSE_ID)
-        self.assertEqual(title.application_urls, APPLICATION_URLS)
+        self.assertEqual(page.application_urls, APPLICATION_URLS)
 
         # The user edits the page (change the page name for ex.)
         page_data = {
@@ -201,12 +199,10 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(resp.status_code, 200)
             self.assertTemplateNotUsed(resp, 'admin/login.html')
             page = Page.objects.get(pk=page.pk)
-
             self.assertEqual(page.get_title(), NEW_PAGE_NAME)
             self.assertEqual(page.reverse_id, REVERSE_ID)
+            self.assertEqual(page.application_urls, APPLICATION_URLS)
             title = page.get_title_obj()
-            self.assertEqual(title.application_urls, APPLICATION_URLS)
-
             # The admin edits the page (change the page name for ex.)
             page_data = {
                 'title': OLD_PAGE_NAME,
@@ -216,7 +212,6 @@ class AdminTestCase(AdminTestsBase):
                 'template': page.template,
                 'reverse_id': page.reverse_id,
             }
-
 
         with self.login_user_context(admin):
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page.pk, page_data,
@@ -231,8 +226,7 @@ class AdminTestCase(AdminTestsBase):
 
             self.assertEqual(page.get_title(), OLD_PAGE_NAME)
             self.assertEqual(page.reverse_id, REVERSE_ID)
-            title = page.get_title_obj()
-            self.assertEqual(title.application_urls, '')
+            self.assertEqual(page.application_urls, '')
 
     def test_delete(self):
         admin = self.get_superuser()
@@ -367,10 +361,10 @@ class AdminTestCase(AdminTestsBase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         # should include both direct descendant pages
-        self.assertTrue('id="page_%s"' % second_level_page_top.pk in response.content)
-        self.assertTrue('id="page_%s"' % second_level_page_bottom.pk in response.content)
+        self.assertContains(response, 'id="page_%s"' % second_level_page_top.pk)
+        self.assertContains(response, 'id="page_%s"' % second_level_page_bottom.pk)
         # but not any further down the tree
-        self.assertFalse('id="page_%s"' % third_level_page.pk in response.content)
+        self.assertNotContains(response, 'id="page_%s"' % third_level_page.pk)
 
     def test_unihandecode_doesnt_break_404_in_admin(self):
         admin = self.get_superuser()
@@ -544,7 +538,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.pk, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "ok")
+            self.assertEqual(response.content, b"ok")
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.id, 'plugin_parent': ''})
@@ -554,7 +548,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.id, 'plugin_parent': ''})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, "ok")
+            self.assertEqual(response.content, b"ok")
 
     def test_preview_page(self):
         permless = self.get_permless()
@@ -896,7 +890,7 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertEqual(response['content-type'], 'application/json')
-        pk = response.content.split("edit-plugin/")[1].split("/")[0]
+        pk = response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0]
         self.assertTrue(CMSPlugin.objects.filter(pk=int(pk)).exists())
 
 

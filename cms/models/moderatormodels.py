@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+from cms.utils.compat.dj import python_2_unicode_compatible
 
 from django.conf import settings
 from django.db import models
@@ -14,6 +15,7 @@ from cms.models.pagemodel import Page
 # Moderation
 ################################################################################
 
+@python_2_unicode_compatible
 class PageModeratorState(models.Model):
     """PageModeratorState memories all actions made on page.
     Page can be in only one advanced state.
@@ -42,5 +44,5 @@ class PageModeratorState(models.Model):
 
     css_class = lambda self: self.action.lower()
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s: %s" % (self.page, self.get_action_display())

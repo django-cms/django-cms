@@ -185,6 +185,10 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Removed CMS_SHOW_START_DATE. Always enabled.
 - Removed CMS_SHOW_END_DATE. Always enabled.
 - Added (optional) language fallback for placeholders.
-
+- moved apphooks from title to page model so we need to add them only once.
+- request.current_app has been removed.
+- added a namespace field, reverse_id is not used anymore for apphook namespaces.
+- PlaceholderAdmin does not have LanguageTabs anymore. It only has a PluginAPI now.
+- PageAdmin uses the same Plugin API as PlaceholderAdmin
 
 

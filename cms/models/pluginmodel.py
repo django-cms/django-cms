@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
+from cms.utils.compat.metaclasses import with_metaclass
 
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
@@ -15,6 +16,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils.helpers import reversion_register
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils import get_cms_setting
 from mptt.models import MPTTModel, MPTTModelBase
 
@@ -64,7 +66,8 @@ class PluginModelBase(MPTTModelBase):
         return new_class
 
 
-class CMSPlugin(MPTTModel):
+@python_2_unicode_compatible
+class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -76,8 +79,6 @@ class CMSPlugin(MPTTModel):
     2. Subclasses of CMSPlugin cannot define a "text" field.
 
     '''
-    __metaclass__ = PluginModelBase
-
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
@@ -131,8 +132,8 @@ class CMSPlugin(MPTTModel):
             factory = lambda x, y: x
         return (model_unpickle, (model, defers, factory), data)
 
-    def __unicode__(self):
-        return unicode(self.id)
+    def __str__(self):
+        return force_unicode(self.id)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -142,7 +143,7 @@ class CMSPlugin(MPTTModel):
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
         if instance is not None:
-            return unicode(instance)
+            return force_unicode(instance)
         return _("<Empty>")
 
     def get_plugin_class(self):
@@ -224,7 +225,7 @@ class CMSPlugin(MPTTModel):
         """
         instance, plugin = self.get_plugin_instance()
         if instance:
-            return unicode(plugin.icon_alt(instance))
+            return force_unicode(plugin.icon_alt(instance))
         else:
             return u''
 
@@ -277,7 +278,7 @@ class CMSPlugin(MPTTModel):
                 # going down; remove more items from plugin_trail
                 if level_difference < 0:
                     plugin_trail[:] = plugin_trail[:level_difference]
-                # assign new_plugin.parent
+                    # assign new_plugin.parent
             new_plugin.parent = plugin_trail[-1]
             # new_plugin becomes the last item in the tree for the next round
             plugin_trail.append(new_plugin)
@@ -363,14 +364,25 @@ class CMSPlugin(MPTTModel):
         return self.position + 1
 
     def get_breadcrumb(self):
+        models = self.placeholder._get_attached_models()
+        if models:
+            model = models[0]
+        else:
+            from cms.models import Page
+
+            model = Page
         breadcrumb = []
         if not self.parent_id:
-            breadcrumb.append({'title': unicode(self.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
+            breadcrumb.append({'title': force_unicode(self.get_plugin_name()),
+                'url': force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                            args=[self.pk]))})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
-            breadcrumb.append({'title': unicode(parent.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
+            breadcrumb.append({'title': force_unicode(parent.get_plugin_name()),
+                'url': force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                            args=[parent.pk]))})
         return breadcrumb
 
     def get_breadcrumb_json(self):

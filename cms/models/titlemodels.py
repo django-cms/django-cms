@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -7,6 +8,7 @@ from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
 
 
+@python_2_unicode_compatible
 class Title(models.Model):
     language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
@@ -19,7 +21,6 @@ class Title(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
@@ -29,7 +30,7 @@ class Title(models.Model):
         unique_together = (('language', 'page'),)
         app_label = 'cms'
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s (%s, %s)" % (self.title, self.slug, self.language)
 
     def update_path(self):
