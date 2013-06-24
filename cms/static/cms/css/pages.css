@@ -209,6 +209,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 }
 
 #sitemap li .col-softroot,
+#sitemap li .col-apphook,
 #sitemap li .col-language,
 #sitemap li .col-actions,	
 #sitemap li .col-published,
@@ -230,6 +231,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	white-space:nowrap;
 }
 
+#sitemap li .col-apphook,
 #sitemap li .col-softroot,
 #sitemap li .col-language{
 	background:none;
@@ -311,6 +313,7 @@ div#sitemap ul.header, div#sitemap ul.header li{
 #sitemap ul.header li .col-actions,	
 #sitemap ul.header li .col-published,
 #sitemap ul.header li .col-navigation,
+#sitemap ul.header li .col-apphook,
 #sitemap ul.header li .col-softroot,
 #sitemap ul.header li .col-moderator,
 #sitemap ul.header li .col-lastchange,
@@ -433,6 +436,9 @@ div#sitemap ul.header, div#sitemap ul.header li{
 /* moderation - you should approve */
 #sitemap li .cont.publisher_draft .col-draft span.state { color: #44ad41; }
 
+/* apphook icon */
+
+#sitemap li .col-apphook span.icon { background-position: -40px -60px; }
 /* softroot icon */
 #sitemap li .col-softroot span.icon { background-position: -80px 0px; }
 
