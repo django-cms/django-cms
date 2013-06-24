@@ -70,3 +70,7 @@ class LanguageError(Exception): pass
 
 
 class PluginConsistencyError(Exception): pass
+
+
+class PlaceholderNotFound(Exception): pass
+
