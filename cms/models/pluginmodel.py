@@ -2,7 +2,7 @@
 from datetime import date
 from cms.utils.compat.metaclasses import with_metaclass
 
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.safestring import mark_safe
 import os
 import warnings
@@ -364,25 +364,35 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return self.position + 1
 
     def get_breadcrumb(self):
+        from cms.models import Page
+
         models = self.placeholder._get_attached_models()
         if models:
             model = models[0]
         else:
-            from cms.models import Page
-
             model = Page
         breadcrumb = []
         if not self.parent_id:
-            breadcrumb.append({'title': force_unicode(self.get_plugin_name()),
-                'url': force_unicode(
+            try:
+                url = force_unicode(
                     reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[self.pk]))})
+                            args=[self.pk]))
+            except NoReverseMatch:
+                url = force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                            args=[self.pk]))
+            breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
-            breadcrumb.append({'title': force_unicode(parent.get_plugin_name()),
-                'url': force_unicode(
+            try:
+                url = force_unicode(
                     reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[parent.pk]))})
+                            args=[parent.pk]))
+            except NoReverseMatch:
+                url = force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                            args=[parent.pk]))
+            breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):
