@@ -18,9 +18,9 @@
 {% block extrastyle %}
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/pages.css"/>
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/tree_component.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/js/jstree/tree_component.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/cms.base.css" />
-{% if cl.is_filtered %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/themes/default/style.css" />{% endif %}
+{% if cl.is_filtered %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/js/jstree/themes/default/style.css" />{% endif %}
 {% endblock extrastyle %}
 
 {% block extrahead %}
@@ -29,8 +29,8 @@
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/class.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <!-- load jstree -->
-<script type="text/javascript" src="{{ STATIC_URL }}cms/jstree/_lib/_all.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/jstree/tree_component.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/jstree/_lib/_all.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}cms/js/jstree/tree_component.js"></script>
 <!-- load jquery plugins -->
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.ui.custom.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.ui.checkbox.js"></script>
