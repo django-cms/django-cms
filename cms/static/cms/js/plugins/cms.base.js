@@ -30,10 +30,10 @@ $(document).ready(function () {
 	 */
 	CMS.API.Helpers = {
 
-		reloadBrowser: function (timeout) {
+		reloadBrowser: function (url, timeout) {
 			// add timeout if provided
 			setTimeout(function () {
-				window.location.reload();
+				(url) ? window.location.href = url : window.location.reload();
 			}, timeout || 0);
 		}
 

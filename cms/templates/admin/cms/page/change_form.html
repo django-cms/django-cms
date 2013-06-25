@@ -37,26 +37,23 @@
 
 {% if show_language_tabs and not show_permissions %}
 <div id="page_form_lang_tabs">
-    {% for lang_code, lang_name in language_tabs %}
-        <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
-            class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
-            id="debutton" name="{{lang_code}}" value="{{lang_name}}" />
-    {% endfor %}
+	{% for lang_code, lang_name in language_tabs %}
+		<input type="button" onclick="CMS.API.changeLanguage('./?language={{lang_code}}');"
+			class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
+			id="debutton" name="{{lang_code}}" value="{{lang_name}}" />
+	{% endfor %}
+	<div class="lang_tabs_line"></div>
 </div>
 {% endif %}
 
-
 <div id="lang_tab_content">
-{% if show_language_tabs and not show_permissions%}
-<h2 class="header"></h2>
-{% endif %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if errors %}
-    <p class="errornote">
-    {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
-    </p>
-    <ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+<p class="errornote">
+{% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+</p>
+<ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
 {% endif %}
 
 {% for fieldset in adminform %}
@@ -69,24 +66,23 @@
 
 {% if show_permissions %}
 	{% if CMS_PERMISSION and can_change_permissions %}
-		<div class="inline-group">
-			<div class="tabular inline-related">
-				<fieldset id="inherited_permissions" class="module aligned collapse">
-				  <h2>{% trans 'All permissions' %}</h2>
-				  <div class="loading" rel="../permissions/">{% trans 'Loading...' %}</div>
-				</fieldset>
-			</div>
+	<div class="inline-group">
+		<div class="tabular inline-related">
+			<fieldset id="inherited_permissions" class="module aligned collapse">
+			  <h2>{% trans 'All permissions' %}</h2>
+			  <div class="loading" rel="../permissions/">{% trans 'Loading...' %}</div>
+			</fieldset>
 		</div>
+	</div>
 	{% endif %}
-
-    <div class="inline-group">
-        <div class="tabular inline-related">
-            <fieldset id="page_states" class="module aligned collapse">
-              <h2 class="load_remote">{% trans 'Page states' %}</h2>
-              <div class="loading" rel="../moderation-states/">{% trans 'Loading...' %}</div>
-            </fieldset>
-        </div>
-    </div>
+	<div class="inline-group">
+		<div class="tabular inline-related">
+			<fieldset id="page_states" class="module aligned collapse">
+			  <h2 class="load_remote">{% trans 'Page states' %}</h2>
+			  <div class="loading" rel="../moderation-states/">{% trans 'Loading...' %}</div>
+			</fieldset>
+		</div>
+	</div>
 {% endif %}
 
 {% block after_related_objects %}{% endblock %}
@@ -99,6 +95,9 @@
 {% else %}
 	{% page_submit_row %}
 {% endif %}
+</div>
+</form>
+</div>
 
 {% for url in unihandecode_urls %}<script type="text/javascript" src="{{ url }}"></script>{% endfor %}
 {% if unihandecode_urls %}
@@ -110,7 +109,4 @@
 {# JavaScript for prepopulated fields #}
 {% prepopulated_fields_js %}
 
-</div>
-</form>
-</div>
 {% endblock %}

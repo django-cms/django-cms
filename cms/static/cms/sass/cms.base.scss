@@ -22,26 +22,20 @@ form .rte-toolbar p { float:left; margin:0; padding:0; padding-right:5px; }
 
 //##################################################
 // #TABS#
-.language_button {
-	font-weight:bold;
-	margin-bottom:-1px;
-	border-color:#ddd #aaa #ccc #ddd !important;
-	border:1px;
-	background:#fff;
-}
 
-#lang_tab_content h2.header {
-	margin:0;
-	padding:2px 5px 3px 5px;
-	font-size:11px;
-	text-align:left;
-	font-weight:bold;
-	background:#7ca0c7;
-	color:#fff;
-}
+// used in: /cms/admin/page/change_form
+#page_form_lang_tabs {
+	position:relative;
 
-.notfilled {
-    color: #808080 !important;
+	input.language_button { background:#ccc; }
+	input.selected { color:black; text-shadow:none; background:white; }
+	input.notfilled { color:#bbb; background:none; }
+
+	.lang_tabs_line {
+		position:absolute; left:0; bottom:-5px;
+		width:100%; height:5px;
+		background:white;
+	}
 }
 
 //##################################################
