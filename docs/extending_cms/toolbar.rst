@@ -18,35 +18,37 @@ Registering
 There are two ways to control what gets shown in the toolbar. 
 
 One is the :setting:`CMS_TOOLBARS`. This gives you full control over which
-modifiers are loaded, but requires that you specify them all manually.
+classes are loaded, but requires that you specify them all manually.
 
 The other is to provide ``cms_toolbar.py`` files in your apps, which will be
 automatically loaded as long :setting:`CMS_TOOLBARS` is not set (or set to
 ``None``).
 
 If you use the automated way, your ``cms_toolbar.py`` file should contain
-functions that modify the toolbar using :meth:`cms.toolbar_pool.toolbar_pool.register`.
+classes that extend from ``cms.toolbar_base.CMSToolbar`` and are registered using :meth:`cms.toolbar_pool.toolbar_pool.register`.
+The register function can be used as a decorator.
 
-These functions must accept four parameters:
+These have four attributes:
+* toolbar (the toolbar object)
+* request (the current request)
+* is_current_app (a flag indicating whether the current request is handled by the same app as
+  the function is in)
+* app_path (the name of the app used for the current request)
 
-* the toolbar object
-* the current request
-* a flag indicating whether the current request is handled by the same app as
-  the function is in
-* the name of the app used for the current request
+This classes must implement a ``populate`` function.
+The populate function will only be called if the current user is a staff user.
 
-Modifier functions have no return value. The register function can be used as a
-decorator.
-
-The modifier function will only be called if the current user is a staff user.
-
-A simple example, registering a modifier that does nothing::
+A simple example, registering a class that does nothing::
 
     from cms.toolbar_pool import toolbar_pool
+    from cms.toolbar_base import CMSToolbar
 
     @toolbar_pool.register
-    def noop_modifier(toolbar, request, is_current_app, app_name):
-        pass
+    class MoopModifier(CMSToolbar):
+
+        def populate():
+            pass
+
 
 
 ************
@@ -74,14 +76,16 @@ to the toolbar::
     from django.core.urlresolvers import reverse
     from django.utils.translation import ugettext_lazy as _
     from cms.toolbar_pool import toolbar_pool
+    from cms.toolbar_base import CMSToolbar
 
     @toolbar_pool.register
-    def poll_toolbar(toolbar, request, is_current_app, app_name):
-        if not request.is_staff:
-            return # no point in adding items the user can't access
-        menu = toolbar.get_or_create_menu('poll-app', _('Polls')
-        url = reverse('admin:polls_poll_changelist')
-        menu.add_sideframe_item(_('Poll overview'), url=url)
+    class PollToolbar(CMSToolbar):
+
+        def populate():
+            if self.is_current_app:
+                menu = self.toolbar.get_or_create_menu('poll-app', _('Polls')
+                url = reverse('admin:polls_poll_changelist')
+                menu.add_sideframe_item(_('Poll overview'), url=url)
 
 
 However, there's already a menu added by the CMS which provides access to
@@ -96,15 +100,16 @@ menus::
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar.items import Break
     from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+    from cms.toolbar_base import CMSToolbar
 
     @toolbar_pool.register
-    def poll_toolbar(toolbar, request, is_current_app, app_name):
-        if not request.is_staff:
-            return # no point in adding items the user can't access
-        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site')
-        position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
-        menu = admin_menu.get_or_create_menu('poll-menu', _('Polls'), position=position)
-        url = reverse('admin:polls_poll_changelist')
-        menu.add_sideframe_item(_('Poll overview'), url=url)
-        admin_menu.add_break('poll-break', position=menu)
+    class PollToolbar(CMSToolbar):
+
+        def populate():
+            admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site')
+            position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
+            menu = admin_menu.get_or_create_menu('poll-menu', _('Polls'), position=position)
+            url = reverse('admin:polls_poll_changelist')
+            menu.add_sideframe_item(_('Poll overview'), url=url)
+            admin_menu.add_break('poll-break', position=menu)
 
