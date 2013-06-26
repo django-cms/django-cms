@@ -14,15 +14,15 @@
 {% block coltype %}flex{% endblock %}
 {% block extrastyle %}
 {{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/js/jstree/tree_component.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/cms.base.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.pagetree.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/js/jstree/tree_component.css" />
 {% if cl.is_filtered %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/js/jstree/themes/default/style.css" />{% endif %}
 {% endblock extrastyle %}
 
 {% block extrahead %}
 {{ block.super }}
-<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
+{% block jquery %}<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>{% endblock jquery %}
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/class.min.js"></script>
 <!-- load jstree -->
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/jstree/_lib/_all.js"></script>
@@ -38,40 +38,40 @@
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.changelist.js"></script>
 <script type="text/javascript">
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
 
-	//<![CDATA[
-	(function namespacing($) {
-		$(document).ready(function() {
-			{% if not cl.is_filtered %}
-				initTree();
-			{% endif %}
-		});
+	{% if not cl.is_filtered %}
+		initTree();
+	{% endif %}
 
-		showchangelistfilter = function(){
-			$("#changelist-filter").toggle();
+	showchangelistfilter = function(){
+		$("#changelist-filter").toggle();
+	};
+	moveSuccess = function(node){
+		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
+		node.append(msg);
+		msg.fadeOut(3000);
+	};
+	moveError = function(node,message){
+		if(message && message!="error") {
+			var msg = $({% javascript_string %}<span class="success">{% end_javascript_string %}+message+{% javascript_string %}</span>{% end_javascript_string %});
 		}
-		moveSuccess = function(node){
-			var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
-			node.append(msg);
-			msg.fadeOut(3000);
+		else {
+			var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
 		}
-		moveError = function(node,message){
-			if(message && message!="error") {
-				var msg = $({% javascript_string %}<span class="success">{% end_javascript_string %}+message+{% javascript_string %}</span>{% end_javascript_string %});
-			}
-			else {
-				var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
-			}
-			node.append(msg);
-		}
-		// some settings used by javascript functions
+		node.append(msg);
+	};
+	// some settings used by javascript functions
 
-		cmsSettings = {
-			cmsPermission: {{ CMS_PERMISSION|js }},
-			debug: {{ DEBUG|js }}
-		};
-	})(window.CMS.$);
-	//]]>
+	cmsSettings = {
+		cmsPermission: {{ CMS_PERMISSION|js }},
+		debug: {{ DEBUG|js }}
+	};
+
+});
+})(CMS.$);
 </script>
 {% endblock extrahead %}
 
