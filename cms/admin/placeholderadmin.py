@@ -418,15 +418,6 @@ class LanguageTabsAdmin(ModelAdmin):
     render_placeholder_language_tabs = True
     change_form_template = 'admin/placeholders/placeholder/change_form.html'
 
-    class Media:
-        css = {
-            'all': [cms_static_url(path) for path in (
-                'css/rte.css',
-                'css/change_form.css',
-                'css/cms.base.css',
-            )]
-        }
-
     def get_language_from_request(self, request):
         language = request.REQUEST.get('language', None)
         if not language:
