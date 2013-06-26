@@ -31,8 +31,7 @@ The register function can be used as a decorator.
 These have four attributes:
 * toolbar (the toolbar object)
 * request (the current request)
-* is_current_app (a flag indicating whether the current request is handled by the same app as
-  the function is in)
+* is_current_app (a flag indicating whether the current request is handled by the same app as the function is in)
 * app_path (the name of the app used for the current request)
 
 This classes must implement a ``populate`` function.
