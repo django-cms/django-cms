@@ -43,6 +43,16 @@ $(document).ready(function () {
 			$('form').submit(function () {
 				$('input[type="submit"]').attr('disabled', 'disabled');
 			});
+		},
+
+		// fixes csrf behaviour
+		csrf: function (csrf_token) {
+			$.ajaxSetup({
+				beforeSend: function (xhr) {
+					// set csrf_token
+					xhr.setRequestHeader("X-CSRFToken", csrf_token);
+				}
+			});
 		}
 
 	};

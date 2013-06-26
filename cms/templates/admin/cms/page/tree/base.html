@@ -42,6 +42,8 @@
 // CMS.$ will be passed for $
 $(document).ready(function () {
 
+	CMS.API.Helpers.csrf('{{ csrf_token }}');
+
 	{% if not cl.is_filtered %}
 		initTree();
 	{% endif %}
