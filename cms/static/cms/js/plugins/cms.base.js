@@ -30,14 +30,25 @@ $(document).ready(function () {
 	 */
 	CMS.API.Helpers = {
 
+		// redirects to a specific url or reloads browser
 		reloadBrowser: function (url, timeout) {
 			// add timeout if provided
 			setTimeout(function () {
 				(url) ? window.location.href = url : window.location.reload();
 			}, timeout || 0);
+		},
+
+		// disable multiple form submissions
+		preventSubmit: function () {
+			$('form').submit(function () {
+				$('input[type="submit"]').attr('disabled', 'disabled');
+			});
 		}
 
 	};
+
+	// autoinits
+	CMS.API.Helpers.preventSubmit();
 
 });
 })(CMS.$);
