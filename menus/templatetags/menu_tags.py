@@ -191,12 +191,16 @@ class ShowSubMenu(InclusionTag):
 
     options = Options(
         IntegerArgument('levels', default=100, required=False),
-        IntegerArgument('root_level', default=None, required=False),
+        Argument('root_level', default=None, required=False),
         IntegerArgument('nephews', default=100, required=False),
         Argument('template', default='menu/sub_menu.html', required=False),
     )
 
     def get_context(self, context, levels, root_level, nephews, template):
+        # Django 1.4 doesn't accept 'None' as a tag value and resolve to ''
+        # So we need to force it to None again
+        if not root_level and root_level != 0:
+            root_level = None
         try:
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']

@@ -36,16 +36,12 @@ class PlaceholderToolbar(CMSToolbar):
     """
 
     def populate(self):
-        print self.request.placeholder_detected
-        print self.toolbar.edit_mode
-        if getattr(self.request, 'placeholder_detected', False) and self.toolbar.edit_mode:
-
-            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
-                                                    extra_classes=['cms_toolbar-item-cms-mode-switcher'])
-            switcher.add_button(_("Content"), '?edit', active=not self.toolbar.build_mode,
-                                disabled=self.toolbar.build_mode)
-            switcher.add_button(_("Structure"), '?build', active=self.toolbar.build_mode,
-                                disabled=not self.toolbar.build_mode)
+        switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
+                                                extra_classes=['cms_toolbar-item-cms-mode-switcher'])
+        switcher.add_button(_("Content"), '?edit', active=not self.toolbar.build_mode,
+                            disabled=self.toolbar.build_mode)
+        switcher.add_button(_("Structure"), '?build', active=self.toolbar.build_mode,
+                            disabled=not self.toolbar.build_mode)
 
 
 @toolbar_pool.register

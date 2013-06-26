@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
+from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
@@ -53,7 +54,36 @@ if 'reversion' in settings.INSTALLED_APPS:
 else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
 
-    create_revision = lambda: lambda x: x
+    class ReversionContext(object):
+        def __enter__(self):
+            yield
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        def __call__(self, func):
+            """Allows this revision context to be used as a decorator."""
+
+            @wraps(func)
+            def do_revision_context(*args, **kwargs):
+                self.__enter__()
+                exception = False
+                try:
+                    try:
+                        return func(*args, **kwargs)
+                    except:
+                        exception = True
+                        if not self.__exit__(*sys.exc_info()):
+                            raise
+                finally:
+                    if not exception:
+                        self.__exit__(None, None, None)
+
+            return do_revision_context
+
+
+    def create_revision():
+        return ReversionContext()
 
 PUBLISH_COMMENT = "Publish"
 
@@ -240,7 +270,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         page = get_object_or_404(Page, pk=object_id)
         if not page.has_advanced_settings_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
-        return self.change_view(request, object_id, {'title': _("Advanced Settings")})
+        return self.change_view(request, object_id, {'advanced_settings': True, 'title': _("Advanced Settings")})
 
     def permissions(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
@@ -299,7 +329,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         The 'change' admin view for the Page model.
         """
         if extra_context is None:
-            extra_context = {}
+            extra_context = {'basic_info': True}
         try:
             obj = self.model.objects.get(pk=object_id)
         except self.model.DoesNotExist:
@@ -315,7 +345,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'can_change': obj.has_change_permission(request),
                 'can_change_permissions': obj.has_change_permissions_permission(request),
-                'show_delete_translation': len(list(obj.get_languages())) > 1,
                 'current_site_id': settings.SITE_ID,
             }
             context.update(extra_context or {})

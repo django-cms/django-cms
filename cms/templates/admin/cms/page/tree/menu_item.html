@@ -7,7 +7,7 @@
 	<div class="col1">
 		{% if has_change_permission %}
 			<a href="./{{ page.id }}/preview/" target="_parent" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>
-			<a href="./{{ page.id }}/preview/" target="_parent" class="changelink" title="{% trans "edit this page" %}">{% trans "edit" %}</a>
+			<a href="{{ url }}{{ page.id }}/" class="changelink" title="{% trans "edit this page" %}">{% trans "edit" %}</a>
 		{% else %}
 			<span class="title">{{ page.get_slug }}</span>
 		{% endif %}
@@ -62,19 +62,20 @@
 		</div>
 
 			<div class="col-published">
-            <label>{{ page.is_public_published|boolean_icon }}</label>
-			{% if has_publish_permission %}
-				{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
-				{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
+            <label>{{ page.is_public_published|boolean_icon }}
+				{% if has_publish_permission %}
+					{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
+					{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
+					{% endif %}
 				{% endif %}
-			{% endif %}
+			</label>
 
             {% if page.is_public_published %}<a href="./{{ page.id }}/preview/?public=1" target="_parent" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}
 		</div>
 
 		<div class="col-published">{{ page.publication_date|date:"Y-m-d" }}</div>
             <div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>
-		<div class="col-view-perms">{{ page|is_restricted:request }}</div>
+		<div class="col-view-perms"><a href="{{ url }}{{ page.id }}/permission-settings/">{{ page|is_restricted:request }}</a></div>
 
 
 		<div class="col-lastchange">

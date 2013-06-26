@@ -560,7 +560,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request(data)
                 response = admin.add_plugin(request)
                 self.assertEqual(response.status_code, 200)
-                plugin_id = int(str(response.content).split('/", "breadcrumb')[0].split("/")[-1])
+                plugin_id = int(str(response.content).split('edit-plugin/')[1].split("/")[0])
                 data = {
                     'body': 'Hello World',
                 }
