@@ -12,11 +12,12 @@
 
 {% block content %}
 <script type="text/javascript">
-jQuery(document).ready(function ($) {
-	// determing if we are inside the current window or in a popup
-	var CMS = CMS || window.parent.CMS;
+(function($, CMS) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
 	// save current plugin
 	CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:1000 }});
 });
+})(CMS.$, window.CMS || window.parent.CMS);
 </script>
 {% endblock %}
