@@ -4,8 +4,7 @@ Placeholders outside the CMS
 
 Placeholders are special model fields that django CMS uses to render
 user-editable content (plugins) in templates. That is, it's the place where a
-user can add text, video or any other plugin to a webpage, using either the
-normal Django admin interface or the so called `frontend editing`.
+user can add text, video or any other plugin to a webpage, using the so called `frontend editing`.
 
 Placeholders can be viewed as containers for :class:`CMSPlugin` instances, and
 can be used outside the CMS in custom applications using the
@@ -131,9 +130,6 @@ like this:
 *******************************
 Adding content to a placeholder
 *******************************
-
-There are two ways to add or edit content to a placeholder, the front-end admin
-view and the back-end view.
 
 Using the front-end editor
 ==========================
