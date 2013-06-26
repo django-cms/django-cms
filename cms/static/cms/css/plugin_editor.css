@@ -33,11 +33,11 @@ select[name="plugins"] {
 .plugin-holder .plugin-editor label{
 	display:block;
 }
-
+/*
 .plugin-holder{
 	background:url(../images/pluginlist-holder-bg.gif) repeat-y;		
 }
-
+*/
 .plugin-list-holder{
 	width:300px;
 }
@@ -89,11 +89,12 @@ ul.plugin-list span.delete{
 	float:left;
 	height:28px;
 	width:15px;
-	background:url(../images/pluginlist-delete.png) no-repeat 0px 0px;
+	/* TODO this file shall be removed */
+	/*background:url(../images/pluginlist-delete.png) no-repeat 0px 0px;*/
 	text-indent:-7777px;
 	cursor:pointer;	
 	_background:none;
-	_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/media/cms/images/pluginlist-delete.png',sizingMethod='crop');	
+	/*_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/media/cms/images/pluginlist-delete.png',sizingMethod='crop');*/
 }
 
 ul.plugin-list li:hover{background-position:0px -100px; color:#fff;}

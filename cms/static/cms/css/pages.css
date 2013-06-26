@@ -7,7 +7,7 @@
 	width: 18px;
 	height: 18px;
 	display: inline-block;
-	background: url(../images/icons.png) 0px 0px no-repeat;
+	background: url(../img/pagetree/sprite.png) 0px 0px no-repeat;
 	margin-top: 5px;
 }
 
@@ -131,7 +131,7 @@ a.collapsed span.collapsed{
 }
 
 .ac_loading {
-    background: white url('../images/indicator.gif') right center no-repeat;
+    background: white url('../img/loader-small.gif') right center no-repeat;
 }
 
 .ac_odd {
@@ -172,7 +172,7 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 
 #sitemap li.moveable .col1 .title{
 	background-repeat:no-repeat;
-	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
+	background:url(../img/pagetree/tree-li-drag.gif) no-repeat 0 0;
 }
 
 #sitemap li .col1 .success{
@@ -251,17 +251,17 @@ div#sitemap li, div#sitemap ul{list-style-type: none;}
 	width:18px;
 	height:18px;
 	display:inline-block;
-	background:url(../images/icons.png) -20px -20px no-repeat; 
+	background:url(../img/pagetree/sprite.png) -20px -20px no-repeat;
 }
 #sitemap li a.move span{display:none;}
 
 #sitemap li a.copy {
-	width:15px;
-	height:15px;
+	width:18px;
+	height:18px;
 	margin-left:1px;
-    margin-top:-1px;
+    margin-top:0;
 	display:inline-block;
-	background:url(../images/copy.gif) 0px 0px no-repeat; 
+	background:url(../img/pagetree/sprite.png) -40px -60px no-repeat;
 }
 
 #sitemap li a.copy span{display:none;}

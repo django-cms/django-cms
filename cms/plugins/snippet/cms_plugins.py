@@ -38,6 +38,6 @@ class SnippetPlugin(CMSPluginBase):
         return context
 
     def icon_src(self, instance):
-        return settings.STATIC_URL + u"cms/images/plugins/snippet.png"
+        return settings.STATIC_URL + u"cms/img/icons/plugins/snippet.png"
 
 plugin_pool.register_plugin(SnippetPlugin)
