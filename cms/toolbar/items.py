@@ -325,7 +325,7 @@ class ModalItem(BaseItem):
 
     def get_context(self):
         return {
-            'name': "%s ..." % self.name,
+            'name': self.name,
             'url': self.url,
             'active': self.active,
             'disabled': self.disabled,

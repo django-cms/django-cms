@@ -14,7 +14,7 @@ class CategoryToolbar(CMSToolbar):
     def populate(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
-        category_menu = admin_menu.get_or_create_menu('category', _('Category'), position=position)
+        category_menu = admin_menu.get_or_create_menu('category', _('Category'), position=position-1)
         category_menu.add_sideframe_item(_('Categories'), url=reverse('admin:sampleapp_category_changelist'))
         category_menu.add_modal_item(_('Add Category'), url=reverse('admin:sampleapp_category_add'),
                                      close_on_url=self.toolbar.URL_CHANGE)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
+from cms.models import Title
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.utils.i18n import get_language_objects, get_language_object
@@ -17,6 +18,7 @@ from menus.utils import DefaultLanguageChanger
 
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
+LANGUAGE_MENU_IDENTIFIER = 'language-menu'
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_FIRST_BREAK = 'Page Menu First Break'
 PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'
@@ -26,6 +28,8 @@ MANAGE_PAGES_BREAK = 'Manage Pages Break'
 ADMIN_SITES_BREAK = 'Admin Sites Break'
 ADMINISTRATION_BREAK = 'Administration Break'
 USER_SETTINGS_BREAK = 'User Settings Break'
+ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
+REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 
 
 @toolbar_pool.register
@@ -56,7 +60,7 @@ class BasicToolbar(CMSToolbar):
         self.add_language_menu()
 
     def add_admin_menu(self):
-        admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
+        admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user'):
             admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
             # sites menu
@@ -85,11 +89,12 @@ class BasicToolbar(CMSToolbar):
             current_lang = get_language_object(get_language_from_request(self.request), self.current_site.pk)
         except LanguageError:
             current_lang = None
-        language_menu = self.toolbar.get_or_create_menu('language', _('Language'))
+        language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
         language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
+        print current_lang
         for language in get_language_objects(self.current_site.pk):
             url = language_changer(language['code'])
-            language_menu.add_link_item(language['name'], url=url, active=current_lang == language['code'])
+            language_menu.add_link_item(language['name'], url=url, active=current_lang['code'] == language['code'])
 
 
 @toolbar_pool.register
@@ -120,6 +125,7 @@ class PageToolbar(CMSToolbar):
             if self.toolbar.edit_mode:
                 # history menu
                 self.add_history_menu()
+                self.change_language_menu()
                 # publish button
                 if current_page.has_publish_permission(self.request):
                     classes = ["cms_btn-action", "cms_btn-publish"]
@@ -137,13 +143,36 @@ class PageToolbar(CMSToolbar):
 
     def add_draft_live(self):
         self.toolbar.add_item(TemplateItem("cms/toolbar/items/live_draft.html", extra_context={'request': self.request},
-                                           side=self.toolbar.RIGHT),
-                              len(self.toolbar.right_items))
+                                           side=self.toolbar.RIGHT), len(self.toolbar.right_items))
+
+    def change_language_menu(self):
+        language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER)
+        add = []
+        remove = Title.objects.filter(page=self.page).values_list('language', flat=True)
+        for language in get_language_objects(self.current_site.pk):
+            code = language['code']
+            if not code in remove:
+                add.append(code)
+        if add:
+            language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
+            for code in add:
+                language = get_language_object(code, self.current_site.pk)
+                url = "%s?language=%s" % (reverse("admin:cms_page_change", args=[self.page.pk]), language['code'])
+                language_menu.add_modal_item(_("Add %(language)s Translation") % {'language': language['name']},
+                                             url=url)
+        if remove:
+            language_menu.add_break(REMOVE_PAGE_LANGUAGE_BREAK)
+            for code in remove:
+                language = get_language_object(code, self.current_site.pk)
+                url = "%s?language=%s" % (
+                    reverse("admin:cms_page_delete_translation", args=[self.page.pk]), language['code'])
+                language_menu.add_modal_item(_("Delete %(language)s Translation") % {'language': language['name']},
+                                             url=url, disabled=len(remove) == 1)
 
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         # cms page admin
-        pages_menu = admin_menu.get_or_create_menu('pages', _('Pages'))
+        pages_menu = admin_menu.get_or_create_menu('pages', _('Pages'), position=0)
         pages_menu.add_sideframe_item(_('Manage pages'), url=reverse("admin:cms_page_changelist"))
         pages_menu.add_break(MANAGE_PAGES_BREAK)
         pages_menu.add_sideframe_item(_('Add new page'), url=reverse("admin:cms_page_add"))
@@ -151,10 +180,10 @@ class PageToolbar(CMSToolbar):
     def add_page_menu(self):
         # menu for current page
         not_edit_mode = not self.toolbar.edit_mode
-        current_page_menu = self.toolbar.get_or_create_menu('page', _('Page'))
-        current_page_menu.add_link_item(_('Edit Page'), disabled=self.toolbar.edit_mode, url='?edit')
+        current_page_menu = self.toolbar.get_or_create_menu('page', _('Page'), position=1)
+        current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?edit')
         page_info_url = reverse('admin:cms_page_change', args=(self.page.pk,))
-        current_page_menu.add_modal_item(_('Page info'), url=page_info_url, disabled=not_edit_mode,
+        current_page_menu.add_modal_item(_('Page settings'), url=page_info_url, disabled=not_edit_mode,
                                          close_on_url=self.toolbar.URL_CHANGE, on_close=self.toolbar.REFRESH_PAGE)
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             # add templates
@@ -165,36 +194,7 @@ class PageToolbar(CMSToolbar):
                 if path == TEMPLATE_INHERITANCE_MAGIC:
                     templates_menu.add_break(TEMPLATE_MENU_BREAK)
                 templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active)
-
-        # navigation toggle
-        if self.page.in_navigation:
-            nav_title = _("Hide in navigation")
-        else:
-            nav_title = _("Display in navigation")
-        nav_action = reverse('admin:cms_page_change_innavigation', args=(self.page.pk,))
-        current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
         current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
-        # move pages
-        current_page_menu.add_modal_item(_('Move page'), url=reverse('admin:cms_page_changelist'),
-                                         disabled=not_edit_mode)
-        # add child/slibling
-        add_url = reverse('admin:cms_page_add')
-        child_data = {
-            'position': 'last-child',
-            'target': self.page.pk,
-        }
-        child_url = '%s?%s' % (add_url, urlencode(child_data))
-        current_page_menu.add_modal_item(_('Add child page'), url=child_url, close_on_url=self.toolbar.URL_CHANGE,
-                                         disabled=not_edit_mode)
-        sibling_data = {
-            'position': 'last-child',
-        }
-        if self.page.parent_id:
-            sibling_data['target'] = self.page.parent_id
-        sibling_url = '%s?%s' % (add_url, urlencode(sibling_data))
-        current_page_menu.add_modal_item(_('Add sibling page'), url=sibling_url, close_on_url=self.toolbar.URL_CHANGE,
-                                         disabled=not_edit_mode)
-        current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
         # advanced settings
         advanced_url = reverse('admin:cms_page_advanced', args=(self.page.pk,))
         advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not self.toolbar.edit_mode
@@ -208,7 +208,14 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_modal_item(_('Permissions'), url=permissions_url,
                                              close_on_url=self.toolbar.URL_CHANGE,
                                              disabled=permission_disabled)
-        current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
+        current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
+        # navigation toggle
+        if self.page.in_navigation:
+            nav_title = _("Hide in navigation")
+        else:
+            nav_title = _("Display in navigation")
+        nav_action = reverse('admin:cms_page_change_innavigation', args=(self.page.pk,))
+        current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
         # publisher
         if self.page.published:
             publish_title = _('Unpublish page')
@@ -216,6 +223,7 @@ class PageToolbar(CMSToolbar):
             publish_title = _('Publish page')
         publish_url = reverse('admin:cms_page_change_status', args=(self.page.pk,))
         current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
+        current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
         # delete
         delete_url = reverse('admin:cms_page_delete', args=(self.page.pk,))
         current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url=self.toolbar.URL_CHANGE,
@@ -223,7 +231,7 @@ class PageToolbar(CMSToolbar):
 
     def add_history_menu(self):
         # history menu
-        history_menu = self.toolbar.get_or_create_menu('history', _('History'))
+        history_menu = self.toolbar.get_or_create_menu('history', _('History'), position=2)
         if 'reversion' in settings.INSTALLED_APPS:
             import reversion
             from reversion.models import Revision
