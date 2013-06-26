@@ -28,12 +28,11 @@ class StackNode(Tag):
         request = context.get('request', False)
         if not request:
             return ''
-        request.placeholder_detected = True
         if isinstance(code, Stack):
             stack = code
         else:
             stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code,
-            'creation_method': Stack.CREATION_BY_TEMPLATE})
+                'creation_method': Stack.CREATION_BY_TEMPLATE})
         placeholder = stack.content
         return render_placeholder(placeholder, context, name_fallback=code)
 

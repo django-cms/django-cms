@@ -49,6 +49,7 @@
 	</style>
  </head>
 <body id="{% block tpl_id %}none{% endblock %}" class="{{ LANGUAGE_CODE }}">
+{% cms_toolbar %}
 <div id="page" class="container_16 ">
 	<div id="header">
 		<div id="logo">
@@ -76,9 +77,6 @@
 		{% block content %}{% endblock content %}
 	</div>
 </div>
-
-
 	{% render_block "js" %}
-{% cms_toolbar %}
 </body>
 </html> 

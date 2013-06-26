@@ -110,12 +110,6 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if not lang:
         lang = get_language_from_request(request)
     plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
-    if not hasattr(request, 'cms_plugins'):
-        request.cms_plugins = []
-    request.cms_plugins += plugins
-    if not hasattr(request, 'cms_placeholders'):
-        request.cms_placeholders = []
-    request.cms_placeholders.append(placeholder)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
     if (len(plugins) == 0 and placeholder and lang != get_default_language() and
