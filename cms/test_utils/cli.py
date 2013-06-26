@@ -94,8 +94,6 @@ def configure(db_url, **extra):
             'cms.plugins.snippet',
             'cms.plugins.googlemap',
             'cms.plugins.teaser',
-            'cms.plugins.video',
-            'cms.plugins.twitter',
             'cms.plugins.inherit',
             'cms.test_utils.project.sampleapp',
             'cms.test_utils.project.placeholderapp',
