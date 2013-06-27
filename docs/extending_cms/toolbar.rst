@@ -79,7 +79,7 @@ to the toolbar::
     def poll_toolbar(toolbar, request, is_current_app, app_name):
         if not request.is_staff:
             return # no point in adding items the user can't access
-        menu = toolbar.get_or_create_menu('poll-app', _('Polls')
+        menu = toolbar.get_or_create_menu('poll-app', _('Polls'))
         url = reverse('admin:polls_poll_changelist')
         menu.add_sideframe_item(_('Poll overview'), url=url)
 
@@ -101,7 +101,7 @@ menus::
     def poll_toolbar(toolbar, request, is_current_app, app_name):
         if not request.is_staff:
             return # no point in adding items the user can't access
-        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site')
+        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
         position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
         menu = admin_menu.get_or_create_menu('poll-menu', _('Polls'), position=position)
         url = reverse('admin:polls_poll_changelist')
