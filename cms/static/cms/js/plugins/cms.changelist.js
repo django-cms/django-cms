@@ -8,8 +8,43 @@ $(document).ready(function () {
 		$("#changelist-filter").toggle();
 	});
 
+	// jquery.functional
+	$.curry = function(fn) {
+		if (arguments.length < 2) return fn;
+		args = $.makeArray(arguments).slice(1, arguments.length);
+		return function() {
+			return fn.apply(this, args.concat($.makeArray(arguments)));
+		}
+	};
+
+	$.__callbackPool = {};
+
+	$.callbackRegister = function(name, fn /*, arg0, arg1, ..*/){
+		if (arguments.length > 2) {
+			// create curried function
+			fn = $.curry.apply(this, $.makeArray(arguments).slice(1, arguments.length));
+		}
+		$.__callbackPool[name] = fn;
+		return name;
+	};
+
+	$.callbackCall = function(name/*, extra arg0, extra arg1, ..*/){
+		if (!name || !name in $.__callbackPool) {
+			throw "No callback registered with name: " + name;
+		}
+		$.__callbackPool[name].apply(this, $.makeArray(arguments).slice(1, arguments.length));
+		$.callbackRemove(name);
+		return name;
+	};
+
+	$.callbackRemove = function(name) {
+		delete $.__callbackPool[name];
+	};
+
 	// very simple yellow fade plugin..
-	$.fn.yft = function(){ this.effect("highlight", {}, 1000); };
+	$.fn.yft = function(){
+		this.effect("highlight", {}, 1000);
+	};
 	
 	// jquery replace plugin :)
 	$.fn.replace = function(o) { 
@@ -368,9 +403,11 @@ $(document).ready(function () {
 		}
 		
 		// moderation checkboxes over livequery
-		$('div.col-moderator input').livequery(function() {
-			$(this).checkBox({addLabel:false});
-		});
+		// TODO jquery.livequery has been removed
+		//$('div.col-moderator input').livequery(function() {
+			// TODO jquery.checkbox.ui has been removed
+			// $(this).checkBox({addLabel:false});
+		//});
 		
 		function copyTreeItem(item_id, target_id, position, site){
 			if (cmsSettings.cmsPermission || cmsSettings.cmsModerator) {
