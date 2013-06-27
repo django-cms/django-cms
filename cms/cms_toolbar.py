@@ -91,7 +91,6 @@ class BasicToolbar(CMSToolbar):
             current_lang = None
         language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
         language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
-        print current_lang
         for language in get_language_objects(self.current_site.pk):
             url = language_changer(language['code'])
             language_menu.add_link_item(language['name'], url=url, active=current_lang['code'] == language['code'])
