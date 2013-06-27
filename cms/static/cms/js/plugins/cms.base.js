@@ -32,9 +32,11 @@ $(document).ready(function () {
 
 		// redirects to a specific url or reloads browser
 		reloadBrowser: function (url, timeout) {
+			// is there a parent window?
+			parent = (window.parent) ? window.parent : window;
 			// add timeout if provided
-			setTimeout(function () {
-				(url) ? window.location.href = url : window.location.reload();
+			parent.setTimeout(function () {
+				(url) ? parent.location.href = url : parent.location.reload();
 			}, timeout || 0);
 		},
 
