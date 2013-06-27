@@ -60,8 +60,7 @@
 </div>
 {% render_block "js" %}
 <script>
-	var CMS = CMS || undefined;
-	if(CMS !== undefined) {
+	if(window.CMS !== undefined) {
 		CMS.$('#add-page').bind('click', function (e) {
 			e.preventDefault();
 			CMS.API.Toolbar.openModal('{% url "admin:cms_page_add" %}?title=Home', 'Add page');
