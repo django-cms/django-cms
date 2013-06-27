@@ -1,10 +1,10 @@
 {% load i18n cms_admin %}
 <table>
 	<thead><tr>
-		<th>{% trans 'Action' %}</th>
-		<th>{% trans 'Created' %}</th>
-		<th>{% trans 'User' %}</th>
-		<th>{% trans 'Message' %}</th>
+		<th>{% trans "Action" %}</th>
+		<th>{% trans "Created" %}</th>
+		<th>{% trans "User" %}</th>
+		<th>{% trans "Message" %}</th>
 	</tr></thead>
 	<tbody>
 		{% for state in page.pagemoderatorstate_set.all %}<tr class="{% cycle 'row1' 'row2' %}">
