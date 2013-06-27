@@ -1,5 +1,13 @@
 // some very small jquery extensions
-(function namespacing($) {
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+
+	// adds functionality to the filter
+	$('#changelist-filter-button').bind('click', function () {
+		$("#changelist-filter").toggle();
+	});
+
 	// very simple yellow fade plugin..
 	$.fn.yft = function(){ this.effect("highlight", {}, 1000); };
 	
@@ -503,4 +511,6 @@
 	function addUndo(node, target, position){
 		undos.push({node:node, target:target, position:position});
 	}
-})(window.CMS.$);
+
+});
+})(CMS.$);
