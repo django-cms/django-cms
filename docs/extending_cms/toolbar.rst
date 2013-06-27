@@ -82,9 +82,9 @@ to the toolbar::
 
         def populate():
             if self.is_current_app:
-                menu = self.toolbar.get_or_create_menu('poll-app', _('Polls')
+                menu = self.toolbar.get_or_create_menu('poll-app', _('Polls'))
                 url = reverse('admin:polls_poll_changelist')
-                menu.add_sideframe_item(_('Poll overview'), url=url)
+                menu.add_sideframe_item(_('Poll overview'), url=url))=
 
 
 However, there's already a menu added by the CMS which provides access to
@@ -105,7 +105,7 @@ menus::
     class PollToolbar(CMSToolbar):
 
         def populate():
-            admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site')
+            admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
             position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
             menu = admin_menu.get_or_create_menu('poll-menu', _('Polls'), position=position)
             url = reverse('admin:polls_poll_changelist')
