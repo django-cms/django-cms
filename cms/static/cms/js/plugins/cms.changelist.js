@@ -1,7 +1,10 @@
-// some very small jquery extensions
+/*##################################################|*/
+/* #CMS# */
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
+
+	// TODO this will be refactored in 3.1
 
 	// adds functionality to the filter
 	$('#changelist-filter-button').bind('click', function () {
