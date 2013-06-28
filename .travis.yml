@@ -6,10 +6,10 @@ python:
 env:
     - DJANGO=1.4 DB='sqlite://localhost/:memory:'
     - DJANGO=1.4 DB='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.4 DB='postgres://postgres@127.0.0.1/djangocms_test$TRAVIS_JOB_NUMBER'
+    - DJANGO=1.4 DB='postgres://postgres@127.0.0.1/djangocms_test'
     - DJANGO=1.5 DB='sqlite://localhost/:memory:'
     - DJANGO=1.5 DB='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.5 DB='postgres://postgres@127.0.0.1/djangocms_test$TRAVIS_JOB_NUMBER'
+    - DJANGO=1.5 DB='postgres://postgres@127.0.0.1/djangocms_test'
 
 before_script:
   - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
@@ -21,6 +21,7 @@ install:
     - sh -e /etc/init.d/xvfb start
     - if [ $TRAVIS_PYTHON_VERSION == '3.3' ]; then BASE='django'; else BASE='selenium'; fi && pip install -q -r "test_requirements/$BASE-$DJANGO.txt" --use-mirrors
     - if [ $DB == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python --use-mirrors; fi
+    - if [ $DB == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then export DB=$DB$TRAVIS_JOB_NUMBER; fi
 script:
     python runtests.py --db $DB
 notifications:
