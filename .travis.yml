@@ -12,8 +12,8 @@ env:
     - DJANGO=1.5 DB='postgres://postgres@127.0.0.1/djangocms_test'
 
 before_script:
-  - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test$TRAVIS_JOB_NUMBER;' -U postgres; fi"
-  - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'create database djangocms_test$TRAVIS_JOB_NUMBER;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test'$TRAVIS_JOB_NUMBER';' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'create database djangocms_test'$TRAVIS_JOB_NUMBER';' -U postgres; fi"
   - sh -c "if [ '$DB' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi"
 
 install:
