@@ -60,7 +60,7 @@ $(document).ready(function () {
 			var question = gettext("Are you sure you want to change tabs without saving the page first?");
 			answer = confirm(question);
 		}
-		if(answer) CMS.API.Helpers.reloadBrowser(url);
+		if(answer) window.location.href = url;
 	};
 
 });
