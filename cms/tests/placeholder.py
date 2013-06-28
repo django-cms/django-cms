@@ -165,7 +165,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
-            self.assertContains(response, "/static/plugins/empty-image-file.png")
+            self.assertContains(response, "/static/cms/img/icons/plugins/image.png")
 
     def test_nested_plugin_escapejs_page(self):
         """
@@ -184,7 +184,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 reverse('admin:cms_page_change', args=(page.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
-            self.assertContains(response, "/static/plugins/empty-image-file.png")
+            self.assertContains(response, "/static/cms/img/icons/plugins/image.png")
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
