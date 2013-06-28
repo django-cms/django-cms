@@ -217,6 +217,7 @@ class PlaceholderAdmin(ModelAdmin):
             reduced_list.append(
                 {'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id, 'position': plugin.position,
                     'desc': force_unicode(plugin.get_short_description())})
+        self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         return HttpResponse(simplejson.dumps({'plugin_list': reduced_list}), content_type='application/json')
 
     @xframe_options_sameorigin

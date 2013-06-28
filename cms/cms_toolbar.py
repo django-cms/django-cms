@@ -7,7 +7,6 @@ from cms.toolbar_base import CMSToolbar
 from cms.utils.i18n import get_language_objects, get_language_object
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
-from cms.utils.compat.urls import urlencode
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings
@@ -30,6 +29,7 @@ ADMINISTRATION_BREAK = 'Administration Break'
 USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
+COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 
 
 @toolbar_pool.register
@@ -121,23 +121,22 @@ class PageToolbar(CMSToolbar):
             if self.page:
                 self.add_page_menu()
 
-            if self.toolbar.edit_mode:
-                # history menu
-                self.add_history_menu()
-                self.change_language_menu()
-                # publish button
-                if current_page.has_publish_permission(self.request):
-                    classes = ["cms_btn-action", "cms_btn-publish"]
-                    if current_page.is_dirty():
-                        classes.append("cms_btn-publish-active")
-                    if current_page.published:
-                        title = _("Publish Changes")
-                    else:
-                        title = _("Publish Page now")
-                    publish_url = reverse('admin:cms_page_publish_page', args=(current_page.pk,))
-                    self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
-                                            disabled=not current_page.is_dirty())
-            if self.page:
+                if self.toolbar.edit_mode:
+                    # history menu
+                    self.add_history_menu()
+                    self.change_language_menu()
+                    # publish button
+                    if current_page.has_publish_permission(self.request):
+                        classes = ["cms_btn-action", "cms_btn-publish"]
+                        if current_page.is_dirty():
+                            classes.append("cms_btn-publish-active")
+                        if current_page.published:
+                            title = _("Publish Changes")
+                        else:
+                            title = _("Publish Page now")
+                        publish_url = reverse('admin:cms_page_publish_page', args=(current_page.pk,))
+                        self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
+                                                disabled=not current_page.is_dirty())
                 self.add_draft_live()
 
     def add_draft_live(self):
@@ -148,7 +147,8 @@ class PageToolbar(CMSToolbar):
         language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER)
         add = []
         remove = Title.objects.filter(page=self.page).values_list('language', flat=True)
-        for language in get_language_objects(self.current_site.pk):
+        languages = get_language_objects(self.current_site.pk)
+        for language in languages:
             code = language['code']
             if not code in remove:
                 add.append(code)
@@ -167,6 +167,20 @@ class PageToolbar(CMSToolbar):
                     reverse("admin:cms_page_delete_translation", args=[self.page.pk]), language['code'])
                 language_menu.add_modal_item(_("Delete %(language)s Translation") % {'language': language['name']},
                                              url=url, disabled=len(remove) == 1)
+        try:
+            current_lang = get_language_object(get_language_from_request(self.request), self.current_site.pk)
+        except LanguageError:
+            current_lang = None
+        if len(languages) > 1 and current_lang and len(remove) > 1:
+            language_menu.add_break(COPY_PAGE_LANGUAGE_BREAK)
+            for language in languages:
+                if current_lang['code'] == language['code'] or language['code'] in add:
+                    continue
+                url = reverse('admin:cms_page_copy_language', args=[self.page.pk])
+                question = _('Are you sure you want copy all plugins from %s?') % language['name']
+                language_menu.add_ajax_item(_("Copy all plugins from %s") % language['name'], action=url,
+                                            data={'source_language': language['code'],
+                                            'target_language': current_lang['code']}, question=question)
 
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
