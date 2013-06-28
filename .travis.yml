@@ -6,10 +6,10 @@ python:
 env:
     - DJANGO=1.4 DB='sqlite://localhost/:memory:'
     - DJANGO=1.4 DB='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.4 DB='postgres://postgres@127.0.0.1/djangocms_test'
+    - DJANGO=1.4 DB='postgres://postgres@127.0.0.1/djangocms_test$TRAVIS_JOB_NUMBER'
     - DJANGO=1.5 DB='sqlite://localhost/:memory:'
     - DJANGO=1.5 DB='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.5 DB='postgres://postgres@127.0.0.1/djangocms_test'
+    - DJANGO=1.5 DB='postgres://postgres@127.0.0.1/djangocms_test$TRAVIS_JOB_NUMBER'
 
 before_script:
   - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
