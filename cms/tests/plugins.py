@@ -585,7 +585,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
-            position=1,
+            position=0,
             language=self.FIRST_LANG)
         plugin_base.insert_at(None, position='last-child', save=False)
 
@@ -596,7 +596,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_ref_1_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
-            position=1,
+            position=0,
             language=self.FIRST_LANG)
         plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)
 
@@ -607,7 +607,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_ref_2_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
-            position=2,
+            position=1,
             language=self.FIRST_LANG)
         plugin_ref_2_base.insert_at(plugin_base, position='last-child', save=False)
 
@@ -649,9 +649,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.count(), 6)
         plugins = list(Text.objects.all())
-        new_plugin = plugins[-1]
+        new_plugin = plugins[3]
         idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
-        expected = sorted([plugins[3].pk, plugins[4].pk])
+        expected = sorted([plugins[4].pk, plugins[5].pk])
         self.assertEquals(idlist, expected)
 
     def test_empty_plugin_is_ignored(self):
