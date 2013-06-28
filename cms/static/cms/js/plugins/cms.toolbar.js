@@ -676,7 +676,6 @@ $(document).ready(function () {
 					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
 					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
 				} else {
-					console.log('show');
 					this.sideframe.animate({ 'width': width }, 0);
 					this.body.animate({ 'margin-left': width }, 0);
 				}
