@@ -929,7 +929,11 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         path = '../../'
         # TODO: use admin base here!
         if 'admin' not in referrer:
-            path = '%s?edit_off' % referrer.split('?')[0]
+            if page.is_home():
+                path = '/?edit_off'
+            else:
+                path = '%s?edit_off' % referrer.split('?')[0]
+
         return HttpResponseRedirect(path)
 
     #TODO: Make the change form buttons use POST
