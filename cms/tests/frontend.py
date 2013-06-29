@@ -11,6 +11,7 @@ try:
     from django.test import LiveServerTestCase
 except ImportError:
     from django.test import TestCase as LiveServerTestCase
+
     WebDriver = NoSuchElementException = False
 
 try:
@@ -20,13 +21,11 @@ except ImportError:
     Display = None
 
 
-
-
 class CMSLiveTests(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         if Display:
-            cls.display = Display(visible=0 , size=(800, 600))
+            cls.display = Display(visible=0, size=(800, 600))
             cls.display.start()
         if WebDriver:
             cls.selenium = WebDriver()
@@ -34,14 +33,14 @@ class CMSLiveTests(LiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(CMSLiveTests, cls).tearDownClass()
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
         if hasattr(cls, 'display'):
             cls.display.stop()
-        super(CMSLiveTests, cls).tearDownClass()
 
-    def tearDown(self):
-        Page.objects.all().delete() # not 100% sure why this is needed, but it is
+    #def tearDown(self):
+    #    Page.objects.all().delete() # not 100% sure why this is needed, but it is
 
     def stop_server(self):
         if hasattr(self, 'server_thread'):
@@ -55,6 +54,7 @@ class CMSLiveTests(LiveServerTestCase):
         See the other public methods that call this function for more details.
         """
         from selenium.webdriver.support.wait import WebDriverWait
+
         WebDriverWait(self.selenium, timeout).until(callback)
 
     def wait_loaded_tag(self, tag_name, timeout=10):
@@ -72,6 +72,7 @@ class CMSLiveTests(LiveServerTestCase):
         Block until page has started to load.
         """
         from selenium.common.exceptions import TimeoutException
+
         try:
             # Wait for the next page to be loaded
             self.wait_loaded_tag('body')
@@ -83,7 +84,6 @@ class CMSLiveTests(LiveServerTestCase):
 
 
 class ToolbarBasicTests(CMSLiveTests):
-
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
 
