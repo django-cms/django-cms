@@ -112,7 +112,7 @@ $(document).ready(function () {
 <div id="changelist-filter" style="display:none;">
 <h2>{% trans 'Filter' %}</h2>
 {% for spec in cl.filter_specs %}
-   {% clean_admin_list_filter cl spec %}
+	{% clean_admin_list_filter cl spec %}
 {% endfor %}
 </div>
 {% endif %}
