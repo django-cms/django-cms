@@ -952,6 +952,7 @@ class AdminFormsTests(AdminTestsBase):
             'language': 'en',
             'site': site.pk,
             'reverse_id': dupe_id,
+            'template': 'col_two.html',
         }
         form = AdvancedSettingsForm(data=page2_data, files=None)
         self.assertFalse(form.is_valid())
@@ -967,6 +968,7 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual([u'A page with this reverse URL id exists already.'],
                          form.errors['reverse_id'])
         page2_data['reverse_id'] = ""
+
         form = AdvancedSettingsForm(data=page2_data, files=None)
         self.assertTrue(form.is_valid())
         admin = self._get_guys(admin_only=True)

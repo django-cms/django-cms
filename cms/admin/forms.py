@@ -217,7 +217,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = [
-            'site', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
             'application_urls', 'application_namespace'
         ]
 
