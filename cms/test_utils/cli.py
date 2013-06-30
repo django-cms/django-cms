@@ -90,6 +90,7 @@ def configure(db_url, **extra):
             'cms.plugins.video',
             'cms.plugins.twitter',
             'cms.plugins.inherit',
+            'cms.plugins.slideshow',
             'cms.test_utils.project.sampleapp',
             'cms.test_utils.project.placeholderapp',
             'cms.test_utils.project.pluginapp',
@@ -174,19 +175,20 @@ def configure(db_url, **extra):
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin'),
+                            'TextPlugin', 'SnippetPlugin', 'SlideshowPlugin'),
                 'name': gettext("sidebar column")
             },
 
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin'),
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'SlideshowPlugin'),
                 'name': gettext("left column")
             },
 
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin'),
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin',
+                            'SlideshowPlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {

@@ -14,6 +14,7 @@ from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
 from cms.plugins.link.models import Link
 from cms.plugins.picture.models import Picture
+from cms.plugins.slideshow.models import Slideshow, SlideshowSlide
 from cms.plugins.text.models import Text
 from cms.plugins.text.utils import (plugin_tags_to_id_list, plugin_tags_to_admin_html)
 from cms.plugins.twitter.models import TwitterRecentEntries
@@ -1091,6 +1092,35 @@ class PicturePluginTests(PluginsTestBaseCase):
         picture.url = "test"
         self.assertRaises(ValidationError, picture.clean)
 
+
+class SlideshowPluginTests(PluginsTestBaseCase):
+    def test_copy_and_order(self):
+        """Tests a slideshow and that the copy_relations method correctly copies
+        between two slideshow instances."""
+
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        slideshow = Slideshow(name="test")
+        slideshow.clean()
+        slideshow.save()
+        
+        slide = SlideshowSlide(slideshow=slideshow, caption="test1", order=0)
+        slide.save()
+        
+        slideshow_new = Slideshow(name="test2")
+        slideshow_new.save()
+        SlideshowSlide(slideshow=slideshow_new, caption="test2", order=1).save()
+        slideshow_new.copy_relations(slideshow)
+        self.assertEqual(
+            slideshow_new.slideshowslide_set.all()[0].caption,
+            "test1"
+        )
+        self.assertEqual(
+            slideshow_new.slideshowslide_set.all()[1].caption,
+            "test2"
+        )
 
 class SimplePluginTests(TestCase):
     def test_simple_naming(self):
