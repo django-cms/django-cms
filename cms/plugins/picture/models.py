@@ -23,6 +23,7 @@ class Picture(CMSPlugin):
     url = models.CharField(_("link"), max_length=255, blank=True, null=True,
         help_text=_("If present, clicking on image will take user to link."))
     page_link = models.ForeignKey(Page, verbose_name=_("page"), null=True,
+        limit_choices_to={'publisher_is_draft': True},
         blank=True, help_text=_("If present, clicking on image will take user \
         to specified page."))
     alt = models.CharField(_("alternate text"), max_length=255, blank=True,
