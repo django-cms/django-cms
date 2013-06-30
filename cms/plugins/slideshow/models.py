@@ -86,5 +86,8 @@ class SlideshowSlide(models.Model):
         verbose_name_plural = _("slide images")
 
     def __unicode__(self):
-        return str(self.image)
+        if self.image:
+            return str(self.image)
+        else:
+            return self.caption
 
