@@ -30,6 +30,7 @@ use::
         my_placeholder = PlaceholderField('placeholder_name')
         # your methods
 
+
 The :class:`~cms.models.fields.PlaceholderField` takes a string as its first
 argument which will be used to configure which plugins can be used in this
 placeholder. The configuration is the same as for placeholders in the CMS.
