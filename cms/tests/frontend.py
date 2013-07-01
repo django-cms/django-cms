@@ -39,8 +39,10 @@ class CMSLiveTests(LiveServerTestCase):
             cls.display.stop()
         super(CMSLiveTests, cls).tearDownClass()
 
-    #def tearDown(self):
-    #    Page.objects.all().delete() # not 100% sure why this is needed, but it is
+    def tearDown(self):
+        super(CMSLiveTests, self).tearDown()
+        Page.objects.all().delete() # not 100% sure why this is needed, but it is
+
 
     def stop_server(self):
         if hasattr(self, 'server_thread'):
