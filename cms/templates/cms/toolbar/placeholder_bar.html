@@ -27,7 +27,9 @@
 
 {% addtoblock "js" %}
 <script type="text/javascript">
-CMS.$(document).ready(function () {
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
 	new CMS.PlaceholderItem('#cms_placeholder-bar-{{ placeholder.pk }}', {
 		'type': 'bar',
 		'placeholder_id': '{{ placeholder.pk }}',
@@ -41,5 +43,6 @@ CMS.$(document).ready(function () {
 		}
 	});
 });
+})(CMS.$);
 </script>
 {% endaddtoblock %}

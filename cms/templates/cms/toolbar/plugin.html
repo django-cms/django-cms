@@ -1,7 +1,9 @@
 {% load i18n sekizai_tags cms_tags %}{% load url from future %}
 {% addtoblock "js" %}
 <script type="text/javascript">
-CMS.$(document).ready(function () {
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
 	new CMS.PlaceholderItem('#cms_plugin-{{ instance.pk }}', {
 		'type': 'plugin',
 		'placeholder_id': '{{ instance.placeholder.id }}',
@@ -22,6 +24,7 @@ CMS.$(document).ready(function () {
 		}
 	});
 });
+})(CMS.$);
 </script>
 {% endaddtoblock %}
 
