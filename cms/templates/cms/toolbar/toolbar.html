@@ -1,4 +1,4 @@
-{% load i18n sekizai_tags cms_js_tags cms_admin cms_tags %}{% load url from future %}
+{% load i18n sekizai_tags admin_static cms_js_tags cms_admin cms_tags %}{% load url from future %}
 {% language request.toolbar.toolbar_language %}
 {% addtoblock "js" %}
 <script type="text/javascript">
@@ -6,19 +6,20 @@
 	var _$ = window.$ || null;
 </script>
 {% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/class.min.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.ui.custom.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.toolbar.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.placeholders.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/libs/class.min.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.base.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.toolbar.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.placeholders.js" %}"></script>{% endaddtoblock %}
 
-{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.toolbar.css" />{% endaddtoblock %}
-{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.placeholders.css" />{% endaddtoblock %}
+{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{% static "cms/css/plugins/cms.toolbar.css" %}" />{% endaddtoblock %}
+{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{% static "cms/css/plugins/cms.placeholders.css" %}" />{% endaddtoblock %}
 {% addtoblock "js" %}
 <script type="text/javascript">
-
-CMS.$(document).ready(function () {
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
 	// initialize toolbar and pass required options
 	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {
 		'csrf': '{{ csrf_token }}',
@@ -50,6 +51,7 @@ CMS.$(document).ready(function () {
 	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
 	{% endif %}
 });
+})(CMS.$);
 </script>
 {% endaddtoblock %}
 {% addtoblock "js" %}

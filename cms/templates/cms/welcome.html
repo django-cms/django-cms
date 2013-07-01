@@ -13,7 +13,7 @@
 		body { background:#0f3e62; overflow:hidden; }
 
 		.wrapper { font:16px/24px "Helvetica Neue",Helvetica,Arial,sans-serif; font-weight:200;
-			background:#0f3e62 url("{% static 'cms/img/new-bg.png' %}") no-repeat 120% center; }
+			background:#0f3e62 url("{% static 'cms/img/welcome-bg.png' %}") no-repeat 120% center; }
 		.inner { max-width:340px; min-width:320px; padding:10% 10px; margin:0 auto; }
 		.logo { display:block; padding:90px 0 0;
 			background: url("{% static 'cms/img/logo-white.png' %}") no-repeat left top; }
@@ -59,9 +59,8 @@
 	</div>
 </div>
 {% render_block "js" %}
-<script>
-	var CMS = CMS || undefined;
-	if(CMS !== undefined) {
+<script type="text/javascript">
+	if(window.CMS !== undefined) {
 		CMS.$('#add-page').bind('click', function (e) {
 			e.preventDefault();
 			CMS.API.Toolbar.openModal('{% url "admin:cms_page_add" %}?title=Home', 'Add page');
