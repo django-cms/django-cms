@@ -33,11 +33,11 @@ class CMSLiveTests(LiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(CMSLiveTests, cls).tearDownClass()
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
         if hasattr(cls, 'display'):
             cls.display.stop()
+        super(CMSLiveTests, cls).tearDownClass()
 
     #def tearDown(self):
     #    Page.objects.all().delete() # not 100% sure why this is needed, but it is
