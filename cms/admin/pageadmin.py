@@ -99,15 +99,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     inlines = PERMISSION_ADMIN_INLINES
 
-    class Media:
-        css = {
-            'all': [cms_static_url(path) for path in (
-                'css/pages.css',
-                'css/change_form.css',
-                'css/cms.base.css',
-            )]
-        }
-
     def get_urls(self):
         """Get the admin urls
         """
