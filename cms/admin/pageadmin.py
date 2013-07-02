@@ -568,7 +568,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     def get_placeholder_template(self, request, placeholder):
         page = placeholder.page
-        return page.get_template()
+        if page:
+            return page.get_template()
 
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
