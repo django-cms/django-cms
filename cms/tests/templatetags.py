@@ -275,19 +275,25 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         from django.core.cache import cache
 
         cache.clear()
-        page = create_page('Test', 'col_two.html', 'en')
+        page = create_page('Test', 'col_two.html', 'en', published=True)
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         request = RequestFactory().get('/')
+        user = User(username="admin", password="admin", is_superuser=True, is_staff=True, is_active=True)
+        user.save()
+        request.current_page = page.publisher_public
+        request.user = user
         template = Template(
             "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}")
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')
         request = RequestFactory().get('/?preview')
+        request.current_page = page
+        request.user = user
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             output = template.render(context)
         self.assertIn('<b>Test2</b>', output)
