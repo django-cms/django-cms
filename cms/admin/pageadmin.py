@@ -180,9 +180,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 obj.rght = old_obj.rght
                 obj.lft = old_obj.lft
                 obj.tree_id = old_obj.tree_id
-
         obj.save()
-
         if 'recover' in request.path or 'history' in request.path:
             obj.pagemoderatorstate_set.all().delete()
             moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
@@ -943,9 +941,9 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page)
         referrer = request.META.get('HTTP_REFERER', '')
         path = '../../'
-        # TODO: use admin base here!
         if 'admin' not in referrer:
-            path = '%s?edit_off' % referrer.split('?')[0]
+            public_page = Page.objects.get(publisher_public=page.pk)
+            path = '%s?edit_off' % public_page.get_absolute_url()
         return HttpResponseRedirect(path)
 
     #TODO: Make the change form buttons use POST
