@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-<<<<<<< HEAD
 import urllib
 from cms import compat
-=======
->>>>>>> upstream/develop
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.utils.i18n import get_language_objects, get_language_object

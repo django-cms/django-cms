@@ -227,9 +227,7 @@ def configure(db_url, **extra):
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ),
-<<<<<<< HEAD
         AUTH_USER_MODEL='customuserapp.User',
-=======
         ALLOWED_HOSTS=['localhost'],
         LOGGING={
             'version': 1,
@@ -274,7 +272,6 @@ def configure(db_url, **extra):
                 }
             }
         }
->>>>>>> upstream/develop
     )
     from django.utils.functional import empty
 
