@@ -1,0 +1,91 @@
+{% load i18n sekizai_tags %}
+{% comment %}
+  README:
+  
+  You should probaby override this file! Use settings.TEMPLATE_DIRS to add your
+  project's local template directory and add a file:
+  cms/plugins/slideshow/slideshow.html
+{% endcomment %}
+
+
+{% comment %}
+    SIMPLE EXAMPLE
+{% endcomment %}
+
+<div id="slideshow{{ slideshow.id }}" class="carousel slide">
+  <div class="carousel-inner">
+
+  {% for slide in slideshow.get_slides %}
+  <div class="item{% if forloop.first %} active{% endif %}">
+    <a href="{% if slide.url %}{{ slide.url }}{% else %}{{ slide.cms_page.get_absolute_url }}{% endif %}">
+      <img src="{{ slide.image.url }}" />
+    </a>
+    {{ slide.caption|linebreaks }}
+    <p><a href="{% if slide.url %}{{ slide.url }}{% else %}{{ slide.cms_page.get_absolute_url }}{% endif %}">
+        {% trans "Read more" %}&raquo;
+    </a></p>
+  </div>
+  {% endfor %}
+
+  </div>
+
+</div>
+
+{% comment %}
+  Load your JS include seperately so it does not get loaded several times.
+  Sekizai is clever and does not load the same JS files repeatedly.
+{% endcomment %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}js/slideshow.js"></script>{% endaddtoblock %}
+
+{% addtoblock "js" %}
+<script>
+  // Put your slideshow javascript activation here!
+  // e.g.:
+  // $('#slideshow{{ slideshow.id }}').start()
+</script>
+{% endaddtoblock %}
+
+{% comment %}
+    Bootstrap example, using sorl.thumbnail
+{% endcomment %}
+
+{% comment %}
+{% load thumbnail i18n sekizai_tags %}
+<div id="slideshow{{ slideshow.id }}" class="carousel slide">
+  <div class="carousel-inner">
+
+  {% for slide in slideshow.get_slides %}
+  <div class="item{% if forloop.first %} active{% endif %}">
+    {% thumbnail slide.image "1200x600" crop="center" as im %}
+      <a href="{% if slide.url %}{{ slide.url }}{% else %}{{ slide.cms_page.get_absolute_url }}{% endif %}">
+        <img src="{{ im.url }}" class="slideshow_image" />
+      </a>
+    {% endthumbnail %}
+      <div class="container">
+        <div class="carousel-caption">
+          {{ slide.caption|safe }}
+          <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+          <p><a href="{% if slide.url %}{{ slide.url }}{% else %}{{ slide.cms_page.get_absolute_url }}{% endif %}" class="btn btn-large btn-primary">
+            {% trans "Read more" %}&raquo;
+          </a></p>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+  </div>
+  <a class="left carousel-control" href="#slideshow{{ slideshow.id }}" data-slide="prev">&lsaquo;</a>
+  <a class="right carousel-control" href="#slideshow{{ slideshow.id }}" data-slide="next">&rsaquo;</a>
+
+</div>
+
+{% addtoblock "js" %}
+<script>
+  !function ($) {
+    $(function(){
+      $('#{{ slideshow.id }}').carousel()
+    })
+  }(window.jQuery)
+</script>
+{% endaddtoblock %}
+{% endcomment %}
