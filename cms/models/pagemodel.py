@@ -419,12 +419,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 public_page = Page(created_by=self.created_by)
 
             self._copy_attributes(public_page)
+
             # we need to set relate this new public copy to its draft page (self)
             public_page.publisher_public = self
             public_page.publisher_is_draft = False
-
+            public_page.save()  # we need a pk for mptt
             # Ensure that the page is in the right position and save it
             public_page = self._publisher_save_public(public_page)
+            public_page = Page.objects.get(pk=public_page.pk)  # reload for correct mptt values
             public_page.published = (public_page.parent_id is None or public_page.parent.published)
             public_page.save()
 
