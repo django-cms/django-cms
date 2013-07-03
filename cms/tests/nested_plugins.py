@@ -463,7 +463,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
             # add the link plugin to the body
             # emulate the editor in admin that adds some txt for the nested plugin
-            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/images/plugins/link.png">"""
+            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
             nesting_body = u"%s<p>%s</p>" % (text_plugin.body, (in_txt % (link_plugin.id)))
             text_plugin.body = nesting_body
             text_plugin.save()
@@ -516,7 +516,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
-            in_txt = """<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/images/plugins/link.png">"""
+            in_txt = """<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
             nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body
@@ -726,7 +726,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # reload after every save
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
-            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/images/plugins/link.png">"""
+            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
             nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body

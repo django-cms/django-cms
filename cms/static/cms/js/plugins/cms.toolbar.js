@@ -681,7 +681,6 @@ $(document).ready(function () {
 					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
 					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
 				} else {
-					console.log('show');
 					this.sideframe.animate({ 'width': width }, 0);
 					this.body.animate({ 'margin-left': width }, 0);
 				}
@@ -932,7 +931,7 @@ $(document).ready(function () {
 			var width = container.width();
 			var height = container.height();
 			var modalLeft = this.modal.position().left;
-			var modalTop = this.modal.position().top - 47; // TODO need to figure out why -47
+			var modalTop = this.modal.position().top;
 
 			this.modal.find('.cms_modal-shim').show();
 

@@ -8,10 +8,13 @@
 
 {% addtoblock "js" %}
 {% if request.toolbar.login_form.errors %}
-<script>
-CMS.$(document).ready(function () {
+<script type="text/javascript">
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
 	CMS.API.Toolbar.showError('{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}');
 });
+})(CMS.$);
 </script>
 {% endif %}
 {% endaddtoblock %}

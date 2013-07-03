@@ -6,7 +6,7 @@
 	<meta name="description" content="{% page_attribute meta_description %}" />
 	<link href="{{ STATIC_URL }}css/style.css" media="all" rel="stylesheet" type="text/css" />
     {% render_block "css" %}
-	{% render_block "js" %}
+
 	<style type="text/css">
 	body { font:normal 16px/18px "Times New Roman", Times, serif; margin:0; background:#fcfcfc; }
 
@@ -47,8 +47,7 @@
 	p { padding:0; margin:0 0 15px; }
 	img { max-width:100%; }
 	</style>
-
-</head>
+ </head>
 <body id="{% block tpl_id %}none{% endblock %}" class="{{ LANGUAGE_CODE }}">
 {% cms_toolbar %}
 <div id="page" class="container_16 ">
@@ -78,5 +77,6 @@
 		{% block content %}{% endblock content %}
 	</div>
 </div>
+	{% render_block "js" %}
 </body>
 </html> 
