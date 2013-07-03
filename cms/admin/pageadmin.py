@@ -37,7 +37,7 @@ from cms.admin.views import revert_plugins
 from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
     titlemodels
 from cms.models.managers import PagePermissionsPermissionManager
-from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, cms_static_url
+from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, cms_static_url, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
@@ -99,15 +99,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     inlines = PERMISSION_ADMIN_INLINES
 
-    class Media:
-        css = {
-            'all': [cms_static_url(path) for path in (
-                'css/pages.css',
-                'css/change_form.css',
-                'css/cms.base.css',
-            )]
-        }
-
     def get_urls(self):
         """Get the admin urls
         """
@@ -124,6 +115,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
+            pat(r'^([0-9]+)/copy-language/$', self.copy_language),
             pat(r'^([0-9]+)/change-status/$', self.change_status),
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
@@ -188,9 +180,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 obj.rght = old_obj.rght
                 obj.lft = old_obj.lft
                 obj.tree_id = old_obj.tree_id
-
         obj.save()
-
         if 'recover' in request.path or 'history' in request.path:
             obj.pagemoderatorstate_set.all().delete()
             moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
@@ -578,7 +568,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     def get_placeholder_template(self, request, placeholder):
         page = placeholder.page
-        return page.get_template()
+        if page:
+            return page.get_template()
 
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
@@ -844,6 +835,30 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         }
         return render_to_response('admin/cms/page/permissions.html', context)
 
+    @require_POST
+    @transaction.commit_on_success
+    def copy_language(self, request, page_id):
+        with create_revision():
+            source_language = request.POST.get('source_language')
+            target_language = request.POST.get('target_language')
+            page = Page.objects.get(pk=page_id)
+            placeholders = page.placeholders.all()
+
+            if not target_language or not target_language in get_language_list():
+                return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+            for placeholder in placeholders:
+                plugins = list(
+                    placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                if not self.has_copy_plugin_permission(request, placeholder, placeholder, plugins):
+                    return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
+                copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
+            if page and "reversion" in settings.INSTALLED_APPS:
+                message = _(u"Copied plugins from %(source_language)s to %(target_language)s") % {
+                    'source_language': source_language, 'target_language': target_language}
+                helpers.make_revision_with_plugins(page, request.user, message)
+            return HttpResponse("ok")
+
+
     @transaction.commit_on_success
     def copy_page(self, request, page_id, extra_context=None):
         """
@@ -927,9 +942,9 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page)
         referrer = request.META.get('HTTP_REFERER', '')
         path = '../../'
-        # TODO: use admin base here!
         if 'admin' not in referrer:
-            path = '%s?edit_off' % referrer.split('?')[0]
+            public_page = Page.objects.get(publisher_public=page.pk)
+            path = '%s?edit_off' % public_page.get_absolute_url()
         return HttpResponseRedirect(path)
 
     #TODO: Make the change form buttons use POST

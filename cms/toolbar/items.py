@@ -150,7 +150,7 @@ class ToolbarAPIMixin(object):
 
 class BaseItem(object):
     __metaclass__ = abc.ABCMeta
-    template = abc.abstractproperty()
+    template = None
 
     def __init__(self, side=LEFT):
         self.side = side
@@ -163,6 +163,18 @@ class BaseItem(object):
         return render_to_string(self.template, self.get_context())
 
     def get_context(self):
+        return {}
+
+
+class TemplateItem(BaseItem):
+    def __init__(self, template, extra_context=None, side=LEFT):
+        super(TemplateItem, self).__init__(side)
+        self.template = template
+        self.extra_context = extra_context
+
+    def get_context(self):
+        if self.extra_context:
+            return self.extra_context
         return {}
 
 

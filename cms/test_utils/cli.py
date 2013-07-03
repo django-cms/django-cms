@@ -179,6 +179,7 @@ def configure(db_url, **extra):
             ('col_three.html', gettext('three columns')),
             ('nav_playground.html', gettext('navigation examples')),
             ('simple.html', 'simple'),
+            ('stacks.html', 'stacks'),
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {

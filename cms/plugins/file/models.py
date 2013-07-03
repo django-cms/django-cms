@@ -15,7 +15,7 @@ class File(CMSPlugin):
     Default template displays download link with icon (if available) and file size.
 
     Icons are searched for within <MEDIA_ROOT>/<CMS_FILE_ICON_PATH>
-    (CMS_FILE_ICON_PATH is a plugin-specific setting which defaults to "<CMS_MEDIA_PATH>/images/file_icons")
+    (CMS_FILE_ICON_PATH is a plugin-specific setting which defaults to "<CMS_MEDIA_PATH>/img/icons/filetypes")
     with filenames of the form <file_ext>.<icon_ext>, where <file_ext> is the extension
     of the file itself, and <icon_ext> is one of <CMS_FILE_ICON_EXTENSIONS>
     (another plugin specific setting, which defaults to ('gif', 'png'))
@@ -30,8 +30,8 @@ class File(CMSPlugin):
     # CMS_ICON_EXTENSIONS and CMS_ICON_PATH are assumed to be plugin-specific, and not included in cms.settings
     # -- they are therefore imported from django.conf.settings
     ICON_EXTENSIONS = getattr(settings, "CMS_FILE_ICON_EXTENSIONS", ('gif', 'png'))
-    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", os.path.join(settings.STATIC_ROOT, "cms", "images", "file_icons"))
-    ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s/%s/%s/" % (settings.STATIC_URL, "cms", "images", "file_icons"))
+    ICON_PATH = getattr(settings, "CMS_FILE_ICON_PATH", os.path.join(settings.STATIC_ROOT, "cms", "img", "icons/filetypes"))
+    ICON_URL = getattr(settings, "CMS_FILE_ICON_URL", "%s%s/%s/%s/" % (settings.STATIC_URL, "cms", "img", "icons/filetypes"))
 
     def __str__(self):
         if self.title:

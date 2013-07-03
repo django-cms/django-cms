@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from cms.cms_toolbar import cms_toolbar
-from cms.constants import LEFT, RIGHT
+from cms.constants import LEFT
 from cms.models import UserSettings, Placeholder
-from cms.toolbar.items import Menu, ToolbarAPIMixin, BaseItem, ButtonList
+from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import force_language
 
@@ -69,7 +68,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Public API
 
-    def get_or_create_menu(self, key, verbose_name, side=LEFT, position=None):
+    def get_or_create_menu(self, key, verbose_name=None, side=LEFT, position=None):
         if key in self.menus:
             return self.menus[key]
         menu = Menu(verbose_name, self.csrf_token, side=side)
@@ -146,20 +145,21 @@ class CMSToolbar(ToolbarAPIMixin):
                 self.view_name = ""
         with force_language(self.toolbar_language):
             toolbars = toolbar_pool.get_toolbars()
-            callbacks = []
             app_key = ""
-            for key, callback in toolbars.items():
+            for key in toolbars:
                 app_name = ".".join(key.split(".")[:-2])
                 if app_name in self.view_name and len(key) > len(app_key):
                     app_key = key
-                callbacks.append(callback)
-            # if the cms_toolbar is in use, ensure it's first
-            if cms_toolbar in callbacks:
-                callbacks.remove(cms_toolbar)
-                callbacks.insert(0, cms_toolbar)
-            for callback in callbacks:
-                callback_key = toolbar_pool.get_app_key(callback)
-                callback(self, self.request, callback_key == app_key, app_key)
+                # if the cms_toolbar is in use, ensure it's first
+            first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
+            for key in first:
+                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
+                toolbar.populate()
+            for key in toolbars:
+                if key in first:
+                    continue
+                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
+                toolbar.populate()
 
     def request_hook(self):
         if self.request.method != 'POST':

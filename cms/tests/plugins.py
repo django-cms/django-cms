@@ -557,7 +557,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                                            target=text_plugin,
                                            name="A Link %d" % i,
                                            url="http://django-cms.org"))
-            text_plugin.text.body += '<img src="/static/cms/images/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
+            text_plugin.text.body += '<img src="/static/cms/img/icons/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
                 link_plugins[-1].name,
                 link_plugins[-1].pk,
                 link_plugins[-1].name,
