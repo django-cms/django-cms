@@ -20,7 +20,7 @@ from cms.tests.plugins import *
 from cms.tests.po import *
 from cms.tests.publisher import *
 from cms.tests.rendering import *
-from cms.tests.reversion_tests import *
+#from cms.tests.reversion_tests import *
 from cms.tests.security import *
 from cms.tests.settings import *
 from cms.tests.site import *
