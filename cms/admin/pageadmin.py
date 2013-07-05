@@ -142,6 +142,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     def get_revision_instances(self, request, object):
         """Returns all the instances to be used in the object's revision."""
+        if isinstance(object, Title):
+            object = object.page
         placeholder_relation = find_placeholder_relation(object)
         data = [object]
         filters = {'placeholder__%s' % placeholder_relation: object}
