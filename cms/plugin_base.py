@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
+try:
+    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
+    ModelAdminMetaClass)
+except:
+    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
 from cms.utils.compat.metaclasses import with_metaclass
 import re
 
@@ -20,7 +25,7 @@ from django.utils.translation import ugettext_lazy as _
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
-class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
+class CMSPluginBaseMetaclass(ModelAdminMetaClass):
     """
     Ensure the CMSPlugin subclasses have sane values and set some defaults if 
     they're not given.
