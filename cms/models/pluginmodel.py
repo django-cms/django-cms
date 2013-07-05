@@ -10,7 +10,8 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
-from django.utils import timezone, simplejson
+from django.utils import timezone
+import json as simplejson
 from django.utils.translation import ugettext_lazy as _
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder

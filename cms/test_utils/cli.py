@@ -302,7 +302,7 @@ def configure(db_url, **extra):
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
     if extra_settings:
-        from django.utils.simplejson import load, loads
+        from json import load, loads
 
         if os.path.exists(extra_settings):
             with open(extra_settings) as fobj:

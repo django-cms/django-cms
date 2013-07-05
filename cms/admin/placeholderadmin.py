@@ -3,7 +3,7 @@ import sys
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
 from django.db import transaction
-from django.utils import simplejson
+import json as simplejson
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
