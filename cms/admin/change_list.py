@@ -51,7 +51,7 @@ class CMSChangeList(ChangeList):
         self._current_site = current_site(request)
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
-            self.query_set = self.get_query_set(request)
+            self.queryset = self.get_query_set(request)
         except:
             raise
         self.get_results(request)
@@ -59,7 +59,7 @@ class CMSChangeList(ChangeList):
         if self._current_site:
             request.session['cms_admin_site'] = self._current_site.pk
         self.set_sites(request)
-        
+
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
