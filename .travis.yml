@@ -10,9 +10,9 @@ env:
     - DJANGO=1.5 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - DJANGO=1.5 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-    - DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
-    - DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:'
+    - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
 
 before_script:
   - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
