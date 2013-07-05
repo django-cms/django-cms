@@ -157,9 +157,6 @@ class PlaceholderAdmin(ModelAdmin):
         else:
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             placeholder = parent.placeholder
-            page = placeholder.page if placeholder else None
-            if not page: # Make sure we do have a page
-                raise Http404()
             position = request.POST.get('plugin_order',
                                         CMSPlugin.objects.filter(language=language, parent=parent).count())
             # placeholder (non-page) add-plugin
