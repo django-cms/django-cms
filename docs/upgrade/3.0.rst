@@ -18,7 +18,8 @@ What's new in 3.0
 New Frontend Editing
 ====================
 
-django CMS 3.0 introduces a new Frontend Editing system. 
+django CMS 3.0 introduces a new Frontend Editing system as well as a customizable
+django admin skin.
 
 In the new system, Placeholders and their Plugins are no longer managed in the
 Admin site, but only from the Frontend.
