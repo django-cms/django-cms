@@ -1,4 +1,4 @@
 -r requirements_base.txt
 https://github.com/django/django/archive/stable/1.6.x.zip#egg=django
-django-reversion==1.6.2
+django-reversion>=1.7,<1.8
 
