@@ -142,7 +142,7 @@ class PlaceholderAdmin(ModelAdmin):
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
             return HttpResponseForbidden(_('You do not have permission to add a plugin'))
         parent = None
-        language = request.POST['plugin_language'] or get_language_from_request(request)
+        language = request.POST.get('plugin_language') or get_language_from_request(request)
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language,
                                      template=self.get_placeholder_template(request, placeholder))
