@@ -53,7 +53,7 @@ class TitleExtension(with_metaclass(BaseTitleExtension, models.Model)):
 
 
 @receiver(post_publish)
-def copy_page_extensions(sender, **kwargs):
+def copy_title_extensions(sender, **kwargs):
     draft_page = kwargs.get('instance')
     public_page = draft_page.publisher_public
     extensions = getattr(Title._meta, 'extensions', [])
