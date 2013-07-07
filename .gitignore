@@ -38,3 +38,5 @@ include/
 lib/
 man/
 share/
+*.iml
+/.idea

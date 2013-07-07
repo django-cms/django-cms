@@ -168,11 +168,16 @@ $(document).ready(function () {
 			this.menu.bind('click', function (e) {
 				e.stopPropagation();
 
-				// set active state
-				that.setActive($(this).data('id'));
+                var id = $(this).data('id');
 
-				// show e dit mode
+				// set active state
+				that.setActive(id);
+
+				// show edit mode
 				that._enableEditMode(300);
+
+                // show plugin modal
+                $('#cms_plugin-' + id).trigger('dblclick');
 			});
 
 			this.modes.eq(0).bind('click', function (e) {
