@@ -15,7 +15,7 @@ Your class should live in one of your apps ``models.py``. You are free to add ev
 Hooking the extension to the admin site
 =======================================
 
-To show your created extension in the admin interface you could use the PageExtensionAdmin in ``cms.admin.pageextensionadmin``. If you want to use your own admin class make sure to exclude the live versions of the extensions by using ``filter(extended_page__publisher_is_draft=True)``.
+To show your created extension in the admin interface you could use the ``PageExtensionAdmin`` in ``cms.admin.pageextensionadmin``. If you want to use your own admin class make sure to exclude the live versions of the extensions by using ``filter(extended_page__publisher_is_draft=True)`` on the queryset.
 
 If you save an extension the corresponding page is marked as having unpublished changes. To see your extension live make sure to publish the page.
 
