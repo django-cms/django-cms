@@ -27,6 +27,8 @@ $(document).ready(function () {
 	 * @version: 1.0.0
 	 * @public_methods:
 	 *	- CMS.API.Helpers.reloadBrowser();
+	 *	- CMS.API.Helpers.getUrl(urlString);
+	 *	- CMS.API.Helpers.setUrl(urlString, options);
 	 */
 	CMS.API.Helpers = {
 
@@ -55,6 +57,60 @@ $(document).ready(function () {
 					xhr.setRequestHeader("X-CSRFToken", csrf_token);
 				}
 			});
+		},
+
+		getUrl: function(str) {
+			var	o = {
+				'strictMode': false,
+				'key': ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+				'q': { 'name': 'queryKey', 'parser': /(?:^|&)([^&=]*)=?([^&]*)/g },
+				'parser': {
+					'strict': /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+					'loose':  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+				}
+			};
+
+			var m = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str), uri = {}, i = 14;
+
+			while(i--) uri[o.key[i]] = m[i] || '';
+
+			uri[o.q.name] = {};
+			uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+				if($1) { uri[o.q.name][$1] = $2; }
+			});
+
+			return uri;
+		},
+
+		setUrl: function (str, options) {
+			var uri = str;
+
+			// now we neet to get the partials of the element
+			var getUrlObj = this.getUrl(uri);
+			var query = getUrlObj.queryKey;
+			var serialized = '';
+			var index = 0;
+
+			// we could loop the query and replace the param at the right place
+			// but instead of replacing it just append it to the end of the query so its more visible
+			if(options && options.removeParam) delete query[options.removeParam];
+			if(options && options.addParam) query[options.addParam.split('=')[0]] = options.addParam.split('=')[1];
+
+			$.each(query, function (key, value) {
+				// add &
+				if(index != 0) serialized += '&';
+				// if a value is given attach it
+				serialized += (value) ? (key + '=' + value) : (key);
+				index++;
+			});
+
+			// check if we should add the questionmark
+			var addition = (serialized === '') ? '' : '?';
+			var anchor = (getUrlObj.anchor) ? '#' + getUrlObj.anchor : '';
+
+			uri = getUrlObj.protocol + '://' + getUrlObj.authority + getUrlObj.directory + getUrlObj.file + addition + serialized + anchor;
+
+			return uri;
 		}
 
 	};
