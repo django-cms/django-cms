@@ -79,8 +79,8 @@ $color-background-blue-hover: #e6f6fd;
 	li .col1 > div { text-align:center; }
 	li .col1 .title { background:none; }
 	li .col1 .success { color:$color-font; padding-left:10px; }
-	li .col1 a.changelink { display:none; line-height:27px; margin-left:10px; }
-	li .col1 .title, li .col1 .success { float:left; line-height:27px; height:28px; padding-left:20px; }
+	li .col1 a.changelink { display:none; line-height:27px; margin:6px 0 0 10px !important; }
+	li .col1 .title, li .col1 .success { float:left; line-height:29px; height:28px; padding-left:20px; }
 
 	li .move-target-container { display:none; float:left;
 		font-size: 14px; line-height:27px; margin-right:10px; }
@@ -128,7 +128,7 @@ $color-background-blue-hover: #e6f6fd;
 .change-list .filtered { min-height:auto; background:white !important; }
 
 // only visible on multiple sites
-#site-selector { float:left; margin:5px 18px 0 8px; }
+#site-selector { float:left; margin:9px 18px 0 8px; }
 
 // loader on top right
 #loader-message { position:fixed; top:0; right:0; padding:4px 8px; background:white; display:none; }

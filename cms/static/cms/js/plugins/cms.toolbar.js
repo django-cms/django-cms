@@ -98,6 +98,16 @@ $(document).ready(function () {
 
 			// load initial states
 			this._load();
+
+			// check if modes should be visible
+			if($('.cms_placeholder-bar').length) {
+				this.container.find('.cms_toolbar-item-cms-mode-switcher').show();
+			}
+
+			// hide publish button
+			var publishBtn = $('.cms_btn-publish').parent();
+				publishBtn.hide();
+			if($('.cms_btn-publish-active').length) publishBtn.show();
 		},
 
 		_load: function () {
