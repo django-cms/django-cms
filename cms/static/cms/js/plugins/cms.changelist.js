@@ -373,38 +373,21 @@ $(document).ready(function () {
 		$(window).bind('resize', syncCols);
 
 		/* Site Selector */
-		$('#site-select').change(function(event){
-			var id = this.value;
-			var url = window.location.href;
-
-			if(action=="copy"){
-				//url = insert_into_url(url, "copy", selected_page);
-				url = CMS.API.Helpers.setUrl(document.location, {
-					'addParam': "copy=" + selected_page,
-					'removeParam': "copy"
-				});
-			}else{
-				//url = remove_from_url(url, "copy");
-				url = CMS.API.Helpers.setUrl(document.location, {
-					'addParam': "copy",
-					'removeParam': "copy"
-				});
-			}
-			//url = insert_into_url(url, "site__exact", id);
-			url = CMS.API.Helpers.setUrl(document.location, {
-				'addParam': "site__exact=" + id,
-				'removeParam': "site__exact"
-			});
-
-			window.location.href = url;
+		$('#site-select').change(function(){
+			var form = $(this).closest('form');
+			// add correct value for copy
+			if(action === 'copy') $('#site-copy').val(selected_page);
+			// submit form
+			form.submit();
 		});
+
 		var copy_splits = window.location.href.split("copy=");
 		if(copy_splits.length > 1){
 			var id = copy_splits[1].split("&")[0];
 			var action = mark_copy_node(id);
 			selected_page = id;
 		}
-		
+
 		// moderation checkboxes over livequery
 		// TODO jquery.livequery has been removed
 		//$('div.col-moderator input').livequery(function() {

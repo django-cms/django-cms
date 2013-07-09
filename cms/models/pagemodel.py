@@ -749,7 +749,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 title = Title.objects.get_title(self, language, language_fallback=fallback)
                 if title:
                     self.title_cache[title.language] = title
-                language = title.language
+                    language = title.language
         return language
 
     def get_template(self):
