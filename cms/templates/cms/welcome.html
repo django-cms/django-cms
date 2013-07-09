@@ -64,6 +64,9 @@
 		CMS.$('#add-page').bind('click', function (e) {
 			e.preventDefault();
 			CMS.API.Toolbar.openModal('{% url "admin:cms_page_add" %}?title=Home', 'Add page');
+			CMS.API.Toolbar.closeModal = function () {
+				CMS.API.Helpers.reloadBrowser();
+			};
 		});
 	}
 </script>
