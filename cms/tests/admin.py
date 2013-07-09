@@ -814,6 +814,25 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
+    def test_plugins_copy_language(self):
+        """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
+        plugin = self._create_plugin()
+        _, normal_guy = self._get_guys()
+        self.client.login(username='test', password='test')
+        self.assertEqual(1, CMSPlugin.objects.all().count())
+        url = reverse('admin:cms_page_copy_language', args=[self._page.pk])
+        data = dict(
+            source_language='en',
+            target_language='fr',
+        )
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # After he got the permissions, he can edit the plugin
+        self._give_permission(normal_guy, Text, 'add')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(2, CMSPlugin.objects.all().count())
+
     def test_page_permission_inline_visibility(self):
         user = User(username='user', email='user@domain.com', password='user',
                     is_staff=True)
@@ -952,6 +971,7 @@ class AdminFormsTests(AdminTestsBase):
             'language': 'en',
             'site': site.pk,
             'reverse_id': dupe_id,
+            'template': 'col_two.html',
         }
         form = AdvancedSettingsForm(data=page2_data, files=None)
         self.assertFalse(form.is_valid())
@@ -967,6 +987,7 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual([u'A page with this reverse URL id exists already.'],
                          form.errors['reverse_id'])
         page2_data['reverse_id'] = ""
+
         form = AdvancedSettingsForm(data=page2_data, files=None)
         self.assertTrue(form.is_valid())
         admin = self._get_guys(admin_only=True)

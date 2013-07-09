@@ -6,7 +6,6 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
-from cms.utils.i18n import get_language_object
 from cms.utils.permissions import get_any_page_view_permissions
 from django import template
 from django.conf import settings
@@ -178,14 +177,15 @@ register.tag(RenderPlugin)
 
 class PageSubmitRow(InclusionTag):
     name = 'page_submit_row'
-    template = 'admin/page_submit_line.html'
+    template = 'admin/cms/page/submit_row.html'
 
     def get_context(self, context):
         opts = context['opts']
         change = context['change']
         is_popup = context['is_popup']
         save_as = context['save_as']
-        show_delete_translation = context.get('show_delete_translation')
+        basic_info = context.get('advanced_settings', False)
+        advanced_settings = context.get('basic_info', False)
         language = context['language']
         return {
             'onclick_attrib': (opts.get_ordered_objects() and change
@@ -195,10 +195,11 @@ class PageSubmitRow(InclusionTag):
             'show_save_and_add_another': False,
             'show_save_and_continue': not is_popup and context['has_change_permission'],
             'is_popup': is_popup,
+            'basic_info': basic_info,
+            'advanced_settings': advanced_settings,
             'show_save': True,
             'language': language,
-            'language_name': get_language_object(language)['name'],
-            'show_delete_translation': show_delete_translation
+            'object_id': context.get('object_id', None)
         }
 
 

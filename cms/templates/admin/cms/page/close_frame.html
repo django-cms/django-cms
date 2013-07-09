@@ -1,20 +1,23 @@
-{% load i18n admin_modify cms_js_tags cms_admin %}
-{% comment %}
-- This template is used when an iframe is closed to refresh the page
-{% endcomment %}
+{% extends "admin/change_form.html" %}
+{% load i18n admin_static %}
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<title>{% trans "Successfully saved." %}</title>
-		<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
-		<script type="text/javascript">
-		jQuery().ready(function ($) {
-			window.parent.CMS.API.Helpers.reloadBrowser();
-		});
-		</script>
-	</head>
-	<body>
-		{% trans "Successfully saved." %}
-	</body>
-</html>
+{% block title %}{% trans "Change a page" %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% block jquery %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endblock jquery %}
+<script type="text/javascript" src="{% static "cms/js/plugins/cms.base.js" %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+(function($, CMS) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+	// save current plugin
+	CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:1000 }});
+});
+})(CMS.$, window.CMS || window.parent.CMS);
+</script>
+{% endblock %}

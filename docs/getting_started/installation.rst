@@ -16,6 +16,7 @@ Requirements
 * `django-mptt`_ 0.5.2 (strict due to API compatibility issues)
 * `django-sekizai`_ 0.7 or higher
 * `html5lib`_ 0.90 or higher
+* `djangocms-admin-style`_
 * `django-i18nurls`_ (if using django 1.3.X)
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
@@ -32,6 +33,7 @@ Requirements
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: http://code.google.com/p/html5lib/
 .. _django-i18nurls: https://github.com/brocaar/django-i18nurls
+.. _djangocms-admin-style: https://github.com/divio/djangocms-admin-style
 
 Recommended
 ===========
@@ -94,7 +96,7 @@ following is an example requirements.txt file that can be used with pip to insta
 ::
 
     # Bare minimum
-    django-cms==2.4.1
+    django-cms==3.0
     
     #These dependencies are brought in by django-cms, but if you want to lock-in their version, specify them
     Django==1.5.1
@@ -104,6 +106,7 @@ following is an example requirements.txt file that can be used with pip to insta
     django-mptt==0.5.2
     django-sekizai==0.7
     six==1.3.0
+    djangocms-admin-style==0.1.2
     
     #Optional, recommended packages                
     Pillow==2.0.0

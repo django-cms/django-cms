@@ -165,7 +165,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
-            self.assertContains(response, "/static/plugins/empty-image-file.png")
+            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
     def test_nested_plugin_escapejs_page(self):
         """
@@ -184,7 +184,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 reverse('admin:cms_page_change', args=(page.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
-            self.assertContains(response, "/static/plugins/empty-image-file.png")
+            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
@@ -560,7 +560,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request(data)
                 response = admin.add_plugin(request)
                 self.assertEqual(response.status_code, 200)
-                plugin_id = int(str(response.content).split('/", "breadcrumb')[0].split("/")[-1])
+                plugin_id = int(str(response.content).split('edit-plugin/')[1].split("/")[0])
                 data = {
                     'body': 'Hello World',
                 }

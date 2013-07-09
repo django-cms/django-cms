@@ -157,9 +157,6 @@ class PlaceholderAdmin(ModelAdmin):
         else:
             parent = get_object_or_404(CMSPlugin, pk=parent_id)
             placeholder = parent.placeholder
-            page = placeholder.page if placeholder else None
-            if not page: # Make sure we do have a page
-                raise Http404()
             position = request.POST.get('plugin_order',
                                         CMSPlugin.objects.filter(language=language, parent=parent).count())
             # placeholder (non-page) add-plugin
@@ -203,20 +200,21 @@ class PlaceholderAdmin(ModelAdmin):
             source_plugin = get_object_or_404(CMSPlugin, pk=source_plugin_id)
             plugins = list(
                 source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
-                                                        rght__lte=source_plugin.rght).order_by('tree_id', '-rght'))
+                                                        rght__lte=source_plugin.rght).order_by('tree_id', 'level', 'position'))
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', '-rght'))
+                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
         copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
-            'tree_id', 'lft')
+            'tree_id', 'level', 'position')
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(
                 {'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id, 'position': plugin.position,
-                    'desc': plugin.get_short_description()})
+                    'desc': force_unicode(plugin.get_short_description())})
+        self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         return HttpResponse(simplejson.dumps({'plugin_list': reduced_list}), content_type='application/json')
 
     @xframe_options_sameorigin
@@ -416,16 +414,7 @@ class PlaceholderAdmin(ModelAdmin):
 
 class LanguageTabsAdmin(ModelAdmin):
     render_placeholder_language_tabs = True
-    change_form_template = 'admin/placeholders/placeholder/change_form.html'
-
-    class Media:
-        css = {
-            'all': [cms_static_url(path) for path in (
-                'css/rte.css',
-                'css/change_form.css',
-                'css/cms.base.css',
-            )]
-        }
+#    change_form_template = 'admin/placeholders/placeholder/change_form.html'
 
     def get_language_from_request(self, request):
         language = request.REQUEST.get('language', None)

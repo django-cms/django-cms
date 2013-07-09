@@ -11,6 +11,6 @@ class EmptyPlugin(CMSPluginBase):
         return context
 
     def icon_src(self, instance):
-        return settings.STATIC_URL + u"plugins/empty-image-file.png"
+        return settings.STATIC_URL + u"cms/img/icons/plugins/image.png"
 
 plugin_pool.register_plugin(EmptyPlugin)

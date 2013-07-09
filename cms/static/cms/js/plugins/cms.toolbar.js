@@ -676,7 +676,6 @@ $(document).ready(function () {
 					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
 					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
 				} else {
-					console.log('show');
 					this.sideframe.animate({ 'width': width }, 0);
 					this.body.animate({ 'margin-left': width }, 0);
 				}
@@ -1023,7 +1022,7 @@ $(document).ready(function () {
 						if(input.length) input.click();
 
 						var anchor = row.find('a[href="'+$(this).attr('data-url')+'"]');
-						if(anchor.length) iframe.attr('src', iframe.attr('src') + anchor.attr('href'));
+						if(anchor.length) iframe.attr('src', anchor.attr('href'));
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
