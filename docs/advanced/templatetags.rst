@@ -260,6 +260,22 @@ Example::
 	{% load cms_tags %}
 	{% show_editable_page_title %}
 
+******************
+Stack Templatetags
+******************
+
+stack
+=====
+
+The stack templatetag can be used anywhere in any template. It needs a name and it will create a placeholder
+that you can fill with plugins afterwards. The stack tag is normally used to display the same content on
+multiple locations.
+
+
+Example::
+    {% load stack_tags %}
+    {% stack "footer" %}
+
 
 *****************
 Menu Templatetags
