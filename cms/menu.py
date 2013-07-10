@@ -228,7 +228,7 @@ class CMSMenu(Menu):
         lang = get_language_from_request(request)
         fallbacks = get_fallback_languages(lang)
 
-        filters = {'site': site, 'level__lte': PageLevelMenu.page_level}
+        filters = {'site': site, 'level__lte': CMSMenu.page_level}
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
 
@@ -239,12 +239,17 @@ class CMSMenu(Menu):
 
         # cache view perms
         visible_pages = get_visible_pages(request, pages, site)
+        titles = get_title_queryset(request).filter(
+            page__in=visible_pages,
+            language__in=fallbacks + [lang])
+        id_to_titles = defaultdict(dict)
+        for title in titles:
+            id_to_titles[title.page_id][title.language] = title
 
         for page in pages:
             # Pages are ordered by tree_id, therefore the first page is the root
             # of the page tree (a.k.a "home")
-            if page.pk not in visible_pages:
-                # Don't include pages the user doesn't have access to
+            if page.id not in visible_pages:
                 continue
             if not home:
                 home = page
@@ -256,15 +261,15 @@ class CMSMenu(Menu):
 
             page.title_cache = getattr(page, 'title_cache', {})
             # add the title and slugs and some meta data
-            for title in page.title_set.filter(language=lang):
+            lang_to_titles = id_to_titles[page.id]
+            if lang in lang_to_titles:
+                title = lang_to_titles[lang]
                 page.title_cache[title.language] = title
                 nodes.append(page_to_node(page, home, home_cut))
-
             if fallbacks and not page.title_cache:
-                for title in page.title_set.filter(language__in=fallbacks):
-                    page.title_cache[title.language] = title
+                page.title_cache.update(lang_to_titles)
+                for lang in lang_to_titles:
                     nodes.append(page_to_node(page, home, home_cut))
-
         return nodes
 
 
