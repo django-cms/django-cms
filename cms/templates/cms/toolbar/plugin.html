@@ -6,6 +6,7 @@
 $(document).ready(function () {
 	new CMS.PlaceholderItem('#cms_plugin-{{ instance.pk }}', {
 		'type': 'plugin',
+		'page_language': '{{ LANGUAGE_CODE }}',
 		'placeholder_id': '{{ instance.placeholder.id }}',
 		'plugin_type': '{{ instance.plugin_type }}',
 		'plugin_name': '{{ instance.get_plugin_name }}',
