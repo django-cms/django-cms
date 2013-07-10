@@ -7,7 +7,7 @@ from django.utils.encoding import iri_to_uri
 from .settingmodels import *
 from .moderatormodels import *
 from .pagemodel import *
-from .permissionmodels import GlobalPagePermission, PagePermission, PageUserGroup
+from .permissionmodels import *
 from .placeholdermodel import *
 from .pluginmodel import *
 from .titlemodels import *
