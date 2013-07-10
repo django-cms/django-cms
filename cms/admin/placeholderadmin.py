@@ -138,6 +138,9 @@ class PlaceholderAdmin(ModelAdmin):
                           DeprecationWarning)
         if not parent_id:
             parent_id = request.POST.get('plugin_parent', None)
+        if parent_id and not placeholder_id:
+            parent = get_object_or_404(CMSPlugin, pk=parent_id)
+            placeholder_id = parent.placeholder_id
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
             return HttpResponseForbidden(_('You do not have permission to add a plugin'))
