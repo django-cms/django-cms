@@ -107,9 +107,7 @@ class PagePermission(AbstractPagePermission):
         page = self.page_id and force_unicode(self.page) or "None"
         return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
 
-User = get_user_model()
-
-class PageUser(User):
+class PageUser(get_user_model()):
     """Cms specific user data, required for permission system
     """
     created_by = models.ForeignKey(user_model_label, related_name="created_users")

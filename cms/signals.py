@@ -5,7 +5,8 @@ from django.db.models import signals
 from django.dispatch import Signal
 
 from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
-from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, PageUser, PageUserGroup
+from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, PageUserGroup
+from cms.models.permissionmodels import PageUser
 from django.conf import settings
 from menus.menu_pool import menu_pool
 
