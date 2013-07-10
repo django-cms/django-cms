@@ -532,7 +532,8 @@ $(document).ready(function () {
 				'placeholder_id': placeholder_id,
 				'plugin_id': this.options.plugin_id,
 				'plugin_parent': plugin_parent || '',
-				'plugin_language': this.options.plugin_language,
+				 // this is a hack: when moving to different languages use the global language
+				'plugin_language': this.options.page_language,
 				'plugin_order': plugin_order,
 				'csrfmiddlewaretoken': CMS.API.Toolbar.options.csrf
 			};
