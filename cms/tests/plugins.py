@@ -339,6 +339,26 @@ class PluginsTestCase(PluginsTestBaseCase):
         # test subplugin copy
         copy_plugins_to([link_plugin_en], ph_de, 'de')
 
+    def test_deep_copy_plugins(self):
+        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        page_de = create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
+        ph_en = page_en.placeholders.get(slot="body")
+        ph_de = page_de.placeholders.get(slot="body")
+
+        # add the text plugin
+        mcol1 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+        mcol2 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+        col1 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        col2 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        col3 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
+        col4 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
+        mcol1 = add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")
+        # add a *nested* link plugin
+        link_plugin_en = add_plugin(ph_en, "LinkPlugin", "en", target=col2,
+                                    name="A Link", url="https://www.django-cms.org")
+        copy_plugins_to([col2, link_plugin_en], ph_de, 'de', mcol1.pk)
+
+
     def test_remove_plugin_before_published(self):
         """
         When removing a draft plugin we would expect the public copy of the plugin to also be removed
