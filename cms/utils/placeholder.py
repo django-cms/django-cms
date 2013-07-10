@@ -70,10 +70,10 @@ class MLNGPlaceholderActions(PlaceholderNoAction):
         if not source_placeholder:
             return False
         plugins = source_placeholder.get_plugins_list()
-        ptree = []
+        cache = {}
         new_plugins = []
         for p in plugins:
-            new_plugins.append(p.copy_plugin(target_placeholder, target_language, ptree))
+            new_plugins.append(p.copy_plugin(target_placeholder, target_language, cache))
         return new_plugins
 
     def get_copy_languages(self, placeholder, model, fieldname, **kwargs):
