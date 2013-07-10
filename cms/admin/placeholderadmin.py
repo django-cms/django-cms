@@ -206,7 +206,7 @@ class PlaceholderAdmin(ModelAdmin):
                 source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
-        copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
+        copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
             'tree_id', 'level', 'position')
         reduced_list = []

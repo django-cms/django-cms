@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+
+
 def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin_id=None):
     """
     Copies a list of plugins to a placeholder to a language.
@@ -9,14 +12,18 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin
     for old_plugin in plugin_list:
         if first:
             old_plugin.parent = None
-            old_plugin.parent_id = parent_plugin_id
-            first = False
+            old_plugin.parent_id = None
         if to_language:
             plugin_language = to_language
         else:
             plugin_language = old_plugin.language
             # do the simple copying
         new_plugin = old_plugin.copy_plugin(to_placeholder, plugin_language, old_parent_cache)
+        if first:
+            first = False
+            if parent_plugin_id:
+                from cms.models import CMSPlugin
+                new_plugin.move_to(target=CMSPlugin.objects.get(pk=parent_plugin_id))
         plugins_ziplist.append((new_plugin, old_plugin))
         # this magic is needed for advanced plugins like Text Plugins that can have
     # nested plugins and need to update their content based on the new plugins.
