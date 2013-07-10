@@ -525,28 +525,46 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': 'invalid-placeholder'})
+                'placeholder_id': 'invalid-placeholder', 'plugin_language': 'en'})
             self.assertRaises(ValueError, self.admin_class.move_plugin, request)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent': ''})
+                'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent': ''})
+                'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, b"ok")
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent': ''})
+                'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
             self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent': ''})
+                'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.content, b"ok")
+
+    def test_move_language(self):
+        page = self.get_page()
+        source, target = list(page.placeholders.all())[:2]
+        col = add_plugin(source, 'MultiColumnPlugin', 'en')
+        sub_col = add_plugin(source, 'ColumnPlugin', 'en', target=col)
+        col2 = add_plugin(source, 'MultiColumnPlugin', 'de')
+
+        admin = self.get_admin()
+        with self.login_user_context(admin):
+            request = self.get_request(post_data={'plugin_id': sub_col.pk,
+                'placeholder_id': source.id, 'plugin_parent': col2.pk, 'plugin_language': 'de'})
+            response = self.admin_class.move_plugin(request)
+            self.assertEquals(response.status_code, 200)
+        sub_col = CMSPlugin.objects.get(pk=sub_col.pk)
+        self.assertEquals(sub_col.language, "de")
+        self.assertEquals(sub_col.parent_id, col2.pk)
+
 
     def test_preview_page(self):
         permless = self.get_permless()
