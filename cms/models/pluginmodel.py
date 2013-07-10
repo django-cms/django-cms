@@ -240,7 +240,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, plugin_trail):
+    def copy_plugin(self, target_placeholder, target_language, parent_cache):
         """
         Copy this plugin and return the new plugin.
         """
@@ -256,32 +256,10 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         new_plugin.lft = None
         new_plugin.rght = None
         new_plugin.level = None
-
-        # In the block below, we use plugin_trail as a kind of breadcrumb trail 
-        # through the tree. 
-        #
         # we assign a parent to our new plugin
-        if not self.parent:
-            # We're lucky; we don't need to find a parent. We'll just put 
-            # new_plugin into the plugin_trail for potential children to use,
-            # and move on.
-            plugin_trail[:] = [new_plugin]
-        else:
-            # We will need to find a parent for our new_plugin.
-            marker = plugin_trail.pop()
-            # are we going up or down?
-            level_difference = self.level - marker.level
-            if level_difference == 1:
-            # going up; put the marker back
-                plugin_trail.append(marker)
-            else:
-                # going down; remove more items from plugin_trail
-                if level_difference < 0:
-                    plugin_trail[:] = plugin_trail[:level_difference]
-                    # assign new_plugin.parent
-            new_plugin.parent = plugin_trail[-1]
-            # new_plugin becomes the last item in the tree for the next round
-            plugin_trail.append(new_plugin)
+        parent_cache[self.pk] = new_plugin
+        if self.parent:
+            new_plugin.parent = parent_cache[self.parent_id]
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
