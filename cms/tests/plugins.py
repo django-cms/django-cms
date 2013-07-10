@@ -9,6 +9,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.plugins.utils import get_plugins_for_page
 from cms.plugins.file.models import File
@@ -18,13 +19,11 @@ from cms.plugins.link.models import Link
 from cms.plugins.picture.models import Picture
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
-from cms.plugins.twitter.models import TwitterRecentEntries
 from cms.test_utils.project.pluginapp.models import Article, Section
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel)
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, \
-    URL_CMS_PLUGIN_HISTORY_EDIT
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -176,7 +175,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
-        expected =  {
+        expected = {
             "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
             "breadcrumb": [
                 {
@@ -491,12 +490,14 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         body = inheritfrompage.placeholders.get(slot="body")
 
-        plugin = TwitterRecentEntries(
-            plugin_type='TwitterRecentEntriesPlugin',
+        plugin = GoogleMap(
+            plugin_type='GoogleMapPlugin',
             placeholder=body,
             position=1,
             language=settings.LANGUAGE_CODE,
-            twitter_user='djangocms',
+            address="Riedtlistrasse 16",
+            zipcode="8006",
+            city="Zurich",
         )
         plugin.insert_at(None, position='last-child', save=True)
         inheritfrompage.publish()
@@ -520,7 +521,9 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.client.logout()
         response = self.client.get(page.get_absolute_url())
-        self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content.decode('utf8'), response.content)
+        self.assertTrue(
+            'https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true' in response.content.decode('utf8'),
+            response.content)
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = create_page('page to inherit from',

@@ -28,12 +28,15 @@ class SettingsAdmin(ModelAdmin):
             url(r'^$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
+            url(r'^(.+)/$',
+                wrap(self.change_view),
+                name='%s_%s_change' % info),
         )
         return urlpatterns
 
     @csrf_protect_m
     @transaction.commit_on_success
-    def change_view(self, request):
+    def change_view(self, request, id=None):
         model = self.model
         try:
             obj = model.objects.get(user=request.user)
