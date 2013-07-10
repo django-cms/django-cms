@@ -21,7 +21,7 @@ class BaseTitleExtension(models.base.ModelBase):
         return new_class
 
 
-class TitleExtension(with_metaclass(BaseTitleExtension, models.Model)):
+class SingleTitleExtension(with_metaclass(BaseTitleExtension, models.Model)):
     extended_title = models.OneToOneField(Title, limit_choices_to={'page__publisher_is_draft': True})
 
     class Meta:
@@ -32,24 +32,42 @@ class TitleExtension(with_metaclass(BaseTitleExtension, models.Model)):
 
         try:
             extension = cls.objects.get(extended_title=title)
-        except cls.DoesNotExist:
-            extension = None
-        except cls.MultipleObjectsReturned:
-            cls.objects.filter(extended_title=title).delete()
-            extension = None
-
-        if extension:
             self.pk = extension.pk
-            self.extended_title = title
-            self.save()
-        else:
+        except cls.DoesNotExist:
             self.pk = None
-            self.extended_title = title
-            self.save()
+
+        self.extended_title = title
+        self.save()
 
     def save(self, *args, **kwargs):
         self.extended_title.page.save(no_signals=True)  # mark page unpublished
-        return super(TitleExtension, self).save(*args, **kwargs)
+        return super(SingleTitleExtension, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.extended_title.page.save(no_signals=True)  # mark page unpublished
+        return super(SingleTitleExtension, self).delete(*args, **kwargs)
+
+
+class MultiTitleExtension(with_metaclass(BaseTitleExtension, models.Model)):
+    extended_title = models.ForeignKey(Title, limit_choices_to={'page__publisher_is_draft': True})
+    public_extension = models.OneToOneField('self', null=True, related_name='draft_extension', editable=False)
+
+    class Meta:
+        abstract = True
+        unique_together = (('extended_title', 'public_extension'),)
+
+    def copy_to_public(self, title):
+        cls = type(self)
+        this = cls.objects.get(pk=self.pk)
+
+        extension = self.public_extension
+        if extension:
+            self.pk = extension.pk
+        else:
+            self.pk = None
+        self.public_extension_id = this
+        self.extended_title = title
+        self.save(force_update=bool(extension))
 
 
 @receiver(post_publish)
