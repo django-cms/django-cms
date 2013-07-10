@@ -9,7 +9,7 @@ calling these methods!
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import PageUser, PagePermission, \
     GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS
@@ -320,7 +320,7 @@ def create_page_user(created_by, user,
     user.is_staff = True
     user.is_active = True
     page_user = PageUser(created_by=created_by)
-    for field in [f.name for f in User._meta.local_fields]:
+    for field in [f.name for f in get_user_model()._meta.local_fields]:
         setattr(page_user, field, getattr(user, field))
     user.save()
     page_user.save()

@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser, Group
 
 from cms.api import create_page
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.menu import get_visible_pages
 from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
@@ -136,7 +136,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             ('user_staff', True, None),
         ]
         for username, is_staff, groupname in userdata:
-            user = User.objects.create(username=username,
+            user = get_user_model().objects.create(username=username,
                                        email=username + '@domain.com',
                                        is_active=True,
                                        is_staff=is_staff)
@@ -147,7 +147,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
                 group.user_set.add(user)
                 group.save()
 
-        self.assertEquals(11, User.objects.all().count())
+        self.assertEquals(11, get_user_model().objects.all().count())
 
 
     def _setup_view_restrictions(self):
@@ -235,7 +235,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         # log the user in if present
         user = None
         if username is not None:
-            user = User.objects.get(username__iexact=username)
+            user = get_user_model().objects.get(username__iexact=username)
         request = self.get_request(user)
         visible_page_ids = get_visible_pages(request, all_pages, self.site)
         public_page_ids = Page.objects.drafts().filter(title_set__title__in=expected_granted_pages).values_list('id',
@@ -341,7 +341,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
             'page_d_d'
         ]
         urls = self.get_url_dict(all_pages)
-        user = User.objects.get(username='user_1')
+        user = get_user_model().objects.get(username='user_1')
         self.assertGrantedVisibility(all_pages, granted, username='user_1')
         self.assertViewAllowed(urls["/en/page_b/"], user)
         self.assertInMenu(urls["/en/page_b/"], user)
@@ -382,7 +382,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_2')
         urls = self.get_url_dict(all_pages)
-        user = User.objects.get(username='user_2')
+        user = get_user_model().objects.get(username='user_2')
         self.assertViewNotAllowed(urls["/en/page_b/page_b_b/"], user)
         self.assertViewAllowed(urls["/en/page_b/page_b_b/page_b_b_a/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_b/page_b_b_a/page_b_b_a_a/"], user)
@@ -420,7 +420,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_3')
         urls = self.get_url_dict(all_pages)
-        user = User.objects.get(username='user_3')
+        user = get_user_model().objects.get(username='user_3')
         self.assertViewAllowed(urls["/en/page_b/"], user)
         self.assertViewAllowed(urls["/en/page_b/page_b_d/page_b_d_a/"], user)
         self.assertViewNotAllowed(urls["/en/page_d/"], user)
@@ -449,7 +449,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_4')
         urls = self.get_url_dict(all_pages)
-        user = User.objects.get(username='user_4')
+        user = get_user_model().objects.get(username='user_4')
         self.assertViewNotAllowed(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_b/"], user)
         self.assertViewAllowed(urls["/en/page_b/page_b_b/page_b_b_a/"], user)
@@ -476,7 +476,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_5')
         urls = self.get_url_dict(all_pages)
-        user = User.objects.get(username='user_5')
+        user = get_user_model().objects.get(username='user_5')
         # call /
         self.assertViewNotAllowed(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_b/"], user)
@@ -529,7 +529,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         ]
 
     def _setup_user(self):
-        user = User.objects.create(username='user_6', email='user_6@domain.com', is_active=True, is_staff=True)
+        user = get_user_model().objects.create(username='user_6', email='user_6@domain.com', is_active=True, is_staff=True)
         user.set_password(user.username)
         user.save()
         group = Group.objects.create(name=self.GROUPNAME_6)
@@ -580,7 +580,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         ]
 
         self.assertGrantedVisibility(all_pages, granted, username='user_6')
-        user = User.objects.get(username='user_6')
+        user = get_user_model().objects.get(username='user_6')
         url = "/en/page_2/page_3/page_4/"
         self.assertViewAllowed(urls[url], user)
         url = "/en/page_5/page_6/"

@@ -4,7 +4,8 @@ from cms.utils.compat.dj import python_2_unicode_compatible
 
 from django.conf import settings
 from django.db import models
-from cms.compat import User
+from cms.compat import get_user_model
+from cms.compat import user_model_label
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models.managers import PageModeratorStateManager
@@ -29,7 +30,7 @@ class PageModeratorState(models.Model):
     )
 
     page = models.ForeignKey(Page)
-    user = models.ForeignKey(User, null=True)
+    user = models.ForeignKey(user_model_label, null=True)
     created = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=3, choices=_action_choices, null=True, blank=True)
     message = models.TextField(max_length=1000, blank=True, default="")

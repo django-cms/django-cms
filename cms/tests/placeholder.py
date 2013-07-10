@@ -2,7 +2,7 @@
 from __future__ import with_statement
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder

@@ -7,7 +7,7 @@ from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
 from cms.apphook_pool import apphook_pool, ApphookPool
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -43,7 +43,7 @@ class AdminTestsBase(CMSTestCase):
             return admin
         USERNAME = 'test'
 
-        normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
+        normal_guy = get_user_model().objects.create_user(USERNAME, 'test@test.com', USERNAME)
         normal_guy.is_staff = True
         normal_guy.is_active = True
         normal_guy.save()
@@ -1036,10 +1036,10 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
                 old_response_size = len(response.content)
-                old_user_count = User.objects.count()
+                old_user_count = get_user_model().objects.count()
                 # create additionals user and reload the page
-                User.objects.create(username=USER_NAME, is_active=True)
-                user_count = User.objects.count()
+                get_user_model().objects.create(username=USER_NAME, is_active=True)
+                user_count = get_user_model().objects.count()
                 more_users_in_db = old_user_count < user_count
                 # we have more users
                 self.assertTrue(more_users_in_db, "New users got NOT created")

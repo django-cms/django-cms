@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
-from cms.compat import User, is_user_swapped
+from cms.compat import get_user_model, is_user_swapped
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware

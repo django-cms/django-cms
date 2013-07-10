@@ -4,7 +4,7 @@ import datetime
 import json
 
 from cms.api import create_page, publish_page, add_plugin
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase

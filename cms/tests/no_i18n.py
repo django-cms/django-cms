@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from djangocms_text_ckeditor.models import Text
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.models import Page, CMSPlugin
 from django.core.urlresolvers import clear_url_caches
 from cms.test_utils.util.context_managers import SettingsOverride

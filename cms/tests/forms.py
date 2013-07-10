@@ -3,7 +3,7 @@ from __future__ import with_statement
 from cms.admin import forms
 from cms.admin.forms import PageUserForm
 from cms.api import create_page, create_page_user
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
@@ -120,7 +120,7 @@ class FormsTestCase(CMSTestCase):
         self.assertEquals(normal_result, list(lazy_result))
 
     def test_page_user_form_initial(self):
-        myuser = User.objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
+        myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',

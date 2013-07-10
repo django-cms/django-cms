@@ -2,7 +2,7 @@
 from __future__ import with_statement
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar

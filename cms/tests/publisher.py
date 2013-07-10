@@ -4,7 +4,7 @@ from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin
 from cms.models.pagemodel import Page
@@ -28,7 +28,7 @@ class PublisherCommandTests(TestCase):
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
-        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
 
         pages_from_output = 0
         published_from_output = 0
@@ -50,7 +50,7 @@ class PublisherCommandTests(TestCase):
 
     def test_command_line_ignores_draft_page(self):
         # we need to create a superuser (the db is empty)
-        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
 
         create_page("The page!", "nav_playground.html", "en", published=False)
 
@@ -85,7 +85,7 @@ class PublisherCommandTests(TestCase):
         filters on purpose (this helps test the managers)
         """
         # we need to create a superuser (the db is empty)
-        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
 
         # Now, let's create a page. That actually creates 2 Page objects
         create_page("The page!", "nav_playground.html", "en", published=True)

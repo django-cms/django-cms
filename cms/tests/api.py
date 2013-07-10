@@ -3,7 +3,7 @@ import sys
 
 from cms.api import _generate_valid_slug, create_page, _verify_plugin_type, assign_user_to_page
 from cms.apphook_pool import apphook_pool
-from cms.compat import User
+from cms.compat import get_user_model
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -142,14 +142,14 @@ class PythonAPITests(TestCase):
 
     def test_assign_user_to_page_nothing(self):
         page = create_page(**self._get_default_create_page_arguments())
-        user = User.objects.create(username='user', email='user@django-cms.org',
+        user = get_user_model().objects.create(username='user', email='user@django-cms.org',
                                    is_staff=True, is_active=True)
         request = AttributeObject(user=user)
         self.assertFalse(page.has_change_permission(request))
 
     def test_assign_user_to_page_single(self):
         page = create_page(**self._get_default_create_page_arguments())
-        user = User.objects.create(username='user', email='user@django-cms.org',
+        user = get_user_model().objects.create(username='user', email='user@django-cms.org',
                                    is_staff=True, is_active=True)
         request = AttributeObject(user=user)
         assign_user_to_page(page, user, can_change=True)
@@ -157,14 +157,14 @@ class PythonAPITests(TestCase):
         self.assertFalse(page.has_add_permission(request))
         _grant_page_permission(user, 'change')
         page = Page.objects.get(pk=page.pk)
-        user = User.objects.get(pk=user.pk)
+        user = get_user_model().objects.get(pk=user.pk)
         request = AttributeObject(user=user)
         self.assertTrue(page.has_change_permission(request))
         self.assertFalse(page.has_add_permission(request))
 
     def test_assign_user_to_page_all(self):
         page = create_page(**self._get_default_create_page_arguments())
-        user = User.objects.create(username='user', email='user@django-cms.org',
+        user = get_user_model().objects.create(username='user', email='user@django-cms.org',
                                    is_staff=True, is_active=True)
         request = AttributeObject(user=user)
         assign_user_to_page(page, user, grant_all=True)
@@ -173,7 +173,7 @@ class PythonAPITests(TestCase):
         _grant_page_permission(user, 'change')
         _grant_page_permission(user, 'add')
         page = Page.objects.get(pk=page.pk)
-        user = User.objects.get(pk=user.pk)
+        user = get_user_model().objects.get(pk=user.pk)
         request = AttributeObject(user=user)
         self.assertTrue(page.has_change_permission(request))
         self.assertTrue(page.has_add_permission(request))
