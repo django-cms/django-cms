@@ -290,16 +290,14 @@ class PlaceholderAdmin(ModelAdmin):
         POST request with following parameters:
         -plugin_id
         -placeholder_id
-        -plugin_language
+        -plugin_language (optional)
         -plugin_parent (optional)
         -plugin_order (array, optional)
         """
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
         parent_id = request.POST.get('plugin_parent', None)
-        language = request.POST.get('plugin_language', None)
-        if not language:
-            return HttpResponseBadRequest('plugin_language required')
+        language = request.POST.get('plugin_language', plugin.language)
         if not parent_id:
             parent_id = None
         else:
