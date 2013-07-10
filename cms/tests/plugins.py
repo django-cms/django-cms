@@ -356,7 +356,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add a *nested* link plugin
         link_plugin_en = add_plugin(ph_en, "LinkPlugin", "en", target=col2,
                                     name="A Link", url="https://www.django-cms.org")
+        col2 = self.reload(col2)
         copy_plugins_to([col2, link_plugin_en], ph_de, 'de', mcol1.pk)
+        col2 = self.reload(col2)
+        link_plugin_en = self.reload(link_plugin_en)
+        mcol1 = self.reload(mcol1)
+        self.assertEquals(mcol1.get_descendants().count(), 2)
+
 
 
     def test_remove_plugin_before_published(self):
