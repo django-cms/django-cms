@@ -185,10 +185,7 @@ class PageToolbar(CMSToolbar):
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         # cms page admin
-        pages_menu = admin_menu.get_or_create_menu('pages', _('Pages'), position=0)
-        pages_menu.add_sideframe_item(_('Manage pages'), url=reverse("admin:cms_page_changelist"))
-        pages_menu.add_break(MANAGE_PAGES_BREAK)
-        pages_menu.add_sideframe_item(_('Add new page'), url=reverse("admin:cms_page_add"))
+        admin_menu.add_sideframe_item(_('Pages'), url=reverse("admin:cms_page_changelist"), position=0)
 
     def add_page_menu(self):
         # menu for current page
