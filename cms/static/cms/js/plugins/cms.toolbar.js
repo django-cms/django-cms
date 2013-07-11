@@ -68,7 +68,6 @@ $(document).ready(function () {
 			this.messages = this.container.find('.cms_messages');
 			this.modal = this.container.find('.cms_modal');
 			this.tooltip = this.container.find('.cms_placeholders-tooltip');
-			this.menu = $('.cms_switcher');
 			this.bars = $('.cms_placeholder-bar');
 
 			this.plugins = $('.cms_plugin');
@@ -108,6 +107,9 @@ $(document).ready(function () {
 			var publishBtn = $('.cms_btn-publish').parent();
 				publishBtn.hide();
 			if($('.cms_btn-publish-active').length) publishBtn.show();
+
+			// add toolbar ready class to body
+			$('body').addClass('cms_toolbar-ready');
 		},
 
 		_load: function () {
@@ -172,17 +174,6 @@ $(document).ready(function () {
 				that._stopSideframeResize();
 				that._endModalMove(e);
 				that._endModalResize(e);
-			});
-
-			// event for switching between edit and layout mode
-			this.menu.bind('click', function (e) {
-				e.stopPropagation();
-
-				// set active state
-				that.setActive($(this).data('id'));
-
-				// show e dit mode
-				that._enableEditMode(300);
 			});
 
 			this.modes.eq(0).bind('click', function (e) {
@@ -334,7 +325,7 @@ $(document).ready(function () {
 					this.openSideframe(el.attr('href'), true);
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'), el.attr('data-post'));
+					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
 					break;
 				default:
 					window.location.href = el.attr('href');
@@ -529,14 +520,19 @@ $(document).ready(function () {
 			this._hideModal(100);
 		},
 
-		openAjax: function (url, post) {
+		openAjax: function (url, post, text) {
 			var that = this;
+
+			// check if we have a confirmation text
+			var question = (text) ? confirm(text) : true;
+			// cancel if question has been denied
+			if(!question) return false;
 
 			$.ajax({
 				'type': 'POST',
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
-				'success': function () {
+				'success': function (data) {
 					CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
@@ -556,6 +552,10 @@ $(document).ready(function () {
 			// attach active class to current element
 			var dragitem = $('#cms_draggable-' + id);
 			var plugin = $('#cms_plugin-' + id);
+
+			// collapse all previous elements
+			var collapsed = dragitem.parents().siblings().filter('.cms_dragitem-collapsed');
+				collapsed.trigger('click');
 
 			// set new classes
 			dragitem.addClass('cms_draggable-selected');
@@ -596,7 +596,6 @@ $(document).ready(function () {
 			this.bars.hide();
 			this.plugins.stop(true, true).fadeIn(speed);
 			this.placeholders.hide();
-			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
 			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
@@ -616,7 +615,6 @@ $(document).ready(function () {
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
 			this.placeholders.stop(true, true).fadeIn(speed);
-			this.menu.hide();
 
 			// set active item
 			this.modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
