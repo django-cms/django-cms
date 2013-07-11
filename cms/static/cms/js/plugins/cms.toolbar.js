@@ -557,6 +557,10 @@ $(document).ready(function () {
 			var dragitem = $('#cms_draggable-' + id);
 			var plugin = $('#cms_plugin-' + id);
 
+			// collapse all previous elements
+			var collapsed = dragitem.parents().siblings().filter('.cms_dragitem-collapsed');
+				collapsed.trigger('click');
+
 			// set new classes
 			dragitem.addClass('cms_draggable-selected');
 			plugin.addClass('cms_plugin-active');
