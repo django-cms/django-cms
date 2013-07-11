@@ -142,7 +142,7 @@ class PlaceholderAdmin(ModelAdmin):
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
             return HttpResponseForbidden(_('You do not have permission to add a plugin'))
         parent = None
-        language = request.POST['plugin_language'] or get_language_from_request(request)
+        language = request.POST.get('plugin_language') or get_language_from_request(request)
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language,
                                      template=self.get_placeholder_template(request, placeholder))
@@ -290,12 +290,14 @@ class PlaceholderAdmin(ModelAdmin):
         POST request with following parameters:
         -plugin_id
         -placeholder_id
+        -plugin_language (optional)
         -plugin_parent (optional)
         -plugin_order (array, optional)
         """
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
         parent_id = request.POST.get('plugin_parent', None)
+        language = request.POST.get('plugin_language', plugin.language)
         if not parent_id:
             parent_id = None
         else:
@@ -306,6 +308,10 @@ class PlaceholderAdmin(ModelAdmin):
         if plugin.parent_id != parent_id:
             if parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
+                if parent.placeholder_id != placeholder.pk:
+                    return HttpResponseBadRequest('parent must be in the same placeholder')
+                if parent.language != language:
+                    return HttpResponseBadRequest('parent must be in the same language as plugin_language')
             else:
                 parent = None
             plugin.move_to(parent, position='last-child')
@@ -314,10 +320,10 @@ class PlaceholderAdmin(ModelAdmin):
             has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
         except PluginLimitReached as er:
             return HttpResponseBadRequest(er)
-        plugin.placeholder = placeholder
         plugin.save()
-        for child in plugin.get_descendants():
+        for child in plugin.get_descendants(include_self=True):
             child.placeholder = placeholder
+            child.language = language
             child.save()
         plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder)
         for level_plugin in plugins:

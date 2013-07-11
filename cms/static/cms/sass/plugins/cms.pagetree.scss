@@ -45,6 +45,7 @@ $color-background-blue-hover: #e6f6fd;
 	li a.addlink,
 	li a.deletelink { display:inline-block; width:10px; height:10px; padding:0; margin:0 0 0 4px; background-position:0 0; }
 	li .col-softroot span.icon { background-position:-80px 0; margin-top:0; }
+	li .col-apphook span.icon { background-position:-40px -80px; margin-top:0; }
 	// icons last row
 	li .col-lastchange .state-icon.add { background-position:-40px 0; }
 	li .col-lastchange .state-icon.cha { background-position:-40px -20px; }
@@ -140,4 +141,7 @@ $color-background-blue-hover: #e6f6fd;
 	li .col-softroot span.icon {
 		width: 18px !important; height: 18px !important; margin:0 !important;
 		background: url('../../img/pagetree/sprite.png') -80px 0 no-repeat !important; }
+	li .col-apphook span.icon {
+		width: 18px !important; height: 18px !important; margin:0 !important;
+		background: url('../../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
 }

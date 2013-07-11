@@ -3,21 +3,16 @@
 
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
-{% block extrahead %}
-{{ block.super }}
-{% block jquery %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endblock jquery %}
-<script type="text/javascript" src="{% static "cms/js/plugins/cms.base.js" %}"></script>
-{{ media }}
-{% endblock %}
-
 {% block content %}
 <script type="text/javascript">
-(function($, CMS) {
+(function(Window) {
 // CMS.$ will be passed for $
-$(document).ready(function () {
+Window.CMS.$(document).ready(function () {
 	// save current plugin
-	CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:1000 }});
+	Window.CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:1000 }});
 });
-})(CMS.$, window.CMS || window.parent.CMS);
+// we have a special case here cause the CMS namespace
+// can be either inside the current window or the parent
+})(window.parent || window);
 </script>
 {% endblock %}
