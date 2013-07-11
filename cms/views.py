@@ -13,7 +13,7 @@ from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.utils import translation
+from django.contrib.auth.views import redirect_to_login
 from django.utils.http import urlquote
 
 def _handle_no_page(request, slug):
@@ -131,9 +131,7 @@ def details(request, slug):
 
     # permission checks
     if page.login_required and not request.user.is_authenticated():
-        path = urlquote(request.get_full_path())
-        tup = settings.LOGIN_URL, "next", path
-        return HttpResponseRedirect('%s?%s=%s' % tup)
+        return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
     # fill the context 
