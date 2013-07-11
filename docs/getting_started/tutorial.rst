@@ -101,22 +101,12 @@ There are even more plugins available on the django CMS `extensions page`_.
 
 In addition, make sure you uncomment (enable) ``'django.contrib.admin'``
 
-you may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
+You may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
 instead of the :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
-:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins. In this
-case you should not add them to :setting:`django:INSTALLED_APPS` but add the following
-instead:
-
-* ``'filer'``
-* ``'cmsplugin_filer_file'``
-* ``'cmsplugin_filer_folder'``
-* ``'cmsplugin_filer_image'``
-* ``'cmsplugin_filer_teaser'``
-* ``'cmsplugin_filer_video'``
-
-.. note::
-  See the `django-filer documentation <django-filer:installation_and_configuration>`_ and
-  `django CMS plugin documentation`_ for detailed installation information.
+:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins.
+In this case you should check the `django-filer documentation <django-filer:installation_and_configuration>`_
+and `django CMS plugin documentation`_ for detailed installation information, and
+then return to this tutorial.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
