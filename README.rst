@@ -20,7 +20,6 @@ can fill with CMS plugins, by default we ship the following plugins:
 * Teaser
 * Text
 * Video
-* Twitter
 
 However this is not the end of the list, there are many
 `3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_ 
@@ -52,7 +51,6 @@ Credits
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Video plugin uses the
   `OSFlashVideoPlayer <https://github.com/FlashJunior/OSFlashVideoPlayer/>`_.
-* Includes the `Wymeditor <http://www.wymeditor.org/>`_.
 * Python tree engine powered by
   `django-mptt <https://github.com/django-mptt/django-mptt>`_.
 * Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
