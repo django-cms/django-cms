@@ -134,25 +134,6 @@ that with the example from above::
 Now you can link this Menu to a page in the 'Advanced' tab of the page
 settings under attached menu.
 
-Each must have a :meth:`get_menu_title` method, a
-:meth:`~django.db.models.Model.get_absolute_url` method, and a ``childrens``
-list with all of its children inside (the 's' at the end of ``childrens`` is
-done on purpose because ``children`` is already taken by django-mptt).
-
-Be sure that :meth:`get_menu_title` and :meth:`get_absolute_url` don't trigger
-any queries when called in a template or you may have some serious performance
-and database problems with a lot of queries.
-
-It may be wise to cache the output of :meth:`~menu.base.Menu.get_nodes`. For
-this you may need to write a wrapper class because of dynamic content that the
-pickle module can't handle.
-
-If you want to display some static pages in the navigation ("login", for
-example) you can write your own "dummy" class that adheres to the conventions
-described above.
-
-A base class for this purpose can be found in ``cms/utils/navigation.py``
-
 
 *********
 App-Hooks
