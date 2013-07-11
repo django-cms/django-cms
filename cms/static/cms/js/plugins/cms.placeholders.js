@@ -403,6 +403,8 @@ $(document).ready(function () {
 			});
 
 			plugin.bind('mousedown mouseup mousemove', function (e) {
+				e.stopPropagation();
+
 				if(e.type === 'mousedown') {
 					// start countdown
 					timer = setTimeout(function () {
