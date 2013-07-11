@@ -322,7 +322,7 @@ $(document).ready(function () {
 					this.openSideframe(el.attr('href'), true);
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'), el.attr('data-post'));
+					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
 					break;
 				default:
 					window.location.href = el.attr('href');
@@ -517,14 +517,19 @@ $(document).ready(function () {
 			this._hideModal(100);
 		},
 
-		openAjax: function (url, post) {
+		openAjax: function (url, post, text) {
 			var that = this;
+
+			// check if we have a confirmation text
+			var question = (text) ? confirm(text) : true;
+			// cancel if question has been denied
+			if(!question) return false;
 
 			$.ajax({
 				'type': 'POST',
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
-				'success': function () {
+				'success': function (data) {
 					CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
