@@ -149,7 +149,6 @@ $(document).ready(function () {
 					$('.cms_droppable-empty-wrapper').slideDown(200);
 					// ensure all menus are closed
 					$('.cms_dragitem .cms_submenu').hide();
-					$('.cms_dragitem .cms_switcher').hide();
 					// remove classes from empty dropzones
 					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
 				},
@@ -392,8 +391,8 @@ $(document).ready(function () {
 			var dragitem = draggable.find('> .cms_dragitem');
 			var timer = function () {};
 
-			var options = draggable.find('.cms_submenu:eq(0)').add(draggable.find('.cms_switcher:eq(0)'));
-			var allOptions = draggables.find('.cms_submenu').add(draggables.find('.cms_switcher'));
+			var options = draggable.find('.cms_submenu:eq(0)');
+			var allOptions = draggables.find('.cms_submenu');
 
 			// PLUGIN EVENTS
 			plugin.bind('dblclick', function (e) {
@@ -442,7 +441,6 @@ $(document).ready(function () {
 				setTimeout(function () {
 					if(!$(e.currentTarget).data('active')) {
 						$(e.currentTarget).find('.cms_submenu:eq(0)').hide();
-						$(e.currentTarget).find('.cms_switcher:eq(0)').hide();
 					}
 				}, 100);
 			});
@@ -452,9 +450,6 @@ $(document).ready(function () {
 				e.stopPropagation();
 				that.movePlugin();
 			});
-
-			// attach id to cms switcher
-			dragitem.find('.cms_switcher:eq(0)').data('id', plugin.data('settings').plugin_id);
 		},
 
 		_setGeneric: function () {

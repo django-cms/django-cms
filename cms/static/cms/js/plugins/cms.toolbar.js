@@ -68,7 +68,6 @@ $(document).ready(function () {
 			this.messages = this.container.find('.cms_messages');
 			this.modal = this.container.find('.cms_modal');
 			this.tooltip = this.container.find('.cms_placeholders-tooltip');
-			this.menu = $('.cms_switcher');
 			this.bars = $('.cms_placeholder-bar');
 
 			this.plugins = $('.cms_plugin');
@@ -172,17 +171,6 @@ $(document).ready(function () {
 				that._stopSideframeResize();
 				that._endModalMove(e);
 				that._endModalResize(e);
-			});
-
-			// event for switching between edit and layout mode
-			this.menu.bind('click', function (e) {
-				e.stopPropagation();
-
-				// set active state
-				that.setActive($(this).data('id'));
-
-				// show e dit mode
-				that._enableEditMode(300);
 			});
 
 			this.modes.eq(0).bind('click', function (e) {
@@ -600,7 +588,6 @@ $(document).ready(function () {
 			this.bars.hide();
 			this.plugins.stop(true, true).fadeIn(speed);
 			this.placeholders.hide();
-			this.menu.hide().removeClass('cms_placeholders-menu-alternate');
 
 			// set active item
 			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
@@ -620,7 +607,6 @@ $(document).ready(function () {
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
 			this.placeholders.stop(true, true).fadeIn(speed);
-			this.menu.hide();
 
 			// set active item
 			this.modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
