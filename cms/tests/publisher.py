@@ -137,7 +137,7 @@ class PublishingTests(TestCase):
         with self.login_user_context(superuser):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk]))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], "http://testserver/en/?edit_off")
+            self.assertEqual(response['Location'], "http://testserver/?edit_off")
 
     def test_publish_single(self):
         name = self._testMethodName
@@ -690,3 +690,40 @@ class PublishingTests(TestCase):
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
 
+    def test_publish_child_page_slug(self):
+        """
+        This test asserts the correct path construction for child pages added to an unpublished home page
+        """
+        page_home = create_page("page_home", "nav_playground.html", "en")
+        page_internal = create_page("page_internal", "nav_playground.html", "en",
+                                    parent=page_home)
+        page_nephew = create_page("page_nephew", "nav_playground.html", "en",
+                                  parent=page_internal)
+
+        page_home = Page.objects.get(pk=page_home.pk)
+        page_internal = Page.objects.get(pk=page_internal.pk)
+        page_nephew = Page.objects.get(pk=page_nephew.pk)
+
+        page_home.publish()
+        page_internal.publish()
+        page_nephew.publish()
+
+        self.assertEqual(page_home.get_path("en"), "")
+        self.assertEqual(page_internal.get_path(), "page_internal")
+        self.assertEqual(page_nephew.get_path(), "page_internal/page_nephew")
+
+    def test_publish_nephew_page_slug(self):
+        """
+        This test asserts the correct path construction for child pages added to a published home page
+        """
+        page_home = create_page("page_home", "nav_playground.html", "en")
+        page_home.publish()
+        page_internal = create_page("page_internal", "nav_playground.html", "en", parent=page_home)
+        page_nephew = create_page("page_nephew", "nav_playground.html", "en", parent=page_internal)
+
+        page_internal.publish()
+        page_nephew.publish()
+
+        self.assertEqual(page_home.get_path("en"), "")
+        self.assertEqual(page_internal.get_path(), "page_internal")
+        self.assertEqual(page_nephew.get_path(), "page_internal/page_nephew")
