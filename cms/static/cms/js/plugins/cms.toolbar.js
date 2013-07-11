@@ -107,6 +107,9 @@ $(document).ready(function () {
 			var publishBtn = $('.cms_btn-publish').parent();
 				publishBtn.hide();
 			if($('.cms_btn-publish-active').length) publishBtn.show();
+
+			// add toolbar ready class to body
+			$('body').addClass('cms_toolbar-ready');
 		},
 
 		_load: function () {
