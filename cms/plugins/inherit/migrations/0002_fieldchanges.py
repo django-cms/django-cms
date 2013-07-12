@@ -34,13 +34,12 @@ class Migration:
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'slot': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'})
         },
-        'flash.flash': {
-            'Meta': {'object_name': 'Flash', 'db_table': "'cmsplugin_flash'", '_ormbases': ['cms.CMSPlugin']},
+        'inherit.inheritpageplaceholder': {
+            'Meta': {'object_name': 'InheritPagePlaceholder', 'db_table': "'cmsplugin_inheritpageplaceholder'", '_ormbases': ['cms.CMSPlugin']},
             'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'height': ('django.db.models.fields.CharField', [], {'max_length': '6'}),
-            'width': ('django.db.models.fields.CharField', [], {'max_length': '6'})
-        }
+            'from_language': ('django.db.models.fields.CharField', [], {'max_length': '5', 'null': 'True', 'blank': 'True'}),
+            'from_page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Page']", 'null': 'True', 'blank': 'True'})
+        },
     }
 
-    complete_apps = ['flash']
+    complete_apps = ['inherit']
