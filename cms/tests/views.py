@@ -116,11 +116,12 @@ class ViewTests(SettingsOverrideTestCase):
         response = details(request, '')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '%s?next=/en/' % settings.LOGIN_URL)
-        with SettingsOverride(USE_I18N=False):
+        with SettingsOverride(USE_I18N=False, LOGIN_URL='/accounts/?signin'):
             request = self.get_request('/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?next=/' % settings.LOGIN_URL)
+            self.assertTrue(response['Location'].find("?signin?next") == -1)
+            self.assertEqual(response['Location'], '%s=&next=/' % settings.LOGIN_URL)
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
