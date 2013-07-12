@@ -236,7 +236,7 @@ Example::
 
 	{% load cms_tags %}
 	<div class="multicolumn">
-	{% for plugin in instance.child_plugins %}
+	{% for plugin in instance.child_plugin_instances %}
 		<div style="width: {{ plugin.width }}00px;">
      		{% render_plugin plugin %}
 		</div>
