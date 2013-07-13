@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from cms.api import create_page
 from cms.cms_toolbar import CMSToolbar
+from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.toolbar.items import (Anchor, TemplateHTML, Switcher, List, ListItem, 
@@ -310,3 +311,18 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 4)
 
+    def test_toolbar_logout_no_page_permission(self):
+        root_page = create_page('test', 'nav_playground.html', 'en', published=True)
+        child_page = create_page(
+            'test2', 'nav_playground.html', 'en', published=True, parent=root_page,
+        )
+
+        # Protect page, so that only certain user can view it
+        PagePermission.objects.create(
+            page=child_page, can_view=True, user=self.get_nonstaff()
+        )
+
+        response = self.client.get('%s?cms-toolbar-logout' % child_page.get_absolute_url())
+        self.assertNotEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(settings.LOGIN_URL in response['Location'])
