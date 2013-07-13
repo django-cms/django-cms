@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
+from django.contrib.auth.views import redirect_to_login
 from cms.toolbar.base import Toolbar
 from cms.toolbar.constants import LEFT, RIGHT
 from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List,
@@ -235,6 +236,10 @@ class CMSToolbar(Toolbar):
         request = self.request
         if 'cms-toolbar-logout' in request.GET:
             logout(request)
+            # If request contains cms page, and user has no permission to view
+            # it, redirect him to login
+            if request.current_page and not request.current_page.has_view_permission(request):
+                return redirect_to_login(request.current_page.get_absolute_url())
             return HttpResponseRedirect(request.path)
 
     def _request_hook_post(self):
