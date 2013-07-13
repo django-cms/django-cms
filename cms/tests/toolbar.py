@@ -322,8 +322,10 @@ class ToolbarTests(ToolbarTestBase):
         # Protect page, so that only certain user can view it
         PagePermission.objects.create(page=child_page, can_view=True, user=self.get_nonstaff())
 
-        response = self.client.get('%s?cms-toolbar-logout' % child_page.get_absolute_url(), follow=True)
-        login_url = '/%s%s' % (get_language(), settings.LOGIN_URL)
-        self.assertEquals(response.request.get('PATH_INFO', ''), login_url)
+        response = self.client.get('%s?cms-toolbar-logout' % child_page.get_absolute_url())
+        self.assertNotEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response['Location'].find(settings.LOGIN_URL) > -1)
+        self.assertTrue(settings.LOGIN_URL in response['Location'])
 
 
