@@ -9,6 +9,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.plugins.utils import get_plugins_for_page
 from cms.plugins.file.models import File
@@ -18,13 +19,11 @@ from cms.plugins.link.models import Link
 from cms.plugins.picture.models import Picture
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
-from cms.plugins.twitter.models import TwitterRecentEntries
 from cms.test_utils.project.pluginapp.models import Article, Section
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel)
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, \
-    URL_CMS_PLUGIN_HISTORY_EDIT
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -176,7 +175,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEquals(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
-        expected =  {
+        expected = {
             "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
             "breadcrumb": [
                 {
@@ -340,6 +339,32 @@ class PluginsTestCase(PluginsTestBaseCase):
         # test subplugin copy
         copy_plugins_to([link_plugin_en], ph_de, 'de')
 
+    def test_deep_copy_plugins(self):
+        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        page_de = create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
+        ph_en = page_en.placeholders.get(slot="body")
+        ph_de = page_de.placeholders.get(slot="body")
+
+        # add the text plugin
+        mcol1 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+        mcol2 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+        col1 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        col2 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        col3 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
+        col4 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
+        mcol1 = add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")
+        # add a *nested* link plugin
+        link_plugin_en = add_plugin(ph_en, "LinkPlugin", "en", target=col2,
+                                    name="A Link", url="https://www.django-cms.org")
+        col2 = self.reload(col2)
+        copy_plugins_to([col2, link_plugin_en], ph_de, 'de', mcol1.pk)
+        col2 = self.reload(col2)
+        link_plugin_en = self.reload(link_plugin_en)
+        mcol1 = self.reload(mcol1)
+        self.assertEquals(mcol1.get_descendants().count(), 2)
+
+
+
     def test_remove_plugin_before_published(self):
         """
         When removing a draft plugin we would expect the public copy of the plugin to also be removed
@@ -491,12 +516,14 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         body = inheritfrompage.placeholders.get(slot="body")
 
-        plugin = TwitterRecentEntries(
-            plugin_type='TwitterRecentEntriesPlugin',
+        plugin = GoogleMap(
+            plugin_type='GoogleMapPlugin',
             placeholder=body,
             position=1,
             language=settings.LANGUAGE_CODE,
-            twitter_user='djangocms',
+            address="Riedtlistrasse 16",
+            zipcode="8006",
+            city="Zurich",
         )
         plugin.insert_at(None, position='last-child', save=True)
         inheritfrompage.publish()
@@ -520,7 +547,9 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.client.logout()
         response = self.client.get(page.get_absolute_url())
-        self.assertTrue('%scms/js/plugins/jquery.tweet.js' % settings.STATIC_URL in response.content.decode('utf8'), response.content)
+        self.assertTrue(
+            'https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true' in response.content.decode('utf8'),
+            response.content)
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = create_page('page to inherit from',

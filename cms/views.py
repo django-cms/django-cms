@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.contrib.auth.views import redirect_to_login
 from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
@@ -132,9 +133,7 @@ def details(request, slug):
 
     # permission checks
     if page.login_required and not request.user.is_authenticated():
-        path = urlquote(request.get_full_path())
-        tup = settings.LOGIN_URL, "next", path
-        return HttpResponseRedirect('%s?%s=%s' % tup)
+        return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
     # fill the context 
