@@ -262,9 +262,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             pop = push
 
         context_en = NoPushPopContext()
-        context_en['request'] = self.get_request(language="en")
+        context_en['request'] = self.get_request(language="en", page=page_en)
         context_de = NoPushPopContext()
-        context_de['request'] = self.get_request(language="de")
+        context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (non-fallback) behavior)
         ## English page should have the text plugin
