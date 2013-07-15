@@ -116,25 +116,25 @@ $(document).ready(function () {
 	{% with slot="clipbaord" %}
 	<!-- start: clipboard -->
 	<div class="cms_clipboard">
-		<ul class="cms_clipboard-triggers">
+		<div class="cms_clipboard-triggers">
 			<!-- maximum of 5 -->
 			<!-- delete link -->
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
 				{% if not plugin.parent_id %}
-				<li><a href="#">{{ forloop.index }}</a></li>
+				<div class="cms_clipboard-numbers"><a href="#">{{ forloop.index }}</a></div>
 				{% endif %}
 			{% endfor %}
-		</ul>
+		</div>
 		{% for plugin in request.toolbar.get_clipboard_plugins %}
 		<div class="cms_plugins">{% include "cms/toolbar/plugin.html" with instance=plugin %}</div>
 		{% endfor %}
-		<ul class="cms_clipboard-containers cms_draggables">
+		<div class="cms_clipboard-containers cms_draggables">
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
 				{% if forloop.counter <= 5 %}
 				{% with show_language="true" %}{% include "cms/toolbar/draggable_item.html" with plugin=plugin %}{% endwith %}
 				{% endif %}
 			{% endfor %}
-		</ul>
+		</div>
 		<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>{% trans "Empty Clipboard" %}</a></p>
 	</div>
 	<!-- end: clipboard -->
