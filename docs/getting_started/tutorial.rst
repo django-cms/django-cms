@@ -72,8 +72,8 @@ other highly recommended applications/libraries:
 * ``'menus'``, helper for model independent hierarchical website navigation
 * ``'south'``, intelligent schema and data migrations
 * ``'sekizai'``, for javascript and css management
-* ``'django_admin_style'``, for the admin skin. You **must** add
-  ``'django_admin_style'`` in the list before ``'django.contrib.admin'``.
+* ``'djangocms_admin_style'``, for the admin skin. You **must** add
+  ``'djangocms_admin_style'`` in the list before ``'django.contrib.admin'``.
 
 
 Also add any (or all) of the following plugins, depending on your needs:
