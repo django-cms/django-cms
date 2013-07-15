@@ -5,6 +5,7 @@ from cms.models.moderatormodels import (ACCESS_DESCENDANTS,
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
+from cms.models.pagemodel import Page
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_page_queryset, get_title_queryset
@@ -16,6 +17,39 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db.models.query_utils import Q
 from django.contrib.auth.models import Permission
+
+
+def _pages_to_dict(pages):
+    """
+        Builds a dict with page ids as keys and list of children ids as values
+    """
+    # make sure all pages are present as keys
+    pages_with_children = defaultdict(list)
+    for page in pages:
+        # set page as key
+        pages_with_children[page.id]
+        # if page has parent add page to parent's list of children
+        parent_id = page.parent_id
+        # parent might not be published
+        if parent_id and parent_id in pages_with_children:
+            pages_with_children[parent_id].append(page.id)
+
+    return pages_with_children
+
+
+def _get_descendants(pages_dict, page_ids):
+    """
+        Returnes all descendants for a list of pages using a page dict
+            built with _pages_to_dict method.
+    """
+    result = []
+    for page_id in page_ids:
+        result.append(page_id)
+        value = pages_dict.get(page_id, None)
+        if value:
+            result.extend(_get_descendants(pages_dict, value))
+    return result
+
 
 def get_visible_pages(request, pages, site=None):
     """
@@ -30,47 +64,63 @@ def get_visible_pages(request, pages, site=None):
     is_auth_user = request.user.is_authenticated()
 
     visible_page_ids = []
-    restricted_pages = defaultdict(list)
-    pages_perms_q = Q()
+    pages_with_children = _pages_to_dict(pages)
 
-    for page in pages:
-        # taken from for_page as multiple at once version
-        page_q = Q(page__tree_id=page.tree_id) & (
-            Q(page=page)
-            | (Q(page__level__lt=page.level)  & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS)))
-            | (Q(page__level=page.level - 1) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)))
-        )
-        pages_perms_q |= page_q
+    access_for_page = [ACCESS_PAGE]
+    access_for_children = [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]
+    access_for_desc = [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]
+    perms_to_collect = access_for_page + access_for_children + access_for_desc
 
+    # we'll get permission's user, group and users that belog to group just
+    #       so we save time executing more queries
+    perms_with_data = Page.objects.filter(
+        id__in=[p.id for p in pages]).prefetch_related(
+            'pagepermission', 'pagepermission__user', 'pagepermission__group',
+            'pagepermission__group__user').filter(
+                pagepermission__can_view=True,
+                pagepermission__grant_on__in=perms_to_collect).values_list(
+                    'id', 'pagepermission__id', 'pagepermission__grant_on',
+                    'pagepermission__user_id', 'pagepermission__group_id',
+                    'pagepermission__group__user__id'
+                    )
 
-    pages_perms_q &= Q(can_view=True)
-    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
+    # separate data from the values returned by the query
+    perm_data = defaultdict(dict)
+    for data in perms_with_data:
+        page_id, perm_id, grant_on, user_id, group_id, user_from_group_id = data
+        perm_data[perm_id].setdefault('grant_on', grant_on)
+        perm_data[perm_id].setdefault('user_id', user_id)
+        perm_data[perm_id].setdefault('page_id', page_id)
+        group = perm_data[perm_id].setdefault('group_id', [])
+        group.append(user_from_group_id) if user_from_group_id else ''
 
-    for perm in page_permissions:
-        # collect the pages that are affected by permissions
-        if perm is not None and perm not in restricted_pages[perm.page.pk]:
-            # affective restricted pages gathering
-            # using mptt functions
-            # add the page with the perm itself
-            if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN ,ACCESS_PAGE_AND_DESCENDANTS]:
-                restricted_pages[perm.page.pk].append(perm)
-            # add children
-            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]:
-                child_ids = perm.page.get_children().values_list('id', flat=True)
-                for id in child_ids:
-                    restricted_pages[id].append(perm)
-            # add descendants
-            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]:
-                child_ids = perm.page.get_descendants().values_list('id', flat=True)
-                for id in child_ids:
-                    restricted_pages[id].append(perm)
+    access_for_page += [ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS]
+    restricted = defaultdict(list)
+    for perm_id, data in perm_data.items():
+        page_id, grant_on = data['page_id'], data['grant_on']
+        # won't append it multiple times for the descendant/child pages
+        if perm_id in restricted[page_id]:
+            continue
+        if grant_on in access_for_page:
+            restricted[page_id].append(perm_id)
+
+        children = []
+        if grant_on in access_for_children:
+            # set permision to children
+            children = pages_with_children[page_id]
+        elif grant_on in access_for_desc:
+            # set permission for descendants
+            children = pages_with_children[page_id]
+            children.extend(_get_descendants(pages_with_children, children))
+        for child_id in children:
+            restricted[child_id].append(perm_id)
+
     # anonymous
     # no restriction applied at all
     if (not is_auth_user and
         is_setting_public_all and
-        not restricted_pages):
-        return [page.pk for page in pages]
-
+        not restricted):
+        return pages_with_children.keys()
 
     if site is None:
         site = current_site(request)
@@ -85,16 +135,15 @@ def get_visible_pages(request, pages, site=None):
         #no page perms edgcase - all visible
         if ((is_setting_public_all or (
             is_setting_public_staff and request.user.is_staff))and
-            not restricted_pages and
+            not restricted and
             not global_view_perms):
-            return [page.pk for page in pages]
+            return pages_with_children.keys()
         #no page perms edgcase - none visible
         elif (is_setting_public_staff and
             not request.user.is_staff and
-            not restricted_pages and
+            not restricted and
             not global_view_perms):
             return []
-
 
     def has_global_perm():
         if has_global_perm.cache < 0:
@@ -102,30 +151,29 @@ def get_visible_pages(request, pages, site=None):
         return bool(has_global_perm.cache)
     has_global_perm.cache = -1
 
-    def has_permission_membership(page):
+    def has_permission_membership(page_id):
         """
         PagePermission user group membership tests
         """
-        user_pk = request.user.pk
-        page_pk = page.pk
+        user_id = request.user.pk
+        page_id = page_id
         has_perm = False
-        for perm in restricted_pages[page_pk]:
-            if perm.user_id == user_pk:
+        for perm_id in restricted[page_id]:
+            if perm_data[perm_id]['user_id'] == user_id:
                 has_perm = True
-            if not perm.group_id:
+            if not perm_data[perm_id]['group_id']:
                 continue
-            group_user_ids = perm.group.user_set.values_list('pk', flat=True)
-            if user_pk in group_user_ids:
+            if user_id in perm_data[perm_id]['group_id']:
                 has_perm = True
         return has_perm
 
-    for page in pages:
+    for page_id in pages_with_children.keys():
         to_add = False
         # default to false, showing a restricted page is bad
         # explicitly check all the conditions
         # of settings and permissions
-        is_restricted = page.pk in restricted_pages
-        # restricted_pages contains as key any page.pk that is
+        is_restricted = page_id in restricted
+        # restricted contains as key any page.pk that is
         # affected by a permission grant_on
         if is_auth_user:
             # a global permission was given to the request's user
@@ -141,7 +189,7 @@ def get_visible_pages(request, pages, site=None):
                 # authenticated staff user, no restriction and public for staff
                 to_add = True
             # check group and user memberships to restricted pages
-            elif is_restricted and has_permission_membership(page):
+            elif is_restricted and has_permission_membership(page_id):
                 to_add = True
             elif has_global_perm():
                 to_add = True
@@ -150,8 +198,9 @@ def get_visible_pages(request, pages, site=None):
             to_add = True
         # store it
         if to_add:
-            visible_page_ids.append(page.pk)
+            visible_page_ids.append(page_id)
     return visible_page_ids
+
 
 def page_to_node(page, home, cut):
     '''
@@ -221,19 +270,17 @@ def page_to_node(page, home, cut):
 
 class CMSMenu(Menu):
 
-    page_level = getattr(settings, 'CMS_MENU_PAGE_LEVEL', 2)
-
     def get_nodes(self, request):
         site = Site.objects.get_current()
         lang = get_language_from_request(request)
         fallbacks = get_fallback_languages(lang)
 
-        filters = {'site': site, 'level__lte': CMSMenu.page_level}
+        filters = {'site': site}
         if settings.CMS_HIDE_UNTRANSLATED:
             filters['title_set__language'] = lang
 
-        pages = get_page_queryset(request).published().filter(**filters).\
-            order_by("tree_id", "lft").select_related('title_set', 'site')
+        pages = list(get_page_queryset(request).published().filter(**filters).\
+            order_by("tree_id", "lft"))
 
         nodes, first, home_cut, home = [], True, False, None
 

@@ -874,13 +874,10 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             user.save()
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            page.level = 0
-            page.tree_id = 1
+            page = create_page('p1', 'nav_playground.html', 'en')
             pages = [page]
             result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
+            self.assertEqual(result, [page.id])
     
     def test_authed_basic_perm_num_queries(self):
         site = Site()
@@ -892,10 +889,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             user.save()
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            page.level = 0
-            page.tree_id = 1
+            page = create_page('p1', 'nav_playground.html', 'en')
             pages = [page]
             with self.assertNumQueries(2):
                 """
@@ -1005,7 +999,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, group=group, page=page)
             pages = [page]
-            with self.assertNumQueries(3):
+            with self.assertNumQueries(2):
                 """
                 The queries are:
                 PagePermission query for affected pages
