@@ -71,7 +71,7 @@ $(document).ready(function () {
 			$.each(states, function (index, id) {
 				var el = $('#cms_draggable-' + id);
 					el.find('> .cms_draggables').hide();
-					el.find('> div').addClass('cms_dragitem-collapsed');
+					el.find('> .cms_dragitem').addClass('cms_dragitem-collapsed');
 			});
 		},
 
@@ -405,7 +405,7 @@ $(document).ready(function () {
 			});
 
 			plugin.bind('mousedown mouseup mousemove', function (e) {
-				e.stopPropagation();
+				if(e.type !== 'mousemove') e.stopPropagation();
 
 				if(e.type === 'mousedown') {
 					// start countdown
