@@ -9,7 +9,7 @@
 
 //######################################################################################################################
 // #PLACEHOLDER
-.cms_placeholder { padding:5px 5px 0.1px; @include border-radius(3px); background:$color-grey-70; }
+.cms_placeholder { padding:5px 5px 0.1px; margin:0 0 5px; @include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
 .cms_plugin { display:inline; position:relative; }
 .cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
@@ -40,15 +40,15 @@
 		border:1px solid $color-grey-10; background:white;
 		@include box-shadow(0 2px 2px $color-grey-10);
 
-		li { zoom:1; }
-		li a, span { display:block; font-size:12px; line-height:15px; text-align:left; padding:4px 8px 3px 8px; }
+		.cms_submenu-item { zoom:1; }
+		.cms_submenu-item a, span { display:block; font-size:12px; line-height:15px; text-align:left; padding:4px 8px 3px 8px; }
 
-		li a { color:black;
+		.cms_submenu-item a { color:black;
 			&:hover { color:white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
 			&:first-child { border-top:none; } }
-		li span { cursor:default; font-weight:bold; color:black;
+		.cms_submenu-item span { cursor:default; font-weight:bold; color:black;
 			border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }
-		li:first-child span { border-top:none; }
+		.cms_submenu-item:first-child span { border-top:none; }
 	}
 
 	.cms_submenu-quicksearch { display:none; position:absolute; right:-5px; top:-5px; z-index:1000;

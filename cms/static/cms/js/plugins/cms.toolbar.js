@@ -992,13 +992,13 @@ $(document).ready(function () {
 
 		_setModalButtons: function (iframe) {
 			var that = this;
-			var row = iframe.contents().find('.submit-row');
+			var row = iframe.contents().find('.submit-row:eq(0)');
 			var buttons = row.find('input, a');
-			var render = $('<span />');
+			var render = $('<span />'); // seriously jquery...
 
 			// if there are no buttons, try again
 			if(!buttons.length) {
-				row = iframe.contents().find('form');
+				row = iframe.contents().find('form:eq(0)');
 				buttons = row.find('input[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
@@ -1007,6 +1007,11 @@ $(document).ready(function () {
 			} else {
 				this.enforceReload = false;
 			}
+
+			// attach relation id
+			buttons.each(function (index, item) {
+				$(item).attr('data-rel', '_' + index);
+			});
 
 			// loop over input buttons
 			buttons.each(function (index, item) {
@@ -1019,18 +1024,15 @@ $(document).ready(function () {
 				var title = item.attr('value') || item.text();
 				var cls = 'cms_btn';
 
-				// set additional css classes
+				// set additional special css classes
 				if(item.hasClass('default')) cls = 'cms_btn cms_btn-action';
 				if(item.hasClass('deletelink')) cls = 'cms_btn cms_btn-caution';
 
 				// create the element
-				var el = $('<div class="'+cls+'" data-name="'+item.attr('name')+'" data-url="'+item.attr('href')+'">'+title+'</div>');
+				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind('click', function () {
-						var input = row.find('input[name="'+$(this).attr('data-name')+'"]');
-						if(input.length) input.click();
-
-						var anchor = row.find('a[href="'+$(this).attr('data-url')+'"]');
-						if(anchor.length) iframe.attr('src', anchor.attr('href'));
+						if(item.is('input')) item.click();
+						if(item.is('anchor')) iframe.attr('src', item.attr('href'));
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
