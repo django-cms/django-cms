@@ -404,7 +404,7 @@ $(document).ready(function () {
 			this.setSettings();
 		},
 
-		openMessage: function (msg, dir, error, delay) {
+		openMessage: function (msg, dir, delay, error) {
 			// set toolbar freeze
 			this.lockToolbar = true;
 
@@ -416,7 +416,7 @@ $(document).ready(function () {
 
 			// determine width
 			var that = this;
-			var width = this.messages.outerWidth(true);
+			var width = 320;
 			var height = this.messages.outerHeight(true);
 			var top = this.toolbar.outerHeight(true);
 			var close = this.messages.find('.cms_messages-close');
@@ -442,21 +442,26 @@ $(document).ready(function () {
 				case 'left':
 					this.messages.css({
 						'top': top,
-						'left': -width
+						'left': -width,
+						'right': 'auto',
+						'margin-left': 0
 					});
 					this.messages.animate({ 'left': 0 });
 					break;
 				case 'right':
 					this.messages.css({
 						'top': top,
-						'right': -width
+						'right': -width,
+						'left': 'auto',
+						'margin-left': 0
 					});
 					this.messages.animate({ 'right': 0 });
 					break;
 				default:
 					this.messages.css({
 						'left': '50%',
-						'margin-left': -(320 / 2)
+						'right': 'auto',
+						'margin-left': -(width / 2)
 					});
 					this.messages.animate({ 'top': top });
 			}
@@ -1130,7 +1135,7 @@ $(document).ready(function () {
 		},
 
 		showError: function (msg) {
-			this.openMessage(msg, 'center', true);
+			this.openMessage(msg, 'center', this.options.messageDelay, true);
 		}
 
 	});
