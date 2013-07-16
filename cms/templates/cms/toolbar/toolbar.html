@@ -41,17 +41,20 @@ $(document).ready(function () {
 		}
 	});
 
-
-
 	// initialize placeholder helpers
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
 
+	// open django messages if provided
 	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
 
-	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated  %}
+	// special message for published status
+	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}
 	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'center');
 	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
 	{% endif %}
+
+	// ensure toolbar is shown when not logged in
+	{% if not user.is_authenticated %}CMS.API.Toolbar._showToolbar(0);{% endif %}
 });
 })(CMS.$);
 </script>
