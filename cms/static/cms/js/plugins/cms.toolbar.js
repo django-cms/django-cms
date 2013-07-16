@@ -44,7 +44,8 @@ $(document).ready(function () {
 					'url': null,
 					'hidden': false,
 					'maximized': false
-				}
+				},
+				'position': null
 			}
 		},
 
@@ -606,6 +607,9 @@ $(document).ready(function () {
 			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
 			this.settings.mode = 'edit';
 
+			// set correct position
+			$('body').scrollTop(this.settings.position || 0);
+
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
 
@@ -613,6 +617,9 @@ $(document).ready(function () {
 		},
 
 		_enableDragMode: function (speed, init) {
+			// we need to save the position first
+			this.settings.position = $('body').scrollTop();
+
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
 			this.placeholders.stop(true, true).fadeIn(speed);
