@@ -49,7 +49,7 @@ $(document).ready(function () {
 
 	// special message for published status
 	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}
-	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'center');
+	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'right');
 	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
 	{% endif %}
 
