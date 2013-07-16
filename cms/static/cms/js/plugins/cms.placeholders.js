@@ -406,7 +406,7 @@ $(document).ready(function () {
 			plugin.bind('mousedown mouseup mousemove', function (e) {
 				if(e.type !== 'mousemove') e.stopPropagation();
 
-				if(e.type === 'mousedown') {
+				if(e.type === 'mousedown' && (e.which !== 3 || e.button !== 2)) {
 					// start countdown
 					timer = setTimeout(function () {
 						CMS.API.Toolbar._enableDragMode(300);
