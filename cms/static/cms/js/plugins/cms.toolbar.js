@@ -604,10 +604,6 @@ $(document).ready(function () {
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
 
-			// set active element to online block
-			var active = this.plugins.filter('.cms_plugin-active');
-				active.css('display', 'inline-block');
-
 			if(!init) this.setSettings();
 		},
 
