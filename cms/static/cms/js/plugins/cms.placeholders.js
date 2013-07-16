@@ -363,7 +363,6 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
-			this.keyBound = 1;
 
 			// bind data element to the container
 			this.container.data('settings', this.options);
@@ -628,8 +627,7 @@ $(document).ready(function () {
 				}
 				if(e.type === 'keyup') {
 					clearTimeout(that.timer);
-					// cancel if we have less than x keys
-					if($(this).val().length < that.keyBound) return false;
+					// keybound is not required
 					that.timer = setTimeout(function () {
 						that._searchSubnav(nav, $(e.currentTarget).val());
 					}, 100);
@@ -690,6 +688,35 @@ $(document).ready(function () {
 
 				(text.indexOf(search) >= 0 || search === '') ? $(this).parent().show() : $(this).parent().hide();
 			});
+
+			// show all titles
+			nav.find('.cms_submenu-item-title').show();
+
+			// cancel here if there is no value
+			if(value === '') return false;
+
+			// check if any title should be hidden
+			nav.find('.cms_submenu-item').each(function (index, item) {
+				item = $(item);
+				// check if we have a title
+				var title = item.find('span');
+				if(title.length) {
+					var entries = item.nextUntil('.cms_submenu-item-title');
+
+					if(entries.filter(':visible').length === 0) {
+						title.parent().hide();
+					} else {
+						title.parent().show();
+					}
+				}
+			});
+
+			console.log(nav.find('.cms_submenu-item-title').filter(':visible').length);
+
+			// check for empty entries
+			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
+				nav.find('.cms_submenu-item-title:eq(0)').show();
+			}
 		},
 
 		_getId: function (el) {
