@@ -45,7 +45,7 @@ class ExtensionsTestCase(CMSTestCase):
         extension_pool.unregister(page_extension)
         self.assertEqual(len(extension_pool.page_extensions), 0)
 
-        extension_pool.register(title_extension)
+        extension_pool.unregister(title_extension)
         self.assertEqual(len(extension_pool.title_extensions), 0)
 
     def get_page_extension_class(self):

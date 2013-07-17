@@ -26,6 +26,11 @@ class ExtensionPool(object):
         self._activate_signaling()
 
     def unregister(self, extension):
+        """
+        Unregisters the given extension. No error is thrown if given extension isn't an extension or wasn't
+        registered yet.
+        """
+
         try:
             if issubclass(extension, PageExtension):
                 self.page_extensions.remove(extension)
