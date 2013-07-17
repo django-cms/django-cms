@@ -304,7 +304,6 @@ class PlaceholderTestCase(CMSTestCase):
             for placeholder in page.placeholders.all():
                 self.assertContains(response, "'placeholder_id': '%s'" % placeholder.pk)
                 self.assertNotContains(response, "'placeholder_id': '%s'" % format(placeholder.pk, ".", grouping=3, thousand_sep=","))
-            print response
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     def test_placeholder_no_action(self):
