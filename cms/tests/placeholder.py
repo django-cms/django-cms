@@ -284,6 +284,16 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
 
+    def test_thousands_placeholder(self):
+        for x in xrange(2000):
+            Placeholder.objects.create(slot="name%s" % x)
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+            # Superuser
+            user = self.get_superuser()
+            self.client.login(username=user.username, password=user.username)
+            response = self.client.get("/en/?edit")
+            self.assertContains(response, "'placeholder_id': '2002'")
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     def test_placeholder_no_action(self):
