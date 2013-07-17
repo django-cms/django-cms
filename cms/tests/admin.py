@@ -20,6 +20,7 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 import django
 from django.contrib import admin
+from django.db.models import Max
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission, AnonymousUser
@@ -795,6 +796,26 @@ class AdminTests(AdminTestsBase):
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+
+    def test_thousands_format_in_admin(self):
+        page = self.get_page()
+        for placeholder in page.placeholders.all():
+            page.placeholders.remove(placeholder)
+            placeholder.pk += 1000
+            placeholder.save()
+            page.placeholders.add(placeholder)
+        page.reload()
+        for placeholder in page.placeholders.all():
+            plugin = add_plugin(placeholder, "TextPlugin", "en", body="body",
+                                id=placeholder.pk)
+        admin = self.get_admin()
+        url = reverse('admin:cms_page_change', args=(page.pk,))
+        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+            with self.login_user_context(admin):
+                response = self.client.get(url)
+                for placeholder in page.placeholders.all():
+                    self.assertContains(response, "placeholder_element.data('id', %s);" % placeholder.pk)
+                    self.assertContains(response, 'id="plugin_%s' % placeholder.pk)
 
 
 class NoDBAdminTests(CMSTestCase):
