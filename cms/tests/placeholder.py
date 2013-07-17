@@ -284,7 +284,7 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
 
-    def test_thousands_placeholder(self):
+    def test_placeholder_pk_thousands_format(self):
         for x in xrange(2000):
             Placeholder.objects.create(slot="name%s" % x)
         page = create_page("page", "nav_playground.html", "en", published=True)
