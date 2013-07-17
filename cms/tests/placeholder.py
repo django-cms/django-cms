@@ -293,7 +293,8 @@ class PlaceholderTestCase(CMSTestCase):
             user = self.get_superuser()
             self.client.login(username=user.username, password=user.username)
             response = self.client.get("/en/?edit")
-            self.assertContains(response, "'placeholder_id': '2002'")
+            for placeholder in page.placeholders.all():
+                self.assertContains(response, "'placeholder_id': '%s'" % placeholder.pk)
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     def test_placeholder_no_action(self):
