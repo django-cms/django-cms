@@ -19,35 +19,37 @@ from django.db.models.query_utils import Q
 from django.contrib.auth.models import Permission
 
 
-def _pages_to_dict(pages):
+def _ordered_pages_to_dict(pages, initial_pks):
     """
         Builds a dict with page ids as keys and list of children ids as values
+        This must be called with a list of pages already
+            ordered by "tree_id", "lft".
     """
     # make sure all pages are present as keys
-    pages_with_children = defaultdict(list)
+    page_with_children = defaultdict(list)
     for page in pages:
         # set page as key
-        pages_with_children[page.id]
+        page_with_children[page.id] = []
         # if page has parent add page to parent's list of children
         parent_id = page.parent_id
         # parent might not be published
-        if parent_id and parent_id in pages_with_children:
-            pages_with_children[parent_id].append(page.id)
+        if parent_id and parent_id in initial_pks:
+            page_with_children[parent_id].append(page.id)
 
-    return pages_with_children
+    return page_with_children
 
 
-def _get_descendants(pages_dict, page_ids):
+def _get_descendants(page_dict, page_ids):
     """
         Returnes all descendants for a list of pages using a page dict
-            built with _pages_to_dict method.
+            built with _ordered_pages_to_dict method.
     """
     result = []
     for page_id in page_ids:
         result.append(page_id)
-        value = pages_dict.get(page_id, None)
-        if value:
-            result.extend(_get_descendants(pages_dict, value))
+        children_ids = page_dict.get(page_id, None)
+        if children_ids:
+            result.extend(_get_descendants(page_dict, children_ids))
     return result
 
 
@@ -64,7 +66,8 @@ def get_visible_pages(request, pages, site=None):
     is_auth_user = request.user.is_authenticated()
 
     visible_page_ids = []
-    pages_with_children = _pages_to_dict(pages)
+    initial_pks = set(p.id for p in pages)
+    page_with_children = _ordered_pages_to_dict(pages, initial_pks)
 
     access_for_page = [ACCESS_PAGE]
     access_for_children = [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]
@@ -73,45 +76,40 @@ def get_visible_pages(request, pages, site=None):
 
     # we'll get permission's user, group and users that belog to group just
     #       so we save time executing more queries
-    perms_with_data = Page.objects.filter(
-        id__in=[p.id for p in pages]).prefetch_related(
-            'pagepermission', 'pagepermission__user', 'pagepermission__group',
-            'pagepermission__group__user').filter(
-                pagepermission__can_view=True,
-                pagepermission__grant_on__in=perms_to_collect).values_list(
-                    'id', 'pagepermission__id', 'pagepermission__grant_on',
-                    'pagepermission__user_id', 'pagepermission__group_id',
-                    'pagepermission__group__user__id'
-                    )
+    page_ids_and_permissions = PagePermission.objects.filter(
+            page_id__in=initial_pks,
+            can_view=True,
+            grant_on__in=perms_to_collect).values_list(
+                'page_id', 'id', 'grant_on', 'user_id', 'group_id',
+                'group__user')
 
     # separate data from the values returned by the query
-    perm_data = defaultdict(dict)
-    for data in perms_with_data:
+    permissions = defaultdict(dict)
+    for data in page_ids_and_permissions:
         page_id, perm_id, grant_on, user_id, group_id, user_from_group_id = data
-        perm_data[perm_id].setdefault('grant_on', grant_on)
-        perm_data[perm_id].setdefault('user_id', user_id)
-        perm_data[perm_id].setdefault('page_id', page_id)
-        group = perm_data[perm_id].setdefault('group_id', [])
+        permissions[perm_id]['grant_on'] = grant_on
+        permissions[perm_id]['user_id'] = user_id
+        permissions[perm_id]['page_id'] = page_id
+        group = permissions[perm_id].setdefault('group_id', [])
         group.append(user_from_group_id) if user_from_group_id else ''
+
 
     access_for_page += [ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS]
     restricted = defaultdict(list)
-    for perm_id, data in perm_data.items():
+    for perm_id, data in permissions.items():
         page_id, grant_on = data['page_id'], data['grant_on']
-        # won't append it multiple times for the descendant/child pages
-        if perm_id in restricted[page_id]:
-            continue
+
         if grant_on in access_for_page:
             restricted[page_id].append(perm_id)
 
         children = []
         if grant_on in access_for_children:
             # set permision to children
-            children = pages_with_children[page_id]
+            children = page_with_children[page_id]
         elif grant_on in access_for_desc:
             # set permission for descendants
-            children = pages_with_children[page_id]
-            children.extend(_get_descendants(pages_with_children, children))
+            children = page_with_children[page_id]
+            children.extend(_get_descendants(page_with_children, children))
         for child_id in children:
             restricted[child_id].append(perm_id)
 
@@ -120,7 +118,8 @@ def get_visible_pages(request, pages, site=None):
     if (not is_auth_user and
         is_setting_public_all and
         not restricted):
-        return pages_with_children.keys()
+        assert set(page_with_children.keys()) == initial_pks
+        return page_with_children.keys()
 
     if site is None:
         site = current_site(request)
@@ -137,7 +136,8 @@ def get_visible_pages(request, pages, site=None):
             is_setting_public_staff and request.user.is_staff))and
             not restricted and
             not global_view_perms):
-            return pages_with_children.keys()
+            assert set(page_with_children.keys()) == initial_pks
+            return page_with_children.keys()
         #no page perms edgcase - none visible
         elif (is_setting_public_staff and
             not request.user.is_staff and
@@ -159,15 +159,16 @@ def get_visible_pages(request, pages, site=None):
         page_id = page_id
         has_perm = False
         for perm_id in restricted[page_id]:
-            if perm_data[perm_id]['user_id'] == user_id:
+            if permissions[perm_id]['user_id'] == user_id:
                 has_perm = True
-            if not perm_data[perm_id]['group_id']:
+            if not permissions[perm_id]['group_id']:
                 continue
-            if user_id in perm_data[perm_id]['group_id']:
+            if user_id in permissions[perm_id]['group_id']:
                 has_perm = True
         return has_perm
 
-    for page_id in pages_with_children.keys():
+    assert set(page_with_children.keys()) == initial_pks
+    for page_id in page_with_children.keys():
         to_add = False
         # default to false, showing a restricted page is bad
         # explicitly check all the conditions
@@ -289,9 +290,9 @@ class CMSMenu(Menu):
         titles = get_title_queryset(request).filter(
             page__in=visible_pages,
             language__in=fallbacks + [lang])
-        id_to_titles = defaultdict(dict)
+        page_id_to_titles = defaultdict(dict)
         for title in titles:
-            id_to_titles[title.page_id][title.language] = title
+            page_id_to_titles[title.page_id][title.language] = title
 
         for page in pages:
             # Pages are ordered by tree_id, therefore the first page is the root
@@ -308,7 +309,7 @@ class CMSMenu(Menu):
 
             page.title_cache = getattr(page, 'title_cache', {})
             # add the title and slugs and some meta data
-            lang_to_titles = id_to_titles[page.id]
+            lang_to_titles = page_id_to_titles[page.id]
             if lang in lang_to_titles:
                 title = lang_to_titles[lang]
                 page.title_cache[title.language] = title
