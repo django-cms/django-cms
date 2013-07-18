@@ -84,7 +84,7 @@ to the toolbar::
             if self.is_current_app:
                 menu = self.toolbar.get_or_create_menu('poll-app', _('Polls'))
                 url = reverse('admin:polls_poll_changelist')
-                menu.add_sideframe_item(_('Poll overview'), url=url))=
+                menu.add_sideframe_item(_('Poll overview'), url=url)
 
 
 However, there's already a menu added by the CMS which provides access to
