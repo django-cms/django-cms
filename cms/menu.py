@@ -5,7 +5,6 @@ from cms.models.moderatormodels import (ACCESS_DESCENDANTS,
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
-from cms.models.pagemodel import Page
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_page_queryset, get_title_queryset
