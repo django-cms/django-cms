@@ -28,10 +28,12 @@ from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_M
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
+from django import http
 from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
@@ -49,6 +51,19 @@ class DumbFixturePlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         return context
+
+
+class DumbFixturePluginWithUrls(DumbFixturePlugin):
+    name = DumbFixturePlugin.name + " With custom URLs."
+
+    def test_view(self, request):
+        return http.HttpResponse("It works")
+
+    def get_plugin_url(self):
+        from django.conf.urls.defaults import patterns, url
+        return patterns('',
+            url(r'^testview/$', admin.site.admin_view(self.test_view), name='dumbfixtureplugin'),
+        )
 
 
 class PluginsTestBaseCase(CMSTestCase):
@@ -878,6 +893,16 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_pool.unregister_plugin(ReloadDrivenPlugin)
         plugin_pool.unregister_plugin(NonReloadDrivenPlugin)
 
+    def test_custom_plugin_urls(self):
+        plugin_pool.register_plugin(DumbFixturePluginWithUrls)
+
+        plugin_url = urlresolvers.reverse('dumbfixtureplugin')
+
+        response = self.client.get(plugin_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.content, "It works")
+
+        plugin_pool.unregister_plugin(DumbFixturePluginWithUrls)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):
