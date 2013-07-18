@@ -269,7 +269,6 @@ class PlaceholderTestCase(CMSTestCase):
             user = self.get_superuser()
             self.client.login(username=user.username, password=user.username)
             response = self.client.get("/en/?edit")
-            #print response
             for placeholder in page.placeholders.all():
                 self.assertContains(response, "'placeholder_id': '%s'" % placeholder.pk)
                 self.assertNotContains(response, "'placeholder_id': '%s'" % format(placeholder.pk, ".", grouping=3, thousand_sep=","))
