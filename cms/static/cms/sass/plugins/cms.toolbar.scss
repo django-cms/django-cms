@@ -25,7 +25,7 @@
 
 #cms_toolbar { position:absolute; left:0; top:0; z-index:9999999; width:100%; }
 #cms_toolbar {
-	.cms_toolbar { position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
+	.cms_toolbar { display:none; position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
 		border-bottom:1px solid $color-grey !important; background:$color-grey-5;
 		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
 
@@ -328,6 +328,7 @@
 		padding:3px 0 0 0;
 
 		label { float:left; cursor:pointer; padding-left:10px; }
+		label span { padding-top:1px; @include inline-block(); }
 		input[type="text"], input[type="password"] { font-size:13px; line-height:13px; width:100px;
 			padding:3px 5px; margin:0; @include border-radius(3px);
 			color:$color-grey; border:1px solid lighten($color-grey, 45%);

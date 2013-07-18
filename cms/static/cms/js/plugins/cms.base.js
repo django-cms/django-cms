@@ -43,7 +43,10 @@ $(document).ready(function () {
 		// disable multiple form submissions
 		preventSubmit: function () {
 			$('form').submit(function () {
-				$('input[type="submit"]').attr('disabled', 'disabled');
+				// we cannot use disabled as the name action will be ignored
+				$('input[type="submit"]').bind('click', function (e) {
+					e.preventDefault();
+				}).css('opacity', 0.5);
 			});
 		},
 
