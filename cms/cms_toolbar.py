@@ -12,6 +12,8 @@ from cms.utils.permissions import get_user_sites_queryset, has_page_change_permi
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import admin
+from django.contrib.auth.models import User
 from menus.utils import DefaultLanguageChanger
 
 
@@ -61,7 +63,7 @@ class BasicToolbar(CMSToolbar):
 
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
-        if self.request.user.has_perm('user.change_user'):
+        if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
             admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
             # sites menu
         if get_cms_setting('PERMISSION'):
