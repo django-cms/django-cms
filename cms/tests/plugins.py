@@ -59,11 +59,12 @@ class DumbFixturePluginWithUrls(DumbFixturePlugin):
     def test_view(self, request):
         return http.HttpResponse("It works")
 
-    def get_plugin_url(self):
+    def get_plugin_urls(self):
         from django.conf.urls.defaults import patterns, url
         return patterns('',
             url(r'^testview/$', admin.site.admin_view(self.test_view), name='dumbfixtureplugin'),
         )
+plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 
 class PluginsTestBaseCase(CMSTestCase):
@@ -894,15 +895,11 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_pool.unregister_plugin(NonReloadDrivenPlugin)
 
     def test_custom_plugin_urls(self):
-        plugin_pool.register_plugin(DumbFixturePluginWithUrls)
-
-        plugin_url = urlresolvers.reverse('dumbfixtureplugin')
+        plugin_url = urlresolvers.reverse('admin:dumbfixtureplugin')
 
         response = self.client.get(plugin_url)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.content, "It works")
-
-        plugin_pool.unregister_plugin(DumbFixturePluginWithUrls)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):
