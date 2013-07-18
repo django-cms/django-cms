@@ -118,6 +118,8 @@ class PluginPool(object):
         return self.plugins[name]
     
     def get_patterns(self):
+        self.discover_plugins()
+
         # We want untranslated name of the plugin for its slug so we deactivate translation
         lang = get_language()
         deactivate_all()
