@@ -1,4 +1,4 @@
-{% load i18n sekizai_tags admin_static cms_js_tags cms_admin cms_tags %}{% load url from future %}
+{% load i18n l10n sekizai_tags admin_static cms_js_tags cms_admin cms_tags %}{% load url from future %}
 {% language request.toolbar.toolbar_language %}
 {% addtoblock "js" %}
 <script type="text/javascript">
@@ -34,7 +34,7 @@ $(document).ready(function () {
 			'settings': '',
 			'static': {{ STATIC_URL }}
 		},
-		'clipboard': '{{ request.toolbar.clipboard.pk }}',
+		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}',
 		'lang': {
 			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
 			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
