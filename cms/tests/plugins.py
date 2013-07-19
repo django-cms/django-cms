@@ -899,7 +899,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         response = self.client.get(plugin_url)
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, "It works")
+        self.assertEquals(response.content, b"It works")
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

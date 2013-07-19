@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls.defaults import url, patterns, include
 from django.template.defaultfilters import slugify
-from django.utils.encoding import force_unicode
 from django.utils.translation import get_language, deactivate_all, activate
 
 class PluginPool(object):
