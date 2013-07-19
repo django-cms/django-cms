@@ -271,7 +271,9 @@ class PlaceholderTestCase(CMSTestCase):
             response = self.client.get("/en/?edit")
             for placeholder in page.placeholders.all():
                 self.assertContains(response, "'placeholder_id': '%s'" % placeholder.pk)
-                self.assertNotContains(response, "'placeholder_id': '%s'" % format(placeholder.pk, ".", grouping=3, thousand_sep=","))
+                self.assertNotContains(response, "'placeholder_id': '%s'" % format(
+                    placeholder.pk, ".", decimal_pos=None, grouping=3, thousand_sep=","))
+
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     
