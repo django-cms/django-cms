@@ -1,12 +1,12 @@
-{% load sekizai_tags %}
+{% load sekizai_tags l10n %}
 {% addtoblock "js" %}
 <script type="text/javascript">
 CMS.$(document).ready(function () {
-	new CMS.Placeholder('#cms_placeholder-{{ instance.pk }}', {
+	new CMS.Placeholder('#cms_placeholder-{{ instance.pk|unlocalize }}', {
 		'type': 'holder',
-		'plugin_id': '{{ instance.pk }}',
+		'plugin_id': '{{ instance.pk|unlocalize }}',
 		'plugin_type': '{{ instance.plugin_type }}',
-		'placeholder_id': '{{ instance.placeholder.id }}',
+		'placeholder_id': '{{ instance.placeholder.pk|unlocalize }}',
 		'placeholder_slot': '{{ instance.placeholder.slot }}',
 		'urls': {
 			'remove_plugin': '{{ instance.placeholder.get_remove_url }}',
@@ -17,4 +17,4 @@ CMS.$(document).ready(function () {
 });
 </script>
 {% endaddtoblock %}
-<div id="cms_placeholder-{{ instance.pk }}" class="cms_placeholder cms_placeholder_slot::{{ instance.placeholder.slot }}">{{ rendered_content }}</div>
+<div id="cms_placeholder-{{ instance.pk|unlocalize }}" class="cms_placeholder cms_placeholder_slot::{{ instance.placeholder.slot }}">{{ rendered_content }}</div>
