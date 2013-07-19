@@ -54,10 +54,10 @@ $(document).ready(function () {
 
 				if(el.hasClass('cms_dragitem-collapsed')) {
 					// show element
-					el.removeClass('cms_dragitem-collapsed').parent().find('> ul').show();
+					el.removeClass('cms_dragitem-collapsed').parent().find('> .cms_draggables').show();
 				} else {
 					// hide element
-					el.addClass('cms_dragitem-collapsed').parent().find('> ul').hide();
+					el.addClass('cms_dragitem-collapsed').parent().find('> .cms_draggables').hide();
 					settings.states.push(id);
 				}
 
@@ -70,8 +70,8 @@ $(document).ready(function () {
 			// loop through the items
 			$.each(states, function (index, id) {
 				var el = $('#cms_draggable-' + id);
-					el.find('> ul').hide();
-					el.find('> div').addClass('cms_dragitem-collapsed');
+					el.find('> .cms_draggables').hide();
+					el.find('> .cms_dragitem').addClass('cms_dragitem-collapsed');
 			});
 		},
 
@@ -137,13 +137,13 @@ $(document).ready(function () {
 				'opacity': 0.4,
 				'zIndex': 999999,
 				// nestedSortable
-				'listType': 'ul',
+				'listType': 'div.cms_draggables',
 				'doNotClear': true,
 				'disableNestingClass': 'cms_draggable-disabled',
 				'errorClass': 'cms_draggable-disallowed',
 				'hoveringClass': 'cms_draggable-hover',
 				// methods
-				'start': function () {
+				'start': function (e, ui) {
 					that.dragging = true;
 					// show empty
 					$('.cms_droppable-empty-wrapper').slideDown(200);
@@ -151,6 +151,8 @@ $(document).ready(function () {
 					$('.cms_dragitem .cms_submenu').hide();
 					// remove classes from empty dropzones
 					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
+					// fixes placeholder height
+					ui.placeholder.height(ui.item.height());
 				},
 
 				'stop': function (event, ui) {
@@ -223,7 +225,7 @@ $(document).ready(function () {
 			var that = this;
 			var remove = this.clipboard.find('.cms_clipboard-empty a');
 			var triggers = this.clipboard.find('.cms_clipboard-triggers a');
-			var containers = this.clipboard.find('.cms_clipboard-containers > li');
+			var containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
 			var position = 220;
 			var speed = 100;
 			var timer = function () {};
@@ -243,7 +245,7 @@ $(document).ready(function () {
 				if(e.type === 'mouseleave') hide();
 
 				triggers = that.clipboard.find('.cms_clipboard-triggers a');
-				containers = that.clipboard.find('.cms_clipboard-containers > li');
+				containers = that.clipboard.find('.cms_clipboard-containers > .cms_draggable');
 				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
 				var el = containers.eq(index);
 				// cancel if element is already open
@@ -277,7 +279,7 @@ $(document).ready(function () {
 			if(!this.clipboard.length) return false;
 
 			var containers = this.clipboard.find('.cms_clipboard-containers .cms_draggable');
-			var triggers = this.clipboard.find('.cms_clipboard-triggers li');
+			var triggers = this.clipboard.find('.cms_clipboard-triggers .cms_clipboard-numbers');
 
 			var lengthContainers = containers.length;
 			var lengthTriggers = triggers.length;
@@ -361,7 +363,6 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
-			this.keyBound = 1;
 
 			// bind data element to the container
 			this.container.data('settings', this.options);
@@ -403,9 +404,9 @@ $(document).ready(function () {
 			});
 
 			plugin.bind('mousedown mouseup mousemove', function (e) {
-				e.stopPropagation();
+				if(e.type !== 'mousemove') e.stopPropagation();
 
-				if(e.type === 'mousedown') {
+				if(e.type === 'mousedown' && (e.which !== 3 || e.button !== 2)) {
 					// start countdown
 					timer = setTimeout(function () {
 						CMS.API.Toolbar._enableDragMode(300);
@@ -626,8 +627,7 @@ $(document).ready(function () {
 				}
 				if(e.type === 'keyup') {
 					clearTimeout(that.timer);
-					// cancel if we have less than x keys
-					if($(this).val().length < that.keyBound) return false;
+					// keybound is not required
 					that.timer = setTimeout(function () {
 						that._searchSubnav(nav, $(e.currentTarget).val());
 					}, 100);
@@ -656,7 +656,7 @@ $(document).ready(function () {
 				nav.find('.cms_submenu-quicksearch').show();
 
 				// set visible states
-				nav.find('> ul').show();
+				nav.find('> .cms_submenu-dropdown').show();
 			}, 100);
 		},
 
@@ -672,7 +672,7 @@ $(document).ready(function () {
 
 			this.timer = setTimeout(function () {
 				// set visible states
-				nav.find('> ul').hide();
+				nav.find('> .cms_submenu-dropdown').hide();
 				nav.find('.cms_submenu-quicksearch').hide();
 				// reset search
 				nav.find('input').val('');
@@ -682,12 +682,41 @@ $(document).ready(function () {
 
 		_searchSubnav: function (nav, value) {
 			// loop through items and figure out if we need to hide items
-			nav.find('li a').each(function (index, item) {
+			nav.find('.cms_submenu-item a').each(function (index, item) {
 				var text = $(item).text().toLowerCase();
 				var search = value.toLowerCase();
 
 				(text.indexOf(search) >= 0 || search === '') ? $(this).parent().show() : $(this).parent().hide();
 			});
+
+			// show all titles
+			nav.find('.cms_submenu-item-title').show();
+
+			// cancel here if there is no value
+			if(value === '') return false;
+
+			// check if any title should be hidden
+			nav.find('.cms_submenu-item').each(function (index, item) {
+				item = $(item);
+				// check if we have a title
+				var title = item.find('span');
+				if(title.length) {
+					var entries = item.nextUntil('.cms_submenu-item-title');
+
+					if(entries.filter(':visible').length === 0) {
+						title.parent().hide();
+					} else {
+						title.parent().show();
+					}
+				}
+			});
+
+			console.log(nav.find('.cms_submenu-item-title').filter(':visible').length);
+
+			// check for empty entries
+			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
+				nav.find('.cms_submenu-item-title:eq(0)').show();
+			}
 		},
 
 		_getId: function (el) {

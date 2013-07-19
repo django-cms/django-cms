@@ -44,7 +44,8 @@ $(document).ready(function () {
 					'url': null,
 					'hidden': false,
 					'maximized': false
-				}
+				},
+				'position': null
 			}
 		},
 
@@ -404,7 +405,7 @@ $(document).ready(function () {
 			this.setSettings();
 		},
 
-		openMessage: function (msg, dir, error, delay) {
+		openMessage: function (msg, dir, delay, error) {
 			// set toolbar freeze
 			this.lockToolbar = true;
 
@@ -416,7 +417,7 @@ $(document).ready(function () {
 
 			// determine width
 			var that = this;
-			var width = this.messages.outerWidth(true);
+			var width = 320;
 			var height = this.messages.outerHeight(true);
 			var top = this.toolbar.outerHeight(true);
 			var close = this.messages.find('.cms_messages-close');
@@ -442,21 +443,26 @@ $(document).ready(function () {
 				case 'left':
 					this.messages.css({
 						'top': top,
-						'left': -width
+						'left': -width,
+						'right': 'auto',
+						'margin-left': 0
 					});
 					this.messages.animate({ 'left': 0 });
 					break;
 				case 'right':
 					this.messages.css({
 						'top': top,
-						'right': -width
+						'right': -width,
+						'left': 'auto',
+						'margin-left': 0
 					});
 					this.messages.animate({ 'right': 0 });
 					break;
 				default:
 					this.messages.css({
 						'left': '50%',
-						'margin-left': -(320 / 2)
+						'right': 'auto',
+						'margin-left': -(width / 2)
 					});
 					this.messages.animate({ 'top': top });
 			}
@@ -601,17 +607,19 @@ $(document).ready(function () {
 			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
 			this.settings.mode = 'edit';
 
+			// set correct position
+			$('body').scrollTop(this.settings.position || 0);
+
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
-
-			// set active element to online block
-			var active = this.plugins.filter('.cms_plugin-active');
-				active.css('display', 'inline-block');
 
 			if(!init) this.setSettings();
 		},
 
 		_enableDragMode: function (speed, init) {
+			// we need to save the position first
+			this.settings.position = $('body').scrollTop();
+
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
 			this.placeholders.stop(true, true).fadeIn(speed);
@@ -992,13 +1000,13 @@ $(document).ready(function () {
 
 		_setModalButtons: function (iframe) {
 			var that = this;
-			var row = iframe.contents().find('.submit-row');
+			var row = iframe.contents().find('.submit-row:eq(0)');
 			var buttons = row.find('input, a');
-			var render = $('<span />');
+			var render = $('<span />'); // seriously jquery...
 
 			// if there are no buttons, try again
 			if(!buttons.length) {
-				row = iframe.contents().find('form');
+				row = iframe.contents().find('form:eq(0)');
 				buttons = row.find('input[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
@@ -1007,6 +1015,11 @@ $(document).ready(function () {
 			} else {
 				this.enforceReload = false;
 			}
+
+			// attach relation id
+			buttons.each(function (index, item) {
+				$(item).attr('data-rel', '_' + index);
+			});
 
 			// loop over input buttons
 			buttons.each(function (index, item) {
@@ -1019,18 +1032,15 @@ $(document).ready(function () {
 				var title = item.attr('value') || item.text();
 				var cls = 'cms_btn';
 
-				// set additional css classes
+				// set additional special css classes
 				if(item.hasClass('default')) cls = 'cms_btn cms_btn-action';
 				if(item.hasClass('deletelink')) cls = 'cms_btn cms_btn-caution';
 
 				// create the element
-				var el = $('<div class="'+cls+'" data-name="'+item.attr('name')+'" data-url="'+item.attr('href')+'">'+title+'</div>');
+				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind('click', function () {
-						var input = row.find('input[name="'+$(this).attr('data-name')+'"]');
-						if(input.length) input.click();
-
-						var anchor = row.find('a[href="'+$(this).attr('data-url')+'"]');
-						if(anchor.length) iframe.attr('src', anchor.attr('href'));
+						if(item.is('input')) item.click();
+						if(item.is('anchor')) iframe.attr('src', item.attr('href'));
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
@@ -1132,7 +1142,7 @@ $(document).ready(function () {
 		},
 
 		showError: function (msg) {
-			this.openMessage(msg, 'center', true);
+			this.openMessage(msg, 'center', this.options.messageDelay, true);
 		}
 
 	});

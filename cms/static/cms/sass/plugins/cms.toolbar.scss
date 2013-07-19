@@ -25,7 +25,7 @@
 
 #cms_toolbar { position:absolute; left:0; top:0; z-index:9999999; width:100%; }
 #cms_toolbar {
-	.cms_toolbar { position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
+	.cms_toolbar { display:none; position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
 		border-bottom:1px solid $color-grey !important; background:$color-grey-5;
 		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
 
@@ -137,13 +137,13 @@
 	.cms_clipboard { position:fixed; left:0; top:130px; z-index:99;
 		p { pading:0; margin:0; }
 
-		ul li { margin:0 0 2px; }
-		ul a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
+		.cms_clipboard-numbers { margin:0 0 2px; }
+		.cms_clipboard-numbers a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
 			border:5px solid $color-grey-70; border-left:none; border-right:none; overflow:hidden;
 			background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left -130px;
 			&:hover, &:active, &:focus { background-color:$color-grey-90; background-position:-20px -130px; }
 		}
-		ul li ul { display:none !important; }
+		cms_clipboard-numbers .cms_clipboard-numbers { display:none !important; }
 
 		.cms_clipboard-empty a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
 			background:$color-grey-70 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat left -110px; cursor:pointer;
@@ -152,10 +152,10 @@
 
 		// placeholders
 		.cms_clipboard-triggers { position:relative; z-index:999; }
-		.cms_clipboard-triggers li:nth-child(n+6) { display:none; }
+		.cms_clipboard-triggers .cms_clipboard-numbers:nth-child(n+6) { display:none; }
 
 		.cms_clipboard-containers { position:absolute; top:0; left:-1px; z-index:99; width:0; }
-		.cms_clipboard-containers li { margin-left:-220px; width:190px; }
+		.cms_clipboard-containers .cms_draggable { margin-left:-220px; width:190px; }
 
 		// custom style for draggable item
 		.cms_draggable { border:1px solid $color-grey-70; @include border-radius(0 3px 3px 0); }
@@ -328,6 +328,7 @@
 		padding:3px 0 0 0;
 
 		label { float:left; cursor:pointer; padding-left:10px; }
+		label span { padding-top:1px; @include inline-block(); }
 		input[type="text"], input[type="password"] { font-size:13px; line-height:13px; width:100px;
 			padding:3px 5px; margin:0; @include border-radius(3px);
 			color:$color-grey; border:1px solid lighten($color-grey, 45%);

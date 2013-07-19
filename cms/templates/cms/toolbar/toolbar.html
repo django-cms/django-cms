@@ -1,4 +1,4 @@
-{% load i18n sekizai_tags admin_static cms_js_tags cms_admin cms_tags %}{% load url from future %}
+{% load i18n l10n sekizai_tags admin_static cms_js_tags cms_admin cms_tags %}{% load url from future %}
 {% language request.toolbar.toolbar_language %}
 {% addtoblock "js" %}
 <script type="text/javascript">
@@ -33,7 +33,7 @@ $(document).ready(function () {
 			'settings': '',
 			'static': {{ STATIC_URL }}
 		},
-		'clipboard': '{{ request.toolbar.clipboard.pk }}',
+		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}',
 		'lang': {
 			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
 			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
@@ -41,17 +41,20 @@ $(document).ready(function () {
 		}
 	});
 
-
-
 	// initialize placeholder helpers
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
 
+	// open django messages if provided
 	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
 
-	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated  %}
-	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'center');
+	// special message for published status
+	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}
+	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'right');
 	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
 	{% endif %}
+
+	// ensure toolbar is shown when not logged in
+	{% if not user.is_authenticated %}CMS.API.Toolbar._showToolbar(0);{% endif %}
 });
 })(CMS.$);
 </script>
@@ -116,25 +119,25 @@ $(document).ready(function () {
 	{% with slot="clipbaord" %}
 	<!-- start: clipboard -->
 	<div class="cms_clipboard">
-		<ul class="cms_clipboard-triggers">
+		<div class="cms_clipboard-triggers">
 			<!-- maximum of 5 -->
 			<!-- delete link -->
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
 				{% if not plugin.parent_id %}
-				<li><a href="#">{{ forloop.index }}</a></li>
+				<div class="cms_clipboard-numbers"><a href="#">{{ forloop.index }}</a></div>
 				{% endif %}
 			{% endfor %}
-		</ul>
+		</div>
 		{% for plugin in request.toolbar.get_clipboard_plugins %}
 		<div class="cms_plugins">{% include "cms/toolbar/plugin.html" with instance=plugin %}</div>
 		{% endfor %}
-		<ul class="cms_clipboard-containers cms_draggables">
+		<div class="cms_clipboard-containers cms_draggables">
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
 				{% if forloop.counter <= 5 %}
 				{% with show_language="true" %}{% include "cms/toolbar/draggable_item.html" with plugin=plugin %}{% endwith %}
 				{% endif %}
 			{% endfor %}
-		</ul>
+		</div>
 		<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>{% trans "Empty Clipboard" %}</a></p>
 	</div>
 	<!-- end: clipboard -->
