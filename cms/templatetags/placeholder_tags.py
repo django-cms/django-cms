@@ -35,6 +35,7 @@ class CMSEditableObject(InclusionTag):
     options = Options(
         Argument('instance'),
         Argument('attribute'),
+        Argument('language', default=None, required=False),
     )
 
     def _is_editable(self, request):
@@ -46,13 +47,15 @@ class CMSEditableObject(InclusionTag):
             return self.edit_template
         return self.template
 
-    def get_context(self, context, instance, attribute):
+    def get_context(self, context, instance, attribute, language):
         context['item'] = getattr(instance, attribute, '')
         context['instance'] = instance
         context['opts'] = instance._meta
         context['admin_url'] = reverse('admin:%s_%s_change' % (
             instance._meta.app_label, instance._meta.module_name),
                                        args=(instance.pk,))
+        if language:
+            context['admin_url'] += "?language=%s" % language
         return context
 
 
