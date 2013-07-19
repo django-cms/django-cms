@@ -22,8 +22,7 @@ class Stack(models.Model):
     code = models.CharField(
         verbose_name=_(u'stack code'), max_length=255, unique=True, blank=True,
         help_text=_(u'To render the stack in templates.'))
-    content = PlaceholderField(
-        slotname=u'stack_content', verbose_name=_(u'stack content'), related_name='stacks_contents')
+    content = PlaceholderField(verbose_name=_(u'stack content'), related_name='stacks_contents')
 
     creation_method = models.CharField(
         verbose_name=('creation_method'), choices=CREATION_METHODS, default=CREATION_BY_CODE,
@@ -41,6 +40,9 @@ class Stack(models.Model):
         # TODO: check for clashes if the random code is already taken
         if not self.code:
             self.code = u'stack-%s' % uuid.uuid4()
+
+    def get_content_placeholder_slot(self):
+        return self.code
 
 
 @python_2_unicode_compatible
