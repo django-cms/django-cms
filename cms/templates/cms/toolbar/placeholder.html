@@ -1,12 +1,12 @@
-{% load i18n sekizai_tags %}
+{% load i18n sekizai_tags l10n %}
 {% addtoblock "js" %}
 <script type="text/javascript">
 CMS.$(document).ready(function () {
-	new CMS.Placeholder('#cms_placeholder-bar-{{ placeholder.pk }}', {
+	new CMS.Placeholder('#cms_placeholder-bar-{{ placeholder.pk|unlocalize }}', {
 		'type': 'bar',
 		'page_id': '{{ page.id }}',
 		'page_language': '{{ language }}',
-		'placeholder_id': '{{ placeholder.pk }}',
+		'placeholder_id': '{{ placeholder.pk|unlocalize }}',
 		'urls': {
 			'add_plugin': '{{ placeholder.get_add_url }}',
 			'change_list': '{{ placeholder.get_changelist_url }}'
@@ -18,7 +18,7 @@ CMS.$(document).ready(function () {
     .cms_placeholder { display: none; }
 </style>
 {% endaddtoblock %}
-<div id="cms_placeholder-bar-{{ placeholder.pk }}" class="cms_placeholder-bar cms_reset cms_placeholder_slot::{{ placeholder.slot }}">
+<div id="cms_placeholder-bar-{{ placeholder.pk|unlocalize }}" class="cms_placeholder-bar cms_reset cms_placeholder_slot::{{ placeholder.slot }}">
 	<div class="cms_placeholder-title">{{ placeholder_label }}</div>
 		<div class="cms_placeholder-btn">
 		<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">

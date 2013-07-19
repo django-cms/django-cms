@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.utils.numberformat import format
 from cms.api import add_plugin, create_page
 from cms.conf.global_settings import CMS_TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import DuplicatePlaceholderWarning
@@ -249,6 +250,29 @@ class PlaceholderTestCase(CMSTestCase):
 
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
+
+    def test_placeholder_pk_thousands_format(self):
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        page.publish()
+        page = page.get_public_object()
+        for placeholder in page.placeholders.all():
+            page.placeholders.remove(placeholder)
+            placeholder.pk += 1000
+            placeholder.save()
+            page.placeholders.add(placeholder)
+        page.reload()
+        for placeholder in page.placeholders.all():
+            plugin = add_plugin(placeholder, "TextPlugin", "en", body="body",
+                                id=placeholder.pk)
+        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+            # Superuser
+            user = self.get_superuser()
+            self.client.login(username=user.username, password=user.username)
+            response = self.client.get("/en/?edit")
+            for placeholder in page.placeholders.all():
+                self.assertContains(response, "'placeholder_id': '%s'" % placeholder.pk)
+                self.assertNotContains(response, "'placeholder_id': '%s'" % format(
+                    placeholder.pk, ".", decimal_pos=None, grouping=3, thousand_sep=","))
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
