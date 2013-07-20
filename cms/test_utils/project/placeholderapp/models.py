@@ -21,6 +21,19 @@ class TwoPlaceholderExample(models.Model):
     placeholder_2 = PlaceholderField('placeholder_2', related_name='p2')
 
 
+class DynamicPlaceholderSlotExample(models.Model):
+    char_1 = models.CharField(u'char_1', max_length=255)
+    char_2 = models.CharField(u'char_2', max_length=255)
+    placeholder_1 = PlaceholderField(related_name='dynamic_pl_1')
+    placeholder_2 = PlaceholderField(related_name='dynamic_pl_2')
+
+    def get_placeholder_1_slot(self):
+        return self.char_1
+
+    def get_placeholder_2_slot(self):
+        return self.char_2
+
+
 @python_2_unicode_compatible
 class MultilingualExample1(TranslatableModel):
     translations = TranslatedFields(

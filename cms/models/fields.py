@@ -30,7 +30,7 @@ def validate_placeholder_fields(sender, **kwargs):
 
 
 class PlaceholderField(models.ForeignKey):
-    dynamic_slot_callable = 'get_%s_placeholder_slot'
+    dynamic_slot_callable = 'get_%s_slot'
 
     def __init__(self, slotname=None, default_width=None, actions=PlaceholderNoAction, **kwargs):
         if kwargs.get('related_name', None) == '+':
@@ -48,9 +48,11 @@ class PlaceholderField(models.ForeignKey):
     def _get_placeholder_slot(self, model_instance):
         if self.slotname is None:
             slot_callable = self.dynamic_slot_callable % self.name
-            self.slotname = getattr(model_instance, slot_callable)()
-            validate_placeholder_name(self.slotname)
-        return self.slotname
+            slotname = getattr(model_instance, slot_callable)()
+            validate_placeholder_name(slotname)
+        else:
+            slotname = self.slotname
+        return slotname
 
     def pre_save(self, model_instance, add):
         if not model_instance.pk:

@@ -41,7 +41,7 @@ class Stack(models.Model):
         if not self.code:
             self.code = u'stack-%s' % uuid.uuid4()
 
-    def get_content_placeholder_slot(self):
+    def get_content_slot(self):
         return self.code
 
 
