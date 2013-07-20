@@ -5,6 +5,7 @@ from django import template
 from django.template.defaultfilters import safe
 from classytags.helpers import InclusionTag
 from django.core.urlresolvers import reverse
+from cms.utils import get_language_from_request
 
 register = template.Library()
 
@@ -48,14 +49,16 @@ class CMSEditableObject(InclusionTag):
         return self.template
 
     def get_context(self, context, instance, attribute, language):
+        if not language:
+            language = get_language_from_request(context['request'])
         context['item'] = getattr(instance, attribute, '')
         context['instance'] = instance
         context['opts'] = instance._meta
-        context['admin_url'] = reverse('admin:%s_%s_change' % (
-            instance._meta.app_label, instance._meta.module_name),
-                                       args=(instance.pk,))
-        if language:
-            context['admin_url'] += "?language=%s" % language
+        context['admin_url'] = "%s?language=%s" % (
+            reverse('admin:%s_%s_change' % (
+                instance._meta.app_label, instance._meta.module_name),
+                    args=(instance.pk,)),
+            language)
         return context
 
 
