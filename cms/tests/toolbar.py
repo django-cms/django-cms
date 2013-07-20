@@ -13,6 +13,9 @@ from django.contrib.auth.models import AnonymousUser, User, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
+from django.core.urlresolvers import reverse
+from cms.test_utils.project.placeholderapp.models import (Example1, TwoPlaceholderExample, MultilingualExample1)
+from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
@@ -223,6 +226,73 @@ class ToolbarTests(ToolbarTestBase):
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
+
+
+class EditModelTemplateTagTest(ToolbarTestBase):
+    urls = 'cms.test_utils.project.placeholderapp_urls'
+
+    def tearDown(self):
+        Example1.objects.all().delete()
+        MultilingualExample1.objects.all().delete()
+        super(EditModelTemplateTagTest, self).tearDown()
+
+    def test_anon(self):
+        user = self.get_anon()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=False)
+        response = detail_view(request, ex1.pk)
+        self.assertContains(response, "<h1>char_1</h1>")
+        self.assertNotContains(response, "CMS.API.Toolbar")
+
+    def test_noedit(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=False)
+        response = detail_view(request, ex1.pk)
+        self.assertContains(response, "<h1>char_1</h1>")
+        self.assertContains(response, "CMS.API.Toolbar")
+
+    def test_edit(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s" class="cms_placeholder-generic">char_1</span></h1>' % ex1.pk)
+
+    def test_multi_edit(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        title = create_title("fr", "test", page)
+
+        exm = MultilingualExample1()
+        exm.translate("en")
+        exm.char_1='one'
+        exm.char_2='two'
+        exm.save()
+        exm.translate("fr")
+        exm.char_1="un"
+        exm.char_2="deux"
+        exm.save()
+
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view_multi(request, exm.pk)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s" class="cms_placeholder-generic">one</span></h1>' % exm.pk)
+        self.assertContains(response, "/admin/placeholderapp/multilingualexample1/1/?language=en")
+
+        with SettingsOverride(LANGUAGE_CODE="fr"):
+            request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
+            response = detail_view_multi(request, exm.pk)
+            self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s" class="cms_placeholder-generic">un</span></h1>' % exm.pk)
+            self.assertContains(response, "/admin/placeholderapp/multilingualexample1/1/?language=fr")
 
 
 class ToolbarAPITests(TestCase):

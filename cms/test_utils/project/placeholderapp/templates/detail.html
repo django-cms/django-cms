@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load placeholder_tags %}
 
-</body>
-</html>
+{% block content %}
+<h1>{% show_editable_model instance "char_1" %}</h1>
+{% endblock content %}

@@ -692,7 +692,6 @@ class AdminTests(AdminTestsBase):
             draft_page = Page.objects.get(pk=page.pk).get_draft_object()
             self.assertTrue(draft_page.is_dirty())
 
-
 class NoDBAdminTests(CMSTestCase):
     @property
     def admin_class(self):
