@@ -192,4 +192,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - PageAdmin uses the same Plugin API as PlaceholderAdmin
 - Toolbar API for your own apps added
 - twitter plugin removed
-
+- New stacks application
