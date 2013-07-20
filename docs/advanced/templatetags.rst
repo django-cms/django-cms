@@ -257,7 +257,9 @@ If in edit mode you can double click on the title and modify in an overlay windo
 it fallbacks to ``page_attribute title``.
 
 Example::
+
 	{% load cms_tags %}
+
 	{% show_editable_page_title %}
 
 ******************
@@ -273,7 +275,9 @@ multiple locations.
 
 
 Example::
+
     {% load stack_tags %}
+
     {% stack "footer" %}
 
 

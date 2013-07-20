@@ -177,9 +177,11 @@ Twitter Plugin removed
 ======================
 
 Twitter disabled V1 of their API. We removed the twitter plugin because of this.
+
 For an alternative have a look at this plugins:
 
-https://github.com/nephila/djangocms_twitter
-https://github.com/changer/cmsplugin-twitter
+* https://github.com/nephila/djangocms_twitter
+
+* https://github.com/changer/cmsplugin-twitter
 
 
