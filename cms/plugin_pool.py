@@ -8,6 +8,7 @@ from cms.utils.compat.dj import force_unicode
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls.defaults import url, patterns, include
+from django.contrib.formtools.wizard.views import normalize_name
 from django.template.defaultfilters import slugify
 from django.utils.translation import get_language, deactivate_all, activate
 
@@ -127,7 +128,7 @@ class PluginPool(object):
             url_patterns = []
             for plugin in self.get_all_plugins():
                 p = plugin()
-                slug = slugify(force_unicode(p.name))
+                slug = slugify(force_unicode(normalize_name(p.__class__.__name__)))
                 url_patterns += patterns('',
                     url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
                 )
