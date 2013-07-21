@@ -211,7 +211,7 @@ cms.plugin_base
     .. method:: get_plugin_urls(instance)
 
         Returns URL patterns for which the plugin wants to register views for.
-        They are included under Django CMS PageAdmin in the plugin path
+        They are included under django CMS PageAdmin in the plugin path
         (e.g.: ``/admin/cms/page/plugin/<plugin-name>/`` in the default case).
         Useful if your plugin needs to asynchronously talk to the admin.
 
