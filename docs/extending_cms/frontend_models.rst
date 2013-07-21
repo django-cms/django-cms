@@ -38,8 +38,8 @@ clickable.
 Arguments:
 
 * ``instance``: instance of your model in the template
-* ``attribute``: the name of the attribute you want to show in the template;
-  you can use field, property or callable.
+* ``attribute``: the name of the attribute you want to show in the template; it
+  can be a context variable; it's possible to target field, property or callable.
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
 
