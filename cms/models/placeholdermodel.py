@@ -133,7 +133,7 @@ class Placeholder(models.Model):
         """
         Returns a list of objects attached to this placeholder.
         """
-        return [obj for field in self._get_attached_fields() 
+        return [obj for field in self._get_attached_fields()
                 for obj in getattr(self, field.related.get_accessor_name()).all()]
 
     def page_getter(self):
