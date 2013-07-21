@@ -268,6 +268,27 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk)
         self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s" class="cms_placeholder-generic">char_1</span></h1>' % ex1.pk)
 
+    def test_callable_item(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, 'detail_callable.html')
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s" class="cms_placeholder-generic">char_1</span></h1>' % ex1.pk)
+
+    def test_item_from_context(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, 'detail_variable.html',
+                               item_name="callable_item")
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s" class="cms_placeholder-generic">char_1</span></h1>' % ex1.pk)
+
     def test_multi_edit(self):
         user = self.get_staff()
         page = create_page('Test', 'col_two.html', 'en', published=True)

@@ -19,6 +19,9 @@ class Example1(models.Model):
     char_4 = models.CharField(u'char_4', max_length=255)
     placeholder = PlaceholderField('placeholder')
 
+    def callable_item(self):
+        return self.char_1
+
 
 class TwoPlaceholderExample(models.Model):
     char_1 = models.CharField(u'char_1', max_length=255)

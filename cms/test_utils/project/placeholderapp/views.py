@@ -10,12 +10,16 @@ def example_view(request):
     context['examples'] = Example1.objects.all()
     return render_to_response('placeholderapp.html', context)
 
+
 def detail_view_multi(request, id):
     context = RequestContext(request)
-    context['instance'] = MultilingualExample1.objects.language(get_language_from_request(request)).get(pk=id)
+    context['instance'] = MultilingualExample1.objects.language(
+        get_language_from_request(request)).get(pk=id)
     return render_to_response('detail.html', context)
 
-def detail_view(request, id):
+
+def detail_view(request, id, template='detail.html', item_name="char_1"):
     context = RequestContext(request)
     context['instance'] = Example1.objects.get(pk=id)
-    return render_to_response('detail.html', context)
+    context['item_name'] = item_name
+    return render_to_response(template, context)
