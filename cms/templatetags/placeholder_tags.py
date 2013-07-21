@@ -52,6 +52,8 @@ class CMSEditableObject(InclusionTag):
         if not language:
             language = get_language_from_request(context['request'])
         context['item'] = getattr(instance, attribute, '')
+        if callable(context['item']):
+            context['item'] = context['item']()
         context['instance'] = instance
         context['opts'] = instance._meta
         context['admin_url'] = "%s?language=%s" % (
