@@ -5,7 +5,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 from django.db import models
 from django.utils.text import capfirst
-from django.db.models.signals import class_prepared
 
 
 class PlaceholderField(models.ForeignKey):
