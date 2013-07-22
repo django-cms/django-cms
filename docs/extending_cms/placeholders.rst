@@ -31,10 +31,20 @@ use::
         # your methods
 
 
-The :class:`~cms.models.fields.PlaceholderField` takes an optional parameter (`slotname`) of type string as its first
-argument which will be used to configure which plugins can be used in this
-placeholder.
-The configuration is the same as for placeholders in the CMS.
+The :class:`~cms.models.fields.PlaceholderField` has one required parameter (`slotname`) which can be a of type string, allowing you to configure which plugins can be used in this
+placeholder (configuration is the same as for placeholders in the CMS) or you can also provide a callable like so::
+
+    from django.db import models
+    from cms.models.fields import PlaceholderField
+
+    def my_placeholder_slotname(instance):
+        return 'placeholder_name'
+
+    class MyModel(models.Model):
+        # your fields
+        my_placeholder = PlaceholderField(my_placeholder_slotname)
+        # your methods
+
 
 .. warning::
 
@@ -42,33 +52,6 @@ The configuration is the same as for placeholders in the CMS.
     :class:`~cms.models.fields.PlaceholderField` may not be surpressed using
     ``'+'`` to allow the cms to check permissions properly. Attempting to do
     so will raise a :exc:`ValueError`.
-
-
-Field Options
-=================
-
-If you don't provide a `slotname` to the :class:`~cms.models.fields.PlaceholderField`,
-then you need to define a ``get_myplaceholderfield_name_slot()`` method in your model which the field will use to retrieve the
-slotname dynamically.
-So the above example could be defined as::
-
-    from django.db import models
-    from cms.models.fields import PlaceholderField
-
-    class MyModel(models.Model):
-        # your fields
-        my_placeholder = PlaceholderField()
-
-        # your methods
-        def get_my_placeholder_slot(self):
-            return 'placeholder_name'
-
-
-.. warning::
-
-    If you don't provide a `slotname` to :class:`~cms.models.fields.PlaceholderField` and
-    don't define a ``get_myplaceholderfield_name_slot()`` method in your model,
-    then the field will throw an :exc:`ImproperlyConfigured exception`.
 
 
 Admin Integration

@@ -290,13 +290,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(old_placeholder_1_plugin_count, current_placeholder_1_plugin_count)
         self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
 
-    def test_placeholder_field_dynamic_slot_improperly_configured(self):
-        def create_placeholder_model():
-            attrs = {'__module__': 'cms.test_utils.project.placeholderapp', 'pl_1': PlaceholderField()}
-            return type('PlaceholderFieldExceptionTest', (Model,), attrs)
-
-        with self.assertRaises(ImproperlyConfigured):
-            create_placeholder_model()
 
     def test_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration """

@@ -5,34 +5,12 @@ from cms.models.placeholdermodel import Placeholder
 from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 from django.db import models
 from django.utils.text import capfirst
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models.signals import class_prepared
 
 
-def validate_placeholder_field(cls, field):
-    dynamic_name_callable = field.dynamic_slot_callable % field.name
-    try:
-        slotname = getattr(cls, dynamic_name_callable)
-    except AttributeError:
-        msg = "Please provide slotname or define a %s callable in your model %s." % (dynamic_name_callable, cls.__name__)
-        raise ImproperlyConfigured(msg)
-    else:
-        if not callable(slotname):
-            msg = "Please make sure %s is a callable in your model %s." % (dynamic_name_callable, cls.__name__)
-            raise ImproperlyConfigured(msg)
-
-
-def validate_placeholder_fields(sender, **kwargs):
-    opts = sender._meta
-    for field in opts.local_fields:
-        if isinstance(field, PlaceholderField) and not field.slotname:
-            validate_placeholder_field(sender, field)
-
-
 class PlaceholderField(models.ForeignKey):
-    dynamic_slot_callable = 'get_%s_slot'
 
-    def __init__(self, slotname=None, default_width=None, actions=PlaceholderNoAction, **kwargs):
+    def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
         if kwargs.get('related_name', None) == '+':
             raise ValueError("PlaceholderField does not support disabling of related names via '+'.")
         self.slotname = slotname
@@ -46,9 +24,8 @@ class PlaceholderField(models.ForeignKey):
         return Placeholder.objects.create(slot=self._get_placeholder_slot(instance), default_width=self.default_width)
 
     def _get_placeholder_slot(self, model_instance):
-        if self.slotname is None:
-            slot_callable = self.dynamic_slot_callable % self.name
-            slotname = getattr(model_instance, slot_callable)()
+        if callable(self.slotname):
+            slotname = self.slotname(model_instance)
             validate_placeholder_name(slotname)
         else:
             slotname = self.slotname
@@ -86,9 +63,7 @@ class PlaceholderField(models.ForeignKey):
             cls._meta.placeholder_field_names = []
         if not hasattr(cls._meta, 'placeholder_fields'):
             cls._meta.placeholder_fields = {}
-        if self.slotname is None:
-            class_prepared.connect(validate_placeholder_fields, sender=cls, dispatch_uid='%s_placeholder_validation' % cls.__name__)
-        else:
+        if not callable(self.slotname):
             validate_placeholder_name(self.slotname)
         cls._meta.placeholder_field_names.append(name)
         cls._meta.placeholder_fields[self] = name

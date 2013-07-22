@@ -8,6 +8,15 @@ from cms.models.fields import PlaceholderField
 from cms.models.pluginmodel import CMSPlugin
 
 
+
+def stack_slotname(instance):
+    """
+    Returns a string to be used as the slot
+    for the stack's content placeholder field.
+    """
+    return instance.code
+
+
 @python_2_unicode_compatible
 class Stack(models.Model):
     CREATION_BY_TEMPLATE = 'template'
@@ -22,7 +31,7 @@ class Stack(models.Model):
     code = models.CharField(
         verbose_name=_(u'stack code'), max_length=255, unique=True, blank=True,
         help_text=_(u'To render the stack in templates.'))
-    content = PlaceholderField(verbose_name=_(u'stack content'), related_name='stacks_contents')
+    content = PlaceholderField(stack_slotname, verbose_name=_(u'stack content'), related_name='stacks_contents')
 
     creation_method = models.CharField(
         verbose_name=('creation_method'), choices=CREATION_METHODS, default=CREATION_BY_CODE,
@@ -40,9 +49,6 @@ class Stack(models.Model):
         # TODO: check for clashes if the random code is already taken
         if not self.code:
             self.code = u'stack-%s' % uuid.uuid4()
-
-    def get_content_slot(self):
-        return self.code
 
 
 @python_2_unicode_compatible
