@@ -56,7 +56,7 @@ $(document).ready(function () {
 	{% endif %}
 
 	// ensure toolbar is shown when not logged in
-	{% if not user.is_authenticated %}CMS.API.Toolbar._showToolbar(0);{% endif %}
+	{% if not user.is_authenticated %}CMS.API.Toolbar.toggleToolbar(true);{% endif %}
 });
 })(CMS.$);
 </script>

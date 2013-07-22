@@ -126,7 +126,7 @@ $(document).ready(function () {
 			// attach event to the trigger handler
 			this.toolbarTrigger.bind('click', function (e) {
 				e.preventDefault();
-				that.toggleToolbar(200);
+				that.toggleToolbar();
 			});
 
 			// attach event to the navigation elements
@@ -273,8 +273,11 @@ $(document).ready(function () {
 		},
 
 		// public methods
-		toggleToolbar: function (speed) {
-			(this.settings.toolbar === 'collapsed') ? this._showToolbar(speed) : this._hideToolbar(speed);
+		toggleToolbar: function (show) {
+			// overwrite state when provided
+			if(show) this.settings.toolbar = 'collapsed';
+			// toggle bar
+			(this.settings.toolbar === 'collapsed') ? this._showToolbar(200) : this._hideToolbar(200);
 		},
 
 		setSettings: function (settings) {
