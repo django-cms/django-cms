@@ -306,7 +306,7 @@ $(document).ready(function () {
 
 			// reset settings
 			window.localStorage.removeItem('cms_cookie');
-			this.settings = this.setSettings(this.options.settings)
+			this.settings = this.setSettings(this.options.settings);
 
 			// enforce reload to apply changes
 			CMS.API.Helpers.reloadBrowser();
@@ -548,7 +548,7 @@ $(document).ready(function () {
 				'type': 'POST',
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
-				'success': function (data) {
+				'success': function () {
 					CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
