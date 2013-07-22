@@ -255,6 +255,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
 
+    def test_placeholder_field_valid_slotname(self):
+        self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)
+
     def test_placeholder_field_dynamic_slot_generation(self):
         instance = DynamicPlaceholderSlotExample.objects.create(char_1='slot1', char_2='slot2')
         self.assertEquals(instance.char_1, instance.placeholder_1.slot)

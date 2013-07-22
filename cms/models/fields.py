@@ -12,6 +12,8 @@ class PlaceholderField(models.ForeignKey):
     def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
         if kwargs.get('related_name', None) == '+':
             raise ValueError("PlaceholderField does not support disabling of related names via '+'.")
+        if not callable(slotname):
+            validate_placeholder_name(slotname)
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()
@@ -62,8 +64,6 @@ class PlaceholderField(models.ForeignKey):
             cls._meta.placeholder_field_names = []
         if not hasattr(cls._meta, 'placeholder_fields'):
             cls._meta.placeholder_fields = {}
-        if not callable(self.slotname):
-            validate_placeholder_name(self.slotname)
         cls._meta.placeholder_field_names.append(name)
         cls._meta.placeholder_fields[self] = name
         self.model = cls
