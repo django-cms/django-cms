@@ -107,7 +107,13 @@ def configure(db_url, **extra):
             'reversion',
             'sekizai',
             'hvad',
+            'guardian',
         ],
+        AUTHENTICATION_BACKENDS=(
+            'django.contrib.auth.backends.ModelBackend',
+            'guardian.backends.ObjectPermissionBackend',
+        ),
+        ANONYMOUS_USER_ID=-1,  # for guardian
         LANGUAGE_CODE="en",
         LANGUAGES=(
             ('en', gettext('English')),
