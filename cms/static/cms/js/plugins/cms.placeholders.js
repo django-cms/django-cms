@@ -136,6 +136,7 @@ $(document).ready(function () {
 				'cursor': 'move',
 				'opacity': 0.4,
 				'zIndex': 999999,
+				'delay': 150,
 				// nestedSortable
 				'listType': 'div.cms_draggables',
 				'doNotClear': true,
