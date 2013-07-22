@@ -113,7 +113,7 @@ $(document).ready(function () {
 
 		_load: function () {
 			// reset some settings if not authenticated
-			if(!this.options.authenticated) this.reset();
+			if(!this.options.authenticated) this._reset();
 			// check if we should show the sideframe
 			if(this.settings.sideframe.url) {
 				this.openSideframe(this.settings.sideframe.url, false);
@@ -135,7 +135,7 @@ $(document).ready(function () {
 				// attach delegate event
 				item.find('li ul a').bind('click', function (e) {
 					e.preventDefault();
-					if(!$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that.delegate($(this));
+					if(!$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that._delegate($(this));
 				});
 				// remove events from first level
 				item.find('> li > a').bind('click', function (e) {
@@ -143,7 +143,7 @@ $(document).ready(function () {
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
 						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')
-						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that.delegate($(this));
+						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that._delegate($(this));
 				});
 
 				// handle states
@@ -310,40 +310,6 @@ $(document).ready(function () {
 
 			// enforce reload to apply changes
 			CMS.API.Helpers.reloadBrowser();
-		},
-
-		delegate: function (el) {
-			// save local vars
-			var target = el.attr('data-rel');
-
-			// reset states
-			this.reset();
-
-			switch(target) {
-				case 'modal':
-					this.openModal(el.attr('href'), el.attr('data-name'));
-					break;
-				case 'message':
-					this.openMessage(el.attr('data-text'));
-					break;
-				case 'sideframe':
-					this.openSideframe(el.attr('href'), true);
-					break;
-				case 'ajax':
-					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
-					break;
-				default:
-					window.location.href = el.attr('href');
-			}
-		},
-
-		reset: function () {
-			// reset sideframe settings
-			this.settings.sideframe = {
-				'url': null,
-				'hidden': false,
-				'maximized': this.settings.sideframe.maximized // we need to keep the default value
-			};
 		},
 
 		openSideframe: function (url, animate) {
@@ -690,6 +656,40 @@ $(document).ready(function () {
 			setTimeout(function () {
 				window.location.href = anchor.attr('href');
 			}, duration);
+		},
+
+		_delegate: function (el) {
+			// save local vars
+			var target = el.attr('data-rel');
+
+			// reset states
+			this._reset();
+
+			switch(target) {
+				case 'modal':
+					this.openModal(el.attr('href'), el.attr('data-name'));
+					break;
+				case 'message':
+					this.openMessage(el.attr('data-text'));
+					break;
+				case 'sideframe':
+					this.openSideframe(el.attr('href'), true);
+					break;
+				case 'ajax':
+					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
+					break;
+				default:
+					window.location.href = el.attr('href');
+			}
+		},
+
+		_reset: function () {
+			// reset sideframe settings
+			this.settings.sideframe = {
+				'url': null,
+				'hidden': false,
+				'maximized': this.settings.sideframe.maximized // we need to keep the default value
+			};
 		},
 
 		_showSideframe: function (width, animate) {

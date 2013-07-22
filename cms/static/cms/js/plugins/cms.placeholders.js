@@ -750,7 +750,7 @@ $(document).ready(function () {
 		},
 
 		_delegate: function (el) {
-			return CMS.API.Toolbar.delegate(el);
+			return CMS.API.Toolbar._delegate(el);
 		}
 
 	});
