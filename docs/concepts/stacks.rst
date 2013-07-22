@@ -1,3 +1,5 @@
+.. _stacks-reference:
+
 #################################################
 Displaying the same content on multiple locations
 #################################################

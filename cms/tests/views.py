@@ -121,6 +121,7 @@ class ViewTests(SettingsOverrideTestCase):
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(login_rx.search(response['Location']))
+        login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
         with SettingsOverride(USE_I18N=False, LOGIN_URL=plain_url+'?signin'):
             request = self.get_request('/')
             response = details(request, '')
