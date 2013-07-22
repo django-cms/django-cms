@@ -47,7 +47,7 @@ $(document).ready(function () {
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
 
 	// open django messages if provided
-	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
+	{% if messages %}CMS.API.Toolbar.openMessage('{% for message in messages %}{{ message }}{% endfor %}');{% endif %}
 
 	// special message for published status
 	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}
