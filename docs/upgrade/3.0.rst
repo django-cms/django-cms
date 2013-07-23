@@ -99,7 +99,17 @@ show_editable_page_title
 ========================
 
 New ``show_editable_page_title`` to edit page title from the frontend.
-                 
+
+
+Stacks
+======
+
+Stacks are a way to display the same content on multiple locations.
+
+When upgrading from previous django CMS version, you need to add ``cms.stacks``
+to ``INSTALLED_APPS``.
+
+See :ref:`stacks-reference` for in depth information about stacks.
 
 Plugins removed
 ===============
@@ -167,9 +177,11 @@ Twitter Plugin removed
 ======================
 
 Twitter disabled V1 of their API. We removed the twitter plugin because of this.
+
 For an alternative have a look at this plugins:
 
-https://github.com/nephila/djangocms_twitter
-https://github.com/changer/cmsplugin-twitter
+* https://github.com/nephila/djangocms_twitter
+
+* https://github.com/changer/cmsplugin-twitter
 
 
