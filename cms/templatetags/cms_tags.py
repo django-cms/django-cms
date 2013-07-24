@@ -17,6 +17,7 @@ from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
+from cms import __version__
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -553,6 +554,7 @@ class CMSToolbar(InclusionTag):
         language = request.toolbar.language
         with force_language(language):
             request.toolbar.populate()
+            context['cms_version'] = __version__
             content = super(CMSToolbar, self).render(context)
         return content
 

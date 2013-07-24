@@ -31,12 +31,8 @@ $(document).ready(function () {
 				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css',
 				'css_sideframe': 'cms/css/plugins/cms.toolbar.sideframe.css'
 			},
-			'lang': {
-				'confirm': 'Yes',
-				'cancel': 'Cancel'
-			},
 			'settings': {
-				'version': '3.0.beta1', // this is required to flush storage on new releases
+				'version': '3.0.0', // this is required to flush storage on new releases
 				'toolbar': 'expanded', // expanded or collapsed
 				'mode': 'edit', // live, draft, edit or layout
 				'states': [],
@@ -53,7 +49,6 @@ $(document).ready(function () {
 			this.container = $(container);
 			this.options = $.extend(true, {}, this.options, options);
 			this.settings = this.getSettings() || this.setSettings(this.options.settings);
-
 			// class variables
 			this.toolbar = this.container.find('.cms_toolbar');
 			this.toolbar.hide();
@@ -111,11 +106,14 @@ $(document).ready(function () {
 
 			// add toolbar ready class to body
 			$('body').addClass('cms_toolbar-ready');
+
+			// check if debug is true
+			if(this.options.debug) this._debug();
 		},
 
 		_load: function () {
 			// reset some settings if not authenticated
-			if(!this.options.authenticated) this.reset();
+			if(!this.options.authenticated) this._reset();
 			// check if we should show the sideframe
 			if(this.settings.sideframe.url) {
 				this.openSideframe(this.settings.sideframe.url, false);
@@ -128,7 +126,7 @@ $(document).ready(function () {
 			// attach event to the trigger handler
 			this.toolbarTrigger.bind('click', function (e) {
 				e.preventDefault();
-				that.toggleToolbar(200);
+				that.toggleToolbar();
 			});
 
 			// attach event to the navigation elements
@@ -137,7 +135,7 @@ $(document).ready(function () {
 				// attach delegate event
 				item.find('li ul a').bind('click', function (e) {
 					e.preventDefault();
-					if(!$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that.delegate($(this));
+					if(!$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that._delegate($(this));
 				});
 				// remove events from first level
 				item.find('> li > a').bind('click', function (e) {
@@ -145,7 +143,7 @@ $(document).ready(function () {
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
 						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')
-						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that.delegate($(this));
+						&& !$(this).parent().hasClass('cms_toolbar-item-navigation-disabled')) that._delegate($(this));
 				});
 
 				// handle states
@@ -275,13 +273,17 @@ $(document).ready(function () {
 		},
 
 		// public methods
-		toggleToolbar: function (speed) {
-			(this.settings.toolbar === 'collapsed') ? this._showToolbar(speed) : this._hideToolbar(speed);
+		toggleToolbar: function (show) {
+			// overwrite state when provided
+			if(show) this.settings.toolbar = 'collapsed';
+			// toggle bar
+			(this.settings.toolbar === 'collapsed') ? this._showToolbar(200) : this._hideToolbar(200);
 		},
 
 		setSettings: function (settings) {
 			// cancel if local storage is not available
 			if(!window.localStorage) return false;
+
 			// set settings
 			settings = $.extend(true, {}, this.settings, settings);
 			// save inside local storage
@@ -301,45 +303,13 @@ $(document).ready(function () {
 		resetSettings: function () {
 			// cancel if local storage is not available
 			if(!window.localStorage) return false;
+
 			// reset settings
-			localStorage.removeItem('cms_cookie');
-			this.setSettings(this.options.settings);
+			window.localStorage.removeItem('cms_cookie');
+			this.settings = this.setSettings(this.options.settings);
+
 			// enforce reload to apply changes
 			CMS.API.Helpers.reloadBrowser();
-		},
-
-		delegate: function (el) {
-			// save local vars
-			var target = el.attr('data-rel');
-
-			// reset states
-			this.reset();
-
-			switch(target) {
-				case 'modal':
-					this.openModal(el.attr('href'), el.attr('data-name'));
-					break;
-				case 'message':
-					this.openMessage(el.attr('data-text'));
-					break;
-				case 'sideframe':
-					this.openSideframe(el.attr('href'), true);
-					break;
-				case 'ajax':
-					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
-					break;
-				default:
-					window.location.href = el.attr('href');
-			}
-		},
-
-		reset: function () {
-			// reset sideframe settings
-			this.settings.sideframe = {
-				'url': null,
-				'hidden': false,
-				'maximized': this.settings.sideframe.maximized // we need to keep the default value
-			};
 		},
 
 		openSideframe: function (url, animate) {
@@ -365,6 +335,9 @@ $(document).ready(function () {
 				} else {
 					that.enforceReload = false;
 				}
+
+				// add debug infos
+				if(that.options.debug) iframe.contents().find('body').addClass('cms_debug');
 
 				// save url in settings
 				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
@@ -428,6 +401,9 @@ $(document).ready(function () {
 
 			// set top to 0 if toolbar is collapsed
 			if(this.settings.toolbar === 'collapsed') top = 0;
+
+			// do we need to add debug styles?
+			if(this.options.debug) top = top + 5;
 
 			// set correct position and show
 			this.messages.css('top', -height).show();
@@ -538,7 +514,7 @@ $(document).ready(function () {
 				'type': 'POST',
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
-				'success': function (data) {
+				'success': function () {
 					CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
@@ -572,6 +548,10 @@ $(document).ready(function () {
 			var bound = $(window).height();
 			var offset = 200;
 			if(bound - pos <= 0) $(window).scrollTop(pos - offset);
+		},
+
+		showError: function (msg) {
+			this.openMessage(msg, 'center', this.options.messageDelay, true);
 		},
 
 		// private methods
@@ -676,6 +656,40 @@ $(document).ready(function () {
 			setTimeout(function () {
 				window.location.href = anchor.attr('href');
 			}, duration);
+		},
+
+		_delegate: function (el) {
+			// save local vars
+			var target = el.attr('data-rel');
+
+			// reset states
+			this._reset();
+
+			switch(target) {
+				case 'modal':
+					this.openModal(el.attr('href'), el.attr('data-name'));
+					break;
+				case 'message':
+					this.openMessage(el.attr('data-text'));
+					break;
+				case 'sideframe':
+					this.openSideframe(el.attr('href'), true);
+					break;
+				case 'ajax':
+					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
+					break;
+				default:
+					window.location.href = el.attr('href');
+			}
+		},
+
+		_reset: function () {
+			// reset sideframe settings
+			this.settings.sideframe = {
+				'url': null,
+				'hidden': false,
+				'maximized': this.settings.sideframe.maximized // we need to keep the default value
+			};
 		},
 
 		_showSideframe: function (width, animate) {
@@ -832,7 +846,7 @@ $(document).ready(function () {
 
 				this.modal.css({
 					'left': this.toolbar.find('.cms_toolbar-left').outerWidth(true) + 50,
-					'top': 1,
+					'top': (this.options.debug) ? 6 : 1,
 					'margin': 0
 				});
 
@@ -850,6 +864,7 @@ $(document).ready(function () {
 		},
 
 		_maximizeModal: function () {
+			var debug = (this.options.debug) ? 5 : 0;
 			var container = this.modal.find('.cms_modal-body');
 			var trigger = this.modal.find('.cms_modal-maximize');
 			var btnCk = this.modal.find('iframe').contents().find('.cke_button__maximize');
@@ -875,14 +890,14 @@ $(document).ready(function () {
 				// reset
 				this.modal.css({
 					'left': 0,
-					'top': 0,
+					'top': debug,
 					'margin': 0
 				});
 				// bind resize event
 				$(window).bind('resize.cms.modal', function () {
 					container.css({
 						'width': $(window).width(),
-						'height': $(window).height() - 60
+						'height': $(window).height() - 60 - debug
 					});
 				});
 				$(window).trigger('resize.cms.modal');
@@ -1141,8 +1156,25 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-title').text(el.text());
 		},
 
-		showError: function (msg) {
-			this.openMessage(msg, 'center', this.options.messageDelay, true);
+		_debug: function () {
+			var that = this;
+			var timeout = 1000;
+			var timer = function () {};
+
+			// add top margin
+			$('html').css('margin-top', 5);
+
+			// bind message event
+			var debug = this.container.find('.cms_debug-bar');
+				debug.bind('mouseenter mouseleave', function (e) {
+					clearTimeout(timer);
+
+					if(e.type === 'mouseenter') {
+						timer = setTimeout(function () {
+							that.openMessage(that.options.lang.debug);
+						}, timeout);
+					}
+				});
 		}
 
 	});

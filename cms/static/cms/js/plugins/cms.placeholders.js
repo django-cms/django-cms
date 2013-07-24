@@ -136,6 +136,7 @@ $(document).ready(function () {
 				'cursor': 'move',
 				'opacity': 0.4,
 				'zIndex': 999999,
+				'delay': 150,
 				// nestedSortable
 				'listType': 'div.cms_draggables',
 				'doNotClear': true,
@@ -350,7 +351,8 @@ $(document).ready(function () {
 				'add_plugin': '',
 				'edit_plugin': '',
 				'move_plugin': '',
-				'copy_plugin': ''
+				'copy_plugin': '',
+				'cut_plugin': ''
 			}
 		},
 
@@ -557,7 +559,7 @@ $(document).ready(function () {
 			$('.cms_btn-publish').addClass('cms_btn-publish-active').parent().show();
 		},
 
-		copyPlugin: function () {
+		copyPlugin: function (cut) {
 			var that = this;
 			var data = {
 				'source_placeholder_id': this.options.placeholder_id,
@@ -568,9 +570,12 @@ $(document).ready(function () {
 				'csrfmiddlewaretoken': this.csrf
 			};
 
+			// determine if we are using copy or cut
+			var url = (cut) ? this.options.urls.cut_plugin : this.options.urls.copy_plugin;
+
 			$.ajax({
 				'type': 'POST',
-				'url': this.options.urls.copy_plugin,
+				'url': url,
 				'data': data,
 				'success': function () {
 					// refresh browser after success
@@ -749,7 +754,7 @@ $(document).ready(function () {
 		},
 
 		_delegate: function (el) {
-			return CMS.API.Toolbar.delegate(el);
+			return CMS.API.Toolbar._delegate(el);
 		}
 
 	});
