@@ -136,7 +136,8 @@ $(document).ready(function () {
 				'cursor': 'move',
 				'opacity': 0.4,
 				'zIndex': 999999,
-				'delay': 150,
+				'delay': 100,
+				'refreshPositions': true,
 				// nestedSortable
 				'listType': 'div.cms_draggables',
 				'doNotClear': true,
@@ -147,7 +148,7 @@ $(document).ready(function () {
 				'start': function (e, ui) {
 					that.dragging = true;
 					// show empty
-					$('.cms_droppable-empty-wrapper').slideDown(200);
+					$('.cms_droppable-empty-wrapper').show();
 					// ensure all menus are closed
 					$('.cms_dragitem .cms_submenu').hide();
 					// remove classes from empty dropzones
@@ -159,7 +160,7 @@ $(document).ready(function () {
 				'stop': function (event, ui) {
 					that.dragging = false;
 					// hide empty
-					$('.cms_droppable-empty-wrapper').slideUp(200);
+					$('.cms_droppable-empty-wrapper').hide();
 
 					// cancel if isAllowed returns false
 					if(!that.state) return false;
