@@ -119,7 +119,8 @@ class PlaceholderAdmin(ModelAdmin):
         extra_context = extra_context or {}
         extra_context.update(self.language_tab_context(request))
         tab_language = request.GET.get("language", None)
-        response = super(PlaceholderAdmin, self).change_view(request, object_id, extra_context=extra_context)
+        response = super(PlaceholderAdmin, self).change_view(
+            request, object_id, form_url=form_url, extra_context=extra_context)
 
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
             location = response._headers['location']
