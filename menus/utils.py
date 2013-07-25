@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
 import warnings
@@ -79,7 +80,7 @@ class DefaultLanguageChanger(object):
     def app_path(self):
         if self._app_path is None:
             if settings.USE_I18N:
-                page_path = self.get_page_path(self.request.LANGUAGE_CODE)
+                page_path = self.get_page_path(get_language_from_request(self.request))
             else:
                 page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
