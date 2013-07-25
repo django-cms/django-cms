@@ -21,6 +21,7 @@ $(document).ready(function () {
 			'edit_plugin': '{% url "admin:cms_page_edit_plugin" instance.pk %}',
 			'move_plugin': '{% url "admin:cms_page_move_plugin" %}',
 			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}',
+			{% comment %}'cut_plugin': '{% url "admin:cms_page_cut_plugins" %}',{% endcomment %}
 			'stack_plugin': ''
 		}
 	});
