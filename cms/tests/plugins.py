@@ -154,7 +154,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(text_plugin_2.position, 2)
             self.assertEqual(db_plugin_2.position, 2)
             ## Finally we render the placeholder to test the actual content
-            rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url()), None)
+            rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url(), page=page_en), None)
             self.assertEquals(rendered_placeholder, "I'm the firstI'm the second")
 
     def test_add_cancel_plugin(self):
@@ -572,7 +572,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
         # this should not fail, even if there in an empty plugin
-        rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url()), width=200)
+        rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url(), page=other_page), width=200)
         self.assertIn("foobar", rendered)
 
     def test_render_textplugin(self):

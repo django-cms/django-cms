@@ -186,12 +186,22 @@ class PlaceholderAdmin(ModelAdmin):
     @xframe_options_sameorigin
     @transaction.commit_on_success
     def copy_plugins(self, request):
+        """
+        POST request should have the following data:
+
+        - source_language
+        - source_placeholder_id
+        - source_plugin_id (optional)
+        - target_language
+        - target_placeholder_id
+        - target_plugin_id (optional, new parent)
+        """
         source_language = request.POST['source_language']
         source_placeholder_id = request.POST['source_placeholder_id']
         source_plugin_id = request.POST.get('source_plugin_id', None)
         target_language = request.POST['target_language']
         target_placeholder_id = request.POST['target_placeholder_id']
-        target_plugin_id = request.POST.get('target_placeholder_id', None)
+        target_plugin_id = request.POST.get('target_plugin_id', None)
         source_placeholder = get_object_or_404(Placeholder, pk=source_placeholder_id)
         target_placeholder = get_object_or_404(Placeholder, pk=target_placeholder_id)
         if not target_language or not target_language in get_language_list():

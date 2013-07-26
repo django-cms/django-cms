@@ -1,5 +1,6 @@
 from __future__ import with_statement
 import sys
+import re
 
 from django.contrib.auth.models import Permission
 from cms.api import create_page
@@ -113,15 +114,19 @@ class ViewTests(SettingsOverrideTestCase):
     def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,
                     login_required=True)
-        request = self.get_request('/en/')
-        response = details(request, '')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '%s?next=/en/' % settings.LOGIN_URL)
-        with SettingsOverride(USE_I18N=False):
+        plain_url = '/accounts/'
+        login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
+        with SettingsOverride(LOGIN_URL=plain_url+'?signin'):
+            request = self.get_request('/en/')
+            response = details(request, '')
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue(login_rx.search(response['Location']))
+        login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
+        with SettingsOverride(USE_I18N=False, LOGIN_URL=plain_url+'?signin'):
             request = self.get_request('/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?next=/' % settings.LOGIN_URL)
+            self.assertTrue(login_rx.search(response['Location']))
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)

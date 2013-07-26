@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.utils.numberformat import format
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
 from cms.compat import get_user_model
@@ -263,9 +264,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             pop = push
 
         context_en = NoPushPopContext()
-        context_en['request'] = self.get_request(language="en")
+        context_en['request'] = self.get_request(language="en", page=page_en)
         context_de = NoPushPopContext()
-        context_de['request'] = self.get_request(language="de")
+        context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (non-fallback) behavior)
         ## English page should have the text plugin
@@ -290,6 +291,36 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^de body$")
+
+    def test_placeholder_pk_thousands_format(self):
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        for placeholder in page.placeholders.all():
+            page.placeholders.remove(placeholder)
+            placeholder.pk += 1000
+            placeholder.save()
+            page.placeholders.add(placeholder)
+        page.reload()
+        for placeholder in page.placeholders.all():
+            plugin = add_plugin(placeholder, "TextPlugin", "en", body="body",
+                                id=placeholder.pk)
+        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+            # Superuser
+            user = self.get_superuser()
+            self.client.login(username=user.username, password=user.username)
+            response = self.client.get("/en/?edit")
+            for placeholder in page.placeholders.all():
+                self.assertContains(
+                    response, "'placeholder_id': '%s'" % placeholder.pk)
+                self.assertNotContains(
+                    response, "'placeholder_id': '%s'" % format(
+                        placeholder.pk, ".", grouping=3, thousand_sep=","))
+                self.assertNotContains(
+                    response, "'plugin_id': '%s'" % format(
+                        placeholder.pk, ".", grouping=3, thousand_sep=","))
+                self.assertNotContains(
+                    response, "'clipboard': '%s'" % format(
+                        response.context['request'].toolbar.clipboard.pk, ".",
+                        grouping=3, thousand_sep=","))
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
