@@ -1,32 +1,43 @@
 # -*- coding: utf-8 -*-
+from itertools import chain
+from datetime import datetime
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel
-from cms.plugin_rendering import render_plugins, render_placeholder
+from cms.plugin_pool import plugin_pool
+from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
-from cms.utils import get_language_from_request
-from cms.utils.moderator import get_cmsplugin_queryset, get_page_queryset
+from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils.compat.type_checks import string_types, int_types
+from cms.utils.compat.dj import force_unicode
+from cms.utils.i18n import force_language
+from cms.utils.moderator import use_draft
+from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
+from cms import __version__
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
-from itertools import chain
 import re
+from sekizai.helpers import Watcher, get_varname
 
 
 register = template.Library()
+
 
 def get_site_id(site):
     if site:
         if isinstance(site, Site):
             site_id = site.id
-        elif isinstance(site, int) or (isinstance(site, basestring) and site.isdigit()):
+        elif isinstance(site, int) or (isinstance(site, string_types) and site.isdigit()):
             site_id = int(site)
         else:
             site_id = settings.SITE_ID
@@ -34,14 +45,19 @@ def get_site_id(site):
         site_id = settings.SITE_ID
     return site_id
 
+
 def has_permission(page, request):
     return page.has_change_permission(request)
+
+
 register.filter(has_permission)
 
 CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
 
+
 def _clean_key(key):
     return CLEAN_KEY_PATTERN.sub('-', key)
+
 
 def _get_cache_key(name, page_lookup, lang, site_id):
     if isinstance(page_lookup, Page):
@@ -49,7 +65,8 @@ def _get_cache_key(name, page_lookup, lang, site_id):
     else:
         page_key = str(page_lookup)
     page_key = _clean_key(page_key)
-    return name+'__page_lookup:'+page_key+'_site:'+str(site_id)+'_lang:'+str(lang)
+    return name + '__page_lookup:' + page_key + '_site:' + str(site_id) + '_lang:' + str(lang)
+
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
     """
@@ -65,27 +82,41 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         return request.current_page
     if isinstance(page_lookup, Page):
         return page_lookup
-    if isinstance(page_lookup, basestring):
+    if isinstance(page_lookup, string_types):
         page_lookup = {'reverse_id': page_lookup}
-    elif isinstance(page_lookup, (int, long)):
+    elif isinstance(page_lookup, int_types):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
     page_lookup.update({'site': site_id})
     try:
-        return get_page_queryset(request).get(**page_lookup)
+        if 'pk' in page_lookup:
+            page = Page.objects.all().get(**page_lookup)
+            if request and use_draft(request):
+                if page.publisher_is_draft:
+                    return page
+                else:
+                    return page.publisher_draft
+            else:
+                if page.publisher_is_draft:
+                    return page.publisher_public
+                else:
+                    return page
+        else:
+            return get_page_queryset(request).get(**page_lookup)
     except Page.DoesNotExist:
         site = Site.objects.get_current()
-        subject = _('Page not found on %(domain)s') % {'domain':site.domain}
+        subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
-            "The URL of the request was: http://%(host)s%(path)s") \
-            % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
+                 "The URL of the request was: http://%(host)s%(path)s") \
+               % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
             if settings.SEND_BROKEN_LINK_EMAILS:
                 mail_managers(subject, body, fail_silently=True)
             return None
+
 
 class PageUrl(InclusionTag):
     template = 'cms/content.html'
@@ -107,35 +138,42 @@ class PageUrl(InclusionTag):
             return {'content': ''}
         if lang is None:
             lang = get_language_from_request(request)
-        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id)+'_type:absolute_url'
+        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
         url = cache.get(cache_key)
         if not url:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, settings.CMS_CACHE_DURATIONS['content'])
+                cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
             return {'content': url}
         return {'content': ''}
+
+
 register.tag(PageUrl)
 
 register.tag('page_id_url', PageUrl)
 
 
 def _get_placeholder(current_page, page, context, name):
-    from cms.utils.plugins import get_placeholders
     placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
     if page.pk in placeholder_cache:
-        return placeholder_cache[page.pk].get(name, None)
+        placeholder = placeholder_cache[page.pk].get(name, None)
+        if placeholder:
+            return placeholder
     placeholder_cache[page.pk] = {}
-    slots = get_placeholders(page.get_template())
-    placeholders = page.placeholders.filter(slot__in=slots)
+    placeholders = page.rescan_placeholders().values()
     assign_plugins(context['request'], placeholders, get_language())
     for placeholder in placeholders:
         placeholder_cache[page.pk][placeholder.slot] = placeholder
         placeholder.page = page
     current_page._tmp_placeholders_cache = placeholder_cache
-    return placeholder_cache[page.pk].get(name, None)
+    placeholder = placeholder_cache[page.pk].get(name, None)
+    if page.application_urls and not placeholder:
+        raise PlaceholderNotFound(
+            '"%s" placeholder not found in an apphook application. Please use stacks instead.' % name)
+    return placeholder
+
 
 def get_placeholder_content(context, request, current_page, name, inherit):
     edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
@@ -154,9 +192,9 @@ def get_placeholder_content(context, request, current_page, name, inherit):
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
-    # if we reach this point, we have an empty or non-existant placeholder
-    # call _get_placeholder again to get the placeholder properly rendered
-    # in frontend editing
+            # if we reach this point, we have an empty or non-existant placeholder
+            # call _get_placeholder again to get the placeholder properly rendered
+            # in frontend editing
     placeholder = _get_placeholder(current_page, current_page, context, name)
     return render_placeholder(placeholder, context, name)
 
@@ -215,6 +253,7 @@ class Placeholder(Tag):
             elif bit.isdigit():
                 width = int(bit)
                 import warnings
+
                 warnings.warn(
                     "The width parameter for the placeholder tag is deprecated.",
                     DeprecationWarning
@@ -239,12 +278,67 @@ class Placeholder(Tag):
 
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
+
+
 register.tag(Placeholder)
+
+
+class RenderPlugin(InclusionTag):
+    template = 'cms/content.html'
+    name = 'render_plugin'
+    options = Options(
+        Argument('plugin')
+    )
+
+    def get_context(self, context, plugin):
+        # Prepend frontedit toolbar output if applicable
+        edit = False
+        request = context['request']
+        toolbar = getattr(request, 'toolbar', None)
+        page = request.current_page
+        if toolbar.edit_mode and (not page or page.has_change_permission(request)):
+            edit = True
+        if edit:
+            from cms.middleware.toolbar import toolbar_plugin_processor
+
+            processors = (toolbar_plugin_processor,)
+        else:
+            processors = None
+
+        return {'content': plugin.render_plugin(context, processors=processors)}
+
+
+register.tag(RenderPlugin)
+
+
+class PluginChildClasses(InclusionTag):
+    template = "cms/toolbar/draggable_menu.html"
+    name = "plugin_child_classes"
+    options = Options(
+        Argument('plugin')
+    )
+
+    def get_context(self, context, plugin):
+        # Prepend frontedit toolbar output if applicable
+
+        request = context['request']
+        page = request.current_page
+        slot = context['slot']
+        child_plugin_classes = []
+        if plugin.get_plugin_class().allow_children:
+            instance, plugin = plugin.get_plugin_instance()
+            for child_class_name in plugin.get_child_classes(slot, page):
+                cls = plugin_pool.get_plugin(child_class_name)
+                child_plugin_classes.append((cls.__name__, force_unicode(cls.name)))
+        return {'plugin_classes': child_plugin_classes}
+
+
+register.tag(PluginChildClasses)
 
 
 class PageAttribute(AsTag):
     """
-    This template node is used to output attribute from a page such
+    This template node is used to output an attribute from a page such
     as its title or slug.
 
     Synopsis
@@ -270,7 +364,8 @@ class PageAttribute(AsTag):
     - page_title
     - slug
     - meta_description
-    - meta_keywords
+    - changed_date
+    - changed_by
 
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
@@ -291,9 +386,10 @@ class PageAttribute(AsTag):
         "title",
         "slug",
         "meta_description",
-        "meta_keywords",
         "page_title",
-        "menu_title"
+        "menu_title",
+        "changed_date",
+        "changed_by",
     ]
 
     def get_value(self, context, name, page_lookup):
@@ -306,10 +402,16 @@ class PageAttribute(AsTag):
         if page == "dummy":
             return ''
         if page and name in self.valid_attributes:
-            f = getattr(page, "get_%s" % name)
-            return f(language=lang, fallback=True)
+            func = getattr(page, "get_%s" % name)
+            ret_val = func(language=lang, fallback=True)
+            if not isinstance(ret_val, datetime):
+                ret_val = escape(ret_val)
+            return ret_val
         return ''
+
+
 register.tag(PageAttribute)
+
 
 class CleanAdminListFilter(InclusionTag):
     template = 'admin/filter.html'
@@ -328,11 +430,20 @@ class CleanAdminListFilter(InclusionTag):
             if choice['query_string'] != query_string:
                 unique_choices.append(choice)
                 query_string = choice['query_string']
-        return {'title': spec.title(), 'choices' : unique_choices}
+        return {'title': spec.title(), 'choices': unique_choices}
+
+
+def _restore_sekizai(context, changes):
+    varname = get_varname()
+    sekizai_container = context[varname]
+    for key, values in changes.items():
+        sekizai_namespace = sekizai_container[key]
+        for value in values:
+            sekizai_namespace.append(value)
 
 
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
-        site=None, cache_result=True):
+                               site=None, cache_result=True):
     """
     Shows the content of a page with a placeholder name and given lookup
     arguments in the given language.
@@ -352,30 +463,35 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     if lang is None:
         lang = get_language_from_request(request)
 
-    content = None
-
     if cache_result:
         base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
         cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
-        content = cache.get(cache_key)
+        cached_value = cache.get(cache_key)
+        if isinstance(cached_value, dict): # new style
+            _restore_sekizai(context, cached_value['sekizai'])
+            return {'content': mark_safe(cached_value['content'])}
+        elif isinstance(cached_value, string_types): # old style
+            return {'content': mark_safe(cached_value)}
 
-    if not content:
-        page = _get_page_by_untyped_arg(page_lookup, request, site_id)
-        if not page:
-            return {'content': ''}
-        try:
-            placeholder = page.placeholders.get(slot=placeholder_name)
-        except PlaceholderModel.DoesNotExist:
-            if settings.DEBUG:
-                raise
-            return {'content': ''}
-        content = render_placeholder(placeholder, context, placeholder_name)
+    page = _get_page_by_untyped_arg(page_lookup, request, site_id)
+    if not page:
+        return {'content': ''}
+    try:
+        placeholder = page.placeholders.get(slot=placeholder_name)
+    except PlaceholderModel.DoesNotExist:
+        if settings.DEBUG:
+            raise
+        return {'content': ''}
+    watcher = Watcher(context)
+    content = render_placeholder(placeholder, context, placeholder_name)
+    changes = watcher.get_changes()
     if cache_result:
-        cache.set(cache_key, content, settings.CMS_CACHE_DURATIONS['content'])
+        cache.set(cache_key, {'content': content, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
 
     if content:
         return {'content': mark_safe(content)}
     return {'content': ''}
+
 
 class ShowPlaceholderById(InclusionTag):
     template = 'cms/content.html'
@@ -392,25 +508,34 @@ class ShowPlaceholderById(InclusionTag):
         return _show_placeholder_for_page(**self.get_kwargs(*args, **kwargs))
 
     def get_kwargs(self, context, placeholder_name, reverse_id, lang, site):
+        cache_result = True
+        if 'preview' in context['request'].GET:
+            cache_result = False
         return {
             'context': context,
             'placeholder_name': placeholder_name,
             'page_lookup': reverse_id,
             'lang': lang,
-            'site': site
+            'site': site,
+            'cache_result': cache_result
         }
+
+
 register.tag(ShowPlaceholderById)
 register.tag('show_placeholder', ShowPlaceholderById)
 
+
 class ShowUncachedPlaceholderById(ShowPlaceholderById):
     name = 'show_uncached_placeholder_by_id'
+
     def get_kwargs(self, *args, **kwargs):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
         kwargs['cache_result'] = False
         return kwargs
+
+
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
-
 
 
 class CMSToolbar(InclusionTag):
@@ -426,9 +551,35 @@ class CMSToolbar(InclusionTag):
             return ''
         if not toolbar.show_toolbar:
             return ''
-        return super(CMSToolbar, self).render(context)
+        language = request.toolbar.language
+        with force_language(language):
+            request.toolbar.populate()
+            context['cms_version'] = __version__
+            content = super(CMSToolbar, self).render(context)
+        return content
 
     def get_context(self, context):
-        context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
         return context
+
+
 register.tag(CMSToolbar)
+
+
+class CMSEditablePageTitle(InclusionTag):
+    template = 'cms/toolbar/plugin_text_noedit.html'
+    edit_template = 'cms/toolbar/plugin_text.html'
+    name = 'show_editable_page_title'
+
+    def get_template(self, context, **kwargs):
+        request = context.get('request', None)
+        if request and hasattr(request, 'toolbar'):
+            if request.toolbar.edit_mode:
+                return self.edit_template
+        return self.template
+
+    def get_context(self, context):
+
+        return context
+
+
+register.tag(CMSEditablePageTitle)

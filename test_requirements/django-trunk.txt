@@ -1,2 +1,4 @@
 -r requirements_base.txt
-https://github.com/django/django/tarball/master/django-cms.tar.gz'
+https://github.com/django/django/tarball/master/django.tar.gz#egg=django
+django-reversion==1.6.2
+

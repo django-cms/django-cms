@@ -11,7 +11,6 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
     Test CMS_PUBLIC_FOR=staff group access and menu nodes rendering
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'staff',
     }
@@ -50,6 +49,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_c',
                    'page_b_d',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -111,6 +112,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_b_b',
                    'page_b_b_c',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -177,6 +180,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_d_b',
                    'page_b_d_c',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -185,7 +190,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self.assertGrantedVisibility(all_pages, granted, username='user_3')
         user = User.objects.get(username='user_3')
         urls = self.get_url_dict(all_pages)
-        url = '/en' + self.get_pages_root()
+        url = self.get_pages_root()
         self.assertViewAllowed(urls[url], user)
         self.assertViewAllowed(urls["/en/page_b/"], user)
         self.assertViewAllowed(urls["/en/page_b/page_b_a/"], user)
@@ -226,7 +231,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         user = User.objects.get(username='user_3_nostaff')
         urls = self.get_url_dict(all_pages)
         # call /
-        url = '/en' + self.get_pages_root()
+        url = self.get_pages_root()
         self.assertViewNotAllowed(urls[url], user)
         self.assertViewAllowed(urls["/en/page_b/"], user)
         self.assertViewAllowed(urls["/en/page_b/page_b_a/"], user)
@@ -256,6 +261,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_b_b',
                    'page_b_b_c',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -265,7 +272,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         user = User.objects.get(username='user_4')
         urls = self.get_url_dict(all_pages)
         # call /
-        url = '/en' + self.get_pages_root()
+        url = self.get_pages_root()
         self.assertViewAllowed(urls[url], user)
         self.assertViewNotAllowed(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_a/"], user)
@@ -300,7 +307,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self.assertGrantedVisibility(all_pages, granted, username='user_4_nostaff')
         user = User.objects.get(username='user_4_nostaff')
         urls = self.get_url_dict(all_pages)
-        url = '/en' + self.get_pages_root()
+        url = self.get_pages_root()
         self.assertViewNotAllowed(urls[url], user)
         self.assertViewNotAllowed(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_a/"], user)
@@ -327,6 +334,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self._setup_view_restrictions()
         granted = ['page_a',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d',
                    'page_d_a',
                    'page_d_b',
@@ -336,7 +345,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self.assertGrantedVisibility(all_pages, granted, username='user_5')
         user = User.objects.get(username='user_5')
         urls = self.get_url_dict(all_pages)
-        url = '/en' + self.get_pages_root()
+        url = self.get_pages_root()
         self.assertViewAllowed(urls[url], user)
         self.assertViewNotAllowed(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_a/"], user)
@@ -361,7 +370,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self.assertGrantedVisibility(all_pages, granted, username='user_5_nostaff')
         user = User.objects.get(username='user_5_nostaff')
         urls = self.get_url_dict(all_pages)
-        url = '/en' + self.get_pages_root()
+        url = self.get_pages_root()
         self.assertViewNotAllowed(urls[url], user)
         self.assertViewAllowed(urls["/en/page_d/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/"], user)

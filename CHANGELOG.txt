@@ -110,7 +110,86 @@
 
  - fixed an incompatibility with Python 2.5
 
+==== 2.3.4 (2012-11-09) ====
 
+- Fixed WymEditor
+- Fixed Norwegian translations
+- Fixed a bug that could lead to slug clashes
+- Fixed page change form (jQuery and permissions)
+- Fixed placeholder field permission checks
 
+==== 2.4.0 (2013-4-17)===
 
+Please see Install/2.4 release notes *before* attempting to upgrade to version 2.4.
 
+- Compatibility with Django 1.4 and 1.5 (1.3 support dropped)
+- Support for Python 2.5 dropped
+- CMS_MAX_PAGE_PUBLISH_REVERSIONS has been added
+- Reversion integration has changed to limit DB size
+- CMS_LANGUAGE setting has changed
+- CMS_HIDE_UNTRANSLATED setting removed
+- CMS_LANGUAGE_FALLBACK setting removed
+- CMS_LANGUAGE_CONF setting removed
+- CMS_SITE_LANGUAGES setting removed
+- CMS_FRONTEND_LANGUAGES setting removed
+- MultilingualMiddleware has been removed
+- CMS_FLAT_URLS has been removed
+- CMS_MODERATOR has been removed and replaced with simple publisher.
+- PlaceholderAdmin has now language tabs and has support for django-hvad
+- Added `cms.middleware.language.LanguageCookieMiddleware`
+- Added CMS_RAW_ID_USERS
+
+==== 2.4.1 (2013-4-22)===
+
+- USE_I18N=False fixed
+- some frontend css stuff fixed
+- check_copy_relations fixed for abstract classes
+- non public frontend languages fixed
+
+==== 2.4.2 (2013-5-29)===
+
+- Apphook edit mode bugfix
+- Added option to render_placeholder tag to set language
+- Huge permission cache invalidation speed up
+- Doc improvements
+- css cleanup in PlaceholderAdmin
+- Log change of page status done via AJAX
+- Use --noinput convention for delete_orphaned_plugins command
+- added Testing docs
+- fixed more issues with only one language
+- locales updated
+
+==== 3.0.0 (XXXXX) ===
+
+- Plugins are only editable in frontend
+- PluginEditor has been removed in backend
+- New frontend editing
+- New Toolbar
+- Plugin API for creating new plugins and moving has changed
+- render_to_response replaced with TemplateResponse in cms.views
+- CMS_SEO_FIELDS removed and seo fields better integrated
+- meta_keywords field removed as not relevant anymore
+- CMS_MENU_TITLE_OVERWRITE default changed to True
+- Toolbar has language switcher built in
+- User settings module added for saving the language of the user so when he switches languages the toolbar/interface
+  keeps the language.
+- language_chooser templatetag now only displays public languages, even when you are logged in as staff.
+- undo and redo functionality added in toolbar if django-reversion is installed.
+- page admin split in 3 different for basic, advanced and permissions
+- New show_editable_page_title templatetag to edit page title from the frontend
+- Removed PLACEHOLDER_FRONTEND_EDITING setting
+- Removed CMS_URL_OVERWRITE setting. Always enabled.
+- Removed CMS_MENU_TITLE_OVERWRITE settings. Always enabled.
+- Removed CMS_REDIRECTS. Always enabled.
+- Removed CMS_SOFTROOT. Always enabled.
+- Removed CMS_SHOW_START_DATE. Always enabled.
+- Removed CMS_SHOW_END_DATE. Always enabled.
+- Added (optional) language fallback for placeholders.
+- moved apphooks from title to page model so we need to add them only once.
+- request.current_app has been removed.
+- added a namespace field, reverse_id is not used anymore for apphook namespaces.
+- PlaceholderAdmin does not have LanguageTabs anymore. It only has a PluginAPI now.
+- PageAdmin uses the same Plugin API as PlaceholderAdmin
+- Toolbar API for your own apps added
+- twitter plugin removed
+- New stacks application

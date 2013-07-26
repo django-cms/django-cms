@@ -1,103 +1,352 @@
 # -*- coding: utf-8 -*-
-from south.db import db
-from django.db import models
-from cms.models import *
 import datetime
+from south.db import db
+from south.v2 import SchemaMigration
+from django.db import models
 
-class Migration:
-    
+
+class Migration(SchemaMigration):
+
     def forwards(self, orm):
-        
-        # Adding field 'Title.meta_keywords'
-        db.add_column('cms_title', 'meta_keywords', models.CharField(_("keywords"), max_length=255, blank=True, null=True))
-        
-        # Adding field 'Title.meta_description'
-        db.add_column('cms_title', 'meta_description', models.TextField(_("description"), max_length=255, blank=True, null=True))        
-    
+        # Dummy migration
+        pass
+
+
+
     def backwards(self, orm):
-        
-        # Deleting field 'Title.meta_keywords'
-        db.delete_column('cms_title', 'meta_keywords')
-        
-        # Deleting field 'Title.meta_description'
-        db.delete_column('cms_title', 'meta_description')
-        
-    
+    # Dummy migration
+        pass
+
+
     models = {
-        'sites.site': {
-            'Meta': {'ordering': "('domain',)", 'db_table': "'django_site'"},
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True'})
+        'auth.group': {
+            'Meta': {'object_name': 'Group'},
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [],
+                     {'unique': 'True', 'max_length': '80'}),
+            'permissions': ('django.db.models.fields.related.ManyToManyField', [],
+                            {'to': "orm['auth.Permission']", 'symmetrical': 'False',
+                             'blank': 'True'})
+        },
+        'auth.permission': {
+            'Meta': {
+                'ordering': "('content_type__app_label', 'content_type__model', 'codename')",
+                'unique_together': "(('content_type', 'codename'),)",
+                'object_name': 'Permission'},
+            'codename': (
+                'django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [],
+                             {'to': "orm['contenttypes.ContentType']"}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'auth.user': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True'})
-        },
-        'cms.pagepermission': {
-            'can_change_softroot': ('models.BooleanField', ['_("can change soft-root")'], {'default': 'False'}),
-            'can_edit': ('models.BooleanField', ['_("can edit")'], {'default': 'True'}),
-            'can_publish': ('models.BooleanField', ['_("can publish")'], {'default': 'True'}),
-            'everybody': ('models.BooleanField', ['_("everybody")'], {'default': 'False'}),
-            'group': ('models.ForeignKey', ['Group'], {'null': 'True', 'blank': 'True'}),
-            'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'page': ('models.ForeignKey', ['Page'], {'null': 'True', 'blank': 'True'}),
-            'type': ('models.IntegerField', ['_("type")'], {'default': '0'}),
-            'user': ('models.ForeignKey', ['User'], {'null': 'True', 'blank': 'True'})
-        },
-        'cms.title': {
-            'Meta': {'unique_together': "(('language','page'),)"},
-            'application_urls': ('models.CharField', ["_('application')"], {'blank': 'True', 'max_length': '200', 'null': 'True', 'db_index': 'True'}),
-            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
-            'has_url_overwrite': ('models.BooleanField', ['_("has url overwrite")'], {'default': 'False', 'editable': 'False', 'db_index': 'True'}),
-            'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'language': ('models.CharField', ['_("language")'], {'max_length': '3', 'db_index': 'True'}),
-            'meta_description': ('models.TextField', ['_("description")'], {'max_length': '255', 'blank': 'True', 'null':'True'}),
-            'meta_keywords': ('models.CharField', ['_("keywords")'], {'max_length': '255', 'blank': 'True', 'null':'True'}),
-            'page': ('models.ForeignKey', ['Page'], {'related_name': '"title_set"'}),
-            'path': ('models.CharField', ['_("path")'], {'max_length': '255', 'db_index': 'True'}),
-            'redirect': ('models.CharField', ['_("redirect")'], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'slug': ('models.SlugField', ['_("slug")'], {'unique': 'False', 'max_length': '255', 'db_index': 'True'}),
-            'title': ('models.CharField', ['_("title")'], {'max_length': '255'})
+            'Meta': {'object_name': 'User'},
+            'date_joined': ('django.db.models.fields.DateTimeField', [],
+                            {'default': 'datetime.datetime.now'}),
+            'email': ('django.db.models.fields.EmailField', [],
+                      {'max_length': '75', 'blank': 'True'}),
+            'first_name': ('django.db.models.fields.CharField', [],
+                           {'max_length': '30', 'blank': 'True'}),
+            'groups': ('django.db.models.fields.related.ManyToManyField', [],
+                       {'to': "orm['auth.Group']", 'symmetrical': 'False',
+                        'blank': 'True'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_active': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_staff': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_superuser': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [],
+                           {'default': 'datetime.datetime.now'}),
+            'last_name': ('django.db.models.fields.CharField', [],
+                          {'max_length': '30', 'blank': 'True'}),
+            'password': (
+                'django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'user_permissions': (
+                'django.db.models.fields.related.ManyToManyField', [],
+                {'to': "orm['auth.Permission']", 'symmetrical': 'False',
+                 'blank': 'True'}),
+            'username': ('django.db.models.fields.CharField', [],
+                         {'unique': 'True', 'max_length': '30'})
         },
         'cms.cmsplugin': {
-            'creation_date': ('models.DateTimeField', ['_("creation date")'], {'default': 'datetime.datetime.now', 'editable': 'False'}),
-            'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'language': ('models.CharField', ['_("language")'], {'db_index': 'True', 'max_length': '3', 'editable': 'False', 'blank': 'False'}),
-            'level': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
-            'lft': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
-            'page': ('models.ForeignKey', ['Page'], {'editable': 'False'}),
-            'parent': ('models.ForeignKey', ['CMSPlugin'], {'null': 'True', 'editable': 'False', 'blank': 'True'}),
-            'placeholder': ('models.CharField', ['_("slot")'], {'max_length': '50', 'editable': 'False', 'db_index': 'True'}),
-            'plugin_type': ('models.CharField', ['_("plugin_name")'], {'max_length': '50', 'editable': 'False', 'db_index': 'True'}),
-            'position': ('models.PositiveSmallIntegerField', ['_("position")'], {'null': 'True', 'editable': 'False', 'blank': 'True'}),
-            'rght': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
-            'tree_id': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'})
+            'Meta': {'object_name': 'CMSPlugin'},
+            'changed_date': ('django.db.models.fields.DateTimeField', [],
+                             {'auto_now': 'True', 'blank': 'True'}),
+            'creation_date': ('django.db.models.fields.DateTimeField', [],
+                              {'default': 'datetime.datetime.now'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'language': ('django.db.models.fields.CharField', [],
+                         {'max_length': '15', 'db_index': 'True'}),
+            'level': ('django.db.models.fields.PositiveIntegerField', [],
+                      {'db_index': 'True'}),
+            'lft': ('django.db.models.fields.PositiveIntegerField', [],
+                    {'db_index': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [],
+                       {'to': "orm['cms.CMSPlugin']", 'null': 'True',
+                        'blank': 'True'}),
+            'placeholder': ('django.db.models.fields.related.ForeignKey', [],
+                            {'to': "orm['cms.Placeholder']", 'null': 'True'}),
+            'plugin_type': ('django.db.models.fields.CharField', [],
+                            {'max_length': '50', 'db_index': 'True'}),
+            'position': ('django.db.models.fields.PositiveSmallIntegerField', [],
+                         {'null': 'True', 'blank': 'True'}),
+            'rght': ('django.db.models.fields.PositiveIntegerField', [],
+                     {'db_index': 'True'}),
+            'tree_id': ('django.db.models.fields.PositiveIntegerField', [],
+                        {'db_index': 'True'})
+        },
+        'cms.globalpagepermission': {
+            'Meta': {'object_name': 'GlobalPagePermission'},
+            'can_add': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_change': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_change_advanced_settings': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'can_change_permissions': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'can_delete': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_moderate': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_move_page': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_publish': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_recover_page': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_view': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'group': ('django.db.models.fields.related.ForeignKey', [],
+                      {'to': "orm['auth.Group']", 'null': 'True', 'blank': 'True'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'sites': ('django.db.models.fields.related.ManyToManyField', [],
+                      {'symmetrical': 'False', 'to': "orm['sites.Site']",
+                       'null': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
         },
         'cms.page': {
-            'Meta': {'ordering': "('tree_id','lft')"},
-            'author': ('models.ForeignKey', ['User'], {'limit_choices_to': "{'page__isnull':False}"}),
-            'creation_date': ('models.DateTimeField', [], {'default': 'datetime.datetime.now', 'editable': 'False'}),
-            'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'in_navigation': ('models.BooleanField', ['_("in navigation")'], {'default': 'True', 'db_index': 'True'}),
-            'level': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
-            'lft': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
-            'login_required': ('models.BooleanField', ["_('login required')"], {'default': 'False'}),
-            'navigation_extenders': ('models.CharField', ['_("navigation extenders")'], {'blank': 'True', 'max_length': '80', 'null': 'True', 'db_index': 'True'}),
-            'parent': ('models.ForeignKey', ['Page'], {'db_index': 'True', 'related_name': "'children'", 'null': 'True', 'blank': 'True'}),
-            'publication_date': ('models.DateTimeField', ['_("publication date")'], {'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'publication_end_date': ('models.DateTimeField', ['_("publication end date")'], {'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'reverse_id': ('models.CharField', ['_("id")'], {'blank': 'True', 'max_length': '40', 'null': 'True', 'db_index': 'True'}),
-            'rght': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'}),
-            'sites': ('models.ManyToManyField', ['Site'], {}),
-            'soft_root': ('models.BooleanField', ['_("soft root")'], {'default': 'False', 'db_index': 'True'}),
-            'status': ('models.IntegerField', ['_("status")'], {'default': '0', 'db_index': 'True'}),
-            'template': ('models.CharField', ['_("template")'], {'max_length': '100'}),
-            'tree_id': ('models.PositiveIntegerField', [],{'db_index':'True', 'editable':'False'})
+            'Meta': {'ordering': "('site', 'tree_id', 'lft')",
+                     'object_name': 'Page'},
+            'changed_by': (
+                'django.db.models.fields.CharField', [], {'max_length': '70'}),
+            'changed_date': ('django.db.models.fields.DateTimeField', [],
+                             {'auto_now': 'True', 'blank': 'True'}),
+            'created_by': (
+                'django.db.models.fields.CharField', [], {'max_length': '70'}),
+            'creation_date': ('django.db.models.fields.DateTimeField', [],
+                              {'auto_now_add': 'True', 'blank': 'True'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'in_navigation': ('django.db.models.fields.BooleanField', [],
+                              {'default': 'True', 'db_index': 'True'}),
+            'level': ('django.db.models.fields.PositiveIntegerField', [],
+                      {'db_index': 'True'}),
+            'lft': ('django.db.models.fields.PositiveIntegerField', [],
+                    {'db_index': 'True'}),
+            'limit_visibility_in_menu': (
+                'django.db.models.fields.SmallIntegerField', [],
+                {'default': 'None', 'null': 'True', 'db_index': 'True',
+                 'blank': 'True'}),
+            'login_required': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'moderator_state': ('django.db.models.fields.SmallIntegerField', [],
+                                {'default': '1', 'blank': 'True'}),
+            'navigation_extenders': ('django.db.models.fields.CharField', [],
+                                     {'db_index': 'True', 'max_length': '80',
+                                      'null': 'True', 'blank': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [],
+                       {'blank': 'True', 'related_name': "'children'",
+                        'null': 'True', 'to': "orm['cms.Page']"}),
+            'placeholders': ('django.db.models.fields.related.ManyToManyField', [],
+                             {'to': "orm['cms.Placeholder']",
+                              'symmetrical': 'False'}),
+            'publication_date': ('django.db.models.fields.DateTimeField', [],
+                                 {'db_index': 'True', 'null': 'True',
+                                  'blank': 'True'}),
+            'publication_end_date': ('django.db.models.fields.DateTimeField', [],
+                                     {'db_index': 'True', 'null': 'True',
+                                      'blank': 'True'}),
+            'published': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'publisher_is_draft': ('django.db.models.fields.BooleanField', [],
+                                   {'default': 'True', 'db_index': 'True'}),
+            'publisher_public': (
+                'django.db.models.fields.related.OneToOneField', [],
+                {'related_name': "'publisher_draft'", 'unique': 'True', 'null': 'True',
+                 'to': "orm['cms.Page']"}),
+            'publisher_state': ('django.db.models.fields.SmallIntegerField', [],
+                                {'default': '0', 'db_index': 'True'}),
+            'reverse_id': ('django.db.models.fields.CharField', [],
+                           {'db_index': 'True', 'max_length': '40', 'null': 'True',
+                            'blank': 'True'}),
+            'rght': ('django.db.models.fields.PositiveIntegerField', [],
+                     {'db_index': 'True'}),
+            'site': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['sites.Site']"}),
+            'soft_root': ('django.db.models.fields.BooleanField', [],
+                          {'default': 'False', 'db_index': 'True'}),
+            'template': (
+                'django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'tree_id': ('django.db.models.fields.PositiveIntegerField', [],
+                        {'db_index': 'True'})
         },
-        'auth.group': {
-            '_stub': True,
-            'id': ('models.AutoField', [], {'primary_key': 'True'})
+        'cms.pagemoderator': {
+            'Meta': {'object_name': 'PageModerator'},
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'moderate_children': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'moderate_descendants': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'moderate_page': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'page': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['cms.Page']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['auth.User']"})
+        },
+        'cms.pagemoderatorstate': {
+            'Meta': {'ordering': "('page', 'action', '-created')",
+                     'object_name': 'PageModeratorState'},
+            'action': ('django.db.models.fields.CharField', [],
+                       {'max_length': '3', 'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [],
+                        {'auto_now_add': 'True', 'blank': 'True'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'message': ('django.db.models.fields.TextField', [],
+                        {'default': "''", 'max_length': '1000', 'blank': 'True'}),
+            'page': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['cms.Page']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['auth.User']", 'null': 'True'})
+        },
+        'cms.pagepermission': {
+            'Meta': {'object_name': 'PagePermission'},
+            'can_add': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_change': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_change_advanced_settings': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'can_change_permissions': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'can_delete': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_moderate': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_move_page': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_publish': (
+                'django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_view': (
+                'django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'grant_on': (
+                'django.db.models.fields.IntegerField', [], {'default': '5'}),
+            'group': ('django.db.models.fields.related.ForeignKey', [],
+                      {'to': "orm['auth.Group']", 'null': 'True', 'blank': 'True'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'page': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['cms.Page']", 'null': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [],
+                     {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
+        },
+        'cms.pageuser': {
+            'Meta': {'object_name': 'PageUser', '_ormbases': ['auth.User']},
+            'created_by': ('django.db.models.fields.related.ForeignKey', [],
+                           {'related_name': "'created_users'",
+                            'to': "orm['auth.User']"}),
+            'user_ptr': ('django.db.models.fields.related.OneToOneField', [],
+                         {'to': "orm['auth.User']", 'unique': 'True',
+                          'primary_key': 'True'})
+        },
+        'cms.pageusergroup': {
+            'Meta': {'object_name': 'PageUserGroup', '_ormbases': ['auth.Group']},
+            'created_by': ('django.db.models.fields.related.ForeignKey', [],
+                           {'related_name': "'created_usergroups'",
+                            'to': "orm['auth.User']"}),
+            'group_ptr': ('django.db.models.fields.related.OneToOneField', [],
+                          {'to': "orm['auth.Group']", 'unique': 'True',
+                           'primary_key': 'True'})
+        },
+        'cms.placeholder': {
+            'Meta': {'object_name': 'Placeholder'},
+            'default_width': (
+                'django.db.models.fields.PositiveSmallIntegerField', [],
+                {'null': 'True'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'slot': ('django.db.models.fields.CharField', [],
+                     {'max_length': '50', 'db_index': 'True'})
+        },
+        'cms.title': {
+            'Meta': {'unique_together': "(('language', 'page'),)",
+                     'object_name': 'Title'},
+            'application_urls': ('django.db.models.fields.CharField', [],
+                                 {'db_index': 'True', 'max_length': '200',
+                                  'null': 'True', 'blank': 'True'}),
+            'creation_date': ('django.db.models.fields.DateTimeField', [],
+                              {'default': 'datetime.datetime.now'}),
+            'has_url_overwrite': ('django.db.models.fields.BooleanField', [],
+                                  {'default': 'False', 'db_index': 'True'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'language': ('django.db.models.fields.CharField', [],
+                         {'max_length': '15', 'db_index': 'True'}),
+            'menu_title': ('django.db.models.fields.CharField', [],
+                           {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'meta_description': ('django.db.models.fields.TextField', [],
+                                 {'max_length': '255', 'null': 'True',
+                                  'blank': 'True'}),
+            'meta_keywords': ('django.db.models.fields.CharField', [],
+                              {'max_length': '255', 'null': 'True',
+                               'blank': 'True'}),
+            'page': ('django.db.models.fields.related.ForeignKey', [],
+                     {'related_name': "'title_set'", 'to': "orm['cms.Page']"}),
+            'page_title': ('django.db.models.fields.CharField', [],
+                           {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'path': ('django.db.models.fields.CharField', [],
+                     {'max_length': '255', 'db_index': 'True'}),
+            'redirect': ('django.db.models.fields.CharField', [],
+                         {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'slug': (
+                'django.db.models.fields.SlugField', [], {'max_length': '255'}),
+            'title': (
+                'django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
+        'contenttypes.contenttype': {
+            'Meta': {'ordering': "('name',)",
+                     'unique_together': "(('app_label', 'model'),)",
+                     'object_name': 'ContentType',
+                     'db_table': "'django_content_type'"},
+            'app_label': (
+                'django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'model': (
+                'django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
+        'sites.site': {
+            'Meta': {'ordering': "('domain',)", 'object_name': 'Site',
+                     'db_table': "'django_site'"},
+            'domain': (
+                'django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'id': (
+                'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         }
     }
-    
+
     complete_apps = ['cms']

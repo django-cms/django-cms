@@ -1,0 +1,147 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//######################################################################################################################
+// #IMPORT SETTINGS#
+@import "partials/settings";
+
+//######################################################################################################################
+// #PAGETREE#
+
+// colors
+$color-font: #666;
+
+$color-border: #dededc;
+$color-border-light: #fafafa;
+$color-border-medium: #ddd;
+
+$color-background-light: #fefefe;
+$color-background-light-hover: #f5f5f5;
+
+$color-background-blue: #f3fbfe;
+$color-background-blue-hover: #e6f6fd;
+
+// pagetree
+#sitemap {
+	padding:0; margin:0; margin:0; background:$color-background-light;
+
+	a { text-decoration:none; outline:none; border:none; }
+	a:hover { text-decoration:underline; }
+
+	li, ul { list-style-type:none; }
+	li input.hidden { position: absolute; left: -9999em; }
+
+	// icons
+	li a.icon, li span.icon, li a.move, li a.copy {
+		display: inline-block; width: 18px; height: 18px; margin-top:5px;
+		background: url('../../img/pagetree/sprite.png') no-repeat 0 0; }
+	li a.move { background-position:-20px -20px; margin-top:0; }
+	li a.copy { background-position:-40px -60px;  margin-top:0; }
+	li a.publish, li span.state-icon { margin-top:0; }
+	li a.selector-add { background-position:-20px 0; margin-left:4px; margin-top:-1px; }
+	li a.publish { background-position: -60px -82px; margin-left:4px; }
+	li a.addlink,
+	li a.deletelink { display:inline-block; width:10px; height:10px; padding:0; margin:0 0 0 4px; background-position:0 0; }
+	li .col-softroot span.icon { background-position:-80px 0; margin-top:0; }
+	li .col-apphook span.icon { background-position:-40px -80px; margin-top:0; }
+	// icons last row
+	li .col-lastchange .state-icon.add { background-position:-40px 0; }
+	li .col-lastchange .state-icon.cha { background-position:-40px -20px; }
+	li .col-lastchange .state-icon.pub { background-position:-60px -20px; }
+	li .col-lastchange .state-icon.unp { background-position:-60px -40px; }
+	li .col-lastchange .state-icon.mov { background-position:-60px 0; }
+	li .col-lastchange .state-icon.del { background-position:-40px -40px; }
+	li .col-lastchange .state-icon.app { background-position:-600px -60px; }
+
+	li a.move span, li a.copy span, li a.selector-add span,
+	li a.addlink span, li a.deletelink span,
+	.col-navigation input, .col-published input { display:none; }
+
+	// header
+	ul.header { position:relative; top:1px; }
+	ul.header, ul.header li { padding:0; margin:0; border:none; background:none; }
+	ul.header li { color:$color-font; font-size:11px; font-weight:400; height:16px; padding:5px 0 4px 5px;
+		border-bottom:1px solid $color-border; background:$color-background-light; }
+	ul.header li .cont { height:15px; border:none !important; background:none !important; }
+	ul.header li .col1 { font-size:10px; }
+	ul.header li .col2 > div { font-size:10px; line-height:14px; border:none; background:none; }
+
+	// row
+	li .cont { display:block; border-top:1px solid $color-border !important; }
+	li.open > .cont { border-bottom:1px solid $color-border !important; }
+	li.open ul .cont { border-top:none !important; border-bottom:1px solid $color-border !important; }
+	li.moveable > div { border-bottom:none !important; }
+	li.last.leaf .cont, li.last.closed .cont { border-bottom:none !important; }
+	.tree-default .col-navigation, .tree-default .col-published { line-height:30px; }
+
+
+	li .col1 > div { text-align:center; }
+	li .col1 .title { background:none; }
+	li .col1 .success { color:$color-font; padding-left:10px; }
+	li .col1 a.changelink { display:none; line-height:27px; margin:6px 0 0 10px !important; }
+	li .col1 .title, li .col1 .success { float:left; line-height:29px; height:28px; padding-left:20px; }
+
+	li .move-target-container { display:none; float:left;
+		font-size: 14px; line-height:27px; margin-right:10px; }
+	li .move-target-container a:hover { text-decoration: none; }
+	li .move-target { display:inline-block; padding: 2px 8px; border-left: 1px solid $color-border-medium; }
+	li .move-target:first-child { border-left:none; }
+
+	li .col2 > div {
+		float:left; line-height:28px; white-space:nowrap; text-align:center;
+		width:auto; height:28px; padding:0 5px; border-left:1px solid $color-border-medium;
+	}
+	li .col2 > div a, li .col2 > div span { vertical-align:middle; }
+
+	// row hover states
+	li .cont:hover { background:$color-border-light; }
+	li .publisher_draft { background:$color-border-light; }
+	li .publisher_draft:hover { background:$color-background-light-hover; }
+	li .publisher_pending { background:$color-background-blue; }
+	li .publisher_pending:hover { background:$color-background-blue-hover; }
+	li .publisher_dirty { background:$color-background-blue; }
+	li .publisher_dirty:hover { background:$color-background-blue-hover; }
+
+	// custom col asignments
+	li.moveable .col1 .title { background:url('../../img/pagetree/tree-li-drag.gif') no-repeat 0 0; }
+	li .col-language a { text-transform:uppercase; }
+
+	// edit button
+	.cont:hover .col1 a.changelink { display:inline; }
+
+	// drag modus
+	li#dragged { min-width:500px; }
+	li#dragged .col2 { display:none; }
+}
+
+// filter button on top right
+#changelist-filter-button { line-height:30px;
+	display:block; position:absolute; right:0; top:0; z-index:1000;
+	width:150px; height:auto; padding:0 0 0 10px; margin:0;
+	border:1px solid $color-border-medium; border-right:none; border-top:none; background:$color-border-light;
+}
+#changelist-filter { top:30px;
+	h2 { display:none; }
+}
+// remove background assigned from django
+.change-list .filtered { min-height:auto; background:white !important; }
+
+// only visible on multiple sites
+#site-selector { float:left; margin:9px 18px 0 8px; }
+
+// loader on top right
+#loader-message { position:fixed; top:0; right:0; padding:4px 8px; background:white; display:none; }
+
+/* TODO this should be defined inside djangocms-admin.css instead */
+#sitemap {
+	border:1px solid $color-border;
+	ul.header li .col2 > div { padding:0 5.5px; }
+	li .col-softroot span.icon {
+		width: 18px !important; height: 18px !important; margin:0 !important;
+		background: url('../../img/pagetree/sprite.png') -80px 0 no-repeat !important; }
+	li .col-apphook span.icon {
+		width: 18px !important; height: 18px !important; margin:0 !important;
+		background: url('../../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
+}

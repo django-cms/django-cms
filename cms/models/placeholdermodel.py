@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import PlaceholderNoAction
 from django.core.urlresolvers import reverse
@@ -8,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 import operator
 
 
+@python_2_unicode_compatible
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
@@ -15,7 +17,7 @@ class Placeholder(models.Model):
     class Meta:
         app_label = 'cms'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slot
 
     def get_add_url(self):
@@ -68,18 +70,18 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
-    def render(self, context, width):
+    def render(self, context, width, lang=None):
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
             context.update({'width': width})
-        return render_placeholder(self, context)
+        return render_placeholder(self, context, lang=lang)
 
     def get_media(self, request, context):
         from cms.plugins.utils import get_plugin_media
-        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.cmsplugin_set.all()]
+        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
         if media_classes:
             return reduce(operator.add, media_classes)
         return Media()
@@ -144,7 +146,7 @@ class Placeholder(models.Model):
         return list(self.get_plugins())
 
     def get_plugins(self):
-        return self.cmsplugin_set.all().order_by('tree_id', '-rght')
+        return self.cmsplugin_set.all().order_by('tree_id', 'lft')
 
     @property
     def actions(self):

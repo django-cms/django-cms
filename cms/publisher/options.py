@@ -43,9 +43,9 @@ class PublisherOptions(object):
             base_exclude_fields_append = getattr(pmeta, 'exclude_fields_append', None)
              
             if base_exclude_fields and base_exclude_fields_append:
-                raise ValueError, ("Model %s extends defines PublisherMeta, but " +
-                                   "both - exclude_fields and exclude_fields_append"
-                                   "are defined!") % (name,)             
+                raise ValueError("Model %s extends defines PublisherMeta, but "
+                                 "both - exclude_fields and exclude_fields_append"
+                                 "are defined!") % (name,)
             if base_exclude_fields:
                 exclude_fields = exclude_fields.union(base_exclude_fields)
             elif base_exclude_fields_append:

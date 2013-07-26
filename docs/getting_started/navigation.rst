@@ -17,9 +17,9 @@ your template before the line on which you call the templatetag.
 
 .. note::
 
-    Please note that menus were originally implemented to be
-    application-independent and as such, live in the :mod:`menus` application
-    instead of the :mod:`cms` application.
+    Please note that menus live in the :mod:`menus` application, which though
+    tightly coupled to the :mod:`menus` application exists independently of it.
+    Menus are usable by any application, not just by django CMS.
 
 *********
 show_menu
@@ -32,10 +32,9 @@ template to your project or edit the one provided with django-cms.
 ``extra_inactive``, and ``extra_active``.
 
 The first two parameters, ``start_level`` (default=0) and ``end_level``
-(default=100) specify from which level the navigation shoud be rendered
-and at which level it should stop.
-If you have home as a root node and don't want to display home you can render
-the navigation only after level 1.
+(default=100) specify from which level the navigation should be rendered and at
+which level it should stop. If you have home as a root node (i.e. level 0) and
+don't want to display the root node(s), set ``start_level`` to 1.
 
 The third parameter, ``extra_inactive`` (default=0), specifies how many levels
 of navigation should be displayed if a node is not a direct ancestor or
@@ -101,18 +100,38 @@ You can give it the same optional parameters as :ttag:`show_menu`::
 show_sub_menu
 *************
 
-Display the sub menu of the current page (as a nested list).
-Takes one argument that specifies how many levels deep the submenu should be
-displayed. The template can be found at ``menu/sub_menu.html``::
+Displays the sub menu of the current page (as a nested list).
+
+The first argument, ``levels`` (default=100), specifies how many levels deep
+the sub menu should be displayed.
+
+The second argument, ``root_level`` (default=None), specifies at what level, if
+any, the menu should have its root. For example, if root_level is 0 the menu
+will start at that level regardless of what level the current page is on.
+
+The third argument, ``nephews`` (default=100), specifies how many levels of
+nephews (children of siblings) are shown.
+
+Fourth argument, ``template`` (default=menu/sub_menu.html), is the template
+used by the tag; if you want to use a different template you **must** supply
+default values for ``root_level`` and ``nephews``.
+
+Examples::
 
     <ul>
         {% show_sub_menu 1 %}
     </ul>
 
+Rooted at level 0::
+
+    <ul>
+        {% show_sub_menu 1 0 %}
+    </ul>
+
 Or with a custom template::
 
     <ul>
-        {% show_sub_menu 1 "myapp/submenu.html" %}
+        {% show_sub_menu 1 None 100 "myapp/submenu.html" %}
     </ul>
 
 
@@ -120,8 +139,8 @@ Or with a custom template::
 show_breadcrumb
 ***************
 
-Show the breadcrumb navigation of the current page.
-The template for the HTML can be found at ``menu/breadcrumb.html``.::
+Show the breadcrumb navigation of the current page. The template for the HTML
+can be found at ``menu/breadcrumb.html``.::
 
     {% show_breadcrumb %}
 
@@ -157,7 +176,7 @@ The level of the node. Starts at 0.
 
 The level of the node from the root node of the menu. Starts at 0.
 If your menu starts at level 1 or you have a "soft root" (described
-in the next section) the first node would still have 0 as its `menu_level`.
+in the next section) the first node would still have 0 as its ``menu_level``.
 ::
 
     {{ node.get_absolute_url }}
@@ -265,12 +284,7 @@ menu becomes much more manageable:
 Using Soft Roots
 ================
 
-To enable the feature, ``settings.py`` requires:
-
-    CMS_SOFTROOT = True
-
-Mark a page as *soft root* in the 'Advanced' tab of the its settings 
-in the admin interface.
+Mark a page as *soft root* in the 'Advanced Settings' window of a page.
 
 ******************************
 Modifying & Extending the menu

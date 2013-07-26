@@ -22,7 +22,23 @@ class MenuUtilsTests(CMSTestCase):
         self.assertEqual(func.__name__, decorated_view.__name__)
         request = self.get_request('/', 'en')
         response = decorated_view(request)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
+        fake_context = {'request': request}
+        tag = DumbPageLanguageUrl()
+        output = tag.get_context(fake_context, 'en')
+        url = output['content']
+        self.assertEqual(url, '/en/')
+        output = tag.get_context(fake_context, 'ja')
+        url = output['content']
+        self.assertEqual(url, '/ja/')
+
+    def test_default_language_changer(self):
+        view = self.get_simple_view()
+        # check we maintain the view name
+        self.assertEqual(view.__name__, view.__name__)
+        request = self.get_request('/en/', 'en')
+        response = view(request)
+        self.assertEqual(response.content, b'')
         fake_context = {'request': request}
         tag = DumbPageLanguageUrl()
         output = tag.get_context(fake_context, 'en')
@@ -34,11 +50,11 @@ class MenuUtilsTests(CMSTestCase):
         
     def test_language_changer_decorator(self):
         def lang_changer(lang):
-            return "/dummy/"
+            return "/%s/dummy/" % lang
         decorated_view = language_changer_decorator(lang_changer)(self.get_simple_view())
         request = self.get_request('/some/path/', 'en')
         response = decorated_view(request)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
         fake_context = {'request': request}
         tag = DumbPageLanguageUrl()
         output = tag.get_context(fake_context, 'en')
@@ -58,4 +74,3 @@ class MenuUtilsTests(CMSTestCase):
         nodes = [root]
         selected = find_selected(nodes)
         self.assertEqual(selected, selectedchild)
-        

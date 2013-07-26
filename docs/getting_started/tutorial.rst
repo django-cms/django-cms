@@ -59,7 +59,7 @@ To make your life easier, add the following at the top of the file::
     # -*- coding: utf-8 -*-
     import os
     gettext = lambda s: s
-    PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+    PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
 
 Add the following apps to your :setting:`django:INSTALLED_APPS`.
@@ -67,10 +67,14 @@ This includes django CMS itself as well as its dependenices and
 other highly recommended applications/libraries:
 
 * ``'cms'``, django CMS itself
+* ``'cms.stacks'``, for reusable content
 * ``'mptt'``, utilities for implementing a modified pre-order traversal tree
 * ``'menus'``, helper for model independent hierarchical website navigation
 * ``'south'``, intelligent schema and data migrations
 * ``'sekizai'``, for javascript and css management
+* ``'djangocms_admin_style'``, for the admin skin. You **must** add
+  ``'djangocms_admin_style'`` in the list before ``'django.contrib.admin'``.
+
 
 Also add any (or all) of the following plugins, depending on your needs:
 
@@ -97,21 +101,16 @@ There are even more plugins available on the django CMS `extensions page`_.
 
 In addition, make sure you uncomment (enable) ``'django.contrib.admin'``
 
-you may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
+You may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
 instead of the :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
-:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins. In this
-case you should not add them to :setting:`django:INSTALLED_APPS` but add the following
-instead:
-
-* ``'filer'``
-* ``'cmsplugin_filer_file'``
-* ``'cmsplugin_filer_folder'``
-* ``'cmsplugin_filer_image'``
-* ``'cmsplugin_filer_teaser'``
-* ``'cmsplugin_filer_video'``
+:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins.
+In this case you should check the `django-filer documentation <django-filer:installation_and_configuration>`_
+and `django CMS plugin documentation`_ for detailed installation information, and
+then return to this tutorial.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django CMS plugin documentation: https://github.com/stefanfoulis/cmsplugin-filer#installation
 
 If you opt for the core plugins you should take care that directory to which
 the :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
@@ -130,15 +129,17 @@ You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_C
 at the right position::
 
     MIDDLEWARE_CLASSES = (
-        'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
-        'cms.middleware.multilingual.MultilingualURLMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.doc.XViewMiddleware',
+        'django.middleware.common.CommonMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
     )
 
 You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
@@ -227,13 +228,14 @@ You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
 urlpatterns. We suggest starting with the following ``urls.py``::
 
     from django.conf.urls.defaults import *
+    from django.conf.urls.i18n import i18n_patterns
     from django.contrib import admin
     from django.conf import settings
 
     admin.autodiscover()
 
-    urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
+    urlpatterns = i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
         url(r'^', include('cms.urls')),
     )
 
@@ -357,6 +359,14 @@ Run::
     python manage.py migrate
 
 
+Check you did everything right
+==============================
+
+Now, use the following command to check if you did everything correctly::
+
+    python manage.py cms check
+
+
 Up and running!
 ===============
 
@@ -460,6 +470,11 @@ The right part of the plugin area displays a rich text editor (`TinyMCE`_).
 
 In the editor, type in some text and then press the "Save" button.
 
+The new text is only visible on the draft copy so far, but you can see it by using the
+top button "Preview draft". If you use the "View on site" button instead, you can see that the
+page is still blank to the normal users.
+
+To publish the changes you have made, click on the "Publish draft" button.
 Go back to your website using the top right-hand "View on site" button. That's it!
 
 |hello-cms-world|
@@ -476,5 +491,5 @@ with the different plugins provided out of the box and to build great websites!
 
 .. _South: http://south.aeracode.org/
 .. _TinyMCE: http://tinymce.moxiecode.com/
-.. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
+.. _official documentation: http://docs.djangoproject.com/en/1.5/topics/templates/
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms

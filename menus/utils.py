@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
+from cms.utils.i18n import force_language, hide_untranslated
+from django.conf import settings
+import warnings
 from cms.models.titlemodels import Title
 
 
@@ -30,8 +34,8 @@ def find_selected(nodes):
             result = find_selected(node.children)
             if result:
                 return result
-            
-            
+
+
 def set_language_changer(request, func):
     """
     
@@ -66,36 +70,51 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
-class _SimpleLanguageChanger(object):
+class DefaultLanguageChanger(object):
     def __init__(self, request):
         self.request = request
         self._app_path = None
-        
+
     @property
     def app_path(self):
         if self._app_path is None:
-            page_path = self.get_page_path(self.request.LANGUAGE_CODE)
+            if settings.USE_I18N:
+                page_path = self.get_page_path(self.request.LANGUAGE_CODE)
+            else:
+                page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
                 self._app_path = self.request.path[len(page_path):]
             else:
                 self._app_path = self.request.path
         return self._app_path
-        
+
     def __call__(self, lang):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
-    
+
     def get_page_path(self, lang):
-        if getattr(self.request, 'current_page', None):
-            try:
-                return self.request.current_page.get_absolute_url(language=lang, fallback=False)
-            except Title.DoesNotExist:
-                return self.request.current_page.get_absolute_url(language=lang, fallback=True)
+        page = getattr(self.request, 'current_page', None)
+        if page:
+            with force_language(lang):
+                try:
+                    return page.get_absolute_url(language=lang, fallback=False)
+                except Title.DoesNotExist:
+                    if hide_untranslated(lang) and settings.USE_I18N:
+                        return '/%s/' % lang
+                    else:
+                        return page.get_absolute_url(language=lang, fallback=True)
         else:
-            return ''
+            if settings.USE_I18N:
+                return '/%s/' % lang
+            else:
+                return "/"
 
 def simple_language_changer(func):
+    warnings.warn("simple_language_changer is deprecated and will be removed in "
+        "2.5! This is the default behaviour now for non CMS managed views and is no longer needed.",
+        DeprecationWarning)
+
     def _wrapped(request, *args, **kwargs):
-        set_language_changer(request, _SimpleLanguageChanger(request))
+        set_language_changer(request, DefaultLanguageChanger(request))
         return func(request, *args, **kwargs)
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__

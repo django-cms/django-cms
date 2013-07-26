@@ -9,16 +9,3 @@ class PermissionForm(forms.Form):
     copy_permissions = forms.BooleanField(label=_('Copy permissions'), 
                                           required=False, initial=True)
     
-class ModeratorForm(forms.Form):
-    '''
-    Holds the specific field for moderator
-    '''
-    copy_moderation = forms.BooleanField(label=_('Copy moderation'), 
-                                         required=False, initial=True)
-    
-class PermissionAndModeratorForm(PermissionForm, ModeratorForm):
-    '''
-    Subclass of both ModeratorForm AND PermissionForm, thus it inherits both 
-    fields
-    '''
-    pass

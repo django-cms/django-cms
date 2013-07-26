@@ -1,0 +1,39 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# mikelis_a <mikelis.asnins@yahoo.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django-cms\n"
+"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
+"POT-Creation-Date: 2011-08-14 09:44-0500\n"
+"PO-Revision-Date: 2013-04-29 09:20+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"Language-Team: Latvian (http://www.transifex.com/projects/p/django-cms/language/lv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lv\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+
+#: static/cms/js/change_form.js:31
+msgid ""
+"Are you sure you want to change the %(field_name)s without saving the page "
+"first?"
+msgstr "Vai jūs esat pārliecināts, ka gribat mainīt %(field_name)s bez lapas saglabāšanas?"
+
+#: static/cms/js/change_form.js:69
+msgid ""
+"Not all plugins are saved. Are you sure you want to save the page?\n"
+"All unsaved plugin content will tried to save."
+msgstr "Visi plugini nav saglabāti. Vai jūs esat pārliecināts, ka gribat saglabāt šo lapu?\nVisi nesaglabāto spraudņu saturi tiks saglabāti."
+
+#: static/cms/js/change_form.js:127
+msgid "Are you sure you want to change tabs without saving the page first?"
+msgstr "Vai jūs esat pārliecināts, ka gribat mainīt cilnes, bez lapas saglabāšanas?"
+
+#: static/cms/js/plugin_editor.js:132
+msgid "Are you sure you want to delete this plugin?"
+msgstr "Vai jūs esat pārliecināts, ka gribat dzēst šo spraudni?"

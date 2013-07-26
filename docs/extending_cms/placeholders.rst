@@ -30,6 +30,7 @@ use::
         my_placeholder = PlaceholderField('placeholder_name')
         # your methods
 
+
 The :class:`~cms.models.fields.PlaceholderField` takes a string as its first
 argument which will be used to configure which plugins can be used in this
 placeholder. The configuration is the same as for placeholders in the CMS.
@@ -41,6 +42,9 @@ placeholder. The configuration is the same as for placeholders in the CMS.
     ``'+'`` to allow the cms to check permissions properly. Attempting to do
     so will raise a :exc:`ValueError`.
 
+Admin Integration
+=================
+
 If you install this model in the admin application, you have to use
 :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` instead of
 :class:`~django.contrib.admin.ModelAdmin` so the interface renders
@@ -51,6 +55,43 @@ correctly::
     from myapp.models import MyModel
 
     admin.site.register(MyModel, PlaceholderAdmin)
+
+
+I18N Placeholders
+=================
+
+Out of the box :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` supports multiple languages and will
+display language tabs. If you extend `PlaceholderAdmin` and overwrite `change_form_template` be sure to have a look at
+'admin/placeholders/placeholder/change_form.html' on how to display the language tabs.
+
+If you need other fields then the placeholders translated as well: django CMS has support for `django-hvad`_. If you
+use a `TranslatableModel` model be sure to not include the placeholder fields in the translated fields::
+
+    class MultilingualExample1(TranslatableModel):
+        translations = TranslatedFields(
+            title=models.CharField('title', max_length=255),
+            description=models.CharField('description', max_length=255),
+        )
+        placeholder_1 = PlaceholderField('placeholder_1')
+
+        def __unicode__(self):
+            return self.title
+
+Be sure to combine both hvad's :class:`TranslatableAdmin` and :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` when
+registering your model with the admin site::
+
+    from cms.admin.placeholderadmin import PlaceholderAdmin
+    from django.contrib import admin
+    from hvad.admin import TranslatableAdmin
+    from myapp.models import MultilingualExample1
+
+    class MultilingualModelAdmin(TranslatableAdmin, PlaceholderAdmin):
+        pass
+
+    admin.site.register(MultilingualExample1, MultilingualModelAdmin)
+
+Templates
+=========
 
 Now to render the placeholder in a template you use the
 :ttag:`render_placeholder` tag from the
@@ -79,6 +120,14 @@ typically achieved in Django applications by using :class:`RequestContext`::
             'object': object,
         }, context_instance=RequestContext(request))
 
+If you want to render plugins from a specific language, you can use the tag
+like this:
+
+.. code-block:: html+django
+
+    {% load placeholder_tags %}
+
+    {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 
 *******************************
 Adding content to a placeholder
@@ -128,3 +177,6 @@ admin page with at least one :class:`~cms.models.fields.PlaceholderField`:
    :class:`~cms.models.fields.PlaceholderField` per fieldset.
 2. You **must** include the following two classes: ``'plugin-holder'`` and
    ``'plugin-holder-nopage'``
+
+
+.. _django-hvad: https://github.com/kristianoellegaard/django-hvad

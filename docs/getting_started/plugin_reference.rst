@@ -91,6 +91,7 @@ setting in your project's ``settings.py`` file::
         # ...
     )
 
+
 .. :module:: cms.plugins.link
 
 .. :class:: cms.plugins.link.cms_plugins.LinkPlugin

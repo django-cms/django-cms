@@ -13,15 +13,25 @@ This document refers to version |release|
 Install
 *******
 
+.. warning::
+    Version 3.0 introduces some significant changes that **require** action if
+    you are upgrading from a previous version. Please refer to
+    :ref:`Upgrading from previous versions <upgrade-to-3.0>`
+
+
 .. toctree::
     :maxdepth: 1
 
     getting_started/installation
+    upgrade/3.0
+    upgrade/2.4
+    upgrade/2.3.4
     upgrade/2.3.3
     upgrade/2.3.2
     upgrade/2.3
     upgrade/2.2
     upgrade/2.1
+
 
 ***************
 Getting Started
@@ -67,8 +77,10 @@ Extending the CMS
     extending_cms/app_integration
     extending_cms/api_references
     extending_cms/placeholders
+    extending_cms/toolbar
     extending_cms/searchdocs
     extending_cms/fields
+    extending_cms/testing
 
 
 ********
@@ -81,7 +93,9 @@ Concepts
 
     concepts/introduction
     concepts/menu_system
+    concepts/publishing
     concepts/multiple_languages
+    concepts/stacks
 
 
 **************************
@@ -92,7 +106,8 @@ Contributing to django CMS
     :maxdepth: 2
     :numbered:
 
-    contribution
+    contributing/contributing
+    contributing/testing
 
 
 
