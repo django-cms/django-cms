@@ -126,6 +126,10 @@
 		background:rgba(255, 0, 0, 0.1); }
 }
 .cms_placeholder .cms_draggables .cms_draggable { margin-left:0 !important; }
+// hide additional elements when dragging
+body > .cms_draggable .cms_switcher { display:none !important; }
+body > .cms_draggable .cms_submenu { display:none !important; }
+body > .cms_draggable .cms_draggables { display:none !important; }
 
 //##################################################
 // #RETINA#
