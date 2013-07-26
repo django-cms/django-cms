@@ -237,7 +237,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
 				if($(this).hasClass('cms_sideframe-hidden')) {
 					that.settings.sideframe.hidden = false;
-					that._showSideframe(that.options.sideframeWidth, true);
+					that._showSideframe(that.settings.sideframe.position || that.options.sideframeWidth, true);
 				} else {
 					that.settings.sideframe.hidden = true;
 					that._hideSideframe();
@@ -344,7 +344,7 @@ $(document).ready(function () {
 			var holder = this.sideframe.find('.cms_sideframe-frame');
 			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
 				iframe.hide();
-			var width = this.options.sideframeWidth;
+			var width = this.settings.sideframe.position || this.options.sideframeWidth;
 
 			// attach load event to iframe
 			iframe.bind('load', function () {
@@ -399,8 +399,10 @@ $(document).ready(function () {
 			this.settings.sideframe = {
 				'url': null,
 				'hidden': false,
-				'maximized': false
+				'maximized': false,
+				'width': this.options.sideframeWidth
 			};
+
 			this.setSettings();
 		},
 
@@ -769,7 +771,7 @@ $(document).ready(function () {
 			this.body.css('overflow', 'auto');
 
 			// reset to first state
-			this._showSideframe(this.options.sideframeWidth, true);
+			this._showSideframe(this.settings.sideframe.position || this.options.sideframeWidth, true);
 
 			// remove event
 			$(window).unbind('resize.cms');
@@ -806,6 +808,9 @@ $(document).ready(function () {
 
 				that.sideframe.css('width', e.clientX);
 				that.body.css('margin-left', e.clientX);
+
+				// update settings
+				that.settings.sideframe.position = e.clientX;
 			});
 		},
 
@@ -813,6 +818,8 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 1);
 
 			$(document).unbind('mousemove.cms');
+
+			this.setSettings();
 		},
 
 		_showModal: function (speed) {
