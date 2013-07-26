@@ -816,6 +816,16 @@ class PageAdminTestBase(CMSTestCase):
 
 
 class PageAdminTest(PageAdminTestBase):
+    def test_form_url_page_change(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            pageadmin = self.get_admin()
+            page = self.get_page()
+            q = self.get_request()
+            response = pageadmin.change_view(q, str(page.pk), form_url=reverse("admin:cms_page_change", args=(1,)))
+            self.assertTrue('form_url' in response.context_data)
+            self.assertTrue(response.context_data['form_url'])
+
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()
         superuser = self.get_superuser()
