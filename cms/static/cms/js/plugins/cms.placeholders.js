@@ -101,8 +101,13 @@ $(document).ready(function () {
 
 			// this sets the correct position for the edit tooltip
 			$(document.body).bind('mousemove.cms', function (e) {
+				// so lets figure out where we are
+				var offset = 20;
+				var bound = $(document).width();
+				var pos = e.pageX + that.tooltip.outerWidth(true) + offset;
+
 				that.tooltip.css({
-					'left': e.pageX + 20,
+					'left': (pos >= bound) ? e.pageX - that.tooltip.outerWidth(true) - offset : e.pageX + offset,
 					'top': e.pageY - 12
 				});
 			});
