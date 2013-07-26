@@ -137,13 +137,8 @@ $(document).ready(function () {
 				var disabled = 'cms_toolbar-item-navigation-disabled';
 				var children = 'cms_toolbar-item-navigation-children';
 
-				// attach delegate event
-				item.find('li ul a').bind('click', function (e) {
-					e.preventDefault();
-					if(!$(this).parent().hasClass(disabled)) that._delegate($(this));
-				});
 				// remove events from first level
-				item.find('> li > a').bind('click', function (e) {
+				item.find('a').bind('click', function (e) {
 					e.preventDefault();
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
