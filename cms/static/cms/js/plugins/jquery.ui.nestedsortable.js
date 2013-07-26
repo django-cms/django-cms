@@ -323,7 +323,7 @@
 		        	previousItem.children(o.listType).prepend(this.placeholder);
 		        }
 		        // mjs - otherwise, add it to the bottom of the list.
-		        else {
+		        else if(previousItem.children(o.listType).length) {
 					previousItem.children(o.listType)[0].appendChild(this.placeholder[0]);
 				}
 
