@@ -40,39 +40,8 @@ $(document).ready(function () {
 
 		// initial methods
 		_setupPlaceholders: function (placeholders) {
-			var that = this;
-			var draggables = placeholders.find('.cms_draggable');
-
-			// attach events to draggable
-			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
-				var el = $(this);
-				var id = that.getId($(this).parent());
-				var settings = CMS.API.Toolbar.getSettings();
-					settings.states = settings.states || [];
-				var index = settings.states.indexOf(id);
-				if(index != -1) settings.states.splice(settings.states.indexOf(id), 1);
-
-				if(el.hasClass('cms_dragitem-collapsed')) {
-					// show element
-					el.removeClass('cms_dragitem-collapsed').parent().find('> .cms_draggables').show();
-				} else {
-					// hide element
-					el.addClass('cms_dragitem-collapsed').parent().find('> .cms_draggables').hide();
-					settings.states.push(id);
-				}
-
-				// save settings
-				CMS.API.Toolbar.setSettings(settings);
-			});
-
-			// setting correct states
-			var states = CMS.API.Toolbar.getSettings().states;
-			// loop through the items
-			$.each(states, function (index, id) {
-				var el = $('#cms_draggable-' + id);
-					el.find('> .cms_draggables').hide();
-					el.find('> .cms_dragitem').addClass('cms_dragitem-collapsed');
-			});
+			// ensure collapsables work
+			this._collapsables(placeholders.find('.cms_draggable'));
 		},
 
 		_setupPlugins: function (plugins) {
@@ -297,6 +266,38 @@ $(document).ready(function () {
 
 			// remove clipboard if empty
 			if(lengthContainers <= 0) this.clipboard.remove();
+		},
+
+		_collapsables: function (draggables) {
+			var that = this;
+
+			// attach events to draggable
+			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
+				var el = $(this);
+				var id = that.getId($(this).parent());
+				var settings = CMS.API.Toolbar.getSettings();
+					settings.states = settings.states || [];
+				var index = settings.states.indexOf(id);
+
+				// collapsable function and save states
+				if(index != -1) {
+					settings.states.splice(settings.states.indexOf(id), 1);
+					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
+				} else {
+					settings.states.push(id);
+					el.addClass('cms_dragitem-expanded').parent().find('> .cms_draggables').show();
+				}
+
+				// save settings
+				CMS.API.Toolbar.setSettings(settings);
+			});
+
+			// loop through the items
+			$.each(CMS.API.Toolbar.getSettings().states, function (index, id) {
+				var el = $('#cms_draggable-' + id);
+					el.find('> .cms_draggables').show();
+					el.find('> .cms_dragitem').addClass('cms_dragitem-expanded');
+			});
 		},
 
 		_preventEvents: function () {
