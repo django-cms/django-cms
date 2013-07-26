@@ -85,11 +85,16 @@
 		// menu overwrites
 		.cms_submenu { display:none; margin-top:2px; }
 		.cms_submenu-dropdown { right:-1px; top:28px; }
-		.cms_submenu-quicksearch { right:0; top:2px; @include border-radius(0); height:26px; border-left:1px dotted $color-grey-10;
-			background:$color-grey-5 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -416px; }
-		.cms_submenu-quicksearch input { color:black; }
+		.cms_submenu-quicksearch { right:0; top:0; @include border-radius(0); height:28px; border-left:1px dotted $color-grey-10;
+			background:$color-grey-5 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -415px; }
+		.cms_submenu-quicksearch input { color:black; margin-top:1px; }
 
-		.cms_draggable .cms_submenu-quicksearch { background-color:white; }
+		.cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:white; }
+		.cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:$color-grey-5; }
 	}
 
 	// #DRAGGABLES/specific#
