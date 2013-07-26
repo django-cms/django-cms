@@ -285,7 +285,7 @@ $(document).ready(function () {
 			if(!window.localStorage) return false;
 
 			// set settings
-			settings = $.extend(true, {}, this.settings, settings);
+			settings = $.extend({}, this.settings, settings);
 			// save inside local storage
 			localStorage.setItem('cms_cookie', JSON.stringify(settings));
 

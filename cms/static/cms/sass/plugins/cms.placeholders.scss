@@ -9,7 +9,7 @@
 
 //######################################################################################################################
 // #PLACEHOLDER
-.cms_placeholder { padding:5px 5px 0.1px; margin:0 0 5px; @include border-radius(3px); background:$color-grey-70; }
+.cms_placeholder { display:none; padding:5px 5px 0.1px; margin:0 0 5px; @include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
 .cms_plugin { display:inline; position:relative; }
 .cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
@@ -63,7 +63,7 @@
 // #DRAGGABLES#
 .cms_placeholder, body { // we need body to overwrite cms_reset
 	.cms_draggables { list-style-type:none; padding:0; margin:0; }
-	.cms_draggables .cms_draggables { min-height:25px; }
+	.cms_draggables .cms_draggables { display:none; min-height:25px; }
 
 	// #DRAGGABLES/general#
 	.cms_draggable, .cms_droppable { list-style-type:none;
@@ -75,15 +75,26 @@
 			border-color:$color-grey-10; background:white;
 			&:hover { border-color:$color-grey-20; }
 		}
+		.cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable { background:$color-grey-5; }
+		.cms_draggable .cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable { background:white; }
 
 		// menu overwrites
 		.cms_submenu { display:none; margin-top:2px; }
 		.cms_submenu-dropdown { right:-1px; top:28px; }
-		.cms_submenu-quicksearch { right:0; top:2px; @include border-radius(0); height:26px; border-left:1px dotted $color-grey-10;
-			background:$color-grey-5 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -416px; }
-		.cms_submenu-quicksearch input { color:black; }
+		.cms_submenu-quicksearch { right:0; top:0; @include border-radius(0); height:28px; border-left:1px dotted $color-grey-10;
+			background:$color-grey-5 url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -415px; }
+		.cms_submenu-quicksearch input { color:black; margin-top:1px; }
 
-		.cms_draggable .cms_submenu-quicksearch { background-color:white; }
+		.cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:white; }
+		.cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:$color-grey-5; }
 	}
 
 	// #DRAGGABLES/specific#
@@ -97,8 +108,8 @@
 
 	.cms_dragitem { cursor:move; }
 	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
-	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 2px -389px; }
-	.cms_dragitem-collapsed { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -358px; }
+	.cms_dragitem-collapsable { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 3px -358px; }
+	.cms_dragitem-expanded { background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat 2px -389px; }
 	.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
 		width:100%; height:100%;
 		@include opacity(0.6); }
@@ -120,6 +131,10 @@
 		background:rgba(255, 0, 0, 0.1); }
 }
 .cms_placeholder .cms_draggables .cms_draggable { margin-left:0 !important; }
+// hide additional elements when dragging
+body > .cms_draggable .cms_switcher { display:none !important; }
+body > .cms_draggable .cms_submenu { display:none !important; }
+body > .cms_draggable .cms_draggables { display:none !important; }
 
 //##################################################
 // #RETINA#
