@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import with_statement
+from __future__ import with_statement, print_function
 import pkgutil
 import pyclbr
 import subprocess
@@ -21,16 +21,16 @@ def main(argv, failfast=False, test_labels=None):
                 continue
             test = '%s.%s' % (cls.name, method)
             if not test_labels or filter(lambda x: test.find(x)>-1, test_labels):
-                print "Running ",test,
+                print("Running ",test)
                 args = ['python', 'runtests.py'] + argv + [test]
                 p = subprocess.Popen(args, stdout = subprocess.PIPE, stderr= subprocess.PIPE)
                 output, error = p.communicate()
                 if p.returncode > 0:
-                    print error
+                    print(error)
                     if failfast:
                         sys.exit(p.returncode)
                 else:
-                    print
+                    print()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
