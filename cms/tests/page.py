@@ -820,17 +820,18 @@ class PageAdminTest(PageAdminTestBase):
     def test_form_url_page_change(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
+            pageadmin = self.get_admin()
+            page = self.get_page()
+            form_url = reverse("admin:cms_page_change", args=(1,))
             # Middleware is needed to correctly setup the environment for the admin
             middleware = CurrentUserMiddleware()
             request = self.get_request()
             middleware.process_request(request)
-            pageadmin = self.get_admin()
-            page = self.get_page()
             response = pageadmin.change_view(
                 request, str(page.pk),
-                form_url=reverse("admin:cms_page_change", args=(1,)))
+                form_url=form_url)
             self.assertTrue('form_url' in response.context_data)
-            self.assertTrue(response.context_data['form_url'])
+            self.assertEquals(response.context_data['form_url'], form_url)
 
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()
