@@ -15,6 +15,7 @@ from django.utils import timezone
 from cms.admin.forms import PageForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
+from cms.middleware.user import CurrentUserMiddleware
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -819,10 +820,15 @@ class PageAdminTest(PageAdminTestBase):
     def test_form_url_page_change(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
+            # Middleware is needed to correctly setup the environment for the admin
+            middleware = CurrentUserMiddleware()
+            request = self.get_request()
+            middleware.process_request(request)
             pageadmin = self.get_admin()
             page = self.get_page()
-            q = self.get_request()
-            response = pageadmin.change_view(q, str(page.pk), form_url=reverse("admin:cms_page_change", args=(1,)))
+            response = pageadmin.change_view(
+                request, str(page.pk),
+                form_url=reverse("admin:cms_page_change", args=(1,)))
             self.assertTrue('form_url' in response.context_data)
             self.assertTrue(response.context_data['form_url'])
 
