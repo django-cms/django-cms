@@ -52,6 +52,10 @@ DEFAULTS = {
     'UNIHANDECODE_DECODERS': ['ja', 'zh', 'kr', 'vn', 'diacritic'],
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
     'MAX_PAGE_PUBLISH_REVERSIONS': 25,
+    'TOOLBAR_OPTIONS': {
+        'modalWidth': 800,
+        'modalHeight': 400,
+    }
 }
 
 

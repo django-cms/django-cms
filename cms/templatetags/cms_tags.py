@@ -565,6 +565,18 @@ class CMSToolbar(InclusionTag):
 register.tag(CMSToolbar)
 
 
+class CMSToolbarOptions(Tag):
+    name = 'cms_toolbar_options'
+
+    def render_tag(self, context):
+        options = []
+        for option, value in get_cms_setting('TOOLBAR_OPTIONS').items():
+            options.append("'%s': '%s'," % (option, value))
+        return "\n".join(options)
+
+register.tag(CMSToolbarOptions)
+
+
 class CMSEditablePageTitle(InclusionTag):
     template = 'cms/toolbar/plugin_text_noedit.html'
     edit_template = 'cms/toolbar/plugin_text.html'
@@ -580,6 +592,5 @@ class CMSEditablePageTitle(InclusionTag):
     def get_context(self, context):
 
         return context
-
 
 register.tag(CMSEditablePageTitle)
