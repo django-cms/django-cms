@@ -25,7 +25,7 @@ from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Permission
-from guardian.models import UserObjectPermission
+from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from django.contrib.messages.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponse
@@ -686,18 +686,19 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
                 response = admin.add_plugin(request)
             elif key=='change':
                 response = admin.edit_plugin(request, self._plugin.id)
-            should_pass = perms[0] and (perms[1] or perms [2])
+            should_pass = perms[0] and (perms[1] or perms[2])
             expected_status_code = HttpResponse.status_code if should_pass else HttpResponseForbidden.status_code
             self.assertEqual(response.status_code, expected_status_code)
         # cleanup
         self._set_perms(normal_guy, [Text, Example1, self.example_object], (False,)*3, key)
 
     def _set_perms(self, user, objects, perms, key):
-        for obj,perm in zip(objects, perms):
+        for obj, perm in zip(objects, perms):
             action = 'give' if perm else 'delete'
             object = '_object' if isinstance(obj, models.Model) else ''
             method_name = '_%s%s_permission' % (action, object)
             getattr(self, method_name)(user, obj, key)
+
 
 class PlaceholderConfTests(TestCase):
     def test_get_all_plugins_single_page(self):

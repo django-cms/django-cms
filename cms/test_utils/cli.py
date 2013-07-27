@@ -103,17 +103,16 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
+            'cms.test_utils.project.objectpermissionsapp',
             'south',
             'reversion',
             'sekizai',
             'hvad',
-            'guardian',
         ],
         AUTHENTICATION_BACKENDS=(
             'django.contrib.auth.backends.ModelBackend',
-            'guardian.backends.ObjectPermissionBackend',
+            'cms.test_utils.project.objectpermissionsapp.backends.ObjectPermissionBackend',
         ),
-        ANONYMOUS_USER_ID=-1,  # for guardian
         LANGUAGE_CODE="en",
         LANGUAGES=(
             ('en', gettext('English')),
