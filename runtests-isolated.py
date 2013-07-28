@@ -15,6 +15,8 @@ def main(argv, failfast=False, test_labels=None):
         for clsname,cls in clsmembers.items():
             testlist.append(cls)
 
+    failures = []
+
     for cls in testlist:
         for method, line in cls.methods.items():
             if not method.startswith('test_'):
@@ -29,8 +31,15 @@ def main(argv, failfast=False, test_labels=None):
                     print(error)
                     if failfast:
                         sys.exit(p.returncode)
+                    else:
+                        failures.append(test)
                 else:
                     print()
+    print("Result: %s" % ('FAIL' if failures else 'OK'))
+    print("%s Failures:" % len(failures))
+    for failure in failures:
+        print("- %s" % failure)
+    sys.exit(len(failures))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
