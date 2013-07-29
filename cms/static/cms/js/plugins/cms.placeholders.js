@@ -40,8 +40,31 @@ $(document).ready(function () {
 
 		// initial methods
 		_setupPlaceholders: function (placeholders) {
+			var that = this;
+
 			// ensure collapsables work
 			this._collapsables(placeholders.find('.cms_draggable'));
+
+			// add global collapsable events
+			placeholders.find('.cms_expandmenu').bind('click', function () {
+				var el = $(this);
+				if(el.hasClass('cms_expandmenu-collapsed')) {
+					that._collapseAll(el.closest('.cms_placeholder'));
+					el.removeClass('cms_expandmenu-collapsed');
+				} else {
+					that._expandAll(el.closest('.cms_placeholder'));
+					el.addClass('cms_expandmenu-collapsed');
+				}
+			});
+
+			// check which button should be shown for collapsemenu
+			placeholders.each(function (index, item) {
+				var els = $(item).find('.cms_dragitem-collapsable');
+				var open = els.filter('.cms_dragitem-expanded');
+				if(els.length === open.length && (els.length + open.length !== 0)) {
+					$(item).find('.cms_expandmenu').addClass('cms_expandmenu-collapsed');
+				}
+			});
 		},
 
 		_setupPlugins: function (plugins) {
@@ -78,8 +101,13 @@ $(document).ready(function () {
 
 			// this sets the correct position for the edit tooltip
 			$(document.body).bind('mousemove.cms', function (e) {
+				// so lets figure out where we are
+				var offset = 20;
+				var bound = $(document).width();
+				var pos = e.pageX + that.tooltip.outerWidth(true) + offset;
+
 				that.tooltip.css({
-					'left': e.pageX + 20,
+					'left': (pos >= bound) ? e.pageX - that.tooltip.outerWidth(true) - offset : e.pageX + offset,
 					'top': e.pageY - 12
 				});
 			});
@@ -153,6 +181,8 @@ $(document).ready(function () {
 					var bounds = [];
 					// save original state events
 					var original = $('#cms_plugin-' + that.getId(originalItem));
+					// cancel if item has no settings
+					if(original.data('settings') === undefined) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
 					var holder = placeholder.parent().prevAll('.cms_placeholder-bar').first();
@@ -298,6 +328,20 @@ $(document).ready(function () {
 					el.find('> .cms_draggables').show();
 					el.find('> .cms_dragitem').addClass('cms_dragitem-expanded');
 			});
+		},
+
+		_expandAll: function (placeholder) {
+			var items = placeholder.find('.cms_dragitem-collapsable');
+				items.each(function () {
+					if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				});
+		},
+
+		_collapseAll: function (placeholder) {
+			var items = placeholder.find('.cms_dragitem-collapsable');
+				items.each(function () {
+					if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				});
 		},
 
 		_preventEvents: function () {
