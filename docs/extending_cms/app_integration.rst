@@ -25,6 +25,10 @@ You have 5 ways of integrating your app:
 
     Display your models / content in cms pages
 
+6. Toolbar
+
+    Add Entries to the toolbar to add/edit your models
+
 *****
 Menus
 *****
@@ -129,25 +133,6 @@ that with the example from above::
 
 Now you can link this Menu to a page in the 'Advanced' tab of the page
 settings under attached menu.
-
-Each must have a :meth:`get_menu_title` method, a
-:meth:`~django.db.models.Model.get_absolute_url` method, and a ``childrens``
-list with all of its children inside (the 's' at the end of ``childrens`` is
-done on purpose because ``children`` is already taken by django-mptt).
-
-Be sure that :meth:`get_menu_title` and :meth:`get_absolute_url` don't trigger
-any queries when called in a template or you may have some serious performance
-and database problems with a lot of queries.
-
-It may be wise to cache the output of :meth:`~menu.base.Menu.get_nodes`. For
-this you may need to write a wrapper class because of dynamic content that the
-pickle module can't handle.
-
-If you want to display some static pages in the navigation ("login", for
-example) you can write your own "dummy" class that adheres to the conventions
-described above.
-
-A base class for this purpose can be found in ``cms/utils/navigation.py``
 
 
 *********
@@ -288,9 +273,28 @@ If you add this menu now to your app-hook::
 You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 :class:`CategoryMenu` both attached to the same page.
 
+.. _multi_apphook:
 
-Application and instance namespaces
------------------------------------
+Attaching an Application multiple times
+---------------------------------------
+
+If you want to attach an application multiple times to different pages you have 2 possibilities.
+
+1. Give every application its own namespace in the advanced settings of a page.
+2. Define an ``app_name`` attribute on the CMSApp class.
+
+The problem is that if you only define a namespace you need to have multiple templates per attached app.
+
+For example::
+
+    {% url 'my_view' %}
+
+Will not work anymore when you namespace an app. You will need to do something like::
+
+    {% url 'my_namespace:my_view' %}
+
+The problem is now if you attach apps to multiple pages your namespace will change.
+The solution for this problem are application namespaces.
 
 If you'd like to use application namespaces to reverse the URLs related to
 your app, you can assign a value to the `app_name` attribute of your app
@@ -303,7 +307,24 @@ hook like this::
 
     apphook_pool.register(MyNamespacedApphook)
 
-As seen for Language Namespaces, you can reverse namespaced apps similarly:
+
+.. note::
+    If you do that you will need to give the app a unique namespace in the advanced settings of the page.
+    You can then either reverse for the namespace(to target different apps) or the app_name (to target links inside the
+    same app).
+
+If you use app namespace you will need to give all your view ``context`` a ``current_app``::
+
+  def my_view(request):
+      current_app = resolve(request.path).namespace
+      context = RequestContext(request, current_app=current_app)
+      return render_to_response("my_templace.html", context_instance=context)
+
+.. note::
+    You need to set the current_app explicitly in all your view contexts as django does not allow an other way of doing
+    this.
+
+You can reverse namespaced apps similarly and it "knows" in which app instance it is:
 
 .. code-block:: html+django
 
@@ -319,15 +340,6 @@ templatetag:
         {% url myapp_namespace:app_main %}
     {% endlanguage %}
 
-What makes namespaced app hooks really interesting is the fact that you can
-hook them up to more than one page and reverse their URLs by using their
-instance namespace. Django CMS takes the value of the `reverse_id` field
-assigned to a page and uses it as instance namespace for the app hook.
-
-To reverse the URLs you now have two different ways: explicitly by defining
-the instance namespace, or implicitely by specifiyng the application namespace
-and letting the `url` templatetag resolving the correct application instance
-by looking at the currently set `current_app` value.
 
 .. note::
 
@@ -340,9 +352,10 @@ as an argument. You can do so by looking up the `current_app` attribute of
 the request instance::
 
     def myviews(request):
-        ...
+        current_app = resolve(request.path).namespace
+
         reversed_url = reverse('myapp_namespace:app_main',
-                current_app=request.current_app)
+                current_app=current_app)
         ...
 
 Or, if you are rendering a plugin, of the context instance::
@@ -350,8 +363,9 @@ Or, if you are rendering a plugin, of the context instance::
     class MyPlugin(CMSPluginBase):
         def render(self, context, instance, placeholder):
             ...
+            current_app = resolve(request.path).namespace
             reversed_url = reverse('myapp_namespace:app_main',
-                    current_app=context.current_app)
+                    current_app=current_app)
             ...
 
 
@@ -484,3 +498,11 @@ the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to
 the :doc:`custom_plugins` section.
+
+
+***************
+Further reading
+***************
+
+Your app might also want to integrate in the :doc:`toolbar` to
+provide a more streamlined user experience for your admins.

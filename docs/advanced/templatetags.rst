@@ -185,7 +185,7 @@ Arguments:
   information)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
-``"page_title"``, ``"slug"``, ``"meta_description"``, ``"meta_keywords"``
+``"page_title"``, ``"slug"``, ``"meta_description"``, ``"changed_date"``, ``"changed_by"``
 (note that you can also supply that argument without quotes, but this is
 deprecated because the argument might also be a template variable).
 
@@ -243,8 +243,43 @@ Example::
 	{% endfor %}
 	</div>
 	
-Normally the children of plugins can be accessed via the ``child_plugins`` atrribute of plugins.
+Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
+
+.. templatetag:: show_editable_page_title
+.. versionadded:: 3.0
+
+show_editable_page_title
+========================
+
+This templatetags enables editing the page title from the frontend.
+If in edit mode you can double click on the title and modify in an overlay window; if in live mode
+it fallbacks to ``page_attribute title``.
+
+Example::
+
+	{% load cms_tags %}
+
+	{% show_editable_page_title %}
+
+******************
+Stack Templatetags
+******************
+
+stack
+=====
+
+The stack templatetag can be used anywhere in any template. It needs a name and it will create a placeholder
+that you can fill with plugins afterwards. The stack tag is normally used to display the same content on
+multiple locations.
+
+
+Example::
+
+    {% load stack_tags %}
+
+    {% stack "footer" %}
+
 
 *****************
 Menu Templatetags

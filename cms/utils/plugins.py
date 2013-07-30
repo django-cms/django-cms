@@ -5,16 +5,16 @@ from cms.templatetags.cms_tags import Placeholder
 from cms.utils.placeholder import validate_placeholder_name
 from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
-from django.template import (NodeList, TextNode, VariableNode, 
-    TemplateSyntaxError)
+from django.template import NodeList, VariableNode, TemplateSyntaxError
 from django.template.loader import get_template
-from django.template.loader_tags import (ConstantIncludeNode, ExtendsNode, 
-    BlockNode)
+from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
 import warnings
 from sekizai.helpers import is_variable_extend_node
 
+
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
+
 
 def _extend_blocks(extend_node, blocks):
     """
@@ -36,18 +36,20 @@ def _extend_blocks(extend_node, blocks):
                 seen_supers.append(block.super)
                 block = block.super
             block.super = node
-    # search for further ExtendsNodes
+        # search for further ExtendsNodes
     for node in parent.nodelist.get_nodes_by_type(ExtendsNode):
         _extend_blocks(node, blocks)
         break
-        
+
+
 def _find_topmost_template(extend_node):
     parent_template = extend_node.get_parent({})
     for node in parent_template.nodelist.get_nodes_by_type(ExtendsNode):
         # Their can only be one extend block in a template, otherwise django raises an exception
         return _find_topmost_template(node)
-    # No ExtendsNode
-    return extend_node.get_parent({}) 
+        # No ExtendsNode
+    return extend_node.get_parent({})
+
 
 def _extend_nodelist(extend_node):
     """
@@ -57,7 +59,7 @@ def _extend_nodelist(extend_node):
     # we don't support variable extensions
     if is_variable_extend_node(extend_node):
         return []
-    # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
+        # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
     blocks = extend_node.blocks
     _extend_blocks(extend_node, blocks)
     placeholders = []
@@ -69,6 +71,7 @@ def _extend_nodelist(extend_node):
     parent_template = _find_topmost_template(extend_node)
     placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
     return placeholders
+
 
 def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
     placeholders = []
@@ -119,19 +122,25 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                     placeholders += _scan_placeholders(obj, current_block, ignore_blocks)
     return placeholders
 
+
 def get_placeholders(template):
     compiled_template = get_template(template)
     placeholders = _scan_placeholders(compiled_template.nodelist)
     clean_placeholders = []
     for placeholder in placeholders:
         if placeholder in clean_placeholders:
-            warnings.warn("Duplicate placeholder found: `%s`" % placeholder, DuplicatePlaceholderWarning)
+            warnings.warn("Duplicate {{% placeholder \"{0}\" %}} "
+                          "in template {1}."
+                          .format(placeholder, template, placeholder),
+                          DuplicatePlaceholderWarning)
         else:
             validate_placeholder_name(placeholder)
             clean_placeholders.append(placeholder)
     return clean_placeholders
 
+
 SITE_VAR = "site__exact"
+
 
 def current_site(request):
     if SITE_VAR in request.REQUEST:

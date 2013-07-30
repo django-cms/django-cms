@@ -6,7 +6,6 @@ from django import VERSION
 import argparse
 import sys
 import warnings
-from urlparse import urlparse
 import os
 
 

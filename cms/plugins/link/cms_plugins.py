@@ -4,7 +4,7 @@ from django.conf import settings
 from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugins.link.forms import LinkForm
-from models import Link
+from .models import Link
 
 class LinkPlugin(CMSPluginBase):
     model = Link
@@ -63,6 +63,6 @@ class LinkPlugin(CMSPluginBase):
         return FakeForm(Form, site)
         
     def icon_src(self, instance):
-        return settings.STATIC_URL + u"cms/images/plugins/link.png"
+        return settings.STATIC_URL + u"cms/img/icons/plugins/link.png"
     
 plugin_pool.register_plugin(LinkPlugin)

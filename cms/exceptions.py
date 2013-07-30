@@ -17,7 +17,10 @@ class PluginLimitReached(Exception):
 class AppAlreadyRegistered(Exception):
     pass
 
-AppAllreadyRegistered = AppAlreadyRegistered # backwards compatibility, will be dropped in 2.3
+
+class ToolbarAlreadyRegistered(Exception):
+    pass
+
 
 class NotImplemented(Exception):
     pass
@@ -44,10 +47,12 @@ class NoPermissionsException(PermissionsException):
     """Can be fired when some violate action is performed on permission system. 
     """
 
+
 class PublicIsUnmodifiable(Exception):
     """A method was invoked on the public copy, but is only valid for the
     draft version"""
     pass
+
 
 class Deprecated(Exception): pass
 
@@ -62,3 +67,10 @@ class CMSDeprecationWarning(Warning): pass
 
 
 class LanguageError(Exception): pass
+
+
+class PluginConsistencyError(Exception): pass
+
+
+class PlaceholderNotFound(Exception): pass
+

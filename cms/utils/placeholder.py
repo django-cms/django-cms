@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from cms.utils import get_cms_setting
 from django.conf import settings
-from django.core.exceptions import MultipleObjectsReturned, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
+
 
 def get_placeholder_conf(setting, placeholder, template=None, default=None):
     """
@@ -28,35 +29,36 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
                 return value
     return default
 
+
 def get_page_from_placeholder_if_exists(placeholder):
     import warnings
+
     warnings.warn(
         "The get_page_from_placeholder_if_exists function is deprecated. Use placeholder.page instead",
         DeprecationWarning
     )
     return placeholder.page if placeholder else None
 
-def validate_placeholder_name(name):
-    try:
-        name.decode('ascii')
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        raise ImproperlyConfigured("Placeholder identifiers names may not "
-           "contain non-ascii characters. If you wish your placeholder "
-           "identifiers to contain non-ascii characters when displayed to "
-           "users, please use the CMS_PLACEHOLDER_CONF setting with the 'name' "
-           "key to specify a verbose name.")
 
-    
+def validate_placeholder_name(name):
+    if not all(ord(char) < 128 for char in name):
+        raise ImproperlyConfigured("Placeholder identifiers names may not "
+                                   "contain non-ascii characters. If you wish your placeholder "
+                                   "identifiers to contain non-ascii characters when displayed to "
+                                   "users, please use the CMS_PLACEHOLDER_CONF setting with the 'name' "
+                                   "key to specify a verbose name.")
+
+
 class PlaceholderNoAction(object):
     can_copy = False
-    
+
     def copy(self, **kwargs):
         return False
-    
+
     def get_copy_languages(self, **kwargs):
         return []
-    
-    
+
+
 class MLNGPlaceholderActions(PlaceholderNoAction):
     can_copy = True
 
@@ -68,18 +70,18 @@ class MLNGPlaceholderActions(PlaceholderNoAction):
         if not source_placeholder:
             return False
         plugins = source_placeholder.get_plugins_list()
-        ptree = []
+        cache = {}
         new_plugins = []
         for p in plugins:
-            new_plugins.append(p.copy_plugin(target_placeholder, target_language, ptree))
+            new_plugins.append(p.copy_plugin(target_placeholder, target_language, cache))
         return new_plugins
-    
+
     def get_copy_languages(self, placeholder, model, fieldname, **kwargs):
         manager = model.objects
         src = manager.get(**{fieldname: placeholder})
         query = Q(master=src.master)
         query &= Q(**{'%s__cmsplugin__isnull' % fieldname: False})
         query &= ~Q(pk=src.pk)
-        
+
         language_codes = manager.filter(query).values_list('language_code', flat=True).distinct()
         return [(lc, dict(settings.LANGUAGES)[lc]) for lc in language_codes]

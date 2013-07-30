@@ -6,13 +6,13 @@ from django.dispatch import Signal
 
 from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, PageUser, PageUserGroup
-
+from django.conf import settings
 from menus.menu_pool import menu_pool
 
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
 
-# fired when some of nodes (Title) with applications gets saved
+# fired when some of nodes (Page) with applications gets saved
 application_post_changed = Signal(providing_args=["instance"])
 
 # fired after page gets published - copied to public model - there may be more
@@ -67,10 +67,8 @@ def pre_save_title(instance, raw, **kwargs):
         menu_pool.clear(instance.page.site_id)
     if instance.id and not hasattr(instance, "tmp_path"):
         instance.tmp_path = None
-        instance.tmp_application_urls = None
         try:
-            instance.tmp_path, instance.tmp_application_urls = \
-                Title.objects.filter(pk=instance.id).values_list('path', 'application_urls')[0]
+            instance.tmp_path = Title.objects.filter(pk=instance.id).values_list('path')[0][0]
         except IndexError:
             pass  # no Titles exist for this page yet
 
@@ -100,20 +98,10 @@ def post_save_title(instance, raw, created, **kwargs):
         for descendant_title in descendant_titles:
             descendant_title.path = ''  # just reset path
             descendant_title.tmp_prevent_descendant_update = True
-            if descendant_title.application_urls:
-                application_changed = True
             descendant_title.save()
-
-    if not prevent_descendants and \
-            (instance.application_urls != getattr(instance, 'tmp_application_urls', None) or application_changed):
-        # fire it if we have some application linked to this page or some descendant
-        application_post_changed.send(sender=Title, instance=instance)
-
-    # remove temporary attributes
+        # remove temporary attributes
     if hasattr(instance, 'tmp_path'):
         del instance.tmp_path
-    if hasattr(instance, 'tmp_application_urls'):
-        del instance.tmp_application_urls
     if prevent_descendants:
         del instance.tmp_prevent_descendant_update
 
@@ -193,6 +181,8 @@ def post_save_page(instance, **kwargs):
             for title in page.title_set.all():
                 update_title(title)
                 title.save()
+    if instance.old_page is None or instance.old_page.application_urls != instance.application_urls:
+        application_post_changed.send(sender=Page, instance=instance)
 
 
 def update_placeholders(instance, **kwargs):
@@ -259,6 +249,16 @@ def pre_save_delete_page(instance, **kwargs):
     clear_permission_cache()
 
 
+def post_revision(instances, **kwargs):
+    for inst in instances:
+        if isinstance(inst, Page):
+            page = Page.objects.get(pk=inst.pk)
+            page.revision_id = 0
+            page._publisher_keep_state = True
+            page.save()
+            return
+
+
 if get_cms_setting('PERMISSION'):
     signals.pre_save.connect(pre_save_user, sender=User)
     signals.pre_delete.connect(pre_delete_user, sender=User)
@@ -280,3 +280,8 @@ if get_cms_setting('PERMISSION'):
 
     signals.pre_save.connect(pre_save_delete_page, sender=Page)
     signals.pre_delete.connect(pre_save_delete_page, sender=Page)
+
+if 'reversion' in settings.INSTALLED_APPS:
+    from reversion.models import post_revision_commit
+
+    post_revision_commit.connect(post_revision)

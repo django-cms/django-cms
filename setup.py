@@ -14,6 +14,9 @@ CLASSIFIERS = [
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
+    "Programming Language :: Python :: 2.6",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3.3",
 ]
 
 setup(
@@ -34,6 +37,7 @@ setup(
         'html5lib',
         'django-mptt>=0.5.1,<0.5.3',
         'django-sekizai>=0.7',
+	'djangocms-admin-style'
     ],
     tests_require=[
         'django-reversion>=1.6.6',

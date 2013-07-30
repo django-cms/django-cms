@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from cms.forms.fields import PageSelectFormField, PlaceholderFormField
-from cms.forms.widgets import PlaceholderPluginEditorWidget
 from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
@@ -17,20 +16,8 @@ class PlaceholderField(models.ForeignKey):
         self.default_width = default_width
         self.actions = actions()
         kwargs.update({'null': True})  # always allow Null
+        kwargs.update({'editable': False}) # never allow edits in admin
         super(PlaceholderField, self).__init__(Placeholder, **kwargs)
-
-    def formfield(self, **kwargs):
-        """
-        Returns a django.forms.Field instance for this database Field.
-        """
-        return self.formfield_for_admin(None, lambda qs: qs, **kwargs)
-
-    def formfield_for_admin(self, request, filter_func, **kwargs):
-        defaults = {'label': capfirst(self.verbose_name), 'help_text': self.help_text}
-        defaults.update(kwargs)
-        widget = PlaceholderPluginEditorWidget(request, filter_func)
-        widget.choices = []
-        return PlaceholderFormField(required=False, widget=widget, **defaults)
 
     def _get_new_placeholder(self):
         return Placeholder.objects.create(slot=self.slotname,

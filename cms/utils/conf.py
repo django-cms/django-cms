@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
 import pprint
-import urlparse
+from cms.utils.compat.urls import urljoin
 from cms import constants
 from cms.exceptions import CMSDeprecationWarning
 from django.conf import settings
@@ -38,14 +38,8 @@ DEFAULTS = {
     'RAW_ID_USERS': False,
     'PUBLIC_FOR': 'all',
     'CONTENT_CACHE_DURATION': 60,
-    'SHOW_START_DATE': False,
-    'SHOW_END_DATE': False,
-    'URL_OVERWRITE': True,
-    'MENU_TITLE_OVERWRITE': False,
-    'REDIRECTS': False,
-    'SEO_FIELDS': False,
     'APPHOOKS': [],
-    'SOFTROOT': False,
+    'TOOLBARS': [],
     'SITE_CHOICES_CACHE_KEY': 'CMS:site_choices',
     'PAGE_CHOICES_CACHE_KEY': 'CMS:page_choices',
     'MEDIA_PATH': 'cms/',
@@ -74,20 +68,14 @@ def get_media_root():
     return os.path.join(settings.MEDIA_ROOT, get_cms_setting('MEDIA_PATH'))
 
 
-@default('CMS_MEDIA_ROOT')
+@default('CMS_MEDIA_URL')
 def get_media_url():
-    return urlparse.urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
-
-
-@default('PLACEHOLDER_FRONTEND_EDITING')
-def get_placeholder_frontend_editing():
-    return True
+    return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
 
 
 def get_templates():
     templates = list(getattr(settings, 'CMS_TEMPLATES', []))
-    if get_cms_setting('TEMPLATE_INHERITANCE'):
-        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
+    templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
 
 
@@ -225,7 +213,6 @@ COMPLEX = {
     'MEDIA_ROOT': get_media_root,
     'MEDIA_URL': get_media_url,
     # complex because not prefixed by CMS_
-    'PLACEHOLDER_FRONTEND_EDITING': get_placeholder_frontend_editing,
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,

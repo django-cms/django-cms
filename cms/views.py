@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.contrib.auth.views import redirect_to_login
+from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Title
 from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, get_language_list, is_language_prefix_patterns_used
+from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, \
+    get_language_list, is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
-from django.conf.urls.defaults import patterns
+from django.conf.urls import patterns
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.utils import translation
 from django.utils.http import urlquote
+
 
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
-        return render_to_response("cms/new.html", RequestContext(request))
+        return TemplateResponse(request, "cms/welcome.html", RequestContext(request))
     raise Http404('CMS: Page not found for "%s"' % slug)
 
 
@@ -37,10 +39,11 @@ def details(request, slug):
     current_language = get_language_from_request(request)
     # Check that the current page is available in the desired (current) language
     available_languages = []
-    page_languages = page.get_languages()
-    user_languages = get_public_languages()
+    page_languages = list(page.get_languages())
     if hasattr(request, 'user') and request.user.is_staff:
         user_languages = get_language_list()
+    else:
+        user_languages = get_public_languages()
     for frontend_lang in user_languages:
         if frontend_lang in page_languages:
             available_languages.append(frontend_lang)
@@ -51,7 +54,7 @@ def details(request, slug):
         attrs = '?preview=1'
         if 'draft' in request.GET:
             attrs += '&draft=1'
-    # Check that the language is in FRONTEND_LANGUAGES:
+        # Check that the language is in FRONTEND_LANGUAGES:
     if not current_language in user_languages:
         #are we on root?
         if not slug:
@@ -108,16 +111,15 @@ def details(request, slug):
                 pattern_list += urlpatterns
             urlpatterns = patterns('', *pattern_list)
             try:
-                context.current_app = page.reverse_id if page.reverse_id else app.app_name
                 view, args, kwargs = resolve('/', tuple(urlpatterns))
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass
-        # Check if the page has a redirect url defined for this language.
+                # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
         if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
-            and not redirect_url.startswith('/%s/' % current_language)):
+        and not redirect_url.startswith('/%s/' % current_language)):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
@@ -131,9 +133,7 @@ def details(request, slug):
 
     # permission checks
     if page.login_required and not request.user.is_authenticated():
-        path = urlquote(request.get_full_path())
-        tup = settings.LOGIN_URL, "next", path
-        return HttpResponseRedirect('%s?%s=%s' % tup)
+        return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
     # fill the context 
@@ -145,4 +145,4 @@ def details(request, slug):
     if not context['has_view_permissions']:
         return _handle_no_page(request, slug)
 
-    return render_to_response(template_name, context_instance=context)
+    return TemplateResponse(request, template_name, context)

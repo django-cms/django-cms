@@ -14,15 +14,16 @@ Install
 *******
 
 .. warning::
-    Version 2.4 introduces some significant changes that **require** action if
+    Version 3.0 introduces some significant changes that **require** action if
     you are upgrading from a previous version. Please refer to
-    :ref:`Upgrading from previous versions <upgrade-to-2.4>`
+    :ref:`Upgrading from previous versions <upgrade-to-3.0>`
 
 
 .. toctree::
     :maxdepth: 1
 
     getting_started/installation
+    upgrade/3.0
     upgrade/2.4
     upgrade/2.3.4
     upgrade/2.3.3
@@ -76,6 +77,7 @@ Extending the CMS
     extending_cms/app_integration
     extending_cms/api_references
     extending_cms/placeholders
+    extending_cms/toolbar
     extending_cms/searchdocs
     extending_cms/fields
     extending_cms/testing
@@ -93,6 +95,7 @@ Concepts
     concepts/menu_system
     concepts/publishing
     concepts/multiple_languages
+    concepts/stacks
 
 
 **************************

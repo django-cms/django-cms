@@ -10,6 +10,7 @@ from cms.utils import get_language_from_request
 from cms.utils.i18n import get_redirect_on_fallback, get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.placeholder import get_placeholder_conf
+from cms.utils.compat.dj import force_unicode
 
 
 def get_plugins(request, placeholder, lang=None):
@@ -42,7 +43,7 @@ def assign_plugins(request, placeholders, lang=None):
                     break
                     # get all plugins for the given placeholders
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
-        'placeholder', 'tree_id', 'lft')
+        'placeholder', 'tree_id', 'level', 'position')
     plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
@@ -79,7 +80,7 @@ def downcast_plugins(queryset, select_placeholder=False):
     # make a map of plugin types, needed later for downcasting
     for plugin in queryset:
         plugin_types_map[plugin.plugin_type].append(plugin.pk)
-    for plugin_type, pks in plugin_types_map.iteritems():
+    for plugin_type, pks in plugin_types_map.items():
         cls = plugin_pool.get_plugin(plugin_type)
         # get all the plugins of type cls.model
         plugin_qs = cls.model.objects.filter(pk__in=pks)
@@ -129,7 +130,7 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 plugin_type=plugin_type,
             ).count()
             if type_count >= type_limit:
-                plugin_name = unicode(plugin_pool.get_plugin(plugin_type).name)
+                plugin_name = force_unicode(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})

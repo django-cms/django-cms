@@ -2,6 +2,8 @@
 from datetime import timedelta
 
 from cms import constants
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
 from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
@@ -13,6 +15,7 @@ from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -25,11 +28,11 @@ from mptt.models import MPTTModel
 from os.path import join
 
 
-class Page(MPTTModel):
+@python_2_unicode_compatible
+class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
     A simple hierarchical page model
     """
-    __metaclass__ = PageMetaClass
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
@@ -62,14 +65,16 @@ class Page(MPTTModel):
     published = models.BooleanField(_("is published"), blank=True)
 
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
-                                help_text=_('The template used to render the content.'))
+                                help_text=_('The template used to render the content.'),
+                                default=TEMPLATE_INHERITANCE_MAGIC)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
 
     login_required = models.BooleanField(_("login required"), default=False)
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
-
+    application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
+    application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
@@ -83,7 +88,8 @@ class Page(MPTTModel):
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
-
+    # If the draft is loaded from a reversion version save the revision id here.
+    revision_id = models.PositiveIntegerField(default=0, editable=False)
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -93,6 +99,7 @@ class Page(MPTTModel):
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
         )
+        unique_together = (("publisher_is_draft", "application_namespace"),)
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('tree_id', 'lft')
@@ -104,11 +111,11 @@ class Page(MPTTModel):
             'placeholders', 'lft', 'rght', 'tree_id',
             'parent']
 
-    def __unicode__(self):
+    def __str__(self):
         title = self.get_menu_title(fallback=True)
         if title is None:
             title = u""
-        return unicode(title)
+        return force_unicode(title)
 
     def __repr__(self):
         # This is needed to solve the infinite recursion when
@@ -137,12 +144,13 @@ class Page(MPTTModel):
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
 
+        # readability counts :)
+        is_inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
+
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
 
-        if (position in ('left', 'right')
-        and not target.parent
-        and self.template == constants.TEMPLATE_INHERITANCE_MAGIC):
+        if (position in ('left', 'right') and not target.parent and is_inherited_template):
             self.template = self.get_template()
         self.move_to(target, position)
 
@@ -153,6 +161,8 @@ class Page(MPTTModel):
         self.save()  # always save the page after move, because of publisher
         # check the slugs
         page_utils.check_title_slugs(self)
+        # Make sure to update the slug and path of the target page.
+        page_utils.check_title_slugs(target)
 
         if self.publisher_public_id:
             # Ensure we have up to date mptt properties
@@ -175,7 +185,7 @@ class Page(MPTTModel):
             title.page = target
             title.save()
         if old_titles:
-            from titlemodels import Title
+            from .titlemodels import Title
 
             Title.objects.filter(id__in=old_titles.values()).delete()
 
@@ -213,6 +223,8 @@ class Page(MPTTModel):
         target.soft_root = self.soft_root
         target.reverse_id = self.reverse_id
         target.navigation_extenders = self.navigation_extenders
+        target.application_urls = self.application_urls
+        target.application_namespace = self.application_namespace
         target.template = self.template
         target.site_id = self.site_id
 
@@ -229,7 +241,6 @@ class Page(MPTTModel):
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
-        from cms.utils.moderator import update_moderation_message
 
         page_copy = None
 
@@ -302,8 +313,6 @@ class Page(MPTTModel):
                     permission.page = page
                     permission.save()
 
-            update_moderation_message(page, unicode(_('Page was copied.')))
-
             # copy titles of this page
             for title in titles:
                 title.pk = None  # setting pk = None creates a new instance
@@ -349,7 +358,8 @@ class Page(MPTTModel):
 
         if self.reverse_id == "":
             self.reverse_id = None
-
+        if self.application_namespace == "":
+            self.application_namespace = None
         from cms.utils.permissions import _thread_locals
 
         user = getattr(_thread_locals, "user", None)
@@ -536,6 +546,7 @@ class Page(MPTTModel):
         self.published = True
         self.publisher_state = self.PUBLISHER_STATE_DEFAULT
         self._publisher_keep_state = True
+        self.revision_id = 0
         self.save()
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()
@@ -604,10 +615,7 @@ class Page(MPTTModel):
         from cms.models.titlemodels import Title
 
         if not hasattr(self, "all_languages"):
-            self.all_languages = Title.objects.filter(page=self).values_list("language", flat=True).distinct()
-            self.all_languages = list(self.all_languages)
-            self.all_languages.sort()
-            self.all_languages = map(str, self.all_languages)
+            self.all_languages = list(sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
         return self.all_languages
 
     def get_cached_ancestors(self, ascending=True):
@@ -672,6 +680,18 @@ class Page(MPTTModel):
             return self.get_title(language, True, version_id, force_reload)
         return menu_title
 
+    def get_changed_date(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get when this page was last updated
+        """
+        return self.changed_date
+
+    def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
+        """
+        get user who last changed this page
+        """
+        return self.changed_by
+
     def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the page title of the page depending on the given language
@@ -687,17 +707,11 @@ class Page(MPTTModel):
         """
         return self.get_title_obj_attribute("meta_description", language, fallback, version_id, force_reload)
 
-    def get_meta_keywords(self, language=None, fallback=True, version_id=None, force_reload=False):
-        """
-        get content for the keywords meta tag for the page depending on the given language
-        """
-        return self.get_title_obj_attribute("meta_keywords", language, fallback, version_id, force_reload)
-
     def get_application_urls(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get application urls conf for application hook
         """
-        return self.get_title_obj_attribute("application_urls", language, fallback, version_id, force_reload)
+        return self.application_urls
 
     def get_redirect(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
@@ -735,7 +749,7 @@ class Page(MPTTModel):
                 title = Title.objects.get_title(self, language, language_fallback=fallback)
                 if title:
                     self.title_cache[title.language] = title
-                language = title.language
+                    language = title.language
         return language
 
     def get_template(self):
@@ -814,8 +828,8 @@ class Page(MPTTModel):
             else:
                 # anonymous user, no restriction saved in database
                 return True
-            # Authenticated user
-        # Django wide auth perms "can_view" or cms auth perms "can_view"
+                # Authenticated user
+                # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
         return (request.user.has_perm(codename) or
@@ -1104,6 +1118,7 @@ class Page(MPTTModel):
                 placeholder = Placeholder.objects.create(slot=placeholder_name)
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
+        return found
 
 
 def _reversion():

@@ -24,9 +24,7 @@ class PageManager(PublisherManager):
         return super(PageManager, self).drafts()
 
     def public(self):
-        return super(PageManager, self).public().exclude(
-            publisher_state=self.model.PUBLISHER_STATE_DELETE
-        )
+        return super(PageManager, self).public()
 
     # !IMPORTANT: following methods always return access to draft instances,
     # take care on what you do one them. use Page.objects.public() for accessing
@@ -168,12 +166,10 @@ class TitleManager(PublisherManager):
             'slug',
             'title',
             'meta_description',
-            'meta_keywords',
             'page_title',
             'menu_title'
         ]
         advanced_fields = [
-            'application_urls',
             'redirect',
         ]
         cleaned_data = form.cleaned_data
@@ -191,21 +187,24 @@ class TitleManager(PublisherManager):
                 if overwrite_url:
                     data['has_url_overwrite'] = True
                     data['path'] = overwrite_url
+                else:
+                    data['has_url_overwrite'] = False
                 for field in advanced_fields:
                     value = cleaned_data.get(field, None)
-                    if value:
-                        data[field] = value
+                    data[field] = value
             return self.create(**data)
-
         for name in base_fields:
-            value = cleaned_data.get(name, None)
-            setattr(obj, name, value)
+            if name in form.base_fields:
+                value = cleaned_data.get(name, None)
+                setattr(obj, name, value)
         if page.has_advanced_settings_permission(request):
             overwrite_url = cleaned_data.get('overwrite_url', None)
             obj.has_url_overwrite = bool(overwrite_url)
             obj.path = overwrite_url
             for field in advanced_fields:
-                setattr(obj, field, cleaned_data.get(field, None))
+                if field in form.base_fields:
+                    value = cleaned_data.get(field, None)
+                    setattr(obj, field, value)
         obj.save()
         return obj
 

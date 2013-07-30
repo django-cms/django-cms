@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.utils.numberformat import format
 from cms import constants
-from cms.api import add_plugin, create_page
+from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.link.cms_plugins import LinkPlugin
-from cms.plugins.text.cms_plugins import TextPlugin
-from cms.plugins.text.models import Text
+from cms.utils.compat.tests import UnittestCompatMixin
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholderapp.models import (Example1, Example2,
-    Example3, Example4, Example5, MultilingualExample1)
+from cms.test_utils.project.placeholderapp.models import (Example1, TwoPlaceholderExample, MultilingualExample1)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride,
-    UserLoginContext)
+from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
+from cms.utils.compat.dj import force_unicode
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
@@ -31,7 +32,7 @@ from django.template.context import Context, RequestContext
 from django.test import TestCase
 
 
-class PlaceholderTestCase(CMSTestCase):
+class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def setUp(self):
         u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         u.set_password("test")
@@ -76,7 +77,8 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'new_two', u'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
-        placeholders = self.assertWarns(DuplicatePlaceholderWarning, "Duplicate placeholder found: `one`",
+        placeholders = self.assertWarns(DuplicatePlaceholderWarning,
+                                        'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
                                         get_placeholders, 'placeholder_tests/test_seven.html')
         self.assertEqual(sorted(placeholders), sorted([u'one']))
 
@@ -99,45 +101,8 @@ class PlaceholderTestCase(CMSTestCase):
     def test_fieldsets_requests(self):
         response = self.client.get(reverse('admin:placeholderapp_example1_add'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example2_add'))
+        response = self.client.get(reverse('admin:placeholderapp_twoplaceholderexample_add'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example3_add'))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example4_add'))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_example5_add'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_fieldsets(self):
-        from cms.test_utils.project.placeholderapp import admin as __ # load admin
-
-        request = self.get_request('/')
-        admins = [
-            (Example1, 2),
-            (Example2, 3),
-            (Example3, 3),
-            (Example4, 3),
-            (Example5, 4),
-        ]
-        for model, fscount in admins:
-            ainstance = admin.site._registry[model]
-            fieldsets = ainstance.get_fieldsets(request)
-            form = ainstance.get_form(request, None)
-            phfields = ainstance._get_placeholder_fields(form)
-            self.assertEqual(len(fieldsets), fscount, (
-                "Asserting fieldset count for %s. Got %s instead of %s: %s. "
-                "Using %s." % (model.__name__, len(fieldsets),
-                fscount, fieldsets, ainstance.__class__.__name__)
-            ))
-            for label, fieldset in fieldsets:
-                fields = list(fieldset['fields'])
-                for field in fields:
-                    if field in phfields:
-                        self.assertTrue(len(fields) == 1)
-                        self.assertTrue('plugin-holder' in fieldset['classes'])
-                        self.assertTrue('plugin-holder-nopage' in fieldset['classes'])
-                        phfields.remove(field)
-            self.assertEqual(phfields, [])
 
     def test_page_only_plugins(self):
         ex = Example1(
@@ -152,7 +117,7 @@ class PlaceholderTestCase(CMSTestCase):
         self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
 
     def test_inter_placeholder_plugin_move(self):
-        ex = Example5(
+        ex = TwoPlaceholderExample(
             char_1='one',
             char_2='two',
             char_3='tree',
@@ -167,15 +132,14 @@ class PlaceholderTestCase(CMSTestCase):
         ph2_pl1 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin1').cmsplugin_ptr
         ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
-        response = self.client.post(reverse('admin:placeholderapp_example5_move_plugin'), {
-            'placeholder': ph2.slot,
+        response = self.client.post(reverse('admin:placeholderapp_twoplaceholderexample_move_plugin'), {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
-            'ids': "_".join([str(p.pk) for p in [ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3]])
+            'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
-        self.assertEqual([ph2_pl1, ph1_pl2, ph2_pl2, ph2_pl3], list(ph2.cmsplugin_set.order_by('position')))
+        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
 
     def test_nested_plugin_escapejs(self):
         """
@@ -202,7 +166,7 @@ class PlaceholderTestCase(CMSTestCase):
                 reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
-            self.assertContains(response, "/static/plugins/empty-image-file.png")
+            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
     def test_nested_plugin_escapejs_page(self):
         """
@@ -221,7 +185,7 @@ class PlaceholderTestCase(CMSTestCase):
                 reverse('admin:cms_page_change', args=(page.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
-            self.assertContains(response, "/static/plugins/empty-image-file.png")
+            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
@@ -284,6 +248,79 @@ class PlaceholderTestCase(CMSTestCase):
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
 
+    def test_plugins_language_fallback(self):
+        """ Tests language_fallback placeholder configuration """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        title_de = create_title("de", "page_de", page_en)
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
+
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+
+            pop = push
+
+        context_en = NoPushPopContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_de = NoPushPopContext()
+        context_de['request'] = self.get_request(language="de", page=page_en)
+
+        # First test the default (non-fallback) behavior)
+        ## English page should have the text plugin
+        content_en = render_placeholder(placeholder_en, context_en)
+        self.assertRegexpMatches(content_en, "^en body$")
+
+        ## Deutsch page should have no text
+        content_de = render_placeholder(placeholder_en, context_de)
+        self.assertNotRegex(content_de, "^en body$")
+
+        conf = {
+            'col_left': {
+                'language_fallback': True,
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            ## Deutsch page should have no text
+            content_de = render_placeholder(placeholder_en, context_de)
+            self.assertRegexpMatches(content_de, "^en body$")
+
+            # Then we add a plugin to check for proper rendering
+            add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "^de body$")
+
+    def test_placeholder_pk_thousands_format(self):
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        for placeholder in page.placeholders.all():
+            page.placeholders.remove(placeholder)
+            placeholder.pk += 1000
+            placeholder.save()
+            page.placeholders.add(placeholder)
+        page.reload()
+        for placeholder in page.placeholders.all():
+            plugin = add_plugin(placeholder, "TextPlugin", "en", body="body",
+                                id=placeholder.pk)
+        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+            # Superuser
+            user = self.get_superuser()
+            self.client.login(username=user.username, password=user.username)
+            response = self.client.get("/en/?edit")
+            for placeholder in page.placeholders.all():
+                self.assertContains(
+                    response, "'placeholder_id': '%s'" % placeholder.pk)
+                self.assertNotContains(
+                    response, "'placeholder_id': '%s'" % format(
+                        placeholder.pk, ".", grouping=3, thousand_sep=","))
+                self.assertNotContains(
+                    response, "'plugin_id': '%s'" % format(
+                        placeholder.pk, ".", grouping=3, thousand_sep=","))
+                self.assertNotContains(
+                    response, "'clipboard': '%s'" % format(
+                        response.context['request'].toolbar.clipboard.pk, ".",
+                        grouping=3, thousand_sep=","))
+
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     def test_placeholder_no_action(self):
@@ -308,9 +345,9 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         )
         EN = ('en', 'English')
         FR = ('fr', 'French')
-        self.assertEqual(fr_copy_languages, [EN])
-        self.assertEqual(de_copy_languages, [EN, FR])
-        self.assertEqual(en_copy_languages, [FR])
+        self.assertEqual(set(fr_copy_languages), set([EN]))
+        self.assertEqual(set(de_copy_languages), set([EN, FR]))
+        self.assertEqual(set(en_copy_languages), set([FR]))
 
     def test_mlng_placeholder_actions_copy(self):
         actions = MLNGPlaceholderActions()
@@ -387,7 +424,7 @@ class PlaceholderModelTests(CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = unicode(ph)
+        result = force_unicode(ph)
         self.assertEqual(result, u'test')
 
     def test_excercise_get_attached_model(self):
@@ -457,8 +494,8 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         admin = self.get_admin()
         data = {
             'plugin_type': 'LinkPlugin',
-            'placeholder': placeholder.pk,
-            'language': 'en',
+            'placeholder_id': placeholder.pk,
+            'plugin_language': 'en',
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
@@ -470,15 +507,15 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 200)
                 response = admin.add_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit(self):
         placeholder = self.get_placeholder()
         admin = self.get_admin()
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': placeholder.pk,
-            'language': 'en',
+            'placeholder_id': placeholder.pk,
+            'plugin_language': 'en',
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
@@ -489,7 +526,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 response = admin.add_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
-                                 "This placeholder already has the maximum number (1) of allowed Text plugins.")
+                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()
@@ -515,7 +552,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
                 response = admin.move_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit_on_plugin_move(self):
         admin = self.get_admin()
@@ -538,15 +575,15 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 response = admin.move_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
-                                 "This placeholder already has the maximum number (1) of allowed Text plugins.")
+                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
         admin = self.get_admin()
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': placeholder.pk,
-            'language': 'en',
+            'placeholder_id': placeholder.pk,
+            'plugin_language': 'en',
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
@@ -554,7 +591,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request(data)
                 response = admin.add_plugin(request)
                 self.assertEqual(response.status_code, 200)
-                plugin_id = int(response.content)
+                plugin_id = int(str(response.content).split('edit-plugin/')[1].split("/")[0])
                 data = {
                     'body': 'Hello World',
                 }
@@ -607,8 +644,8 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
     def _post_request(self, user):
         data = {
             'plugin_type': 'TextPlugin',
-            'placeholder': self._placeholder.pk,
-            'language': 'en',
+            'placeholder_id': self._placeholder.pk,
+            'plugin_language': 'en',
         }
         request = self.get_post_request(data)
         request.user = self.reload(user)
@@ -713,7 +750,6 @@ class PlaceholderI18NTest(CMSTestCase):
         return u
 
     def test_hvad_tabs(self):
-
         ex = MultilingualExample1(
             char_1='one',
             char_2='two',
@@ -727,33 +763,32 @@ class PlaceholderI18NTest(CMSTestCase):
 
 
     def test_no_tabs(self):
-
-        ex = Example4(
+        ex = Example1(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
-            )
+        )
         ex.save()
         user = self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/example4/1/')
+        response = self.client.get('/de/admin/placeholderapp/example1/1/')
         self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_placeholder_tabs(self):
-
-        ex = Example5(
+        ex = TwoPlaceholderExample(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
-            )
+        )
         ex.save()
         user = self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/example5/1/')
-        self.assertNotContains(response, """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
+        response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/1/')
+        self.assertNotContains(response,
+                               """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
 
 

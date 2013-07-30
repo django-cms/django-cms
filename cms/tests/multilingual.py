@@ -5,15 +5,12 @@ from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
 from cms.models import Title
-from cms.test_utils.testcases import (CMSTestCase, SettingsOverrideTestCase,
-                                      URL_CMS_PAGE_ADD, 
-                                      URL_CMS_PAGE, URL_CMS_PAGE_CHANGE,
-                                      URL_CMS_PAGE_CHANGE_LANGUAGE)
+from cms.test_utils.testcases import (SettingsOverrideTestCase,
+                                      URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.conf import get_languages
-from django.conf import settings
 from django.contrib.sites.models import Site
 
 from django.contrib.auth.models import User
@@ -88,7 +85,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
                                         page_data)
-            
+            response = self.client.post(URL_CMS_PAGE_PUBLISH % page.pk)
             page = page.reload()
             self.assertTrue(page.published)
             

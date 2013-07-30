@@ -1,0 +1,39 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//##################################################
+// #IMPORT SETTINGS#
+@import "partials/settings";
+
+//##################################################
+// #TABS#
+
+// used in: /cms/admin/page/change_form
+#page_form_lang_tabs {
+	position:relative;
+
+	input.language_button { background:#ccc; }
+	input.selected { color:black; text-shadow:none; background:white; }
+	input.notfilled { color:#bbb; background:none; }
+
+	.lang_tabs_line {
+		position:absolute; left:0; bottom:-5px;
+		width:100%; height:5px;
+		background:white;
+	}
+}
+
+//##################################################
+// #DOALOG#
+
+// used in: /cms/admin/page/tree/copy_premissions
+.cms_dialog {
+	position:absolute; left:50%; top:50%; z-index:99999;
+	width:500px; height:200px; padding:25px; margin:-100px 0 0 -275px;
+	background:white; border:1px solid #ccc; @include border-radius(5px);
+
+	h1 { padding:0; margin:0 0 15px; }
+	form { padding:15px 0; margin:15px 0; border-top:1px solid #f3f3f3; }
+}

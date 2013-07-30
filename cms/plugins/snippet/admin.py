@@ -1,4 +1,4 @@
-from models import Snippet
+from .models import Snippet
 from django.contrib import admin
 
 class SnippetAdmin(admin.ModelAdmin):

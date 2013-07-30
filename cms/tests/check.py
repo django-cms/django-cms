@@ -5,7 +5,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
-from cms.plugins.text.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.api import add_plugin
 from django.test import TestCase

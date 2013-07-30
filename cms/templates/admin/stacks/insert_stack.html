@@ -1,0 +1,49 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_static admin_modify cms_admin %}
+
+{% block title %}{% trans "Insert Stack" %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% block jquery %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endblock jquery %}
+{{ media }}
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<form action="." method="post">
+{% if messages %}
+<ul class="messages">
+	{% for message in messages %}
+		<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+<h1>{% trans 'Insert Stack' %}</h1>
+{% block field_sets %}
+<fieldset class="module aligned {{ fieldset.classes }}">
+	{% csrf_token %}
+		{% for field in form %}
+			{% if field.is_hidden %}
+				{{ field }}
+			{% else %}
+				<div class="form-row{% if field.field.name %} field-{{ field.name }}{% if field.errors %} errors{% endif %}{% endif %}">
+					<div>
+					{% if not field.is_hidden %}<label for="id_{{ field.name }}">{{ field.label }}</label>{% endif %}
+					{{ field }}
+					{% if field.help_text %}
+						<p class="help">{{ field.help_text|safe }}</p>
+					{% endif %}
+					</div>
+				</div>
+			{% endif %}
+		{% endfor %}
+</fieldset>
+{% endblock %}
+
+{% block submit_buttons_bottom %}<div class="submit-row"><input type="submit" class="default" name="_save" value="{% trans 'Save' %}"/></div>{% endblock %}
+
+</form>
+{% endblock %}
