@@ -55,7 +55,7 @@ class BaseExtension(models.Model):
 
 
 class PageExtension(BaseExtension):
-    extended_object = models.ForeignKey(Page, editable=False)
+    extended_object = models.OneToOneField(Page, editable=False)
 
     class Meta:
         abstract = True
@@ -65,7 +65,7 @@ class PageExtension(BaseExtension):
 
 
 class TitleExtension(BaseExtension):
-    extended_object = models.ForeignKey(Title, editable=False)
+    extended_object = models.OneToOneField(Title, editable=False)
 
     class Meta:
         abstract = True
