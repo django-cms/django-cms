@@ -314,7 +314,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
-    def change_view(self, request, object_id, extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         """
         The 'change' admin view for the Page model.
         """
@@ -350,8 +350,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         # as a parameter, the workaround is to set it as an attribute...
         if DJANGO_1_4:
             self._current_page = obj
-        response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
-
+        response = super(PageAdmin, self).change_view(
+            request, object_id, form_url=form_url, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))

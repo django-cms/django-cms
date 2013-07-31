@@ -9,6 +9,7 @@
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/libs/class.min.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/jquery.ui.nestedsortable.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.base.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.toolbar.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.placeholders.js" %}"></script>{% endaddtoblock %}
@@ -26,18 +27,20 @@ $(document).ready(function () {
 		'authenticated': {% if user.is_authenticated %}true{% else %}false{% endif %},
 		'debug': {% if debug %}true{% else %}false{% endif %},
 		'settings': {
+			'version': '{{ cms_version }}',
 			'toolbar': 'expanded',
 			'mode': 'edit'
 		},
 		'urls': {
 			'settings': '',
-			'static': {{ STATIC_URL }}
+			'static': '{{ STATIC_URL }}'
 		},
 		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}',
 		'lang': {
 			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
 			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
-			'cancel': {% javascript_string %}{% trans "Cancel" %}{% end_javascript_string %}
+			'cancel': {% javascript_string %}{% trans "Cancel" %}{% end_javascript_string %},
+			'debug': {% javascript_string %}{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}{% end_javascript_string %}
 		}
 	});
 
@@ -45,7 +48,7 @@ $(document).ready(function () {
 	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
 
 	// open django messages if provided
-	{% if messages %}{% for message in messages %}CMS.API.Toolbar.openMessage('{{ message }}');{% endfor %}{% endif %}
+	{% if messages %}CMS.API.Toolbar.openMessage('{% for message in messages %}{{ message }}{% endfor %}');{% endif %}
 
 	// special message for published status
 	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}
@@ -54,7 +57,7 @@ $(document).ready(function () {
 	{% endif %}
 
 	// ensure toolbar is shown when not logged in
-	{% if not user.is_authenticated %}CMS.API.Toolbar._showToolbar(0);{% endif %}
+	{% if not user.is_authenticated %}CMS.API.Toolbar.toggleToolbar(true);{% endif %}
 });
 })(CMS.$);
 </script>
@@ -65,7 +68,11 @@ $(document).ready(function () {
 	window.$ = _$;
 </script>
 {% endaddtoblock %}
-<div id="cms_toolbar" class="cms_reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}">
+<div id="cms_toolbar" class="cms_reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}{% if debug %} cms_toolbar-debug{% endif %}">
+
+	<!-- debug bar -->
+	<div class="cms_debug-bar"></div>
+
 	<!-- start: toolbar -->
 	<div class="cms_toolbar">
 		<div class="cms_toolbar-left">
