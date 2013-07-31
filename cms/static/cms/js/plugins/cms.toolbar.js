@@ -1154,7 +1154,7 @@ $(document).ready(function () {
 					messages.remove();
 
 				// determine if we should close the modal or reload
-				if(messages.length && that.enforceReload) window.location.href = '/'; // redirect to home
+				if(messages.length && that.enforceReload) CMS.API.Helpers.reloadBrowser();
 				if(messages.length && that.enforceClose) {
 					that.closeModal();
 					return false;
