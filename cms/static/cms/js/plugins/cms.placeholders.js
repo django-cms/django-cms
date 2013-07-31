@@ -775,8 +775,6 @@ $(document).ready(function () {
 				}
 			});
 
-			console.log(nav.find('.cms_submenu-item-title').filter(':visible').length);
-
 			// check for empty entries
 			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
 				nav.find('.cms_submenu-item-title:eq(0)').show();
