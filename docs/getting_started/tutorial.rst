@@ -74,6 +74,8 @@ other highly recommended applications/libraries:
 * ``'sekizai'``, for javascript and css management
 * ``'djangocms_admin_style'``, for the admin skin. You **must** add
   ``'djangocms_admin_style'`` in the list before ``'django.contrib.admin'``.
+* ``'django.contrib.messages'`` to enable ``messages`` framework (see
+  :ref:`Enable messages <enable-messages>`)
 
 
 Also add any (or all) of the following plugins, depending on your needs:
@@ -146,6 +148,7 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
     TEMPLATE_CONTEXT_PROCESSORS = (
         'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
         'django.core.context_processors.i18n',
         'django.core.context_processors.request',
         'django.core.context_processors.media',
@@ -158,6 +161,22 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
     
     This setting will be missing from automatically generated Django settings
     files, so you will have to add it.
+
+.. _enable-messages:
+
+.. versionchanged:: 3.0.0
+
+.. warning:: Enable ``messages``
+
+    Django ``messages`` framework is now required for the toolbar to work
+    properly.
+    
+    To enable it you must be check the following settings:
+        
+        * ``INSTALLED_APPS``: must contain ``'django.contrib.messages'``
+        * ``MIDDLEWARE_CLASSES``: must contain ``'django.contrib.messages.middleware.MessageMiddleware'``
+        * ``TEMPLATE_CONTEXT_PROCESSORS``: must contain ``'django.contrib.messages.context_processors.messages'``
+
 
 Point your :setting:`django:STATIC_ROOT` to where the static files should live
 (that is, your images, CSS files, Javascript files, etc.)::
