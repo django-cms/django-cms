@@ -800,6 +800,7 @@ $(document).ready(function () {
 
 		_startSideframeResize: function () {
 			var that = this;
+			var timer = function () {};
 			// this prevents the iframe from being focusable
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
 
@@ -811,6 +812,12 @@ $(document).ready(function () {
 
 				// update settings
 				that.settings.sideframe.position = e.clientX;
+
+				// save position
+				clearTimeout(timer);
+				timer = setTimeout(function () {
+					that.setSettings();
+				}, 500);
 			});
 		},
 
@@ -818,8 +825,6 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 1);
 
 			$(document).unbind('mousemove.cms');
-
-			this.setSettings();
 		},
 
 		_showModal: function (speed) {
@@ -849,6 +854,13 @@ $(document).ready(function () {
 
 				// fade in modal window
 				that.modal.show();
+			});
+
+			// add esc close event
+			// TODO the event also needs to be added to the iframe
+			$(document).bind('keydown.cms', function (e) {
+				console.log(e.keyCode);
+				if(e.keyCode === 27) that.closeModal();
 			});
 		},
 

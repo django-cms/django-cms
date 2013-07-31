@@ -300,6 +300,7 @@ $(document).ready(function () {
 
 		_collapsables: function (draggables) {
 			var that = this;
+			var settings = CMS.API.Toolbar.getSettings();
 
 			// attach events to draggable
 			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
@@ -307,10 +308,9 @@ $(document).ready(function () {
 				var id = that.getId($(this).parent());
 				var settings = CMS.API.Toolbar.getSettings();
 					settings.states = settings.states || [];
-				var index = settings.states.indexOf(id);
 
 				// collapsable function and save states
-				if(index != -1) {
+				if(el.hasClass('cms_dragitem-expanded')) {
 					settings.states.splice(settings.states.indexOf(id), 1);
 					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
 				} else {
@@ -321,6 +321,19 @@ $(document).ready(function () {
 				// save settings
 				CMS.API.Toolbar.setSettings(settings);
 			});
+
+			// removing dublicate entries
+			var sortedArr = settings.states.sort();
+			var filteredArray = [];
+			for(var i = 0; i < sortedArr.length; i++) {
+				if(sortedArr[i] !== sortedArr[i + 1]) {
+					filteredArray.push(sortedArr[i]);
+				}
+			}
+			settings.states = filteredArray;
+
+			// save cleaned array
+			CMS.API.Toolbar.setSettings(settings);
 
 			// loop through the items
 			$.each(CMS.API.Toolbar.getSettings().states, function (index, id) {
