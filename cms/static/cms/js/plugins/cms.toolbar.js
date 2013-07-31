@@ -855,6 +855,13 @@ $(document).ready(function () {
 				// fade in modal window
 				that.modal.show();
 			});
+
+			// add esc close event
+			// TODO the event also needs to be added to the iframe
+			$(document).bind('keydown.cms', function (e) {
+				console.log(e.keyCode);
+				if(e.keyCode === 27) that.closeModal();
+			});
 		},
 
 		_hideModal: function (speed) {
