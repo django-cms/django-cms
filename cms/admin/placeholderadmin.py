@@ -5,13 +5,14 @@ from django.db import transaction
 from django.utils import simplejson
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
+from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
 from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import cms_static_url, get_cms_setting
 from cms.utils.compat.dj import force_unicode
-from cms.plugins.utils import has_reached_plugin_limit
+from cms.plugins.utils import has_reached_plugin_limit, requires_reload
 from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
@@ -208,12 +209,14 @@ class PlaceholderAdmin(ModelAdmin):
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
         if source_plugin_id:
             source_plugin = get_object_or_404(CMSPlugin, pk=source_plugin_id)
+            reload_required = requires_reload(PLUGIN_COPY_ACTION, [source_plugin])
             plugins = list(
                 source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
                                                         rght__lte=source_plugin.rght).order_by('tree_id', 'level', 'position'))
         else:
             plugins = list(
                 source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+            reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
         copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
@@ -225,7 +228,8 @@ class PlaceholderAdmin(ModelAdmin):
                 {'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id, 'position': plugin.position,
                     'desc': force_unicode(plugin.get_short_description())})
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
-        return HttpResponse(simplejson.dumps({'plugin_list': reduced_list}), content_type='application/json')
+        json_response = {'plugin_list': reduced_list, 'reload': reload_required}
+        return HttpResponse(simplejson.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
@@ -345,7 +349,8 @@ class PlaceholderAdmin(ModelAdmin):
                     break
                 x += 1
         self.post_move_plugin(request, plugin)
-        return HttpResponse(str("ok"))
+        json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
+        return HttpResponse(simplejson.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):
