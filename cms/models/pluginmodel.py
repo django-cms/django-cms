@@ -259,7 +259,14 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         # we assign a parent to our new plugin
         parent_cache[self.pk] = new_plugin
         if self.parent:
-            new_plugin.parent = parent_cache[self.parent_id]
+            try:
+                new_plugin.parent = parent_cache[self.parent_id]
+            except KeyError:
+                from django.core.management import call_command
+                from django.http import Http404
+                call_command('cms', 'fix-mptt')
+                raise Http404
+
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
