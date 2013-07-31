@@ -9,9 +9,10 @@
 
 //######################################################################################################################
 // #PLACEHOLDER
-.cms_placeholder { display:none; padding:5px 5px 0.1px; margin:0 0 5px; @include border-radius(3px); background:$color-grey-70; }
+.cms_placeholder { position:relative; z-index:1000; display:none; padding:5px 5px 0.1px; margin:0 0 5px;
+	@include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
-.cms_plugin { display:inline; position:relative; }
+.cms_plugin { display:inline; }
 .cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
 
 //######################################################################################################################
