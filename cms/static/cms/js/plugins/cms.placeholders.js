@@ -152,6 +152,13 @@ $(document).ready(function () {
 					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
 					// fixes placeholder height
 					ui.placeholder.height(ui.item.height());
+					// show placeholder without entries
+					$('.cms_draggables').each(function () {
+						console.log($(this).children().length);
+						if($(this).children().length === 0) {
+							$(this).show();
+						}
+					});
 				},
 
 				'stop': function (event, ui) {
@@ -175,6 +182,14 @@ $(document).ready(function () {
 
 					// update clipboard entries
 					that._updateClipboard(ui.item);
+
+					// reset placeholder without entries
+					$('.cms_draggables').each(function () {
+						console.log($(this).children().length);
+						if($(this).children().length === 0) {
+							$(this).hide();
+						}
+					});
 				},
 				'isAllowed': function(placeholder, placeholderParent, originalItem) {
 					// getting restriction array
@@ -602,6 +617,7 @@ $(document).ready(function () {
 				'url': this.options.urls.move_plugin,
 				'data': data,
 				'success': function (response) {
+					// response should be { 'status': true, 'redirect': true }
 					if(response === 'success') that._showSuccess(dragitem);
 
 					// determin if we should refresh
