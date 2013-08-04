@@ -103,6 +103,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
+            'cms.test_utils.project.extensionapp',
             'south',
             'reversion',
             'sekizai',
