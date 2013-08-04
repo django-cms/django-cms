@@ -10,7 +10,7 @@ class BaseExtension(models.Model):
     class Meta:
         abstract = True
 
-    def get_page(self):
+    def get_page(self):  # pragma: no cover
         raise NotImplementedError('Function must be overwritten in subclasses and return the extended page object.')
 
     def copy_relations(self, oldinstance):
@@ -20,7 +20,6 @@ class BaseExtension(models.Model):
 
         :param oldinstance: the draft version of the extension
         """
-
         pass
 
     def copy_to_public(self, public_object):

@@ -86,7 +86,7 @@ class ExtensionPool(object):
             ).delete()
 
     def _remove_orphaned_title_extensions(self):
-        for extension in self.page_extensions:
+        for extension in self.title_extensions:
             extension.objects.filter(
                 extended_object__page__publisher_is_draft=False,
                 draft_extension=None
