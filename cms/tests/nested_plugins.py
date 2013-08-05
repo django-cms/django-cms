@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import json
 
 from cms.api import create_page, add_plugin
+from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -770,10 +772,12 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     'plugin_language':'en',
                     'plugin_parent':'',
                 }
+                plugin_class = text_plugin_two.get_plugin_class_instance()
+                expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
                 edit_url = URL_CMS_MOVE_PLUGIN % page_one.id
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.content, b'ok')
+                self.assertEquals(json.loads(response.content.decode('utf8')), expected)
                 # check if the plugin got moved
                 page_one = self.reload(page_one)
                 text_plugin_two = self.reload(text_plugin_two)

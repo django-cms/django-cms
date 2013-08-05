@@ -151,16 +151,19 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
         return plugin_pool.get_plugin(self.plugin_type)
 
-    def get_plugin_instance(self, admin=None):
+    def get_plugin_class_instance(self, admin=None):
         plugin_class = self.get_plugin_class()
-        plugin = plugin_class(plugin_class.model,
-                              admin) # needed so we have the same signature as the original ModelAdmin
+        # needed so we have the same signature as the original ModelAdmin
+        return plugin_class(plugin_class.model, admin)
+
+    def get_plugin_instance(self, admin=None):
+        plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
-                instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
+                instance = plugin.model.objects.get(cmsplugin_ptr=self)
                 instance._render_meta = self._render_meta
             except (AttributeError, ObjectDoesNotExist):
                 instance = None

@@ -5,7 +5,7 @@ from cms.exceptions import LanguageError
 from cms.models import Title
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
-from cms.utils.i18n import get_language_objects, get_language_object
+from cms.utils.i18n import get_language_objects, get_language_object, force_language
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
 from cms.toolbar_pool import toolbar_pool
@@ -191,6 +191,11 @@ class PageToolbar(CMSToolbar):
         page_info_url = reverse('admin:cms_page_change', args=(self.page.pk,))
         current_page_menu.add_modal_item(_('Page settings'), url=page_info_url, disabled=not_edit_mode,
                                          close_on_url=self.toolbar.URL_CHANGE, on_close=self.toolbar.REFRESH_PAGE)
+        # Why are we doing this everywhere ?
+        try:
+            current_lang = get_language_object(get_language_from_request(self.request), self.current_site.pk)
+        except LanguageError:
+            current_lang = None
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             # add templates
             templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
@@ -232,8 +237,22 @@ class PageToolbar(CMSToolbar):
         current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
         # delete
         delete_url = reverse('admin:cms_page_delete', args=(self.page.pk,))
+        with force_language(current_lang['code']):
+            # We use force_language because it makes no sense to redirect a user
+            # who just deleted a german page to an english page (user's default language)
+            # simply because the url /en/some-german-page-slug will show nothing
+            if self.page.parent:
+                # If this page has a parent, then redirect to it
+                on_delete_redirect_url = self.page.parent.get_absolute_url(language=current_lang['code'])
+            else:
+                # If there's no parent, we redirect to the root.
+                # Can't call Page.objects.get_home() because the user could very well delete the homepage
+                # causing get_home to throw an error.
+                # Let's keep in mind that if the user has deleted the last page, and django is running on DEBUG == False
+                # this redirect will cause a 404...
+                on_delete_redirect_url = reverse('pages-root')
         current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url=self.toolbar.URL_CHANGE,
-                                         on_close='/', disabled=not_edit_mode)
+                                         on_close=on_delete_redirect_url, disabled=not_edit_mode)
 
     def add_history_menu(self):
         # history menu

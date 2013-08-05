@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.utils.compat.metaclasses import with_metaclass
 import re
 
@@ -108,6 +109,16 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     opts = {}
     module = None #track in which module/application belongs
+
+    action_options = {
+        PLUGIN_MOVE_ACTION: {
+            'requires_reload': True
+        },
+        PLUGIN_COPY_ACTION: {
+            'requires_reload': True
+        },
+    }
+
 
     def __init__(self, model=None, admin_site=None):
         if admin_site:
@@ -232,6 +243,17 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         else:
             installed_plugins = plugin_pool.get_all_plugins(slot, page)
             return [cls.__name__ for cls in installed_plugins]
+
+    def get_action_options(self):
+        return self.action_options
+
+    def requires_reload(self, action):
+        actions = self.get_action_options()
+        reload_required = False
+        if action in actions:
+            options = actions[action]
+            reload_required = options.get('requires_reload', False)
+        return reload_required
 
     def __repr__(self):
         return smart_str(self.name)

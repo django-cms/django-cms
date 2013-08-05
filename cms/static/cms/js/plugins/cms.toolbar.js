@@ -859,7 +859,6 @@ $(document).ready(function () {
 			// add esc close event
 			// TODO the event also needs to be added to the iframe
 			$(document).bind('keydown.cms', function (e) {
-				console.log(e.keyCode);
 				if(e.keyCode === 27) that.closeModal();
 			});
 		},
@@ -1154,7 +1153,7 @@ $(document).ready(function () {
 					messages.remove();
 
 				// determine if we should close the modal or reload
-				if(messages.length && that.enforceReload) window.location.href = '/'; // redirect to home
+				if(messages.length && that.enforceReload) CMS.API.Helpers.reloadBrowser();
 				if(messages.length && that.enforceClose) {
 					that.closeModal();
 					return false;
