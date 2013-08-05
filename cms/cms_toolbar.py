@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.models import Title
@@ -103,14 +104,7 @@ class PageToolbar(CMSToolbar):
     def populate(self):
         self.current_site = Site.objects.get_current()
         # always use draft if we have a page
-        if self.request.current_page:
-            if self.request.current_page.publisher_is_draft:
-                current_page = self.request.current_page
-            else:
-                current_page = self.request.current_page.publisher_draft
-        else:
-            current_page = None
-        self.page = current_page
+        self.page = get_page_draft(self.request.current_page)
         # check global permissions if CMS_PERMISSIONS is active
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)
@@ -128,17 +122,17 @@ class PageToolbar(CMSToolbar):
                     self.add_history_menu()
                     self.change_language_menu()
                     # publish button
-                    if current_page.has_publish_permission(self.request):
+                    if self.page.has_publish_permission(self.request):
                         classes = ["cms_btn-action", "cms_btn-publish"]
-                        if current_page.is_dirty():
+                        if self.page.is_dirty():
                             classes.append("cms_btn-publish-active")
-                        if current_page.published:
+                        if self.page.published:
                             title = _("Publish Changes")
                         else:
                             title = _("Publish Page now")
-                        publish_url = reverse('admin:cms_page_publish_page', args=(current_page.pk,))
+                        publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk,))
                         self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
-                                                disabled=not current_page.is_dirty())
+                                                disabled=not self.page.is_dirty())
                 self.add_draft_live()
 
     def add_draft_live(self):

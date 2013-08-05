@@ -911,7 +911,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         # ensure user has permissions to publish this page
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
-        page.publish()
+        published = page.publish()
         messages.info(request, _('The page "%s" was successfully published.') % page)
         if "reversion" in settings.INSTALLED_APPS:
             # delete revisions that are not publish revisions
@@ -943,8 +943,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         referrer = request.META.get('HTTP_REFERER', '')
         path = '../../'
         if 'admin' not in referrer:
-            public_page = Page.objects.get(publisher_public=page.pk)
-            path = '%s?edit_off' % public_page.get_absolute_url()
+            if published:
+                public_page = Page.objects.get(publisher_public=page.pk)
+                path = '%s?edit_off' % public_page.get_absolute_url()
+            else:
+                path = '/?edit_off'
+
         return HttpResponseRedirect(path)
 
     #TODO: Make the change form buttons use POST
