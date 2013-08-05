@@ -89,7 +89,6 @@ Also add any (or all) of the following plugins, depending on your needs:
 * ``'cms.plugins.teaser'``
 * ``'djangocms_text_ckeditor # note this needs to be above the 'cms' entry``
 * ``'cms.plugins.video'``
-* ``'cms.plugins.twitter'``
 
 .. warning::
 
