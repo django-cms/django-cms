@@ -215,7 +215,7 @@ class ExtensionAdminTestCase(AdminTestsBase):
                 {'post': 'yes'}, follow=True
             )
             self.assertEqual(response.status_code, 403)
-            self.assertTrue(MyPageExtension.objects.filter(extended_object=self.page_extension.pk).exists())
+            self.assertTrue(MyPageExtension.objects.filter(extended_object=self.page_extension).exists())
 
 
     def test_admin_title_extension(self):
@@ -276,4 +276,4 @@ class ExtensionAdminTestCase(AdminTestsBase):
                 {'post': 'yes'}, follow=True
             )
             self.assertEqual(response.status_code, 403)
-            self.assertTrue(MyTitleExtension.objects.filter(extended_object=self.title_extension.pk).exists())
+            self.assertTrue(MyTitleExtension.objects.filter(extended_object=self.title_extension).exists())
