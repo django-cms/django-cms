@@ -22,6 +22,17 @@ def get_plugins(request, placeholder, lang=None):
     return getattr(placeholder, '_%s_plugins_cache' % lang)
 
 
+def requires_reload(action, plugins):
+    """
+    Returns True if ANY of the plugins require a page reload when action is taking place.
+    """
+    for plugin in plugins:
+        plugin_class = plugin.get_plugin_class_instance()
+        if plugin_class.requires_reload(action):
+            return True
+    return False
+
+
 def assign_plugins(request, placeholders, lang=None):
     """
     Fetch all plugins for the given ``placeholders`` and
