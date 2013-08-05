@@ -14,7 +14,12 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholderapp.models import (Example1, TwoPlaceholderExample, MultilingualExample1)
+from cms.test_utils.project.placeholderapp.models import (
+    Example1,
+    TwoPlaceholderExample,
+    DynamicPlaceholderSlotExample,
+    MultilingualExample1
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
@@ -25,7 +30,9 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Permission
 from django.contrib.messages.storage import default_storage
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
+from django.db.models import Model
 from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
@@ -247,6 +254,45 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
+
+    def test_placeholder_field_valid_slotname(self):
+        self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)
+
+    def test_placeholder_field_dynamic_slot_generation(self):
+        instance = DynamicPlaceholderSlotExample.objects.create(char_1='slot1', char_2='slot2')
+        self.assertEquals(instance.char_1, instance.placeholder_1.slot)
+        self.assertEquals(instance.char_2, instance.placeholder_2.slot)
+
+    def test_placeholder_field_dynamic_slot_update(self):
+        instance = DynamicPlaceholderSlotExample.objects.create(char_1='slot1', char_2='slot2')
+
+        # Plugin counts
+        old_placeholder_1_plugin_count = len(instance.placeholder_1.get_plugins())
+        old_placeholder_2_plugin_count = len(instance.placeholder_2.get_plugins())
+
+        # Switch around the slot names
+        instance.char_1, instance.char_2 = instance.char_2, instance.char_1
+
+        # Store the ids before save, to test that a new placeholder is NOT created.
+        placeholder_1_id = instance.placeholder_1.pk
+        placeholder_2_id = instance.placeholder_2.pk
+
+        # Save instance
+        instance.save()
+
+        current_placeholder_1_plugin_count = len(instance.placeholder_1.get_plugins())
+        current_placeholder_2_plugin_count = len(instance.placeholder_2.get_plugins())
+
+        # Now test that the placeholder slots have changed
+        self.assertEquals(instance.char_2, 'slot1')
+        self.assertEquals(instance.char_1, 'slot2')
+        # Test that a new placeholder was never created
+        self.assertEquals(instance.placeholder_1.pk, placeholder_1_id)
+        self.assertEquals(instance.placeholder_2.pk, placeholder_2_id)
+        # And test the plugin counts remain the same
+        self.assertEqual(old_placeholder_1_plugin_count, current_placeholder_1_plugin_count)
+        self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
+
 
     def test_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration """
