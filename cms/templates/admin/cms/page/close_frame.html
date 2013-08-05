@@ -23,7 +23,7 @@ Window.CMS.$(document).ready(function () {
 		'plugin_desc': '{{ alt }}'
 	};
 	// save current plugin
-	Window.CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:1000 }});
+	Window.CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:500 }});
 });
 // we have a special case here cause the CMS namespace
 // can be either inside the current window or the parent
