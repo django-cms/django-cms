@@ -122,17 +122,17 @@ class PageToolbar(CMSToolbar):
                     self.add_history_menu()
                     self.change_language_menu()
                     # publish button
-                    if current_page.has_publish_permission(self.request):
+                    if self.page.has_publish_permission(self.request):
                         classes = ["cms_btn-action", "cms_btn-publish"]
-                        if current_page.is_dirty():
+                        if self.page.is_dirty():
                             classes.append("cms_btn-publish-active")
-                        if current_page.published:
+                        if self.page.published:
                             title = _("Publish Changes")
                         else:
                             title = _("Publish Page now")
-                        publish_url = reverse('admin:cms_page_publish_page', args=(current_page.pk,))
+                        publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk,))
                         self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
-                                                disabled=not current_page.is_dirty())
+                                                disabled=not self.page.is_dirty())
                 self.add_draft_live()
 
     def add_draft_live(self):
