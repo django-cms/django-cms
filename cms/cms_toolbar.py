@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.models import Title
@@ -103,14 +104,7 @@ class PageToolbar(CMSToolbar):
     def populate(self):
         self.current_site = Site.objects.get_current()
         # always use draft if we have a page
-        if self.request.current_page:
-            if self.request.current_page.publisher_is_draft:
-                current_page = self.request.current_page
-            else:
-                current_page = self.request.current_page.publisher_draft
-        else:
-            current_page = None
-        self.page = current_page
+        self.page = get_page_draft(self.request.current_page)
         # check global permissions if CMS_PERMISSIONS is active
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)

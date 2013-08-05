@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from cms.test_utils.project.extensionapp.models import MyTitleExtension
+from cms.api import get_page_draft
+from cms.test_utils.project.extensionapp.models import MyTitleExtension, MyPageExtension
 from cms.utils import get_cms_setting
 from cms.utils.permissions import has_page_change_permission
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -13,14 +14,7 @@ from cms.toolbar_base import CMSToolbar
 class MyTitleExtensionToolbar(CMSToolbar):
     def populate(self):
         # always use draft if we have a page
-        if self.request.current_page:
-            if self.request.current_page.publisher_is_draft:
-                current_page = self.request.current_page
-            else:
-                current_page = self.request.current_page.publisher_draft
-        else:
-            current_page = None
-        self.page = current_page
+        self.page = get_page_draft(self.request.current_page)
 
         if not self.page:
             # Nothing to do
@@ -56,14 +50,7 @@ class MyTitleExtensionToolbar(CMSToolbar):
 class MyPageExtensionToolbar(CMSToolbar):
     def populate(self):
         # always use draft if we have a page
-        if self.request.current_page:
-            if self.request.current_page.publisher_is_draft:
-                current_page = self.request.current_page
-            else:
-                current_page = self.request.current_page.publisher_draft
-        else:
-            current_page = None
-        self.page = current_page
+        self.page = get_page_draft(self.request.current_page)
 
         if not self.page:
             # Nothing to do
@@ -78,8 +65,8 @@ class MyPageExtensionToolbar(CMSToolbar):
         can_change = self.request.current_page and self.request.current_page.has_change_permission(self.request)
         if has_global_current_page_change_permission or can_change:
             try:
-                mypageextension = MyTitleExtension.objects.get(extended_object_id=self.page.id)
-            except MyTitleExtension.DoesNotExist:
+                mypageextension = MyPageExtension.objects.get(extended_object_id=self.page.id)
+            except MyPageExtension.DoesNotExist:
                 mypageextension = None
             try:
                 if mypageextension:
