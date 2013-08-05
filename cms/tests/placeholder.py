@@ -391,9 +391,9 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         )
         EN = ('en', 'English')
         FR = ('fr', 'French')
-        self.assertEqual(fr_copy_languages, [EN])
-        self.assertEqual(de_copy_languages, [EN, FR])
-        self.assertEqual(en_copy_languages, [FR])
+        self.assertEqual(set(fr_copy_languages), set([EN]))
+        self.assertEqual(set(de_copy_languages), set([EN, FR]))
+        self.assertEqual(set(en_copy_languages), set([FR]))
 
     def test_mlng_placeholder_actions_copy(self):
         actions = MLNGPlaceholderActions()

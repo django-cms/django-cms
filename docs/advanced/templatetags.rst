@@ -236,14 +236,14 @@ Example::
 
 	{% load cms_tags %}
 	<div class="multicolumn">
-	{% for plugin in instance.child_plugins %}
+	{% for plugin in instance.child_plugin_instances %}
 		<div style="width: {{ plugin.width }}00px;">
      		{% render_plugin plugin %}
 		</div>
 	{% endfor %}
 	</div>
 	
-Normally the children of plugins can be accessed via the ``child_plugins`` atrribute of plugins.
+Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
 .. templatetag:: show_editable_page_title
@@ -257,7 +257,9 @@ If in edit mode you can double click on the title and modify in an overlay windo
 it fallbacks to ``page_attribute title``.
 
 Example::
+
 	{% load cms_tags %}
+
 	{% show_editable_page_title %}
 
 ******************
@@ -273,7 +275,9 @@ multiple locations.
 
 
 Example::
+
     {% load stack_tags %}
+
     {% stack "footer" %}
 
 

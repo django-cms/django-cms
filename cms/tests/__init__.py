@@ -5,6 +5,7 @@ from cms.tests.admin import *
 from cms.tests.api import *
 from cms.tests.apphooks import *
 from cms.tests.docs import *
+from cms.tests.extensions import *
 from cms.tests.forms import *
 from cms.tests.i18n import *
 from cms.tests.mail import *

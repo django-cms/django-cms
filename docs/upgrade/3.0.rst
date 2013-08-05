@@ -38,6 +38,11 @@ The Toolbar's code has been simplified and its appearance refreshed.
 The Toolbar is now a more consistent management tool for adding and changing
 objects in a django CMS-based system. See :doc:`../extending_cms/toolbar`.
 
+.. warning:: Upgrading from previous versions
+
+    3.0 now requires django `messages` application for the toolbar to work.
+    See :ref:`Enable messages <enable-messages>` on how to enable it.
+
 Experimental Python 3.3 support
 ===============================
 
@@ -99,7 +104,17 @@ show_editable_page_title
 ========================
 
 New ``show_editable_page_title`` to edit page title from the frontend.
-                 
+
+
+Stacks
+======
+
+Stacks are a way to display the same content on multiple locations.
+
+When upgrading from previous django CMS version, you need to add ``cms.stacks``
+to ``INSTALLED_APPS``.
+
+See :ref:`stacks-reference` for in depth information about stacks.
 
 Plugins removed
 ===============
@@ -167,9 +182,11 @@ Twitter Plugin removed
 ======================
 
 Twitter disabled V1 of their API. We removed the twitter plugin because of this.
+
 For an alternative have a look at this plugins:
 
-https://github.com/nephila/djangocms_twitter
-https://github.com/changer/cmsplugin-twitter
+* https://github.com/nephila/djangocms_twitter
+
+* https://github.com/changer/cmsplugin-twitter
 
 
