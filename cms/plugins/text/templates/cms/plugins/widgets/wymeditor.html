@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n staticfiles %}
 <script type="text/javascript">
 //<![CDATA]
 
@@ -20,6 +20,7 @@ var editPluginPopupCallbacks = {};
 			updateSelector: 'input[type=submit],',
 			updateEvent: 'click',
 			logoHtml: '',
+			wymPath: '{% static 'cms/wymeditor/jquery.wymeditor.js' %}',
 			toolsItems: [
 					{{ WYM_TOOLS }}
 				],
