@@ -154,7 +154,6 @@ $(document).ready(function () {
 					ui.placeholder.height(ui.item.height());
 					// show placeholder without entries
 					$('.cms_draggables').each(function () {
-						console.log($(this).children().length);
 						if($(this).children().length === 0) {
 							$(this).show();
 						}
@@ -185,7 +184,6 @@ $(document).ready(function () {
 
 					// reset placeholder without entries
 					$('.cms_draggables').each(function () {
-						console.log($(this).children().length);
 						if($(this).children().length === 0) {
 							$(this).hide();
 						}
