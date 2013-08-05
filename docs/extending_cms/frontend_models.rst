@@ -29,7 +29,7 @@ templatetag
 ``show_editable_model`` works by showing the content of the given attribute in
 the model instance.
 
-If the toolbar is not enable, the value of the attribute is rendered in the
+If the toolbar is not enabled, the value of the attribute is rendered in the
 template without further action.
 
 If the toolbar is enabled, frontend code is added to make the attribute value
@@ -41,6 +41,9 @@ Arguments:
 * ``attribute``: the name of the attribute you want to show in the template; it
   can be a context variable name; it's possible to target field, property or
   callable.
+* ``view_url``: the name of a url that will be reversed using the instance ``pk``
+  as the only argument.
+* ``view_property``: a property name
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
 
