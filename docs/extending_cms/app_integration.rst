@@ -94,6 +94,29 @@ The get_nodes function should return a list of
 Additionally, each :class:`NavigationNode` provides a number of methods which are
 detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
+Customize menus at runtime
+--------------------------
+
+To adapt your menus according to request dependent conditions (say: anonymous /
+logged in user), you can use `Navigation Modifiers`_  or you can leverage existing
+ones.
+
+For example it's possible to add ``{'visible_for_anonymous': False}`` /
+``{'visible_for_authenticated': False}`` attributes recognized by the
+django CMS core ``AuthVisibility`` modifier.
+
+Complete example::
+
+    class UserMenu(Menu):
+        def get_nodes(self, request):
+                return [
+                    NavigationNode(_("Profile"), reverse(profile), 1, attr={'visible_for_anonymous': False}),
+                    NavigationNode(_("Log in"), reverse(login), 3, attr={'visible_for_authenticated': False}),
+                    NavigationNode(_("Sign up"), reverse(logout), 4, attr={'visible_for_authenticated': False}),
+                    NavigationNode(_("Log out"), reverse(logout), 2, attr={'visible_for_anonymous': False}),
+                ]
+
+
 ************
 Attach Menus
 ************
