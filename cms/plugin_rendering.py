@@ -151,7 +151,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     toolbar_content = ''
     draggable_content = ''
     if edit:
-        toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback))
+        toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, '', name_fallback=name_fallback))
         draggable_content = mark_safe(render_dragables(plugins, slot, request))
     content = mark_safe("".join(content))
 
