@@ -40,15 +40,18 @@ class StacksTestCase(PluginsTestBaseCase):
 
     def test_template_creation(self):
         self.assertObjectDoesNotExist(Stack.objects.all(), code='foobar')
+        self.assertObjectDoesNotExist(Placeholder.objects.all(), slot='foobar')
         t = Template('{% load stack_tags %}{% stack "foobar" %}')
         t.render(self.get_context('/'))
         self.assertObjectExist(Stack.objects.all(), code='foobar', creation_method=Stack.CREATION_BY_TEMPLATE)
+        self.assertObjectExist(Placeholder.objects.all(), slot='foobar')
 
     def test_create_stack_from_placeholder(self):
         placeholder = self.fill_placeholder()
         response = self.client.post(reverse('admin:stacks_stack_create_stack', kwargs={'placeholder_id': placeholder.pk}), data={'name': 'foo', 'code': 'bar'})
         new_placeholder = Placeholder.objects.get(stacks_contents__code='bar')
         self.assertEqual(len(placeholder.get_plugins()), len(new_placeholder.get_plugins()))
+        self.assertEqual(new_placeholder.slot, 'bar')
 
     def test_create_stack_from_plugin(self):
         placeholder = self.fill_placeholder()
@@ -56,6 +59,7 @@ class StacksTestCase(PluginsTestBaseCase):
         response = self.client.post(reverse('admin:stacks_stack_create_stack_from_plugin', kwargs={'placeholder_id': placeholder.pk, 'plugin_id': plugin.pk}), data={'name': 'foo', 'code': 'bar'})
         new_placeholder = Placeholder.objects.get(stacks_contents__code='bar')
         self.assertEqual(len(placeholder.get_plugins()), len(new_placeholder.get_plugins()))
+        self.assertEqual(new_placeholder.slot, 'bar')
 
     def test_insert_stack_plugin(self):
         placeholder = self.fill_placeholder()

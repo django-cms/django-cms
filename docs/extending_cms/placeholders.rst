@@ -31,9 +31,20 @@ use::
         # your methods
 
 
-The :class:`~cms.models.fields.PlaceholderField` takes a string as its first
-argument which will be used to configure which plugins can be used in this
-placeholder. The configuration is the same as for placeholders in the CMS.
+The :class:`~cms.models.fields.PlaceholderField` has one required parameter (`slotname`) which can be a of type string, allowing you to configure which plugins can be used in this
+placeholder (configuration is the same as for placeholders in the CMS) or you can also provide a callable like so::
+
+    from django.db import models
+    from cms.models.fields import PlaceholderField
+
+    def my_placeholder_slotname(instance):
+        return 'placeholder_name'
+
+    class MyModel(models.Model):
+        # your fields
+        my_placeholder = PlaceholderField(my_placeholder_slotname)
+        # your methods
+
 
 .. warning::
 
@@ -41,6 +52,7 @@ placeholder. The configuration is the same as for placeholders in the CMS.
     :class:`~cms.models.fields.PlaceholderField` may not be surpressed using
     ``'+'`` to allow the cms to check permissions properly. Attempting to do
     so will raise a :exc:`ValueError`.
+
 
 Admin Integration
 =================
