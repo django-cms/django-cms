@@ -21,6 +21,19 @@ class Link(CMSPlugin):
         ("_top", _("topmost frame")),
     )))
 
+    def link(self):
+        """
+        Returns the link with highest priority among the model fields
+        """
+        if self.mailto:
+            return u"mailto:%s" % self.mailto
+        elif self.url:
+            return self.url
+        elif self.page_link:
+            return self.page_link.get_absolute_url()
+        else:
+            return ""
+
     def __str__(self):
         return self.name
 
