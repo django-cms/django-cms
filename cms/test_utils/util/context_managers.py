@@ -5,7 +5,7 @@ from django.db import reset_queries
 from django.template import context
 from django.utils.translation import get_language, activate
 from shutil import rmtree as _rmtree
-from tempfile import template, mkdtemp, _exists
+from tempfile import template, mkdtemp
 import sys
 from cms.utils.compat.string_io import StringIO
 
@@ -107,8 +107,12 @@ class TemporaryDirectory:
         return self.name
 
     def cleanup(self):
-        if _exists(self.name):
-            _rmtree(self.name)
+        try:
+            from tempfile import _exists
+            if _exists(self.name):
+                _rmtree(self.name)
+        except ImportError:
+            pass
 
     def __exit__(self, exc, value, tb):
         self.cleanup()
