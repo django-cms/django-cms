@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from distutils.version import LooseVersion
+import json
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
+from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -511,6 +513,8 @@ class AdminTests(AdminTestsBase):
         page = self.get_page()
         source, target = list(page.placeholders.all())[:2]
         pageplugin = add_plugin(source, 'TextPlugin', 'en', body='test')
+        plugin_class = pageplugin.get_plugin_class_instance()
+        expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
         placeholder = Placeholder.objects.all()[0]
         permless = self.get_permless()
         admin = self.get_admin()
@@ -536,7 +540,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, b"ok")
+            self.assertEquals(json.loads(response.content.decode('utf8')), expected)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
@@ -546,7 +550,7 @@ class AdminTests(AdminTestsBase):
                 'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, b"ok")
+            self.assertEquals(json.loads(response.content.decode('utf8')), expected)
 
     def test_move_language(self):
         page = self.get_page()
@@ -719,7 +723,7 @@ class PluginPermissionTests(AdminTestsBase):
         codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
         user.user_permissions.add(Permission.objects.get(codename=codename))
 
-    def _give_page_permssion_rights(self, user):
+    def _give_page_permission_rights(self, user):
         self._give_permission(user, PagePermission, 'add')
         self._give_permission(user, PagePermission, 'change')
         self._give_permission(user, PagePermission, 'delete')
@@ -855,7 +859,7 @@ class PluginPermissionTests(AdminTestsBase):
         user = User(username='user', email='user@domain.com', password='user',
                     is_staff=True)
         user.save()
-        self._give_page_permssion_rights(user)
+        self._give_page_permission_rights(user)
         page = create_page('A', 'nav_playground.html', 'en')
         page_permission = PagePermission.objects.create(
             can_change_permissions=True, user=user, page=page)
