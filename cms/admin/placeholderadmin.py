@@ -166,6 +166,8 @@ class PlaceholderAdmin(ModelAdmin):
         if settings.USE_I18N:
             if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
                 return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+            if parent and parent.language != language:
+                return HttpResponseBadRequest(_("Parent plugin language must be same as language!"))
         else:
             language = settings.LANGUAGE_CODE
         plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
