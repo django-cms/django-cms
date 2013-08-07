@@ -88,12 +88,15 @@ Also add any (or all) of the following plugins, depending on your needs:
 * ``'cms.plugins.snippet'``
 * ``'cms.plugins.teaser'``
 * ``'cms.plugins.video'``
-* ``'cms.plugins.twitter'``
 
 .. warning::
 
     Adding the ``'cms.plugins.snippet'`` plugin is a potential security hazard.
     For more information, refer to :ref:`snippets-plugin`.
+
+    In addition, ``'cms.plugins.text'`` and ``'cms.plugins.twitter'`` have
+    been removed from the Django-CMS bundle. Read :ref:`upgrade-to-3.0` for
+    detailed information.
 
 The plugins are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
 There are even more plugins available on the django CMS `extensions page`_.
@@ -389,14 +392,14 @@ Up and running!
 ===============
 
 That should be it. Restart your development server using ``python manage.py runserver`` 
-and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ :you should get 
+and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ : you should get 
 the django CMS "It Worked" screen.
 
 |it-works-cms|
 
 .. |it-works-cms| image:: ../images/it-works-cms.png
 
-Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
+Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log imagesn with
 the user you created during the database setup.
 
 To deploy your django CMS project on a production webserver, please refer to the
