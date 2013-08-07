@@ -173,13 +173,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             public_page.save()
             page_utils.check_title_slugs(public_page)
 
-    def _copy_titles(self, target):
+    def _copy_titles(self, target, language):
         """
         Copy all the titles to a new page (which must have a pk).
         :param target: The page where the new titles should be stored
         """
-        old_titles = dict(target.title_set.values_list('language', 'pk'))
-        for title in self.title_set.all():
+        old_titles = dict(target.title_set.filter(language=language).values_list('language', 'pk'))
+        for title in self.title_set.filter(language=language):
             # If an old title exists, overwrite. Otherwise create new
             title.pk = old_titles.pop(title.language, None)
             title.page = target
@@ -189,16 +189,16 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
             Title.objects.filter(id__in=old_titles.values()).delete()
 
-    def _copy_contents(self, target):
+    def _copy_contents(self, target, language):
         """
         Copy all the plugins to a new page.
         :param target: The page where the new content should be stored
         """
         # TODO: Make this into a "graceful" copy instead of deleting and overwriting
         # copy the placeholders (and plugins on those placeholders!)
-        CMSPlugin.objects.filter(placeholder__page=target).delete()
+        CMSPlugin.objects.filter(placeholder__page=target, language=language).delete()
         for ph in self.placeholders.all():
-            plugins = ph.get_plugins_list()
+            plugins = ph.get_plugins_list(language)
             try:
                 ph = target.placeholders.get(slot=ph.slot)
             except Placeholder.DoesNotExist:
@@ -394,7 +394,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
-    def publish(self):
+    def publish(self, language):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible.
 
@@ -429,8 +429,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             public_page.save()
 
             # The target page now has a pk, so can be used as a target
-            self._copy_titles(public_page)
-            self._copy_contents(public_page)
+            self._copy_titles(public_page, language)
+            self._copy_contents(public_page, language)
 
             # invalidate the menu for this site
             menu_pool.clear(site_id=self.site_id)

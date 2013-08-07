@@ -121,7 +121,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
+            pat(r'^([0-9]+)/publish/([a-z\-]+)/$', self.publish_page), # publish page
             pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
@@ -906,12 +906,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     #@require_POST
     @transaction.commit_on_success
     @create_revision()
-    def publish_page(self, request, page_id):
+    def publish_page(self, request, page_id, language):
         page = get_object_or_404(Page, id=page_id)
         # ensure user has permissions to publish this page
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
-        published = page.publish()
+        published = page.publish(language)
         messages.info(request, _('The page "%s" was successfully published.') % page)
         if "reversion" in settings.INSTALLED_APPS:
             # delete revisions that are not publish revisions
