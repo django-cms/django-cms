@@ -114,10 +114,12 @@ menus::
 
 
 
-==========
+==========================
 Adding items through views
-==========
-Another way to add items to the toolbar is through our own views (``polls/views.py``). This method can be useful if you need to access certain variables, in our case e.g. the selected poll and its sub-methods::
+==========================
+Another way to add items to the toolbar is through our own views (``polls/views.py``).
+This method can be useful if you need to access certain variables, in our case e.g. the
+selected poll and its sub-methods::
 
     from django.core.urlresolvers import reverse
     from django.shortcuts import get_object_or_404, render
@@ -131,8 +133,8 @@ Another way to add items to the toolbar is through our own views (``polls/views.
 
         request.toolbar.populate()
         menu = request.toolbar.get_or_create_menu('polls-app', _('Polls'))
-        menu.add_sideframe_item(_('Change this Poll'), url=reverse('admin:polls_poll_change', args=[poll_id]))
-        menu.add_sideframe_item(_('Show History of this Poll'), url=reverse('admin:polls_poll_history', args=[poll_id]))
-        menu.add_sideframe_item(_('Delete this Poll'), url=reverse('admin:polls_poll_delete', args=[poll_id]))
+        menu.add_modal_item(_('Change this Poll'), url=reverse('admin:polls_poll_change', args=[poll_id]))
+        menu.add_modal_item(_('Show History of this Poll'), url=reverse('admin:polls_poll_history', args=[poll_id]))
+        menu.add_modal_item(_('Delete this Poll'), url=reverse('admin:polls_poll_delete', args=[poll_id]))
 
         return render(request, 'polls/detail.html', {'poll': poll})
