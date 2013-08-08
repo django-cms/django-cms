@@ -134,7 +134,7 @@ selected poll and its sub-methods::
         request.toolbar.populate()
         menu = request.toolbar.get_or_create_menu('polls-app', _('Polls'))
         menu.add_modal_item(_('Change this Poll'), url=reverse('admin:polls_poll_change', args=[poll_id]))
-        menu.add_modal_item(_('Show History of this Poll'), url=reverse('admin:polls_poll_history', args=[poll_id]))
-        menu.add_modal_item(_('Delete this Poll'), url=reverse('admin:polls_poll_delete', args=[poll_id]))
+        menu.add_sideframe_item(_('Show History of this Poll'), url=reverse('admin:polls_poll_history', args=[poll_id]))
+        menu.add_sideframe_item(_('Delete this Poll'), url=reverse('admin:polls_poll_delete', args=[poll_id]))
 
         return render(request, 'polls/detail.html', {'poll': poll})
