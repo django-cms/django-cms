@@ -40,8 +40,31 @@ $(document).ready(function () {
 
 		// initial methods
 		_setupPlaceholders: function (placeholders) {
+			var that = this;
+
 			// ensure collapsables work
 			this._collapsables(placeholders.find('.cms_draggable'));
+
+			// add global collapsable events
+			placeholders.find('.cms_expandmenu').bind('click', function () {
+				var el = $(this);
+				if(el.hasClass('cms_expandmenu-collapsed')) {
+					that._collapseAll(el.closest('.cms_placeholder'));
+					el.removeClass('cms_expandmenu-collapsed');
+				} else {
+					that._expandAll(el.closest('.cms_placeholder'));
+					el.addClass('cms_expandmenu-collapsed');
+				}
+			});
+
+			// check which button should be shown for collapsemenu
+			placeholders.each(function (index, item) {
+				var els = $(item).find('.cms_dragitem-collapsable');
+				var open = els.filter('.cms_dragitem-expanded');
+				if(els.length === open.length && (els.length + open.length !== 0)) {
+					$(item).find('.cms_expandmenu').addClass('cms_expandmenu-collapsed');
+				}
+			});
 		},
 
 		_setupPlugins: function (plugins) {
@@ -78,8 +101,13 @@ $(document).ready(function () {
 
 			// this sets the correct position for the edit tooltip
 			$(document.body).bind('mousemove.cms', function (e) {
+				// so lets figure out where we are
+				var offset = 20;
+				var bound = $(document).width();
+				var pos = e.pageX + that.tooltip.outerWidth(true) + offset;
+
 				that.tooltip.css({
-					'left': e.pageX + 20,
+					'left': (pos >= bound) ? e.pageX - that.tooltip.outerWidth(true) - offset : e.pageX + offset,
 					'top': e.pageY - 12
 				});
 			});
@@ -124,6 +152,13 @@ $(document).ready(function () {
 					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
 					// fixes placeholder height
 					ui.placeholder.height(ui.item.height());
+					// show placeholder without entries
+					$('.cms_draggables').each(function () {
+						console.log($(this).children().length);
+						if($(this).children().length === 0) {
+							$(this).show();
+						}
+					});
 				},
 
 				'stop': function (event, ui) {
@@ -147,12 +182,22 @@ $(document).ready(function () {
 
 					// update clipboard entries
 					that._updateClipboard(ui.item);
+
+					// reset placeholder without entries
+					$('.cms_draggables').each(function () {
+						console.log($(this).children().length);
+						if($(this).children().length === 0) {
+							$(this).hide();
+						}
+					});
 				},
 				'isAllowed': function(placeholder, placeholderParent, originalItem) {
 					// getting restriction array
 					var bounds = [];
 					// save original state events
 					var original = $('#cms_plugin-' + that.getId(originalItem));
+					// cancel if item has no settings
+					if(original.data('settings') === undefined) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
 					var holder = placeholder.parent().prevAll('.cms_placeholder-bar').first();
@@ -270,6 +315,7 @@ $(document).ready(function () {
 
 		_collapsables: function (draggables) {
 			var that = this;
+			var settings = CMS.API.Toolbar.getSettings();
 
 			// attach events to draggable
 			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
@@ -277,10 +323,9 @@ $(document).ready(function () {
 				var id = that.getId($(this).parent());
 				var settings = CMS.API.Toolbar.getSettings();
 					settings.states = settings.states || [];
-				var index = settings.states.indexOf(id);
 
 				// collapsable function and save states
-				if(index != -1) {
+				if(el.hasClass('cms_dragitem-expanded')) {
 					settings.states.splice(settings.states.indexOf(id), 1);
 					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
 				} else {
@@ -292,12 +337,39 @@ $(document).ready(function () {
 				CMS.API.Toolbar.setSettings(settings);
 			});
 
+			// removing dublicate entries
+			var sortedArr = settings.states.sort();
+			var filteredArray = [];
+			for(var i = 0; i < sortedArr.length; i++) {
+				if(sortedArr[i] !== sortedArr[i + 1]) {
+					filteredArray.push(sortedArr[i]);
+				}
+			}
+			settings.states = filteredArray;
+
+			// save cleaned array
+			CMS.API.Toolbar.setSettings(settings);
+
 			// loop through the items
 			$.each(CMS.API.Toolbar.getSettings().states, function (index, id) {
 				var el = $('#cms_draggable-' + id);
 					el.find('> .cms_draggables').show();
 					el.find('> .cms_dragitem').addClass('cms_dragitem-expanded');
 			});
+		},
+
+		_expandAll: function (placeholder) {
+			var items = placeholder.find('.cms_dragitem-collapsable');
+				items.each(function () {
+					if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				});
+		},
+
+		_collapseAll: function (placeholder) {
+			var items = placeholder.find('.cms_dragitem-collapsable');
+				items.each(function () {
+					if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				});
 		},
 
 		_preventEvents: function () {
@@ -545,6 +617,7 @@ $(document).ready(function () {
 				'url': this.options.urls.move_plugin,
 				'data': data,
 				'success': function (response) {
+					// response should be { 'status': true, 'redirect': true }
 					if(response === 'success') that._showSuccess(dragitem);
 
 					// determin if we should refresh
@@ -717,8 +790,6 @@ $(document).ready(function () {
 					}
 				}
 			});
-
-			console.log(nav.find('.cms_submenu-item-title').filter(':visible').length);
 
 			// check for empty entries
 			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {

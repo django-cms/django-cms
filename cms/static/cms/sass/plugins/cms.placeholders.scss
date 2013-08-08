@@ -9,9 +9,10 @@
 
 //######################################################################################################################
 // #PLACEHOLDER
-.cms_placeholder { display:none; padding:5px 5px 0.1px; margin:0 0 5px; @include border-radius(3px); background:$color-grey-70; }
+.cms_placeholder { position:relative; z-index:1000; display:none; padding:5px 5px 0.1px; margin:0 0 5px;
+	@include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
-.cms_plugin { display:inline; position:relative; }
+.cms_plugin { display:inline; }
 .cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
 
 //######################################################################################################################
@@ -24,6 +25,14 @@
 	.cms_placeholder-title { font-size:12px; line-height:16px; text-transform:uppercase;
 		font-weight:500; padding:0 0 0 2px; height:20px;
 		color:white; @include text-shadow(0px 1px 0px black); }
+
+	.cms_expandmenu { float:right; width:20px; height:20px; cursor:pointer;
+		background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -80px -113px;
+		&:hover { background-position:-100px -113px; }
+	}
+	.cms_expandmenu-collapsed { background-position:-120px -113px;
+		&:hover { background-position:-140px -113px; }
+	}
 }
 
 //######################################################################################################################
@@ -143,7 +152,7 @@ body > .cms_draggable .cms_draggables { display:none !important; }
 	(-webkit-min-device-pixel-ratio: 1.25),
 	(min-resolution: 120dpi) {
 
-	.cms_submenu, .cms_submenu-quicksearch
+	.cms_submenu, .cms_submenu-quicksearch, .cms_collapsemenu,
 	.cms_placeholder .cms_dragitem-collapsable, body .cms_dragitem-collapsable,
 	.cms_placeholder .cms_dragitem-collapsed, body .cms_dragitem-collapsed {
 		background-image:url('/static/cms/img/toolbar/sprite_toolbar@2x.png') !important;

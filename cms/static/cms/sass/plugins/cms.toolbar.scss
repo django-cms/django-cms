@@ -82,7 +82,6 @@
 				ul { display:none; left:100%; top:-5px; }
 				> a { cursor:default; }
 				> a span { display:block; background:url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat right -270px; }
-				&:hover ul { display:block; }
 			}
 
 			// anchor hover
@@ -261,7 +260,7 @@
 			a span, .cms_modal-breadcrumb-title { float:left; position:relative; z-index:120; color:$color-grey; }
 			.cms_modal-breadcrumb-title { padding:10px 20px 10px 15px;
 				border-right:1px solid $color-grey-10; @include border-radius(0 0 0 5px);
-				background:white url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -113px -104px; @include hide-text(); }
+				background:white url('/static/cms/img/toolbar/sprite_toolbar.png') no-repeat -133px -84px; @include hide-text(); }
 
 			a:hover { color:black; background-position:right -232px !important; }
 			a:hover span { color:black; background-color:white; }
