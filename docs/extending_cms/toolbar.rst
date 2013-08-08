@@ -45,7 +45,7 @@ A simple example, registering a class that does nothing::
     @toolbar_pool.register
     class MoopModifier(CMSToolbar):
 
-        def populate():
+        def populate(self):
             pass
 
 
@@ -80,7 +80,7 @@ to the toolbar::
     @toolbar_pool.register
     class PollToolbar(CMSToolbar):
 
-        def populate():
+        def populate(self):
             if self.is_current_app:
                 menu = self.toolbar.get_or_create_menu('poll-app', _('Polls'))
                 url = reverse('admin:polls_poll_changelist')
@@ -104,7 +104,7 @@ menus::
     @toolbar_pool.register
     class PollToolbar(CMSToolbar):
 
-        def populate():
+        def populate(self):
             admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
             position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
             menu = admin_menu.get_or_create_menu('poll-menu', _('Polls'), position=position)
