@@ -41,6 +41,13 @@ Recommended
 These packages are not *required*, but they provide useful functionality with
 minimal additional configuration and are well-proven.
 
+Text Editors
+------------
+
+* `Django CMS CKEditor`_ for a WYSIWYG editor
+
+.. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
+
 File and image handling
 -----------------------
 
