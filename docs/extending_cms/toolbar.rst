@@ -45,7 +45,7 @@ A simple example, registering a class that does nothing::
     @toolbar_pool.register
     class MoopModifier(CMSToolbar):
 
-        def populate():
+        def populate(self):
             pass
 
 
@@ -80,7 +80,7 @@ to the toolbar::
     @toolbar_pool.register
     class PollToolbar(CMSToolbar):
 
-        def populate():
+        def populate(self):
             if self.is_current_app:
                 menu = self.toolbar.get_or_create_menu('poll-app', _('Polls'))
                 url = reverse('admin:polls_poll_changelist')
@@ -104,7 +104,7 @@ menus::
     @toolbar_pool.register
     class PollToolbar(CMSToolbar):
 
-        def populate():
+        def populate(self):
             admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, _('Site'))
             position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
             menu = admin_menu.get_or_create_menu('poll-menu', _('Polls'), position=position)
@@ -112,3 +112,29 @@ menus::
             menu.add_sideframe_item(_('Poll overview'), url=url)
             admin_menu.add_break('poll-break', position=menu)
 
+
+
+==========================
+Adding items through views
+==========================
+Another way to add items to the toolbar is through our own views (``polls/views.py``).
+This method can be useful if you need to access certain variables, in our case e.g. the
+selected poll and its sub-methods::
+
+    from django.core.urlresolvers import reverse
+    from django.shortcuts import get_object_or_404, render
+    from django.utils.translation import ugettext_lazy as _
+
+    from polls.models import Poll
+
+
+    def detail(request, poll_id):
+        poll = get_object_or_404(Poll, pk=poll_id)
+
+        request.toolbar.populate()
+        menu = request.toolbar.get_or_create_menu('polls-app', _('Polls'))
+        menu.add_modal_item(_('Change this Poll'), url=reverse('admin:polls_poll_change', args=[poll_id]))
+        menu.add_sideframe_item(_('Show History of this Poll'), url=reverse('admin:polls_poll_history', args=[poll_id]))
+        menu.add_sideframe_item(_('Delete this Poll'), url=reverse('admin:polls_poll_delete', args=[poll_id]))
+
+        return render(request, 'polls/detail.html', {'poll': poll})
