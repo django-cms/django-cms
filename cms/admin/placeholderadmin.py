@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.utils import simplejson
@@ -32,6 +33,67 @@ from django.http import HttpResponseRedirect
 
 from cms.utils import copy_plugins, permissions, get_language_from_request
 from cms.utils.i18n import get_language_list
+
+
+class FrontendEditableAdmin(object):
+    def get_urls(self):
+        """
+        Register the plugin specific urls (add/edit/copy/remove/move)
+        """
+        from django.conf.urls import patterns, url
+
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        url_patterns = patterns(
+            '',
+            pat(r'edit-field/([0-9]+)/(\w+)/$', self.edit_field),
+        )
+        return url_patterns + super(FrontendEditableAdmin, self).get_urls()
+
+    def edit_field(self, request, object_id, field_name):
+        obj = self.model.objects.get(pk=object_id)
+        saved_successfully = False
+        cancel_clicked = request.POST.get("_cancel", False)
+        opts = self.model._meta
+        if not request.user.has_perm("%s_change" % self.model._meta.module_name):
+            return HttpResponseForbidden(_("You do not have permission to edit this page"))
+        # This will create the form class with only `field_name` field in it
+        form_class = self.get_form(request, obj, fields=(field_name,))
+        if not cancel_clicked and request.method == 'POST':
+            form = form_class(instance=obj, data=request.POST)
+            if form.is_valid():
+                form.save()
+                saved_successfully = True
+        else:
+            form = form_class(instance=obj)
+        admin_form = AdminForm(form, fieldsets=[(None, {'fields': (field_name,)})], prepopulated_fields={},
+                               model_admin=self)
+        media = self.media + admin_form.media
+        context = {
+            'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
+            'title': field_name,
+            'plugin': None,
+            'plugin_id': None,
+            'adminform': admin_form,
+            'add': False,
+            'is_popup': True,
+            'media': media,
+            'opts': opts,
+            'change': True,
+            'save_as': False,
+            'has_add_permission': False,
+            'window_close_timeout': 10,
+        }
+        if cancel_clicked:
+            # cancel button was clicked
+            context.update({
+                'cancel': True,
+            })
+            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+        if not cancel_clicked and request.method == 'POST' and saved_successfully:
+            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+        return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
 
 
 class PlaceholderAdmin(ModelAdmin):

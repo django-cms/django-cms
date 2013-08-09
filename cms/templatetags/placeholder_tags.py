@@ -36,6 +36,9 @@ class CMSEditableObject(InclusionTag):
     options = Options(
         Argument('instance'),
         Argument('attribute'),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+        Argument('edit_field', default=None, required=False),
         Argument('language', default=None, required=False),
     )
 
@@ -48,19 +51,45 @@ class CMSEditableObject(InclusionTag):
             return self.edit_template
         return self.template
 
-    def get_context(self, context, instance, attribute, language):
+    def get_context(self, context, instance, attribute, view_url, view_method,
+                    edit_field, language):
         if not language:
             language = get_language_from_request(context['request'])
+        # This allow the requested item to be a method, a property or an
+        # attribute
         context['item'] = getattr(instance, attribute, '')
+        context['attribute_name'] = attribute
+        if edit_field:
+            context['edit_field'] = edit_field
+        else:
+            context['edit_field'] = attribute
         if callable(context['item']):
             context['item'] = context['item']()
-        context['instance'] = instance
-        context['opts'] = instance._meta
-        context['admin_url'] = "%s?language=%s" % (
-            reverse('admin:%s_%s_change' % (
-                instance._meta.app_label, instance._meta.module_name),
-                    args=(instance.pk,)),
-            language)
+        # If the toolbar is not enabled the following part is just skipped: it
+        # would cause a perfomance hit for no reason
+        if self._is_editable(context.get('request', None)):
+            context['instance'] = instance
+            context['opts'] = instance._meta
+            # view_method has the precedence and we retrieve the corresponding
+            # attribute in the instance class.
+            # If view_method refers to a method it will be called passing the
+            # request; if it's an attribute, it's stored for later use
+            if view_method:
+                method = getattr(instance, view_method)
+                if callable(method):
+                    url_param = method(context['request'])
+                else:
+                    url_param = method
+            else:
+                # The default view_url is the default admin changeform for the
+                # current instance
+                if not view_url:
+                    view_url = 'admin:%s_%s_change' % (
+                        instance._meta.app_label, instance._meta.module_name)
+                    url_param = reverse(view_url, args=(instance.pk,))
+                else:
+                    url_param = reverse(view_url, args=(instance.pk, context['edit_field']))
+            context['admin_url'] = "%s?language=%s" % (url_param, language)
         return context
 
 

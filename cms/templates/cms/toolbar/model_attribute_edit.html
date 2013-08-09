@@ -4,7 +4,7 @@
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.PlaceholderItem('#cms_placeholder-model-{{ opts.app_label }}-{{ instance.pk|unlocalize }}', {
+	new CMS.PlaceholderItem('#cms_placeholder-model-{{ opts.app_label }}-{{ instance.pk|unlocalize }}-{{ attribute_name|slugify }}', {
 		'type': 'generic',
 		'plugin_name': 'Edit {{ opts.verbose_name }}',
 		'urls': {
@@ -15,4 +15,4 @@ $(document).ready(function () {
 })(CMS.$);
 </script>
 {% endaddtoblock %}
-<span id="cms_placeholder-model-{{ opts.app_label }}-{{ instance.pk|unlocalize }}" class="cms_placeholder-generic">{{ item }}</span>{% endspaceless %}
+<span id="cms_placeholder-model-{{ opts.app_label }}-{{ instance.pk|unlocalize }}-{{ attribute_name|slugify }}" class="cms_placeholder-generic">{{ item }}</span>{% endspaceless %}
