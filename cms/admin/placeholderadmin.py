@@ -38,7 +38,7 @@ from cms.utils.i18n import get_language_list
 class FrontendEditableAdmin(object):
     def get_urls(self):
         """
-        Register the plugin specific urls (add/edit/copy/remove/move)
+        Register the url for the single field edit view
         """
         from django.conf.urls import patterns, url
 
@@ -58,7 +58,8 @@ class FrontendEditableAdmin(object):
         opts = self.model._meta
         if not request.user.has_perm("%s_change" % self.model._meta.module_name):
             return HttpResponseForbidden(_("You do not have permission to edit this page"))
-        # This will create the form class with only `field_name` field in it
+        # Dinamically creates the form class with only `field_name` field
+        # enabled
         form_class = self.get_form(request, obj, fields=(field_name,))
         if not cancel_clicked and request.method == 'POST':
             form = form_class(instance=obj, data=request.POST)
