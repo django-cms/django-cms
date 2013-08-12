@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from cms.models.fields import PlaceholderField
@@ -21,6 +22,12 @@ class Example1(models.Model):
 
     def callable_item(self):
         return self.char_1
+
+    def __str__(self):
+        return self.char_1
+
+    def get_absolute_url(self):
+        return reverse("detail", args=(self.pk,))
 
 
 class TwoPlaceholderExample(models.Model):
@@ -49,3 +56,6 @@ class MultilingualExample1(TranslatableModel):
 
     def __str__(self):
         return self.char_1
+
+    def get_absolute_url(self):
+        return reverse("detail_multi", args=(self.pk,))

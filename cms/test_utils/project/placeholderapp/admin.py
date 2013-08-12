@@ -1,10 +1,10 @@
-from cms.admin.placeholderadmin import PlaceholderAdmin
+from cms.admin.placeholderadmin import PlaceholderAdmin, FrontendEditableAdmin
 from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1, TwoPlaceholderExample)
 from django.contrib import admin
 from hvad.admin import TranslatableAdmin
 
 
-class ExampleAdmin(PlaceholderAdmin):
+class ExampleAdmin(FrontendEditableAdmin, PlaceholderAdmin):
     pass
 
 
@@ -12,7 +12,8 @@ class TwoPlaceholderExampleAdmin(PlaceholderAdmin):
     pass
 
 
-class MultilingualAdmin(TranslatableAdmin, PlaceholderAdmin):
+class MultilingualAdmin(FrontendEditableAdmin, TranslatableAdmin,
+                        PlaceholderAdmin):
     pass
 
 
