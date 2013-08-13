@@ -152,12 +152,6 @@ class PageForm(forms.ModelForm):
         return language
 
 
-class PublicationForm(forms.ModelForm):
-    class Meta:
-        model = Page
-        fields = ["publication_date", "publication_end_date"]
-
-
 class AdvancedSettingsForm(forms.ModelForm):
     application_urls = forms.ChoiceField(label=_('Application'),
                                          choices=(), required=False,

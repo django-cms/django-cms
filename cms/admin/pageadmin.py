@@ -37,9 +37,8 @@ from cms.admin.views import revert_plugins
 from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
     titlemodels
 from cms.models.managers import PagePermissionsPermissionManager
-from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, cms_static_url, copy_plugins
+from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
-from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
@@ -120,15 +119,15 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/publish/([a-z\-]+)/$', self.publish_page),  # publish page
-            pat(r'^([0-9]+)/unpublish/([a-z\-]+)$', self.unpublish),   # unpublish page
+            pat(r'^([0-9]+)/publish/([a-z\-]+)/$', self.publish_page), # publish page
+            pat(r'^([0-9]+)/unpublish/([a-z\-]+)$', self.unpublish), # unpublish page
             pat(r'^([0-9]+)/revert/$', self.revert_page),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
-            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
-            pat(r'^([0-9]+)/preview/$', self.preview_page),  # copy dialog
-            pat(r'^([0-9]+)/descendants/$', self.descendants),  # menu html for page descendants
-            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template),  # copy dialog
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
+            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
+            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
         )
 
         url_patterns += super(PageAdmin, self).get_urls()
@@ -973,7 +972,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             return HttpResponseForbidden(_("This page was never published"))
         try:
             page.unpublish(language)
-            message = _('The %s page "%s" was successfully unpublished') % (get_language_object(language, site)['name'], page)
+            message = _('The %s page "%s" was successfully unpublished') % (
+            get_language_object(language, site)['name'], page)
             messages.info(request, message)
             LogEntry.objects.log_action(
                 user_id=request.user.id,
@@ -992,17 +992,16 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         return admin_utils.render_admin_menu_item(request, page)
 
 
-
     #TODO: Make the change form buttons use POST
     #@require_POST
     @transaction.commit_on_success
-    def revert_page(self, request, page_id):
+    def revert_page(self, request, page_id, language):
         page = get_object_or_404(Page, id=page_id)
         # ensure user has permissions to publish this page
         if not page.has_change_permission(request):
             return HttpResponseForbidden(_("You do not have permission to change this page"))
 
-        page.revert()
+        page.revert(language)
 
         messages.info(request, _('The page "%s" was successfully reverted.') % page)
 
@@ -1130,7 +1129,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
             page.site.domain, url)
         return HttpResponseRedirect(url)
-
 
 
     @require_POST

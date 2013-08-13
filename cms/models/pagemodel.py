@@ -50,12 +50,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     changed_date = models.DateTimeField(auto_now=True)
-
-    publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_(
-        'When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
-    publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True,
-                                                help_text=_('When to expire the page. Leave empty to never expire.'),
-                                                db_index=True)
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
                                     help_text=_("All ancestors will not be displayed in the navigation"))

@@ -478,7 +478,7 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             request.method = "POST"
-            response = self.admin_class.publish_page(request, Page.objects.all()[0].pk)
+            response = self.admin_class.publish_page(request, Page.objects.all()[0].pk, "en")
             self.assertEqual(response.status_code, 403)
 
     def test_revert_page_requires_perms(self):
@@ -491,7 +491,7 @@ class AdminTests(AdminTestsBase):
 
     def test_revert_page_redirects(self):
         admin = self.get_admin()
-        self.page.publish() # Ensure public copy exists before reverting
+        self.page.publish("en")  # Ensure public copy exists before reverting
         with self.login_user_context(admin):
             response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk,)))
             self.assertEqual(response.status_code, 302)
@@ -577,7 +577,7 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(Http404, self.admin_class.preview_page, request,
                               404)
         page = self.get_page()
-        page.publish()
+        page.publish("en")
         base_url = page.get_absolute_url()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
@@ -591,7 +591,7 @@ class AdminTests(AdminTestsBase):
             site = Site.objects.create(domain='django-cms.org', name='django-cms')
             page.site = site
             page.save()
-            page.publish()
+            page.publish("en")
             self.assertTrue(page.is_home())
             response = self.admin_class.preview_page(request, page.pk)
             self.assertEqual(response.status_code, 302)
@@ -673,7 +673,7 @@ class AdminTests(AdminTestsBase):
         page = create_page('A', 'nav_playground.html', language)
         page_admin = PageAdmin(Page, None)
         page_admin._current_page = page
-        page.publish()
+        page.publish("en")
         draft_page = page.get_draft_object()
         admin_url = reverse("admin:cms_page_edit_title", args=(
             draft_page.pk, language
