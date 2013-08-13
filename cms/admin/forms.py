@@ -75,13 +75,12 @@ class PageForm(forms.ModelForm):
 
     class Meta:
         model = Page
-        fields = ["parent", "site", 'template']
+        fields = ["parent", "site"]
 
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)
         self.fields['parent'].widget = HiddenInput()
         self.fields['site'].widget = HiddenInput()
-        self.fields['template'].widget = HiddenInput()
         self.fields['language'].widget = HiddenInput()
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
@@ -211,7 +210,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = [
-            'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'site', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
             'application_urls', 'application_namespace'
         ]
 

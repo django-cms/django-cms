@@ -94,7 +94,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     recover_form_template = "admin/cms/page/history/recover_header.html"
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
-    list_filter = ['in_navigation', 'template', 'changed_by', 'soft_root']
+    list_filter = ['in_navigation', 'changed_by', 'soft_root']
 
     inlines = PERMISSION_ADMIN_INLINES
 
