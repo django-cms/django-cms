@@ -108,26 +108,27 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
         url_patterns = patterns(
             '',
-            pat(r'^([0-9]+)/([a-z\-]+)/edit-title/$', self.edit_title),
+
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
             pat(r'^([0-9]+)/permission-settings/$', self.permissions),
             pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/copy-language/$', self.copy_language),
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants),  # menu html for page descendants
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/publish/([a-z\-]+)/$', self.publish_page), # publish page
-            pat(r'^([0-9]+)/unpublish/([a-z\-]+)$', self.unpublish), # unpublish page
-            pat(r'^([0-9]+)/revert/$', self.revert_page),
-            pat(r'^([0-9]+)/undo/$', self.undo),
-            pat(r'^([0-9]+)/redo/$', self.redo),
-            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
-            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
-            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
-            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
+            pat(r'^([0-9]+)/([a-z\-]+)/edit-title/$', self.edit_title),
+            pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),  # publish page
+            pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),  # unpublish page
+            pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
+            pat(r'^([0-9]+)/([a-z\-]+)/undo/$', self.undo),
+            pat(r'^([0-9]+)/([a-z\-]+)/redo/$', self.redo),
+            pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),  # copy dialog
+            pat(r'^([0-9]+)/([a-z\-]+)/change_template/$', self.change_template),  # copy dialog
         )
 
         url_patterns += super(PageAdmin, self).get_urls()
@@ -758,7 +759,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     @require_POST
     @create_revision()
-    def change_template(self, request, object_id):
+    def change_template(self, request, object_id, language):
         page = get_object_or_404(Page, pk=object_id)
         if not page.has_change_permission(request):
             return HttpResponseForbidden(_("You do not have permission to change the template"))
@@ -766,7 +767,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         to_template = request.POST.get("template", None)
         if to_template not in dict(get_cms_setting('TEMPLATES')):
             return HttpResponseBadRequest(_("Template not valid"))
-
+        if not page.publisher_is_draft:
+            return HttpResponseBadRequest(_("Only draft versions can change the template"))
         page.template = to_template
         page.save()
         if "reversion" in settings.INSTALLED_APPS:

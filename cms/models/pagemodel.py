@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
 
 from cms import constants
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
-from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
+from cms.exceptions import NoHomeFound, PublicIsUnmodifiable, PublicVersionNeeded
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -21,7 +20,6 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
@@ -43,8 +41,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     # Page was marked published, but some of page parents are not.
     PUBLISHER_STATE_PENDING = 4
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
-
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
     changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
@@ -56,9 +52,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
         "An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
-    template = models.CharField(_("template"), max_length=100, choices=template_choices,
-                                help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_INHERITANCE_MAGIC)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
 
     login_required = models.BooleanField(_("login required"), default=False)
@@ -170,6 +163,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         :param target: The page where the new titles should be stored
         """
         from .titlemodels import Title
+
         old_titles = dict(target.title_set.filter(language=language).values_list('language', 'pk'))
         for title in self.title_set.filter(language=language):
             old_pk = title.pk
@@ -212,8 +206,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         that are specific to an exact instance.
         :param target: The Page to copy the attributes to
         """
-        target.publication_date = self.publication_date
-        target.publication_end_date = self.publication_end_date
         target.in_navigation = self.in_navigation
         target.login_required = self.login_required
         target.limit_visibility_in_menu = self.limit_visibility_in_menu
@@ -222,7 +214,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
         target.application_namespace = self.application_namespace
-        target.template = self.template
         target.site_id = self.site_id
 
     def copy_page(self, target, site, position='first-child',
@@ -348,11 +339,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             delattr(self, '_template_cache')
 
         created = not bool(self.pk)
-        # Published pages should always have a publication date
-        # if the page is published we set the publish date if not set yet.
-        if self.publication_date is None:
-            self.publication_date = timezone.now() - timedelta(seconds=5)
-
         if self.reverse_id == "":
             self.reverse_id = None
         if self.application_namespace == "":
@@ -518,25 +504,18 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 pl.cmsplugin_set.filter(language=language).delete()
         return True
 
-    def revert(self):
+    def revert(self, language):
         """Revert the draft version to the same state as the public version
         """
         # Revert can only be called on draft pages
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
         if not self.publisher_public:
-            # TODO: Issue an error
-            return
-
+            raise PublicVersionNeeded('A public version of this page is needed')
         public = self.publisher_public
-        public._copy_titles(self)
-        if self.parent != (self.publisher_public.parent_id and
-            self.publisher_public.parent.publisher_draft):
-            # We don't send the signals here
-            self.move_to(public.parent.publisher_draft)
-        public._copy_contents(self)
+        public._copy_titles(self, language)
+        public._copy_contents(self, language)
         public._copy_attributes(self)
-        self.published = True
         self.publisher_state = self.PUBLISHER_STATE_DEFAULT
         self._publisher_keep_state = True
         self.revision_id = 0
@@ -608,7 +587,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         from cms.models.titlemodels import Title
 
         if not hasattr(self, "all_languages"):
-            self.all_languages = list(sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
+            self.all_languages = list(
+                sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
         return self.all_languages
 
     def get_cached_ancestors(self, ascending=True):

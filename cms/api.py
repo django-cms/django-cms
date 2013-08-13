@@ -127,8 +127,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     else:
         _thread_locals.user = None
 
-    # validate template
-    assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+
 
     # validate site
     if not site:
@@ -177,13 +176,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         created_by=created_by,
         changed_by=created_by,
         parent=parent,
-        publication_date=publication_date,
-        publication_end_date=publication_end_date,
         in_navigation=in_navigation,
         soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        template=template,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
         site=site,
@@ -201,7 +197,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
-        overwrite_url=overwrite_url
+        overwrite_url=overwrite_url,
+        template=template,
     )
 
     if published:
@@ -213,7 +210,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None,
-                 parent=None, overwrite_url=None):
+                 parent=None, overwrite_url=None, template=None):
     """
     Create a title.
     
@@ -227,6 +224,11 @@ def create_title(language, title, page, menu_title=None, slug=None,
     # validate language:
     assert language in get_language_list(page.site_id)
 
+    # validate template
+    assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')] or page.title_set.count() > 0
+
+    if not template:
+        template = page.title_set.all()[0].template
     # set default slug:
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
@@ -238,7 +240,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
         slug=slug,
         redirect=redirect,
         meta_description=meta_description,
-        page=page
+        page=page,
+        template=template,
     )
 
     if overwrite_url:

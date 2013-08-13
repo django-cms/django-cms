@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-from cms.utils.conf import get_cms_setting
-from django.db.models import Q
 from django.contrib.sites.models import Site
 from cms.publisher.query import PublisherQuerySet
-from django.conf import settings
 from cms.exceptions import NoHomeFound
-from django.utils import timezone
 
 
 class PageQuerySet(PublisherQuerySet):
@@ -50,15 +45,9 @@ class PageQuerySet(PublisherQuerySet):
 
     def published(self, site=None):
         pub = self.on_site(site).filter(
-            Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
-            Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
             publisher_public_id__gt=0,
         )
         return pub
-
-    def expired(self):
-        return self.on_site().filter(
-            publication_end_date__lte=timezone.now())
 
     def get_all_pages_with_application(self):
         """Returns all pages containing applications for all sites.

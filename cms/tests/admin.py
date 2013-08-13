@@ -275,11 +275,11 @@ class AdminTestCase(AdminTestsBase):
         request.method = "POST"
         pageadmin = site._registry[Page]
         with self.login_user_context(staff):
-            self.assertRaises(Http404, pageadmin.change_template, request, 1)
+            self.assertRaises(Http404, pageadmin.change_template, request, 1, 'en')
             page = create_page('test-page', 'nav_playground.html', 'en')
-            response = pageadmin.change_template(request, page.pk)
+            response = pageadmin.change_template(request, page.pk, 'en')
             self.assertEqual(response.status_code, 403)
-        url = reverse('admin:cms_page_change_template', args=(page.pk,))
+        url = reverse('admin:cms_page_change_template', args=(page.pk, 'en'))
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
             self.assertEqual(response.status_code, 400)
@@ -486,14 +486,14 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             request.method = "POST"
-            response = self.admin_class.revert_page(request, Page.objects.all()[0].pk)
+            response = self.admin_class.revert_page(request, Page.objects.all()[0].pk, 'en')
             self.assertEqual(response.status_code, 403)
 
     def test_revert_page_redirects(self):
         admin = self.get_admin()
         self.page.publish("en")  # Ensure public copy exists before reverting
         with self.login_user_context(admin):
-            response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk,)))
+            response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk, 'en')))
             self.assertEqual(response.status_code, 302)
             url = response['Location']
             self.assertTrue(url.endswith('?edit_off'))
