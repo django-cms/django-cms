@@ -407,36 +407,36 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.get_moderation_states(request, page.pk)
             self.assertEqual(response.status_code, 200)
 
-    def test_change_status(self):
+    def test_change_publish_unpublish(self):
         page = self.get_page()
         permless = self.get_permless()
         with self.login_user_context(permless):
             request = self.get_request()
-            response = self.admin_class.change_status(request, page.pk)
-            self.assertEqual(response.status_code, 405)
+            response = self.admin_class.publish_page(request, page.pk, "en")
+            self.assertEqual(response.status_code, 403)
             page = self.reload(page)
-            self.assertFalse(page.published)
+            self.assertFalse(page.publisher_public_id > 0)
 
             request = self.get_request(post_data={'no': 'data'})
-            response = self.admin_class.change_status(request, page.pk)
+            response = self.admin_class.publish_page(request, page.pk, "en")
             # Forbidden
             self.assertEqual(response.status_code, 403)
-            self.assertFalse(page.published)
+            self.assertFalse(page.publisher_public_id > 0)
 
         admin = self.get_admin()
         with self.login_user_context(admin):
             request = self.get_request(post_data={'no': 'data'})
-            response = self.admin_class.change_status(request, page.pk)
+            response = self.admin_class.publish_page(request, page.pk, "en")
+            self.assertEqual(response.status_code, 302)
+
+            page = self.reload(page)
+            self.assertTrue(page.publisher_public_id > 0)
+
+            response = self.admin_class.unpublish(request, page.pk, "en")
             self.assertEqual(response.status_code, 200)
 
             page = self.reload(page)
-            self.assertTrue(page.published)
-
-            response = self.admin_class.change_status(request, page.pk)
-            self.assertEqual(response.status_code, 200)
-
-            page = self.reload(page)
-            self.assertFalse(page.published)
+            self.assertFalse(page.publisher_public_id > 0)
 
     def test_change_status_adds_log_entry(self):
         page = self.get_page()
@@ -444,8 +444,8 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(admin):
             request = self.get_request(post_data={'no': 'data'})
             self.assertFalse(LogEntry.objects.count())
-            response = self.admin_class.change_status(request, page.pk)
-            self.assertEqual(response.status_code, 200)
+            response = self.admin_class.publish_page(request, page.pk, "en")
+            self.assertEqual(response.status_code, 302)
             self.assertEqual(1, LogEntry.objects.count())
             self.assertEqual(page.pk, int(LogEntry.objects.all()[0].object_id))
 
@@ -653,7 +653,7 @@ class AdminTests(AdminTestsBase):
         page = create_page('A', 'nav_playground.html', language)
         page_admin = PageAdmin(Page, None)
         page_admin._current_page = page
-        page.publish()
+        page.publish("en")
         draft_page = page.get_draft_object()
         admin_url = reverse("admin:cms_page_edit_title", args=(
             draft_page.pk, language

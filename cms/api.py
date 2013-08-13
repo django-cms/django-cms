@@ -183,7 +183,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        published=False, # will be published later
         template=template,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
@@ -206,7 +205,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     )
 
     if published:
-        page.publish()
+        page.publish(language)
 
     del _thread_locals.user
     return page.reload()
@@ -359,7 +358,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     return page_permission
 
 
-def publish_page(page, user):
+def publish_page(page, user, language):
     """
     Publish a page. This sets `page.published` to `True` and calls publish()
     which does the actual publishing.
@@ -377,7 +376,7 @@ def publish_page(page, user):
         raise PermissionDenied()
     page.published = True
     page.save()
-    page.publish()
+    page.publish(language)
     return page.reload()
 
 

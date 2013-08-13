@@ -142,11 +142,14 @@ class Placeholder(models.Model):
 
     page = property(page_getter, page_setter)
 
-    def get_plugins_list(self):
-        return list(self.get_plugins())
+    def get_plugins_list(self, language=None):
+        return list(self.get_plugins(language))
 
-    def get_plugins(self):
-        return self.cmsplugin_set.all().order_by('tree_id', 'lft')
+    def get_plugins(self, language=None):
+        if language:
+            return self.cmsplugin_set.filter(language=language).order_by('tree_id', 'lft')
+        else:
+            return self.cmsplugin_set.all().order_by('tree_id', 'lft')
 
     @property
     def actions(self):

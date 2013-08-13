@@ -52,7 +52,7 @@ class PageQuerySet(PublisherQuerySet):
         pub = self.on_site(site).filter(
             Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
             Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
-            published=True,
+            publisher_public_id__gt=0,
         )
         return pub
 

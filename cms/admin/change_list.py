@@ -129,7 +129,7 @@ class CMSChangeList(ChangeList):
             pm_states[state.page_id].append(state)
 
         public_page_id_set = Page.objects.public().filter(
-            published=True, publisher_public__in=pages).values_list('id', flat=True)
+            publisher_public_id__gt=0, publisher_public__in=pages).values_list('id', flat=True)
 
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'

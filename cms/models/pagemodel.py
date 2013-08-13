@@ -62,8 +62,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
         "An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
-    published = models.BooleanField(_("is published"), blank=True)
-
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
                                 default=TEMPLATE_INHERITANCE_MAGIC)
@@ -88,8 +86,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
-    # If the draft is loaded from a reversion version save the revision id here.
-    revision_id = models.PositiveIntegerField(default=0, editable=False)
+
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -178,15 +175,21 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         Copy all the titles to a new page (which must have a pk).
         :param target: The page where the new titles should be stored
         """
+        from .titlemodels import Title
         old_titles = dict(target.title_set.filter(language=language).values_list('language', 'pk'))
         for title in self.title_set.filter(language=language):
+            old_pk = title.pk
             # If an old title exists, overwrite. Otherwise create new
             title.pk = old_titles.pop(title.language, None)
             title.page = target
+            title.publisher_is_draft = False
+            title.publisher_public_id = old_pk
             title.save()
+            old_title = Title.objects.get(pk=old_pk)
+            old_title.publisher_public = title
+            old_title.publisher_state = 0
+            old_title.save()
         if old_titles:
-            from .titlemodels import Title
-
             Title.objects.filter(id__in=old_titles.values()).delete()
 
     def _copy_contents(self, target, language):
@@ -353,7 +356,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         created = not bool(self.pk)
         # Published pages should always have a publication date
         # if the page is published we set the publish date if not set yet.
-        if self.publication_date is None and self.published:
+        if self.publication_date is None:
             self.publication_date = timezone.now() - timedelta(seconds=5)
 
         if self.reverse_id == "":
@@ -425,7 +428,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
             # Ensure that the page is in the right position and save it
             public_page = self._publisher_save_public(public_page)
-            public_page.published = (public_page.parent_id is None or public_page.parent.published)
             public_page.save()
 
             # The target page now has a pk, so can be used as a target
@@ -449,7 +451,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             # Nothing left to do
             pass
 
-        if self.publisher_public and self.publisher_public.published:
+        if self.publisher_public:
             self.publisher_state = Page.PUBLISHER_STATE_DEFAULT
         else:
             self.publisher_state = Page.PUBLISHER_STATE_PENDING
@@ -494,7 +496,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         return published
 
-    def unpublish(self):
+    def unpublish(self, language):
         """
         Removes this page from the public site
         :returns: True if this page was successfully unpublished
@@ -504,25 +506,22 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             raise PublicIsUnmodifiable('The public instance cannot be unpublished. Use draft.')
 
         # First, make sure we are in the correct state
-        self.published = False
-        self.save()
-        public_page = self.get_public_object()
-        if public_page:
-            public_page.published = False
-            public_page.save()
-
-            # Go through all children of our public instance
-            descendants = public_page.get_descendants()
-            for child in descendants:
-                child.published = False
-                child.save()
-                draft = child.publisher_public
-                if (draft and draft.published and
-                        draft.publisher_state == Page.PUBLISHER_STATE_DEFAULT):
-                    draft.publisher_state = Page.PUBLISHER_STATE_PENDING
-                    draft._publisher_keep_state = True
-                    draft.save()
-
+        title = self.title_set.get(language=language)
+        public_title = title.publisher_public
+        title.publisher_public = None
+        title.save()
+        public_title.publisher_public = None
+        public_title.delete()
+        public_page = self.publisher_public
+        public_placeholders = public_page.placeholders.all()
+        if not self.title_set.filter(publisher_public_id__gt=0).count():
+            self.publisher_public = None
+            self.save()
+            public_page.publisher_public = None
+            public_page.delete()
+        else:
+            for pl in public_placeholders:
+                pl.cmsplugin_set.filter(language=language).delete()
         return True
 
     def revert(self):
@@ -966,7 +965,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             return self._public_published_cache
             # If we have a public version it will be published as well.
         # If it isn't published, it should be deleted.
-        return self.published and self.publisher_public_id and self.publisher_public.published
+        return self.publisher_public_id
 
     def reload(self):
         """
