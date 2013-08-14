@@ -17,7 +17,7 @@ application_post_changed = Signal(providing_args=["instance"])
 
 # fired after page gets published - copied to public model - there may be more
 # than one instances published before this signal gets called
-post_publish = Signal(providing_args=["instance"])
+post_publish = Signal(providing_args=["instance", "language"])
 
 
 def update_plugin_positions(**kwargs):
@@ -186,7 +186,7 @@ def post_save_page(instance, **kwargs):
 
 
 def update_placeholders(instance, **kwargs):
-    instance.rescan_placeholders()
+    instance.page.rescan_placeholders()
 
 
 def invalidate_menu_cache(instance, **kwargs):
@@ -196,7 +196,7 @@ def invalidate_menu_cache(instance, **kwargs):
 signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
 signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
 signals.post_save.connect(post_save_page, sender=Page)
-signals.post_save.connect(update_placeholders, sender=Page)
+signals.post_save.connect(update_placeholders, sender=Title)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
 

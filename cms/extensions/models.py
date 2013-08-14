@@ -13,16 +13,17 @@ class BaseExtension(models.Model):
     def get_page(self):  # pragma: no cover
         raise NotImplementedError('Function must be overwritten in subclasses and return the extended page object.')
 
-    def copy_relations(self, oldinstance):
+    def copy_relations(self, oldinstance, language):
         """
         Copy relations like many to many or foreign key relations to the public version.
         Similar to the same named cms plugin function.
 
         :param oldinstance: the draft version of the extension
+        :param language: the language that is published
         """
         pass
 
-    def copy_to_public(self, public_object):
+    def copy_to_public(self, public_object, language):
         this = self.__class__.objects.get(pk=self.pk)  # get a copy of this instance
         public_extension = self.public_extension  # get the public version of this instance if any
 
@@ -37,7 +38,7 @@ class BaseExtension(models.Model):
             self.public_extension = this
             self.save(mark_page=False)
 
-        this.copy_relations(self)
+        this.copy_relations(self, language)
         this.save(force_update=True, mark_page=False)
 
         return this

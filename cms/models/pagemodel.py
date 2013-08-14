@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from cms import constants
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
@@ -472,7 +471,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # fire signal after publishing is done
         import cms.signals as cms_signals
 
-        cms_signals.post_publish.send(sender=Page, instance=self)
+        cms_signals.post_publish.send(sender=Page, instance=self, language=language)
 
         return published
 
@@ -725,26 +724,38 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     language = title.language
         return language
 
-    def get_template(self):
+    def get_template(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
+        if not language:
+            language = get_language()
         if hasattr(self, '_template_cache'):
-            return self._template_cache
-        template = None
-        if self.template:
-            if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
-                template = self.template
-            else:
-                try:
-                    template = self.get_ancestors(ascending=True).exclude(
-                        template=constants.TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
-                except IndexError:
-                    pass
-        if not template:
+            if language in self._template_cache:
+                return self._template_cache[language]
+        else:
+            self._template_cache = {}
+
+        template = self.get_title_obj_attribute("template", language, fallback, version_id, force_reload)
+        if template and template == constants.TEMPLATE_INHERITANCE_MAGIC:
+            try:
+                from cms.models.titlemodels import Title
+
+                template = Title.objects.filter(
+                    page__rght__gt=self.rght,
+                    page__lft__lt=self.lft,
+                    language=language
+                ).exclude(
+                    template=constants.TEMPLATE_INHERITANCE_MAGIC
+                ).order_by(
+                    'page__lft'
+                ).values_list('template', flat=True)[0]
+            except IndexError:
+                pass
+        if not template or template == constants.TEMPLATE_INHERITANCE_MAGIC:
             template = get_cms_setting('TEMPLATES')[0][0]
-        self._template_cache = template
+        self._template_cache[language] = template
         return template
 
     def get_template_name(self):
@@ -1081,7 +1092,17 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # inline import to prevent circular imports
         from cms.utils.plugins import get_placeholders
 
-        placeholders = get_placeholders(self.get_template())
+        templates = []
+        for language in self.title_set.all().values_list("language", flat=True):
+            template = self.get_template(language)
+            if not template in templates:
+                templates.append(template)
+        placeholders = []
+        for template in templates:
+            tmp_pls = get_placeholders(template)
+            for pl in tmp_pls:
+                if not pl in placeholders:
+                    placeholders.append(pl)
         found = {}
         for placeholder in self.placeholders.all():
             if placeholder.slot in placeholders:

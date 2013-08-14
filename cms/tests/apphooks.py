@@ -437,17 +437,20 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser)
         create_title('de', page.get_title(), page)
-        page.publish()
+        page.publish('en')
+        page.publish('de')
 
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
         create_title('de', child_page.get_title(), child_page)
-        child_page.publish()
+        child_page.publish('en')
+        child_page.publish('de')
 
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
         create_title("de", '%s_de' % child_child_page.get_title(), child_child_page)
-        child_child_page.publish()
+        child_child_page.publish('en')
+        child_child_page.publish('de')
 
         # publisher_public is set to draft on publish, issue with one to one reverse
         child_child_page = self.reload(child_child_page)

@@ -98,7 +98,6 @@ class AdminTestCase(AdminTestsBase):
             'slug': page.get_slug(),
             'language': title.language,
             'site': page.site.pk,
-            'template': page.template,
             'pagepermission_set-TOTAL_FORMS': 0,
             'pagepermission_set-INITIAL_FORMS': 0,
             'pagepermission_set-MAX_NUM_FORMS': 0,
@@ -126,7 +125,6 @@ class AdminTestCase(AdminTestsBase):
                 'slug': page.get_slug(),
                 'language': title.language,
                 'site': page.site.pk,
-                'template': page.template,
                 'reverse_id': page.reverse_id,
                 'pagepermission_set-TOTAL_FORMS': 0, # required only if user haves can_change_permission
                 'pagepermission_set-INITIAL_FORMS': 0,
@@ -183,15 +181,11 @@ class AdminTestCase(AdminTestsBase):
             'slug': page.get_slug(),
             'language': title.language,
             'site': page.site.pk,
-            'template': page.template,
+            'pagepermission_set-TOTAL_FORMS': 0, 'pagepermission_set-INITIAL_FORMS': 0,
+            'pagepermission_set-MAX_NUM_FORMS': 0, 'pagepermission_set-2-TOTAL_FORMS': 0,
+            'pagepermission_set-2-INITIAL_FORMS': 0, 'pagepermission_set-2-MAX_NUM_FORMS': 0
         }
         # required only if user haves can_change_permission
-        page_data['pagepermission_set-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
 
         with self.login_user_context(normal_guy):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
@@ -209,7 +203,6 @@ class AdminTestCase(AdminTestsBase):
                 'slug': page.get_slug(),
                 'language': title.language,
                 'site': page.site.pk,
-                'template': page.template,
                 'reverse_id': page.reverse_id,
             }
 
@@ -964,7 +957,6 @@ class AdminFormsTests(AdminTestsBase):
         site0 = Site.objects.create(domain='foo.com', name='foo.com')
         site1 = Site.objects.create(domain='foo.com', name='foo.com')
         parent_page = Page.objects.create(
-            template='nav_playground.html',
             site=site0)
         new_page_data = {
             'title': 'Title',
