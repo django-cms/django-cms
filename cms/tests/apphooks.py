@@ -74,7 +74,8 @@ class ApphooksTestCase(CMSTestCase):
                                        apphook_namespace=namespace)
         create_title("de", child_child_page.get_title(), child_child_page)
 
-        child_child_page.publish()
+        child_child_page.publish('en')
+        child_child_page.publish('de')
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
@@ -129,8 +130,9 @@ class ApphooksTestCase(CMSTestCase):
             english_title = page.title_set.all()[0]
             self.assertEquals(english_title.language, 'en')
             create_title("de", "aphooked-page-de", page)
-            self.assertTrue(page.publish())
-            self.assertTrue(blank_page.publish())
+            self.assertTrue(page.publish('en'))
+            self.assertTrue(page.publish('de'))
+            self.assertTrue(blank_page.publish('en'))
             with force_language("en"):
                 response = self.client.get(self.get_pages_root())
             self.assertTemplateUsed(response, 'sampleapp/home.html')
@@ -147,7 +149,8 @@ class ApphooksTestCase(CMSTestCase):
             page = create_page("apphooked-page", "nav_playground.html", "en",
                                created_by=superuser, published=True, apphook="SampleApp")
             create_title("de", "aphooked-page-de", page)
-            self.assertTrue(page.publish())
+            self.assertTrue(page.publish('de'))
+            self.assertTrue(page.publish('en'))
 
             self.reload_urls()
 
@@ -273,15 +276,14 @@ class ApphooksTestCase(CMSTestCase):
             de_title = Title.objects.get(page=public_de_title.page.publisher_draft, language="de")
             de_title.slug = "de"
             de_title.save()
-            de_title.page.publish()
+            de_title.page.publish('de')
 
             page2 = create_page("page2", "nav_playground.html",
                                 "en", created_by=self.superuser, published=True, parent=de_title.page.parent,
                                 apphook=NS_APP_NAME,
                                 apphook_namespace="instance_2")
             de_title2 = create_title("de", "de_title", page2, slug="slug")
-
-            page2.publish()
+            page2.publish('de')
             clear_app_resolvers()
             clear_url_caches()
 
