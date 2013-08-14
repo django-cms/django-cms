@@ -615,11 +615,11 @@ $(document).ready(function () {
 				'url': this.options.urls.move_plugin,
 				'data': data,
 				'success': function (response) {
-					// response should be { 'status': true, 'redirect': true }
-					if(response === 'success') that._showSuccess(dragitem);
+					// if response is reload
+					if(response.reload) CMS.API.Helpers.reloadBrowser();
 
-					// determin if we should refresh
-					// if(parseInt(that.options.placeholder_id) === parseInt(CMS.API.Toolbar.options.clipboard)) CMS.API.Helpers.reloadBrowser();
+					// TODO: show only if(response.status)
+					that._showSuccess(dragitem);
 				},
 				'error': function (jqXHR) {
 					var msg = 'An error occured during the update.';
