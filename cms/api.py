@@ -382,3 +382,17 @@ def publish_page(page, user):
     page.save()
     page.publish()
     return page.reload()
+
+
+def get_page_draft(page):
+    """
+    Returns the draft version of a page, regardless if the passed in
+    page is a published version or a draft version.
+    """
+    if page:
+        if page.publisher_is_draft:
+            return page
+        else:
+            return page.publisher_draft
+    else:
+        return None

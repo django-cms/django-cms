@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.utils import get_cms_setting
+from cms.utils.compat.type_checks import string_types
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
@@ -41,6 +42,9 @@ def get_page_from_placeholder_if_exists(placeholder):
 
 
 def validate_placeholder_name(name):
+    if not isinstance(name, string_types):
+        raise ImproperlyConfigured("Placeholder identifier names need to be of type string. ")
+
     if not all(ord(char) < 128 for char in name):
         raise ImproperlyConfigured("Placeholder identifiers names may not "
                                    "contain non-ascii characters. If you wish your placeholder "

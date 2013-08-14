@@ -5,6 +5,7 @@ import json
 
 from cms.api import create_page, publish_page, add_plugin
 from cms.compat import get_user_model
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
@@ -769,6 +770,114 @@ class PluginsTestCase(PluginsTestBaseCase):
         inner_text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1")
         text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
         self.assertEquals(text_plugin_2.is_last_in_placeholder(), True)
+
+    def test_plugin_move_with_reload(self):
+        action_options = {
+            PLUGIN_MOVE_ACTION: {
+                'requires_reload': True
+            },
+            PLUGIN_COPY_ACTION: {
+                'requires_reload': True
+            },
+        }
+        non_reload_action_options = {
+            PLUGIN_MOVE_ACTION: {
+                'requires_reload': False
+            },
+            PLUGIN_COPY_ACTION: {
+                'requires_reload': False
+            },
+        }
+        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options))
+        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options))
+        plugin_pool.register_plugin(ReloadDrivenPlugin)
+        plugin_pool.register_plugin(NonReloadDrivenPlugin)
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        source_placeholder = page.placeholders.get(slot='body')
+        target_placeholder = page.placeholders.get(slot='right-column')
+        reload_expected = {'reload': True}
+        no_reload_expected = {'reload': False}
+        plugin_1 = add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
+        plugin_2 = add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
+
+        # Test Plugin reload == True on Move
+        post = {
+            'plugin_id': plugin_1.pk,
+            'placeholder_id': target_placeholder.pk,
+            'plugin_parent': '',
+        }
+        response = self.client.post(URL_CMS_PLUGIN_MOVE, post)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(json.loads(response.content.decode('utf8')), reload_expected)
+
+        # Test Plugin reload == False on Move
+        post = {
+            'plugin_id': plugin_2.pk,
+            'placeholder_id': target_placeholder.pk,
+            'plugin_parent': '',
+        }
+        response = self.client.post(URL_CMS_PLUGIN_MOVE, post)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(json.loads(response.content.decode('utf8')), no_reload_expected)
+
+        plugin_pool.unregister_plugin(ReloadDrivenPlugin)
+        plugin_pool.unregister_plugin(NonReloadDrivenPlugin)
+
+    def test_plugin_copy_with_reload(self):
+        action_options = {
+            PLUGIN_MOVE_ACTION: {
+                'requires_reload': True
+            },
+            PLUGIN_COPY_ACTION: {
+                'requires_reload': True
+            },
+        }
+        non_reload_action_options = {
+            PLUGIN_MOVE_ACTION: {
+                'requires_reload': False
+            },
+            PLUGIN_COPY_ACTION: {
+                'requires_reload': False
+            },
+        }
+        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options))
+        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options))
+        plugin_pool.register_plugin(ReloadDrivenPlugin)
+        plugin_pool.register_plugin(NonReloadDrivenPlugin)
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        source_placeholder = page.placeholders.get(slot='body')
+        target_placeholder = page.placeholders.get(slot='right-column')
+        plugin_1 = add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
+        plugin_2 = add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
+
+        # Test Plugin reload == True on Copy
+        copy_data = {
+            'source_placeholder_id': source_placeholder.pk,
+            'target_placeholder_id': target_placeholder.pk,
+            'target_language': settings.LANGUAGES[0][0],
+            'source_language': settings.LANGUAGES[0][0],
+        }
+        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
+        self.assertEquals(response.status_code, 200)
+        json_response = json.loads(response.content.decode('utf8'))
+        self.assertEquals(json_response['reload'], True)
+
+        # Test Plugin reload == False on Copy
+        copy_data = {
+            'source_placeholder_id': source_placeholder.pk,
+            'source_plugin_id': plugin_2.pk,
+            'target_placeholder_id': target_placeholder.pk,
+            'target_language': settings.LANGUAGES[0][0],
+            'source_language': settings.LANGUAGES[0][0],
+        }
+        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
+        self.assertEquals(response.status_code, 200)
+        json_response = json.loads(response.content.decode('utf8'))
+        self.assertEquals(json_response['reload'], False)
+
+        plugin_pool.unregister_plugin(ReloadDrivenPlugin)
+        plugin_pool.unregister_plugin(NonReloadDrivenPlugin)
+
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

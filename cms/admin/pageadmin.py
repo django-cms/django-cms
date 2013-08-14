@@ -314,7 +314,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
-    def change_view(self, request, object_id, extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         """
         The 'change' admin view for the Page model.
         """
@@ -350,8 +350,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         # as a parameter, the workaround is to set it as an attribute...
         if DJANGO_1_4:
             self._current_page = obj
-        response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
-
+        response = super(PageAdmin, self).change_view(
+            request, object_id, form_url=form_url, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
@@ -911,7 +911,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         # ensure user has permissions to publish this page
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
-        page.publish()
+        published = page.publish()
         messages.info(request, _('The page "%s" was successfully published.') % page)
         if "reversion" in settings.INSTALLED_APPS:
             # delete revisions that are not publish revisions
@@ -943,8 +943,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         referrer = request.META.get('HTTP_REFERER', '')
         path = '../../'
         if 'admin' not in referrer:
-            public_page = Page.objects.get(publisher_public=page.pk)
-            path = '%s?edit_off' % public_page.get_absolute_url()
+            if published:
+                public_page = Page.objects.get(publisher_public=page.pk)
+                path = '%s?edit_off' % public_page.get_absolute_url()
+            else:
+                path = '/?edit_off'
+
         return HttpResponseRedirect(path)
 
     #TODO: Make the change form buttons use POST

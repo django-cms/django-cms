@@ -37,17 +37,20 @@ setup(
         'html5lib',
         'django-mptt>=0.5.1,<0.5.3',
         'django-sekizai>=0.7',
-	'djangocms-admin-style',
-    'proxytypes'
+	    'djangocms-admin-style',
+        'proxytypes'
     ],
     tests_require=[
-        'django-reversion>=1.6.6',
+        'django-reversion==1.6.6',
         'Pillow==1.7.7',
         'Sphinx==1.1.3',
         'Jinja2==2.6',
         'Pygments==1.5',
         'dj-database-url==0.2.1',
         'django-hvad',
+        'djangocms-text-ckeditor',
+        'djangocms-column',
+        'djangocms-style',
     ],
     packages=find_packages(exclude=["project", "project.*"]),
     include_package_data=True,

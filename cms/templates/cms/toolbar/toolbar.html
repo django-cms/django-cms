@@ -9,6 +9,7 @@
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/libs/class.min.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/jquery.ui.nestedsortable.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.base.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.toolbar.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "cms/js/plugins/cms.placeholders.js" %}"></script>{% endaddtoblock %}
@@ -32,7 +33,7 @@ $(document).ready(function () {
 		},
 		'urls': {
 			'settings': '',
-			'static': {{ STATIC_URL }}
+			'static': '{{ STATIC_URL }}'
 		},
 		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}',
 		'lang': {
