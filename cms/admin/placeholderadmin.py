@@ -47,15 +47,23 @@ class FrontendEditableAdmin(object):
 
         url_patterns = patterns(
             '',
-            pat(r'edit-field/([0-9]+)/(\w+)/$', self.edit_field),
+            pat(r'edit-field/([0-9]+)/(\w+)/([a-z\-]+)/$', self.edit_field),
         )
         return url_patterns + super(FrontendEditableAdmin, self).get_urls()
 
-    def edit_field(self, request, object_id, field_name):
-        obj = self.model.objects.get(pk=object_id)
+    def _get_object_for_single_field(self, object_id, language):
+        # Quick and dirty way to retrieve objects for django-hvad
+        # Cleaner implementation will extend this method in a child mixin
+        try:
+            return self.model.objects.language(language).get(pk=object_id)
+        except AttributeError:
+            return self.model.objects.get(pk=object_id)
+
+    def edit_field(self, request, object_id, field_name, language):
+        obj = self._get_object_for_single_field(object_id, language)
+        opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
-        opts = self.model._meta
         if not request.user.has_perm("%s_change" % self.model._meta.module_name):
             return HttpResponseForbidden(_("You do not have permission to edit this page"))
         # Dinamically creates the form class with only `field_name` field

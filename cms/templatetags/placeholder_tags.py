@@ -88,7 +88,9 @@ class CMSEditableObject(InclusionTag):
                         instance._meta.app_label, instance._meta.module_name)
                     url_param = reverse(view_url, args=(instance.pk,))
                 else:
-                    url_param = reverse(view_url, args=(instance.pk, context['edit_field']))
+                    url_param = reverse(view_url, args=(instance.pk,
+                                                        context['edit_field'],
+                                                        language))
             context['admin_url'] = "%s?language=%s" % (url_param, language)
         return context
 
