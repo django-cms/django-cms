@@ -151,10 +151,14 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page3 = create_page("page2", "nav_playground.html", "en")
             create_title("de", page3.get_title(), page3, slug=page3.get_slug())
             page4 = create_page("page4", "nav_playground.html", "de")
-            page.publish()
-            page2.publish()
-            page3.publish()
-            page4.publish()
+            page.publish('en')
+            page.publish('de')
+            page2.publish('en')
+            page2.publish('de')
+            page3.publish('en')
+            page3.publish('de')
+            page4.publish('en')
+            page4.publish('de')
             response = self.client.get("/en/")
             self.assertRedirects(response, "/de/")
             response = self.client.get("/en/page2/")
@@ -174,7 +178,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
     def test_detail_view_404_when_no_language_is_found(self):
         page = create_page("page1", "nav_playground.html", "en")
         create_title("de", page.get_title(), page, slug=page.get_slug())
-        page.publish()
+        page.publish('en')
+        page.publish('de')
 
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
@@ -210,7 +215,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                     ]},
             ):
             create_title("x-klingon", "futla ak", page, slug=page.get_slug())
-            page.publish()
+            page.publish('x-klingon')
             from cms.views import details
 
             request = AttributeObject(

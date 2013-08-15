@@ -59,8 +59,8 @@ Example::
     ``filter(extended_page__publisher_is_draft=True)`` on the queryset.
 
 .. note::
-If you save an extension, the corresponding page is marked as having
-unpublished changes. To see your extension live make sure to publish the page.
+    If you save an extension, the corresponding page is marked as having
+    unpublished changes. To see your extension live make sure to publish the page.
 
 To make your model editable from the cms toolbar, add a menu entry as in the
 example below::

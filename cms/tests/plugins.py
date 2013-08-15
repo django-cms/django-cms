@@ -527,7 +527,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             city="Zurich",
         )
         plugin.insert_at(None, position='last-child', save=True)
-        inheritfrompage.publish()
+        inheritfrompage.publish('en')
 
         page = create_page('inherit from page',
                            'nav_playground.html',
@@ -544,7 +544,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             from_page=inheritfrompage,
             from_language=settings.LANGUAGE_CODE)
         inherit_plugin.insert_at(None, position='last-child', save=True)
-        page.publish()
+        page.publish('en')
 
         self.client.logout()
         response = self.client.get(page.get_absolute_url())

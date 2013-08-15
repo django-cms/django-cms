@@ -196,7 +196,8 @@ class ApphooksTestCase(CMSTestCase):
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser, published=True, apphook=APP_NAME)
         create_title('de', page.get_title(), page)
-        page.publish()
+        page.publish('en')
+        page.publish('de')
         public_page = page.get_public_object()
 
         with self.login_user_context(superuser):

@@ -31,7 +31,11 @@ class Command(NoArgsCommand):
         
         for i, page in enumerate(qs):
             m = " "
-            if page.publish():
+            add = True
+            for lang in page.title_set.values_list("language", flat=True):
+                if not page.publish(lang):
+                    add = False
+            if add:
                 pages_published += 1
                 m = "*"
             print(u"%d.\t%s  %s [%d]" % (i + 1, m, force_unicode(page), page.id))
