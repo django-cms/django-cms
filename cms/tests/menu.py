@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
-from django.db import connection
 from cms.api import create_page
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
-    SoftrootFixture, ExtendedMenusFixture)
+from cms.test_utils.fixtures.menus import MenusFixture, SubMenusFixture, SoftrootFixture, ExtendedMenusFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride,
-    LanguageOverride)
+from cms.test_utils.util.context_managers import SettingsOverride, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
@@ -26,9 +23,7 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 from django.utils.unittest import skipUnless
 
 
-
 class BaseMenuTest(SettingsOverrideTestCase):
-
     def _get_nodes(self, path='/'):
         node1 = NavigationNode('1', '/1/', 1)
         node2 = NavigationNode('2', '/2/', 2, 1)
@@ -57,6 +52,7 @@ class BaseMenuTest(SettingsOverrideTestCase):
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
 
+
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     """
     Tree from fixture:
@@ -73,15 +69,16 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
           + P7
           + P8
     """
+
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
-    
+
     def get_level(self, num):
         return Page.objects.public().filter(level=num)
 
     def get_all_pages(self):
         return Page.objects.public()
-    
+
     def test_menu_failfast_on_invalid_usage(self):
         context = self.get_context()
         context['child'] = self.get_page(1)
@@ -96,7 +93,7 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         tpl.render(context)
         nodes = context["children"]
         # P2 is the selected node
-        self.assertTrue(nodes[0].selected) 
+        self.assertTrue(nodes[0].selected)
         # Should include P10 but not P11 
         self.assertEqual(len(nodes[1].children), 1)
         self.assertFalse(nodes[1].children[0].children)
@@ -130,15 +127,16 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
           + P7
           + P8
     """
+
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
-    
+
     def get_level(self, num):
         return Page.objects.public().filter(level=num)
-    
+
     def get_all_pages(self):
         return Page.objects.public()
-    
+
     def test_menu_failfast_on_invalid_usage(self):
         context = self.get_context()
         context['child'] = self.get_page(1)
@@ -485,7 +483,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # Must use the drafts to find the parent when calling create_page
         parent = Page.objects.drafts().get(title_set__title='P3')
         invisible_page = create_page("invisible", "nav_playground.html", "en",
-            parent=parent, published=True, in_navigation=False)
+                                     parent=parent, published=True, in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context)
@@ -782,6 +780,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
           + P7 (not in menu)
           + P8
     """
+
     def test_show_submenu(self):
         page = self.get_page(6)
         subpage = self.get_page(8)
@@ -810,6 +809,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
 
+
 class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation(self):
         """
@@ -825,7 +825,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
         b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
+                        published=True, in_navigation=True)
         c = create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
@@ -857,9 +857,9 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
         b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
-        create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
+        create_page('C', 'nav_playground.html', 'en', parent=b,
+                    published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
 
@@ -1158,6 +1158,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             GlobalpagePermission query for user
             """
             get_visible_pages(request, pages, site)
+
 
 class SoftrootTests(SettingsOverrideTestCase):
     """

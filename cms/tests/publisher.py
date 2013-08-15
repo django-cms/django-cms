@@ -151,7 +151,7 @@ class PublishingTests(TestCase):
         self.assertObjectDoesNotExist(public, title_set__title=name)
         self.assertObjectDoesNotExist(published, title_set__title=name)
 
-        page.publish()
+        page.publish("en")
 
         self.assertTrue(page.published)
         self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
@@ -194,7 +194,7 @@ class PublishingTests(TestCase):
             self.assertObjectDoesNotExist(public, title_set__title=name)
             self.assertObjectDoesNotExist(published, title_set__title=name)
 
-        child.publish()
+        child.publish("en")
 
         self.assertTrue(child.published)
         self.assertEqual(child.publisher_state, Page.PUBLISHER_STATE_PENDING)
@@ -206,7 +206,7 @@ class PublishingTests(TestCase):
             self.assertObjectDoesNotExist(public, title_set__title=name)
             self.assertObjectDoesNotExist(published, title_set__title=name)
 
-        parent.publish()
+        parent.publish("en")
 
         # Cascade publish for all pending descendants
         for name in ('parent', 'child'):
@@ -243,7 +243,7 @@ class PublishingTests(TestCase):
         self.assertEqual(len(Page.objects.public().published()), 2)
 
         # Let's publish C now.
-        pageC.publish()
+        pageC.publish("en")
 
         # Assert all are published
         self.assertTrue(pageA.published)
@@ -258,10 +258,10 @@ class PublishingTests(TestCase):
         pageB = self.create_page('pageB', parent=page, published=True)
         page = page.reload()
         pageB.move_page(pageA, 'right')
-        pageB.publish()
+        pageB.publish("en")
         # pageC needs reload since B has swapped places with it
-        pageC.reload().publish()
-        pageA.publish()
+        pageC.reload().publish("en")
+        pageA.publish('en')
 
         drafts = Page.objects.drafts().order_by('tree_id', 'lft')
         draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
@@ -276,7 +276,7 @@ class PublishingTests(TestCase):
                               ('pageB', 4, 5),
                               ('pageC', 6, 7)], public_titles)
 
-        page.publish()
+        page.publish('en')
 
         drafts = Page.objects.drafts().order_by('tree_id', 'lft')
         draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
@@ -300,12 +300,12 @@ class PublishingTests(TestCase):
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(published, title_set__title=name)
 
-        page.unpublish()
+        page.unpublish('en')
         self.assertFalse(page.published)
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectDoesNotExist(published, title_set__title=name)
 
-        page.publish()
+        page.publish('en')
         self.assertTrue(page.published)
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(published, title_set__title=name)
@@ -315,7 +315,7 @@ class PublishingTests(TestCase):
         child = self.create_page("Child", published=True, parent=home,
                                  in_navigation=False)
         home = home.reload()
-        home.unpublish()
+        home.unpublish('en')
         child = self.reload(child)
         self.assertTrue(child.published)
         self.assertFalse(child.publisher_public.published)
@@ -324,7 +324,7 @@ class PublishingTests(TestCase):
 
         child.in_navigation = True
         child.save()
-        child.publish()
+        child.publish('en')
         child = self.reload(child)
 
         self.assertTrue(child.published)
@@ -333,7 +333,7 @@ class PublishingTests(TestCase):
         self.assertTrue(child.publisher_public.in_navigation)
         self.assertEqual(child.publisher_state, Page.PUBLISHER_STATE_PENDING)
 
-        home.publish()
+        home.publish('en')
         child = self.reload(child)
         self.assertTrue(child.publisher_public.published)
         self.assertTrue(child.publisher_public.in_navigation)
@@ -344,7 +344,7 @@ class PublishingTests(TestCase):
         child = self.create_page("Child", published=True, parent=home)
         gc = self.create_page("GC", published=True, parent=child)
         home = home.reload()
-        home.unpublish()
+        home.unpublish('en')
         child = self.reload(child)
         gc = self.reload(gc)
 
@@ -355,7 +355,7 @@ class PublishingTests(TestCase):
         self.assertEqual(child.publisher_state, Page.PUBLISHER_STATE_PENDING)
         self.assertEqual(gc.publisher_state, Page.PUBLISHER_STATE_PENDING)
 
-        home.publish()
+        home.publish('en')
         child = self.reload(child)
         gc = self.reload(gc)
 
@@ -373,7 +373,7 @@ class PublishingTests(TestCase):
         home = self.reload(home)
 
         dirty1.save()
-        home.unpublish()
+        home.unpublish('en')
         dirty2.save()
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
@@ -385,7 +385,7 @@ class PublishingTests(TestCase):
         self.assertEqual(dirty2.publisher_state, Page.PUBLISHER_STATE_DIRTY)
 
         home = self.reload(home)
-        home.publish()
+        home.publish('en')
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
         self.assertTrue(dirty1.published)
@@ -406,9 +406,9 @@ class PublishingTests(TestCase):
         gc1 = self.create_page("GC1", published=True, parent=unpub1)
         gc2 = self.create_page("GC2", published=True, parent=unpub2)
 
-        home.unpublish()
+        home.unpublish('en')
         unpub1 = self.reload(unpub1)
-        unpub2.unpublish() # Just marks this as not published
+        unpub2.unpublish('en')  # Just marks this as not published
         for page in (unpub1, unpub2):
             self.assertFalse(page.published)
             self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_DIRTY)
@@ -450,7 +450,7 @@ class PublishingTests(TestCase):
             self.assertTrue(item.published)
             self.assertEqual(item.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
 
-        self.assertTrue(page.unpublish(), 'Unpublish was not successful')
+        self.assertTrue(page.unpublish('en'), 'Unpublish was not successful')
         self.assertFalse(page.published)
         for url in (base, base + 'child/', base + 'child/grandchild/'):
             response = self.client.get(url)
@@ -491,7 +491,7 @@ class PublishingTests(TestCase):
         self.assertTrue(child.publisher_public.published)
         self.assertTrue(gchild.publisher_public.published)
 
-        page.unpublish()
+        page.unpublish('en')
         child = self.reload(child)
         gchild = self.reload(gchild)
         # Descendants keep their dirty status after unpublish
@@ -519,7 +519,7 @@ class PublishingTests(TestCase):
         self.assertEqual(child2.get_absolute_url(), root + 'another-page/child/')
         self.assertEqual(child2.get_public_object().get_absolute_url(), root + 'another-page/child/')
 
-        home.unpublish()
+        home.unpublish('en')
         home = self.reload(home)
         other = self.reload(other)
         child = self.reload(child)
@@ -539,7 +539,7 @@ class PublishingTests(TestCase):
         #self.assertEqual(child2.get_absolute_url(), root+'child/')
         #self.assertEqual(child2.get_public_object().get_absolute_url(), root+'child/')
 
-        home.publish()
+        home.publish('en')
         home = self.reload(home)
         other = self.reload(other)
         child = self.reload(child)
@@ -562,7 +562,7 @@ class PublishingTests(TestCase):
         placeholder = page.placeholders.get(slot=u"body")
         deleted_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Deleted content")
         text_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Public content")
-        page.publish()
+        page.publish('en')
 
         # Modify and delete plugins
         text_plugin.body = "<p>Draft content</p>"
@@ -661,7 +661,7 @@ class PublishingTests(TestCase):
                 self.assertTrue(draft in draft.parent.get_children())
 
         # Now call publish again. The structure should not change.
-        item2.publish()
+        item2.publish('en')
 
         not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
         drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))

@@ -168,11 +168,13 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         page_1 = create_page('Page 1', 'nav_playground.html', 'en', published=True,
                              in_navigation=True, reverse_id='page1')
         create_title("de", "Seite 1", page_1, slug="seite-1")
-        page_1.publish()
+        page_1.publish('en')
+        page_1.publish('de')
         page_2 = create_page('Page 2', 'nav_playground.html', 'en', page_1, published=True,
                              in_navigation=True, reverse_id='page2')
         create_title("de", "Seite 2", page_2, slug="seite-2")
-        page_2.publish()
+        page_2.publish('en')
+        page_2.publish('de')
         page_3 = create_page('Page 3', 'nav_playground.html', 'en', page_2, published=True,
                              in_navigation=True, reverse_id='page3')
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
