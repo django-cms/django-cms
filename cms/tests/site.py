@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import copy
+from django.test import Client
 from cms.api import create_page
 from cms.models import Page
+from cms.utils import get_cms_setting
+from cms.views import details
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
@@ -53,4 +57,55 @@ class SiteTestCase(CMSTestCase):
             # without param
             self.assertEqual(Page.objects.drafts().on_site().count(), 1)
 
+    def test_site_publish(self):
+        self._login_context.__exit__(None, None, None)
+        pages = {"2": range(0, 5), "3": range(0, 5)}
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        lang_settings[3][1]['public'] = True
 
+        with SettingsOverride(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="de"):
+            with SettingsOverride(SITE_ID=self.site2.pk):
+                pages["2"][0] = create_page("page_2", "nav_playground.html", "de",
+                                            site=self.site2)
+                pages["2"][0].publish()
+                pages["2"][1] = create_page("page_2_1", "nav_playground.html", "de",
+                                            parent=pages["2"][0], site=self.site2)
+                pages["2"][2] = create_page("page_2_2", "nav_playground.html", "de",
+                                            parent=pages["2"][0], site=self.site2)
+                pages["2"][3] = create_page("page_2_1_1", "nav_playground.html", "de",
+                                            parent=pages["2"][1], site=self.site2)
+                pages["2"][4] = create_page("page_2_1_2", "nav_playground.html", "de",
+                                            parent=pages["2"][1], site=self.site2)
+
+                for page in pages["2"]:
+                    page.publish()
+                for page in pages["2"]:
+                    if page.is_home():
+                        page_url = "/de/"
+                    else:
+                        page_url = page.get_absolute_url(language='de')
+                    response = self.client.get(page_url)
+                    self.assertEqual(response.status_code, 200)
+
+            with SettingsOverride(SITE_ID=self.site3.pk):
+                pages["3"][0] = create_page("page_3", "nav_playground.html", "de",
+                                            site=self.site3)
+                pages["3"][0].publish()
+                pages["3"][1] = create_page("page_3_1", "nav_playground.html", "de",
+                                            parent=pages["3"][0], site=self.site3)
+                pages["3"][2] = create_page("page_3_2", "nav_playground.html", "de",
+                                            parent=pages["3"][0], site=self.site3)
+                pages["3"][3] = create_page("page_3_1_1", "nav_playground.html", "de",
+                                            parent=pages["3"][1], site=self.site3)
+                pages["3"][4] = create_page("page_3_1_2", "nav_playground.html", "de",
+                                            parent=pages["3"][1], site=self.site3)
+
+                for page in pages["3"]:
+                    page.publish()
+                for page in pages["3"]:
+                    if page.is_home():
+                        page_url = "/de/"
+                    else:
+                        page_url = page.get_absolute_url(language='de')
+                    response = self.client.get(page_url)
+                    self.assertEqual(response.status_code, 200)
