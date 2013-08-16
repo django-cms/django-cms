@@ -2,7 +2,7 @@
 from logging import getLogger
 
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
 from django.core.management.base import NoArgsCommand
 

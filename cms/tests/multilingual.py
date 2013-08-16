@@ -85,9 +85,9 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
                                         page_data)
-            response = self.client.post(URL_CMS_PAGE_PUBLISH % page.pk)
+            response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, TESTLANG))
             page = page.reload()
-            self.assertTrue(page.published)
+            self.assertTrue(page.publisher_public_id)
             
             # Create a different language using the edit admin page
             # This test case is bound in actual experience...
@@ -134,7 +134,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
         user = User.objects.create_superuser('super', 'super@django-cms.org', 'super')
-        page = publish_page(page, user)
+        page = publish_page(page, user, TESTLANG)
+        page = publish_page(page, user, TESTLANG2)
         public = page.publisher_public
         placeholder = public.placeholders.all()[0]
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
@@ -157,7 +158,6 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page2.publish('de')
             page3.publish('en')
             page3.publish('de')
-            page4.publish('en')
             page4.publish('de')
             response = self.client.get("/en/")
             self.assertRedirects(response, "/de/")

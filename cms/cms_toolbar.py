@@ -228,11 +228,17 @@ class PageToolbar(CMSToolbar):
         nav_action = reverse('admin:cms_page_change_innavigation', args=(self.page.pk,))
         current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
         # publisher
-        if self.page.published:
+        try:
+            title = Title.objects.get(page=self.page, language=current_lang['code'], publisher_is_draft=True)
+        except Title.DoesNotExist:
+            title = None
+        if title.publisher_public_id:
             publish_title = _('Unpublish page')
+            publish_url = reverse('admin:cms_page_unpublish', args=(self.page.pk, current_lang['code']))
         else:
             publish_title = _('Publish page')
-        publish_url = reverse('admin:cms_page_change_status', args=(self.page.pk,))
+            publish_url = reverse('admin:cms_page_publish', args=(self.page.pk, current_lang['code']))
+
         current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
         current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
         # delete
