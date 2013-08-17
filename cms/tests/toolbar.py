@@ -312,13 +312,31 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load placeholder_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "admin:placeholderapp_example1_edit_field" "" "char_2" %}</h1>
+<h1>{% show_editable_model instance "callable_item" "admin:placeholderapp_example1_edit_field" "char_2" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
-        self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/char_2/en/?language=en" % ex1.pk)
+        self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/?edit_fields=%s&amp;language=en" % (ex1.pk, "char_2"))
+
+    def test_admin_url_multiple_fields(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "callable_item" "admin:placeholderapp_example1_edit_field" "char_1,char_2" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
+        self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/?edit_fields=%s&amp;language=en" % (ex1.pk, "char_1%2Cchar_2"))
 
     def test_instance_method(self):
         user = self.get_staff()
@@ -366,8 +384,25 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1.save()
 
         request = self.get_page_request(page, user, edit=True)
-        response = exadmin.edit_field(request, ex1.pk, "char_1", "en")
+        request.GET['edit_fields'] = 'char_1'
+        response = exadmin.edit_field(request, ex1.pk, "en")
         self.assertContains(response, 'name="char_1" type="text" value="char_1"')
+
+    def test_edit_field_not_allowed(self):
+        from django.contrib.admin import site
+        exadmin = site._registry[Example1]
+
+        user = self.get_superuser()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        request = self.get_page_request(page, user, edit=True)
+        request.GET['edit_fields'] = 'char_3'
+        response = exadmin.edit_field(request, ex1.pk, "en")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content, 'Fields char_3 not editabled in the frontend')
 
     def test_multi_edit(self):
         user = self.get_staff()
@@ -376,25 +411,25 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         exm = MultilingualExample1()
         exm.translate("en")
-        exm.char_1='one'
-        exm.char_2='two'
+        exm.char_1 = 'one'
+        exm.char_2 = 'two'
         exm.save()
         exm.translate("fr")
-        exm.char_1="un"
-        exm.char_2="deux"
+        exm.char_1 = "un"
+        exm.char_2 = "deux"
         exm.save()
 
         request = self.get_page_request(page, user, edit=True)
         response = detail_view_multi(request, exm.pk)
         self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">one</span></h1>' % (exm.pk, 'char_1'))
-        self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/char_1/en/?language=en" % exm.pk)
-        self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/char_2/en/?language=en" % exm.pk)
+        self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/en/?edit_fields=%s&amp;language=en" % (exm.pk, "char_1"))
+        self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/en/?edit_fields=%s&amp;language=en" % (exm.pk, "char_1%2Cchar_2"))
 
         with SettingsOverride(LANGUAGE_CODE="fr"):
             request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
             response = detail_view_multi(request, exm.pk)
             self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">un</span></h1>' % (exm.pk, 'char_1'))
-            self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/char_1/fr/?language=fr" % exm.pk)
+            self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/?edit_fields=%s&amp;language=fr" % (exm.pk, "char_1%2Cchar_2"))
 
     def test_edit_field_multilingual(self):
         from django.contrib.admin import site
@@ -406,22 +441,24 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         exm = MultilingualExample1()
         exm.translate("en")
-        exm.char_1='one'
-        exm.char_2='two'
+        exm.char_1 = 'one'
+        exm.char_2 = 'two'
         exm.save()
         exm.translate("fr")
-        exm.char_1="un"
-        exm.char_2="deux"
+        exm.char_1 = "un"
+        exm.char_2 = "deux"
         exm.save()
 
         request = self.get_page_request(page, user, edit=True)
-        response = exadmin.edit_field(request, exm.pk, "char_2", "en")
+        request.GET['edit_fields'] = 'char_2'
+        response = exadmin.edit_field(request, exm.pk, "en")
         self.assertContains(response, 'name="char_2" type="text" value="two"')
-        response = exadmin.edit_field(request, exm.pk, "char_2", "fr")
+        response = exadmin.edit_field(request, exm.pk, "fr")
         self.assertContains(response, 'name="char_2" type="text" value="deux"')
         with SettingsOverride(LANGUAGE_CODE="fr"):
             request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
-            response = exadmin.edit_field(request, exm.pk, "char_2", "fr")
+            request.GET['edit_fields'] = 'char_2'
+            response = exadmin.edit_field(request, exm.pk, "fr")
             self.assertContains(response, 'name="char_2" type="text" value="deux"')
 
 

@@ -3,6 +3,6 @@
 
 {% block content %}
 <h1>{% show_editable_model instance "char_1" "admin:placeholderapp_multilingualexample1_edit_field" %}</h1>
-{% show_editable_model instance "char_2" "admin:placeholderapp_multilingualexample1_edit_field" %}
+{% show_editable_model instance "char_2" "admin:placeholderapp_multilingualexample1_edit_field" "char_1,char_2" %}
 {% render_placeholder instance.placeholder_1 %}
 {% endblock content %}

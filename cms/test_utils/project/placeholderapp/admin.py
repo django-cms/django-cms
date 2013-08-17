@@ -5,7 +5,7 @@ from hvad.admin import TranslatableAdmin
 
 
 class ExampleAdmin(FrontendEditableAdmin, PlaceholderAdmin):
-    pass
+    frontend_editable_fields = ("char_1", "char_2")
 
 
 class TwoPlaceholderExampleAdmin(PlaceholderAdmin):
@@ -14,7 +14,7 @@ class TwoPlaceholderExampleAdmin(PlaceholderAdmin):
 
 class MultilingualAdmin(FrontendEditableAdmin, TranslatableAdmin,
                         PlaceholderAdmin):
-    pass
+    frontend_editable_fields = ("char_1", "char_2")
 
 
 admin.site.register(Example1, ExampleAdmin)
