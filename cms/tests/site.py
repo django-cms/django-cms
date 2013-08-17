@@ -34,7 +34,6 @@ class SiteTestCase(CMSTestCase):
     def tearDown(self):
         self._login_context.__exit__(None, None, None)
 
-
     def test_site_framework(self):
         #Test the site framework, and test if it's possible to disable it
         with SettingsOverride(SITE_ID=self.site2.pk):
@@ -59,7 +58,7 @@ class SiteTestCase(CMSTestCase):
 
     def test_site_publish(self):
         self._login_context.__exit__(None, None, None)
-        pages = {"2": range(0, 5), "3": range(0, 5)}
+        pages = {"2": list(range(0, 5)), "3": list(range(0, 5))}
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[3][1]['public'] = True
 
