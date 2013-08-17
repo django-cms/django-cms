@@ -3,6 +3,7 @@ from classytags.arguments import Argument
 from classytags.core import Tag, Options
 from django import template
 from django.template.defaultfilters import safe
+from django.utils.http import urlencode
 from classytags.helpers import InclusionTag
 from django.core.urlresolvers import reverse
 from cms.utils import get_language_from_request
@@ -37,8 +38,8 @@ class CMSEditableObject(InclusionTag):
         Argument('instance'),
         Argument('attribute'),
         Argument('view_url', default=None, required=False),
+        Argument('edit_fields', default=None, required=False),
         Argument('view_method', default=None, required=False),
-        Argument('edit_field', default=None, required=False),
         Argument('language', default=None, required=False),
     )
 
@@ -51,18 +52,19 @@ class CMSEditableObject(InclusionTag):
             return self.edit_template
         return self.template
 
-    def get_context(self, context, instance, attribute, view_url, view_method,
-                    edit_field, language):
+    def get_context(self, context, instance, attribute, view_url, edit_fields,
+                    view_method, language):
         if not language:
             language = get_language_from_request(context['request'])
         # This allow the requested item to be a method, a property or an
         # attribute
         context['item'] = getattr(instance, attribute, '')
         context['attribute_name'] = attribute
-        if edit_field:
-            context['edit_field'] = edit_field
+        querystring = {'language': language}
+        if edit_fields:
+            context['edit_fields'] = edit_fields.split(",")
         else:
-            context['edit_field'] = attribute
+            context['edit_fields'] = (attribute, )
         if callable(context['item']):
             context['item'] = context['item']()
         # If the toolbar is not enabled the following part is just skipped: it
@@ -77,21 +79,20 @@ class CMSEditableObject(InclusionTag):
             if view_method:
                 method = getattr(instance, view_method)
                 if callable(method):
-                    url_param = method(context['request'])
+                    url_base = method(context['request'])
                 else:
-                    url_param = method
+                    url_base = method
             else:
                 # The default view_url is the default admin changeform for the
                 # current instance
                 if not view_url:
                     view_url = 'admin:%s_%s_change' % (
                         instance._meta.app_label, instance._meta.module_name)
-                    url_param = reverse(view_url, args=(instance.pk,))
+                    url_base = reverse(view_url, args=(instance.pk,))
                 else:
-                    url_param = reverse(view_url, args=(instance.pk,
-                                                        context['edit_field'],
-                                                        language))
-            context['admin_url'] = "%s?language=%s" % (url_param, language)
+                    url_base = reverse(view_url, args=(instance.pk, language))
+                    querystring['edit_fields'] = ",".join(context['edit_fields'])
+            context['admin_url'] = "%s?%s" % (url_base, urlencode(querystring))
         return context
 
 

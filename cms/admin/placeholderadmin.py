@@ -36,6 +36,8 @@ from cms.utils.i18n import get_language_list
 
 
 class FrontendEditableAdmin(object):
+    frontend_editable_fields = []
+
     def get_urls(self):
         """
         Register the url for the single field edit view
@@ -47,7 +49,7 @@ class FrontendEditableAdmin(object):
 
         url_patterns = patterns(
             '',
-            pat(r'edit-field/([0-9]+)/(\w+)/([a-z\-]+)/$', self.edit_field),
+            pat(r'edit-field/([0-9]+)/([a-z\-]+)/$', self.edit_field),
         )
         return url_patterns + super(FrontendEditableAdmin, self).get_urls()
 
@@ -59,16 +61,20 @@ class FrontendEditableAdmin(object):
         except AttributeError:
             return self.model.objects.get(pk=object_id)
 
-    def edit_field(self, request, object_id, field_name, language):
+    def edit_field(self, request, object_id, language):
         obj = self._get_object_for_single_field(object_id, language)
         opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
+        raw_fields = request.GET.get("edit_fields")
+        fields = [field for field in raw_fields.split(",") if field in self.frontend_editable_fields]
+        if not fields:
+            return HttpResponseBadRequest(_("Fields %s not editabled in the frontend") % raw_fields)
         if not request.user.has_perm("%s_change" % self.model._meta.module_name):
-            return HttpResponseForbidden(_("You do not have permission to edit this page"))
+            return HttpResponseForbidden(_("You do not have permission to edit this item"))
         # Dinamically creates the form class with only `field_name` field
         # enabled
-        form_class = self.get_form(request, obj, fields=(field_name,))
+        form_class = self.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
             form = form_class(instance=obj, data=request.POST)
             if form.is_valid():
@@ -76,12 +82,12 @@ class FrontendEditableAdmin(object):
                 saved_successfully = True
         else:
             form = form_class(instance=obj)
-        admin_form = AdminForm(form, fieldsets=[(None, {'fields': (field_name,)})], prepopulated_fields={},
+        admin_form = AdminForm(form, fieldsets=[(None, {'fields': fields})], prepopulated_fields={},
                                model_admin=self)
         media = self.media + admin_form.media
         context = {
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-            'title': field_name,
+            'title': opts.verbose_name,
             'plugin': None,
             'plugin_id': None,
             'adminform': admin_form,
