@@ -7,6 +7,10 @@ from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.conf.urls.defaults import url, patterns, include
+from django.contrib.formtools.wizard.views import normalize_name
+from django.template.defaultfilters import slugify
+from django.utils.translation import get_language, deactivate_all, activate
 
 class PluginPool(object):
     def __init__(self):
@@ -112,7 +116,27 @@ class PluginPool(object):
         """
         self.discover_plugins()
         return self.plugins[name]
+    
+    def get_patterns(self):
+        self.discover_plugins()
 
+        # We want untranslated name of the plugin for its slug so we deactivate translation
+        lang = get_language()
+        deactivate_all()
+
+        try:
+            url_patterns = []
+            for plugin in self.get_all_plugins():
+                p = plugin()
+                slug = slugify(force_unicode(normalize_name(p.__class__.__name__)))
+                url_patterns += patterns('',
+                    url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                )
+        finally:
+            # Reactivate translation
+            activate(lang)
+
+        return url_patterns
 
 plugin_pool = PluginPool()
 
