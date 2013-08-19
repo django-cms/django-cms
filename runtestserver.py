@@ -11,11 +11,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--port', default='8000')
     parser.add_argument('-b', '--bind', default='127.0.0.1')
+    parser.add_argument('-d', '--db', default='sqlite://localhost/cmstestdb.sqlite')
+    parser.add_argument('-n', '--new_db', action='store_true')
     args = parser.parse_args()
-    new_db = not os.path.exists('cmstestdb.sqlite')
+    if args.db.startswith("sqlite"):
+        new_db = not os.path.exists('cmstestdb.sqlite')
+    else:
+        new_db = (args.new_db == 1)
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
-            configure("sqlite://localhost/cmstestdb.sqlite",
+            configure(args.db,
                 ROOT_URLCONF='cms.test_utils.project.urls',
                 STATIC_ROOT=STATIC_ROOT,
                 MEDIA_ROOT=MEDIA_ROOT,
