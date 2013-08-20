@@ -243,13 +243,13 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
 
         for name, data in fieldsets:
-            if data.get('fields'):
+            if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
                 return fieldsets
 
         if self.inlines:
-            return []
+            return []  # if plugin has inlines but no own fields return empty fieldsets to remove empty white fieldset
 
-        try:
+        try:  # if all fieldsets are empty (assuming there is only one fieldset then) add description
             fieldsets[0][1]['description'] = _('There are no further settings for this plugin. Please hit OK to save.')
         except KeyError:
             pass
