@@ -236,6 +236,26 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         """
         return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
 
+    def get_fieldsets(self, request, obj=None):
+        """
+        Same as from base class except if there are no fields, show an info message.
+        """
+        fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
+
+        for name, data in fieldsets:
+            if data.get('fields'):
+                return fieldsets
+
+        if self.inlines:
+            return []
+
+        try:
+            fieldsets[0][1]['description'] = _('There are no further settings for this plugin. Please hit OK to save.')
+        except KeyError:
+            pass
+
+        return fieldsets
+
     def get_child_classes(self, slot, page):
         from cms.plugin_pool import plugin_pool
         if self.child_classes:
