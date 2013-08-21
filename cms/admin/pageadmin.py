@@ -385,12 +385,17 @@ class PageAdmin(ModelAdmin):
         language = get_language_from_request(request, obj)
 
         if obj:
+            def exclude_field(has_permission, field):
+                if not has_permission:
+                    if field not in self.exclude:
+                        self.exclude.append(field)
+                else:
+                    if field in self.exclude:
+                        self.exclude.remove(field)
+                
             self.inlines = PAGE_ADMIN_INLINES
-            if not obj.has_publish_permission(request) and not 'published' in self.exclude:
-                self.exclude.append('published')
-            elif 'published' in self.exclude:
-                self.exclude.remove('published')
-
+            exclude_field(obj.has_publish_permission(request), 'published')
+            exclude_field(obj.has_set_navigation_permission(request), 'in_navigation')
             if not settings.CMS_SOFTROOT and 'soft_root' in self.exclude:
                 self.exclude.remove('soft_root')
 
