@@ -2,7 +2,7 @@
 Permissions
 ###########
 
-In django-cms you can set two types of permissions:
+In django CMS you can set two types of permissions:
 
 1. View restrictions for restricting front-end view access to users
 2. Page permissions for allowing staff users to only have rights on certain sections of certain sites
