@@ -193,3 +193,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Toolbar API for your own apps added
 - twitter plugin removed
 - New stacks application
+- Object level permission support for Placeholder
