@@ -134,6 +134,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             ('user_5_nostaff', False, self.GROUPNAME_5),
             ('user_staff', True, None),
         ]
+        default_users_count = User.objects.all().count()
         for username, is_staff, groupname in userdata:
             user = User.objects.create(username=username,
                                        email=username + '@domain.com',
@@ -145,8 +146,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
                 group, _ = Group.objects.get_or_create(name=groupname)
                 group.user_set.add(user)
                 group.save()
-
-        self.assertEquals(11, User.objects.all().count())
+        self.assertEquals(11, User.objects.all().count()-default_users_count)
 
 
     def _setup_view_restrictions(self):
