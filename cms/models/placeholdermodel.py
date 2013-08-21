@@ -44,18 +44,20 @@ class Placeholder(models.Model):
     def _get_permission(self, request, key):
         """
         Generic method to check the permissions for a request for a given key,
-        the key can be: 'add', 'change' or 'delete'.
+        the key can be: 'add', 'change' or 'delete'. For each attached object
+        permission has to be granted either on attached model or on attached object.
         """
         if request.user.is_superuser:
             return True
         found = False
-        # check all attached models for change permissions
-        for model in self._get_attached_models():
+        # check all attached models/objects for change permissions
+        for object in self._get_attached_objects():
+            model = object.__class__
             opts = model._meta
             perm_accessor = getattr(opts, 'get_%s_permission' % key)
             perm_code = '%s.%s' % (opts.app_label, perm_accessor())
-            # if they don't have the permission for this attached model, bail out
-            if not request.user.has_perm(perm_code):
+            # if they don't have the permission for this attached model or object, bail out
+            if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, object)):
                 return False
             else:
                 found = True
@@ -127,6 +129,13 @@ class Placeholder(models.Model):
         Returns a list of models of attached to this placeholder.
         """
         return [field.model for field in self._get_attached_fields()]
+
+    def _get_attached_objects(self):
+        """
+        Returns a list of objects attached to this placeholder.
+        """
+        return [obj for field in self._get_attached_fields()
+                for obj in getattr(self, field.related.get_accessor_name()).all()]
 
     def page_getter(self):
         if not hasattr(self, '_page'):

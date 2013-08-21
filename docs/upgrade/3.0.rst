@@ -189,4 +189,8 @@ For an alternative have a look at this plugins:
 
 * https://github.com/changer/cmsplugin-twitter
 
-
+Placeholder object permissions
+==============================
+ 
+In adition to model level permission Placeholder now checks if user has permission on specific object
+of that model. Details can be found here: :ref:`placeholder_object_permissions`

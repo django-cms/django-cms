@@ -176,6 +176,31 @@ Plugins are rendered at once, so you can get an idea how it will look
 `in fine`. However, to view the final look of a plugin simply leave edit mode by
 clicking the "Edit mode" button in the banner again.
 
+.. _placeholder_object_permissions:
+
+Permissions
+===========
+
+To be able to edit placeholder user has to be staff member and either has to
+have edit permission on model that contains :class:`~cms.models.fields.PlaceholderField`
+or has to have edit permission on that specific object of that model.
+
+Model permissions are usually added through default django auth application
+and its admin interface. On the other hand, object permission can be handled by
+writing custom Auth Backend as described in 
+`django docs <https://docs.djangoproject.com/en/1.5/topics/auth/customizing/#handling-object-permissions>`_
+For example, if there is a ``UserProfile`` model that contains placeholder field
+then custom backend can have following ``has_perm`` method that grants all rights
+to current user only on his ``UserProfile`` object::
+
+    def has_perm(self, user_obj, perm, obj=None):
+        if not user_obj.is_staff:
+            return False
+        if isinstance(obj, UserProfile):
+            if user_obj.get_profile()==obj:
+                return True
+        return False
+
 
 *********
 Fieldsets
