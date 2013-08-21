@@ -176,6 +176,8 @@ Plugins are rendered at once, so you can get an idea how it will look
 `in fine`. However, to view the final look of a plugin simply leave edit mode by
 clicking the "Edit mode" button in the banner again.
 
+.. _placeholder_object_permissions:
+
 Permissions
 ===========
 
