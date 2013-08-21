@@ -70,7 +70,7 @@ class PageManager(PublisherManager):
 
         Doesn't cares about the application language.
         """
-        return self.get_query_set().filter(title_set__application_urls__gt='').distinct()
+        return self.get_query_set().filter(application_urls__gt='').distinct()
 
     def get_home(self, site=None):
         return self.get_query_set().get_home(site)

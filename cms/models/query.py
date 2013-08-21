@@ -54,7 +54,7 @@ class PageQuerySet(PublisherQuerySet):
 
         Doesn't cares about the application language.
         """
-        return self.published().filter(title_set__application_urls__gt='').distinct()
+        return self.published().filter(application_urls__gt='').distinct()
 
     def get_home(self, site=None):
         try:

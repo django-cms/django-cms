@@ -72,6 +72,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
+    languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
     # Managers
     objects = PageManager()
@@ -301,13 +302,29 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     permission.save()
 
             # copy titles of this page
+            draft_titles = {}
+            public_titles = []
             for title in titles:
+                if title.publisher_draft:
+                    title.pk = None  # setting pk = None creates a new instance
+                    title.page = page
+                    if title.publisher_public_id:
+                        draft_titles[title.publisher_public_id] = title
+                        title.publisher_public = None
+                    # create slug-copy for standard copy
+                    title.slug = page_utils.get_available_slug(title)
+                    title.save()
+                else:
+                    public_titles.append(title)
+            for title in public_titles:
+                draft_title = draft_titles[title.pk]
                 title.pk = None  # setting pk = None creates a new instance
                 title.page = page
-
-                # create slug-copy for standard copy
                 title.slug = page_utils.get_available_slug(title)
+                title.publisher_public_id = draft_title.pk
                 title.save()
+                draft_title.publisher_public = title
+                draft_title.save()
 
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
@@ -580,15 +597,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.publisher_public
 
     def get_languages(self):
-        """
-        get the list of all existing languages for this page
-        """
-        from cms.models.titlemodels import Title
-
-        if not hasattr(self, "all_languages"):
-            self.all_languages = list(
-                sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
-        return self.all_languages
+        return sorted(self.languages.split(','))
 
     def get_cached_ancestors(self, ascending=True):
         if ascending:

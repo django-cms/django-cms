@@ -265,7 +265,7 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         template = Template(
             "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
@@ -283,12 +283,12 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         request = RequestFactory().get('/')
         user = User(username="admin", password="admin", is_superuser=True, is_staff=True, is_active=True)
         user.save()
-        request.current_page = page.publisher_public
+        request.current_page = page
         request.user = user
         template = Template(
             "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}")
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')
@@ -296,6 +296,6 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         request.current_page = page
         request.user = user
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(3):
             output = template.render(context)
         self.assertIn('<b>Test2</b>', output)

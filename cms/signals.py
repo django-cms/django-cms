@@ -63,6 +63,14 @@ def update_title(title):
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
+    if instance.page.languages:
+        languages = instance.page.languages.split(',')
+    else:
+        languages = []
+    if not instance.language in languages:
+        languages.append(instance.language)
+        instance.page.languages = ",".join(languages)
+        instance.page.save()
     if not instance.page.publisher_is_draft:
         menu_pool.clear(instance.page.site_id)
     if instance.id and not hasattr(instance, "tmp_path"):
@@ -78,6 +86,18 @@ def pre_save_title(instance, raw, **kwargs):
     else:
         update_title(instance)
 
+
+def pre_delete_title(instance, **kwargs):
+    """Save old state to instance and setup path
+    """
+    if instance.page.languages:
+        languages = instance.page.languages.split(',')
+    else:
+        languages = []
+    if instance.language in languages:
+        languages.remove(instance.language)
+        instance.page.languages = ",".join(languages)
+        instance.page.save()
 
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
@@ -199,6 +219,7 @@ signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Title)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
+signals.pre_delete.connect(pre_delete_title, sender=Title)
 
 
 def pre_save_user(instance, raw, **kwargs):
