@@ -52,11 +52,11 @@ File and image handling
 -----------------------
 
 * `Django Filer`_ for file and image management
-* `django-filer plugins for django-cms`_, required to use Django Filer with django-cms
+* `django-filer plugins for django CMS`_, required to use Django Filer with django CMS
 * `Pillow`_ (fork of PIL) for image manipulation
 
 .. _Django Filer: https://github.com/stefanfoulis/django-filer
-.. _django-filer plugins for django-cms: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django-filer plugins for django CMS: https://github.com/stefanfoulis/cmsplugin-filer
 .. _Pillow: https://github.com/python-imaging/Pillow
 
 Revision management
@@ -98,14 +98,14 @@ You can switch to your virtualenv at the command line by typing:
   source env/bin/activate
   
 Next, you can install packages one at a time using `pip`_, but we recommend using a `requirements.txt`_ file. The
-following is an example requirements.txt file that can be used with pip to install django-cms and its dependencies:
+following is an example requirements.txt file that can be used with pip to install django CMS and its dependencies:
 
 ::
 
     # Bare minimum
     django-cms==3.0
     
-    #These dependencies are brought in by django-cms, but if you want to lock-in their version, specify them
+    #These dependencies are brought in by django CMS, but if you want to lock-in their version, specify them
     Django==1.5.1
     django-classy-tags==0.4
     South==0.8.1

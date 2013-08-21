@@ -29,9 +29,12 @@ from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_M
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
+from django import http
 from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
+from cms.compat import get_user_model
+from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
@@ -51,13 +54,31 @@ class DumbFixturePlugin(CMSPluginBase):
         return context
 
 
+class DumbFixturePluginWithUrls(DumbFixturePlugin):
+    name = DumbFixturePlugin.name + " With custom URLs."
+
+    def test_view(self, request):
+        return http.HttpResponse("It works")
+
+    def get_plugin_urls(self):
+        from django.conf.urls.defaults import patterns, url
+        return patterns('',
+            url(r'^testview/$', admin.site.admin_view(self.test_view), name='dumbfixtureplugin'),
+        )
+plugin_pool.register_plugin(DumbFixturePluginWithUrls)
+
+
 class PluginsTestBaseCase(CMSTestCase):
     def setUp(self):
-        self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        User = get_user_model()
+        
+        self.super_user = User(is_staff=True, is_active=True, is_superuser=True)
+        setattr(self.super_user, User.USERNAME_FIELD, "test") 
         self.super_user.set_password("test")
         self.super_user.save()
 
-        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
+        self.slave = User(is_staff=True, is_active=True, is_superuser=False)
+        setattr(self.super_user, User.USERNAME_FIELD, "slave")
         self.slave.set_password("slave")
         self.slave.save()
 
@@ -878,6 +899,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_pool.unregister_plugin(ReloadDrivenPlugin)
         plugin_pool.unregister_plugin(NonReloadDrivenPlugin)
 
+    def test_custom_plugin_urls(self):
+        plugin_url = urlresolvers.reverse('admin:dumbfixtureplugin')
+
+        response = self.client.get(plugin_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.content, b"It works")
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

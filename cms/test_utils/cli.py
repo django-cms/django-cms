@@ -147,7 +147,7 @@ def configure(db_url, **extra):
                 {
                     'code': 'de',
                     'name': gettext('German'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['fr'],
                     'public': True,
                 },
                 {
@@ -160,13 +160,13 @@ def configure(db_url, **extra):
                 {
                     'code': 'nl',
                     'name': gettext('Dutch'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['de'],
                     'public': True,
                 },
                 {
                     'code': 'de',
                     'name': gettext('German'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['nl'],
                     'public': False,
                 },
             ],
