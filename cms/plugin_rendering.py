@@ -171,7 +171,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     if not page:
         page = getattr(request, 'current_page', None)
     if page:
-        template = page.template
+        template = page.get_template(get_language_from_request(request, page))
         if name_fallback and not placeholder:
             placeholder = Placeholder.objects.create(slot=name_fallback)
             page.placeholders.add(placeholder)
