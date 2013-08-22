@@ -260,7 +260,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.published = False
             page.publisher_public_id = None
             # only set reverse_id on standard copy
             if page.reverse_id in site_reverse_ids:
@@ -308,7 +307,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     if title.publisher_public_id:
                         draft_titles[title.publisher_public_id] = title
                         title.publisher_public = None
-                    # create slug-copy for standard copy
+                        # create slug-copy for standard copy
                     title.slug = page_utils.get_available_slug(title)
                     title.save()
                 else:
@@ -397,11 +396,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         :returns: True if page was successfully published.
         """
         # Publish can only be called on draft pages
+        published = False
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be published. Use draft.')
-
-        # publish, but only if all parents are published!!
-        published = None
 
         if not self.pk:
             self.save()
@@ -421,25 +418,26 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
             # Ensure that the page is in the right position and save it
             public_page = self._publisher_save_public(public_page)
-            public_page.save()
+            published = public_page.parent_id is None or public_page.parent.publisher_public_id
+            if published:
+                public_page.save()
 
-            # The target page now has a pk, so can be used as a target
-            self._copy_titles(public_page, language)
-            self._copy_contents(public_page, language)
+                # The target page now has a pk, so can be used as a target
+                self._copy_titles(public_page, language)
+                self._copy_contents(public_page, language)
 
-            # invalidate the menu for this site
-            menu_pool.clear(site_id=self.site_id)
+                # invalidate the menu for this site
+                menu_pool.clear(site_id=self.site_id)
 
-            # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
-            # insert_at() was maybe calling _create_tree_space() method, in this
-            # case may tree_id change, so we must update tree_id from db first
-            # before save
-            if getattr(self, 'tree_id', None):
-                me = self._default_manager.get(pk=self.pk)
-                self.tree_id = me.tree_id
+                # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
+                # insert_at() was maybe calling _create_tree_space() method, in this
+                # case may tree_id change, so we must update tree_id from db first
+                # before save
+                if getattr(self, 'tree_id', None):
+                    me = self._default_manager.get(pk=self.pk)
+                    self.tree_id = me.tree_id
 
-            self.publisher_public = public_page
-            published = True
+                self.publisher_public = public_page
         else:
             # Nothing left to do
             pass
@@ -464,6 +462,18 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         if not published:
             # was not published, escape
             return
+
+        # Check if there are some children which are waiting for parents to
+        # become published.
+        publish_set = self.get_descendants().filter(
+            level=self.level + 1,
+            publisher_state=Page.PUBLISHER_STATE_PENDING
+        ).select_related(
+            'publisher_public'
+        )
+        for page in publish_set:
+            if not page.publisher_public_id and page.publisher_state == Page.PUBLISHER_STATE_PENDING:
+                page.publish(language)
 
         # fire signal after publishing is done
         import cms.signals as cms_signals
@@ -958,7 +968,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         """
         if self.parent_id:
             try:
-                return bool(self.parent.publisher_public_id)
+                return bool(self.parent.publisher_public_id > 0)
             except AttributeError:
                 raise MpttPublisherCantPublish
         return True

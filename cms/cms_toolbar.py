@@ -126,7 +126,7 @@ class PageToolbar(CMSToolbar):
                         classes = ["cms_btn-action", "cms_btn-publish"]
                         if self.page.is_dirty():
                             classes.append("cms_btn-publish-active")
-                        if self.page.published:
+                        if self.page.publisher_public_id:
                             title = _("Publish Changes")
                         else:
                             title = _("Publish Page now")

@@ -913,7 +913,11 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
         published = page.publish(language)
-        messages.info(request, _('The page "%s" was successfully published.') % page)
+        if published:
+            messages.info(request, _('The page "%s" was successfully published.') % page)
+        else:
+            if page.publisher_state == Page.PUBLISHER_STATE_PENDING:
+                return HttpResponseBadRequest(_("Not able to publish page. You need to publish the parent first"))
         if "reversion" in settings.INSTALLED_APPS:
             # delete revisions that are not publish revisions
             from reversion.models import Version

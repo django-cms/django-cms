@@ -62,7 +62,6 @@ class PagesTestCase(CMSTestCase):
             self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
 
             page = title.page
-            page.published = True
             page.save()
             page.publish('en')
             self.assertEqual(page.get_title(), page_data['title'])
@@ -266,8 +265,8 @@ class PagesTestCase(CMSTestCase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %}")
             req = HttpRequest()
-            page.published = True
             page.save()
+            page.publish('en')
             req.current_page = page
             req.REQUEST = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
@@ -287,8 +286,8 @@ class PagesTestCase(CMSTestCase):
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
             t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-d\TH:i:s' }}")
             req = HttpRequest()
-            page.published = True
             page.save()
+            page.publish('en')
             after_change = datetime.datetime.now()
             req.current_page = page
             req.REQUEST = {}
