@@ -320,7 +320,6 @@ class PluginChildClasses(InclusionTag):
 
     def get_context(self, context, plugin):
         # Prepend frontedit toolbar output if applicable
-
         request = context['request']
         page = request.current_page
         slot = context['slot']
@@ -329,7 +328,7 @@ class PluginChildClasses(InclusionTag):
             instance, plugin = plugin.get_plugin_instance()
             for child_class_name in plugin.get_child_classes(slot, page):
                 cls = plugin_pool.get_plugin(child_class_name)
-                child_plugin_classes.append((cls.__name__, force_unicode(cls.name)))
+                child_plugin_classes.append(cls)
         return {'plugin_classes': child_plugin_classes}
 
 
