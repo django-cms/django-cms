@@ -110,7 +110,6 @@ def _verify_plugin_type(plugin_type):
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, apphook_namespace=None, redirect=None, meta_description=None,
                 created_by='python-api', parent=None,
-                publication_date=None, publication_end_date=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
@@ -146,14 +145,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     if parent:
         assert isinstance(parent, Page)
         parent = Page.objects.get(pk=parent.pk)
-
-    # validate publication date
-    if publication_date:
-        assert isinstance(publication_date, datetime.date)
-
-    # validate publication end date
-    if publication_end_date:
-        assert isinstance(publication_end_date, datetime.date)
 
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)

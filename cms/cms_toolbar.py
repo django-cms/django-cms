@@ -142,7 +142,7 @@ class PageToolbar(CMSToolbar):
     def change_language_menu(self):
         language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER)
         add = []
-        remove = Title.objects.filter(page=self.page).values_list('language', flat=True)
+        remove = self.page.get_languages()
         languages = get_language_objects(self.current_site.pk)
         for language in languages:
             code = language['code']

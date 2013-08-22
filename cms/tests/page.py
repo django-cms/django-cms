@@ -400,6 +400,7 @@ class PagesTestCase(CMSTestCase):
                             "en", parent=parent)
         self.assertEqual(child.get_template(), parent.get_template())
         child.move_page(parent, 'left')
+        child = Page.objects.get(pk=child.pk)
         self.assertEqual(child.get_template(), parent.get_template())
 
 
@@ -439,9 +440,11 @@ class PagesTestCase(CMSTestCase):
 
     def test_sitemap_includes_last_modification_date(self):
         one_day_ago = timezone.now() - datetime.timedelta(days=1)
-        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=one_day_ago)
+        page = create_page("page", "nav_playground.html", "en", published=True)
         page.creation_date = one_day_ago
+        page.change_date = one_day_ago
         page.save()
+        page.publish('en')
         sitemap = CMSSitemap()
         self.assertEqual(sitemap.items().count(), 1)
         actual_last_modification_time = sitemap.lastmod(sitemap.items()[0])
@@ -451,12 +454,12 @@ class PagesTestCase(CMSTestCase):
         now = timezone.now()
         now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
-        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        page = create_page("page", "nav_playground.html", "en", published=True)
         page.creation_date = one_day_ago
-        page.changed_date = one_day_ago
         sitemap = CMSSitemap()
         actual_last_modification_time = sitemap.lastmod(page)
-        self.assertEqual(actual_last_modification_time, now)
+        actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
+        self.assertEquals(actual_last_modification_time, now)
 
     def test_edit_page_other_site_and_language(self):
         """
@@ -481,7 +484,6 @@ class PagesTestCase(CMSTestCase):
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
 
-
     def test_templates(self):
         """
         Test the inheritance magic for templates
@@ -495,18 +497,15 @@ class PagesTestCase(CMSTestCase):
         grand_child.save()
 
         # kill template cache
-        delattr(grand_child, '_template_cache')
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             self.assertEqual(child.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child.get_template()
-
-        parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        parent.save()
-        self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        parent = Page.objects.get(pk=parent.pk)
+        parent.title_set.all().update(template=constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
 
@@ -609,18 +608,6 @@ class PagesTestCase(CMSTestCase):
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
-
-    def test_page_already_expired(self):
-        """
-        Test that a page which has a end date in the past gives a 404, not a
-        500.
-        """
-        yesterday = timezone.now() - datetime.timedelta(days=1)
-        with SettingsOverride(CMS_PERMISSION=False):
-            page = create_page('page', 'nav_playground.html', 'en',
-                               publication_end_date=yesterday, published=True)
-            resp = self.client.get(page.get_absolute_url('en'))
-            self.assertEqual(resp.status_code, 404)
 
     def test_existing_overwrite_url(self):
         with SettingsOverride(CMS_PERMISSION=False):
@@ -733,10 +720,9 @@ class PagesTestCase(CMSTestCase):
             except ValidationError:
                 url = False
             if url:
-                bar.published = True
                 bar.save()
                 bar.publish('en')
-            self.assertFalse(bar.published)
+            self.assertFalse(bar.publisher_public_id)
 
     def test_valid_url_multisite(self):
         site1 = Site.objects.get_current()
@@ -792,7 +778,7 @@ class PagesTestCase(CMSTestCase):
             reverse('pages-root')
             # trigger the get_languages query so it doesn't get in our way
             context = self.get_context(page=page)
-            context['request'].current_page.get_languages()
+            page.get_template()
             with self.assertNumQueries(4):
                 for i, placeholder in enumerate(placeholders):
                     content = get_placeholder_content(context, context['request'], page, placeholder.slot, False)

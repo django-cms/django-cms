@@ -127,17 +127,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         """
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
-
-        # readability counts :)
-        is_inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
-
-        # make sure move_page does not break when using INHERIT template
-        # and moving to a top level position
-
-        if (position in ('left', 'right') and not target.parent and is_inherited_template):
-            self.template = self.get_template()
+        # if we move a page to root be sure that it takes its template with it
+        for title in self.title_set.all():
+            is_inherited_template = title.template == constants.TEMPLATE_INHERITANCE_MAGIC
+            if position in ('left', 'right') and not target.parent and is_inherited_template:
+                title.template = self.get_template(title.language)
+                title.save()
+                self._template_cache = {}
         self.move_to(target, position)
-
         # fire signal
         import cms.signals as cms_signals
 
@@ -305,7 +302,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             draft_titles = {}
             public_titles = []
             for title in titles:
-                if title.publisher_draft:
+                if title.publisher_is_draft:
                     title.pk = None  # setting pk = None creates a new instance
                     title.page = page
                     if title.publisher_public_id:
@@ -452,7 +449,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         else:
             self.publisher_state = Page.PUBLISHER_STATE_PENDING
 
-        self.published = True
         self._publisher_keep_state = True
         self.save()
         # If we are publishing, this page might have become a "home" which
@@ -468,22 +464,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         if not published:
             # was not published, escape
             return
-
-        # Check if there are some children which are waiting for parents to
-        # become published.
-        publish_set = self.get_descendants().filter(published=True).select_related('publisher_public')
-        for page in publish_set:
-            if page.publisher_public:
-                if page.publisher_public.parent.published:
-                    if not page.publisher_public.published:
-                        page.publisher_public.published = True
-                        page.publisher_public.save()
-                    if page.publisher_state == Page.PUBLISHER_STATE_PENDING:
-                        page.publisher_state = Page.PUBLISHER_STATE_DEFAULT
-                        page._publisher_keep_state = True
-                        page.save()
-            elif page.publisher_state == Page.PUBLISHER_STATE_PENDING:
-                page.publish()
 
         # fire signal after publishing is done
         import cms.signals as cms_signals
@@ -1102,7 +1082,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         from cms.utils.plugins import get_placeholders
 
         templates = []
-        for language in self.title_set.all().values_list("language", flat=True):
+        for language in self.get_languages():
             template = self.get_template(language)
             if not template in templates:
                 templates.append(template)

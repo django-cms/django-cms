@@ -20,7 +20,7 @@ class CMSSitemap(Sitemap):
         return all_pages
 
     def lastmod(self, page):
-        modification_dates = [page.changed_date, page.publication_date]
+        modification_dates = [page.changed_date]
         plugins_for_placeholder = lambda placeholder: placeholder.get_plugins()
         plugins = from_iterable(map(plugins_for_placeholder, page.placeholders.all()))
         plugin_modification_dates = map(lambda plugin: plugin.changed_date, plugins)
