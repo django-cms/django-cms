@@ -1,4 +1,6 @@
 from __future__ import with_statement
+from cms.views import details
+from cms.utils.compat.dj import force_unicode
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
@@ -135,6 +137,23 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response, '<div id="cms_toolbar"')
         self.assertContains(response, 'cms.placeholders.js')
         self.assertContains(response, 'cms.placeholders.css')
+
+    def test_markup_generic_module(self):
+        create_page("toolbar-page", "col_two.html", "en", published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Generic</span>')
+
+    def test_markup_flash_custom_module(self):
+        superuser = self.get_superuser()
+        create_page("toolbar-page", "col_two.html", "en", published=True)
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, 'href="LinkPlugin">Add a link')
+        self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
 
     def test_show_toolbar_to_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
