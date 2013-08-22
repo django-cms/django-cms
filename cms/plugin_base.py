@@ -88,6 +88,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
+    module = _("Generic")  # To be overridden in child classes
 
     form = None
     change_form_template = "admin/cms/page/plugin/change_form.html"
@@ -108,7 +109,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     child_classes = None
 
     opts = {}
-    module = None #track in which module/application belongs
 
     action_options = {
         PLUGIN_MOVE_ACTION: {
