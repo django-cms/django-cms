@@ -135,7 +135,7 @@ class PublishingTests(TestCase):
         self.assertEquals(Page.objects.all().count(), 1)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk]))
+            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'], "http://testserver/en/?edit_off")
 
@@ -171,7 +171,7 @@ class PublishingTests(TestCase):
         page.save()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk]))
+            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 
@@ -558,7 +558,7 @@ class PublishingTests(TestCase):
         self.assertEquals(CMSPlugin.objects.count(), 3)
 
         # Now let's revert and restore
-        page.revert()
+        page.revert('en')
         self.assertEquals(page.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
         self.assertEquals(page.pagemoderatorstate_set.count(), 0)
 

@@ -216,7 +216,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         """
         page = create_page('Test', 'col_two.html', 'en')
         # I need to make it seem like the user added another plcaeholder to the SAME template.
-        page._template_cache = 'col_three.html'
+        page._template_cache['en'] = 'col_three.html'
 
         class FakeRequest(object):
             current_page = page

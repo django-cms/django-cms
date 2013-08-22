@@ -170,7 +170,7 @@ class PageToolbar(CMSToolbar):
                 question = _('Are you sure you want copy all plugins from %s?') % language['name']
                 language_menu.add_ajax_item(_("Copy all plugins from %s") % language['name'], action=url,
                                             data={'source_language': language['code'],
-                                                'target_language': current_lang}, question=question)
+                                                'target_language': self.current_lang}, question=question)
 
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
