@@ -194,3 +194,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - twitter plugin removed
 - New stacks application
 - Object level permission support for Placeholder
+- Configuration for plugin custom modules and labels in the toolbar UI

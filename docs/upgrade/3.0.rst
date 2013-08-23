@@ -194,3 +194,9 @@ Placeholder object permissions
  
 In adition to model level permission Placeholder now checks if user has permission on specific object
 of that model. Details can be found here: :ref:`placeholder_object_permissions`
+
+Custom modules and plugin labels in the toolbar UI
+==================================================
+
+Is now possible to configure module and plugins labels to show in the toolbar UI.
+See :setting:`CMS_PLACEHOLDER_CONF` for details.

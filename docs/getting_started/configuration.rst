@@ -87,6 +87,12 @@ Example::
                 'TeaserPlugin': 1,
                 'LinkPlugin': 1,
             },
+            'plugin_modules': {
+                'LinkPlugin': 'Extra',
+            }.
+            'plugin_labes': {
+                'LinkPlugin': 'Add a link',
+            }.
         },
         'base.html content': {
             "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin']
@@ -122,6 +128,14 @@ plugins, as shown above with ``base.html content``.
     When ``True``, if the placeholder has no plugin for the current language
     it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
     Defaults to ``False`` to maintain pre-3.0 behavior.
+
+``plugin_modules``
+    A dictionary of plugins and custom module names to group plugin in the
+    toolbar UI.
+
+``plugin_labes``
+    A dictionary of plugins and custom labels to show in the toolbar UI.
+
 
 .. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
