@@ -12,6 +12,7 @@ from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from cms.utils.placeholder import get_toolbar_plugin_struct
 
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
@@ -181,7 +182,9 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
         slot = placeholder.slot
     else:
         slot = None
-    installed_plugins = plugin_pool.get_all_plugins(slot, page)
+    # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
+    installed_plugins = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, template)
+
     name = get_placeholder_conf("name", slot, template, title(slot))
     name = _(name)
     context.push()

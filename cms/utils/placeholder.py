@@ -1,9 +1,34 @@
 # -*- coding: utf-8 -*-
+import operator
 from cms.utils import get_cms_setting
 from cms.utils.compat.type_checks import string_types
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from cms.utils.compat.dj import force_unicode
 from django.db.models.query_utils import Q
+
+
+def get_toolbar_plugin_struct(plugins_list, slot, template):
+    """
+    Return the list of plugins to render in the toolbar.
+    The dictionary contains the label, the classname and the module for the
+    plugin.
+    Names and modules can be defined on a per-placeholder basis using
+    'plugin_modules' and 'plugin_labes' attributes in CMS_PLACEHOLDER_CONF
+
+    :param plugins_list: list of plugins valid for the placeholder
+    :param slot: placeholder slot name
+    :param template: template name
+    :return: list of dictionaries
+    """
+    main_list = []
+    for plugin in plugins_list:
+        modules = get_placeholder_conf("plugin_modules", slot, template, default={})
+        names = get_placeholder_conf("plugin_labes", slot, template, default={})
+        main_list.append({'value': plugin.value,
+                          'name': force_unicode(names.get(plugin.value, plugin.name)),
+                          'module': force_unicode(modules.get(plugin.value, plugin.module))})
+    return sorted(main_list, key=operator.itemgetter("module"))
 
 
 def get_placeholder_conf(setting, placeholder, template=None, default=None):

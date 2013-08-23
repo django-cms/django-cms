@@ -28,6 +28,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 import re
 from sekizai.helpers import Watcher, get_varname
+from cms.utils.placeholder import get_toolbar_plugin_struct
 
 
 register = template.Library()
@@ -326,9 +327,9 @@ class PluginChildClasses(InclusionTag):
         child_plugin_classes = []
         if plugin.get_plugin_class().allow_children:
             instance, plugin = plugin.get_plugin_instance()
-            for child_class_name in plugin.get_child_classes(slot, page):
-                cls = plugin_pool.get_plugin(child_class_name)
-                child_plugin_classes.append(cls)
+            childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
+            # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
+            child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page.template)
         return {'plugin_classes': child_plugin_classes}
 
 
