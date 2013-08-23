@@ -195,7 +195,13 @@ def configure(db_url, **extra):
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                 'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
-                'name': gettext("left column")
+                'name': gettext("left column"),
+                'plugin_modules': {
+                    'LinkPlugin': 'Different Grouper'
+                },
+                'plugin_labes': {
+                    'LinkPlugin': 'Add a link'
+                }
             },
 
             'col_right': {
