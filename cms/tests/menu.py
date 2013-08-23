@@ -354,7 +354,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             context = self.get_context(path=self.get_page(3).get_absolute_url())
             tpl = Template("{% load menu_tags %}{% language_chooser %}")
             tpl.render(context)
-            self.assertEqual(len(context['languages']), 2)
+            self.assertEqual(len(context['languages']), 3)
             # try a different template and some different args
             tpl = Template("{% load menu_tags %}{% language_chooser 'menu/test_language_chooser.html' %}")
             tpl.render(context)
