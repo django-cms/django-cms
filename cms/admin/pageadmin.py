@@ -985,7 +985,7 @@ class PageAdmin(ModelAdmin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': get_language_object(language)['name']
+                'language': force_unicode(get_language_object(language)['name'])
             }
             self.log_change(request, titleobj, message)
             messages.info(request, message)
