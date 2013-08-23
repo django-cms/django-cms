@@ -769,10 +769,11 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             return HttpResponseBadRequest(_("Template not valid"))
         if not page.publisher_is_draft:
             return HttpResponseBadRequest(_("Only draft versions can change the template"))
-        page.template = to_template
-        page.save()
+        title = page.title_set.get(language=language, publisher_is_draft=True)
+        title.template = to_template
+        title.save()
         if "reversion" in settings.INSTALLED_APPS:
-            message = _("Template changed to %s") % dict(get_cms_setting('TEMPLATES'))[to_template]
+            message = _("%s template changed to %s") % (language, dict(get_cms_setting('TEMPLATES'))[to_template])
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(_("The template was successfully changed"))
 

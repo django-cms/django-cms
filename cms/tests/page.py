@@ -407,8 +407,9 @@ class PagesTestCase(CMSTestCase):
         # create page
         page = create_page("Add Placeholder", "nav_playground.html", "en",
                            position="last-child", published=True, in_navigation=True)
-        page.template = 'add_placeholder.html'
-        page.save()
+        title = Title.objects.get(page=page, language='en', publisher_is_draft=True)
+        title.template = 'add_placeholder.html'
+        title.save()
         page.publish('en')
         url = page.get_absolute_url()
         response = self.client.get(url)
@@ -490,14 +491,14 @@ class PagesTestCase(CMSTestCase):
         parent = create_page("parent", "nav_playground.html", "en")
         child = create_page("child", "nav_playground.html", "en", parent=parent)
         grand_child = create_page("child", "nav_playground.html", "en", parent=child)
-        child.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        grand_child.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        child.set_template(constants.TEMPLATE_INHERITANCE_MAGIC, 'en')
+        grand_child.set_template(constants.TEMPLATE_INHERITANCE_MAGIC, 'en')
         child.save()
         grand_child.save()
 
         # kill template cache
         with self.assertNumQueries(2):
-            self.assertEqual(child.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+            self.assertEqual(child.get_template('en', raw=True), constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
         # test template cache

@@ -723,21 +723,26 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     language = title.language
         return language
 
-    def get_template(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def set_template(self, template, language):
+        title = self.title_set.get(language=language, publisher_is_draft=self.publisher_is_draft)
+        title.template = template
+        title.save()
+
+    def get_template(self, language=None, fallback=True, version_id=None, force_reload=False, raw=False):
         """
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
         if not language:
             language = get_language()
-        if hasattr(self, '_template_cache'):
+        if hasattr(self, '_template_cache') and not force_reload and not raw:
             if language in self._template_cache:
                 return self._template_cache[language]
         else:
             self._template_cache = {}
 
         template = self.get_title_obj_attribute("template", language, fallback, version_id, force_reload)
-        if template and template == constants.TEMPLATE_INHERITANCE_MAGIC:
+        if template and template == constants.TEMPLATE_INHERITANCE_MAGIC and not raw:
             try:
                 from cms.models.titlemodels import Title
 
@@ -752,9 +757,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 ).values_list('template', flat=True)[0]
             except IndexError:
                 pass
-        if not template or template == constants.TEMPLATE_INHERITANCE_MAGIC:
+        if not template or template == constants.TEMPLATE_INHERITANCE_MAGIC and not raw:
             template = get_cms_setting('TEMPLATES')[0][0]
-        self._template_cache[language] = template
+        if not raw:
+            self._template_cache[language] = template
         return template
 
     def get_template_name(self):
