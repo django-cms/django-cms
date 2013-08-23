@@ -109,6 +109,7 @@ def configure(db_url, **extra):
             ('de', gettext('German')),
             ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
+            ('es-mx', u'Español'),
         ),
         CMS_LANGUAGES={
             1: [
@@ -133,6 +134,11 @@ def configure(db_url, **extra):
                     'code':'pt-br',
                     'name':gettext('Brazilian Portuguese'),
                     'public':False,
+                },
+                {
+                    'code':'es-mx',
+                    'name':u'Español',
+                    'public':True,
                 },
             ],
             2: [
