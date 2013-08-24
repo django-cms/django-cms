@@ -7,9 +7,10 @@ from django.core.management.base import BaseCommand, CommandError
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 
-class Command(BaseCommand):
+
+class LangCopyCommand(BaseCommand):
     args = '<language_from language_to>'
-    help = 'dupplicate the cms content from one lang to another (to boot a new lang)'
+    help = 'duplicate the cms content from one lang to another (to boot a new lang)'
 
     option_list = BaseCommand.option_list + (
         make_option('--skipattrs', action='store_true', dest='skipattrs', default=False,
@@ -29,14 +30,13 @@ class Command(BaseCommand):
             
             assert from_lang != to_lang
         except AssertionError:
-            print 'available LANGUAGES :'+str(settings.LANGUAGES)
-            raise CommandError("Error: bad arguments -- Usage: manage.py lang_copy en de")
+            raise CommandError("Error: bad arguments -- Usage: manage.py cms copy-lang <lang_from> <lang_to>")
         
-        try:         
-            assert list(k for k,v in settings.LANGUAGES if k == from_lang)
-            assert list(k for k,v in settings.LANGUAGES if k == to_lang)
+        try:
+            assert from_lang in settings.LANGUAGES
+            assert to_lang in settings.LANGUAGES
         except AssertionError:
-            raise CommandError("Both languages have to be present in settings.LANGUAGES")
+            raise CommandError("Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES")
 
         for plugin in CMSPlugin.objects.filter(language=from_lang):
             #copying content of the page
