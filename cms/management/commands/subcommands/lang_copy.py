@@ -8,20 +8,24 @@ from django.core.management.base import BaseCommand, CommandError
 
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
+from cms.utils.i18n import get_languages, get_language_list
 
 
 class LangCopyCommand(BaseCommand):
     args = '<language_from language_to>'
-    help = 'duplicate the cms content from one lang to another (to boot a new lang)'
+    help = u'duplicate the cms content from one lang to another (to boot a new lang)'
 
     option_list = BaseCommand.option_list + (
-        make_option('--skipattrs', action='store_true', dest='skipattrs', default=False,
-        help='Tells django-cms to NOT copy page attributes (like title, slug, id, plugin app, etc..). '),
+        make_option('--skipattrs', action='store_true', dest='skipattrs',
+                    default=False,
+                    help=u'Tells django-cms to NOT copy page attributes (like title, slug, id, plugin app, etc..). '),
+        make_option('--site', dest='site', default=1, help=u'The site to work on')
     )
 
     def handle(self, *args, **kwargs):
         verbosity = kwargs.get('verbosity', 1)
         skip_attributes = kwargs.get('skipattrs', False)
+        site = kwargs.get('site', 1)
         
         #test both langs
         try:
@@ -35,8 +39,8 @@ class LangCopyCommand(BaseCommand):
             raise CommandError("Error: bad arguments -- Usage: manage.py cms copy-lang <lang_from> <lang_to>")
         
         try:
-            assert from_lang in settings.LANGUAGES
-            assert to_lang in settings.LANGUAGES
+            assert from_lang in get_language_list(site)
+            assert to_lang in get_language_list(site)
         except AssertionError:
             raise CommandError("Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES")
 
