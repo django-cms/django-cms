@@ -400,7 +400,7 @@ the django CMS "It Worked" screen.
 
 .. |it-works-cms| image:: ../images/it-works-cms.png
 
-Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log imagesn with
+Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
 the user you created during the database setup.
 
 To deploy your django CMS project on a production webserver, please refer to the
