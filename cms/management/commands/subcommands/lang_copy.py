@@ -16,15 +16,11 @@ class LangCopyCommand(BaseCommand):
     help = u'duplicate the cms content from one lang to another (to boot a new lang)'
 
     option_list = BaseCommand.option_list + (
-        make_option('--skipattrs', action='store_true', dest='skipattrs',
-                    default=False,
-                    help=u'Tells django-cms to NOT copy page attributes (like title, slug, id, plugin app, etc..). '),
-        make_option('--site', dest='site', default=1, help=u'The site to work on')
+        make_option('--site', dest='site', default=1, help=u'The site to work on'),
     )
 
     def handle(self, *args, **kwargs):
         verbosity = kwargs.get('verbosity', 1)
-        skip_attributes = kwargs.get('skipattrs', False)
         site = kwargs.get('site', 1)
         
         #test both langs
@@ -51,17 +47,14 @@ class LangCopyCommand(BaseCommand):
                     sys.stdout.write('copying plugin from %s\n' % plugin)
                 plugin.copy_plugin(plugin.placeholder, to_lang, [])
 
-        if not skip_attributes:
-            #copying attributes of the page
-            for title in Title.objects.filter(language=from_lang):
-                if not Title.objects.filter(page=title.page, language=to_lang).exists():
-                    if verbosity == "2":
-                        sys.stdout.write('copying title from %s\n' % title)
-                    title.id = None
-                    title.language = to_lang
-                    title.save()
-        elif verbosity == '2':
-            sys.stdout.write('skipping attributes\n')
+        #copying titles
+        for title in Title.objects.filter(language=from_lang):
+            if not Title.objects.filter(page=title.page, language=to_lang).exists():
+                if verbosity == "2":
+                    sys.stdout.write('copying title from %s\n' % title)
+                title.id = None
+                title.language = to_lang
+                title.save()
 
         if verbosity == '2':
             sys.stdout.write('DONE\n')
