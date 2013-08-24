@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import sys
 from copy import deepcopy
 from optparse import make_option
 
@@ -42,7 +44,7 @@ class LangCopyCommand(BaseCommand):
             #copying content of the page
             if not CMSPlugin.objects.filter(language=to_lang, placeholder=plugin.placeholder, position=plugin.position).exists():
                 if verbosity == "2":
-                    print 'copying plugin from '+str(plugin)
+                    sys.stdout.write('copying plugin from %s\n' % plugin)
                 plugin.copy_plugin(plugin.placeholder, to_lang, [])
 
         if not skip_attributes:
@@ -50,12 +52,12 @@ class LangCopyCommand(BaseCommand):
             for title in Title.objects.filter(language=from_lang):
                 if not Title.objects.filter(page=title.page, language=to_lang).exists():
                     if verbosity == "2":
-                        print 'copying title from '+str(title)
+                        sys.stdout.write('copying title from %s\n' % title)
                     title.id = None
                     title.language = to_lang
                     title.save()
         elif verbosity == '2':
-            print 'skipping attributes'
+            sys.stdout.write('skipping attributes\n')
 
         if verbosity == '2':
-            print 'DONE'
+            sys.stdout.write('DONE\n')
