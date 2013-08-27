@@ -189,6 +189,8 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     name = _(name)
     context.push()
     context['installed_plugins'] = installed_plugins
+    ## to restrict child-only plugins from draggables..
+    context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
     context['language'] = get_language_from_request(request)
     context['placeholder_label'] = name
     context['placeholder'] = placeholder
