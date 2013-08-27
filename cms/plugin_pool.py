@@ -66,7 +66,7 @@ class PluginPool(object):
             )
         del self.plugins[plugin_name]
 
-    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True, include_child_only=False):
+    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True, include_require_parent=False):
         self.discover_plugins()
         plugins = list(self.plugins.values())
         plugins.sort(key=lambda obj: force_unicode(obj.name))
@@ -90,7 +90,7 @@ class PluginPool(object):
                     include_plugin = True
             if plugin.page_only and not include_page_only:
                 include_plugin = False
-            if plugin.child_only and not include_child_only:
+            if plugin.require_parent and not include_require_parent:
                 include_plugin = False
             if include_plugin:
                 final_plugins.append(plugin)

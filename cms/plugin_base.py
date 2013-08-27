@@ -108,7 +108,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     allow_children = False
     child_classes = None
 
-    child_only = False
+    require_parent = False
     parent_classes = None
 
     opts = {}
@@ -272,8 +272,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         if self.parent_classes:
             return self.parent_classes
         else:
-            installed_plugins = plugin_pool.get_all_plugins(slot, page)
-            return [cls.__name__ for cls in installed_plugins]
+			return None
 
     def get_action_options(self):
         return self.action_options
