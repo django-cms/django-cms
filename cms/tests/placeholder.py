@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from django.utils.numberformat import format
+from django.db import models
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
 from cms.compat import get_user_model
@@ -30,6 +31,8 @@ from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import Permission
+from cms.compat import get_user_model
+from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from django.contrib.messages.storage import default_storage
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -38,11 +41,16 @@ from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from django.test import TestCase
+import itertools
 
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def setUp(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        User = get_user_model()
+        
+        u = User(is_staff=True, is_active=True, is_superuser=True)
+        setattr(u, u.USERNAME_FIELD, "test")
+        
         u.set_password("test")
         u.save()
 
@@ -662,7 +670,9 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
     def _testuser(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=False)
+        User = get_user_model()
+        u = User(is_staff=True, is_active=True, is_superuser=False)
+        setattr(u, u.USERNAME_FIELD, "test")
         u.set_password("test")
         u.save()
         return u
@@ -676,6 +686,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         )
         ex.save()
         self._placeholder = ex.placeholder
+        self.example_object = ex
 
     def _create_plugin(self):
         self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
@@ -687,6 +698,14 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
     def _delete_permission(self, user, model, permission_type, save=True):
         codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
         user.user_permissions.remove(Permission.objects.get(codename=codename))
+
+    def _give_object_permission(self, user, object, permission_type, save=True):
+        codename = '%s_%s' % (permission_type, object.__class__._meta.object_name.lower())
+        UserObjectPermission.objects.assign_perm(codename, user=user, obj=object)
+
+    def _delete_object_permission(self, user, object, permission_type, save=True):
+        codename = '%s_%s' % (permission_type, object.__class__._meta.object_name.lower())
+        UserObjectPermission.objects.remove_perm(codename, user=user, obj=object)
 
     def _post_request(self, user):
         data = {
@@ -701,57 +720,38 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
 
     def test_plugin_add_requires_permissions(self):
         """User wants to add a plugin to the example app placeholder but has no permissions"""
-        self._create_example()
-        normal_guy = self._testuser()
-        admin = self.get_admin()
-        request = self._post_request(normal_guy)
-        response = admin.add_plugin(request)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # The user gets the permission only for the plugin
-        self._give_permission(normal_guy, Text, 'add')
-        request = self._post_request(normal_guy)
-        response = admin.add_plugin(request)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # the user gets the permission only for the app
-        self._delete_permission(normal_guy, Text, 'add')
-        self._give_permission(normal_guy, Example1, 'add')
-        request = self._post_request(normal_guy)
-        response = admin.add_plugin(request)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # user gets permissions for the plugin and the app
-        self._give_permission(normal_guy, Text, 'add')
-        request = self._post_request(normal_guy)
-        response = admin.add_plugin(request)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
+        self._test_plugin_action_requires_permissions('add')
 
     def test_plugin_edit_requires_permissions(self):
         """User wants to edit a plugin to the example app placeholder but has no permissions"""
+        self._test_plugin_action_requires_permissions('change')
+
+    def _test_plugin_action_requires_permissions(self, key):
         self._create_example()
-        self._create_plugin()
+        if key=='change':
+            self._create_plugin()
         normal_guy = self._testuser()
         admin = self.get_admin()
-        request = self._post_request(normal_guy)
-        response = admin.edit_plugin(request, self._plugin.id)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # The user gets the permission only for the plugin
-        self._give_permission(normal_guy, Text, 'change')
-        request = self._post_request(normal_guy)
-        response = admin.edit_plugin(request, self._plugin.id)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # the user gets the permission only for the app
-        self._delete_permission(normal_guy, Text, 'change')
-        self._give_permission(normal_guy, Example1, 'change')
-        request = self._post_request(normal_guy)
-        response = admin.edit_plugin(request, self._plugin.id)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # user gets permissions for the plugin and the app
-        self._give_permission(normal_guy, Text, 'change')
-        request = self._post_request(normal_guy)
-        response = admin.edit_plugin(request, self._plugin.id)
-        # It looks like it breaks here because of a missing csrf token in the request
-        # I have no idea how to fix this
-        self.assertEqual(response.status_code, HttpResponse.status_code, response)
+        # check all combinations of plugin, app and object permission
+        for perms in itertools.product(*[[False, True]]*3):
+            self._set_perms(normal_guy, [Text, Example1, self.example_object], perms, key)
+            request = self._post_request(normal_guy)
+            if key=='add':
+                response = admin.add_plugin(request)
+            elif key=='change':
+                response = admin.edit_plugin(request, self._plugin.id)
+            should_pass = perms[0] and (perms[1] or perms[2])
+            expected_status_code = HttpResponse.status_code if should_pass else HttpResponseForbidden.status_code
+            self.assertEqual(response.status_code, expected_status_code)
+        # cleanup
+        self._set_perms(normal_guy, [Text, Example1, self.example_object], (False,)*3, key)
+
+    def _set_perms(self, user, objects, perms, key):
+        for obj, perm in zip(objects, perms):
+            action = 'give' if perm else 'delete'
+            object = '_object' if isinstance(obj, models.Model) else ''
+            method_name = '_%s%s_permission' % (action, object)
+            getattr(self, method_name)(user, obj, key)
 
 
 class PlaceholderConfTests(TestCase):
@@ -791,7 +791,9 @@ class PlaceholderConfTests(TestCase):
 
 class PlaceholderI18NTest(CMSTestCase):
     def _testuser(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        User = get_user_model()
+        u = User(is_staff=True, is_active=True, is_superuser=True)
+        setattr(u, u.USERNAME_FIELD, "test")
         u.set_password("test")
         u.save()
         return u

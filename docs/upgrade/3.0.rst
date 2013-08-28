@@ -1,3 +1,5 @@
+.. _upgrade-to-3.0:
+
 #################
 3.0 release notes
 #################
@@ -5,9 +7,6 @@
 *****************
 What's new in 3.0
 *****************
-
-
-.. _upgrade-to-3.0:
 
 .. warning:: Upgrading from previous versions
 
@@ -189,4 +188,33 @@ For an alternative have a look at this plugins:
 
 * https://github.com/changer/cmsplugin-twitter
 
+Placeholder object permissions
+==============================
+ 
+In adition to model level permission Placeholder now checks if user has permission on specific object
+of that model. Details can be found here: :ref:`placeholder_object_permissions`
 
+Custom modules and plugin labels in the toolbar UI
+==================================================
+
+Is now possible to configure module and plugins labels to show in the toolbar UI.
+See :setting:`CMS_PLACEHOLDER_CONF` for details.
+
+
+New copy-lang subcommand
+========================
+
+A new copy-lang subcommand exists to copy content between languages.
+
+
+Added language copy command
+===========================
+
+Added a management command to copy content (titles and plugins) from one
+language to another.
+
+The command can be run with::
+
+    manage.py cms copy_lang from_lang to_lang
+
+Please read :ref:`cms-copy-lang-command` before using.
