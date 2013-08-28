@@ -88,6 +88,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
+    module = _("Generic")  # To be overridden in child classes
 
     form = None
     change_form_template = "admin/cms/page/plugin/change_form.html"
@@ -108,7 +109,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     child_classes = None
 
     opts = {}
-    module = None #track in which module/application belongs
 
     action_options = {
         PLUGIN_MOVE_ACTION: {
@@ -236,6 +236,26 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         """
         return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
 
+    def get_fieldsets(self, request, obj=None):
+        """
+        Same as from base class except if there are no fields, show an info message.
+        """
+        fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
+
+        for name, data in fieldsets:
+            if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
+                return fieldsets
+
+        if self.inlines:
+            return []  # if plugin has inlines but no own fields return empty fieldsets to remove empty white fieldset
+
+        try:  # if all fieldsets are empty (assuming there is only one fieldset then) add description
+            fieldsets[0][1]['description'] = _('There are no further settings for this plugin. Please hit OK to save.')
+        except KeyError:
+            pass
+
+        return fieldsets
+
     def get_child_classes(self, slot, page):
         from cms.plugin_pool import plugin_pool
         if self.child_classes:
@@ -254,6 +274,17 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             options = actions[action]
             reload_required = options.get('requires_reload', False)
         return reload_required
+
+    def get_plugin_urls(self):
+        """
+        Return URL patterns for which the plugin wants to register
+        views for.
+        """
+        return []
+
+    def plugin_urls(self):
+        return self.get_plugin_urls()
+    plugin_urls = property(plugin_urls)
 
     def __repr__(self):
         return smart_str(self.name)

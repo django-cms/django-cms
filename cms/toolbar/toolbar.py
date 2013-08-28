@@ -3,6 +3,7 @@ from cms.constants import LEFT
 from cms.models import UserSettings, Placeholder
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
+from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language
 
 from django.contrib.auth.forms import AuthenticationForm
@@ -43,7 +44,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
         if settings.USE_I18N:
-            self.language = self.request.LANGUAGE_CODE
+            self.language = get_language_from_request(request)
         else:
             self.language = settings.LANGUAGE_CODE
 

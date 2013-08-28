@@ -1,7 +1,6 @@
 {% load i18n l10n sekizai_tags %}
 {% load url from future %}
 
-{% regroup installed_plugins by module as module_list %}
 <div id="cms_placeholder-bar-{{ placeholder.pk|unlocalize }}" class="cms_placeholder-bar">
 	{% language request.toolbar.language %}
 	<div class="cms_submenu">
@@ -12,12 +11,7 @@
 			<div class="cms_submenu-item"><a data-rel="modal" href="{% url "admin:cms_page_clear_placeholder" placeholder.pk %}" data-name="{{ placeholder_label }}">{% trans "Empty all" %}</a></div>
 			<div class="cms_submenu-item"><a data-rel="modal" href='{% url "admin:stacks_stack_create_stack" placeholder_id=placeholder.pk %}?_popup'>{% trans "Create stack" %}</a></div>
 			<div class="cms_submenu-item"><a data-rel="modal" href='{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'>{% trans "Insert stack" %}</a></div>
-			{% for module in module_list %}
-			<div class="cms_submenu-item cms_submenu-item-title"><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></div>
-			{% for p in module.list %}
-			<div class="cms_submenu-item"><a data-rel="add" href="{{ p.value }}">{{ p.name }}</a></div>
-			{% endfor %}
-			{% endfor %}
+			{% include "cms/toolbar/draggable_menu.html" with plugin_classes=installed_plugins %}
 		</div>
 	</div>
 	<div class="cms_expandmenu" title="{% trans "Expand / Collapse" %}"></div>

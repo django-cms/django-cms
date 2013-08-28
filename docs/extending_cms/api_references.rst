@@ -63,14 +63,14 @@ Functions and constants
     :type parent: :class:`cms.models.pagemodel.Page` instance
     :param datetime publication_date: Date to publish this page
     :param datetime publication_end_date: Date to unpublish this page
-    :param boolean in_navigation: Whether this page should be in the navigation or not
-    :param boolean soft_root: Whether this page is a softroot or not
+    :param bool in_navigation: Whether this page should be in the navigation or not
+    :param bool soft_root: Whether this page is a softroot or not
     :param string reverse_id: Reverse ID of this page (for template tags)
     :param string navigation_extenders: Menu to attach to this page. Must be a valid menu
-    :param boolean published: Whether this page should be published or not
+    :param bool published: Whether this page should be published or not
     :param site: Site to put this page on
     :type site: :class:`django.contrib.sites.models.Site` instance
-    :param boolean login_required: Whether users must be logged in or not to view this page
+    :param bool login_required: Whether users must be logged in or not to view this page
     :param limit_menu_visibility: Limits visibility of this page in the menu
     :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_STAFF`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
@@ -117,8 +117,8 @@ Functions and constants
     :type created_by: :class:`django.contrib.auth.models.User` instance
     :param user: The user to create the page user from
     :type user: :class:`django.contrib.auth.models.User` instance
-    :param boolean can_*: Permissions to give the user
-    :param boolean grant_all: Grant all permissions to the user
+    :param bool can_*: Permissions to give the user
+    :param bool grant_all: Grant all permissions to the user
 
 
 .. function:: assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_add=False, can_change=False, can_delete=False, can_change_advanced_settings=False, can_publish=False, can_change_permissions=False, can_move_page=False, grant_all=False)
@@ -134,7 +134,7 @@ Functions and constants
     :param grant_on: Controls which pages are affected
     :type grant_on: :data:`cms.models.permissionmodels.ACCESS_PAGE`, :data:`cms.models.permissionmodels.ACCESS_CHILDREN`, :data:`cms.models.permissionmodels.ACCESS_DESCENDANTS` or :data:`cms.models.permissionmodels.ACCESS_PAGE_AND_DESCENDANTS`
     :param can_*: Permissions to grant
-    :param boolean grant_all: Grant all permissions to the user
+    :param bool grant_all: Grant all permissions to the user
     
 
 .. function:: publish_page(page, user)
@@ -146,7 +146,31 @@ Functions and constants
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
 
+.. function:: get_page_draft(page):
 
+    Returns the draft version of a page, regardless if the passed in
+    page is a published version or a draft version.
+
+    :param page: The page to get the draft version
+    :type page: :class:`cms.models.pagemodel.Page` instance
+    :return page: draft version of the page
+
+.. function:: copy_plugins_to_language(page, source_language, target_language, only_empty=True):
+
+    Copy the plugins to another language in the same page for all the page
+    placeholders.
+
+    By default plugins are copied only if placeholder has no plugin for the target language; use ``only_empty=False`` to change this.
+
+    .. warning:: This function skips permissions checks
+
+    :param page: the page to copy
+    :type page: :class:`cms.models.pagemodel.Page` instance
+    :param string source_language: The source language code, must be in :setting:`django:LANGUAGES`
+    :param string target_language: The source language code, must be in :setting:`django:LANGUAGES`
+    :param bool only_empty: if False, plugin are copied even if plugins exists in the
+     target language (on a placeholder basis).
+    :return int: number of copied plugins
 
 Example workflows
 =================
@@ -207,6 +231,13 @@ cms.plugin_base
     .. attribute:: form
     
         Custom form class to be used to edit this plugin.
+
+    .. method:: get_plugin_urls(instance)
+
+        Returns URL patterns for which the plugin wants to register views for.
+        They are included under django CMS PageAdmin in the plugin path
+        (e.g.: ``/admin/cms/page/plugin/<plugin-name>/`` in the default case).
+        Useful if your plugin needs to asynchronously talk to the admin.
 
     .. attribute:: model
 

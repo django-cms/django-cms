@@ -103,12 +103,17 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
+            'cms.test_utils.project.objectpermissionsapp',
             'cms.test_utils.project.extensionapp',
             'south',
             'reversion',
             'sekizai',
             'hvad',
         ],
+        AUTHENTICATION_BACKENDS=(
+            'django.contrib.auth.backends.ModelBackend',
+            'cms.test_utils.project.objectpermissionsapp.backends.ObjectPermissionBackend',
+        ),
         LANGUAGE_CODE="en",
         LANGUAGES=(
             ('en', gettext('English')),
@@ -116,6 +121,7 @@ def configure(db_url, **extra):
             ('de', gettext('German')),
             ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
+            ('es-mx', u'Español'),
         ),
         CMS_LANGUAGES={
             1: [
@@ -141,12 +147,17 @@ def configure(db_url, **extra):
                     'name': gettext('Brazilian Portuguese'),
                     'public': False,
                 },
+                {
+                    'code': 'es-mx',
+                    'name': u'Español',
+                    'public': True,
+                },
             ],
             2: [
                 {
                     'code': 'de',
                     'name': gettext('German'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['fr'],
                     'public': True,
                 },
                 {
@@ -159,13 +170,13 @@ def configure(db_url, **extra):
                 {
                     'code': 'nl',
                     'name': gettext('Dutch'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['de'],
                     'public': True,
                 },
                 {
                     'code': 'de',
                     'name': gettext('German'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['nl'],
                     'public': False,
                 },
             ],
@@ -190,7 +201,13 @@ def configure(db_url, **extra):
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                 'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
-                'name': gettext("left column")
+                'name': gettext("left column"),
+                'plugin_modules': {
+                    'LinkPlugin': 'Different Grouper'
+                },
+                'plugin_labes': {
+                    'LinkPlugin': 'Add a link'
+                }
             },
 
             'col_right': {
