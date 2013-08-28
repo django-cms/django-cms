@@ -272,7 +272,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         if self.parent_classes:
             return self.parent_classes
         else:
-			return None
+            return None
 
     def get_action_options(self):
         return self.action_options
