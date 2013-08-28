@@ -411,6 +411,7 @@ $(document).ready(function () {
 
 		options: {
 			'type': '', // bar, plugin or generic
+			'page_language': '',
 			'placeholder_id': null,
 			'plugin_type': '',
 			'plugin_id': null,
