@@ -330,7 +330,7 @@ class PluginChildClasses(InclusionTag):
             instance, plugin = plugin.get_plugin_instance()
             childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
             # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-            child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page.template, parent=(plugin_class, page))
+            child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
         return {'plugin_classes': child_plugin_classes}
 
 

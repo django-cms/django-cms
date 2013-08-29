@@ -5,6 +5,7 @@ from cms.utils.compat.metaclasses import with_metaclass
 import re
 
 from cms.utils import get_cms_setting
+from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
@@ -260,16 +261,35 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         return fieldsets
 
     def get_child_classes(self, slot, page):
-        from cms.plugin_pool import plugin_pool
+        template = None
+        if page:
+            template = page.template
+
+        ## config overrides..
+        ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
+        child_classes = ph_conf.get(self.__class__.__name__, None)
+        
+        if child_classes:
+            return child_classes
         if self.child_classes:
             return self.child_classes
         else:
+            from cms.plugin_pool import plugin_pool
             installed_plugins = plugin_pool.get_all_plugins(slot, page)
             return [cls.__name__ for cls in installed_plugins]
 
     def get_parent_classes(self, slot, page):
-        from cms.plugin_pool import plugin_pool
-        if self.parent_classes:
+        template = None
+        if page:
+            template = page.template
+
+        ## config overrides..
+        ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
+        parent_classes = ph_conf.get(self.__class__.__name__, None)
+        
+        if parent_classes:
+            return parent_classes
+        elif self.parent_classes:
             return self.parent_classes
         else:
             return None

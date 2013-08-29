@@ -183,7 +183,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     else:
         slot = None
     # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-    installed_plugins = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, template)
+    installed_plugins = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
 
     name = get_placeholder_conf("name", slot, template, title(slot))
     name = _(name)
