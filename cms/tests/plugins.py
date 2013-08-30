@@ -901,6 +901,103 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.content, b"It works")
 
+    def test_plugin_require_parent(self):
+        """
+        Assert that a plugin marked as 'require_parent' is not listed
+        in the plugin pool when a placeholder is specified
+        """
+        ParentRequiredPlugin = type('ParentRequiredPlugin', (CMSPluginBase,),
+                                    dict(require_parent=True))
+        plugin_pool.register_plugin(ParentRequiredPlugin)
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+
+        plugin_list = plugin_pool.get_all_plugins(placeholder=placeholder, page=page)
+        self.assertFalse(ParentRequiredPlugin in plugin_list)
+        plugin_pool.unregister_plugin(ParentRequiredPlugin)
+
+    def test_plugin_parent_classes(self):
+        """
+        Assert that a plugin with a list of parent classes only appears in the
+        toolbar plugin struct for those given parent Plugins
+        """
+        ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
+                                    dict(parent_classes=['GenericParentPlugin']))
+        GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {})
+        KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {})
+
+        expected_struct = {'module': u'Generic',
+                            'name': u'Parent Classes Plugin',
+                            'value': 'ParentClassesPlugin'}
+
+        for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
+            plugin_pool.register_plugin(plugin)
+
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+
+        from cms.utils.placeholder import get_toolbar_plugin_struct
+        toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
+                                                    placeholder.slot,
+                                                    page,
+                                                    parent=GenericParentPlugin)
+        self.assertTrue(expected_struct in toolbar_struct)
+
+        toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
+                                                    placeholder.slot,
+                                                    page,
+                                                    parent=KidnapperPlugin)
+        self.assertFalse(expected_struct in toolbar_struct)
+
+        for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
+            plugin_pool.unregister_plugin(plugin)
+
+    def test_plugin_child_classes_from_settings(self):
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+        ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
+                                    dict(child_classes=['TextPlugin']))
+        plugin_pool.register_plugin(ChildClassesPlugin)
+        plugin = add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
+        plugin = plugin.get_plugin_class_instance()
+        ## assert baseline
+        self.assertEquals(['TextPlugin'], plugin.get_child_classes(placeholder.slot, page))
+
+        CMS_PLACEHOLDER_CONF = {
+            'body': {
+                'child_classes': {
+                    'ChildClassesPlugin': ['LinkPlugin', 'PicturePlugin'],
+                }
+            }
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            self.assertEquals(['LinkPlugin', 'PicturePlugin'],
+                                plugin.get_child_classes(placeholder.slot, page))
+        plugin_pool.unregister_plugin(ChildClassesPlugin)
+
+    def test_plugin_parent_classes_from_settings(self):
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+        ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
+                                    dict(parent_classes=['TextPlugin']))
+        plugin_pool.register_plugin(ParentClassesPlugin)
+        plugin = add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
+        plugin = plugin.get_plugin_class_instance()
+        ## assert baseline
+        self.assertEquals(['TextPlugin'], plugin.get_parent_classes(placeholder.slot, page))
+
+        CMS_PLACEHOLDER_CONF = {
+            'body': {
+                'parent_classes': {
+                    'ParentClassesPlugin': ['StackPlugin'],
+                }
+            }
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            self.assertEquals(['StackPlugin'],
+                                plugin.get_parent_classes(placeholder.slot, page))
+        plugin_pool.unregister_plugin(ParentClassesPlugin)
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):

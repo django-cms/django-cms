@@ -644,3 +644,17 @@ Default: None
 A List of Plugin Class Names. If this is set, only plugins listed here can be added to this plugin.
 
     
+parent_classes
+--------------
+
+Default: None
+
+A list of Plugin Class Names.  If this is set, this plugin may only be added to plugins listed here.
+
+
+require_parent
+--------------
+
+Default: False
+
+Is it required that this plugin is a child of another plugin? Or can it be added to any placeholder, even one attached to a page.
