@@ -961,7 +961,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin = add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
         ## assert baseline
-        self.assertEquals(['TextPlugin'], plugin.get_child_classes())
+        self.assertEquals(['TextPlugin'], plugin.get_child_classes(placeholder.slot, page))
 
         CMS_PLACEHOLDER_CONF = {
             'body': {
@@ -972,7 +972,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         with SettingsOverride(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEquals(['LinkPlugin', 'PicturePlugin'],
-                                plugin.get_child_classes())
+                                plugin.get_child_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ChildClassesPlugin)
 
     def test_plugin_parent_classes_from_settings(self):
@@ -984,18 +984,18 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin = add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
         ## assert baseline
-        self.assertEquals(['TextPlugin'], plugin.get_parent_classes())
+        self.assertEquals(['TextPlugin'], plugin.get_parent_classes(placeholder.slot, page))
 
         CMS_PLACEHOLDER_CONF = {
             'body': {
-                'child_classes': {
+                'parent_classes': {
                     'ParentClassesPlugin': ['StackPlugin'],
                 }
             }
         }
         with SettingsOverride(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEquals(['StackPlugin'],
-                                plugin.get_parent_classes())
+                                plugin.get_parent_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ParentClassesPlugin)
 
 
