@@ -83,7 +83,9 @@ class PluginPool(object):
         for plugin in plugins:
             include_plugin = False
             if placeholder:
-                if allowed_plugins:
+                if plugin.require_parent:
+                    include_plugin = False
+                elif allowed_plugins:
                     if plugin.__name__ in allowed_plugins:
                         include_plugin = True
                 elif setting_key == "plugins":

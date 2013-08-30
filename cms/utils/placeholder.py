@@ -8,7 +8,7 @@ from cms.utils.compat.dj import force_unicode
 from django.db.models.query_utils import Q
 
 
-def get_toolbar_plugin_struct(plugins_list, slot, template):
+def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
     """
     Return the list of plugins to render in the toolbar.
     The dictionary contains the label, the classname and the module for the
@@ -18,11 +18,22 @@ def get_toolbar_plugin_struct(plugins_list, slot, template):
 
     :param plugins_list: list of plugins valid for the placeholder
     :param slot: placeholder slot name
-    :param template: template name
+    :param page: the page
+    :param parent: parent plugin class, if any
     :return: list of dictionaries
     """
+    template = None
+    if page:
+        template = page.template
     main_list = []
     for plugin in plugins_list:
+        if parent:
+            allowed_parents = plugin().get_parent_classes(slot, page)
+            ## skip to the next if this plugin is not allowed to be a child
+            ## of the parent
+            if allowed_parents and parent.__name__ not in allowed_parents:
+                continue
+
         modules = get_placeholder_conf("plugin_modules", slot, template, default={})
         names = get_placeholder_conf("plugin_labes", slot, template, default={})
         main_list.append({'value': plugin.value,
