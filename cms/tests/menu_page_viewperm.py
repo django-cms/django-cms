@@ -13,6 +13,11 @@ from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from menus.menu_pool import menu_pool
 
+__all__ = [
+    'ViewPermissionTreeBugTests',
+    'ViewPermissionComplexMenuAllNodesTests'
+]
+
 
 class ViewPermissionTests(SettingsOverrideTestCase):
     """

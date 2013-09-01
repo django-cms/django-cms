@@ -29,7 +29,7 @@ def main(db_url="sqlite://localhost/:memory:", test_runner='cms.test_utils.runne
 
             test_runner = TestRunner(verbosity=verbosity, interactive=False, failfast=failfast)
             failures = test_runner.run_tests(test_labels)
-    sys.exit(failures)
+    return failures
 
 
 if __name__ == '__main__':
@@ -55,6 +55,7 @@ if __name__ == '__main__':
     time_tests = getattr(args, 'time_tests', False)
     test_labels = ['cms.%s' % label for label in args.test_labels]
     db_url = os.environ.get('DATABASE_URL', args.db)
-    main(db_url, test_runner=test_runner, junit_output_dir=junit_output_dir, time_tests=time_tests,
+    failures = main(db_url, test_runner=test_runner, junit_output_dir=junit_output_dir, time_tests=time_tests,
          verbosity=args.verbosity, failfast=args.failfast, test_labels=test_labels)
+    sys.exit(failures)
 
