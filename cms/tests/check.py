@@ -56,7 +56,7 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_no_sekizai(self):
-        with SettingsOverride(INSTALLED_APPS=[]):
+        with SettingsOverride(INSTALLED_APPS=['cms']):
             self.assertCheck(False, errors=2)
 
     def test_no_sekizai_template_context_processor(self):

@@ -1,0 +1,222 @@
+#!/bin/env python
+from __future__ import print_function
+import multiprocessing
+import pkgutil
+import pyclbr
+import subprocess
+import os
+import sys
+import warnings
+
+from docopt import docopt
+from django import VERSION
+from django.utils import autoreload
+
+from cms import __version__
+from cms.test_utils.cli import configure
+from cms.test_utils.tmpdir import temp_dir
+
+__doc__ = '''django CMS development helper script. 
+
+To use a different database, set the DATABASE_ENV environment variable to a
+dj-database-url compatible value.
+
+Usage:
+    develop.py test [--parallel | --failfast] [<test-label>...]
+    develop.py timed test [test-label...]
+    develop.py isolated test [<test-label>...]
+    develop.py bisect test <test-label>
+    develop.py server [--port=<port>] [--bind=<bind>]
+    develop.py shell
+    develop.py compilemessages
+
+Options:
+    -h --help                   Show this screen.
+    --version                   Show version.
+    --parallel                  Run tests in parallel.
+    --failfast                  Stop tests on first failure (only if not --parallel).
+    --port=<port>               Port to listen on [default: 8000].
+    --bind=<bind>               Interface to bind to [default: 127.0.0.1].
+'''
+
+
+def server(bind='127.0.0.1', port=8000):
+    if os.environ.get("RUN_MAIN") != "true":
+        from south.management.commands import syncdb, migrate
+        syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
+        migrate.Command().handle(interactive=False, verbosity=1)
+        from django.contrib.auth.models import User
+        if not User.objects.filter(is_superuser=True).exists():
+            usr = User()
+            usr.username = 'admin'
+            usr.email = 'admin@admin.com'
+            usr.set_password('admin')
+            usr.is_superuser = True
+            usr.is_staff = True
+            usr.is_active = True
+            usr.save()
+            print('')
+            print("A admin user (username: admin, password: admin) has been created.")
+            print('')
+    from django.contrib.staticfiles.management.commands import runserver
+    rs = runserver.Command()
+    rs.stdout = sys.stdout
+    rs.stderr = sys.stderr
+    rs.use_ipv6 = False
+    rs._raw_ipv6 = False
+    rs.addr = bind
+    rs.port = port
+    autoreload.main(rs.inner_run, (), {
+        'addrport': '%s:%s' % (bind, port),
+        'insecure_serving': True,
+        'use_threading': True
+    })
+
+def _split(itr, num):
+    split = []
+    size = int(len(itr) / num)
+    for index in range(num):
+        split.append(itr[size * index:size * (index + 1)])
+    return split
+
+def _get_test_labels():
+    test_labels = []
+    for module in [name for _, name, _ in pkgutil.iter_modules([os.path.join("cms","tests")])]:
+        clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+        for clsname, cls in clsmembers.items():
+            for method, _ in cls.methods.items():
+                if method.startswith('test_'):
+                    test_labels.append('cms.%s.%s' % (clsname, method))
+    return test_labels
+
+def _test_run_worker(test_labels, failfast=False, test_runner='django.test.simple.DjangoTestSuiteRunner'):
+    warnings.filterwarnings(
+        'error', r"DateTimeField received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+    from django.conf import settings
+    settings.TEST_RUNNER = test_runner
+    from django.test.utils import get_runner
+    TestRunner = get_runner(settings)
+
+    test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
+    failures = test_runner.run_tests(test_labels)
+    return failures
+
+def _test_in_subprocess(test_labels):
+    return subprocess.call(['python', 'develop.py', 'test'] + test_labels)
+
+def isolated(test_labels):
+    test_labels = test_labels or _get_test_labels()
+    failures = []
+    for test_label in test_labels:
+        if _test_in_subprocess([test_label]) > 0:
+            failures.append(test_label)
+    return failures
+
+def timed(test_labels):
+    return _test_run_worker(test_labels, test_runner='cms.test_utils.runners.TimedTestRunner')
+
+def bisect(test_label):
+    test_labels = _get_test_labels()
+    test_labels.remove(test_label)
+    if _test_in_subprocess([test_label]) == 0:
+        print("Test passes standalone, stopping")
+        return None
+    half = int(len(test_labels) / 2)
+    left, right = test_labels[:half], test_labels[half:]
+    while left and right:
+        if _test_in_subprocess(left + [test_label]) == 0:
+            half = int(len(left) / 2)
+            left, right = left[:half], left[half:]
+            if not left and right:
+                return (left or right)[0]
+        elif _test_in_subprocess(right + [test_label]) == 0:
+            half = int(len(right) / 2)
+            left, right = right[:half], right[half:]
+            if not left and right:
+                return (left or right)[0]
+        else:
+            print("Both halves fail, stopping")
+            return None
+
+def test(test_labels, parallel=False, failfast=False):
+    test_labels = test_labels or _get_test_labels()
+    if parallel:
+        worker_tests = _split(test_labels, multiprocessing.cpu_count())
+
+        pool = multiprocessing.Pool()
+        failures = sum(pool.map(_test_run_worker, worker_tests))
+        return failures
+    else:
+        return _test_run_worker(test_labels, failfast)
+
+def compilemessages():
+    from django.core.management import call_command
+    os.chdir('cms')
+    call_command('compilemessages', all=True)
+
+def makemessages():
+    from django.core.management import call_command
+    os.chdir('cms')
+    call_command('makemessages', all=True)
+
+def shell():
+    from django.core.management import call_command
+    call_command('shell')
+
+if __name__ == '__main__':
+    args = docopt(__doc__, version=__version__)
+
+    # configure django
+    warnings.filterwarnings(
+        'error', r"DateTimeField received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+
+    default_name = ':memory:' if args['test'] else 'local.sqlite'
+
+    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+
+    with temp_dir() as STATIC_ROOT, temp_dir() as MEDIA_ROOT:
+        use_tz = VERSION[:2] >= (1, 4)
+        configure(db_url=db_url,
+            ROOT_URLCONF='cms.test_utils.project.urls',
+            STATIC_ROOT=STATIC_ROOT,
+            MEDIA_ROOT=MEDIA_ROOT,
+            USE_TZ=use_tz
+        )
+
+        # run
+        if args['test']:
+            if args['isolated']:
+                failures = isolated(args['<test-label>'])
+                print()
+                print("Failed tests")
+                print("============")
+                if failures:
+                    for failure in failures:
+                        print(" - %s" % failure)
+                else:
+                    print(" None")
+                num_failures = len(failures)
+            elif args['timed']:
+                num_failures = timed(args['<test-label>'])
+            elif args['bisect']:
+                offender = bisect(args['<test-label>'][0])
+                print()
+                if offender:
+                    print("Passes with %s" % offender)
+                    num_failures = 0
+                else:
+                    print("No combination found that passes")
+                    num_failures = 1
+            else:
+                num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
+            sys.exit(num_failures)
+        elif args['server']:
+            server(args['--bind'], args['--port'])
+        elif args['shell']:
+            shell()
+        elif args['compilemessages']:
+            compilemessages()
+        elif args['makemessages']:
+            compilemessages()
