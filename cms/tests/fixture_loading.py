@@ -15,17 +15,13 @@ from cms.models import Page
 
 
 class FixtureTestCase(NavextendersFixture, SettingsOverrideTestCase):
-    settings_overrides = {
-        'USE_TZ': False
-    }
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_fixture_load(self):
+        """
+        This test dumps a live set of pages, cleanup the database and load it
+        again.
+        This makes fixtures unnecessary and it's easier to maintain.
+        """
         output = StringIO()
         dump = tempfile.mkstemp(".json")
         call_command('dumpdata', 'cms', indent=3, stdout=output)
@@ -35,5 +31,7 @@ class FixtureTestCase(NavextendersFixture, SettingsOverrideTestCase):
             dumpfile.write(output.read())
 
         self.assertEqual(0, Page.objects.count())
+        # Transaction disable, otherwise the connection it the test would be
+        # isolated from the data loaded in the different command connection
         call_command('loaddata', dump[1], commit=False, stdout=output)
         self.assertEqual(10, Page.objects.count())
