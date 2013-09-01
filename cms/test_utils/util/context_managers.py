@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 from django.conf import settings
 from django.core.signals import request_started
 from django.db import reset_queries
@@ -192,3 +193,11 @@ class _AssertNumQueriesContext(object):
                 executed, self.num, queries
             )
         )
+
+
+@contextmanager
+def disable_logger(logger):
+    old = logger.disabled
+    logger.disabled = True
+    yield
+    logger.disabled = old
