@@ -90,7 +90,7 @@ def _ensure_languages_settings_new(languages):
 
     for key in defaults:
         if key not in valid_language_keys:
-            raise ImproperlyConfigured("CMS_LANGUAGES has an invalid property in the default properties: s" % key)
+            raise ImproperlyConfigured("CMS_LANGUAGES has an invalid property in the default properties: %s" % key)
 
     for key in simple_defaults:
         if key not in defaults:
