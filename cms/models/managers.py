@@ -330,16 +330,27 @@ class PagePermissionManager(BasicPagePermissionManager):
         from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, \
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE
 
-        parents = Q(page__tree_id=page.tree_id, page__lft__lte=page.lft, page__rght__gte=page.rght) & (
+        parents = Q(page__tree_id=page.tree_id) & (
             Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
         direct_parents = Q(
             page__tree_id=page.tree_id,
-            page__lft__lte=page.lft,
-            page__rght__gte=page.rght,
             page__level=page.level - 1) & \
             (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
         page_qs = Q(page=page) & (
             Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) | Q(grant_on=ACCESS_PAGE))
+
+        if page.lft:
+            parents = parents & Q(page__lft__lte=page.lft)
+            direct_parents = direct_parents & Q(page__lft__lte=page.lft)
+        else:
+            parents = parents & Q(page__lft__isnull=True)
+            direct_parents = direct_parents & Q(page__lft__isnull=True)
+        if page.rght:
+            parents = parents & Q(page__rght__gte=page.rght)
+            direct_parents = direct_parents & Q(page__rght__gte=page.rght)
+        else:
+            parents = parents & Q(page__rght__isnull=True)
+            direct_parents = direct_parents & Q(page__rght__isnull=True)
 
         query = (parents | direct_parents | page_qs)
         return self.filter(query).order_by('page__level')
