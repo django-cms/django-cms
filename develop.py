@@ -24,8 +24,7 @@ dj-database-url compatible value.
 Usage:
     develop.py test [--parallel | --failfast] [<test-label>...]
     develop.py timed test [test-label...]
-    develop.py isolated test [<test-label>...]
-    develop.py bisect test <test-label>
+    develop.py isolated test [<test-label>...] [--parallel]
     develop.py server [--port=<port>] [--bind=<bind>]
     develop.py shell
     develop.py compilemessages
@@ -105,39 +104,19 @@ def _test_run_worker(test_labels, failfast=False, test_runner='django.test.simpl
 def _test_in_subprocess(test_labels):
     return subprocess.call(['python', 'develop.py', 'test'] + test_labels)
 
-def isolated(test_labels):
+def isolated(test_labels, parallel=False):
     test_labels = test_labels or _get_test_labels()
-    failures = []
-    for test_label in test_labels:
-        if _test_in_subprocess([test_label]) > 0:
-            failures.append(test_label)
+    if parallel:
+        pool = multiprocessing.Pool()
+        mapper = pool.map
+    else:
+        mapper = map
+    results = mapper(_test_in_subprocess, ([test_label] for test_label in test_labels))
+    failures = [test_label for test_label, return_code in zip(test_labels, results) if return_code != 0]
     return failures
 
 def timed(test_labels):
     return _test_run_worker(test_labels, test_runner='cms.test_utils.runners.TimedTestRunner')
-
-def bisect(test_label):
-    test_labels = _get_test_labels()
-    test_labels.remove(test_label)
-    if _test_in_subprocess([test_label]) == 0:
-        print("Test passes standalone, stopping")
-        return None
-    half = int(len(test_labels) / 2)
-    left, right = test_labels[:half], test_labels[half:]
-    while left and right:
-        if _test_in_subprocess(left + [test_label]) == 0:
-            half = int(len(left) / 2)
-            left, right = left[:half], left[half:]
-            if not left and right:
-                return (left or right)[0]
-        elif _test_in_subprocess(right + [test_label]) == 0:
-            half = int(len(right) / 2)
-            left, right = right[:half], right[half:]
-            if not left and right:
-                return (left or right)[0]
-        else:
-            print("Both halves fail, stopping")
-            return None
 
 def test(test_labels, parallel=False, failfast=False):
     test_labels = test_labels or _get_test_labels()
@@ -188,7 +167,7 @@ if __name__ == '__main__':
         # run
         if args['test']:
             if args['isolated']:
-                failures = isolated(args['<test-label>'])
+                failures = isolated(args['<test-label>'], args['--parallel'])
                 print()
                 print("Failed tests")
                 print("============")
@@ -200,15 +179,6 @@ if __name__ == '__main__':
                 num_failures = len(failures)
             elif args['timed']:
                 num_failures = timed(args['<test-label>'])
-            elif args['bisect']:
-                offender = bisect(args['<test-label>'][0])
-                print()
-                if offender:
-                    print("Passes with %s" % offender)
-                    num_failures = 0
-                else:
-                    print("No combination found that passes")
-                    num_failures = 1
             else:
                 num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
             sys.exit(num_failures)
