@@ -137,7 +137,7 @@ class PublishingTests(TestCase):
         with self.login_user_context(superuser):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk]))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], "http://testserver/en/?edit_off")
+            self.assertEqual(response['Location'], "http://testserver/?edit_off")
 
     def test_publish_single(self):
         name = self._testMethodName
@@ -430,7 +430,7 @@ class PublishingTests(TestCase):
         child = self.create_page("Child", parent=page, published=True)
         self.create_page("Grandchild", parent=child, published=True)
         page = page.reload()
-        child = child.reload()
+        child.reload()
         drafts = Page.objects.drafts()
         public = Page.objects.public()
         published = Page.objects.public().published()
