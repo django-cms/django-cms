@@ -71,8 +71,9 @@ the templatetag::
 Special attributes
 ******************
 
-The ``attribute`` argument of the templatetag is not required to be a field of
-the model, you can also use a property or a method as a target.
+The ``attribute`` argument of the templatetag is not required to be a model field,
+property or method can also be used as target; in case of a method, it will be
+called with request as argument.
 
 .. _custom-views:
 
@@ -83,12 +84,13 @@ Custom views
 You can link any field to a custom view (not necessarily an admin view) to handle
 model-specific editing workflow.
 
-The custom view can be passed either as a named url (``view_url``) or as name
-(``view_method``) of a method (or property) on the instance being edited.
+The custom view can be passed either as a named url (``view_url`` parameter)
+or as name of a method (or property) on the instance being edited
+(``view_method`` parameter).
 In case you provide ``view_method`` it will be called whenever the templatetag is
-evaluated with ``request`` as first parameter.
+evaluated with ``request`` as parameter.
 
-The custom view does not need to obey any specific interface, but it will get
+The custom view does not need to obey any specific interface; it will get
 ``edit_fields`` value as a ``GET`` parameter.
 
 See `templatetag reference <show_editable_model_reference>`_ for arguments documentation.
