@@ -116,7 +116,7 @@ Example ``view_method``::
     {% load placeholder_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "some_method" %}</h1>
+    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "" "some_method" %}</h1>
     {% endblock content %}
 
 .. _show_editable_model_reference:
