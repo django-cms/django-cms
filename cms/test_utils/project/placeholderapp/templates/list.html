@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+{% for example in examples %}
+<h2><a href="{{example.get_absolute_url}}">!!{{example}}</a></h2>
+{% endfor %}
+{% endblock content %}
