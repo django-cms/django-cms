@@ -298,7 +298,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load placeholder_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "admin:placeholderapp_example1_edit_field" %}</h1>
+<h1>{% show_editable_model instance "callable_item" "char_1" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -315,7 +315,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load placeholder_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "admin:placeholderapp_example1_edit_field" "char_2" %}</h1>
+<h1>{% show_editable_model instance "callable_item" "char_2" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -334,7 +334,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load placeholder_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "admin:placeholderapp_example1_edit_field" "char_1,char_2" %}</h1>
+<h1>{% show_editable_model instance "callable_item" "char_1,char_2" "en" "admin:placeholderapp_example1_edit_field" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
