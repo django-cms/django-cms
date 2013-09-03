@@ -37,10 +37,10 @@ class CMSEditableObject(InclusionTag):
     options = Options(
         Argument('instance'),
         Argument('attribute'),
-        Argument('view_url', default=None, required=False),
         Argument('edit_fields', default=None, required=False),
-        Argument('view_method', default=None, required=False),
         Argument('language', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
     )
 
     def _is_editable(self, request):
@@ -52,19 +52,17 @@ class CMSEditableObject(InclusionTag):
             return self.edit_template
         return self.template
 
-    def get_context(self, context, instance, attribute, view_url, edit_fields,
-                    view_method, language):
+    def get_context(self, context, instance, attribute, edit_fields, language,
+                    view_url, view_method):
         if not language:
             language = get_language_from_request(context['request'])
         # This allow the requested item to be a method, a property or an
         # attribute
-        context['item'] = getattr(instance, attribute, '')
         context['attribute_name'] = attribute
         querystring = {'language': language}
         if edit_fields:
             context['edit_fields'] = edit_fields.split(",")
-        else:
-            context['edit_fields'] = (attribute, )
+        context['item'] = getattr(instance, attribute, '')
         if callable(context['item']):
             context['item'] = context['item']()
         # If the toolbar is not enabled the following part is just skipped: it
@@ -85,11 +83,14 @@ class CMSEditableObject(InclusionTag):
             else:
                 # The default view_url is the default admin changeform for the
                 # current instance
-                if not view_url:
+                if not edit_fields:
                     view_url = 'admin:%s_%s_change' % (
                         instance._meta.app_label, instance._meta.module_name)
                     url_base = reverse(view_url, args=(instance.pk,))
                 else:
+                    if not view_url:
+                        view_url = 'admin:%s_%s_edit_field' % (
+                            instance._meta.app_label, instance._meta.module_name)
                     url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             context['admin_url'] = "%s?%s" % (url_base, urlencode(querystring))
