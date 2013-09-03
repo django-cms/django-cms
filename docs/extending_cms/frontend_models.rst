@@ -29,7 +29,7 @@ Add ``show_editable_model``::
     <h1>{% show_editable_model instance "some_attribute" %}</h1>
     {% endblock content %}
 
-See `templatetag reference <show_editable_model_reference>`_ for description of arguments.
+See `templatetag reference <show_editable_model_reference>`_ for arguments documentation.
 
 ********************
 Selected fields edit
@@ -80,23 +80,41 @@ the model, you can also use a property or a method as a target.
 Custom views
 ************
 
-You can link any field to a custom view (not necessarily an admin view); in any
-case your view does not need to obey any specific interface, other than
-possibly check to ``_popup`` query string parameter to select a popup-enabled
-template.
+You can link any field to a custom view (not necessarily an admin view) to handle
+model-specific editing workflow.
 
-Custom views can be specified by either passing the ``view_url`` attribute
-(which will be passed to the ``reverse`` function with the instance ``pk`` and
-``language`` arguments) or by using the ``view_method`` to pass a method
-(or property) of the model instance; this property / method must return
-a complete URL.
+The custom view can be passed either as a named url (``view_url``) or as name
+(``view_method``) of a method (or property) on the instance being edited.
+In case you provide ``view_method`` it will be called whenever the templatetag is
+evaluated with ``request`` as first parameter.
 
-Example::
+The custom view does not need to obey any specific interface, but it will get
+``edit_fields`` value as a ``GET`` parameter.
+
+See `templatetag reference <show_editable_model_reference>`_ for arguments documentation.
+
+Example ``view_url``::
 
     {% load placeholder_tags %}
 
     {% block content %}
     <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "admin:exampleapp_example1_some_view" %}</h1>
+    {% endblock content %}
+
+
+Example ``view_method``::
+    
+    class MyModel(models.Model):
+        char = models.CharField(max_length=10)
+        
+        def some_method(self, request):
+            return "/some/url"
+    
+
+    {% load placeholder_tags %}
+
+    {% block content %}
+    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "some_method" %}</h1>
     {% endblock content %}
 
 .. _show_editable_model_reference:
@@ -125,8 +143,9 @@ Arguments:
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
 * ``view_url`` (optional): the name of a url that will be reversed using the
-  instance ``pk`` and the ``attribute`` (or ``edit_field``) as arguments;
+  instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
 
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
