@@ -34,4 +34,4 @@ class FixtureTestCase(NavextendersFixture, SettingsOverrideTestCase):
         # Transaction disable, otherwise the connection it the test would be
         # isolated from the data loaded in the different command connection
         call_command('loaddata', dump[1], commit=False, stdout=output)
-        self.assertEqual(10, Page.objects.count())
+        self.assertEqual(5, Page.objects.count())
