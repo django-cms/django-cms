@@ -797,7 +797,7 @@ class PlaceholderI18NTest(CMSTestCase):
         user = self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/multilingualexample1/1/')
+        response = self.client.get('/de/admin/placeholderapp/multilingualexample1/%d/' % ex.pk)
         self.assertContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
 
@@ -812,7 +812,7 @@ class PlaceholderI18NTest(CMSTestCase):
         user = self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/example1/1/')
+        response = self.client.get('/de/admin/placeholderapp/example1/%d/' % ex.pk)
         self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_placeholder_tabs(self):
@@ -826,7 +826,7 @@ class PlaceholderI18NTest(CMSTestCase):
         user = self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/1/')
+        response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/%d/' % ex.pk)
         self.assertNotContains(response,
                                """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
 
