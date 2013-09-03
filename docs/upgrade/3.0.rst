@@ -218,3 +218,10 @@ The command can be run with::
     manage.py cms copy_lang from_lang to_lang
 
 Please read :ref:`cms-copy-lang-command` before using.
+
+
+Frontedit editor for Django models
+==================================
+
+Starting from 3.0 you can use :ref:`show_editable_model <frontend-editable-fields>` templatetag
+to edit any Django models in the frontend editor.
