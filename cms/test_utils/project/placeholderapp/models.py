@@ -20,7 +20,7 @@ class Example1(models.Model):
     char_4 = models.CharField(u'char_4', max_length=255)
     placeholder = PlaceholderField('placeholder')
 
-    def callable_item(self):
+    def callable_item(self, request):
         return self.char_1
 
     def __str__(self):

@@ -64,7 +64,7 @@ class CMSEditableObject(InclusionTag):
             context['edit_fields'] = edit_fields.split(",")
         context['item'] = getattr(instance, attribute, '')
         if callable(context['item']):
-            context['item'] = context['item']()
+            context['item'] = context['item'](context['request'])
         # If the toolbar is not enabled the following part is just skipped: it
         # would cause a perfomance hit for no reason
         if self._is_editable(context.get('request', None)):

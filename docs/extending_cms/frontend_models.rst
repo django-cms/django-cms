@@ -56,8 +56,8 @@ a tuple of fields editable from the frontend admin::
 Set up the template
 ===================
 
-Then add a the comma separated list of fields (or just the name of one field)
-to the templatetag::
+Then add comma separated list of fields (or just the name of one field) to
+the templatetag::
 
     {% load placeholder_tags %}
 
