@@ -21,7 +21,7 @@ up the your model's template.
 Set up the template
 ===================
 
-Add ``show_editable_model``:
+Add ``show_editable_model``::
 
     {% load placeholder_tags %}
 
@@ -35,15 +35,15 @@ See `templatetag reference <show_editable_model_reference>`_ for description of 
 Selected fields edit
 ********************
 
-Frontend editing is also possible for a restricted set of fields, although not
-as automatic as the example above.
+Frontend editing is also possible for a set of fields, although not as
+automatic as the example above.
 
 Set up the admin
 ================
 
 First you need to properly setup your admin class by adding the
 ``FrontendEditableAdmin`` mixin to the parents of your admin class and declaring
-a tuple of fields editable from the frontend admin
+a tuple of fields editable from the frontend admin::
 
     from cms.admin.placeholderadmin import FrontendEditableAdmin
     from django.contrib import admin
@@ -56,33 +56,13 @@ a tuple of fields editable from the frontend admin
 Set up the template
 ===================
 
-If you only want to edit the fields to be rendered in the page just add
-``show_editable_model`` to your template:
+Then add a the comma separated list of fields (or just the name of one field)
+to the templatetag::
 
     {% load placeholder_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "some_field" "admin:exampleapp_example1_edit_field" %}</h1>
-    {% endblock content %}
-
-The ``admin:exampleapp_example1_edit_field`` string must be changed according
-to your application and model names (e.g.: is the application is named ``news``
-and the model is called ``NewsModel`` you'd write the string
-``admin:news_newsmodel_edit_field``).
-The ``edit_field`` is provided by ``FrontendEditableAdmin`` mixin, so you're not
-required to write your own admin view (but you can do that, if you want, see
-`Custom views <custom-views>`_).
-
-Edit multiple fields
-====================
-
-If you want to edit multiple fields at once use the templatetag ``edit_fields``
-attribute:
-
-    {% load placeholder_tags %}
-
-    {% block content %}
-    <h1>{% show_editable_model instance "some_field" "admin:exampleapp_example1_edit_field" "char_1,char_2" %}</h1>
+    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" %}</h1>
     {% endblock content %}
 
 
@@ -93,9 +73,6 @@ Special attributes
 
 The ``attribute`` argument of the templatetag is not required to be a field of
 the model, you can also use a property or a method as a target.
-
-If you use property or method and link it to single field edit, you **must**
-provide the ``edit_fields`` argument to target a specific field to edit.
 
 .. _custom-views:
 
@@ -110,9 +87,17 @@ template.
 
 Custom views can be specified by either passing the ``view_url`` attribute
 (which will be passed to the ``reverse`` function with the instance ``pk`` and
-``attribute_name`` parameters) or by using the ``view_method`` to pass a
-method (or property) of the model instance; this property / method must return
+``language`` arguments) or by using the ``view_method`` to pass a method
+(or property) of the model instance; this property / method must return
 a complete URL.
+
+Example::
+
+    {% load placeholder_tags %}
+
+    {% block content %}
+    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "admin:exampleapp_example1_some_view" %}</h1>
+    {% endblock content %}
 
 .. _show_editable_model_reference:
 
@@ -135,13 +120,13 @@ Arguments:
 * ``attribute``: the name of the attribute you want to show in the template; it
   can be a context variable name; it's possible to target field, property or
   callable for the specified model;
-* ``view_url`` (optional): the name of a url that will be reversed using the
-  instance ``pk`` and the ``attribute`` (or ``edit_field``) as arguments;
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
   popup editor;
-* ``view_method`` (optional): a method name that will return a URL to a view;
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``attribute`` (or ``edit_field``) as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
 
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
