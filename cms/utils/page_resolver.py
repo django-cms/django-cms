@@ -13,6 +13,7 @@ from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
 from cms.utils.urlutils import any_path_re
+from cms.utils.i18n import force_language, get_languages_for_page_user, get_fallback_languages
 
 ADMIN_PAGE_RE_PATTERN = ur'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
@@ -34,6 +35,16 @@ def get_page_queryset(request=None):
         return Page.objects.drafts()
 
     return Page.objects.public()
+
+
+def get_fallback_path(page, current_language, current_user=None, allowed_languages=None):
+    if allowed_languages is None:
+        allowed_languages = get_languages_for_page_user(page=page, user=current_user)
+
+    for fallback_language in get_fallback_languages(current_language):
+        if fallback_language in allowed_languages:
+            with force_language(fallback_language):
+                return page.get_absolute_url(language=fallback_language, fallback=True)
 
 
 def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
