@@ -1,6 +1,5 @@
 from __future__ import with_statement
 import re
-import copy
 
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
