@@ -10,9 +10,10 @@ from cms.utils.i18n import (
     get_languages_for_page_user,
     get_languages_for_user,
     get_redirect_on_fallback,
-    is_language_prefix_patterns_used
+    is_language_prefix_patterns_used,
+    get_fallback_languages,
 )
-from cms.utils.page_resolver import get_fallback_path, get_page_from_request
+from cms.utils.page_resolver import get_fallback_languages_for_page, get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 
 from django.conf import settings
@@ -61,7 +62,7 @@ def details(request, slug):
     # which is defined in FRONTEND_LANGUAGES:
     if not current_language in get_languages_for_user(user=request.user):
         #are we on root?
-        if slug and available_languages:
+        if not slug and available_languages:
             #redirect to supported language
             languages = [(language, language) for language in available_languages]
             with SettingsOverride(LANGUAGES=languages, LANGUAGE_CODE=languages[0][0]):
@@ -75,15 +76,21 @@ def details(request, slug):
             return _handle_no_page(request, slug)
 
     if current_language not in available_languages:
-        new_path = get_fallback_path(page, current_language, request.user)
-        if new_path and get_redirect_on_fallback(current_language):
-            return HttpResponseRedirect(new_path + attrs)
+        fallback_languages = get_fallback_languages_for_page(page, current_language, request.user)
+        if fallback_languages:
+            if get_redirect_on_fallback(current_language):
+                fallback_language = fallback_languages[0]
+                with force_language(fallback_language):
+                    path = page.get_absolute_url(language=fallback_language, fallback=True) + attrs
+                    return HttpResponseRedirect(path)
         else:
             # There is a page object we can't find a proper language to render it
             return _handle_no_page(request, slug)
     else:
         page_path = page.get_absolute_url(language=current_language)
-        if request.path[:len(page_path)] != page_path:
+        page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)
+
+        if slug != page_slug and request.path[:len(page_path)] != page_path:
             # The current language does not match it's slug.
             # Redirect to the current language.
             return HttpResponseRedirect(page_path + attrs)

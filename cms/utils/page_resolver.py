@@ -37,14 +37,10 @@ def get_page_queryset(request=None):
     return Page.objects.public()
 
 
-def get_fallback_path(page, current_language, current_user=None, allowed_languages=None):
+def get_fallback_languages_for_page(page, current_language, current_user=None, allowed_languages=None):
     if allowed_languages is None:
         allowed_languages = get_languages_for_page_user(page=page, user=current_user)
-
-    for fallback_language in get_fallback_languages(current_language):
-        if fallback_language in allowed_languages:
-            with force_language(fallback_language):
-                return page.get_absolute_url(language=fallback_language, fallback=True)
+    return [language for language in get_fallback_languages(current_language) if language in allowed_languages]
 
 
 def get_page_queryset_from_path(path, preview=False, draft=False, site=None):

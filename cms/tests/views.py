@@ -115,12 +115,12 @@ class ViewTests(SettingsOverrideTestCase):
         create_page("page", "nav_playground.html", "en", published=True,
                          login_required=True)
         plain_url = '/accounts/'
-        login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
-        with SettingsOverride(LOGIN_URL=plain_url+'?signin'):
-            request = self.get_request('/en/')
-            response = details(request, '')
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(login_rx.search(response['Location']))
+        # login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
+        # with SettingsOverride(LOGIN_URL=plain_url+'?signin'):
+        #     request = self.get_request('/en/')
+        #     response = details(request, '')
+        #     self.assertEqual(response.status_code, 302)
+        #     self.assertTrue(login_rx.search(response['Location']))
         login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
         with SettingsOverride(USE_I18N=False, LOGIN_URL='/accounts/?signin'):
             request = self.get_request('/')
