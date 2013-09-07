@@ -88,7 +88,6 @@ def details(request, slug):
     else:
         page_path = page.get_absolute_url(language=current_language)
         page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)
-
         if slug and slug != page_slug and request.path[:len(page_path)] != page_path:
             # The current language does not match it's slug.
             # Redirect to the current language.

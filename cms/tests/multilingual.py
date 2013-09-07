@@ -238,15 +238,15 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         from cms.views import details
         p1 = create_page("page", "nav_playground.html", "en", published=True)
         request = self.get_request('/de/', 'de')
-        #response = details(request, p1.get_path())
-        #self.assertEqual(response.status_code, 302)
-        #self.assertEqual(response['Location'], '/en/')
+        response = details(request, p1.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], '/en/')
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['fallbacks'] = []
         lang_settings[1][1]['fallbacks'] = []
-        #with SettingsOverride(CMS_LANGUAGES=lang_settings):
-            #response = self.client.get("/de/")
-            #self.assertEquals(response.status_code, 404)
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+            response = self.client.get("/de/")
+            self.assertEquals(response.status_code, 404)
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['redirect_on_fallback'] = False
         lang_settings[1][1]['redirect_on_fallback'] = False

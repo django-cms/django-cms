@@ -1,13 +1,16 @@
 from __future__ import with_statement
 import re
+import copy
 
-from django.contrib.auth.models import Permission
-from cms.api import create_page
+from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.views import _handle_no_page, details
+from cms.utils.i18n import force_language
+
+from django.contrib.auth.models import Permission
 from django.conf import settings
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404, HttpResponse
@@ -38,6 +41,20 @@ class ViewTests(SettingsOverrideTestCase):
             slug = ''
             response = _handle_no_page(request, slug)
             self.assertEqual(response.status_code, 200)
+
+    def test_incorrect_slug_for_language(self):
+        """
+        Test details view when page slug and current language don't match.
+        In this case we refer to the user's current language and the page slug we have for that language.
+        """
+        create_page("home", "nav_playground.html", "en", published=True)
+        cms_page = create_page("stevejobs", "nav_playground.html", "en", published=True)
+        create_title("de", "jobs", cms_page)
+        cms_page.publish()
+        with force_language("de"):
+            response = self.client.get('/de/stevejobs/')
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, '/de/jobs/')
 
     def test_apphook_not_hooked(self):
         """
