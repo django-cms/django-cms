@@ -11,7 +11,6 @@ from cms.utils.i18n import (
     get_languages_for_user,
     get_redirect_on_fallback,
     is_language_prefix_patterns_used,
-    get_fallback_languages,
 )
 from cms.utils.page_resolver import get_fallback_languages_for_page, get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -90,7 +89,7 @@ def details(request, slug):
         page_path = page.get_absolute_url(language=current_language)
         page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)
 
-        if slug != page_slug and request.path[:len(page_path)] != page_path:
+        if slug and slug != page_slug and request.path[:len(page_path)] != page_path:
             # The current language does not match it's slug.
             # Redirect to the current language.
             return HttpResponseRedirect(page_path + attrs)
