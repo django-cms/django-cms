@@ -1,3 +1,5 @@
+.. _frontend-editable-fields:
+
 ##################################
 Frontend editing for Django models
 ##################################
