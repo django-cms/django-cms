@@ -18,7 +18,7 @@ from cms.test_utils.tmpdir import temp_dir
 
 __doc__ = '''django CMS development helper script. 
 
-To use a different database, set the DATABASE_ENV environment variable to a
+To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
