@@ -113,7 +113,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (len(plugins) == 0 and placeholder and get_fallback_languages(lang) and
+    fallbacks = get_fallback_languages(lang)
+    if (len(plugins) == 0 and placeholder and fallbacks and
             get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
         fallbacks = get_fallback_languages(lang)
         for fallback_language in fallbacks:
