@@ -155,38 +155,39 @@ if __name__ == '__main__':
 
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
 
-    with temp_dir() as STATIC_ROOT, temp_dir() as MEDIA_ROOT:
-        use_tz = VERSION[:2] >= (1, 4)
-        configure(db_url=db_url,
-            ROOT_URLCONF='cms.test_utils.project.urls',
-            STATIC_ROOT=STATIC_ROOT,
-            MEDIA_ROOT=MEDIA_ROOT,
-            USE_TZ=use_tz
-        )
+    with temp_dir() as STATIC_ROOT:
+        with temp_dir() as MEDIA_ROOT:
+            use_tz = VERSION[:2] >= (1, 4)
+            configure(db_url=db_url,
+                ROOT_URLCONF='cms.test_utils.project.urls',
+                STATIC_ROOT=STATIC_ROOT,
+                MEDIA_ROOT=MEDIA_ROOT,
+                USE_TZ=use_tz
+            )
 
-        # run
-        if args['test']:
-            if args['isolated']:
-                failures = isolated(args['<test-label>'], args['--parallel'])
-                print()
-                print("Failed tests")
-                print("============")
-                if failures:
-                    for failure in failures:
-                        print(" - %s" % failure)
+            # run
+            if args['test']:
+                if args['isolated']:
+                    failures = isolated(args['<test-label>'], args['--parallel'])
+                    print()
+                    print("Failed tests")
+                    print("============")
+                    if failures:
+                        for failure in failures:
+                            print(" - %s" % failure)
+                    else:
+                        print(" None")
+                    num_failures = len(failures)
+                elif args['timed']:
+                    num_failures = timed(args['<test-label>'])
                 else:
-                    print(" None")
-                num_failures = len(failures)
-            elif args['timed']:
-                num_failures = timed(args['<test-label>'])
-            else:
-                num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
-            sys.exit(num_failures)
-        elif args['server']:
-            server(args['--bind'], args['--port'])
-        elif args['shell']:
-            shell()
-        elif args['compilemessages']:
-            compilemessages()
-        elif args['makemessages']:
-            compilemessages()
+                    num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
+                sys.exit(num_failures)
+            elif args['server']:
+                server(args['--bind'], args['--port'])
+            elif args['shell']:
+                shell()
+            elif args['compilemessages']:
+                compilemessages()
+            elif args['makemessages']:
+                compilemessages()
