@@ -33,6 +33,19 @@ def get_languages(site_id=None):
     return result
 
 
+def get_languages_for_user(user):
+    if user and user.is_staff:
+        languages = get_language_list()
+    else:
+        languages = get_public_languages()
+    return languages
+
+
+def get_languages_for_page_user(page, user=None):
+    page_languages = page.get_languages()
+    return [language for language in get_languages_for_user(user) if language in page_languages]
+
+
 def get_language_code(language_code):
     """
     Returns language code while making sure it's in LANGUAGES
