@@ -22,7 +22,7 @@ install:
     - pip install -q -r "test_requirements/django-$DJANGO.txt" --use-mirrors
     - if [ $DB == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python --use-mirrors; fi
 script:
-    python runtests.py --db $DB
+    python develop.py
 notifications:
     email:
         recipients:
