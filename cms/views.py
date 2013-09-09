@@ -143,8 +143,8 @@ def details(request, slug):
     # fill the context
     context['lang'] = current_language
     context['current_page'] = page
-    context['has_change_permissions'] = has_view_permissions
-    context['has_view_permissions'] = page.has_view_permission(request)
+    context['has_change_permissions'] = page.has_change_permission(request)
+    context['has_view_permissions'] = has_view_permissions
 
     if not has_view_permissions:
         return _handle_no_page(request, slug)
