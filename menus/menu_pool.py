@@ -8,7 +8,10 @@ from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import get_language
 from menus.exceptions import NamespaceAllreadyRegistered
 from menus.models import CacheKey
+from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 import copy
+
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
     '''
@@ -138,7 +141,8 @@ class MenuPool(object):
             except NoReverseMatch:
                 # Apps might raise NoReverseMatch if an apphook does not yet
                 # exist, skip them instead of crashing
-                pass
+                nodes = []
+                messages.error(request, _('Missing apphooks for installed applications.'))
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
         cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
