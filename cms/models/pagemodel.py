@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
-from distutils.version import LooseVersion
-import django
-
 from cms import constants
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.utils.compat.metaclasses import with_metaclass
@@ -18,6 +15,7 @@ from cms.utils import i18n, page as page_utils
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.utils.compat import DJANGO_1_5
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -29,7 +27,6 @@ from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 from os.path import join
 
-DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
 
 
 @python_2_unicode_compatible

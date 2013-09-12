@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
 from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
 from django.contrib.admin.helpers import AdminForm
 
-import django
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
@@ -44,8 +42,8 @@ from cms.utils.admin import jsonify_request
 
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
+from cms.utils.compat import DJANGO_1_4
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:

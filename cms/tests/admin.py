@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from distutils.version import LooseVersion
 import json
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
@@ -18,7 +17,7 @@ from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import get_cms_setting
-import django
+from cms.utils.compat import DJANGO_1_4
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
@@ -28,8 +27,6 @@ from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
-
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 
 class AdminTestsBase(CMSTestCase):
