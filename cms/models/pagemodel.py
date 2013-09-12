@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
+from distutils.version import LooseVersion
+import django
 
 from cms import constants
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
@@ -26,6 +28,8 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 from os.path import join
+
+DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
 
 
 @python_2_unicode_compatible
@@ -373,7 +377,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if commit:
             if no_signals:  # ugly hack because of mptt
-                self.save_base(cls=self.__class__, **kwargs)
+                if DJANGO_1_5:
+                    self.save_base(cls=self.__class__, **kwargs)
+                else:
+                    self.save_base(**kwargs)
             else:
                 super(Page, self).save(**kwargs)
 
@@ -392,6 +399,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         if keep_state:
             delattr(self, '_publisher_keep_state')
 
+        if not DJANGO_1_5 and 'cls' in kwargs:
+            del(kwargs['cls'])
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 

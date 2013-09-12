@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from datetime import date
+from distutils.version import LooseVersion
 from cms.utils.compat.metaclasses import with_metaclass
 
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.safestring import mark_safe
 import os
 import warnings
+import django
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
@@ -21,6 +23,7 @@ from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils import get_cms_setting
 from mptt.models import MPTTModel, MPTTModelBase
 
+DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
 
 class BoundRenderMeta(object):
     def __init__(self, meta):
@@ -244,7 +247,10 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
     def save(self, no_signals=False, *args, **kwargs):
         if no_signals:  # ugly hack because of mptt
-            super(CMSPlugin, self).save_base(cls=self.__class__)
+            if DJANGO_1_5:
+                super(CMSPlugin, self).save_base(cls=self.__class__)
+            else:
+                super(CMSPlugin, self).save_base()
         else:
             super(CMSPlugin, self).save()
 
