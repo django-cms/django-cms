@@ -296,7 +296,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(old_placeholder_1_plugin_count, current_placeholder_1_plugin_count)
         self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
 
-
     def test_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration """
         page_en = create_page('page_en', 'col_two.html', 'en')
@@ -322,8 +321,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertRegexpMatches(content_en, "^en body$")
 
         ## Deutsch page should have no text
-        content_de = render_placeholder(placeholder_en, context_de)
+        content_de = render_placeholder(placeholder_de, context_de)
         self.assertNotRegex(content_de, "^en body$")
+        self.assertEqual(len(content_de), 0)
 
         conf = {
             'col_left': {
@@ -332,13 +332,61 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         }
         with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
-            content_de = render_placeholder(placeholder_en, context_de)
+            content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^en body$")
 
+            # remove the cached plugins instances
+            del(placeholder_de._de_plugins_cache)
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^de body$")
+
+    def test_plugins_non_default_language_fallback(self):
+        """ Tests language_fallback placeholder configuration """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        title_de = create_title("de", "page_de", page_en)
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
+
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+
+            pop = push
+
+        context_en = NoPushPopContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_de = NoPushPopContext()
+        context_de['request'] = self.get_request(language="de", page=page_en)
+
+        # First test the default (non-fallback) behavior)
+        ## Deutsch page should have the text plugin
+        content_de = render_placeholder(placeholder_en, context_de)
+        self.assertRegexpMatches(content_de, "^de body$")
+
+        ## English page should have no text
+        content_en = render_placeholder(placeholder_en, context_en)
+        self.assertNotRegex(content_en, "^de body$")
+        self.assertEqual(len(content_en), 0)
+
+        conf = {
+            'col_left': {
+                'language_fallback': True,
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            ## English page should have deutsch text
+            content_en = render_placeholder(placeholder_en, context_en)
+            self.assertRegexpMatches(content_en, "^de body$")
+
+            # remove the cached plugins instances
+            del(placeholder_en._en_plugins_cache)
+            # Then we add a plugin to check for proper rendering
+            add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
+            content_en = render_placeholder(placeholder_en, context_en)
+            self.assertRegexpMatches(content_en, "^en body$")
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
