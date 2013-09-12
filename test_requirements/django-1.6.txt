@@ -1,4 +1,6 @@
 -r requirements_base.txt
 https://github.com/django/django/archive/stable/1.6.x.zip#egg=django
 -e git+https://github.com/etianen/django-reversion/tree/django-1.6#egg=django-reversion
+-e git+https://github.com/meshy/django-hvad/tree/python3.3-django1.6#egg=hvad
+
 
