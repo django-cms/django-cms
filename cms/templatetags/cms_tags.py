@@ -134,10 +134,13 @@ class PageUrl(InclusionTag):
         cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
         url = cache.get(cache_key)
         if not url:
-            page = _get_page_by_untyped_arg(page_lookup, request, site_id)
-            if page:
-                url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
+            try:
+                page = _get_page_by_untyped_arg(page_lookup, request, site_id)
+                if page:
+                    url = page.get_absolute_url(language=lang)
+                    cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
+            except Page.DoesNotExist:
+                url = None
         if url:
             return {'content': url}
         return {'content': ''}
@@ -334,8 +337,8 @@ class PageAttribute(AsTag):
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
-    
-    varname -- context variable name. Output will be added to template context as this variable. 
+
+    varname -- context variable name. Output will be added to template context as this variable.
     This argument is required to follow the 'as' keyword.
     """
     name = 'page_attribute'
