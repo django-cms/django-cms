@@ -11,7 +11,7 @@ from django.db import models
 from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
-from django.utils.compat import DJANGO_1_5
+from cms.utils.compat import DJANGO_1_5
 import json as simplejson
 from django.utils.translation import ugettext_lazy as _
 from cms.exceptions import DontUsePageAttributeWarning
