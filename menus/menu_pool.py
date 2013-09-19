@@ -142,7 +142,9 @@ class MenuPool(object):
                 # Apps might raise NoReverseMatch if an apphook does not yet
                 # exist, skip them instead of crashing
                 nodes = []
-                messages.error(request, _('Missing apphooks for installed applications.'))
+                toolbar = getattr(request, 'toolbar', None)
+                if toolbar and toolbar.is_staff:
+                    messages.error(request, _('Missing apphooks for installed applications.'))
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
         cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
