@@ -52,6 +52,8 @@ matrix:
       env: DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - python: 3.3
       env: DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.3
+      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
   allow_failures:
     - python: 3.3
       env: DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:'
