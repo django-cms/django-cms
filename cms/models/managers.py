@@ -461,6 +461,9 @@ class PagePermissionsPermissionManager(models.Manager):
     def __get_id_list(self, user, site, attr):
         from cms.models import (GlobalPagePermission, PagePermission,
                                 MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
+        if isinstance(site, Site):
+            site = site.id
+
         if attr != "can_view":
             if not user.is_authenticated() or not user.is_staff:
                 return []
@@ -469,9 +472,12 @@ class PagePermissionsPermissionManager(models.Manager):
             # all mark
             return PagePermissionsPermissionManager.GRANT_ALL
         # read from cache if posssible
-        cached = get_permission_cache(user, attr)
-        if cached is not None:
-            return cached
+        cached_perm_dict = get_permission_cache(user, attr)
+        if cached_perm_dict is not None:
+            if site in cached_perm_dict:
+                return cached_perm_dict[site]
+        else:
+            cached_perm_dict = {}
         # check global permissions
         global_permissions = GlobalPagePermission.objects.with_user(user)
         if global_permissions.filter(**{
@@ -498,7 +504,8 @@ class PagePermissionsPermissionManager(models.Manager):
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
         # store value in cache
-        set_permission_cache(user, attr, page_id_allow_list)
+        cached_perm_dict[site] = page_id_allow_list
+        set_permission_cache(user, attr, cached_perm_dict)
         return page_id_allow_list
 
 
