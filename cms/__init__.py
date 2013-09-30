@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '2.3.5pbs.7'
+__version__ = '2.3.5pbs.8'
 
 # patch settings
 try:
