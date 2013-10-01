@@ -88,7 +88,7 @@ class PluginPool(object):
                 include_plugin = False
             if include_plugin:
                 final_plugins.append(plugin)
-                
+
         if final_plugins:
             plugins = final_plugins
 
