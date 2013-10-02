@@ -57,6 +57,8 @@ placeholder (configuration is the same as for placeholders in the CMS) or you ca
 Admin Integration
 =================
 
+.. versionchanged:: 3.0
+
 If you install this model in the admin application, you have to use
 :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` instead of
 :class:`~django.contrib.admin.ModelAdmin` so the interface renders
@@ -67,6 +69,14 @@ correctly::
     from myapp.models import MyModel
 
     admin.site.register(MyModel, PlaceholderAdmin)
+
+
+.. warning::
+
+    Since 3.0 placeholder content can only be modified from the
+    frontend, and thus placeholderfields **must** not be present in any
+    ``fieldsets``, ``fields``, ``form`` or other modeladmin fields definition
+    attribute.
 
 
 I18N Placeholders
@@ -164,8 +174,9 @@ You are now using the so-called *front-end edit mode*:
 
 .. |edit-banner| image:: ../images/edit-banner.png
 
-Once in Front-end editing mode, your placeholders should display a menu,
-allowing you to add plugins to them. The following screen shot shows a
+Once in Front-end editing mode, switch to **Structure mode**, and you should be
+able to see an outline of the placeholder, and a menu,
+allowing you to add plugins to them. The following screen sh, ot shows a
 default selection of plugins in an empty placeholder.
 
 |frontend-placeholder-add-plugin|
@@ -200,20 +211,6 @@ to current user only on his ``UserProfile`` object::
             if user_obj.get_profile()==obj:
                 return True
         return False
-
-
-*********
-Fieldsets
-*********
-
-There are some hard restrictions if you want to add custom fieldsets to an
-admin page with at least one :class:`~cms.models.fields.PlaceholderField`:
-
-1. Every :class:`~cms.models.fields.PlaceholderField` **must** be in its own
-   :attr:`fieldset <django.contrib.admin.ModelAdmin.fieldsets>`, one
-   :class:`~cms.models.fields.PlaceholderField` per fieldset.
-2. You **must** include the following two classes: ``'plugin-holder'`` and
-   ``'plugin-holder-nopage'``
 
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
