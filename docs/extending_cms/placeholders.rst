@@ -155,13 +155,9 @@ like this:
 Adding content to a placeholder
 *******************************
 
-There are two ways to add or edit content to a placeholder, the front-end admin
-view and the back-end view.
+.. versionchanged:: 3.0
 
-Using the front-end editor
-==========================
-
-Probably the simplest way to add content to a placeholder, simply visit the
+Placeholders can be edited from the frontend, simply visiting the
 page displaying your model (where you put the :ttag:`render_placeholder` tag),
 then append ``?edit`` to the page's URL. This will make a top banner appear,
 and after switching the "Edit mode" button to "on", the banner will prompt you
@@ -188,6 +184,7 @@ Plugins are rendered at once, so you can get an idea how it will look
 clicking the "Edit mode" button in the banner again.
 
 .. _placeholder_object_permissions:
+
 
 Permissions
 ===========
