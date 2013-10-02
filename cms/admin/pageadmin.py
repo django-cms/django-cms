@@ -395,6 +395,7 @@ class PageAdmin(ModelAdmin):
                 else:
                     if field in self.exclude:
                         self.exclude.remove(field)
+
             self.inlines = PAGE_ADMIN_INLINES
             exclude_field(obj.has_publish_permission(request), 'published')
             exclude_field(obj.has_set_navigation_permission(request), 'in_navigation')
