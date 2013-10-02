@@ -14,7 +14,6 @@ from cms.utils.permissions import has_generic_permission
 
 from django.contrib.auth.models import User, Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
-from django.contrib.admin.sites import site
 from django.core.management import call_command
 from django.db.models import Q
 
