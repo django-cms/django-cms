@@ -11,7 +11,7 @@ var editPluginPopupCallbacks = {};
 	CMS.$(document).ready(function () {
 		// scroll to top
 		scrollTo(0, 0);
-
+		
 		// init wysiwyg
 		$('#id_{{ name }}').wymeditor({
 			lang: '{{ language }}',
@@ -52,7 +52,7 @@ var editPluginPopupCallbacks = {};
 			},
 			//handle click event on dialog's submit button
 			postInitDialog: function( wym, wdw ) {
-
+		 
 			}
 		});
 
@@ -64,12 +64,12 @@ var editPluginPopupCallbacks = {};
 				var splits = window.location.href.split("?")[0].split("/");
 				var parent_id = Number(splits[splits.length - 2]);
 				var language = $('#id_language').attr('value');
-
+				
 				if (pluginvalue == "") {
 					alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
 					return;
 				}
-
+				
 				var texteditor = get_editor(placeholder);
 				if (texteditor == null || texteditor.insertText == null) {
 					alert("{% filter escapejs %}{% trans "Text editor does not support inserting objects." %}{% endfilter %}");
@@ -77,9 +77,9 @@ var editPluginPopupCallbacks = {};
 				}
 				// First create db instance using AJAX post back
 				add_plugin(pluginvalue, parent_id, language)
-
+				
 			}).css("cursor", "pointer").css("margin", "5px");
-
+			
 			/* onclick for 'Edit selected object' */
 			$('span.edit-object').click(function(){
 				var texteditor = get_editor(placeholder);
