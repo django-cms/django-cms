@@ -14,6 +14,7 @@ from cms.utils.permissions import has_generic_permission
 
 from django.contrib.auth.models import User, Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
+from django.contrib.admin.sites import site
 from django.core.management import call_command
 from django.db.models import Q
 
@@ -1072,3 +1073,35 @@ class PagePermissionTests(PermissionTestsBase):
         self.assertFalse(page.has_change_permissions_permission(request))
 
 
+class GlobalPPAdminWidgets(PermissionTestsBase):
+
+    def test_publication_date_and_end_date_does_not_shown(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            with self.login_user_context(user):
+                page = create_page('A', 'nav_playground.html', 'en')
+                _site = Site.objects.create(domain='django-cms.org', name='django-cms')
+                page.site = _site
+                page.save()
+
+                request = self.get_request('/admin/cms/page/1/')
+
+                gpp = GlobalPagePermission.objects.create(
+                    user=user,
+                    can_change=True,
+                    can_delete=True,
+                    can_change_advanced_settings=False,
+                    can_publish=False,
+                    can_set_navigation=True,
+                    can_change_permissions=False,
+                    can_move_page=True,
+                    can_moderate=True,
+                )
+                gpp.sites = [_site]
+                page_admin = site._registry[Page]
+
+                # response = page_admin.change_view(request, page.id)
+                response = self.client.get('/admin/cms/page/1/')
+                print response.content
+
+                self.assertTrue(True)
