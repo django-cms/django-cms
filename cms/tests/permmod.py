@@ -1073,21 +1073,22 @@ class PagePermissionTests(PermissionTestsBase):
         self.assertFalse(page.has_change_permissions_permission(request))
 
 
-class GlobalPPAdminWidgets(PermissionTestsBase):
+class GlobalPagePermissionTests(PermissionTestsBase):
 
-    def test_publication_date_and_end_date_does_not_shown(self):
+    def test_publication_start_end_date_are_not_shown(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
+            group = Group.objects.create(name='testgroup')
+            group.user_set.add(user)
+
             with self.login_user_context(user):
                 page = create_page('A', 'nav_playground.html', 'en')
                 _site = Site.objects.create(domain='django-cms.org', name='django-cms')
                 page.site = _site
                 page.save()
 
-                request = self.get_request('/admin/cms/page/1/')
-
                 gpp = GlobalPagePermission.objects.create(
-                    user=user,
+                    group=group,
                     can_change=True,
                     can_delete=True,
                     can_change_advanced_settings=False,
@@ -1098,10 +1099,8 @@ class GlobalPPAdminWidgets(PermissionTestsBase):
                     can_moderate=True,
                 )
                 gpp.sites = [_site]
-                page_admin = site._registry[Page]
 
-                # response = page_admin.change_view(request, page.id)
-                response = self.client.get('/admin/cms/page/1/')
-                print response.content
+                response = self.client.get('/admin/cms/page/%s/' % page.id)
 
-                self.assertTrue(True)
+                form_row = '<div class="form-row publication_date publication_end_date">'
+                self.assertTrue(form_row not in response.content)
