@@ -4,16 +4,21 @@ Placeholders outside the CMS
 
 Placeholders are special model fields that django CMS uses to render
 user-editable content (plugins) in templates. That is, it's the place where a
-user can add text, video or any other plugin to a webpage, using either the
-normal Django admin interface or the so called `frontend editing`.
+user can add text, video or any other plugin to a webpage, using the same
+`frontend editing` as the CMS pages.
 
 Placeholders can be viewed as containers for :class:`CMSPlugin` instances, and
 can be used outside the CMS in custom applications using the
 :class:`~cms.models.fields.PlaceholderField`.
 
-By defining one (or several) :class:`~cms.models.fields.PlaceholderField` on a custom model you can take
-advantage of the full power of :class:`CMSPlugin`, including frontend editing.
+By defining one (or several) :class:`~cms.models.fields.PlaceholderField` on a
+custom model you can take advantage of the full power of :class:`CMSPlugin`.
 
+.. warning::
+
+    Screenshots are not in sync with the 3.0 UI at the moment, they will be
+    updated once the new UI will be finalized; for the same reason, you'll find
+    minor difference in the UI description.
 
 **********
 Quickstart
@@ -125,10 +130,15 @@ Now to render the placeholder in a template you use the
 
     {% render_placeholder mymodel_instance.my_placeholder "640" %}
 
-The :ttag:`render_placeholder` tag takes a
-:class:`~cms.models.fields.PlaceholderField` instance as its first argument and
-optionally accepts a width parameter as its second argument for context sensitive
-plugins. The view in which you render your placeholder field must return the
+The :ttag:`render_placeholder` tag takes the following parameters:
+
+* :class:`~cms.models.fields.PlaceholderField` instance
+* ``width`` parameter for context sensitive plugins (optional)
+* ``language`` keyword plus ``language-code`` string to render content in the
+  specified language (optional)
+
+
+The view in which you render your placeholder field must return the
 :attr:`request <django.http.HttpRequest>` object in the context. This is
 typically achieved in Django applications by using :class:`RequestContext`::
 
@@ -157,34 +167,34 @@ Adding content to a placeholder
 
 .. versionchanged:: 3.0
 
-Placeholders can be edited from the frontend, simply visiting the
+Placeholders can be edited from the frontend by visiting the
 page displaying your model (where you put the :ttag:`render_placeholder` tag),
-then append ``?edit`` to the page's URL. This will make a top banner appear,
-and after switching the "Edit mode" button to "on", the banner will prompt you
-for your username and password (the user should be allowed to edit the page,
-obviously).
+then append ``?edit`` to the page's URL.
+This will make the frontend editor top banner appear, and will eventually
+require you to login.
 
-You are now using the so-called *front-end edit mode*:
+You are now using the so-called *frontend edit mode*:
 
 |edit-banner|
 
 .. |edit-banner| image:: ../images/edit-banner.png
 
 Once in Front-end editing mode, switch to **Structure mode**, and you should be
-able to see an outline of the placeholder, and a menu,
-allowing you to add plugins to them. The following screen sh, ot shows a
-default selection of plugins in an empty placeholder.
+able to see an outline of the placeholder, and a menu, allowing you to add
+plugins to them. The following screenshot shows a default selection of plugins
+in an empty placeholder.
 
 |frontend-placeholder-add-plugin|
 
 .. |frontend-placeholder-add-plugin| image:: ../images/frontend-placeholder-add-plugin.png
 
-Plugins are rendered at once, so you can get an idea how it will look
-`in fine`. However, to view the final look of a plugin simply leave edit mode by
-clicking the "Edit mode" button in the banner again.
+Adding the plugins automatically update the model content and they are rendered
+in realtime.
+
+There is no automatic draft / live version of general Django models, so plugins
+content is updated instantly whenever you add / edit them.
 
 .. _placeholder_object_permissions:
-
 
 Permissions
 ===========
