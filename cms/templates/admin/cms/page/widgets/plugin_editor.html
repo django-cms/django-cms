@@ -1,7 +1,7 @@
-{% load i18n %}
+{% load i18n l10n %}
 {% if not add %}
-<div class="plugin-list-holder" id="placeholder-{{ placeholder.pk }}">
-	<ul class="plugin-list" id="plugin-list-{{ placeholder.pk }}">
+<div class="plugin-list-holder" id="placeholder-{{ placeholder.pk|unlocalize }}">
+	<ul class="plugin-list" id="plugin-list-{{ placeholder.pk|unlocalize }}">
 		{% include "admin/cms/page/widgets/plugin_item.html" %}
 	</ul>
 	{% include "admin/cms/page/widgets/installed_plugins_inc.html" %}
@@ -21,8 +21,8 @@
 {% if placeholder %}
 	<script type="text/javascript">
 	cms_plugin_editor_jQuery(document).ready(function($){
-	var placeholder_element = $('#placeholder-{{ placeholder.pk }}');
-	placeholder_element.data('id', {{ placeholder.pk }});
+	var placeholder_element = $('#placeholder-{{ placeholder.pk|unlocalize }}');
+	placeholder_element.data('id', {{ placeholder.pk|unlocalize }});
 	placeholder_element.data('name', '{{ placeholder.slot }}');
 	});
 	</script>
