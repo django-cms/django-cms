@@ -78,8 +78,8 @@
 			{% endif %}
 		</div>
 
-		<div class="col-published">{{ page.publication_date|date:"Y-m-d" }}</div>
-		<div class="col-published">{{ page.publication_end_date|date:"Y-m-d" }}</div>
+		<div class="col-published">{% if has_publish_permission %} {{ page.publication_date|date:"Y-m-d" }} {% endif %} </div>
+		<div class="col-published">{% if has_publish_permission %} {{ page.publication_end_date|date:"Y-m-d" }} {% endif %}</div>
 		<div class="col-view-perms">{{ page|is_restricted:request }}</div>
 
 

@@ -353,6 +353,9 @@ class PageAdmin(ModelAdmin):
                 fields = list(given_fieldsets[0][1]['fields'][2])
                 fields.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(fields)
+
+                # delete publication_date publication_end_date
+                del given_fieldsets[0][1]['fields'][3]
             if not obj.has_set_navigation_permission(request):
                 fields = list(given_fieldsets[0][1]['fields'][2])
                 fields.remove('in_navigation')
@@ -392,7 +395,7 @@ class PageAdmin(ModelAdmin):
                 else:
                     if field in self.exclude:
                         self.exclude.remove(field)
-                
+
             self.inlines = PAGE_ADMIN_INLINES
             exclude_field(obj.has_publish_permission(request), 'published')
             exclude_field(obj.has_set_navigation_permission(request), 'in_navigation')

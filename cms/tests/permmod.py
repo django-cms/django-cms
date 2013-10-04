@@ -1072,3 +1072,34 @@ class PagePermissionTests(PermissionTestsBase):
         self.assertFalse(page.has_change_permissions_permission(request))
 
 
+class GlobalPagePermissionTests(PermissionTestsBase):
+
+    def test_publication_start_end_date_are_not_shown(self):
+        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            group = Group.objects.create(name='testgroup')
+            group.user_set.add(user)
+
+            with self.login_user_context(user):
+                page = create_page('A', 'nav_playground.html', 'en')
+                _site = Site.objects.create(domain='django-cms.org', name='django-cms')
+                page.site = _site
+                page.save()
+
+                gpp = GlobalPagePermission.objects.create(
+                    group=group,
+                    can_change=True,
+                    can_delete=True,
+                    can_change_advanced_settings=False,
+                    can_publish=False,
+                    can_set_navigation=True,
+                    can_change_permissions=False,
+                    can_move_page=True,
+                    can_moderate=True,
+                )
+                gpp.sites = [_site]
+
+                response = self.client.get('/admin/cms/page/%s/' % page.id)
+
+                form_row = '<div class="form-row publication_date publication_end_date">'
+                self.assertTrue(form_row not in response.content)
