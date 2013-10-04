@@ -35,6 +35,27 @@ Main `urls.py` example::
 
 .. _documentation: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
 
+***************
+Language Cookie
+***************
+
+By default if someone visits a page at `http://www.mysite.fr/` django determines the language as follow:
+
+- language in url
+- language in session
+- language in cookie
+- language in from browser
+- LANGUAGE_CODE from settings
+
+No if i have a German browser and visit a page that is only English and French, it will choose the language that is
+in LANGUAGE_CODE. If this is English but i only speak French i have to switch the language. No if after sometime
+i visit the page again. The page will display in English again and I have to switch again. The same is for every
+link that points to `/` will switch to English again. To fix this behavior the cms ships with a middleware:
+
+    `cms.middleware.language.LanguageCookieMiddleware`
+
+add this to you middleware settings fix this.
+
 ****************
 Language Chooser
 ****************
@@ -76,4 +97,13 @@ If `hide_untranslated`  is ``True`` in your :setting:`CMS_LANGUAGES`
 and you are on a page that doesn't yet have an English translation and you view
 the German version then the language chooser will redirect to ``/``. The same
 goes for urls that are not handled by the cms and display a language chooser.
+
+********************************************
+Automated slug generation unicode characters
+********************************************
+
+If your site has languages which use non-ASCII character sets, you might want
+to enable :setting:`CMS_UNIHANDECODE_HOST` and :setting:`CMS_UNIHANDECODE_VERSION`
+to get automated slugs for those languages too.
+
 

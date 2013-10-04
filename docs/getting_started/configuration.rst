@@ -333,6 +333,69 @@ Type: Boolean
 Default:``True``
 
 
+Unicode support for automated slugs
+===================================
+
+The django CMS supports automated slug generation from page titles that contain unicode characters via the
+unihandecode.js project. To enable support for unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
+:setting:`CMS_UNIHANDECODE_VERSION` must be set.
+
+
+.. setting:: CMS_UNIHANDECODE_HOST
+
+CMS_UNIHANDECODE_HOST
+---------------------
+
+default: ``None``
+
+Must be set to the URL where you host your unihandecode.js files. For licensing reasons, the django CMS does not include
+unihandecode.js.
+
+If set to ``None``, the default, unihandecode.js is not used.
+
+
+.. note::
+
+    Unihandecode.js is a rather large library, especially when loading support
+    for Japanese. It is therefore very important that you serve it from a
+    server that supports gzip compression. Further, make sure that those files
+    can be cached by the browser for a very long period.
+
+
+.. setting:: CMS_UNIHANDECODE_VERSION
+
+CMS_UNIHANDECODE_VERSION
+------------------------
+
+default: ``None``
+
+Must be set to the version number (eg ``'1.0.0'``) you want to use. Together with :setting:`CMS_UNIHANDECODE_HOST` this
+setting is used to build the full URLs for the javascript files. URLs are built like this:
+``<CMS_UNIHANDECODE_HOST>-<CMS_UNIHANDECODE_VERSION>.<DECODER>.min.js``.
+
+
+.. setting:: CMS_UNIHANDECODE_DECODERS
+
+CMS_UNIHANDECODE_DECODERS
+-------------------------
+
+default: ``['ja', 'zh', 'vn', 'kr', 'diacritic']``
+
+If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST``, you can add them to this setting.
+
+
+.. setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
+
+CMS_UNIHANDECODE_DEFAULT_DECODER
+--------------------------------
+
+default: ``'diacritic'``
+
+The default decoder to use when unihandecode.js support is enabled, but the current language does not provide a specific
+decoder in :setting:`CMS_UNIHANDECODE_DECODERS`. If set to ``None``, failing to find a specific decoder will disable
+unihandecode.js for this language.
+
+
 **************
 Media Settings
 **************
@@ -467,6 +530,33 @@ a certain page all users he creates can, in turn, only edit this page. Naturally
 he can limit the rights of the users he creates even further, allowing them to see
 only a subset of the pages to which he is allowed access.
 
+.. setting:: CMS_RAW_ID_USERS
+
+CMS_RAW_ID_USERS
+================
+
+Default: ``False``
+
+This setting only applies if :setting:`CMS_PERMISSION` is ``True``
+
+The "view restrictions" and "page permissions" inlines on the
+:class:`cms.models.Page` admin change forms can cause performance problems
+where there are many thousands of users being put into simple select boxes. If
+set to a positive integer, this setting forces the inlines on that page to use
+standard Django admin raw ID widgets rather than select boxes if the number of
+users in the system is greater than that number, dramatically improving
+performance.
+
+.. note:: Using raw ID fields in combination with ``limit_choices_to`` causes
+          errors due to excessively long URLs if you have many thousands of
+          users (the PKs are all included in the URL of the popup window). For
+          this reason, we only apply this limit if the number of users is
+          relatively small (fewer than 500). If the number of users we need to
+          limit to is greater than that, we use the usual input field instead
+          unless the user is a CMS superuser, in which case we bypass the
+          limit.  Unfortunately, this means that non-superusers won't see any
+          benefit from this setting.
+
 .. setting:: CMS_PUBLIC_FOR
 
 CMS_PUBLIC_FOR
@@ -569,3 +659,21 @@ Example::
 
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs on
     :ref:`cache key prefixing <django:cache_key_prefixing>`
+
+
+.. setting::CMS_MAX_PAGE_PUBLISH_REVERSIONS
+
+CMS_MAX_PAGE_PUBLISH_REVERSIONS
+===============================
+
+Default: 25
+
+If `django-reversion`_ is installed everything you do with a page and all plugin changes will be saved in a revision.
+In the page admin there is a history button to revert to previous version of a page. In the past we had the problem
+with huge databases from the revision tables after some time. As a mitigation when you publish a page all revisions
+that are not publish revision will be deleted. This setting however declares how many publish revisions are saved in the
+database. By default the newest 25 publish revisions are kept and all other are deleted when you publish a page.
+If you set this to 0 all publish revisions are kept but you are responsible to keep the revision table small.
+
+.. _django-reversion: https://github.com/etianen/django-reversion
+.. _unihandecode.js: https://github.com/ojii/unihandecode.js

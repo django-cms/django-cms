@@ -6,11 +6,14 @@ import os.path
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.utils import timezone
 
 from cms.admin.forms import PageForm
+from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
@@ -23,9 +26,10 @@ from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE,
                                       URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride,
-                                                  SettingsOverride)
+                                                  SettingsOverride,
+                                                  UserLoginContext)
+from cms.utils import get_cms_setting
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
-from cms.utils import timezone, get_cms_setting
 from cms.utils.page import is_valid_page_slug
 
 class PagesTestCase(CMSTestCase):
@@ -409,6 +413,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_sitemap_uses_publication_date_when_later_than_modification(self):
         now = timezone.now()
+        now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
         page.creation_date = one_day_ago
@@ -772,6 +777,94 @@ class PagesTestCase(CMSTestCase):
                     for j in range(5):
                         self.assertIn('text-%d-%d' % (i, j), content)
                         self.assertIn('link-%d-%d' % (i, j), content)
+
+
+class PageAdminTestBase(CMSTestCase):
+    """
+    The purpose of this class is to provide some basic functionality
+    to test methods of the Page admin.
+    """
+    placeholderconf = {'body': {
+            'limits': {
+                'global': 2,
+                'TextPlugin': 1,
+            }
+        }
+    }
+
+    def get_page(self, parent=None, site=None,
+                 language=None, template='nav_playground.html'):
+        page_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': settings.LANGUAGES[0][0] if not language else language,
+            'template': template,
+            'parent': parent if parent else None,
+            'site': site if site else Site.objects.get_current(),
+        }
+        page_data = self.get_new_page_data_dbfields()
+        return create_page(**page_data)
+    
+    def get_admin(self):
+        """
+        Returns a PageAdmin instance.
+        """
+        return PageAdmin(Page, admin.site)
+    
+    def get_post_request(self, data):
+        return self.get_request(post_data=data)
+
+
+class PageAdminTest(PageAdminTestBase):
+    def test_global_limit_on_plugin_move(self):
+        admin = self.get_admin()
+        superuser = self.get_superuser()
+        cms_page = self.get_page()
+        source_placeholder = cms_page.placeholders.get(slot='right-column')
+        target_placeholder = cms_page.placeholders.get(slot='body')
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        plugin_2 = add_plugin(**data)
+        plugin_3 = add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder': target_placeholder.slot, 'plugin_id': plugin_1.pk})
+                response = admin.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder': target_placeholder.slot, 'plugin_id': plugin_2.pk})
+                response = admin.move_plugin(request) # second
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder': target_placeholder.slot, 'plugin_id': plugin_3.pk})
+                response = admin.move_plugin(request) # third
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number of plugins (2).")
+
+    def test_type_limit_on_plugin_move(self):
+        admin = self.get_admin()
+        superuser = self.get_superuser()
+        cms_page = self.get_page()
+        source_placeholder = cms_page.placeholders.get(slot='right-column')
+        target_placeholder = cms_page.placeholders.get(slot='body')
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'TextPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        plugin_2 = add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder': target_placeholder.slot, 'plugin_id': plugin_1.pk})
+                response = admin.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+                request = self.get_post_request({'placeholder': target_placeholder.slot, 'plugin_id': plugin_2.pk})
+                response = admin.move_plugin(request) # second
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, "This placeholder already has the maximum number (1) of allowed Text plugins.")
 
 
 class NoAdminPageTests(CMSTestCase):

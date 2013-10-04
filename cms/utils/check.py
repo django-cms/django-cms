@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import inspect
 from contextlib import contextmanager
 from cms import constants
+from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
+from cms.management.commands.subcommands.list import plugin_report
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
@@ -14,6 +18,7 @@ ERROR = 3
 SKIPPED = 4
 
 CHECKERS = []
+
 
 class FileOutputWrapper(object):
     """
@@ -161,7 +166,7 @@ def check_sekizai(output):
         if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
             section.success("Sekizai template context processor is installed")
         else:
-            section.error("Sekizai template context processor is not install, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -196,6 +201,61 @@ def check_deprecated_settings(output):
                 found = True
         if not found:
             section.skip("No deprecated settings found")
+
+
+@define_check
+def check_plugin_instances(output):
+    with output.section("Plugin instances") as section:
+        # get the report
+        report = plugin_report()
+        section.success("Plugin instances of %s types found in the database" % len(report))
+        # loop over plugin types in the report
+        for plugin_type in report:
+            # warn about those that are not installed
+            if not plugin_type["model"]:
+                section.error("%s has instances but is no longer installed" % plugin_type["type"] )
+            # warn about those that have unsaved instances
+            if plugin_type["unsaved_instances"]:
+                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))                
+
+        if section.successful:
+            section.finish_success("The plugins in your database are in good order")
+        else:
+            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
+
+@define_check
+def check_copy_relations(output):
+    c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
+
+    def get_class(method_name, model):
+        for cls in inspect.getmro(model):
+            if method_name in cls.__dict__:
+                return cls
+        return None
+
+    with output.section('Presence of "copy_relations"') as section:
+        plugin_pool.discover_plugins()
+        for plugin in plugin_pool.plugins.values():
+            plugin_class = plugin.model
+            if get_class('copy_relations', plugin_class) is not CMSPlugin or plugin_class is CMSPlugin:
+                # this class defines a ``copy_relations`` method, nothing more
+                # to do
+                continue
+            for rel in plugin_class._meta.many_to_many:
+                section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                    c_to_s(plugin_class),
+                    c_to_s(rel.model),
+                ))
+            for rel in plugin_class._meta.get_all_related_objects():
+                if rel.model != CMSPlugin:
+                    section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
+                        c_to_s(plugin_class),
+                        c_to_s(rel.model),
+                    ))
+        if not section.warnings:
+            section.finish_success('All plugins have "copy_relations" method if needed.')
+        else:
+            section.finish_success('Some plugins do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations')
 
 
 def check(output):

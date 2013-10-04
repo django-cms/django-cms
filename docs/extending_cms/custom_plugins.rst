@@ -262,6 +262,8 @@ else clause.
     and your plugin will not work as intended in the administration without
     further work.
 
+.. _handling-relations:
+
 Handling Relations
 ==================
 
@@ -352,11 +354,35 @@ Since :class:`cms.plugin_base.CMSPluginBase` extends
 :class:`django.contrib.admin.options.ModelAdmin`, you can customize the form
 for your plugins just as you would customize your admin interfaces.
 
-.. note::
+The template that the plugin editing mechanism uses is
+``cms/templates/admin/cms/page/plugin_change_form.html``. You might need to
+change this.
 
-    If you want to overwrite the form be sure to extend from
-    ``admin/cms/page/plugin_change_form.html`` to have a unified look across the
-    plugins and to have the preview functionality automatically installed.
+If you want to customise this the best way to do it is:
+
+* create a template of your own that extends ``cms/templates/admin/cms/page/plugin_change_form.html`` to provide the functionality you require
+* provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a ``change_form_template`` attribute pointing at your new template
+
+Extending ``admin/cms/page/plugin_change_form.html`` ensures that you'll keep
+a unified look and functionality across your plugins.
+
+There are various reasons *why* you might want to do this. For example, you
+might have a snippet of JavaScript that needs to refer to a template
+variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
+block.super }}`` to inherit the existing items that were in the parent
+template.
+
+
+Or: ``cms/templates/admin/cms/page/plugin_change_form.html`` extends Django's
+own ``admin/base_site.html``, which loads a rather elderly version of jQuery,
+and your plugin admin might require something newer. In this case, in your
+custom ``change_form_template`` you could do something like::
+
+    {% block jquery %}
+        <script type="text/javascript" src="///ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
+    {% endblock jquery %}``
+
+to override the ``{% block jquery %}``.
 
 .. _custom-plugins-handling-media:
 
@@ -370,6 +396,9 @@ templates are always enforced to have the ``css`` and ``js`` sekizai namespaces,
 therefore those should be used to include the respective files. For more 
 information about django-sekizai, please refer to the
 `django-sekizai documentation`_.
+
+Note that sekizai *can't* help you with the *admin-side* plugin templates -
+what follows is for your plugins' *output* templates.
 
 Sekizai style
 -------------

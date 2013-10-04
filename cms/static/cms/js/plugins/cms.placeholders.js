@@ -84,8 +84,13 @@ CMS.$(document).ready(function ($) {
 					// we get the id back
 					that.editPlugin.call(that, values.placeholder_id, response, editUrl);
 				},
-				'error': function () {
-					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+				'error': function(xhr) {
+					if (xhr.status < 500) {
+						alert(xhr.responseText);
+					}
+					else{
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					};
 				}
 			});
 		},
@@ -176,7 +181,12 @@ CMS.$(document).ready(function ($) {
 					'data': { 'plugin_id': plugin_id },
 					'success': function () {
 						// remove plugin from the dom
-						plugin.remove();
+                        if(plugin.parent().hasClass('cms_multi')){
+                            plugin.parent().remove()
+                        }else{
+                            plugin.remove();
+                        }
+
 					},
 					'error': function () {
 						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
@@ -235,8 +245,13 @@ CMS.$(document).ready(function ($) {
 				'url': url,
 				'data': { 'ids': array.join('_') },
 				'success': refreshPluginPosition,
-				'error': function () {
-					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+				'error': function(xhr) {
+					if (xhr.status < 500) {
+						alert(xhr.responseText);
+					}
+					else{
+						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					};
 				}
 			});
 
@@ -333,8 +348,13 @@ CMS.$(document).ready(function ($) {
 					'success': function () {
 						refreshPluginPosition(slot);
 					},
-					'error': function () {
-						throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+					'error': function(xhr) {
+						if (xhr.status < 500) {
+							alert(xhr.responseText);
+						}
+						else{
+							throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
+						};
 					}
 				});
 			});

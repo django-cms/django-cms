@@ -4,7 +4,7 @@ from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Title
 from cms.utils import get_template_from_request, get_language_from_request
-from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, get_language_list
+from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, get_language_list, is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
@@ -62,7 +62,7 @@ def details(request, slug):
             if languages:
                 with SettingsOverride(LANGUAGES=languages, LANGUAGE_CODE=languages[0][0]):
                     #get supported language
-                    new_language = translation.get_language_from_request(request)
+                    new_language = get_language_from_request(request)
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
@@ -116,7 +116,7 @@ def details(request, slug):
         # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
-        if (settings.USE_I18N and redirect_url[0] == "/"
+        if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
             and not redirect_url.startswith('/%s/' % current_language)):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))

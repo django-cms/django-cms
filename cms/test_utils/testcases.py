@@ -3,7 +3,8 @@ from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User, AnonymousUser, Permission
+from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template.context import Context
@@ -21,6 +22,7 @@ from cms.utils.permissions import set_current_user
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
 URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
+URL_CMS_PAGE_CHANGE_LANGUAGE = URL_CMS_PAGE_CHANGE + "?language=%s"
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
 URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE_CHANGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE_CHANGE, "edit-plugin/")
@@ -92,22 +94,55 @@ class CMSTestCase(testcases.TestCase):
     def login_user_context(self, user):
         return UserLoginContext(self, user)
 
+    def _create_user(self, username, is_staff=False, is_superuser=False,
+                     is_active=True, add_default_permissions=False, permissions=None):
+        """
+        Use this method to create users.
+
+        Default permissions on page and text plugin are added if creating a
+        non-superuser and `add_default_permissions` is set.
+
+        Set `permissions` parameter to an iterable of permission codes to add
+        custom permissios.
+        """
+        user = User(username=username, email=username+'@django-cms.org',
+                    is_staff=is_staff, is_active=is_active, is_superuser=is_superuser)
+        user.set_password(username)
+        user.save()
+        if is_staff and not is_superuser and add_default_permissions:
+            user.user_permissions.add(Permission.objects.get(codename='add_text'))
+            user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+            user.user_permissions.add(Permission.objects.get(codename='change_text'))
+            user.user_permissions.add(Permission.objects.get(codename='publish_page'))
+
+            user.user_permissions.add(Permission.objects.get(codename='add_page'))
+            user.user_permissions.add(Permission.objects.get(codename='change_page'))
+            user.user_permissions.add(Permission.objects.get(codename='delete_page'))
+        if is_staff and not is_superuser and permissions:
+            for permission in permissions:
+                user.user_permissions.add(Permission.objects.get(codename=permission))
+        return user
+
     def get_superuser(self):
         try:
             admin = User.objects.get(username="admin")
         except User.DoesNotExist:
-            admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
-            admin.set_password("admin")
-            admin.save()
+            admin = self._create_user("admin", is_staff=True, is_superuser=True)
         return admin
 
     def get_staff_user_with_no_permissions(self):
         """
         Used in security tests
         """
-        staff = User(username="staff", is_staff=True, is_active=True)
-        staff.set_password("staff")
-        staff.save()
+        staff = self._create_user("staff", is_staff=True, is_superuser=False)
+        return staff
+
+    def get_staff_user_with_std_permissions(self):
+        """
+        This is a non superuser staff
+        """
+        staff = self._create_user("staff", is_staff=True, is_superuser=False,
+                                  add_permissions=True)
         return staff
 
     def get_new_page_data(self, parent_id=''):
@@ -128,6 +163,38 @@ class CMSTestCase(testcases.TestCase):
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         self.counter = self.counter + 1
         return page_data
+
+    
+    def get_new_page_data_dbfields(self, parent=None, site=None,
+                                   language=None,
+                                   template='nav_playground.html',):
+        page_data = {
+            'title': 'test page %d' % self.counter,
+            'slug': 'test-page-%d' % self.counter,
+            'language': settings.LANGUAGES[0][0] if not language else language,
+            'template': template,
+            'parent': parent if parent else None,
+            'site': site if site else Site.objects.get_current(),
+        }
+        self.counter = self.counter + 1
+        return page_data
+    
+    
+    def get_pagedata_from_dbfields(self, page_data):
+        """Converts data created by get_new_page_data_dbfields to data
+        created from get_new_page_data so you can switch between test cases
+        in api.create_page and client.post"""
+        page_data['site'] = page_data['site'].id
+        page_data['parent'] = page_data['parent'].id if page_data['parent'] else ''
+        # required only if user haves can_change_permission
+        page_data['pagepermission_set-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
+        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
+        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
+        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
+        return page_data
+    
 
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
@@ -214,7 +281,10 @@ class CMSTestCase(testcases.TestCase):
             path = self.get_pages_root()
 
         if not language:
-            language = settings.LANGUAGES[0][0]
+            if settings.USE_I18N:
+                language = settings.LANGUAGES[0][0]
+            else:
+                language = settings.LANGUAGE_CODE
 
         if post_data:
             request = factory.post(path, post_data)

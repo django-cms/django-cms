@@ -68,14 +68,14 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
-    def render(self, context, width):
+    def render(self, context, width, lang=None):
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
             context.update({'width': width})
-        return render_placeholder(self, context)
+        return render_placeholder(self, context, lang=lang)
 
     def get_media(self, request, context):
         from cms.plugins.utils import get_plugin_media

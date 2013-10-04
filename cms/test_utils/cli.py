@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
-import django
+from __future__ import with_statement
 import os
 import dj_database_url
 
 gettext = lambda s: s
 
 urlpatterns = []
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(db_url, **extra):
     from django.conf import settings
@@ -65,6 +63,7 @@ def configure(db_url, **extra):
             'django.middleware.common.CommonMiddleware',
             'django.middleware.transaction.TransactionMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
+            'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
@@ -101,6 +100,7 @@ def configure(db_url, **extra):
             'south',
             'reversion',
             'sekizai',
+            'hvad',
         ],
         LANGUAGE_CODE="en",
         LANGUAGES=(
@@ -226,13 +226,18 @@ def configure(db_url, **extra):
             'django.contrib.auth.hashers.MD5PasswordHasher',
         )
     )
-    if DJANGO_1_3:
-        defaults['INSTALLED_APPS'].append("i18nurls")
-        defaults['MIDDLEWARE_CLASSES'][4] = 'i18nurls.middleware.LocaleMiddleware'
-    else:
-        from django.utils.functional import empty
-        settings._wrapped = empty
+    from django.utils.functional import empty
+    settings._wrapped = empty
     defaults.update(extra)
+    # add data from env
+    extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
+    if extra_settings:
+        from django.utils.simplejson import load, loads
+        if os.path.exists(extra_settings):
+            with open(extra_settings) as fobj:
+                defaults.update(load(fobj))
+        else:
+            defaults.update(loads(extra_settings))
     settings.configure(**defaults)
     from south.management.commands import patch_for_test_db_setup
     patch_for_test_db_setup()

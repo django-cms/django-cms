@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from itertools import chain
+
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
@@ -7,7 +9,7 @@ from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting
-from cms.utils.page_resolver import get_page_queryset
+from cms.utils.page_resolver import get_page_queryset, use_draft
 from cms.utils.placeholder import validate_placeholder_name
 from django import template
 from django.conf import settings
@@ -17,11 +19,12 @@ from django.core.mail import mail_managers
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
-from itertools import chain
 import re
+from sekizai.helpers import Watcher, get_varname
 
 
 register = template.Library()
+
 
 def get_site_id(site):
     if site:
@@ -39,9 +42,11 @@ def get_site_id(site):
 def has_permission(page, request):
     return page.has_change_permission(request)
 
+
 register.filter(has_permission)
 
 CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
+
 
 def _clean_key(key):
     return CLEAN_KEY_PATTERN.sub('-', key)
@@ -78,12 +83,25 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
     page_lookup.update({'site': site_id})
     try:
-        return get_page_queryset(request).get(**page_lookup)
+        if 'pk' in page_lookup:
+            page = Page.objects.all().get(**page_lookup)
+            if request and use_draft(request):
+                if page.publisher_is_draft:
+                    return page
+                else:
+                    return page.publisher_draft
+            else:
+                if page.publisher_is_draft:
+                    return page.publisher_public
+                else:
+                    return page
+        else:
+            return get_page_queryset(request).get(**page_lookup)
     except Page.DoesNotExist:
         site = Site.objects.get_current()
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
-                 "The URL of the request was: http://%(host)s%(path)s")\
+                 "The URL of the request was: http://%(host)s%(path)s") \
                % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
@@ -124,6 +142,7 @@ class PageUrl(InclusionTag):
             return {'content': url}
         return {'content': ''}
 
+
 register.tag(PageUrl)
 
 register.tag('page_id_url', PageUrl)
@@ -163,9 +182,9 @@ def get_placeholder_content(context, request, current_page, name, inherit):
         content = render_placeholder(placeholder, context, name)
         if content:
             return content
-        # if we reach this point, we have an empty or non-existant placeholder
-    # call _get_placeholder again to get the placeholder properly rendered
-    # in frontend editing
+            # if we reach this point, we have an empty or non-existant placeholder
+            # call _get_placeholder again to get the placeholder properly rendered
+            # in frontend editing
     placeholder = _get_placeholder(current_page, current_page, context, name)
     return render_placeholder(placeholder, context, name)
 
@@ -250,7 +269,9 @@ class Placeholder(Tag):
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
 
+
 register.tag(Placeholder)
+
 
 class RenderPlugin(InclusionTag):
     template = 'cms/content.html'
@@ -269,11 +290,13 @@ class RenderPlugin(InclusionTag):
             edit = True
         if edit:
             from cms.middleware.toolbar import toolbar_plugin_processor
+
             processors = (toolbar_plugin_processor,)
         else:
             processors = None
 
         return {'content': plugin.render_plugin(context, processors=processors)}
+
 
 register.tag(RenderPlugin)
 
@@ -346,7 +369,9 @@ class PageAttribute(AsTag):
             return escape(func(language=lang, fallback=True))
         return ''
 
+
 register.tag(PageAttribute)
+
 
 class CleanAdminListFilter(InclusionTag):
     template = 'admin/filter.html'
@@ -368,8 +393,17 @@ class CleanAdminListFilter(InclusionTag):
         return {'title': spec.title(), 'choices': unique_choices}
 
 
+def _restore_sekizai(context, changes):
+    varname = get_varname()
+    sekizai_container = context[varname]
+    for key, values in changes.items():
+        sekizai_namespace = sekizai_container[key]
+        for value in values:
+            sekizai_namespace.append(value)
+
+
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
-        site=None, cache_result=True):
+                               site=None, cache_result=True):
     """
     Shows the content of a page with a placeholder name and given lookup
     arguments in the given language.
@@ -389,26 +423,30 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     if lang is None:
         lang = get_language_from_request(request)
 
-    content = None
-
     if cache_result:
         base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
         cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
-        content = cache.get(cache_key)
+        cached_value = cache.get(cache_key)
+        if isinstance(cached_value, dict): # new style
+            _restore_sekizai(context, cached_value['sekizai'])
+            return {'content': mark_safe(cached_value['content'])}
+        elif isinstance(cached_value, basestring): # old style
+            return {'content': mark_safe(cached_value)}
 
-    if not content:
-        page = _get_page_by_untyped_arg(page_lookup, request, site_id)
-        if not page:
-            return {'content': ''}
-        try:
-            placeholder = page.placeholders.get(slot=placeholder_name)
-        except PlaceholderModel.DoesNotExist:
-            if settings.DEBUG:
-                raise
-            return {'content': ''}
-        content = render_placeholder(placeholder, context, placeholder_name)
+    page = _get_page_by_untyped_arg(page_lookup, request, site_id)
+    if not page:
+        return {'content': ''}
+    try:
+        placeholder = page.placeholders.get(slot=placeholder_name)
+    except PlaceholderModel.DoesNotExist:
+        if settings.DEBUG:
+            raise
+        return {'content': ''}
+    watcher = Watcher(context)
+    content = render_placeholder(placeholder, context, placeholder_name)
+    changes = watcher.get_changes()
     if cache_result:
-        cache.set(cache_key, content, get_cms_setting('CACHE_DURATIONS')['content'])
+        cache.set(cache_key, {'content': content, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
 
     if content:
         return {'content': mark_safe(content)}
@@ -438,8 +476,10 @@ class ShowPlaceholderById(InclusionTag):
             'site': site
         }
 
+
 register.tag(ShowPlaceholderById)
 register.tag('show_placeholder', ShowPlaceholderById)
+
 
 class ShowUncachedPlaceholderById(ShowPlaceholderById):
     name = 'show_uncached_placeholder_by_id'
@@ -448,6 +488,7 @@ class ShowUncachedPlaceholderById(ShowPlaceholderById):
         kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
         kwargs['cache_result'] = False
         return kwargs
+
 
 register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
@@ -471,5 +512,6 @@ class CMSToolbar(InclusionTag):
     def get_context(self, context):
         context['CMS_TOOLBAR_CONFIG'] = context['request'].toolbar.as_json(context)
         return context
+
 
 register.tag(CMSToolbar)

@@ -51,7 +51,11 @@ def make_revision_with_plugins(obj, user=None, message=None):
         
         placeholder_relation = find_placeholder_relation(obj)
 
-        if revision_context.is_active():      
+        if revision_context.is_active():
+            if user:
+                revision_context.set_user(user)
+            if message:
+                revision_context.set_comment(message)
             # add toplevel object to the revision
             adapter = revision_manager.get_adapter(obj.__class__)
             revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))
@@ -67,3 +71,34 @@ def make_revision_with_plugins(obj, user=None, message=None):
                 
 def find_placeholder_relation(obj):
     return 'page'
+
+
+class classproperty(object):
+    """Like @property, but for classes, not just instances.
+
+    Example usage:
+
+        >>> from cms.utils.helpers import classproperty
+        >>> class A(object):
+        ...     @classproperty
+        ...     def x(cls):
+        ...         return 'x'
+        ...     @property
+        ...     def y(self):
+        ...         return 'y'
+        ...
+        >>> A.x
+        'x'
+        >>> A().x
+        'x'
+        >>> A.y
+        <property object at 0x2939628>
+        >>> A().y
+        'y'
+
+    """
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)

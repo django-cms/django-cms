@@ -78,6 +78,7 @@ Extending the CMS
     extending_cms/placeholders
     extending_cms/searchdocs
     extending_cms/fields
+    extending_cms/testing
 
 
 ********

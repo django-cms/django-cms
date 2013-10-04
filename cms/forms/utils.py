@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.exceptions import LanguageError
 from cms.models import Page
 from cms.models.titlemodels import Title
 from cms.utils import i18n
@@ -8,13 +9,12 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db.models.signals import post_save, post_delete
-from django.utils import translation
 from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 
 
 def update_site_and_page_choices(lang=None):
-    lang = lang or translation.get_language()
+    lang = lang or i18n.get_current_language()
     SITE_CHOICES_KEY = get_site_cache_key(lang)
     PAGE_CHOICES_KEY = get_page_cache_key(lang)
     title_queryset = (Title.objects.drafts()
@@ -31,7 +31,11 @@ def update_site_and_page_choices(lang=None):
     site_choices = []
     page_choices = [('', '----')]
     
-    language_order = [lang] + i18n.get_fallback_languages(lang)
+    try:
+        fallbacks = i18n.get_fallback_languages(lang)
+    except LanguageError:
+        fallbacks = []
+    language_order = [lang] + fallbacks
     
     for sitepk, sitename in sites.items():
         site_choices.append((sitepk, sitename))
@@ -58,14 +62,14 @@ def update_site_and_page_choices(lang=None):
     return site_choices, page_choices
 
 def get_site_choices(lang=None):
-    lang = lang or translation.get_language()
+    lang = lang or i18n.get_current_language()
     site_choices = cache.get(get_site_cache_key(lang))
     if site_choices is None:
         site_choices, page_choices = update_site_and_page_choices(lang)
     return site_choices
 
 def get_page_choices(lang=None):
-    lang = lang or translation.get_language()
+    lang = lang or i18n.get_current_language()
     page_choices = cache.get(get_page_cache_key(lang))
     if page_choices is None:
         site_choices, page_choices = update_site_and_page_choices(lang)
@@ -82,8 +86,11 @@ def get_page_cache_key(lang):
 
 def _clean_many(prefix):
     keys = []
-    for lang in [language[0] for language in settings.LANGUAGES]:
-        keys.append(_get_key(prefix, lang))
+    if settings.USE_I18N:
+        for lang in [language[0] for language in settings.LANGUAGES]:
+            keys.append(_get_key(prefix, lang))
+    else:
+        keys = [_get_key(prefix, settings.LANGUAGE_CODE)]
     cache.delete_many(keys)
 
 def clean_site_choices_cache(sender, **kwargs):
