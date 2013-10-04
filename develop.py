@@ -22,10 +22,10 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    develop.py test [--parallel | --failfast] [<test-label>...]
+    develop.py test [--parallel | --failfast] [--do-migrations] [<test-label>...]
     develop.py timed test [test-label...]
-    develop.py isolated test [<test-label>...] [--parallel]
-    develop.py server [--port=<port>] [--bind=<bind>]
+    develop.py isolated test [<test-label>...] [--parallel] [--do-migrations]
+    develop.py server [--port=<port>] [--bind=<bind>] [--do-migrations]
     develop.py shell
     develop.py compilemessages
 
@@ -33,17 +33,22 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
     --parallel                  Run tests in parallel.
+    --do-migrations             Use south migrations in test or server command.
     --failfast                  Stop tests on first failure (only if not --parallel).
     --port=<port>               Port to listen on [default: 8000].
     --bind=<bind>               Interface to bind to [default: 127.0.0.1].
 '''
 
 
-def server(bind='127.0.0.1', port=8000):
+def server(bind='127.0.0.1', port=8000, do_migrations=False):
     if os.environ.get("RUN_MAIN") != "true":
         from south.management.commands import syncdb, migrate
-        syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
-        migrate.Command().handle(interactive=False, verbosity=1)
+        if do_migrations:
+            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
+            migrate.Command().handle(interactive=False, verbosity=1)
+        else:
+            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
+            migrate.Command().handle(interactive=False, verbosity=1, fake=True)
         from django.contrib.auth.models import User
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
@@ -154,6 +159,7 @@ if __name__ == '__main__':
     default_name = ':memory:' if args['test'] else 'local.sqlite'
 
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+    do_migrations = args.get('--do-migrations', False) or os.environ.get("CMS_DO_MIGRATIONS", False)
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
@@ -162,7 +168,8 @@ if __name__ == '__main__':
                 ROOT_URLCONF='cms.test_utils.project.urls',
                 STATIC_ROOT=STATIC_ROOT,
                 MEDIA_ROOT=MEDIA_ROOT,
-                USE_TZ=use_tz
+                USE_TZ=use_tz,
+                SOUTH_TESTS_MIGRATE=do_migrations
             )
 
             # run
@@ -184,7 +191,7 @@ if __name__ == '__main__':
                     num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
                 sys.exit(num_failures)
             elif args['server']:
-                server(args['--bind'], args['--port'])
+                server(args['--bind'], args['--port'], do_migrations)
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
