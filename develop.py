@@ -22,10 +22,10 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    develop.py test [--parallel | --failfast] [--do-migrations] [<test-label>...]
+    develop.py test [--parallel | --failfast] [--migrate] [<test-label>...]
     develop.py timed test [test-label...]
-    develop.py isolated test [<test-label>...] [--parallel] [--do-migrations]
-    develop.py server [--port=<port>] [--bind=<bind>] [--do-migrations]
+    develop.py isolated test [<test-label>...] [--parallel] [--migrate]
+    develop.py server [--port=<port>] [--bind=<bind>] [--migrate]
     develop.py shell
     develop.py compilemessages
 
@@ -33,17 +33,17 @@ Options:
     -h --help                   Show this screen.
     --version                   Show version.
     --parallel                  Run tests in parallel.
-    --do-migrations             Use south migrations in test or server command.
+    --migrate                   Use south migrations in test or server command.
     --failfast                  Stop tests on first failure (only if not --parallel).
     --port=<port>               Port to listen on [default: 8000].
     --bind=<bind>               Interface to bind to [default: 127.0.0.1].
 '''
 
 
-def server(bind='127.0.0.1', port=8000, do_migrations=False):
+def server(bind='127.0.0.1', port=8000, migrate=False):
     if os.environ.get("RUN_MAIN") != "true":
         from south.management.commands import syncdb, migrate
-        if do_migrations:
+        if migrate:
             syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
             migrate.Command().handle(interactive=False, verbosity=1)
         else:
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     default_name = ':memory:' if args['test'] else 'local.sqlite'
 
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
-    do_migrations = args.get('--do-migrations', False) or os.environ.get("CMS_DO_MIGRATIONS", False)
+    migrate = args.get('--migrate', False)
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
@@ -169,7 +169,7 @@ if __name__ == '__main__':
                 STATIC_ROOT=STATIC_ROOT,
                 MEDIA_ROOT=MEDIA_ROOT,
                 USE_TZ=use_tz,
-                SOUTH_TESTS_MIGRATE=do_migrations
+                SOUTH_TESTS_MIGRATE=migrate
             )
 
             # run
@@ -191,7 +191,7 @@ if __name__ == '__main__':
                     num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
                 sys.exit(num_failures)
             elif args['server']:
-                server(args['--bind'], args['--port'], do_migrations)
+                server(args['--bind'], args['--port'], migrate)
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
