@@ -118,6 +118,7 @@ class CMSPluginBase(admin.ModelAdmin):
         We just need the popup interface here
         """
         context.update({
+            'current_site': getattr(request.current_page, 'site_id', None),
             'preview': not "no_preview" in request.GET,
             'is_popup': True,
             'plugin': self.cms_plugin_instance,
