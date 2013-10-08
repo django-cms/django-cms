@@ -3,10 +3,7 @@ from __future__ import with_statement
 import inspect
 from contextlib import contextmanager
 from cms import constants
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
-from cms.management.commands.subcommands.list import plugin_report
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
@@ -205,6 +202,7 @@ def check_deprecated_settings(output):
 
 @define_check
 def check_plugin_instances(output):
+    from cms.management.commands.subcommands.list import plugin_report
     with output.section("Plugin instances") as section:
         # get the report
         report = plugin_report()
@@ -225,6 +223,8 @@ def check_plugin_instances(output):
 
 @define_check
 def check_copy_relations(output):
+    from cms.plugin_pool import plugin_pool
+    from cms.models.pluginmodel import CMSPlugin
     c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):

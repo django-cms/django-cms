@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+from cms.compat import get_user_model
 from cms.utils import get_cms_setting
 from django.conf import settings
 from django.core.cache import cache
 
-from django.contrib.auth.models import User
 
 PERMISSION_KEYS = [
     'can_change', 'can_add', 'can_delete',

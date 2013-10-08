@@ -4,6 +4,7 @@ from django.utils.numberformat import format
 from django.db import models
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
+from cms.compat import get_user_model
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
@@ -29,7 +30,8 @@ from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
+from cms.compat import get_user_model
 from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from django.contrib.messages.storage import default_storage
 from django.core.exceptions import ImproperlyConfigured
@@ -44,7 +46,11 @@ import itertools
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def setUp(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        User = get_user_model()
+        
+        u = User(is_staff=True, is_active=True, is_superuser=True)
+        setattr(u, u.USERNAME_FIELD, "test")
+        
         u.set_password("test")
         u.save()
 
@@ -712,7 +718,9 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
     def _testuser(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=False)
+        User = get_user_model()
+        u = User(is_staff=True, is_active=True, is_superuser=False)
+        setattr(u, u.USERNAME_FIELD, "test")
         u.set_password("test")
         u.save()
         return u
@@ -831,7 +839,9 @@ class PlaceholderConfTests(TestCase):
 
 class PlaceholderI18NTest(CMSTestCase):
     def _testuser(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        User = get_user_model()
+        u = User(is_staff=True, is_active=True, is_superuser=True)
+        setattr(u, u.USERNAME_FIELD, "test")
         u.set_password("test")
         u.save()
         return u

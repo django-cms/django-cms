@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from cms.compat import get_user_model
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser, Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -129,8 +130,8 @@ class CMSTestCase(testcases.TestCase):
 
     def get_superuser(self):
         try:
-            admin = User.objects.get(username="admin")
-        except User.DoesNotExist:
+            admin = get_user_model().objects.get(username="admin")
+        except get_user_model().DoesNotExist:
             admin = self._create_user("admin", is_staff=True, is_superuser=True)
         return admin
 

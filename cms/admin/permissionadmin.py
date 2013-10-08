@@ -31,7 +31,7 @@ class PagePermissionInlineAdmin(TabularInline):
     def raw_id_fields(cls):
         # Dynamically set raw_id_fields based on settings
         threshold = get_cms_setting('RAW_ID_USERS')
-        if threshold and User.objects.count() > threshold:
+        if threshold and get_user_model().objects.count() > threshold:
             return ['user']
         return []
 

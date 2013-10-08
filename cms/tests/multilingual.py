@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import copy
 from cms.api import create_page, create_title, publish_page, add_plugin
+from cms.compat import get_user_model
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
 from cms.models import Title
@@ -13,7 +14,6 @@ from cms.utils import get_cms_setting
 from cms.utils.conf import get_languages
 from django.contrib.sites.models import Site
 
-from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
@@ -133,7 +133,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         add_plugin(placeholder, "TextPlugin", TESTLANG, body="test")
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
-        user = User.objects.create_superuser('super', 'super@django-cms.org', 'super')
+        user = get_user_model().objects.create_superuser('super', 'super@django-cms.org', 'super')
         page = publish_page(page, user)
         public = page.publisher_public
         placeholder = public.placeholders.all()[0]

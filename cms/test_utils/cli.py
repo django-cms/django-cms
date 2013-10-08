@@ -103,6 +103,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
+            'cms.test_utils.project.customuserapp',
             'cms.test_utils.project.objectpermissionsapp',
             'cms.test_utils.project.extensionapp',
             'south',
@@ -244,6 +245,7 @@ def configure(db_url, **extra):
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ),
+        AUTH_USER_MODEL='customuserapp.User',
         ALLOWED_HOSTS=['localhost'],
         LOGGING={
             'version': 1,

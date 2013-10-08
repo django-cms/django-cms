@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import urllib
+from cms import compat
 from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
@@ -65,7 +67,7 @@ class BasicToolbar(CMSToolbar):
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
-            admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
+            admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:"+settings.AUTH_USER_MODEL.replace('.','_').lower()+"_changelist"))
             # sites menu
         if get_cms_setting('PERMISSION'):
             sites_queryset = get_user_sites_queryset(self.request.user)
@@ -187,7 +189,60 @@ class PageToolbar(CMSToolbar):
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         # cms page admin
-        admin_menu.add_sideframe_item(_('Pages'), url=reverse("admin:cms_page_changelist"), position=0)
+# <<<<<<< HEAD
+        pages_menu = admin_menu.get_or_create_menu('pages', _('Pages'), position=0)
+        pages_menu.add_sideframe_item(_('Manage pages'), url=reverse("admin:cms_page_changelist"))
+        pages_menu.add_break(MANAGE_PAGES_BREAK)
+        pages_menu.add_sideframe_item(_('Add new page'), url=reverse("admin:cms_page_add"))
+# <<<<<<< HEAD
+#         # users
+#     if request.user.has_perm('user.change_user'):
+#         admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:"+settings.AUTH_USER_MODEL.replace('.','_').lower()+"_changelist"))
+#     if permissions_active:
+#         sites_queryset = get_user_sites_queryset(request.user)
+#     else:
+#         sites_queryset = Site.objects.all()
+#     if len(sites_queryset) > 1:
+#         sites_menu = admin_menu.get_or_create_menu('sites', _('Sites'))
+#         sites_menu.add_sideframe_item(_('Admin Sites'), url=reverse('admin:sites_site_changelist'))
+#         sites_menu.add_break(ADMIN_SITES_BREAK)
+#         for site in sites_queryset:
+#             sites_menu.add_link_item(site.name, url='http://%s' % site.domain, active=site.pk == current_site.pk)
+#             # admin
+#     admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
+#     admin_menu.add_break(ADMINISTRATION_BREAK)
+#     # cms users
+#     admin_menu.add_sideframe_item(_('User settings'), url=reverse('admin:cms_usersettings_change'))
+#     admin_menu.add_break(USER_SETTINGS_BREAK)
+#     # logout
+#     admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'), active=True)
+#     # check if we're in the CMS or on an apphook root
+#     if current_page:
+#         path = current_page.get_path()
+#         if settings.APPEND_SLASH:
+#             path = "%s/" % path
+#         if request.path.endswith(path):
+#             add_cms_menus(toolbar, current_page, permissions_active, request)
+#             # language menu
+#     try:
+#         current_lang = get_language_object(get_language_from_request(request), current_site.pk)
+#     except LanguageError:
+#         current_lang = None
+#     language_menu = toolbar.get_or_create_menu('language', _('Language'))
+#     language_changer = getattr(request, '_language_changer', DefaultLanguageChanger(request))
+#     for language in get_language_objects(current_site.pk):
+#         url = language_changer(language['code'])
+#         language_menu.add_link_item(language['name'], url=url, active=current_lang == language['code'])
+#         # edit switcher
+#     if toolbar.edit_mode and toolbar.can_change:
+#         switcher = toolbar.add_button_list('Mode Switcher', side=toolbar.RIGHT,
+#                                            extra_classes=['cms_toolbar-item-cms-mode-switcher'])
+#         switcher.add_button(_("Content"), '?edit', active=not toolbar.build_mode, disabled=toolbar.build_mode)
+#         switcher.add_button(_("Structure"), '?build', active=toolbar.build_mode, disabled=not toolbar.build_mode)
+# =======
+# =======
+#         admin_menu.add_sideframe_item(_('Pages'), url=reverse("admin:cms_page_changelist"), position=0)
+# >>>>>>> upstream/develop
 
     def add_page_menu(self):
         # menu for current page
@@ -285,3 +340,4 @@ class PageToolbar(CMSToolbar):
         history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
                                    disabled=not self.page.is_dirty())
         history_menu.add_modal_item(_('View history'), url=reverse('admin:cms_page_history', args=(self.page.pk,)))
+# >>>>>>> upstream/develop

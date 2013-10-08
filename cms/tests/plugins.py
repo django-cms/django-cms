@@ -4,6 +4,7 @@ import datetime
 import json
 
 from cms.api import create_page, publish_page, add_plugin
+from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
@@ -32,7 +33,7 @@ from django import http
 from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User
+from cms.compat import get_user_model
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -69,11 +70,15 @@ plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 class PluginsTestBaseCase(CMSTestCase):
     def setUp(self):
-        self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        User = get_user_model()
+        
+        self.super_user = User(is_staff=True, is_active=True, is_superuser=True)
+        setattr(self.super_user, User.USERNAME_FIELD, "test") 
         self.super_user.set_password("test")
         self.super_user.save()
 
-        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
+        self.slave = User(is_staff=True, is_active=True, is_superuser=False)
+        setattr(self.super_user, User.USERNAME_FIELD, "slave")
         self.slave.set_password("slave")
         self.slave.save()
 

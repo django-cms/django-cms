@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.api import create_page, publish_page, add_plugin, create_page_user, assign_user_to_page
+
+import urllib
+
 from cms.management.commands.subcommands.moderator import log
+
+from cms.api import (create_page, publish_page, add_plugin,
+                     create_page_user, assign_user_to_page)
+from cms.compat import get_user_model
+
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
@@ -13,7 +20,7 @@ from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
 from cms.utils.compat.urls import unquote
 
-from django.contrib.auth.models import User, Permission, AnonymousUser, Group
+from django.contrib.auth.models import Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
@@ -435,7 +442,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # really logged in
         self.assertTrue('_auth_user_id' in self.client.session)
         login_user_id = self.client.session.get('_auth_user_id')
-        user = User.objects.get(username=self.user_staff.username)
+        user = get_user_model().objects.get(username=self.user_staff.username)
         self.assertEquals(login_user_id, user.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -579,7 +586,7 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             self.master_page = create_page("master", "nav_playground.html", "en")
 
             # create master user
-            self.user_master = User.objects.create(username="master", email="master@django-cms.org", password="master",
+            self.user_master = get_user_model().objects.create(username="master", email="master@django-cms.org", password="master",
                                                    is_staff=True)
             self.user_master.user_permissions.add(Permission.objects.get(codename='publish_page'))
             #self.user_master = create_page_user(self.user_super, master, grant_all=True)
@@ -789,7 +796,7 @@ class ViewPermissionTests(PermissionTestsBase):
             page.has_view_permission(request)
 
     def test_public_for_all(self):
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
         page = Page()
         page.pk = 1
@@ -798,7 +805,7 @@ class ViewPermissionTests(PermissionTestsBase):
         self.assertTrue(page.has_view_permission(request))
 
     def test_public_for_all_num_queries(self):
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
         site = Site()
         site.pk = 1
@@ -840,7 +847,7 @@ class ViewPermissionTests(PermissionTestsBase):
 
     def test_authed_basic_perm(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
             page = Page()
@@ -853,7 +860,7 @@ class ViewPermissionTests(PermissionTestsBase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
             request = self.get_request(user)
             page = Page()
@@ -873,7 +880,7 @@ class ViewPermissionTests(PermissionTestsBase):
 
     def test_authed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = Page()
             page.pk = 1
@@ -903,7 +910,7 @@ class ViewPermissionTests(PermissionTestsBase):
 
     def test_page_permissions(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, user=user, page=page)
@@ -911,7 +918,7 @@ class ViewPermissionTests(PermissionTestsBase):
 
     def test_page_permissions_view_groups(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
             group.user_set.add(user)
             request = self.get_request(user)
@@ -921,7 +928,7 @@ class ViewPermissionTests(PermissionTestsBase):
 
     def test_global_permission(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             GlobalPagePermission.objects.create(can_view=True, user=user)
             request = self.get_request(user)
             page = Page()

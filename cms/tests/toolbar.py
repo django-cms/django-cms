@@ -5,14 +5,16 @@ from cms.utils.compat.dj import force_unicode
 import re
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
+from cms.compat import get_user_model, is_user_swapped
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 
-from django.contrib.auth.models import AnonymousUser, User, Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import TestCase
+
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
 from django.core.urlresolvers import reverse
@@ -106,7 +108,11 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 3)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        if is_user_swapped:
+            self.assertEqual(len(admin_items), 6, admin_items)
+        else:
+            self.assertEqual(len(admin_items), 7, admin_items)
+
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')

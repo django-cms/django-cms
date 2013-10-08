@@ -10,10 +10,9 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from cms.forms.utils import get_site_choices, get_page_choices
-from cms.models import Page, PageUser, Placeholder
+from cms.models import Page, Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request, cms_static_url
-from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 
 
 class PageSelectWidget(MultiWidget):
@@ -133,6 +132,7 @@ class UserSelectAdminWidget(Select):
     attribute.
     """
     def render(self, name, value, attrs=None, choices=()):
+        from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
         output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]    
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + PageUser._meta.get_add_permission())):
