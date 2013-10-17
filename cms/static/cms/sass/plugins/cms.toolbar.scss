@@ -62,7 +62,7 @@
 		li { float:left; position:relative; zoom:1; }
 		li a { float:left; padding:5px 10px; zoom:1; cursor:default; }
 		li ul { display:none; }
-		> li:first-child > a span { font-weight:600; line-height:12px; }
+		> li:first-child > a span { font-weight:600; }
 
 		// hover effect
 		.cms_toolbar-item-navigation-hover {
