@@ -189,15 +189,15 @@ def check_i18n(output):
         else:
             section.warn("Old style (tuple based) CMS_LANGUAGES, please switch to the new (dictionary based) style")
         if getattr(settings, 'LANGUAGE_CODE', '').find('_') > -1:
-            section.warn("LANGUAGE_CODE must contain a valid language code, not a locale ('%s' provided)" % getattr(settings, 'LANGUAGE_CODE', ''))
+            section.warn("LANGUAGE_CODE must contain a valid language code, not a locale (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % getattr(settings, 'LANGUAGE_CODE', ''))
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
-                section.warn("LANGUAGES must contain valid language codes, not locales ('%s' provided)" % lang[0])
+                section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
         for site, items in get_cms_setting('LANGUAGES').items():
             if type(site) == int:
                 for lang in items:
                     if lang['code'].find('_') > -1:
-                        section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales ('%s' provided)" % lang['code'])
+                        section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
                 section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
