@@ -278,7 +278,7 @@ Example::
 .. warning::
 
     Make sure you use **language codes** (`en-us`) and not **locale names**
-    (`en_US`)here and in :setting:`django:LANGUAGES`.
+    (`en_US`) here and in :setting:`django:LANGUAGES`.
     Use :ref:`check command <cms-check-command>` to check for correct syntax.
 
 ``CMS_LANGUAGES`` has different options where you can define how different
