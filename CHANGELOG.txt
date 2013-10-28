@@ -118,6 +118,16 @@
 - Fixed page change form (jQuery and permissions)
 - Fixed placeholder field permission checks
 
+==== 2.3.7 (2013-05-30) ===
+
+- Fixed a bug in the cache handling of plugins using django-sekizai
+- Fixed a performance bug in the permission cache
+
+==== 2.3.8 (2013-10-29) ===
+
+- Fixed a bug in fixture loading signals handling
+- Fixed a bug in thousands formatting in placeholders primary keys
+
 ==== 2.4.0 (2013-4-17)===
 
 Please see Install/2.4 release notes *before* attempting to upgrade to version 2.4.
@@ -158,3 +168,17 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - added Testing docs
 - fixed more issues with only one language
 - locales updated
+
+==== 2.4.3 (2013-10-29)===
+
+- Fixed a bug in fixture loading signals handling
+- Fixed a bug in thousands formatting in placeholders primary keys
+- Test fixes
+- Fix use of cached content in show_placeholder in preview mode
+- Fix issues in cookies handling
+- Fix minor unicode issues
+- Fix a missing argument in ModelAdmin
+- Fix a bug in WymEditor handling
+- Fix bugs in migrations
+- Fix bug in language fallback
+- Minor documentation fixes
