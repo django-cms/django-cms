@@ -1,0 +1,37 @@
+###################
+2.4.3 release notes
+###################
+
+*******************
+What's new in 2.4.3
+*******************
+
+Fixture loading in Postgres
+===========================
+
+Placeholder rescan is skipped when loading fixtures.
+
+Fix placeholder primary keys formatting
+=======================================
+
+Fixed a bug when the Django setting USE_THOUSAND_SEPARATOR = True, which caused
+placeholders primary keys to be formatted according to locale, breaking frontend
+editing.
+
+Fix show_placeholder in preview mode
+====================================
+
+``show_placeholder`` no longer uses cached content in preview mode.
+
+
+Other fixes
+===========
+
+ * Test fixes
+ * Fix issues in cookies handling
+ * Fix minor unicode issues
+ * Fix a missing argument in ModelAdmin
+ * Fix a bug in WymEditor handling
+ * Fix bugs in migrations
+ * Fix bug in language fallback
+ * Minor documentation fixes
