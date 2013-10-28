@@ -169,7 +169,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - fixed more issues with only one language
 - locales updated
 
-==== 2.4.2 (2013-10-29)===
+==== 2.4.3 (2013-10-29)===
 
 - Fixed a bug in fixture loading signals handling
 - Fixed a bug in thousands formatting in placeholders primary keys
