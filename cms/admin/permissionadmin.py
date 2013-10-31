@@ -8,8 +8,13 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 PERMISSION_ADMIN_INLINES = []

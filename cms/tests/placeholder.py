@@ -29,7 +29,7 @@ from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
 from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from django.contrib.messages.storage import default_storage
 from django.core.exceptions import ImproperlyConfigured
@@ -40,6 +40,12 @@ from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from django.test import TestCase
 import itertools
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):

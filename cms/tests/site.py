@@ -8,8 +8,14 @@ from cms.utils import get_cms_setting
 from cms.views import details
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
+
 
 class SiteTestCase(CMSTestCase):
     """Site framework specific test cases.

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
 
@@ -10,6 +9,12 @@ from cms.models import CMSPlugin
 from cms.models.pagemodel import Page
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 class PublisherCommandTests(TestCase):

@@ -11,13 +11,18 @@ from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHA
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from os.path import join
 import reversion
 from reversion.models import Revision, Version, VERSION_CHANGE
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 class BasicReversionTestCase(CMSTestCase):

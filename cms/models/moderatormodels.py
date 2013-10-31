@@ -3,11 +3,16 @@ import sys
 from cms.utils.compat.dj import python_2_unicode_compatible
 
 from django.db import models
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models.managers import PageModeratorStateManager
 from cms.models.pagemodel import Page
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 ################################################################################

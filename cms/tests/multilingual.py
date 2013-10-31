@@ -12,9 +12,13 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.conf import get_languages
 from django.contrib.sites.models import Site
-
-from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
