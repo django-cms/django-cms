@@ -7,9 +7,14 @@ from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 class Mock_PageSelectFormField(PageSelectFormField):

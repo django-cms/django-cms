@@ -32,7 +32,6 @@ from django import http
 from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -40,6 +39,12 @@ from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
 import os
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 class DumbFixturePlugin(CMSPluginBase):

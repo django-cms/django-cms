@@ -29,7 +29,13 @@ def main():
                 from django.core.management import call_command
                 call_command('syncdb', interactive=False, migrate_all=new_db)
                 call_command('migrate', interactive=False, fake=new_db)
-                from django.contrib.auth.models import User
+                
+                try:
+                    from django.contrib.auth import get_user_model
+                    User = get_user_model()
+                except ImportError:
+                    from django.contrib.auth.models import User
+                
                 if not User.objects.filter(is_superuser=True).exists():
                     usr = User()
                     usr.username = 'admin'

@@ -4,11 +4,16 @@ from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 try:

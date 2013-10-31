@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 from cms.api import create_page
 from cms.models import Page
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils.unittest import skipIf
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 try:
     from selenium.webdriver.firefox.webdriver import WebDriver

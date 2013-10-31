@@ -22,12 +22,19 @@ import django
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
-from django.contrib.auth.models import User, Permission, AnonymousUser
+from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
+
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 

@@ -5,12 +5,17 @@ from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.i18n import force_language
-from django.contrib.auth.models import User
 from django.middleware.locale import LocaleMiddleware
 from django.template import Template
 from menus.base import NavigationNode
 from django.http import HttpResponse
 from cms.templatetags.cms_admin import preview_link
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 class NonRootCase(CMSTestCase):

@@ -13,11 +13,17 @@ from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
 from cms.utils.compat.urls import unquote
 
-from django.contrib.auth.models import User, Permission, AnonymousUser, Group
+from django.contrib.auth.models import Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
