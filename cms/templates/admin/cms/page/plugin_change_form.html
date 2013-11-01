@@ -1,7 +1,11 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_modify adminmedia cms_admin %}
 {% load url from future %}
-{% block extrahead %}{{ block.super }}
+{% block extrahead %}
+<script type="text/javascript">
+    var current_site = {{current_site}};
+</script>
+{{ block.super }}
 <script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
@@ -85,9 +89,6 @@
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if current_site %}<input type="hidden" name="_current_site" value="{{current_site}}" />{% endif %}
-<script type="text/javascript">
-    var current_site = {{current_site}};
-</script>
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if errors %}
     <p class="errornote">
