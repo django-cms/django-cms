@@ -14,7 +14,7 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
     The dictionary contains the label, the classname and the module for the
     plugin.
     Names and modules can be defined on a per-placeholder basis using
-    'plugin_modules' and 'plugin_labes' attributes in CMS_PLACEHOLDER_CONF
+    'plugin_modules' and 'plugin_labels' attributes in CMS_PLACEHOLDER_CONF
 
     :param plugins_list: list of plugins valid for the placeholder
     :param slot: placeholder slot name
@@ -35,7 +35,7 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
                 continue
 
         modules = get_placeholder_conf("plugin_modules", slot, template, default={})
-        names = get_placeholder_conf("plugin_labes", slot, template, default={})
+        names = get_placeholder_conf("plugin_labels", slot, template, default={})
         main_list.append({'value': plugin.value,
                           'name': force_unicode(names.get(plugin.value, plugin.name)),
                           'module': force_unicode(modules.get(plugin.value, plugin.module))})
