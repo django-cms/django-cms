@@ -96,7 +96,7 @@ Example::
             'plugin_modules': {
                 'LinkPlugin': 'Extra',
             }.
-            'plugin_labes': {
+            'plugin_labels': {
                 'LinkPlugin': 'Add a link',
             }.
         },
@@ -139,7 +139,7 @@ plugins, as shown above with ``base.html content``.
     A dictionary of plugins and custom module names to group plugin in the
     toolbar UI.
 
-``plugin_labes``
+``plugin_labels``
     A dictionary of plugins and custom labels to show in the toolbar UI.
 
 ``child_classes``
