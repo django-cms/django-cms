@@ -361,7 +361,6 @@ This command depends on whether you **upgrade** your installation or do a
 as it is a very powerful, easy and convenient tool. django CMS uses it extensively.
 
 
-=============
 Fresh install
 =============
 
@@ -373,7 +372,6 @@ Run::
 The first command will prompt you to create a super user. Choose 'yes' and enter
 appropriate values.
 
-=======
 Upgrade
 =======
 
