@@ -64,7 +64,9 @@ class StackAdmin(PlaceholderAdmin):
                 stack = form.save()
                 copy_plugins_to(plugin_list, stack.content)
                 stack.save()
-                return HttpResponse('OK') # TODO: close the window
+                return HttpResponse('<script type="text/javascript">'
+                                    'window.top.CMS.$( ".cms_modal-close" ).trigger( "click" );'
+                                    '</script>')
         return self.add_view(request)
 
     def create_stack_from_plugin(self, request, placeholder_id, plugin_id):
