@@ -584,6 +584,7 @@ $(document).ready(function () {
 
 		// private methods
 		_showToolbar: function (speed, init) {
+		    this.body.css('margin-top', '1.75em');
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
 			// set messages top to toolbar height
@@ -604,6 +605,7 @@ $(document).ready(function () {
 			// set new settings
 			this.settings.toolbar = 'collapsed';
 			if(!init) this.setSettings();
+			this.body.css('margin-top', '0em');
 		},
 
 		_enableEditMode: function (speed, init) {
