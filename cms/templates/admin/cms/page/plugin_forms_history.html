@@ -13,7 +13,7 @@
 //<![CDATA[	
 (function($) {
 	$(document).ready(function() {
-	   parent.setiframeheight($('body').height(), {{plugin.pk}});
+	   parent.setiframeheight($('body').height(), {{ plugin.pk|unlocalize }});
 	});	
 })(jQuery);
 //]]>
