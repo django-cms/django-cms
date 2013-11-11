@@ -1,0 +1,45 @@
+
+
+## Customize the test machine
+machine:
+
+  timezone:
+    Europe/Zurich # Set the timezone
+
+  # Version of ruby to use
+  python:
+    version:
+      2.6
+      2.7
+      3.3
+
+## Customize checkout
+checkout:
+  post:
+    - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
+    - sh -c "if [ '$DB' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'create database djangocms_test;' -U postgres; fi"
+    - sh -c "if [ '$DB' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi"
+
+## Customize dependencies
+dependencies:
+  pre:
+    - npm install coffeescript # install from a different package manager
+    - gem uninstall bundler # use a custom version of bundler
+    - gem install bundler --pre
+
+  override:
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
+    - pip install -q -r "test_requirements/django-$DJANGO.txt" --use-mirrors
+    - if [ $DB == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python --use-mirrors; fi
+
+
+## Customize test commands
+test:
+  override:
+    - DJANGO=1.4 DB='sqlite://localhost/:memory:'
+    - DJANGO=1.4 DB='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=1.4 DB='postgres://postgres@127.0.0.1/djangocms_test'
+    - DJANGO=1.5 DB='sqlite://localhost/:memory:'
+    - DJANGO=1.5 DB='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=1.5 DB='postgres://postgres@127.0.0.1/djangocms_test'
