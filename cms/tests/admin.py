@@ -256,10 +256,15 @@ class AdminTestCase(AdminTestsBase):
         page = create_page("delete-page-translation", "nav_playground.html", "en",
                            created_by=admin, published=True)
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
+        create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin):
             response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
             self.assertEqual(response.status_code, 200)
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_change_template(self):
@@ -679,7 +684,6 @@ class AdminTests(AdminTestsBase):
             response = self.client.post(admin_url, post_data)
             draft_page = Page.objects.get(pk=page.pk).get_draft_object()
             self.assertTrue(draft_page.is_dirty())
-
 
 class NoDBAdminTests(CMSTestCase):
     @property

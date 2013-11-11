@@ -1,4 +1,8 @@
 from __future__ import with_statement
+import re
+from cms.views import details
+from cms.utils.compat.dj import force_unicode
+import re
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
@@ -11,6 +15,9 @@ from django.contrib.auth.models import AnonymousUser, User, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
+from django.core.urlresolvers import reverse
+from cms.test_utils.project.placeholderapp.models import (Example1, TwoPlaceholderExample, MultilingualExample1)
+from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
@@ -136,6 +143,23 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response, 'cms.placeholders.js')
         self.assertContains(response, 'cms.placeholders.css')
 
+    def test_markup_generic_module(self):
+        create_page("toolbar-page", "col_two.html", "en", published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Generic</span>')
+
+    def test_markup_flash_custom_module(self):
+        superuser = self.get_superuser()
+        create_page("toolbar-page", "col_two.html", "en", published=True)
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, 'href="LinkPlugin">Add a link')
+        self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
+
     def test_show_toolbar_to_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
                            published=True)
@@ -204,6 +228,253 @@ class ToolbarTests(ToolbarTestBase):
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
+
+
+class EditModelTemplateTagTest(ToolbarTestBase):
+    urls = 'cms.test_utils.project.placeholderapp_urls'
+    edit_fields_rx = "(\?|&amp;)edit_fields=%s"
+
+    def tearDown(self):
+        Example1.objects.all().delete()
+        MultilingualExample1.objects.all().delete()
+        super(EditModelTemplateTagTest, self).tearDown()
+
+    def test_anon(self):
+        user = self.get_anon()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=False)
+        response = detail_view(request, ex1.pk)
+        self.assertContains(response, "<h1>char_1</h1>")
+        self.assertNotContains(response, "CMS.API.Toolbar")
+
+    def test_noedit(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=False)
+        response = detail_view(request, ex1.pk)
+        self.assertContains(response, "<h1>char_1</h1>")
+        self.assertContains(response, "CMS.API.Toolbar")
+
+    def test_edit(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'char_1'))
+
+    def test_callable_item(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "callable_item" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
+
+    def test_admin_url(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "callable_item" "char_1" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
+
+    def test_admin_url_extra_field(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "callable_item" "char_2" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
+        self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+        self.assertTrue(re.search(self.edit_fields_rx % "char_2", response.content.decode('utf8')))
+
+    def test_admin_url_multiple_fields(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "callable_item" "char_1,char_2" "en" "admin:placeholderapp_example1_edit_field" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
+        self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+        self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode('utf8')))
+        self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
+
+    def test_instance_method(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "callable_item" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
+
+    def test_item_from_context(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance item_name %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text,
+                               item_name="callable_item")
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'callable_item'))
+
+    def test_edit_field(self):
+        from django.contrib.admin import site
+        exadmin = site._registry[Example1]
+
+        user = self.get_superuser()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        request = self.get_page_request(page, user, edit=True)
+        request.GET['edit_fields'] = 'char_1'
+        response = exadmin.edit_field(request, ex1.pk, "en")
+        self.assertContains(response, 'id="id_char_1"')
+        self.assertContains(response, 'value="char_1"')
+
+    def test_edit_field_not_allowed(self):
+        from django.contrib.admin import site
+        exadmin = site._registry[Example1]
+
+        user = self.get_superuser()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        request = self.get_page_request(page, user, edit=True)
+        request.GET['edit_fields'] = 'char_3'
+        response = exadmin.edit_field(request, ex1.pk, "en")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content.decode('utf8'), 'Fields char_3 not editabled in the frontend')
+
+    def test_multi_edit(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        title = create_title("fr", "test", page)
+
+        exm = MultilingualExample1()
+        exm.translate("en")
+        exm.char_1 = 'one'
+        exm.char_2 = 'two'
+        exm.save()
+        exm.translate("fr")
+        exm.char_1 = "un"
+        exm.char_2 = "deux"
+        exm.save()
+
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view_multi(request, exm.pk)
+        self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">one</span></h1>' % (exm.pk, 'char_1'))
+        self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/en/" % exm.pk)
+        self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode('utf8')))
+        self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
+
+        with SettingsOverride(LANGUAGE_CODE="fr"):
+            request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
+            response = detail_view_multi(request, exm.pk)
+            self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">un</span></h1>' % (exm.pk, 'char_1'))
+            self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/" % exm.pk)
+            self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
+
+    def test_edit_field_multilingual(self):
+        from django.contrib.admin import site
+        exadmin = site._registry[MultilingualExample1]
+
+        user = self.get_superuser()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        title = create_title("fr", "test", page)
+
+        exm = MultilingualExample1()
+        exm.translate("en")
+        exm.char_1 = 'one'
+        exm.char_2 = 'two'
+        exm.save()
+        exm.translate("fr")
+        exm.char_1 = "un"
+        exm.char_2 = "deux"
+        exm.save()
+
+        request = self.get_page_request(page, user, edit=True)
+        request.GET['edit_fields'] = 'char_2'
+
+        response = exadmin.edit_field(request, exm.pk, "en")
+        self.assertContains(response, 'id="id_char_2"')
+        self.assertContains(response, 'value="two"')
+
+        response = exadmin.edit_field(request, exm.pk, "fr")
+        self.assertContains(response, 'id="id_char_2"')
+        self.assertContains(response, 'value="deux"')
+
+        with SettingsOverride(LANGUAGE_CODE="fr"):
+            request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
+            request.GET['edit_fields'] = 'char_2'
+            response = exadmin.edit_field(request, exm.pk, "fr")
+            self.assertContains(response, 'id="id_char_2"')
+            self.assertContains(response, 'value="deux"')
 
 
 class ToolbarAPITests(TestCase):

@@ -7,6 +7,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+from cms.utils import copy_plugins
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -376,6 +377,11 @@ def get_page_draft(page):
     """
     Returns the draft version of a page, regardless if the passed in
     page is a published version or a draft version.
+
+    :param page: The page to get the draft version
+    :type page: :class:`cms.models.pagemodel.Page` instance
+    :return page: draft version of the page
+    :type page: :class:`cms.models.pagemodel.Page` instance
     """
     if page:
         if page.publisher_is_draft:
@@ -384,3 +390,37 @@ def get_page_draft(page):
             return page.publisher_draft
     else:
         return None
+
+
+def copy_plugins_to_language(page, source_language, target_language,
+                             only_empty=True):
+    """
+    Copy the plugins to another language in the same page for all the page
+    placeholders.
+
+    By default plugins are copied only if placeholder has no plugin for the
+    target language; use ``only_empty=False`` to change this.
+
+    .. warning: This function skips permissions checks
+
+    :param page: the page to copy
+    :type page: :class:`cms.models.pagemodel.Page` instance
+    :param string source_language: The source language code,
+     must be in :setting:`django:LANGUAGES`
+    :param string target_language: The source language code,
+     must be in :setting:`django:LANGUAGES`
+    :param bool only_empty: if False, plugin are copied even if
+     plugins exists in the target language (on a placeholder basis).
+    :return int: number of copied plugins
+    """
+    copied = 0
+    placeholders = page.placeholders.all()
+    for placeholder in placeholders:
+        # only_empty is True we check if the placeholder already has plugins and
+        # we skip it if has some
+        if not only_empty or not placeholder.cmsplugin_set.filter(language=target_language).exists():
+            plugins = list(
+                placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+            copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
+            copied += len(copied_plugins)
+    return copied

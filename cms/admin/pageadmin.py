@@ -131,6 +131,9 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/change_template/$', self.change_template),  # copy dialog
         )
 
+        if plugin_pool.get_all_plugins():
+            url_patterns += plugin_pool.get_patterns()
+
         url_patterns += super(PageAdmin, self).get_urls()
         return url_patterns
 
@@ -1082,7 +1085,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': get_language_object(language)['name']
+                'language': force_unicode(get_language_object(language)['name'])
             }
             self.log_change(request, titleobj, message)
             messages.info(request, message)

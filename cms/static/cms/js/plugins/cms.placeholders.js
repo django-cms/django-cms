@@ -154,7 +154,6 @@ $(document).ready(function () {
 					ui.placeholder.height(ui.item.height());
 					// show placeholder without entries
 					$('.cms_draggables').each(function () {
-						console.log($(this).children().length);
 						if($(this).children().length === 0) {
 							$(this).show();
 						}
@@ -185,7 +184,6 @@ $(document).ready(function () {
 
 					// reset placeholder without entries
 					$('.cms_draggables').each(function () {
-						console.log($(this).children().length);
 						if($(this).children().length === 0) {
 							$(this).hide();
 						}
@@ -617,11 +615,11 @@ $(document).ready(function () {
 				'url': this.options.urls.move_plugin,
 				'data': data,
 				'success': function (response) {
-					// response should be { 'status': true, 'redirect': true }
-					if(response === 'success') that._showSuccess(dragitem);
+					// if response is reload
+					if(response.reload) CMS.API.Helpers.reloadBrowser();
 
-					// determin if we should refresh
-					// if(parseInt(that.options.placeholder_id) === parseInt(CMS.API.Toolbar.options.clipboard)) CMS.API.Helpers.reloadBrowser();
+					// TODO: show only if(response.status)
+					that._showSuccess(dragitem);
 				},
 				'error': function (jqXHR) {
 					var msg = 'An error occured during the update.';
@@ -738,6 +736,13 @@ $(document).ready(function () {
 				// set visible states
 				nav.find('> .cms_submenu-dropdown').show();
 			}, 100);
+
+			// set relativity
+			$('.cms_placeholder').css({
+				'position': 'relative',
+				'z-index': 99
+			});
+			nav.closest('.cms_placeholder').css('z-index', 999);
 		},
 
 		_hideSubnav: function (nav) {
@@ -758,6 +763,9 @@ $(document).ready(function () {
 				nav.find('input').val('');
 				that._searchSubnav(nav, '');
 			}, this.timeout);
+
+			// reset relativity
+			$('.cms_placeholder').css('position', '');
 		},
 
 		_searchSubnav: function (nav, value) {

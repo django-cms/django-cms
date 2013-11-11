@@ -12,14 +12,9 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-{% if not is_popup %}
-<div class="breadcrumbs">
-	<a href="../../../">{% trans "Home" %}</a> &rsaquo;
-	<a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo;
-	{% if can_change %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo;
-	{% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original.get_title|truncatewords:"18" }}{% endif %}
-</div>
-{% endif %}
+{% with has_change_permission=can_change %}
+	{{ block.super }}
+{% endwith %}
 {% endblock %}
 
 {% block content %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "char_1" %}</h1>
+{% show_editable_model instance "char_2" "char_1,char_2" %}
+{% render_placeholder instance.placeholder %}
+{% endblock content %}

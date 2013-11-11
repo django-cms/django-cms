@@ -206,7 +206,8 @@ def post_save_page(instance, **kwargs):
 
 
 def update_placeholders(instance, **kwargs):
-    instance.page.rescan_placeholders()
+    if not kwargs.get('raw'):
+        instance.page.rescan_placeholders()
 
 
 def invalidate_menu_cache(instance, **kwargs):

@@ -35,6 +35,7 @@ poll and lets the user vote.
 
 In your poll application's ``models.py`` add the following::
 
+    from django.db import models
     from cms.models import CMSPlugin
     
     class PollPlugin(CMSPlugin):

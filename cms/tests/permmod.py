@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.api import create_page, publish_page, add_plugin, create_page_user, assign_user_to_page
+from cms.management.commands.subcommands.moderator import log
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, SettingsOverrideTestCase, \
     URL_CMS_PLUGIN_ADD, CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.context_managers import SettingsOverride, disable_logger
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import has_generic_permission
@@ -741,7 +742,8 @@ class ModeratorSwitchCommandTest(CMSTestCase):
         with force_language("en"):
             pages_root = unquote(reverse("pages-root"))
         page1 = create_page('page', 'nav_playground.html', 'en', published=True)
-        call_command('cms', 'moderator', 'on')
+        with disable_logger(log):
+            call_command('cms', 'moderator', 'on')
         with force_language("en"):
             path = page1.get_absolute_url()[len(pages_root):].strip('/')
             page2 = get_page_from_path(path)

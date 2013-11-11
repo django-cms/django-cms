@@ -829,7 +829,7 @@ class PageAdminTest(PageAdminTestBase):
         with self.login_user_context(superuser):
             pageadmin = self.get_admin()
             page = self.get_page()
-            form_url = reverse("admin:cms_page_change", args=(1,))
+            form_url = reverse("admin:cms_page_change", args=(page.pk,))
             # Middleware is needed to correctly setup the environment for the admin
             middleware = CurrentUserMiddleware()
             request = self.get_request()

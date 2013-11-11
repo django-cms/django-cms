@@ -155,10 +155,16 @@ class PageToolbar(CMSToolbar):
         if remove:
             language_menu.add_break(REMOVE_PAGE_LANGUAGE_BREAK)
             for code in remove:
-                language = get_language_object(code, self.current_site.pk)
+                try:
+                    language = get_language_object(code, self.current_site.pk)
+                    language_code = language['code']
+                    language_name = language['name']
+                except LanguageError:
+                    language_code = code
+                    language_name = code
                 url = "%s?language=%s" % (
-                    reverse("admin:cms_page_delete_translation", args=[self.page.pk]), language['code'])
-                language_menu.add_modal_item(_("Delete %(language)s Translation") % {'language': language['name']},
+                    reverse("admin:cms_page_delete_translation", args=[self.page.pk]), language_code)
+                language_menu.add_modal_item(_("Delete %(language)s Translation") % {'language': language_name},
                                              url=url, disabled=len(remove) == 1)
 
         if len(languages) > 1 and self.current_lang and len(remove) > 1:

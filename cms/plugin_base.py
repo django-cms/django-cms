@@ -5,6 +5,7 @@ from cms.utils.compat.metaclasses import with_metaclass
 import re
 
 from cms.utils import get_cms_setting
+from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
@@ -88,6 +89,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
+    module = _("Generic")  # To be overridden in child classes
 
     form = None
     change_form_template = "admin/cms/page/plugin/change_form.html"
@@ -107,8 +109,10 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     allow_children = False
     child_classes = None
 
+    require_parent = False
+    parent_classes = None
+
     opts = {}
-    module = None #track in which module/application belongs
 
     action_options = {
         PLUGIN_MOVE_ACTION: {
@@ -236,13 +240,59 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         """
         return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
 
+    def get_fieldsets(self, request, obj=None):
+        """
+        Same as from base class except if there are no fields, show an info message.
+        """
+        fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
+
+        for name, data in fieldsets:
+            if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
+                return fieldsets
+
+        if self.inlines:
+            return []  # if plugin has inlines but no own fields return empty fieldsets to remove empty white fieldset
+
+        try:  # if all fieldsets are empty (assuming there is only one fieldset then) add description
+            fieldsets[0][1]['description'] = _('There are no further settings for this plugin. Please hit OK to save.')
+        except KeyError:
+            pass
+
+        return fieldsets
+
     def get_child_classes(self, slot, page):
-        from cms.plugin_pool import plugin_pool
+        template = None
+        if page:
+            template = page.template
+
+        ## config overrides..
+        ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
+        child_classes = ph_conf.get(self.__class__.__name__, None)
+        
+        if child_classes:
+            return child_classes
         if self.child_classes:
             return self.child_classes
         else:
+            from cms.plugin_pool import plugin_pool
             installed_plugins = plugin_pool.get_all_plugins(slot, page)
             return [cls.__name__ for cls in installed_plugins]
+
+    def get_parent_classes(self, slot, page):
+        template = None
+        if page:
+            template = page.template
+
+        ## config overrides..
+        ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
+        parent_classes = ph_conf.get(self.__class__.__name__, None)
+        
+        if parent_classes:
+            return parent_classes
+        elif self.parent_classes:
+            return self.parent_classes
+        else:
+            return None
 
     def get_action_options(self):
         return self.action_options
@@ -254,6 +304,17 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             options = actions[action]
             reload_required = options.get('requires_reload', False)
         return reload_required
+
+    def get_plugin_urls(self):
+        """
+        Return URL patterns for which the plugin wants to register
+        views for.
+        """
+        return []
+
+    def plugin_urls(self):
+        return self.get_plugin_urls()
+    plugin_urls = property(plugin_urls)
 
     def __repr__(self):
         return smart_str(self.name)

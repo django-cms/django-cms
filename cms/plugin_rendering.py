@@ -12,6 +12,7 @@ from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from cms.utils.placeholder import get_toolbar_plugin_struct
 
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
@@ -102,7 +103,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     request = context['request']
     page = placeholder.page if placeholder else None
 
-        # It's kind of duplicate of the similar call in `get_plugins`, but it's required
+    # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work
     if not lang:
         lang = get_language_from_request(request)
@@ -113,14 +114,14 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (len(plugins) == 0 and placeholder and lang != get_default_language() and
+    if (len(plugins) == 0 and placeholder and
             get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
         fallbacks = get_fallback_languages(lang)
         for fallback_language in fallbacks:
             plugins = [plugin for plugin in get_plugins(request, placeholder, fallback_language)]
             if plugins:
                 break
-        # Add extra context as defined in settings, but do not overwrite existing context variables,
+    # Add extra context as defined in settings, but do not overwrite existing context variables,
     # since settings are general and database/template are specific
     # TODO this should actually happen as a plugin context processor, but these currently overwrite
     # existing context -- maybe change this order?
@@ -182,11 +183,15 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
         slot = placeholder.slot
     else:
         slot = None
-    installed_plugins = plugin_pool.get_all_plugins(slot, page)
+    # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
+    installed_plugins = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
+
     name = get_placeholder_conf("name", slot, template, title(slot))
     name = _(name)
     context.push()
     context['installed_plugins'] = installed_plugins
+    ## to restrict child-only plugins from draggables..
+    context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
     context['language'] = get_language_from_request(request)
     context['placeholder_label'] = name
     context['placeholder'] = placeholder
