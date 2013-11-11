@@ -18,7 +18,7 @@ from django.core.urlresolvers import reverse
 from os.path import join
 import reversion
 from reversion.models import Revision, Version
-if reversion.__version__ < (1,8,0):
+if hasattr(reversion.models, 'VERSION_CHANGE'):
     from reversion.models import VERSION_CHANGE
 
 
@@ -248,7 +248,7 @@ class ReversionFileFieldTests(CMSTestCase):
             # manually add a revision because we use the explicit way
             # django-cms uses too.
             adapter = reversion.get_adapter(FileModel)
-            if reversion.__version__ < (1,8,0):
+            if hasattr(reversion.models, 'VERSION_CHANGE'):
                 reversion.revision_context_manager.add_to_context(
                     reversion.default_revision_manager, file1,
                     adapter.get_version_data(file1, VERSION_CHANGE))
