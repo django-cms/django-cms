@@ -263,7 +263,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     def get_child_classes(self, slot, page):
         template = None
         if page:
-            template = page.template
+            template = page.get_template()
 
         ## config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
