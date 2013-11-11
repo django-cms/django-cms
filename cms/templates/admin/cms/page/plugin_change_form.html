@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_modify cms_admin %}
+{% load i18n l10n admin_modify cms_admin %}
 {% load url from future %}
 {% block extrahead %}{{ block.super }}
 {% block jquery %}<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>{% endblock jquery %}
@@ -44,7 +44,7 @@
 		window.onload = runOnLoad.run;
 	}
 	runOnLoad(function(){
-		parent.setiframeheight($('body').height()+20, {{ plugin.pk }});
+		parent.setiframeheight($('body').height()+20, {{ plugin.pk|unlocalize }});
 	});
 	$(document).ready(function(){
 		$("a.add-another,a.related-lookup").each(function(i, sign){

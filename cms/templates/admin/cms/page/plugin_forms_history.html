@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify cms_tags cms_admin %}
+{% load i18n l10n admin_modify cms_tags cms_admin %}
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
@@ -13,7 +13,7 @@
 //<![CDATA[	
 (function($) {
 	$(document).ready(function() {
-	   parent.setiframeheight($('body').height(), {{plugin.pk}});
+	   parent.setiframeheight($('body').height(), {{ plugin.pk|unlocalize }});
 	});	
 })(jQuery);
 //]]>
