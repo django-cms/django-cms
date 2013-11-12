@@ -72,12 +72,7 @@
 // #DRAGGABLES#
 .cms_placeholder, body { // we need body to overwrite cms_reset
 	.cms_draggables { list-style-type:none; padding:0; margin:0; }
-	.cms_draggables .cms_draggables { display:none; min-height:25px; padding-left:7px;
-		background:url('../../img/toolbar/treeline.png') no-repeat left bottom; }
-	.cms_draggables .cms_draggables .cms_draggable:before { content: " ";
-		position:absolute; left:-8px; bottom:4px; width:4px; height:20px; display:block;
-		background:url('../../img/toolbar/treearrow.png') no-repeat left center;
-	}
+	.cms_draggables .cms_draggables { display:none; min-height:25px; padding-left:6px; }
 
 	// #DRAGGABLES/general#
 	.cms_draggable, .cms_droppable { list-style-type:none;
