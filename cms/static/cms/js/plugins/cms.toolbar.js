@@ -575,7 +575,7 @@ $(document).ready(function () {
 			var pos = plugin.position('body').top;
 			var bound = $(window).height();
 			var offset = 200;
-			if(bound - pos <= 0) $(window).scrollTop(pos - offset);
+			// if(bound - pos <= 0) $(window).scrollTop(pos - offset);
 		},
 
 		showError: function (msg) {
@@ -626,7 +626,7 @@ $(document).ready(function () {
 
 		_enableDragMode: function (speed, init) {
 			// we need to save the position first
-			this.settings.position = $('body').scrollTop();
+			// this.settings.position = $('body').scrollTop();
 
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
