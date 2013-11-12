@@ -639,7 +639,7 @@ $(document).ready(function () {
 				'source_plugin_id': this.options.plugin_id || '',
 				'source_language': this.options.plugin_language,
 				'target_placeholder_id': CMS.API.Toolbar.options.clipboard,
-				'target_language':  this.options.plugin_language,
+				'target_language': this.options.plugin_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
 
