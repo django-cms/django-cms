@@ -288,7 +288,7 @@ $(document).ready(function () {
 				e.preventDefault();
 				that._maximizeModal();
 			});
-			this.modal.find('.cms_modal-breadcrumb-items a').live('click', function (e) {
+			this.modal.on('click','.cms_modal-breadcrumb-items a', function (e) {
 				e.preventDefault();
 				that._changeModalContent($(this));
 			});
