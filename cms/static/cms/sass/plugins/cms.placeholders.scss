@@ -158,10 +158,5 @@ body > .cms_draggable .cms_draggables { display:none !important; }
 		background-image:url('../../img/toolbar/sprite_toolbar@2x.png') !important;
 		background-size:190px !important; }
 
-	.cms_placeholder {
-		.cms_draggables .cms_draggables { background-image:url('../../img/toolbar/treeline@2x.png'); background-size:1px !important; }
-		.cms_draggables .cms_draggables .cms_draggable:before { background-image:url('../../img/toolbar/treearrow@2x.png'); background-size:4px !important; }
-	}
-
 // end of retina
 }
