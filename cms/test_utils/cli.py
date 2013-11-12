@@ -205,7 +205,7 @@ def configure(db_url, **extra):
                 'plugin_modules': {
                     'LinkPlugin': 'Different Grouper'
                 },
-                'plugin_labes': {
+                'plugin_labels': {
                     'LinkPlugin': 'Add a link'
                 }
             },
