@@ -314,6 +314,7 @@ $(document).ready(function () {
 		_collapsables: function (draggables) {
 			var that = this;
 			var settings = CMS.API.Toolbar.getSettings();
+			var timer = function () {};
 
 			// attach events to draggable
 			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
@@ -322,17 +323,26 @@ $(document).ready(function () {
 				var settings = CMS.API.Toolbar.getSettings();
 					settings.states = settings.states || [];
 
-				// collapsable function and save states
-				if(el.hasClass('cms_dragitem-expanded')) {
-					settings.states.splice(settings.states.indexOf(id), 1);
-					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
-				} else {
-					settings.states.push(id);
-					el.addClass('cms_dragitem-expanded').parent().find('> .cms_draggables').show();
-				}
+				clearTimeout(timer);
+				timer = setTimeout(function () {
+					// collapsable function and save states
+					if(el.hasClass('cms_dragitem-expanded')) {
+						settings.states.splice(settings.states.indexOf(id), 1);
+						el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
+					} else {
+						settings.states.push(id);
+						el.addClass('cms_dragitem-expanded').parent().find('> .cms_draggables').show();
+					}
 
-				// save settings
-				CMS.API.Toolbar.setSettings(settings);
+					// save settings
+					CMS.API.Toolbar.setSettings(settings);
+				}, 200);
+			});
+			draggables.bind('dblclick', function (e) {
+				e.stopPropagation();
+				clearTimeout(timer);
+
+				$('#cms_plugin-' + that.getId($(this))).trigger('dblclick');
 			});
 
 			// removing dublicate entries
