@@ -336,7 +336,7 @@ $(document).ready(function () {
 
 					// save settings
 					CMS.API.Toolbar.setSettings(settings);
-				}, 200);
+				}, 150);
 			});
 			draggables.bind('dblclick', function (e) {
 				e.stopPropagation();
