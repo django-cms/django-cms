@@ -889,6 +889,9 @@ $(document).ready(function () {
 				that.modal.show();
 			});
 
+			// prevent scrolling
+			this.body.css('overflow', 'hidden');
+
 			// add esc close event
 			// TODO the event also needs to be added to the iframe
 			$(document).bind('keydown.cms', function (e) {
@@ -900,6 +903,8 @@ $(document).ready(function () {
 			this.modal.fadeOut(speed);
 			this.modal.find('.cms_modal-frame iframe').remove();
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
+			// prevent scrolling
+			this.body.css('overflow', '');
 		},
 
 		_minimizeModal: function () {
@@ -927,6 +932,9 @@ $(document).ready(function () {
 					'margin': 0
 				});
 
+				// enable scrolling
+				this.body.css('overflow', '');
+
 				this.minimized = true;
 			} else {
 				// minimize
@@ -935,6 +943,9 @@ $(document).ready(function () {
 
 				// reattach css
 				this.modal.css(this.modal.data('css'));
+
+				// disable scrolling
+				this.body.css('overflow', 'hidden');
 
 				this.minimized = false;
 			}
