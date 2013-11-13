@@ -615,6 +615,8 @@ $(document).ready(function () {
 		_showToolbar: function (speed, init) {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
+			// animate html
+			this.body.animate({ 'margin-top': (this.options.debug) ? 35 : 30 }, (init) ? 0 : speed);
 			// set messages top to toolbar height
 			this.messages.css('top', 31);
 			// set new settings
@@ -628,6 +630,8 @@ $(document).ready(function () {
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideUp(speed);
+			// animate html
+			this.body.animate({ 'margin-top': (this.options.debug) ? 5 : 0 }, speed);
 			// set messages top to 0
 			this.messages.css('top', 0);
 			// set new settings
@@ -1233,9 +1237,6 @@ $(document).ready(function () {
 			var that = this;
 			var timeout = 1000;
 			var timer = function () {};
-
-			// add top margin
-			$('html').css('margin-top', 5);
 
 			// bind message event
 			var debug = this.container.find('.cms_debug-bar');
