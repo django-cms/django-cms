@@ -213,6 +213,14 @@ $(document).ready(function () {
 				}
 			});
 
+			// attach escape event to cancel dragging
+			$(document).bind('keyup.cms', function(e){
+				if(e.keyCode === 27) {
+					that.state = false;
+					that.sortables.sortable('cancel');
+				}
+			});
+
 			// define droppable helpers
 			this.dropareas.droppable({
 				'greedy': true,
