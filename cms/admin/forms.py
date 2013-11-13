@@ -72,7 +72,6 @@ class PageForm(forms.ModelForm):
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
 
-
     class Meta:
         model = Page
         fields = ["parent", "site"]

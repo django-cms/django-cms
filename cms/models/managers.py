@@ -72,8 +72,8 @@ class PageManager(PublisherManager):
         """
         return self.get_query_set().filter(application_urls__gt='').distinct()
 
-    def get_home(self, site=None):
-        return self.get_query_set().get_home(site)
+    def get_home(self, site=None, language=None):
+        return self.get_query_set().get_home(site, language)
 
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
@@ -167,7 +167,8 @@ class TitleManager(PublisherManager):
             'title',
             'meta_description',
             'page_title',
-            'menu_title'
+            'menu_title',
+            'template',
         ]
         advanced_fields = [
             'redirect',

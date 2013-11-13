@@ -47,7 +47,7 @@ page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.upda
 def update_title(title):
     slug = u'%s' % title.slug
 
-    if title.page.is_home():
+    if title.page.is_home:
         title.path = ''
     elif not title.has_url_overwrite:
         title.path = u'%s' % slug
@@ -206,8 +206,7 @@ def post_save_page(instance, **kwargs):
 
 
 def update_placeholders(instance, **kwargs):
-    if not kwargs.get('raw'):
-        instance.page.rescan_placeholders()
+    instance.page.rescan_placeholders(instance.language)
 
 
 def invalidate_menu_cache(instance, **kwargs):

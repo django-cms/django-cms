@@ -43,9 +43,9 @@ class PageQuerySet(PublisherQuerySet):
         else:
             return self.exclude(id__in=exclude_list)
 
-    def published(self, site=None):
+    def published(self, language, site=None):
         pub = self.on_site(site).filter(
-            publisher_public_id__gt=0,
+            publisher_public_id__gt=0, title_set__language=language, title_set__publisher_public_id__gt=0
         )
         return pub
 
@@ -56,9 +56,9 @@ class PageQuerySet(PublisherQuerySet):
         """
         return self.published().filter(application_urls__gt='').distinct()
 
-    def get_home(self, site=None):
+    def get_home(self, site=None, language=None):
         try:
-            home = self.published(site).all_root().order_by("tree_id")[0]
+            home = self.published(language, site).all_root().order_by("tree_id")[0]
         except IndexError:
             raise NoHomeFound('No Root page found. Publish at least one page!')
         return home

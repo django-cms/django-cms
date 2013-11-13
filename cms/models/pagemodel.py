@@ -59,11 +59,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                                                         help_text=_("limit when this page is visible in the menu"))
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
+
+    is_home = models.BooleanField(_("Is homepage"), db_index=True)
+
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
-
     # Placeholders (plugins)
     placeholders = models.ManyToManyField(Placeholder, editable=False)
 
@@ -110,7 +112,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.publisher_state == self.PUBLISHER_STATE_DIRTY
 
     def get_absolute_url(self, language=None, fallback=True):
-        if self.is_home():
+        if self.is_home:
             return reverse('pages-root')
         path = self.get_path(language, fallback) or self.get_slug(language, fallback)
         return reverse('pages-details-by-slug', kwargs={"slug": path})
@@ -402,8 +404,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if not self.pk:
             self.save()
-        if not self.parent_id:
-            self.clear_home_pk_cache()
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -446,12 +446,17 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             self.publisher_state = Page.PUBLISHER_STATE_DEFAULT
         else:
             self.publisher_state = Page.PUBLISHER_STATE_PENDING
-
+        if published:
+            if not "|%s|" % language in self.published_languages:
+                if self.published_languages:
+                    self.published_languages += "%s|" % language
+                else:
+                    self.published_languages = "|%s|" % language
         self._publisher_keep_state = True
         self.save()
         # If we are publishing, this page might have become a "home" which
         # would change the path
-        if self.is_home():
+        if self.is_home:
             for title in self.title_set.all():
                 if title.path != '':
                     title.save()
@@ -500,14 +505,19 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         public_title.delete()
         public_page = self.publisher_public
         public_placeholders = public_page.placeholders.all()
-        if not self.title_set.filter(publisher_public_id__gt=0).count():
+        published_languages = self.published_languages.split("|")
+        published_languages.remove(language)
+        self.published_languages = "|".join(published_languages)
+        if not self.title_set.filter(publisher_public_id__gt=0).count() and self.lft + 1 == self.rght:
+            print "delete", self.lft, self.rght, self, self.pk, public_page.pk
             self.publisher_public = None
             self.save()
-            public_page.publisher_public = None
             public_page.delete()
         else:
             for pl in public_placeholders:
                 pl.cmsplugin_set.filter(language=language).delete()
+            public_page.published_languages = self.published_languages
+            public_page.save()
         return True
 
     def revert(self, language):
@@ -884,20 +894,20 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
 
-    def is_home(self):
+    def is_home(self, language=None):
         if self.parent_id:
             return False
         else:
             try:
-                return self.home_pk_cache == self.pk
+                return self.get_home_pk_cache(language) == self.pk
             except NoHomeFound:
                 pass
         return False
 
-    def get_home_pk_cache(self):
+    def get_home_pk_cache(self, language=None):
         attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
         if getattr(self, attr, None) is None:
-            setattr(self, attr, self.get_object_queryset().get_home(self.site).pk)
+            setattr(self, attr, self.get_object_queryset().get_home(self.site, language).pk)
         return getattr(self, attr)
 
     def set_home_pk_cache(self, value):
@@ -1090,7 +1100,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         return obj
 
-    def rescan_placeholders(self):
+    def rescan_placeholders(self, language=None):
         """
         Rescan and if necessary create placeholders in the current template.
         """
@@ -1098,10 +1108,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         from cms.utils.plugins import get_placeholders
 
         templates = []
-        for language in self.get_languages():
-            template = self.get_template(language)
-            if not template in templates:
-                templates.append(template)
+        if language:
+            templates = [self.get_template(language)]
+        else:
+            for language in self.get_languages():
+                template = self.get_template(language)
+                if not template in templates:
+                    templates.append(template)
         placeholders = []
         for template in templates:
             tmp_pls = get_placeholders(template)

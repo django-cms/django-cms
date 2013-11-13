@@ -176,7 +176,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_add_cancel_plugin(self):
         """
-        Test that you can cancel a new plugin before editing and 
+        Test that you can cancel a new plugin before editing and
         that the plugin is removed.
         """
         # add a new text plugin
@@ -437,8 +437,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 1)
 
         # publish page
-        response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1: 1})
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(URL_CMS_PAGE + "%d/en/publish/" % page.pk, {1: 1})
+        self.assertEqual(response.status_code, 302)
         self.assertEquals(Page.objects.count(), 2)
 
         # there should now be two plugins - 1 draft, 1 public
@@ -720,7 +720,7 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
-        page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        page = create_page("page", "nav_playground.html", "en", published=True)
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
 
