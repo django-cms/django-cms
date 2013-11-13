@@ -767,10 +767,10 @@ $(document).ready(function () {
 
 				// set visible states
 				nav.find('> .cms_submenu-dropdown').show();
-
-				// disable scroll
-				CMS.API.Toolbar._disableScroll();
 			}, 100);
+
+			// disable scroll
+			CMS.API.Toolbar._disableScroll();
 
 			// set relativity
 			$('.cms_placeholder').css({
