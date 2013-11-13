@@ -214,8 +214,8 @@ $(document).ready(function () {
 			});
 
 			// attach escape event to cancel dragging
-			$(document).bind('keyup.cms', function(e){
-				if(e.keyCode === 27) {
+			$(document).bind('keyup.cms', function(e, cancel){
+				if(e.keyCode === 27 || cancel) {
 					that.state = false;
 					that.sortables.sortable('cancel');
 				}
@@ -541,6 +541,20 @@ $(document).ready(function () {
 						$(e.currentTarget).find('.cms_submenu:eq(0)').hide();
 					}
 				}, 100);
+			});
+			draggable.bind('mousedown mouseup mousemove', function (e) {
+				if(e.type === 'mousedown') {
+					// start countdown
+					timer = setTimeout(function () {
+						CMS.API.Toolbar._enableEditMode(300);
+						CMS.API.Toolbar.setActive(plugin.data('settings').plugin_id);
+						setTimeout(function () {
+							$(document).trigger('keyup.cms', [true]);
+						}, 501);
+					}, 500);
+				} else {
+					clearTimeout(timer);
+				}
 			});
 
 			// update plugin position
