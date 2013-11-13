@@ -531,7 +531,7 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseenter' || e.type === 'mouseover') $(this).data('active', true);
 				if(e.type === 'mouseleave') {
-					 $(this).data('active', false);
+					$(this).data('active', false);
 					allOptions.hide();
 				}
 
