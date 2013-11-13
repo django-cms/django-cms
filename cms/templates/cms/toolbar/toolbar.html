@@ -2,8 +2,8 @@
 {% language request.toolbar.toolbar_language %}
 {% addtoblock "js" %}
 <script type="text/javascript">
-	var _jQuery = window.jQuery || null;
-	var _$ = window.$ || null;
+	var _jQuery = window.jQuery || undefined;
+	var _$ = window.$ || undefined;
 </script>
 {% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endaddtoblock %}
