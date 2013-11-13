@@ -385,33 +385,32 @@ $(document).ready(function () {
 			var clicks = 0;
 			var delay = 500;
 			var timer = function () {};
-			var prevent = true;
-			var first = true;
 
 			// unbind click event if already initialized
-			this.plugins.find('a, button, input[type="submit"], input[type="button"]').bind('click', function (e) {
-				if(first) e.preventDefault();
-				if(prevent) {
-					e.preventDefault();
+			this.plugins.find('a').bind('click', function (e) {
+				e.preventDefault();
 
-					// clear timeout after click and increment
-					clearTimeout(timer);
+				// increment
+				clicks++;
 
+				// single click
+				if(clicks === 1) {
 					timer = setTimeout(function () {
-						// if there is only one click use standard event
-						if(clicks === 1) {
-							if(!first) $(e.currentTarget)[0].click();
-							first = false;
-							prevent = false;
-						}
-						// reset
 						clicks = 0;
+						// cancel if link contains a hash
+						if($(e.currentTarget).attr('href').indexOf('#') === 0) return false;
+						// we need to redirect to the default behaviours
+						// all events will be lost in edit mode, use '#' if href should not be triggered
+						window.location.href = $(e.currentTarget).attr('href');
 					}, delay);
-
-					clicks++;
 				}
-			// this prevents the faulty first click behaviour
-			}).eq(0).trigger('click');
+
+				// double click
+				if(clicks === 2) {
+					clearTimeout(timer);
+					clicks = 0;
+				}
+			});
 		}
 
 	});
