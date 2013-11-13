@@ -596,7 +596,7 @@ $(document).ready(function () {
 			var plugin = $('#cms_plugin-' + id);
 
 			// collapse all previous elements
-			var collapsed = dragitem.parents().siblings().filter('.cms_dragitem-collapsed');
+			var collapsed = dragitem.parents().siblings().not('.cms_dragitem-expanded');
 				collapsed.trigger('click');
 
 			// set new classes
