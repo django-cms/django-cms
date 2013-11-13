@@ -133,6 +133,7 @@ $(document).ready(function () {
 			this.navigations.each(function () {
 				var item = $(this);
 				var lists = item.find('li');
+				var root = 'cms_toolbar-item-navigation';
 				var hover = 'cms_toolbar-item-navigation-hover';
 				var disabled = 'cms_toolbar-item-navigation-disabled';
 				var children = 'cms_toolbar-item-navigation-children';
@@ -146,39 +147,62 @@ $(document).ready(function () {
 						&& !$(this).parent().hasClass(disabled)) that._delegate($(this));
 				});
 
-				// handle hover states
+				// handle click states
 				lists.bind('click', function (e) {
-					e.stopImmediatePropagation();
+					e.stopPropagation();
+					var el = $(this);
 
-					lists.removeClass(hover);
-					$(this).addClass(hover);
+					// cancel if el is disabled
+					if(el.hasClass(disabled)) return false;
 
-					// add hover mechanism
-					lists.bind('mouseenter', function () {
-						// handle levels
-						$(this).siblings().removeClass(hover);
-						$(this).addClass(hover);
-					});
-					lists.find('> ul').bind('mouseleave', function () {
-						$(this).find('li').removeClass(hover);
-					});
-					// adds escape mechanism fors children
-					item.find('> li > a').add('> li li > a').bind('mouseenter', function () {
-						if($(this).parent().hasClass(hover)) return false;
-						lists.filter('.'+children).find('> ul').hide();
-					});
+					// close if el is first item
+					if(el.parent().hasClass(root) && el.hasClass(hover)) {
+						reset();
+						return false;
+					}
 
-					// ad sublevel mechanism
-					lists.find('.'+children).bind('mouseenter', function () {
-						$(this).find('> ul').show();
+					// add hover class
+					reset();
+					el.addClass(hover);
+
+					// activate hover selection
+					item.find('> li').bind('mouseenter', function () {
+						// cancel if item is already active
+						if($(this).hasClass(hover)) return false;
+						$(this).trigger('click');
 					});
 
-					// add escape mechanism
-					$(document).bind('click.cms', function () {
+					// create the document event
+					$(document).bind('click.cms', reset);
+
+					// removes classes and events
+					function reset() {
 						lists.removeClass(hover);
-						lists.unbind('mouseenter');
+						lists.find('ul ul').hide();
+						item.find('> li').unbind('mouseenter');
 						$(document).unbind('click.cms');
-					});
+					}
+				});
+
+				// attach hover
+				lists.find('li').bind('mouseenter mouseleave', function (e) {
+					// reset
+					lists.find('li').removeClass(hover);
+
+					var el = $(this);
+					var parent = el.closest('.cms_toolbar-item-navigation-children');
+					var hasChildren = el.hasClass(children) || parent.length;
+
+					el.addClass(hover);
+
+					// handle children elements
+					if(hasChildren) {
+						el.find('> ul').show();
+						// add parent class
+						parent.addClass(hover);
+					} else {
+						lists.find('ul ul').hide();
+					}
 				});
 			});
 
