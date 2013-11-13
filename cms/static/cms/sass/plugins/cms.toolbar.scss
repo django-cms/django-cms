@@ -75,7 +75,7 @@
 			ul li { float:none; zoom:1; }
 			ul li a { float:none; display:block; zoom:1; cursor:pointer; white-space:nowrap;
 				padding:2px 10px 2px 15px; }
-			ul ul { @include border-radius(0 4px 4px 0); }
+			ul ul { @include border-radius(0 4px 4px 0); border-top:1px solid #f5f5f5; }
 
 			// second level
 			.cms_toolbar-item-navigation-children {
