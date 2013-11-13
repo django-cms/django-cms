@@ -535,23 +535,23 @@ $(document).ready(function () {
 					}
 				}, 100);
 			});
-			/* TODO we need to find a way to allow event bubbling
-			draggable.bind('mousedown mouseup mousemove', function (e) {
+			draggable.find('> .cms_dragitem').bind('mousedown mouseup mousemove', function (e) {
 				if(e.type === 'mousedown') {
 					// start countdown
 					timer = setTimeout(function () {
 						CMS.API.Toolbar._enableEditMode(300);
 						CMS.API.Toolbar.setActive(plugin.data('settings').plugin_id);
 						$(document).bind('mousemove.keypress', function () {
-							$(document).trigger('keyup.cms', [true])
-								.unbind('mousemove.keypress');
+							$(document).trigger('keyup.cms', [true]);
+							setTimeout(function () {
+								$(document).unbind('mousemove.keypress');
+							}, 1000);
 						});
 					}, 500);
 				} else {
 					clearTimeout(timer);
 				}
 			});
-			*/
 
 			// update plugin position
 			this.container.bind('cms.placeholder.update', function (e) {
