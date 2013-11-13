@@ -71,7 +71,7 @@
 				@include border-radius(0 0 4px 4px);
 				border:1px solid white; border-top:1px solid $color-grey;
 				background-color:white; background:rgba(white, 0.99);
-				@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.2)); }
+				@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.4)); }
 			ul li { float:none; zoom:1; }
 			ul li a { float:none; display:block; zoom:1; cursor:pointer; white-space:nowrap;
 				padding:2px 10px 2px 15px; }
