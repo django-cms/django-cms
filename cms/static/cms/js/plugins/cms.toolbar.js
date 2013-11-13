@@ -754,6 +754,7 @@ $(document).ready(function () {
 			if(this.settings.sideframe.maximized) this._maximizeSideframe();
 			// otherwise do normal behaviour
 			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
+				this.sideframe.show();
 				if(animate) {
 					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
 					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
