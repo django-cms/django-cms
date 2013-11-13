@@ -152,18 +152,14 @@ $(document).ready(function () {
 					e.stopPropagation();
 					var el = $(this);
 
-					// cancel if el is disabled
-					if(el.hasClass(disabled)) return false;
-
 					// close if el is first item
-					if(el.parent().hasClass(root) && el.hasClass(hover)) {
+					if(el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
 						reset();
 						return false;
+					} else {
+						reset();
+						el.addClass(hover);
 					}
-
-					// add hover class
-					reset();
-					el.addClass(hover);
 
 					// activate hover selection
 					item.find('> li').bind('mouseenter', function () {
@@ -193,6 +189,10 @@ $(document).ready(function () {
 					var parent = el.closest('.cms_toolbar-item-navigation-children');
 					var hasChildren = el.hasClass(children) || parent.length;
 
+					// do not attach hover effect if disabled
+					if(el.hasClass(disabled)) return false;
+
+					// add hover effect
 					el.addClass(hover);
 
 					// handle children elements
@@ -203,6 +203,11 @@ $(document).ready(function () {
 					} else {
 						lists.find('ul ul').hide();
 					}
+				});
+
+				// fix leave event
+				lists.find('> ul').bind('mouseleave', function () {
+					lists.find('li').removeClass(hover);
 				});
 			});
 
