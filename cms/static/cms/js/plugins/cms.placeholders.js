@@ -749,6 +749,9 @@ $(document).ready(function () {
 
 				// set visible states
 				nav.find('> .cms_submenu-dropdown').show();
+
+				// disable scroll
+				CMS.API.Toolbar._disableScroll();
 			}, 100);
 
 			// set relativity
@@ -777,6 +780,9 @@ $(document).ready(function () {
 				nav.find('input').val('');
 				that._searchSubnav(nav, '');
 			}, this.timeout);
+
+			// enable scroll
+			CMS.API.Toolbar._enableScroll();
 
 			// reset relativity
 			$('.cms_placeholder').css('position', '');

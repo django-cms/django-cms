@@ -33,6 +33,9 @@
 }
 .cms_toolbar-debug #container { padding-top:35px !important; }
 
+// helpers
+.cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
+
 // toolbar
 #cms_toolbar { position:absolute; left:0; top:5px; z-index:9999999; width:100%; }
 #cms_toolbar {
