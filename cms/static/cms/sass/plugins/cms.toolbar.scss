@@ -35,6 +35,7 @@
 
 // helpers
 .cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
+#djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
 
 // toolbar
 #cms_toolbar { position:absolute; left:0; top:5px; z-index:9999999; width:100%; }
