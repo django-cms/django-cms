@@ -144,7 +144,11 @@ $(document).ready(function () {
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
 						&& !$(this).parent().hasClass(disabled)
-						&& !$(this).parent().hasClass(disabled)) that._delegate($(this));
+						&& !$(this).parent().hasClass(disabled)) {
+						that._delegate($(this));
+						reset();
+						return false;
+					}
 				});
 
 				// handle click states
@@ -170,14 +174,6 @@ $(document).ready(function () {
 
 					// create the document event
 					$(document).bind('click.cms', reset);
-
-					// removes classes and events
-					function reset() {
-						lists.removeClass(hover);
-						lists.find('ul ul').hide();
-						item.find('> li').unbind('mouseenter');
-						$(document).unbind('click.cms');
-					}
 				});
 
 				// attach hover
@@ -209,6 +205,14 @@ $(document).ready(function () {
 				lists.find('> ul').bind('mouseleave', function () {
 					lists.find('li').removeClass(hover);
 				});
+
+				// removes classes and events
+				function reset() {
+					lists.removeClass(hover);
+					lists.find('ul ul').hide();
+					item.find('> li').unbind('mouseenter');
+					$(document).unbind('click.cms');
+				}
 			});
 
 			// attach event to the switcher elements
