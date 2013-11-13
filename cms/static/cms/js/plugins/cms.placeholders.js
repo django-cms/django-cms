@@ -46,15 +46,8 @@ $(document).ready(function () {
 			this._collapsables(placeholders.find('.cms_draggable'));
 
 			// add global collapsable events
-			placeholders.find('.cms_expandmenu').bind('click', function () {
-				var el = $(this);
-				if(el.hasClass('cms_expandmenu-collapsed')) {
-					that._collapseAll(el.closest('.cms_placeholder'));
-					el.removeClass('cms_expandmenu-collapsed');
-				} else {
-					that._expandAll(el.closest('.cms_placeholder'));
-					el.addClass('cms_expandmenu-collapsed');
-				}
+			placeholders.find('.cms_placeholder-title').bind('click', function () {
+				($(this).hasClass('cms_placeholder-title-expanded')) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
 
 			// check which button should be shown for collapsemenu
@@ -62,7 +55,7 @@ $(document).ready(function () {
 				var els = $(item).find('.cms_dragitem-collapsable');
 				var open = els.filter('.cms_dragitem-expanded');
 				if(els.length === open.length && (els.length + open.length !== 0)) {
-					$(item).find('.cms_expandmenu').addClass('cms_expandmenu-collapsed');
+					$(item).find('.cms_placeholder-title').addClass('cms_placeholder-title-expanded');
 				}
 			});
 		},
@@ -369,18 +362,24 @@ $(document).ready(function () {
 			});
 		},
 
-		_expandAll: function (placeholder) {
-			var items = placeholder.find('.cms_dragitem-collapsable');
-				items.each(function () {
-					if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
-				});
+		_expandAll: function (el) {
+			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			// cancel if there are no items
+			if(!items.length) return false;
+			items.each(function () {
+				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+			});
+
+			el.addClass('cms_placeholder-title-expanded');
 		},
 
-		_collapseAll: function (placeholder) {
-			var items = placeholder.find('.cms_dragitem-collapsable');
-				items.each(function () {
-					if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
-				});
+		_collapseAll: function (el) {
+			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			items.each(function () {
+				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+			});
+
+			el.removeClass('cms_placeholder-title-expanded');
 		},
 
 		_preventEvents: function () {

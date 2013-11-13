@@ -23,15 +23,21 @@
 	@include border-radius(3px); background:$color-grey-70;
 
 	.cms_placeholder-title { font-size:12px; line-height:16px; text-transform:uppercase;
-		font-weight:500; padding:0 0 0 2px; height:20px;
-		color:white; @include text-shadow(0px 1px 0px black); }
+		font-weight:500; padding:0 0 0 15px; height:20px; cursor:pointer;
+		color:white; @include text-shadow(0px 1px 0px black);
 
-	.cms_expandmenu { float:right; width:20px; height:20px; cursor:pointer;
-		background:url('../../img/toolbar/sprite_toolbar.png') no-repeat -80px -113px;
-		&:hover { background-position:-100px -113px; }
+		&:before { content:" "; position:absolute; left:0; top:0; width:15px; height:20px;
+			background:url('../../img/toolbar/sprite_toolbar.png') no-repeat -85px -113px;
+		}
+		&:hover {
+			&:before { background-position:-105px -113px; }
+		}
 	}
-	.cms_expandmenu-collapsed { background-position:-120px -113px;
-		&:hover { background-position:-140px -113px; }
+	.cms_placeholder-title-expanded {
+		&:before { background-position:-124px -114px; }
+		&:hover {
+			&:before { background-position:-144px -114px !important; }
+		}
 	}
 }
 
