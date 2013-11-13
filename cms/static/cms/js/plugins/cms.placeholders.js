@@ -339,6 +339,7 @@ $(document).ready(function () {
 				}, 150);
 			});
 			draggables.bind('dblclick', function (e) {
+				e.preventDefault();
 				e.stopPropagation();
 				clearTimeout(timer);
 
@@ -385,9 +386,11 @@ $(document).ready(function () {
 			var delay = 500;
 			var timer = function () {};
 			var prevent = true;
+			var first = true;
 
 			// unbind click event if already initialized
 			this.plugins.find('a, button, input[type="submit"], input[type="button"]').bind('click', function (e) {
+				if(first) e.preventDefault();
 				if(prevent) {
 					e.preventDefault();
 
@@ -397,9 +400,9 @@ $(document).ready(function () {
 					timer = setTimeout(function () {
 						// if there is only one click use standard event
 						if(clicks === 1) {
+							if(!first) $(e.currentTarget)[0].click();
+							first = false;
 							prevent = false;
-
-							$(e.currentTarget)[0].click();
 						}
 						// reset
 						clicks = 0;
@@ -543,7 +546,8 @@ $(document).ready(function () {
 		_setGeneric: function () {
 			var that = this;
 
-			this.container.bind('dblclick', function () {
+			this.container.bind('dblclick', function (e) {
+				e.preventDefault();
 				that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
 			});
 
@@ -814,6 +818,10 @@ $(document).ready(function () {
 			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
 				nav.find('.cms_submenu-item-title:eq(0)').show();
 			}
+		},
+
+		_updateExpander: function () {
+
 		},
 
 		_getId: function (el) {
