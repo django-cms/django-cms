@@ -1056,7 +1056,7 @@ $(document).ready(function () {
 				});
 				that.modal.css({
 					'left': modalLeft + mvX,
-					'top': modalTop + mvY
+					'top': modalTop + mvY - $(window).scrollTop()
 				});
 			});
 		},
