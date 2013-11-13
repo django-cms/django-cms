@@ -85,10 +85,10 @@ Example:
 
 
 ******************
-hide_unstranslated
+hide_untranslated
 ******************
 
-If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_unstranslated` to ``False``
+If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_untranslated` to ``False``
 all pages will be displayed in all languages even if they are
 not translated yet.
 
