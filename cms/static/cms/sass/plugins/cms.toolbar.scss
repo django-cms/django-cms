@@ -38,7 +38,7 @@
 #cms_toolbar {
 	.cms_toolbar { display:none; position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
 		border-bottom:1px solid $color-grey !important; background-color:$color-grey-5; background:rgba($color-grey-5, 0);
-		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
+		@include background-image($gradient-toolbar); @include box-shadow(0 0 5px rgba(0, 0, 0, 0.2));
 
 		.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
 		.cms_toolbar-right { float:right; padding-right:32px; position:relative; z-index:10; }
@@ -69,13 +69,13 @@
 			ul { position:absolute; left:0; top:30px;
 				display:block; min-width:180px; padding:4px 0;
 				@include border-radius(0 0 4px 4px);
-				border:1px solid $color-grey-10; background-color:white; background:rgba(white, 0.95);
-				@include box-shadow(0 2px 2px $color-grey-10); }
+				border:1px solid white; border-top:1px solid $color-grey;
+				background-color:white; background:rgba(white, 0.99);
+				@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.2)); }
 			ul li { float:none; zoom:1; }
 			ul li a { float:none; display:block; zoom:1; cursor:pointer; white-space:nowrap;
 				padding:2px 10px 2px 15px; }
-			ul .cms_toolbar-item-navigation-active a { font-weight:bold; color:black; }
-			ul .cms_toolbar-item-navigation-active a:hover { color:white; }
+			ul ul { @include border-radius(0 4px 4px 0); }
 
 			// second level
 			.cms_toolbar-item-navigation-children {
@@ -90,7 +90,8 @@
 				@include background-image($gradient-blue); }
 			> a span { background-position:right -300px !important; }
 
-			strong { color:white !important; }
+			// add active style
+			.cms_toolbar-item-navigation-active a { font-weight:600; }
 		}
 
 		.cms_toolbar-item-navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
