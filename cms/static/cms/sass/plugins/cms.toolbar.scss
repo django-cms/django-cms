@@ -37,7 +37,7 @@
 #cms_toolbar { position:absolute; left:0; top:5px; z-index:9999999; width:100%; }
 #cms_toolbar {
 	.cms_toolbar { display:none; position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
-		border-bottom:1px solid $color-grey !important; background:$color-grey-5;
+		border-bottom:1px solid $color-grey !important; background-color:$color-grey-5; background:rgba($color-grey-5, 0);
 		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
 
 		.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
@@ -69,7 +69,7 @@
 			ul { position:absolute; left:0; top:30px;
 				display:block; min-width:180px; padding:4px 0;
 				@include border-radius(0 0 4px 4px);
-				border:1px solid $color-grey-10; background:white;
+				border:1px solid $color-grey-10; background-color:white; background:rgba(white, 0.95);
 				@include box-shadow(0 2px 2px $color-grey-10); }
 			ul li { float:none; zoom:1; }
 			ul li a { float:none; display:block; zoom:1; cursor:pointer; white-space:nowrap;
