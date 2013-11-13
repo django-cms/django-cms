@@ -407,7 +407,8 @@ $(document).ready(function () {
 
 					clicks++;
 				}
-			});
+			// this prevents the faulty first click behaviour
+			}).eq(0).trigger('click');
 		}
 
 	});
