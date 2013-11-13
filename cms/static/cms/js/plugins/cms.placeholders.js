@@ -542,20 +542,23 @@ $(document).ready(function () {
 					}
 				}, 100);
 			});
+			/* TODO we need to find a way to allow event bubbling
 			draggable.bind('mousedown mouseup mousemove', function (e) {
 				if(e.type === 'mousedown') {
 					// start countdown
 					timer = setTimeout(function () {
 						CMS.API.Toolbar._enableEditMode(300);
 						CMS.API.Toolbar.setActive(plugin.data('settings').plugin_id);
-						setTimeout(function () {
-							$(document).trigger('keyup.cms', [true]);
-						}, 501);
+						$(document).bind('mousemove.keypress', function () {
+							$(document).trigger('keyup.cms', [true])
+								.unbind('mousemove.keypress');
+						});
 					}, 500);
 				} else {
 					clearTimeout(timer);
 				}
 			});
+			*/
 
 			// update plugin position
 			this.container.bind('cms.placeholder.update', function (e) {
