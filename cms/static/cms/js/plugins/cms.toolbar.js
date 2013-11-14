@@ -883,6 +883,9 @@ $(document).ready(function () {
 
 				// fade in modal window
 				that.modal.show();
+
+				// hide loader
+				that._showLoader(false);
 			});
 
 			// prevent scrolling
@@ -893,9 +896,6 @@ $(document).ready(function () {
 			$(document).bind('keydown.cms', function (e) {
 				if(e.keyCode === 27) that.closeModal();
 			});
-
-			// hide loader
-			this._showLoader(false);
 		},
 
 		_hideModal: function (speed) {
