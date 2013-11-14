@@ -125,9 +125,9 @@ choices about what to install upon its adopters.
 The most significant of these removals is ``cms.plugins.text``.
 
 We provide ``djangocms-text-ckeditor``, a CKEditor-based Text Plugin. It's
-available from https://github.com/djangocms-text-ckeditor. You may of course
-use your preferred editor; others are available.  
-                        
+available from https://github.com/divio/djangocms-text-ckeditor. You may of
+course use your preferred editor; others are available.
+
 
 Plugin Context Processors take a new argument
 =============================================
