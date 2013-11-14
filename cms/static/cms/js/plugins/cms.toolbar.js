@@ -1252,10 +1252,8 @@ $(document).ready(function () {
 			var scrollTop = $(window).scrollTop();
 
 			if(disable) {
-				console.log('disable');
 				this.body.addClass('cms_toolbar-noscroll').css('top',-scrollTop).data('scroll', scrollTop);
 			} else {
-				console.log('enable');
 				this.body.removeClass('cms_toolbar-noscroll');
 				$(window).scrollTop(this.body.data('scroll'));
 			}
