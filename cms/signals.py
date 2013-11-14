@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from cms.exceptions import NoHomeFound
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import signals
+from django.db.models import signals, Q
 from django.dispatch import Signal
 
 from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
@@ -34,6 +35,32 @@ def update_plugin_positions(**kwargs):
 signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin, dispatch_uid="cms.plugin.update_position")
 
 
+def update_home(instance, **kwargs):
+    if not instance.parent_id:
+        try:
+            home_pk = instance.get_object_queryset().filter(publisher_public_id__gt=0).get_home(instance.site).pk
+        except NoHomeFound:
+            if instance.publisher_is_draft and not instance.publisher_public_id:
+                return
+            home_pk = instance.pk
+            instance.is_home = True
+        for page in instance.get_object_queryset().filter(pk=home_pk, site=instance.site):
+            page.is_home = True
+            if instance.pk == home_pk:
+                instance.is_home = True
+            page.save()
+        for page in instance.get_object_queryset().filter(site=instance.site, is_home=True).exclude(pk=home_pk):
+            if instance.pk == home_pk:
+                instance.is_home = False
+            page.is_home = False
+            page.save()
+
+page_moved.connect(update_home, sender=Page, dispatch_uid="cms.page.update_home")
+post_publish.connect(update_home, sender=Page)
+signals.post_delete.connect(update_home, sender=Page)
+
+
+
 def update_title_paths(instance, **kwargs):
     """Update child pages paths in case when page was moved.
     """
@@ -46,13 +73,11 @@ page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.upda
 
 def update_title(title):
     slug = u'%s' % title.slug
-
-    if title.page.is_home():
+    if title.page.is_home:
         title.path = ''
     elif not title.has_url_overwrite:
         title.path = u'%s' % slug
         parent_page_id = title.page.parent_id
-
         if parent_page_id:
             parent_title = Title.objects.get_title(parent_page_id,
                                                    language=title.language, language_fallback=True)
@@ -162,7 +187,6 @@ def pre_save_page(instance, raw, **kwargs):
     except ObjectDoesNotExist:
         pass
 
-
 def post_save_page_moderator(instance, raw, created, **kwargs):
     """Helper post save signal.
     """
@@ -176,9 +200,11 @@ def post_save_page_moderator(instance, raw, created, **kwargs):
 
 
 def post_save_page(instance, **kwargs):
-    if instance.old_page is None or instance.old_page.parent_id != instance.parent_id:
+
+    if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
+        update_home(instance)
         for page in instance.get_descendants(include_self=True):
-            for title in page.title_set.all():
+            for title in page.title_set.all().select_related('page'):
                 update_title(title)
                 title.save()
     if instance.old_page is None or instance.old_page.application_urls != instance.application_urls:

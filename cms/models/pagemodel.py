@@ -73,6 +73,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
+    is_home = models.BooleanField(editable=False, db_index=True)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
@@ -126,7 +127,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.publisher_state == self.PUBLISHER_STATE_DIRTY
 
     def get_absolute_url(self, language=None, fallback=True):
-        if self.is_home():
+        if self.is_home:
             return reverse('pages-root')
         path = self.get_path(language, fallback) or self.get_slug(language, fallback)
         return reverse('pages-details-by-slug', kwargs={"slug": path})
@@ -409,8 +410,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if not self.pk:
             self.save()
-        if not self.parent_id:
-            self.clear_home_pk_cache()
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -459,7 +458,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         self.save()
         # If we are publishing, this page might have become a "home" which
         # would change the path
-        if self.is_home():
+        if self.is_home:
             for title in self.title_set.all():
                 if title.path != '':
                     title.save()
@@ -894,32 +893,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
-
-    def is_home(self):
-        if self.parent_id:
-            return False
-        else:
-            try:
-                return self.home_pk_cache == self.pk
-            except NoHomeFound:
-                pass
-        return False
-
-    def get_home_pk_cache(self):
-        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        if getattr(self, attr, None) is None:
-            setattr(self, attr, self.get_object_queryset().get_home(self.site).pk)
-        return getattr(self, attr)
-
-    def set_home_pk_cache(self, value):
-
-        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        setattr(self, attr, value)
-
-    home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
-
-    def clear_home_pk_cache(self):
-        self.home_pk_cache = None
 
     def get_media_path(self, filename):
         """
