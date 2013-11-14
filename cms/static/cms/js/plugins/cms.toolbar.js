@@ -521,6 +521,9 @@ $(document).ready(function () {
 		},
 
 		openModal: function (url, name, breadcrumb) {
+			// show loader
+			this._showLoader(true);
+
 			// reset breadcrumb
 			this.modal.find('.cms_modal-breadcrumb').hide();
 			this.modal.find('.cms_modal-breadcrumb-items').html('');
@@ -890,6 +893,9 @@ $(document).ready(function () {
 			$(document).bind('keydown.cms', function (e) {
 				if(e.keyCode === 27) that.closeModal();
 			});
+
+			// hide loader
+			this._showLoader(false);
 		},
 
 		_hideModal: function (speed) {
@@ -1256,6 +1262,14 @@ $(document).ready(function () {
 				this.lockToolbar = false;
 				// make button look disabled
 				this.toolbarTrigger.css('opacity', 1);
+			}
+		},
+
+		_showLoader: function (loader) {
+			if(loader) {
+				this.toolbarTrigger.addClass('cms_toolbar-loader');
+			} else {
+				this.toolbarTrigger.removeClass('cms_toolbar-loader');
 			}
 		},
 

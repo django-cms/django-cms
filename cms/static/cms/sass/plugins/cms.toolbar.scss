@@ -389,9 +389,12 @@
 			&:hover, &:active, &:focus { background-position:-90px -40px; background-color:white; }
 		}
 	 }
+	// #TOOLBAR/loader#
 	.cms_toolbar-trigger-expanded a { background-position:0 -40px;
 		&:hover, &:active, &:focus { background-position:-30px -40px; }
 	}
+	.cms_toolbar-loader a { background:#fcfcfc url('../../img/loader.gif') no-repeat center center !important;
+		background-size:20px 20px !important; }
 
 	// #TOOLBAR/switch#
 	.cms_toolbar-item_switch { position:relative; left:0; top:0; margin:4px 0 4px; @include border-radius(20px);

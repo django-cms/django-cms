@@ -708,6 +708,9 @@ $(document).ready(function () {
 				e.preventDefault();
 				e.stopPropagation();
 
+				// show loader
+				CMS.API.Toolbar._showLoader(true);
+
 				var el = $(this);
 
 				// set switch for subnav entries
@@ -721,10 +724,11 @@ $(document).ready(function () {
 					case 'copy':
 						that.copyPlugin();
 						break;
-					case 'stack':
-						// that.stackPlugin();
-						break;
+					/*case 'stack':
+						//that.stackPlugin();
+						break;*/
 					default:
+						CMS.API.Toolbar._showLoader(false);
 						that._delegate(el);
 				}
 			});
@@ -841,10 +845,6 @@ $(document).ready(function () {
 			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
 				nav.find('.cms_submenu-item-title:eq(0)').show();
 			}
-		},
-
-		_updateExpander: function () {
-
 		},
 
 		_getId: function (el) {
