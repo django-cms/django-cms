@@ -33,12 +33,16 @@
 }
 .cms_toolbar-debug #container { padding-top:35px !important; }
 
+// helpers
+.cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
+#djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
+
 // toolbar
 #cms_toolbar { position:absolute; left:0; top:5px; z-index:9999999; width:100%; }
 #cms_toolbar {
 	.cms_toolbar { display:none; position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
-		border-bottom:1px solid $color-grey !important; background:$color-grey-5;
-		@include background-image($gradient-toolbar); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
+		border-bottom:1px solid $color-grey !important; background-color:$color-grey-5; background:rgba($color-grey-5, 0);
+		@include background-image($gradient-toolbar); @include box-shadow(0 0 5px rgba(0, 0, 0, 0.2));
 
 		.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
 		.cms_toolbar-right { float:right; padding-right:32px; position:relative; z-index:10; }
@@ -69,13 +73,13 @@
 			ul { position:absolute; left:0; top:30px;
 				display:block; min-width:180px; padding:4px 0;
 				@include border-radius(0 0 4px 4px);
-				border:1px solid $color-grey-10; background:white;
-				@include box-shadow(0 2px 2px $color-grey-10); }
+				border:1px solid white; border-top:1px solid $color-grey;
+				background-color:white; background:rgba(white, 0.97);
+				@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.4)); }
 			ul li { float:none; zoom:1; }
 			ul li a { float:none; display:block; zoom:1; cursor:pointer; white-space:nowrap;
 				padding:2px 10px 2px 15px; }
-			ul .cms_toolbar-item-navigation-active a { font-weight:bold; color:black; }
-			ul .cms_toolbar-item-navigation-active a:hover { color:white; }
+			ul ul { @include border-radius(0 4px 4px 0); border-top:1px solid #f5f5f5; }
 
 			// second level
 			.cms_toolbar-item-navigation-children {
@@ -90,7 +94,8 @@
 				@include background-image($gradient-blue); }
 			> a span { background-position:right -300px !important; }
 
-			strong { color:white !important; }
+			// add active style
+			.cms_toolbar-item-navigation-active a { font-weight:600; }
 		}
 
 		.cms_toolbar-item-navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
@@ -199,7 +204,7 @@
 	// #TOOLBAR/modal#
 	.cms_modal {
 		display:none; position:fixed; left:50%; top:50%; z-index:999999; overflow:hidden;
-		@include border-radius(5px); @include box-shadow(0 0 15px rgba(0, 0, 0, 0.2));
+		@include border-radius(5px); @include box-shadow(0 0 20px rgba(0, 0, 0, 0.5));
 		background:white;
 
 		.cms_modal-body { position:relative; z-index:10; width:800px; height:400px;
@@ -384,9 +389,12 @@
 			&:hover, &:active, &:focus { background-position:-90px -40px; background-color:white; }
 		}
 	 }
+	// #TOOLBAR/loader#
 	.cms_toolbar-trigger-expanded a { background-position:0 -40px;
 		&:hover, &:active, &:focus { background-position:-30px -40px; }
 	}
+	.cms_toolbar-loader a { background:#fcfcfc url('../../img/loader.gif') no-repeat center center !important;
+		background-size:20px 20px !important; }
 
 	// #TOOLBAR/switch#
 	.cms_toolbar-item_switch { position:relative; left:0; top:0; margin:4px 0 4px; @include border-radius(20px);
@@ -432,6 +440,8 @@
 		font-size:11px; line-height:11px; font-weight:bold; white-space:nowrap; padding:5px 7px 7px 24px; margin:0;
 		color:$color-grey-10;
 		background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
+		span { display:block; position:absolute; right:0; top:20px; @include border-radius(3px 0 3px 3px);
+			color:white; font-weight:normal; padding:5px 7px; background:$color-grey-70; }
 	}
 
 // end of toolbar
@@ -451,7 +461,8 @@
 	.cms_modal-collapse, .cms_modal-close, .cms_modal-maximize, .cms_modal-resize,
 	.cms_modal-breadcrumb a, .cms_modal-breadcrumb-title,
 	.cms_toolbar-item-logo a, .cms_toolbar-trigger a,
-	.cms_placeholders-tooltip, .cms_placeholders-menu {
+	.cms_placeholders-tooltip, .cms_placeholders-menu,
+	.cms_toolbar-debug .cms_debug-bar {
 		background-image:url('../../img/toolbar/sprite_toolbar@2x.png') !important;
 		background-size:190px !important; }
 

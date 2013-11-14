@@ -46,15 +46,8 @@ $(document).ready(function () {
 			this._collapsables(placeholders.find('.cms_draggable'));
 
 			// add global collapsable events
-			placeholders.find('.cms_expandmenu').bind('click', function () {
-				var el = $(this);
-				if(el.hasClass('cms_expandmenu-collapsed')) {
-					that._collapseAll(el.closest('.cms_placeholder'));
-					el.removeClass('cms_expandmenu-collapsed');
-				} else {
-					that._expandAll(el.closest('.cms_placeholder'));
-					el.addClass('cms_expandmenu-collapsed');
-				}
+			placeholders.find('.cms_placeholder-title').bind('click', function () {
+				($(this).hasClass('cms_placeholder-title-expanded')) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
 
 			// check which button should be shown for collapsemenu
@@ -62,7 +55,7 @@ $(document).ready(function () {
 				var els = $(item).find('.cms_dragitem-collapsable');
 				var open = els.filter('.cms_dragitem-expanded');
 				if(els.length === open.length && (els.length + open.length !== 0)) {
-					$(item).find('.cms_expandmenu').addClass('cms_expandmenu-collapsed');
+					$(item).find('.cms_placeholder-title').addClass('cms_placeholder-title-expanded');
 				}
 			});
 		},
@@ -72,8 +65,13 @@ $(document).ready(function () {
 
 			plugins.bind('mouseover mouseout', function (e) {
 				e.stopPropagation();
-				// add events to placeholder
-				(e.type === 'mouseover') ? that.tooltip.show() : that.tooltip.hide();
+
+				if(e.type === 'mouseover') {
+					var name = $(this).data('settings').plugin_name;
+					that.tooltip.show().find('span').text(name);
+				} else {
+					that.tooltip.hide();
+				}
 			});
 		},
 
@@ -213,6 +211,14 @@ $(document).ready(function () {
 				}
 			});
 
+			// attach escape event to cancel dragging
+			$(document).bind('keyup.cms', function(e, cancel){
+				if(e.keyCode === 27 || cancel) {
+					that.state = false;
+					that.sortables.sortable('cancel');
+				}
+			});
+
 			// define droppable helpers
 			this.dropareas.droppable({
 				'greedy': true,
@@ -334,6 +340,11 @@ $(document).ready(function () {
 				// save settings
 				CMS.API.Toolbar.setSettings(settings);
 			});
+			// adds double click event
+			draggables.bind('dblclick', function (e) {
+				e.stopPropagation();
+				$('#cms_plugin-' + that.getId($(this))).trigger('dblclick');
+			});
 
 			// removing dublicate entries
 			var sortedArr = settings.states.sort();
@@ -356,46 +367,54 @@ $(document).ready(function () {
 			});
 		},
 
-		_expandAll: function (placeholder) {
-			var items = placeholder.find('.cms_dragitem-collapsable');
-				items.each(function () {
-					if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
-				});
+		_expandAll: function (el) {
+			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			// cancel if there are no items
+			if(!items.length) return false;
+			items.each(function () {
+				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+			});
+
+			el.addClass('cms_placeholder-title-expanded');
 		},
 
-		_collapseAll: function (placeholder) {
-			var items = placeholder.find('.cms_dragitem-collapsable');
-				items.each(function () {
-					if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
-				});
+		_collapseAll: function (el) {
+			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			items.each(function () {
+				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+			});
+
+			el.removeClass('cms_placeholder-title-expanded');
 		},
 
 		_preventEvents: function () {
 			var clicks = 0;
 			var delay = 500;
 			var timer = function () {};
-			var prevent = true;
 
 			// unbind click event if already initialized
-			this.plugins.find('a, button, input[type="submit"], input[type="button"]').bind('click', function (e) {
-				if(prevent) {
-					e.preventDefault();
+			this.plugins.find('a').bind('click', function (e) {
+				e.preventDefault();
 
-					// clear timeout after click and increment
-					clearTimeout(timer);
+				// increment
+				clicks++;
 
+				// single click
+				if(clicks === 1) {
 					timer = setTimeout(function () {
-						// if there is only one click use standard event
-						if(clicks === 1) {
-							prevent = false;
-
-							$(e.currentTarget)[0].click();
-						}
-						// reset
 						clicks = 0;
+						// cancel if link contains a hash
+						if($(e.currentTarget).attr('href').indexOf('#') === 0) return false;
+						// we need to redirect to the default behaviours
+						// all events will be lost in edit mode, use '#' if href should not be triggered
+						window.location.href = $(e.currentTarget).attr('href');
 					}, delay);
+				}
 
-					clicks++;
+				// double click
+				if(clicks === 2) {
+					clearTimeout(timer);
+					clicks = 0;
 				}
 			});
 		}
@@ -510,7 +529,7 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseenter' || e.type === 'mouseover') $(this).data('active', true);
 				if(e.type === 'mouseleave') {
-					 $(this).data('active', false);
+					$(this).data('active', false);
 					allOptions.hide();
 				}
 
@@ -520,6 +539,23 @@ $(document).ready(function () {
 						$(e.currentTarget).find('.cms_submenu:eq(0)').hide();
 					}
 				}, 100);
+			});
+			draggable.find('> .cms_dragitem').bind('mousedown mouseup mousemove', function (e) {
+				if(e.type === 'mousedown') {
+					// start countdown
+					timer = setTimeout(function () {
+						CMS.API.Toolbar._enableEditMode(300);
+						CMS.API.Toolbar.setActive(plugin.data('settings').plugin_id);
+						$(document).bind('mousemove.keypress', function () {
+							$(document).trigger('keyup.cms', [true]);
+							setTimeout(function () {
+								$(document).unbind('mousemove.keypress');
+							}, 1000);
+						});
+					}, 500);
+				} else {
+					clearTimeout(timer);
+				}
 			});
 
 			// update plugin position
@@ -532,7 +568,8 @@ $(document).ready(function () {
 		_setGeneric: function () {
 			var that = this;
 
-			this.container.bind('dblclick', function () {
+			this.container.bind('dblclick', function (e) {
+				e.preventDefault();
 				that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
 			});
 
@@ -639,7 +676,7 @@ $(document).ready(function () {
 				'source_plugin_id': this.options.plugin_id || '',
 				'source_language': this.options.plugin_language,
 				'target_placeholder_id': CMS.API.Toolbar.options.clipboard,
-				'target_language':  this.options.plugin_language,
+				'target_language': this.options.plugin_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
 
@@ -676,6 +713,10 @@ $(document).ready(function () {
 				e.preventDefault();
 				e.stopPropagation();
 
+				// show loader and make sure scroll doesn't jump
+				CMS.API.Toolbar._showLoader(true);
+				CMS.API.Toolbar._disableScroll(false);
+
 				var el = $(this);
 
 				// set switch for subnav entries
@@ -689,10 +730,11 @@ $(document).ready(function () {
 					case 'copy':
 						that.copyPlugin();
 						break;
-					case 'stack':
-						// that.stackPlugin();
-						break;
+					/*case 'stack':
+						//that.stackPlugin();
+						break;*/
 					default:
+						CMS.API.Toolbar._showLoader(false);
 						that._delegate(el);
 				}
 			});
@@ -737,6 +779,9 @@ $(document).ready(function () {
 				nav.find('> .cms_submenu-dropdown').show();
 			}, 100);
 
+			// enable scroll
+			CMS.API.Toolbar._disableScroll(true);
+
 			// set relativity
 			$('.cms_placeholder').css({
 				'position': 'relative',
@@ -763,6 +808,9 @@ $(document).ready(function () {
 				nav.find('input').val('');
 				that._searchSubnav(nav, '');
 			}, this.timeout);
+
+			// enable scroll
+			CMS.API.Toolbar._disableScroll(false);
 
 			// reset relativity
 			$('.cms_placeholder').css('position', '');
