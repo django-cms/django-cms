@@ -400,6 +400,11 @@ $(document).ready(function () {
 				// save url in settings
 				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
 				that.setSettings();
+
+				// bind extra events
+				iframe.contents().find('body').bind('click', function () {
+					$(document).trigger('click.cms');
+				});
 			});
 
 			// cancel animation if sideframe is already shown
