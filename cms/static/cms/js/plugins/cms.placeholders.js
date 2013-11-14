@@ -65,8 +65,13 @@ $(document).ready(function () {
 
 			plugins.bind('mouseover mouseout', function (e) {
 				e.stopPropagation();
-				// add events to placeholder
-				(e.type === 'mouseover') ? that.tooltip.show() : that.tooltip.hide();
+
+				if(e.type === 'mouseover') {
+					var name = $(this).data('settings').plugin_name;
+					that.tooltip.show().find('span').text(name);
+				} else {
+					that.tooltip.hide();
+				}
 			});
 		},
 
