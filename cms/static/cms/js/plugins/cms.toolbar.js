@@ -440,7 +440,7 @@ $(document).ready(function () {
 
 		openMessage: function (msg, dir, delay, error) {
 			// set toolbar freeze
-			this.lockToolbar = true;
+			this._lockToolbar(true);
 
 			// add content to element
 			this.messages.find('.cms_messages-inner').html(msg);
@@ -517,7 +517,7 @@ $(document).ready(function () {
 		closeMessage: function () {
 			this.messages.fadeOut(300);
 			// unlock toolbar
-			this.lockToolbar = false;
+			this._lockToolbar(false);
 		},
 
 		openModal: function (url, name, breadcrumb) {
@@ -765,7 +765,7 @@ $(document).ready(function () {
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
 
-			this.lockToolbar = true;
+			this._lockToolbar(true);
 		},
 
 		_hideSideframe: function (close) {
@@ -785,7 +785,8 @@ $(document).ready(function () {
 			// should we reload
 			if(this.enforceReload) CMS.API.Helpers.reloadBrowser();
 
-			this.lockToolbar = false;
+			// lock toolbar
+			this._lockToolbar(false);
 		},
 
 		_minimizeSideframe: function () {
@@ -1244,6 +1245,18 @@ $(document).ready(function () {
 		_enableScroll: function () {
 			this.body.removeClass('cms_toolbar-noscroll');
 			$(window).scrollTop(this.body.data('scroll'));
+		},
+
+		_lockToolbar: function (lock) {
+			if(lock) {
+				this.lockToolbar = true;
+				// make button look disabled
+				this.toolbarTrigger.css('opacity', 0.2);
+			} else {
+				this.lockToolbar = false;
+				// make button look disabled
+				this.toolbarTrigger.css('opacity', 1);
+			}
 		},
 
 		_debug: function () {
