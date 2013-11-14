@@ -124,7 +124,7 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach event to the trigger handler
-			this.toolbarTrigger.bind('click', function (e) {
+			this.toolbarTrigger.bind('click touchend', function (e) {
 				e.preventDefault();
 				that.toggleToolbar();
 			});
@@ -138,7 +138,7 @@ $(document).ready(function () {
 				var children = 'cms_toolbar-item-navigation-children';
 
 				// remove events from first level
-				item.find('a').bind('click', function (e) {
+				item.find('a').bind('click touchend', function (e) {
 					e.preventDefault();
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
@@ -147,7 +147,7 @@ $(document).ready(function () {
 				});
 
 				// handle hover states
-				lists.bind('click', function (e) {
+				lists.bind('click touchend', function (e) {
 					e.stopImmediatePropagation();
 
 					lists.removeClass(hover);
@@ -184,7 +184,7 @@ $(document).ready(function () {
 
 			// attach event to the switcher elements
 			this.switcher.each(function () {
-				$(this).bind('click', function (e) {
+				$(this).bind('click touchend', function (e) {
 					e.preventDefault();
 					that._setSwitcher($(e.currentTarget));
 				});
@@ -201,11 +201,11 @@ $(document).ready(function () {
 				that._endModalResize(e);
 			});
 
-			this.modes.eq(0).bind('click', function (e) {
+			this.modes.eq(0).bind('click touchend', function (e) {
 				e.preventDefault();
 				that._enableEditMode(300);
 			});
-			this.modes.eq(1).bind('click', function (e) {
+			this.modes.eq(1).bind('click touchend', function (e) {
 				e.preventDefault();
 				that._enableDragMode(300);
 			});
@@ -229,12 +229,12 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach close event
-			this.sideframe.find('.cms_sideframe-close').bind('click', function () {
+			this.sideframe.find('.cms_sideframe-close').bind('click touchend', function () {
 				that.closeSideframe(true);
 			});
 
 			// attach hide event
-			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
+			this.sideframe.find('.cms_sideframe-hide').bind('click touchend', function () {
 				if($(this).hasClass('cms_sideframe-hidden')) {
 					that.settings.sideframe.hidden = false;
 					that._showSideframe(that.settings.sideframe.position || that.options.sideframeWidth, true);
@@ -246,7 +246,7 @@ $(document).ready(function () {
 			});
 
 			// attach maximize event
-			this.sideframe.find('.cms_sideframe-maximize').bind('click', function () {
+			this.sideframe.find('.cms_sideframe-maximize').bind('click touchend', function () {
 				if($(this).hasClass('cms_sideframe-minimize')) {
 					that.settings.sideframe.maximized = false;
 					that._minimizeSideframe();
@@ -268,11 +268,11 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach events to window
-			this.modal.find('.cms_modal-close').bind('click', function (e) {
+			this.modal.find('.cms_modal-close').bind('click touchend', function (e) {
 				e.preventDefault();
 				that.closeModal();
 			});
-			this.modal.find('.cms_modal-collapse').bind('click', function (e) {
+			this.modal.find('.cms_modal-collapse').bind('click touchend', function (e) {
 				e.preventDefault();
 				that._minimizeModal();
 			});
@@ -284,15 +284,15 @@ $(document).ready(function () {
 				e.preventDefault();
 				that._startModalResize(e);
 			});
-			this.modal.find('.cms_modal-maximize').bind('click', function (e) {
+			this.modal.find('.cms_modal-maximize').bind('click touchend', function (e) {
 				e.preventDefault();
 				that._maximizeModal();
 			});
-			this.modal.find('.cms_modal-breadcrumb-items a').live('click', function (e) {
+			this.modal.find('.cms_modal-breadcrumb-items a').live('click touchend', function (e) {
 				e.preventDefault();
 				that._changeModalContent($(this));
 			});
-			this.modal.find('.cms_modal-cancel').bind('click', function (e) {
+			this.modal.find('.cms_modal-cancel').bind('click touchend', function (e) {
 				e.preventDefault();
 				that.closeModal();
 			});
@@ -423,7 +423,7 @@ $(document).ready(function () {
 			var top = this.toolbar.outerHeight(true);
 			var close = this.messages.find('.cms_messages-close');
 				close.hide();
-				close.bind('click', function () {
+				close.bind('click touchend', function () {
 					that.closeMessage();
 				});
 
@@ -1098,7 +1098,7 @@ $(document).ready(function () {
 
 				// create the element
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
-					el.bind('click', function () {
+					el.bind('click touchend', function () {
 						if(item.is('input')) item.click();
 						if(item.is('anchor')) iframe.attr('src', item.attr('href'));
 
@@ -1119,7 +1119,7 @@ $(document).ready(function () {
 
 			// manually add cancel button at the end
 			var cancel = $('<div class="cms_btn">'+this.options.lang.cancel+'</div>');
-				cancel.bind('click', function () {
+				cancel.bind('click touchend', function () {
 					that.closeModal();
 				});
 			render.append(cancel);
