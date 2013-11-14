@@ -708,8 +708,9 @@ $(document).ready(function () {
 				e.preventDefault();
 				e.stopPropagation();
 
-				// show loader
+				// show loader and make sure scroll doesn't jump
 				CMS.API.Toolbar._showLoader(true);
+				CMS.API.Toolbar._disableScroll(false);
 
 				var el = $(this);
 
@@ -773,8 +774,8 @@ $(document).ready(function () {
 				nav.find('> .cms_submenu-dropdown').show();
 			}, 100);
 
-			// disable scroll
-			CMS.API.Toolbar._disableScroll();
+			// enable scroll
+			CMS.API.Toolbar._disableScroll(true);
 
 			// set relativity
 			$('.cms_placeholder').css({
@@ -804,7 +805,7 @@ $(document).ready(function () {
 			}, this.timeout);
 
 			// enable scroll
-			CMS.API.Toolbar._enableScroll();
+			CMS.API.Toolbar._disableScroll(false);
 
 			// reset relativity
 			$('.cms_placeholder').css('position', '');

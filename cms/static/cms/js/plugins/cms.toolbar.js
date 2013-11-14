@@ -797,7 +797,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').show();
 
 			// hide scrollbar
-			this._enableScroll();
+			this._disableScroll(false);
 
 			// reset to first state
 			this._showSideframe(this.settings.sideframe.position || this.options.sideframeWidth, true);
@@ -813,7 +813,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').hide();
 
 			// reset scrollbar
-			this._disableScroll();
+			this._disableScroll(true);
 
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
 			// do custom animation
@@ -886,7 +886,7 @@ $(document).ready(function () {
 			});
 
 			// prevent scrolling
-			this._disableScroll();
+			this._disableScroll(true);
 
 			// add esc close event
 			// TODO the event also needs to be added to the iframe
@@ -903,7 +903,7 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-frame iframe').remove();
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 			// prevent scrolling
-			this._enableScroll();
+			this._disableScroll(false);
 		},
 
 		_minimizeModal: function () {
@@ -1243,14 +1243,17 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-title').text(el.text());
 		},
 
-		_disableScroll: function () {
+		_disableScroll: function (disable) {
 			var scrollTop = $(window).scrollTop();
-			this.body.addClass('cms_toolbar-noscroll').css('top',-scrollTop).data('scroll', scrollTop);
-		},
 
-		_enableScroll: function () {
-			this.body.removeClass('cms_toolbar-noscroll');
-			$(window).scrollTop(this.body.data('scroll'));
+			if(disable) {
+				console.log('disable');
+				this.body.addClass('cms_toolbar-noscroll').css('top',-scrollTop).data('scroll', scrollTop);
+			} else {
+				console.log('enable');
+				this.body.removeClass('cms_toolbar-noscroll');
+				$(window).scrollTop(this.body.data('scroll'));
+			}
 		},
 
 		_lockToolbar: function (lock) {
