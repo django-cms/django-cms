@@ -21,6 +21,7 @@ $(document).ready(function () {
 			this.sortables = $('.cms_draggables'); // use global scope
 			this.clipboard = this.toolbar.find('.cms_clipboard');
 			this.dragging = false;
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 
 			// this.dragitems = $('.cms_draggable');
 			this.dropareas = $('.cms_droppable');
@@ -46,7 +47,7 @@ $(document).ready(function () {
 			this._collapsables(placeholders.find('.cms_draggable'));
 
 			// add global collapsable events
-			placeholders.find('.cms_placeholder-title').bind('click', function () {
+			placeholders.find('.cms_placeholder-title').bind(this.click, function () {
 				($(this).hasClass('cms_placeholder-title-expanded')) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
 
@@ -251,7 +252,7 @@ $(document).ready(function () {
 			var timer = function () {};
 
 			// add remove event
-			remove.bind('click', function (e) {
+			remove.bind(this.click, function (e) {
 				e.preventDefault();
 				CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
 			});
@@ -322,7 +323,7 @@ $(document).ready(function () {
 			var settings = CMS.API.Toolbar.getSettings();
 
 			// attach events to draggable
-			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
+			draggables.find('> .cms_dragitem-collapsable').bind(this.click, function () {
 				var el = $(this);
 				var id = that.getId($(this).parent());
 				var settings = CMS.API.Toolbar.getSettings();
@@ -372,7 +373,7 @@ $(document).ready(function () {
 			// cancel if there are no items
 			if(!items.length) return false;
 			items.each(function () {
-				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
 			el.addClass('cms_placeholder-title-expanded');
@@ -381,7 +382,7 @@ $(document).ready(function () {
 		_collapseAll: function (el) {
 			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
 			items.each(function () {
-				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
 			el.removeClass('cms_placeholder-title-expanded');
@@ -393,7 +394,7 @@ $(document).ready(function () {
 			var timer = function () {};
 
 			// unbind click event if already initialized
-			this.plugins.find('a').bind('click', function (e) {
+			this.plugins.find('a').bind(this.click, function (e) {
 				e.preventDefault();
 
 				// increment
@@ -456,6 +457,7 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 
 			// bind data element to the container
 			this.container.data('settings', this.options);
@@ -703,13 +705,13 @@ $(document).ready(function () {
 		_setSubnav: function (nav) {
 			var that = this;
 
-			nav.bind('mouseenter mouseleave', function (e) {
+			nav.bind('mouseenter mouseleave tap.cms', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
 				(e.type === 'mouseenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
 			});
 
-			nav.find('a').bind('click', function (e) {
+			nav.find('a').bind('click.cms tap.cms', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
 
@@ -755,7 +757,7 @@ $(document).ready(function () {
 			});
 
 			// prevent propagnation
-			nav.bind('click', function (e) {
+			nav.bind(this.click, function (e) {
 				e.stopPropagation();
 			});
 		},

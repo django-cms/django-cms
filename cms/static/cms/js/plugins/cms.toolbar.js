@@ -64,6 +64,7 @@ $(document).ready(function () {
 			this.modal = this.container.find('.cms_modal');
 			this.tooltip = this.container.find('.cms_placeholders-tooltip');
 			this.bars = $('.cms_placeholder-bar');
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 
 			this.plugins = $('.cms_plugin');
 			this.placeholders = $('.cms_placeholder');
@@ -123,7 +124,7 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach event to the trigger handler
-			this.toolbarTrigger.bind('click', function (e) {
+			this.toolbarTrigger.bind(this.click, function (e) {
 				e.preventDefault();
 				that.toggleToolbar();
 			});
@@ -138,7 +139,7 @@ $(document).ready(function () {
 				var children = 'cms_toolbar-item-navigation-children';
 
 				// remove events from first level
-				item.find('a').bind('click', function (e) {
+				item.find('a').bind(that.click, function (e) {
 					e.preventDefault();
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
@@ -151,7 +152,7 @@ $(document).ready(function () {
 				});
 
 				// handle click states
-				lists.bind('click', function (e) {
+				lists.bind(that.click, function (e) {
 					e.stopPropagation();
 					var el = $(this);
 
@@ -168,11 +169,11 @@ $(document).ready(function () {
 					item.find('> li').bind('mouseenter', function () {
 						// cancel if item is already active
 						if($(this).hasClass(hover)) return false;
-						$(this).trigger('click');
+						$(this).trigger(that.click);
 					});
 
 					// create the document event
-					$(document).bind('click.cms', reset);
+					$(document).bind(that.click, reset);
 				});
 
 				// attach hover
@@ -210,13 +211,13 @@ $(document).ready(function () {
 					lists.removeClass(hover);
 					lists.find('ul ul').hide();
 					item.find('> li').unbind('mouseenter');
-					$(document).unbind('click.cms');
+					$(document).unbind(that.click);
 				}
 			});
 
 			// attach event to the switcher elements
 			this.switcher.each(function () {
-				$(this).bind('click', function (e) {
+				$(this).bind(that.click, function (e) {
 					e.preventDefault();
 					that._setSwitcher($(e.currentTarget));
 				});
@@ -233,11 +234,11 @@ $(document).ready(function () {
 				that._endModalResize(e);
 			});
 
-			this.modes.eq(0).bind('click', function (e) {
+			this.modes.eq(0).bind(this.click, function (e) {
 				e.preventDefault();
 				that._enableEditMode(300);
 			});
-			this.modes.eq(1).bind('click', function (e) {
+			this.modes.eq(1).bind(this.click, function (e) {
 				e.preventDefault();
 				that._enableDragMode(300);
 			});
@@ -261,12 +262,12 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach close event
-			this.sideframe.find('.cms_sideframe-close').bind('click', function () {
+			this.sideframe.find('.cms_sideframe-close').bind(this.click, function () {
 				that.closeSideframe(true);
 			});
 
 			// attach hide event
-			this.sideframe.find('.cms_sideframe-hide').bind('click', function () {
+			this.sideframe.find('.cms_sideframe-hide').bind(this.click, function () {
 				if($(this).hasClass('cms_sideframe-hidden')) {
 					that.settings.sideframe.hidden = false;
 					that._showSideframe(that.settings.sideframe.position || that.options.sideframeWidth, true);
@@ -278,7 +279,7 @@ $(document).ready(function () {
 			});
 
 			// attach maximize event
-			this.sideframe.find('.cms_sideframe-maximize').bind('click', function () {
+			this.sideframe.find('.cms_sideframe-maximize').bind(this.click, function () {
 				if($(this).hasClass('cms_sideframe-minimize')) {
 					that.settings.sideframe.maximized = false;
 					that._minimizeSideframe();
@@ -300,11 +301,11 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach events to window
-			this.modal.find('.cms_modal-close').bind('click', function (e) {
+			this.modal.find('.cms_modal-close').bind(this.click, function (e) {
 				e.preventDefault();
 				that.closeModal();
 			});
-			this.modal.find('.cms_modal-collapse').bind('click', function (e) {
+			this.modal.find('.cms_modal-collapse').bind(this.click, function (e) {
 				e.preventDefault();
 				that._minimizeModal();
 			});
@@ -316,15 +317,15 @@ $(document).ready(function () {
 				e.preventDefault();
 				that._startModalResize(e);
 			});
-			this.modal.find('.cms_modal-maximize').bind('click', function (e) {
+			this.modal.find('.cms_modal-maximize').bind(this.click, function (e) {
 				e.preventDefault();
 				that._maximizeModal();
 			});
-			this.modal.find('.cms_modal-breadcrumb-items a').live('click', function (e) {
+			this.modal.find('.cms_modal-breadcrumb-items a').live(this.click, function (e) {
 				e.preventDefault();
 				that._changeModalContent($(this));
 			});
-			this.modal.find('.cms_modal-cancel').bind('click', function (e) {
+			this.modal.find('.cms_modal-cancel').bind(this.click, function (e) {
 				e.preventDefault();
 				that.closeModal();
 			});
@@ -402,8 +403,8 @@ $(document).ready(function () {
 				that.setSettings();
 
 				// bind extra events
-				iframe.contents().find('body').bind('click', function () {
-					$(document).trigger('click.cms');
+				iframe.contents().find('body').bind(that.click, function () {
+					$(document).trigger(that.click);
 				});
 			});
 
@@ -460,7 +461,7 @@ $(document).ready(function () {
 			var top = this.toolbar.outerHeight(true);
 			var close = this.messages.find('.cms_messages-close');
 				close.hide();
-				close.bind('click', function () {
+				close.bind(this.click, function () {
 					that.closeMessage();
 				});
 
@@ -608,7 +609,7 @@ $(document).ready(function () {
 
 			// collapse all previous elements
 			var collapsed = dragitem.parents().siblings().not('.cms_dragitem-expanded');
-				collapsed.trigger('click');
+				collapsed.trigger(this.click);
 
 			// set new classes
 			dragitem.addClass('cms_draggable-selected');
@@ -998,7 +999,7 @@ $(document).ready(function () {
 				$(window).trigger('resize.cms.modal');
 
 				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_off')) btnCk.trigger('click');
+				if(btnCk.hasClass('cke_button_off')) btnCk.trigger(this.click);
 			} else {
 				// minimize
 				this.maximized = false;
@@ -1011,7 +1012,7 @@ $(document).ready(function () {
 				container.css(container.data('css'));
 
 				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_on')) btnCk.trigger('click');
+				if(btnCk.hasClass('cke_button_on')) btnCk.trigger(this.click);
 			}
 		},
 
@@ -1148,7 +1149,7 @@ $(document).ready(function () {
 
 				// create the element
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
-					el.bind('click', function () {
+					el.bind(that.click, function () {
 						if(item.is('input')) item.click();
 						if(item.is('a')) iframe.attr('src', item.attr('href'));
 
@@ -1169,7 +1170,7 @@ $(document).ready(function () {
 
 			// manually add cancel button at the end
 			var cancel = $('<div class="cms_btn">'+this.options.lang.cancel+'</div>');
-				cancel.bind('click', function () {
+				cancel.bind(that.click, function () {
 					that.closeModal();
 				});
 			render.append(cancel);
