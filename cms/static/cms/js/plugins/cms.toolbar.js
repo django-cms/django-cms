@@ -1252,8 +1252,10 @@ $(document).ready(function () {
 		},
 
 		_disableScroll: function (disable) {
-			var scrollTop = $(window).scrollTop();
+			// cancel if scrollbar is not visible
+			if($(document).height() <= $(window).height()) return false;
 
+			var scrollTop = $(window).scrollTop();
 			if(disable) {
 				this.body.addClass('cms_toolbar-noscroll').css('top',-scrollTop).data('scroll', scrollTop);
 			} else {
