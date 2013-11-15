@@ -1147,7 +1147,7 @@ $(document).ready(function () {
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind('click', function () {
 						if(item.is('input')) item.click();
-						if(item.is('anchor')) iframe.attr('src', item.attr('href'));
+						if(item.is('a')) iframe.attr('src', item.attr('href'));
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
