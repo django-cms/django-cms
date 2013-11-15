@@ -905,6 +905,9 @@ $(document).ready(function () {
 			$(document).bind('keydown.cms', function (e) {
 				if(e.keyCode === 27) that.closeModal();
 			});
+
+			// set focus to modal
+			this.modal.focus();
 		},
 
 		_hideModal: function (speed) {
