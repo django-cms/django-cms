@@ -301,6 +301,8 @@ class CMSTestCase(testcases.TestCase):
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
         if page:
             request.current_page = page
+        else:
+            request.current_page = None
 
         class MockStorage(object):
 
