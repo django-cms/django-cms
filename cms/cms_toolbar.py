@@ -66,7 +66,7 @@ class BasicToolbar(CMSToolbar):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
             admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
-            # sites menu
+        # sites menu
         if get_cms_setting('PERMISSION'):
             sites_queryset = get_user_sites_queryset(self.request.user)
         else:
@@ -78,7 +78,9 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-                # admin
+        # stacks
+        admin_menu.add_sideframe_item(_('Stacks'), url=reverse('admin:stacks_stack_changelist'))
+        # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)
         # cms users
