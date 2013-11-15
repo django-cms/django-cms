@@ -37,12 +37,9 @@ signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin, dispatch_
 
 
 def update_home(instance, **kwargs):
-
     if getattr(instance, '_home_checked', False):
         return
-    #print "update", instance.pk, kwargs
-    #instance._home_checked = True
-    if not instance.parent_id:
+    if not instance.parent_id or (getattr(instance, 'old_page', False) and not instance.old_page.parent_id):
         if instance.publisher_is_draft:
             qs = Page.objects.drafts()
         else:
@@ -50,22 +47,21 @@ def update_home(instance, **kwargs):
         try:
             home_pk = qs.filter(published=True).get_home(instance.site).pk
         except NoHomeFound:
-            if instance.publisher_is_draft and not instance.published and Page.objects.count() == 1:
+            if instance.publisher_is_draft and not instance.published:
                 return
             home_pk = instance.pk
             instance.is_home = True
-        # print home_pk, instance.pk
-        #print instance.get_object_queryset().values('pk')
         for page in qs.filter(site=instance.site, is_home=True).exclude(pk=home_pk):
-            #print "kill home", page.pk
             if instance.pk == page.pk:
                 instance.is_home = False
             page.is_home = False
             page._publisher_keep_state = True
             page._home_checked = True
             page.save()
-        page = qs.get(pk=home_pk, site=instance.site)
-        #print "new home", page.pk
+        try:
+            page = qs.get(pk=home_pk, site=instance.site)
+        except Page.DoesNotExist:
+            return
         page.is_home = True
         if instance.pk == home_pk:
             instance.is_home = True
@@ -75,9 +71,7 @@ def update_home(instance, **kwargs):
 
 
 page_moved.connect(update_home, sender=Page, dispatch_uid="cms.page.update_home")
-#post_publish.connect(update_home, sender=Page)
-#post_unpublish.connect(update_home, sender=Page)
-signals.pre_delete.connect(update_home, sender=Page)
+signals.post_delete.connect(update_home, sender=Page)
 
 
 
@@ -220,14 +214,12 @@ def post_save_page_moderator(instance, raw, created, **kwargs):
 
 
 def post_save_page(instance, **kwargs):
+    update_home(instance)
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
-        update_home(instance)
         for page in instance.get_descendants(include_self=True):
             for title in page.title_set.all().select_related('page'):
                 update_title(title)
                 title.save()
-    elif instance.old_page.published != instance.published:
-        update_home(instance)
     if instance.old_page is None or instance.old_page.application_urls != instance.application_urls:
         application_post_changed.send(sender=Page, instance=instance)
 
