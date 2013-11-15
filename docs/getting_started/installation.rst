@@ -78,6 +78,10 @@ Revision management
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
+Conflicts
+=========
+django-debug-toolbar v.0.9.4 (current version on pypi) conflicts with django-cms. Master on github is fully compatible.
+
 ************************************
 Installing in a virtualenv using pip
 ************************************
