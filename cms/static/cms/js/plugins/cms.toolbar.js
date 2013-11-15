@@ -529,6 +529,9 @@ $(document).ready(function () {
 			// show loader
 			this._showLoader(true);
 
+			// hide tooltip
+			this.tooltip.hide();
+
 			// reset breadcrumb
 			this.modal.find('.cms_modal-breadcrumb').hide();
 			this.modal.find('.cms_modal-breadcrumb-items').html('');
