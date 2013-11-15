@@ -9,7 +9,7 @@
 
 //######################################################################################################################
 // #PLACEHOLDER
-.cms_placeholder { position:relative; display:none; padding:5px 5px 0.1px; margin:0 0 5px;
+.cms_placeholder { position:relative; display:none; padding:5px 5px 1px; margin:0 0 5px;
 	@include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
 .cms_plugin { display:inline; }
