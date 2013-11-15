@@ -6,7 +6,7 @@ from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
-from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
+from cms.exceptions import PublicIsUnmodifiable
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -521,7 +521,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     draft.publisher_state = Page.PUBLISHER_STATE_PENDING
                     draft._publisher_keep_state = True
                     draft.save()
-
+        from cms.signals import post_unpublish
+        post_unpublish.send(sender=Page, instance=self)
+        #post_unpublish.send(sender=Page, instance=public_page)
         return True
 
     def revert(self):
