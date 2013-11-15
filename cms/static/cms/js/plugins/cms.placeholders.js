@@ -448,7 +448,7 @@ $(document).ready(function () {
 		},
 
 		initialize: function (container, options) {
-			this.container = $(container);
+			this.container = $('[id="' + container + '"]');
 			this.options = $.extend(true, {}, this.options, options);
 
 			this.body = $(document);

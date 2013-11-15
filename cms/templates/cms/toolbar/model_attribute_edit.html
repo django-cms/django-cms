@@ -4,7 +4,7 @@
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.PlaceholderItem('#cms_placeholder-model-{{ opts.app_label }}-{{ instance.pk|unlocalize }}-{{ attribute_name|slugify }}', {
+	new CMS.PlaceholderItem('cms_placeholder-model-{{ opts.app_label }}-{{ instance.pk|unlocalize }}-{{ attribute_name|slugify }}', {
 		'type': 'generic',
 		'plugin_name': 'Edit {{ opts.verbose_name }}',
 		'urls': {
