@@ -2,8 +2,8 @@
 {% language request.toolbar.toolbar_language %}
 {% addtoblock "js" %}
 <script type="text/javascript">
-	var _jQuery = window.jQuery || null;
-	var _$ = window.$ || null;
+	var _jQuery = window.jQuery || undefined;
+	var _$ = window.$ || undefined;
 </script>
 {% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endaddtoblock %}
@@ -183,7 +183,7 @@ $(document).ready(function () {
 	<!-- end: modal -->
 
 	<!-- start: placeholder -->
-	<div class="cms_placeholders-tooltip">Double-click to edit</div>
+	<div class="cms_placeholders-tooltip">Double-click to edit<span></span></div>
 	<!-- end: placeholder -->
 </div>
 

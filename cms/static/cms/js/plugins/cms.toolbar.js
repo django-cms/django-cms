@@ -40,8 +40,7 @@ $(document).ready(function () {
 					'url': null,
 					'hidden': false,
 					'maximized': false
-				},
-				'position': null
+				}
 			}
 		},
 
@@ -133,6 +132,7 @@ $(document).ready(function () {
 			this.navigations.each(function () {
 				var item = $(this);
 				var lists = item.find('li');
+				var root = 'cms_toolbar-item-navigation';
 				var hover = 'cms_toolbar-item-navigation-hover';
 				var disabled = 'cms_toolbar-item-navigation-disabled';
 				var children = 'cms_toolbar-item-navigation-children';
@@ -143,43 +143,75 @@ $(document).ready(function () {
 					if($(this).attr('href') !== ''
 						&& $(this).attr('href') !== '#'
 						&& !$(this).parent().hasClass(disabled)
-						&& !$(this).parent().hasClass(disabled)) that._delegate($(this));
+						&& !$(this).parent().hasClass(disabled)) {
+						that._delegate($(this));
+						reset();
+						return false;
+					}
 				});
 
-				// handle hover states
+				// handle click states
 				lists.bind('click', function (e) {
-					e.stopImmediatePropagation();
+					e.stopPropagation();
+					var el = $(this);
 
-					lists.removeClass(hover);
-					$(this).addClass(hover);
+					// close if el is first item
+					if(el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
+						reset();
+						return false;
+					} else {
+						reset();
+						el.addClass(hover);
+					}
 
-					// add hover mechanism
-					lists.bind('mouseenter', function () {
-						// handle levels
-						$(this).siblings().removeClass(hover);
-						$(this).addClass(hover);
-					});
-					lists.find('> ul').bind('mouseleave', function () {
-						$(this).find('li').removeClass(hover);
-					});
-					// adds escape mechanism fors children
-					item.find('> li > a').add('> li li > a').bind('mouseenter', function () {
-						if($(this).parent().hasClass(hover)) return false;
-						lists.filter('.'+children).find('> ul').hide();
-					});
-
-					// ad sublevel mechanism
-					lists.find('.'+children).bind('mouseenter', function () {
-						$(this).find('> ul').show();
+					// activate hover selection
+					item.find('> li').bind('mouseenter', function () {
+						// cancel if item is already active
+						if($(this).hasClass(hover)) return false;
+						$(this).trigger('click');
 					});
 
-					// add escape mechanism
-					$(document).bind('click.cms', function () {
-						lists.removeClass(hover);
-						lists.unbind('mouseenter');
-						$(document).unbind('click.cms');
-					});
+					// create the document event
+					$(document).bind('click.cms', reset);
 				});
+
+				// attach hover
+				lists.find('li').bind('mouseenter mouseleave', function (e) {
+					// reset
+					lists.find('li').removeClass(hover);
+
+					var el = $(this);
+					var parent = el.closest('.cms_toolbar-item-navigation-children');
+					var hasChildren = el.hasClass(children) || parent.length;
+
+					// do not attach hover effect if disabled
+					if(el.hasClass(disabled)) return false;
+
+					// add hover effect
+					el.addClass(hover);
+
+					// handle children elements
+					if(hasChildren) {
+						el.find('> ul').show();
+						// add parent class
+						parent.addClass(hover);
+					} else {
+						lists.find('ul ul').hide();
+					}
+				});
+
+				// fix leave event
+				lists.find('> ul').bind('mouseleave', function () {
+					lists.find('li').removeClass(hover);
+				});
+
+				// removes classes and events
+				function reset() {
+					lists.removeClass(hover);
+					lists.find('ul ul').hide();
+					item.find('> li').unbind('mouseenter');
+					$(document).unbind('click.cms');
+				}
 			});
 
 			// attach event to the switcher elements
@@ -368,6 +400,11 @@ $(document).ready(function () {
 				// save url in settings
 				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
 				that.setSettings();
+
+				// bind extra events
+				iframe.contents().find('body').bind('click', function () {
+					$(document).trigger('click.cms');
+				});
 			});
 
 			// cancel animation if sideframe is already shown
@@ -408,7 +445,7 @@ $(document).ready(function () {
 
 		openMessage: function (msg, dir, delay, error) {
 			// set toolbar freeze
-			this.lockToolbar = true;
+			this._lockToolbar(true);
 
 			// add content to element
 			this.messages.find('.cms_messages-inner').html(msg);
@@ -485,10 +522,13 @@ $(document).ready(function () {
 		closeMessage: function () {
 			this.messages.fadeOut(300);
 			// unlock toolbar
-			this.lockToolbar = false;
+			this._lockToolbar(false);
 		},
 
 		openModal: function (url, name, breadcrumb) {
+			// show loader
+			this._showLoader(true);
+
 			// reset breadcrumb
 			this.modal.find('.cms_modal-breadcrumb').hide();
 			this.modal.find('.cms_modal-breadcrumb-items').html('');
@@ -564,18 +604,12 @@ $(document).ready(function () {
 			var plugin = $('#cms_plugin-' + id);
 
 			// collapse all previous elements
-			var collapsed = dragitem.parents().siblings().filter('.cms_dragitem-collapsed');
+			var collapsed = dragitem.parents().siblings().not('.cms_dragitem-expanded');
 				collapsed.trigger('click');
 
 			// set new classes
 			dragitem.addClass('cms_draggable-selected');
 			plugin.addClass('cms_plugin-active');
-
-			// set new position
-			var pos = plugin.position('body').top;
-			var bound = $(window).height();
-			var offset = 200;
-			if(bound - pos <= 0) $(window).scrollTop(pos - offset);
 		},
 
 		showError: function (msg) {
@@ -586,6 +620,8 @@ $(document).ready(function () {
 		_showToolbar: function (speed, init) {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
+			// animate html
+			this.body.animate({ 'margin-top': (this.options.debug) ? 35 : 30 }, (init) ? 0 : speed);
 			// set messages top to toolbar height
 			this.messages.css('top', 31);
 			// set new settings
@@ -599,6 +635,8 @@ $(document).ready(function () {
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideUp(speed);
+			// animate html
+			this.body.animate({ 'margin-top': (this.options.debug) ? 5 : 0 }, speed);
 			// set messages top to 0
 			this.messages.css('top', 0);
 			// set new settings
@@ -615,9 +653,6 @@ $(document).ready(function () {
 			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
 			this.settings.mode = 'edit';
 
-			// set correct position
-			$('body').scrollTop(this.settings.position || 0);
-
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
 
@@ -625,9 +660,6 @@ $(document).ready(function () {
 		},
 
 		_enableDragMode: function (speed, init) {
-			// we need to save the position first
-			this.settings.position = $('body').scrollTop();
-
 			this.bars.fadeIn(speed);
 			this.plugins.hide();
 			this.placeholders.stop(true, true).fadeIn(speed);
@@ -730,6 +762,7 @@ $(document).ready(function () {
 			if(this.settings.sideframe.maximized) this._maximizeSideframe();
 			// otherwise do normal behaviour
 			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
+				this.sideframe.show();
 				if(animate) {
 					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
 					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
@@ -740,7 +773,7 @@ $(document).ready(function () {
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
 
-			this.lockToolbar = true;
+			this._lockToolbar(true);
 		},
 
 		_hideSideframe: function (close) {
@@ -760,7 +793,8 @@ $(document).ready(function () {
 			// should we reload
 			if(this.enforceReload) CMS.API.Helpers.reloadBrowser();
 
-			this.lockToolbar = false;
+			// lock toolbar
+			this._lockToolbar(false);
 		},
 
 		_minimizeSideframe: function () {
@@ -768,7 +802,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').show();
 
 			// hide scrollbar
-			this.body.css('overflow', 'auto');
+			this._disableScroll(false);
 
 			// reset to first state
 			this._showSideframe(this.settings.sideframe.position || this.options.sideframeWidth, true);
@@ -784,7 +818,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').hide();
 
 			// reset scrollbar
-			this.body.css('overflow', 'hidden');
+			this._disableScroll(true);
 
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
 			// do custom animation
@@ -854,7 +888,13 @@ $(document).ready(function () {
 
 				// fade in modal window
 				that.modal.show();
+
+				// hide loader
+				that._showLoader(false);
 			});
+
+			// prevent scrolling
+			this._disableScroll(true);
 
 			// add esc close event
 			// TODO the event also needs to be added to the iframe
@@ -867,6 +907,8 @@ $(document).ready(function () {
 			this.modal.fadeOut(speed);
 			this.modal.find('.cms_modal-frame iframe').remove();
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
+			// prevent scrolling
+			this._disableScroll(false);
 		},
 
 		_minimizeModal: function () {
@@ -894,6 +936,9 @@ $(document).ready(function () {
 					'margin': 0
 				});
 
+				// enable scrolling
+				this.body.css('overflow', '');
+
 				this.minimized = true;
 			} else {
 				// minimize
@@ -902,6 +947,9 @@ $(document).ready(function () {
 
 				// reattach css
 				this.modal.css(this.modal.data('css'));
+
+				// disable scrolling
+				this.body.css('overflow', 'hidden');
 
 				this.minimized = false;
 			}
@@ -1023,7 +1071,7 @@ $(document).ready(function () {
 				});
 				that.modal.css({
 					'left': modalLeft + mvX,
-					'top': modalTop + mvY
+					'top': modalTop + mvY - $(window).scrollTop()
 				});
 			});
 		},
@@ -1200,13 +1248,41 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-title').text(el.text());
 		},
 
+		_disableScroll: function (disable) {
+			var scrollTop = $(window).scrollTop();
+
+			if(disable) {
+				this.body.addClass('cms_toolbar-noscroll').css('top',-scrollTop).data('scroll', scrollTop);
+			} else {
+				this.body.removeClass('cms_toolbar-noscroll');
+				$(window).scrollTop(this.body.data('scroll'));
+			}
+		},
+
+		_lockToolbar: function (lock) {
+			if(lock) {
+				this.lockToolbar = true;
+				// make button look disabled
+				this.toolbarTrigger.css('opacity', 0.2);
+			} else {
+				this.lockToolbar = false;
+				// make button look disabled
+				this.toolbarTrigger.css('opacity', 1);
+			}
+		},
+
+		_showLoader: function (loader) {
+			if(loader) {
+				this.toolbarTrigger.addClass('cms_toolbar-loader');
+			} else {
+				this.toolbarTrigger.removeClass('cms_toolbar-loader');
+			}
+		},
+
 		_debug: function () {
 			var that = this;
 			var timeout = 1000;
 			var timer = function () {};
-
-			// add top margin
-			$('html').css('margin-top', 5);
 
 			// bind message event
 			var debug = this.container.find('.cms_debug-bar');

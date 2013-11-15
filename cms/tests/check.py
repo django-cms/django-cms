@@ -8,6 +8,7 @@ from cms.models.placeholdermodel import Placeholder
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.api import add_plugin
+from django.template import TemplateSyntaxError, base
 from django.test import TestCase
 
 class TestOutput(FileOutputWrapper):
@@ -56,8 +57,14 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_no_sekizai(self):
-        with SettingsOverride(INSTALLED_APPS=[]):
-            self.assertCheck(False, errors=2)
+        with SettingsOverride(INSTALLED_APPS=['cms', 'menus']):
+            old_libraries = base.libraries
+            base.libraries = {}
+            old_templatetags_modules = base.templatetags_modules
+            base.templatetags_modules = []
+            self.assertRaises(TemplateSyntaxError, check, TestOutput())
+            base.libraries = old_libraries
+            base.templatetags_modules = old_templatetags_modules
 
     def test_no_sekizai_template_context_processor(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[]):
