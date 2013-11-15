@@ -68,9 +68,9 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseover') {
 					var name = $(this).data('settings').plugin_name;
-					that.tooltip.show().find('span').text(name);
+					that.tooltip.css('visibility', 'visible').show().find('span').text(name);
 				} else {
-					that.tooltip.hide();
+					that.tooltip.css('visibility', 'hidden').hide();
 				}
 			});
 		},

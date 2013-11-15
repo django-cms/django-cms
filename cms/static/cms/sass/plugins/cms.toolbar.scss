@@ -438,11 +438,11 @@
 	}
 
 	// #TOOLBAR/tooltip#
-	.cms_placeholders-tooltip { display:none; position:absolute; left:0; top:0; @include border-radius(3px);
+	.cms_placeholders-tooltip { visibility:hidden; position:absolute; left:0; top:0; @include border-radius(3px);
 		font-size:11px; line-height:11px; font-weight:bold; white-space:nowrap; padding:5px 7px 7px 24px; margin:0;
 		color:$color-grey-10;
 		background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
-		span { display:block; position:absolute; right:0; top:20px; @include border-radius(3px 0 3px 3px);
+		span { float:right; position:absolute; right:0; top:20px; @include border-radius(3px 0 3px 3px);
 			color:white; font-weight:normal; padding:5px 7px; background:$color-grey-70; }
 	}
 
