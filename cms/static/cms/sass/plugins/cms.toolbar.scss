@@ -189,6 +189,8 @@
 		color:white; font-size:12px; line-height:16px; font-weight:200;
 		* { color:white; font-size:12px; line-height:16px; font-weight:200; }
 
+		a { color:$color-blue; }
+		a:hover { text-decoration:underline; }
 		strong { color:lighten($color-blue, 10%); font-weight:200; }
 		ul { display:inline; color:white; }
 		ul li { display:inline; color:white; font-weight:200; }
