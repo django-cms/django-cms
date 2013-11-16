@@ -13,6 +13,9 @@ env:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+    - DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
 
 before_script:
   - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
@@ -53,3 +56,22 @@ matrix:
       env: DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.3
       env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  allow_failures:
+    - python: 3.3
+      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.3
+      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.3
+      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - python: 2.7
+      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 2.7
+      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 2.7
+      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - python: 2.6
+      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 2.6
+      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 2.6
+      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
