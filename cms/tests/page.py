@@ -31,6 +31,19 @@ from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug
 
 
+class PageMigrationTestCase(CMSTestCase):
+
+    def test_content_type(self):
+        """
+        Test correct content type is set for Page object
+        """
+        from django.contrib.contenttypes.models import ContentType
+        for x in ContentType.objects.all():
+            print x.model, x.name
+        self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
+        self.assertTrue(ContentType.objects.filter(model='page', name='page', app_label='cms').exists())
+
+
 class PagesTestCase(CMSTestCase):
     def test_add_page(self):
         """
