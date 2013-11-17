@@ -147,7 +147,7 @@ class MenuPool(object):
                 nodes = []
                 toolbar = getattr(request, 'toolbar', None)
                 if toolbar and toolbar.is_staff:
-                    messages.error(request, _('Menu %s cannot be loaded. Please, make sure all its urls exist and can be resolved.' % menu_class_name))
+                    messages.error(request, _('Menu %s cannot be loaded. Please, make sure all its urls exist and can be resolved.') % menu_class_name)
                     logger.error("Menu %s could not be loaded." % menu_class_name, exc_info=True)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
