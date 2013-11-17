@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import os
 import dj_database_url
+from cms.utils.compat import DJANGO_1_5
 
 gettext = lambda s: s
 
@@ -63,7 +64,6 @@ def configure(db_url, **extra):
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
-            'django.middleware.transaction.TransactionMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
@@ -297,6 +297,8 @@ def configure(db_url, **extra):
     )
     from django.utils.functional import empty
 
+    if DJANGO_1_5:
+        defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
     settings._wrapped = empty
     defaults.update(extra)
     # add data from env
