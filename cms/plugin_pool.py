@@ -117,7 +117,10 @@ class PluginPool(object):
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
-        return self.plugins[name]
+        if name in self.plugins:
+            return self.plugins[name]
+        else:
+            return type('Uninstalled%s' % str(name), (CMSPluginBase,), {'render_plugin': False})
     
     def get_patterns(self):
         self.discover_plugins()
