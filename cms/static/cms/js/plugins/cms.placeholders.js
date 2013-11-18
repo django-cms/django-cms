@@ -825,39 +825,43 @@ $(document).ready(function () {
 		},
 
 		_searchSubnav: function (nav, value) {
+			var items = nav.find('.cms_submenu-item');
+			var titles = nav.find('.cms_submenu-item-title');
+
+			// cancel if value is zero
+			if(value === '') {
+				items.add(titles).show();
+				return false;
+			}
+
 			// loop through items and figure out if we need to hide items
-			nav.find('.cms_submenu-item a').each(function (index, item) {
-				var text = $(item).text().toLowerCase();
+			items.find('a, span').each(function (index, item) {
+				item = $(item);
+				var text = item.text().toLowerCase();
 				var search = value.toLowerCase();
 
-				(text.indexOf(search) >= 0 || search === '') ? $(this).parent().show() : $(this).parent().hide();
+				(text.indexOf(search) >= 0) ? item.parent().show() : item.parent().hide();
 			});
 
-			// show all titles
-			nav.find('.cms_submenu-item-title').show();
+			// check if a title is matching
+			titles.filter(':visible').each(function (index, item) {
+				titles.hide();
+				$(item).nextUntil('.cms_submenu-item-title').show();
+			});
 
-			// cancel here if there is no value
-			if(value === '') return false;
-
-			// check if any title should be hidden
-			nav.find('.cms_submenu-item').each(function (index, item) {
-				item = $(item);
-				// check if we have a title
-				var title = item.find('span');
-				if(title.length) {
-					var entries = item.nextUntil('.cms_submenu-item-title');
-
-					if(entries.filter(':visible').length === 0) {
-						title.parent().hide();
-					} else {
-						title.parent().show();
-					}
+			// always display title of a category
+			items.filter(':visible').each(function (index, item) {
+				if($(item).prev().hasClass('cms_submenu-item-title')) {
+					$(item).prev().show();
+				} else {
+					$(item).prevUntil('.cms_submenu-item-title').last().prev().show();
 				}
 			});
 
-			// check for empty entries
-			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
-				nav.find('.cms_submenu-item-title:eq(0)').show();
+			// if there is no element visible, show only first categoriy
+			nav.find('.cms_submenu-dropdown').show();
+			if(items.add(titles).filter(':visible').length <= 0) {
+				nav.find('.cms_submenu-dropdown').hide();
 			}
 		},
 
