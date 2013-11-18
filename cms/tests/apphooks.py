@@ -422,6 +422,7 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
 
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
+        self.reload_urls()
 
     def tearDown(self):
         clear_app_resolvers()
@@ -429,6 +430,26 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
 
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
+
+    def reload_urls(self):
+        from django.conf import settings
+
+        url_modules = [
+            'cms.urls',
+            # TODO: Add here intermediary modules which may
+            #       include() the 'cms.urls' if it isn't included
+            #       directly in the root urlconf.
+            # '...',
+            'cms.test_utils.project.second_cms_urls_for_apphook_tests',
+            settings.ROOT_URLCONF,
+        ]
+
+        clear_app_resolvers()
+        clear_url_caches()
+
+        for module in url_modules:
+            if module in sys.modules:
+                del sys.modules[module]
 
     def test_page_language_url_for_apphook(self):
 
