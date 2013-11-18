@@ -59,7 +59,7 @@
 		.cms_submenu-item a, span { display:block; font-size:12px; line-height:15px; text-align:left; padding:4px 8px 3px 8px; }
 
 		.cms_submenu-item a { color:black;
-			&:hover { color:white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
+			&:hover, &:focus { color:white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
 			&:first-child { border-top:none; } }
 		.cms_submenu-item span { cursor:default; font-weight:bold; color:black;
 			border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }

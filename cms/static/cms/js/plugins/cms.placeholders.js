@@ -769,6 +769,9 @@ $(document).ready(function () {
 		},
 
 		_showSubnav: function (nav) {
+			var that = this;
+
+			// clearing
 			clearTimeout(this.timer);
 
 			// add small delay before showing submenu
@@ -786,6 +789,35 @@ $(document).ready(function () {
 				// set visible states
 				nav.find('> .cms_submenu-dropdown').show();
 			}, 100);
+
+			// add key events
+			$(document).bind('keydown.cms', function (e) {
+				var anchors = nav.find('.cms_submenu-item:visible a');
+				var index = anchors.index(anchors.filter(':focus'));
+
+				if(e.keyCode === 40) {
+					e.preventDefault();
+					if(index >= 0 && index < anchors.length - 1) {
+						anchors.eq(index + 1).focus();
+					} else {
+						anchors.eq(0).focus();
+					}
+				}
+
+				if(e.keyCode === 38) {
+					e.preventDefault();
+					if(anchors.is(':focus')) {
+						anchors.eq(index - 1).focus();
+					} else {
+						anchors.eq(anchors.length).focus();
+					}
+				}
+
+				// hide subnav when hitting enter
+				if(e.keyCode === 13) {
+					that._hideSubnav(nav);
+				}
+			});
 
 			// enable scroll
 			CMS.API.Toolbar._disableScroll(true);
@@ -816,6 +848,9 @@ $(document).ready(function () {
 				nav.find('input').val('');
 				that._searchSubnav(nav, '');
 			}, this.timeout);
+
+			// unbind key events
+			$(document).unbind('keydown.cms');
 
 			// enable scroll
 			CMS.API.Toolbar._disableScroll(false);
