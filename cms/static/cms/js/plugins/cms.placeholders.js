@@ -791,11 +791,13 @@ $(document).ready(function () {
 			}, 100);
 
 			// add key events
+			$(document).unbind('keydown.cms');
 			$(document).bind('keydown.cms', function (e) {
 				var anchors = nav.find('.cms_submenu-item:visible a');
 				var index = anchors.index(anchors.filter(':focus'));
 
-				if(e.keyCode === 40) {
+				// bind arrow down and tab keys
+				if(e.keyCode === 40 || e.keyCode === 9) {
 					e.preventDefault();
 					if(index >= 0 && index < anchors.length - 1) {
 						anchors.eq(index + 1).focus();
@@ -804,6 +806,7 @@ $(document).ready(function () {
 					}
 				}
 
+				// bind arrow up keys
 				if(e.keyCode === 38) {
 					e.preventDefault();
 					if(anchors.is(':focus')) {
@@ -848,9 +851,6 @@ $(document).ready(function () {
 				nav.find('input').val('');
 				that._searchSubnav(nav, '');
 			}, this.timeout);
-
-			// unbind key events
-			$(document).unbind('keydown.cms');
 
 			// enable scroll
 			CMS.API.Toolbar._disableScroll(false);
