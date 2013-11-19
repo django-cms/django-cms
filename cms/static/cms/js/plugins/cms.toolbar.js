@@ -1194,7 +1194,7 @@ $(document).ready(function () {
 
 			// set correct title
 			var title = this.modal.find('.cms_modal-title');
-				title.html(name);
+				title.html(name || '&nbsp;');
 
 			// insure previous iframe is hidden
 			holder.find('iframe').hide();
@@ -1218,9 +1218,7 @@ $(document).ready(function () {
 
 				// set title of not provided
 				var innerTitle = iframe.contents().find('#content h1:eq(0)');
-				if(name === undefined) {
-					if(title.text().replace(/^\s+|\s+$/g, '') === '') title.html(innerTitle.text());
-				}
+				if(name === undefined) title.html(innerTitle.text());
 				innerTitle.remove();
 
 				// set modal buttons
