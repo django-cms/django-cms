@@ -58,10 +58,11 @@ class CMSEditableObject(InclusionTag):
             language = get_language_from_request(context['request'])
         # This allow the requested item to be a method, a property or an
         # attribute
-        context['attribute_name'] = attribute
+        context['attribute_name'] = attribute.strip()
+        attribute = attribute.strip()
         querystring = {'language': language}
         if edit_fields:
-            context['edit_fields'] = edit_fields.split(",")
+            context['edit_fields'] = edit_fields.strip().split(",")
         context['item'] = getattr(instance, attribute, '')
         if callable(context['item']):
             context['item'] = context['item'](context['request'])
