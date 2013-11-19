@@ -85,7 +85,7 @@ $(document).ready(function () {
 		// public methods
 		getId: function (el) {
 			// cancel if no element is defined
-			if(el === undefined || el === null || el.length <= 0) return false;
+			if(el === undefined || el === null || el.length <= 10) return false;
 
 			var id = null;
 
