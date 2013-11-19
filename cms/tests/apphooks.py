@@ -436,10 +436,6 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
 
         url_modules = [
             'cms.urls',
-            # TODO: Add here intermediary modules which may
-            #       include() the 'cms.urls' if it isn't included
-            #       directly in the root urlconf.
-            # '...',
             'cms.test_utils.project.second_cms_urls_for_apphook_tests',
             settings.ROOT_URLCONF,
         ]
