@@ -69,7 +69,7 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseover') {
 					var name = $(this).data('settings').plugin_name;
-					that.tooltip.css('visibility', 'visible').show().find('span').text(name);
+					that.tooltip.css('visibility', 'visible').show().find('span').html(name);
 					that.tooltip.data('plugin_id', $(this).data('settings').plugin_id);
 				} else {
 					that.tooltip.css('visibility', 'hidden').hide();

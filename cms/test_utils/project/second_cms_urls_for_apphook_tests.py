@@ -23,9 +23,7 @@ if apphook_pool.get_apphooks():
     """If there are some application urls, add special resolver, so we will
     have standard reverse support.
     """
-from cms.appresolver import get_app_patterns
-
-urlpatterns = get_app_patterns() + urlpatterns
-#urlpatterns = (dynamic_app_regex_url_resolver, ) + urlpatterns
+    from cms.appresolver import get_app_patterns
+    urlpatterns = get_app_patterns() + urlpatterns
 
 urlpatterns = patterns('', *urlpatterns)
