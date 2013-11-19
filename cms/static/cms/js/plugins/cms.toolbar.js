@@ -1000,7 +1000,7 @@ $(document).ready(function () {
 				$(window).trigger('resize.cms.modal');
 
 				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_off')) btnCk.trigger(this.click);
+				if(btnCk.hasClass('cke_button_off')) btnCk.trigger('click');
 			} else {
 				// minimize
 				this.maximized = false;
@@ -1013,7 +1013,7 @@ $(document).ready(function () {
 				container.css(container.data('css'));
 
 				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_on')) btnCk.trigger(this.click);
+				if(btnCk.hasClass('cke_button_on')) btnCk.trigger('click');
 			}
 		},
 
