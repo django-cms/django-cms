@@ -65,7 +65,6 @@ $(document).ready(function () {
 
 			plugins.bind('mouseover mouseout', function (e) {
 				e.stopPropagation();
-
 				if(e.type === 'mouseover') {
 					var name = $(this).data('settings').plugin_name;
 					that.tooltip.show().find('span').html(name);
@@ -575,7 +574,8 @@ $(document).ready(function () {
 
 			this.container.bind('mouseenter.cms.placeholder mouseleave.cms.placeholder', function (e) {
 				// add tooltip event to every placeholder
-				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show() : CMS.API.Placeholders.tooltip.hide();
+                var name = $(this).data('settings').plugin_name;
+				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show().find('span').html(name) : CMS.API.Placeholders.tooltip.hide();
 			});
 		},
 

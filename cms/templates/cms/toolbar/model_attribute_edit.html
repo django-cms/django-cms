@@ -6,7 +6,10 @@
 $(document).ready(function () {
 	new CMS.PlaceholderItem('#cms_placeholder-model-{{ opts.app_label }}-{{ instance.pk|unlocalize }}-{{ attribute_name|slugify }}', {
 		'type': 'generic',
-		'plugin_name': 'Edit {{ opts.verbose_name }}',
+		'page_language': '{{ LANGUAGE_CODE }}',
+        'plugin_type': '{% trans opts.module_name %}',
+		'plugin_name': '{% trans "Edit" %} {% trans opts.verbose_name %}',
+		'plugin_id': '{{ instance.pk|unlocalize }}',
 		'urls': {
 			'edit_plugin': '{{ admin_url }}'
 		}
