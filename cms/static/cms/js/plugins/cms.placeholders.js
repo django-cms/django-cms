@@ -85,7 +85,7 @@ $(document).ready(function () {
 		// public methods
 		getId: function (el) {
 			// cancel if no element is defined
-			if(el === undefined || el === null || el.length <= 10) return false;
+			if(el === undefined || el === null || el.length <= 0) return false;
 
 			var id = null;
 
@@ -829,7 +829,7 @@ $(document).ready(function () {
 				}
 			});
 
-			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 0) {
+			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10) {
 				dropdown.css('top', 'auto');
 				dropdown.css('bottom', offset + 4);
 			} else {
