@@ -23,8 +23,6 @@ $(document).ready(function () {
 			'sideframeWidth': 320,
 			'messageDelay': 2000,
 			'modalDuration': 300,
-			'modalWidth': 800,
-			'modalHeight': 400,
 			'urls': {
 				'settings': '', // url to save settings
 				'static': '/static/',
@@ -555,9 +553,10 @@ $(document).ready(function () {
 				'mergin-left': 0,
 				'margin-right': 0
 			});
+			// lets set the modal width and height to the size of the browser
 			this.modal.find('.cms_modal-body').css({
-				'width': this.options.modalWidth,
-				'height': this.options.modalHeight
+				'width': $(window).width() - 300,
+				'height': $(window).height() - 350
 			});
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 			this.modal.find('.cms_modal-maximize').removeClass('cms_modal-maximize-active');
