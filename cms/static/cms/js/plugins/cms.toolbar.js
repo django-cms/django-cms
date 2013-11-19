@@ -1233,6 +1233,13 @@ $(document).ready(function () {
 				iframe.contents().find('body').bind('keydown.cms', function (e) {
 					if(e.keyCode === 27) that.closeModal();
 				});
+
+				// if its only text, maximize modal
+				if(title.text() === that.options.lang.text) {
+					setTimeout(function () {
+						iframe.contents().find('.cke_button__maximize').trigger('click');
+					}, 100);
+				}
 			});
 
 			// inject
