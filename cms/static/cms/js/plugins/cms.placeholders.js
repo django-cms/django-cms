@@ -816,8 +816,8 @@ $(document).ready(function () {
 					}
 				}
 
-				// hide subnav when hitting enter
-				if(e.keyCode === 13) {
+				// hide subnav when hitting enter or escape
+				if(e.keyCode === 13 || e.keyCode === 27) {
 					that._hideSubnav(nav);
 				}
 			});
