@@ -762,6 +762,11 @@ $(document).ready(function () {
 				}
 			});
 
+			// set data attributes
+			nav.find('.cms_submenu-dropdown').each(function () {
+				$(this).data('top', $(this).css('top'))
+			});
+
 			// prevent propagnation
 			nav.bind(this.click, function (e) {
 				e.stopPropagation();
@@ -770,6 +775,8 @@ $(document).ready(function () {
 
 		_showSubnav: function (nav) {
 			var that = this;
+			var dropdown = nav.find('.cms_submenu-dropdown');
+			var offset = parseInt(dropdown.data('top'));
 
 			// clearing
 			clearTimeout(this.timer);
@@ -821,6 +828,14 @@ $(document).ready(function () {
 					that._hideSubnav(nav);
 				}
 			});
+
+			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 0) {
+				dropdown.css('top', 'auto');
+				dropdown.css('bottom', offset + 4);
+			} else {
+				dropdown.css('top', offset);
+				dropdown.css('bottom', 'auto');
+			}
 
 			// enable scroll
 			CMS.API.Toolbar._disableScroll(true);
