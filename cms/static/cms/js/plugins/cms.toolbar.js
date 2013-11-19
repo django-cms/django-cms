@@ -901,7 +901,6 @@ $(document).ready(function () {
 			this._disableScroll(true);
 
 			// add esc close event
-			// TODO the event also needs to be added to the iframe
 			$(document).bind('keydown.cms', function (e) {
 				if(e.keyCode === 27) that.closeModal();
 			});
@@ -1232,6 +1231,11 @@ $(document).ready(function () {
 
 				// append ready state
 				iframe.data('ready', true);
+
+				// attach close event
+				iframe.contents().find('body').bind('keydown.cms', function (e) {
+					if(e.keyCode === 27) that.closeModal();
+				});
 			});
 
 			// inject
