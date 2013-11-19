@@ -177,7 +177,7 @@ $(document).ready(function () {
 				});
 
 				// attach hover
-				lists.find('li').bind('mouseenter mouseleave', function (e) {
+				lists.find('li').bind('mouseenter mouseleave', function () {
 					// reset
 					lists.find('li').removeClass(hover);
 
