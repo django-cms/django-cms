@@ -68,7 +68,7 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseover') {
 					var name = $(this).data('settings').plugin_name;
-					that.tooltip.show().find('span').text(name);
+					that.tooltip.show().find('span').html(name);
 				} else {
 					that.tooltip.hide();
 				}
