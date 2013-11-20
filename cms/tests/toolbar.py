@@ -229,6 +229,20 @@ class ToolbarTests(ToolbarTestBase):
         de_toolbar = CMSToolbar(de_request)
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
 
+    def test_customizable_options(self):
+        create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+        ## Check for default value - Update if modalHeight value changes
+        self.assertContains(response, "'modalHeight': '400',")
+        with SettingsOverride(CMS_TOOLBAR_OPTIONS={'modalWidth': 1000,
+                                                   'modalHeight': 500}):
+            with self.login_user_context(superuser):
+                response = self.client.get('/en/?edit')
+            ## Check for custom value
+            self.assertContains(response, "'modalHeight': '500',")
+
 
 class EditModelTemplateTagTest(ToolbarTestBase):
     urls = 'cms.test_utils.project.placeholderapp_urls'

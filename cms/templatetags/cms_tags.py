@@ -555,13 +555,16 @@ class CMSToolbar(InclusionTag):
         language = request.toolbar.language
         with force_language(language):
             request.toolbar.populate()
+            options = []
+            for option, value in get_cms_setting('TOOLBAR_OPTIONS').items():
+                options.append("'%s': '%s'," % (option, value))
+            context['cms_toolbar_options'] = "\n".join(options)
             context['cms_version'] = __version__
             content = super(CMSToolbar, self).render(context)
         return content
 
     def get_context(self, context):
         return context
-
 
 register.tag(CMSToolbar)
 
@@ -581,6 +584,5 @@ class CMSEditablePageTitle(InclusionTag):
     def get_context(self, context):
 
         return context
-
 
 register.tag(CMSEditablePageTitle)

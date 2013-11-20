@@ -26,6 +26,7 @@ $(document).ready(function () {
 		'csrf': '{{ csrf_token }}',
 		'authenticated': {% if user.is_authenticated %}true{% else %}false{% endif %},
 		'debug': {% if debug %}true{% else %}false{% endif %},
+		{{ cms_toolbar_options|safe }}
 		'settings': {
 			'version': '{{ cms_version }}',
 			'toolbar': 'expanded',
