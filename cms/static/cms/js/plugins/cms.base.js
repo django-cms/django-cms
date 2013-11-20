@@ -76,4 +76,4 @@ $(document).ready(function () {
            return elem === document.activeElement && ( elem.type || elem.href );
         };
     }
-})( jQuery );
+})( CMS.$ );
