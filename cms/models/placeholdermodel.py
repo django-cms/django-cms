@@ -5,7 +5,7 @@ from cms.utils.placeholder import PlaceholderNoAction
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 import operator
 
 
@@ -156,6 +156,10 @@ class Placeholder(models.Model):
 
     def get_plugins(self):
         return self.cmsplugin_set.all().order_by('tree_id', 'lft')
+
+    def get_cached_plugins(self):
+        language = get_language()
+        return getattr(self, '_%s_plugins_cache' % language)
 
     @property
     def actions(self):

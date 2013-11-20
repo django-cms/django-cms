@@ -186,6 +186,18 @@ $(document).ready(function () {
 	<!-- start: placeholder -->
 	<div class="cms_placeholders-tooltip">{% trans "Double-click to edit" %}<span></span></div>
 	<!-- end: placeholder -->
+    {% endlanguage %}
+     <div class="draggables">
+         {% for placeholder in request.toolbar.placeholders.values %}
+         {% with placeholder.slot as slot %}
+         <div class="placeholder" id="{{ placeholder.pk }}">
+                {% for plugin in placeholder.get_cached_plugins %}
+                	{% include "cms/toolbar/draggable_item.html" with plugin=plugin %}
+                {% endfor %}
+            </div>
+         {% endwith %}
+         {% endfor %}
+     </div>
 </div>
 
-{% endlanguage %}
+

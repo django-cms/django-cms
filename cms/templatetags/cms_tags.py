@@ -23,12 +23,14 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
+from django.template.loader import render_to_string
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 import re
 from sekizai.helpers import Watcher, get_varname
 from cms.utils.placeholder import get_toolbar_plugin_struct
+from sekizai.templatetags.sekizai_tags import SekizaiParser
 
 
 register = template.Library()
@@ -539,29 +541,33 @@ register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 
 
-class CMSToolbar(InclusionTag):
-    template = 'cms/toolbar/toolbar.html'
+class CMSToolbar(Tag):
     name = 'cms_toolbar'
 
-    def render(self, context):
+    options = Options(
+        parser_class=SekizaiParser,
+    )
+
+    def render_tag(self, context, nodelist):
+        # render everything below the tag
+        rendered_contents = nodelist.render(context)
+        # sanity checks
         request = context.get('request', None)
         if not request:
-            return ''
+            return rendered_contents
         toolbar = getattr(request, 'toolbar', None)
         if not toolbar:
-            return ''
+            return rendered_contents
         if not toolbar.show_toolbar:
-            return ''
+            return rendered_contents
+        # render the toolbar content
         language = request.toolbar.language
         with force_language(language):
             request.toolbar.populate()
             context['cms_version'] = __version__
-            content = super(CMSToolbar, self).render(context)
-        return content
-
-    def get_context(self, context):
-        return context
-
+            content = render_to_string('cms/toolbar/toolbar.html', context)
+        # return the toolbar content and the content below
+        return '%s\n%s' % (content, rendered_contents)
 
 register.tag(CMSToolbar)
 

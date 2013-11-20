@@ -66,7 +66,6 @@ def assign_plugins(request, placeholders, lang=None):
     for placeholder in placeholders:
         setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
 
-
 def build_plugin_tree(plugin_list):
     root = []
     cache = {}
@@ -104,7 +103,12 @@ def downcast_plugins(queryset, select_placeholder=False):
         for instance in plugin_qs:
             plugin_lookup[instance.pk] = instance
             # make the equivalent list of qs, but with downcasted instances
-    plugin_list = [plugin_lookup[p.pk] for p in queryset if p.pk in plugin_lookup]
+    plugin_list = []
+    for p in queryset:
+        if p.pk in plugin_lookup:
+            plugin_list.append(plugin_lookup[p.pk])
+        else:
+            plugin_list.append(p)
     return plugin_list
 
 
