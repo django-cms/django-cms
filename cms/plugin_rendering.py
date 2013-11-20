@@ -87,8 +87,11 @@ def render_plugins(plugins, context, placeholder, processors=None):
     return out
 
 
-def render_dragables(plugins, slot, request):
-    return render_to_string("cms/toolbar/draggable.html", {'plugins': plugins, 'slot': slot, 'request': request})
+def render_dragables(plugins, slot, request, context):
+    context['plugins'] = plugins
+    context['slot'] = slot
+
+    return render_to_string("cms/toolbar/draggable.html", context)
 
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None):
@@ -150,15 +153,19 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     content.extend(render_plugins(plugins, context, placeholder, processors))
     toolbar_content = ''
-    draggable_content = ''
+
+    if edit:
+        if not hasattr(request.toolbar, 'placeholders'):
+            request.toolbar.placeholders = {}
+        if not placeholder.pk in request.toolbar.placeholders:
+            request.toolbar.placeholders[placeholder.pk] = placeholder
     if edit:
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, '', name_fallback=name_fallback))
-        draggable_content = mark_safe(render_dragables(plugins, slot, request))
     content = mark_safe("".join(content))
-
-    result = render_to_string("cms/toolbar/placeholder.html",
-                              {'plugins': content, "bar": toolbar_content, "draggables": draggable_content,
-                              'edit': edit})
+    context['plugins'] = content
+    context['bar'] = toolbar_content
+    context['edit'] = edit
+    result = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()
     return result
 
