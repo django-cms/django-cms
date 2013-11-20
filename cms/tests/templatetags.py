@@ -6,11 +6,11 @@ import os
 from cms.api import create_page, create_title, add_plugin
 from cms.models.pagemodel import Page, Placeholder
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from cms.templatetags.cms_tags import get_site_id, _get_page_by_untyped_arg, _show_placeholder_for_page, _get_placeholder
+from cms.templatetags.cms_tags import _get_page_by_untyped_arg, _show_placeholder_for_page, _get_placeholder
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils import get_cms_setting
+from cms.utils import get_cms_setting, get_site_id
 from cms.utils.plugins import get_placeholders
 from django.contrib.sites.models import Site
 from django.core import mail

@@ -2,7 +2,7 @@
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from cms import constants
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_default_language, get_language_list, get_language_code
+from cms.utils.i18n import get_default_language, get_language_list, get_language_code, get_site_id
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
@@ -91,3 +91,4 @@ def cms_static_url(path):
     if not path:
         return ''
     return configured_storage.url(os.path.join('cms', path))
+

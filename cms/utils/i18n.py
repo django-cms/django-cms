@@ -3,6 +3,7 @@ from contextlib import contextmanager
 
 from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
@@ -20,7 +21,7 @@ def force_language(new_lang):
 
 
 def get_languages(site_id=None):
-    site_id = get_site(site_id)
+    site_id = get_site_id(site_id)
     result = get_cms_setting('LANGUAGES').get(site_id)
     if not result:
         result = []
@@ -61,14 +62,14 @@ def get_current_language():
     return get_language_code(language_code)
 
 
-def get_site(site):
-    if site is None:
-        return settings.SITE_ID
-    else:
-        try:
-            return int(site)
-        except TypeError:
-            return site.pk
+def get_site_id(site):
+    if isinstance(site, Site):
+        return site.id
+    try:
+        return int(site)
+    except TypeError:
+        pass
+    return settings.SITE_ID
 
 
 def get_language_list(site_id=None):

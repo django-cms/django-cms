@@ -10,7 +10,7 @@ from cms.models import Page, Placeholder as PlaceholderModel
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
-from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils import get_language_from_request, get_cms_setting, get_site_id
 from cms.utils.compat.type_checks import string_types, int_types
 from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import force_language
@@ -32,19 +32,6 @@ from cms.utils.placeholder import get_toolbar_plugin_struct
 
 
 register = template.Library()
-
-
-def get_site_id(site):
-    if site:
-        if isinstance(site, Site):
-            site_id = site.id
-        elif isinstance(site, int) or (isinstance(site, string_types) and site.isdigit()):
-            site_id = int(site)
-        else:
-            site_id = settings.SITE_ID
-    else:
-        site_id = settings.SITE_ID
-    return site_id
 
 
 def has_permission(page, request):
