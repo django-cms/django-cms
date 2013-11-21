@@ -13,37 +13,17 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
-			'csrf': '',
-			'authenticated': false,
-			'debug': false, // not yet required
 			'preventSwitch': false,
 			'preventSwitchMessage': 'Switching is disabled.',
 			'clipboard': null,
-			'sideframeDuration': 300,
-			'sideframeWidth': 320,
-			'messageDelay': 2000,
-			'urls': {
-				'settings': '', // url to save settings
-				'static': '/static/',
-				'css_sideframe': 'cms/css/plugins/cms.toolbar.sideframe.css'
-			},
-			'settings': {
-				'version': '3.0.0', // this is required to flush storage on new releases
-				'toolbar': 'expanded', // expanded or collapsed
-				'mode': 'edit', // live, draft, edit or layout
-				'states': [],
-				'sideframe': {
-					'url': null,
-					'hidden': false,
-					'maximized': false
-				}
-			}
+			'messageDelay': 2000
 		},
 
 		initialize: function (container, options) {
 			this.container = $(container);
 			this.options = $.extend(true, {}, this.options, options);
-			this.settings = this.getSettings() || this.setSettings(this.options.settings);
+			this.config = CMS.config;
+			this.settings = this.getSettings();
 			// class variables
 			this.toolbar = this.container.find('.cms_toolbar');
 			this.toolbar.hide();
@@ -55,7 +35,6 @@ $(document).ready(function () {
 			this.switcher = this.container.find('.cms_toolbar-item_switch');
 
 			this.body = $('html');
-			this.sideframe = this.container.find('.cms_sideframe');
 			this.messages = this.container.find('.cms_messages');
 			this.bars = $('.cms_placeholder-bar');
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
@@ -75,9 +54,6 @@ $(document).ready(function () {
 
 		// initial methods
 		_setup: function () {
-			// reset settings if version does not match
-			if(this.settings.version !== this.options.settings.version) this.resetSettings();
-
 			// setup toolbar visibility, we need to reverse the options to set the correct state
 			(this.settings.toolbar === 'expanded') ? this._showToolbar(0, true) : this._hideToolbar(0, true);
 			// setup toolbar mode
@@ -100,16 +76,12 @@ $(document).ready(function () {
 			$('body').addClass('cms_toolbar-ready');
 
 			// check if debug is true
-			if(this.options.debug) this._debug();
+			if(this.config.debug) this._debug();
 		},
 
 		_load: function () {
 			// reset some settings if not authenticated
-			if(!this.options.authenticated) this._reset();
-			// check if we should show the sideframe
-			if(this.settings.sideframe.url) {
-				this.openSideframe(this.settings.sideframe.url, false);
-			}
+			if(!this.config.auth) this._reset();
 		},
 
 		_events: function () {
@@ -215,14 +187,6 @@ $(document).ready(function () {
 				});
 			});
 
-			// module events
-			this._eventsSideframe();
-
-			// stopper events
-			$(document).bind('mouseup.cms', function (e) {
-				that._stopSideframeResize();
-			});
-
 			this.modes.eq(0).bind(this.click, function (e) {
 				e.preventDefault();
 				that._enableEditMode(300);
@@ -247,156 +211,12 @@ $(document).ready(function () {
 			});
 		},
 
-		_eventsSideframe: function () {
-			var that = this;
-
-			// attach close event
-			this.sideframe.find('.cms_sideframe-close').bind(this.click, function () {
-				that.closeSideframe(true);
-			});
-
-			// attach hide event
-			this.sideframe.find('.cms_sideframe-hide').bind(this.click, function () {
-				if($(this).hasClass('cms_sideframe-hidden')) {
-					that.settings.sideframe.hidden = false;
-					that._showSideframe(that.settings.sideframe.position || that.options.sideframeWidth, true);
-				} else {
-					that.settings.sideframe.hidden = true;
-					that._hideSideframe();
-				}
-				that.setSettings();
-			});
-
-			// attach maximize event
-			this.sideframe.find('.cms_sideframe-maximize').bind(this.click, function () {
-				if($(this).hasClass('cms_sideframe-minimize')) {
-					that.settings.sideframe.maximized = false;
-					that._minimizeSideframe();
-				} else {
-					that.settings.sideframe.maximized = true;
-					that.settings.sideframe.hidden = false;
-					that._maximizeSideframe();
-				}
-				that.setSettings();
-			});
-
-			this.sideframe.find('.cms_sideframe-resize').bind('mousedown', function (e) {
-				e.preventDefault();
-				that._startSideframeResize();
-			});
-		},
-
 		// public methods
 		toggleToolbar: function (show) {
 			// overwrite state when provided
 			if(show) this.settings.toolbar = 'collapsed';
 			// toggle bar
 			(this.settings.toolbar === 'collapsed') ? this._showToolbar(200) : this._hideToolbar(200);
-		},
-
-		setSettings: function (settings) {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
-
-			// set settings
-			settings = $.extend({}, this.settings, settings);
-			// save inside local storage
-			localStorage.setItem('cms_cookie', JSON.stringify(settings));
-
-			return settings;
-		},
-
-		getSettings: function () {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
-
-			// get settings
-			return JSON.parse(localStorage.getItem('cms_cookie'));
-		},
-
-		resetSettings: function () {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
-
-			// reset settings
-			window.localStorage.removeItem('cms_cookie');
-			this.settings = this.setSettings(this.options.settings);
-
-			// enforce reload to apply changes
-			CMS.API.Helpers.reloadBrowser();
-		},
-
-		openSideframe: function (url, animate) {
-			// prepare iframe
-			var that = this;
-			var holder = this.sideframe.find('.cms_sideframe-frame');
-			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
-				iframe.hide();
-			var width = this.settings.sideframe.position || this.options.sideframeWidth;
-
-			// attach load event to iframe
-			iframe.bind('load', function () {
-				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.options.urls.static + that.options.urls.css_sideframe + '" />'));
-				// remove loader
-				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
-				// than show
-				iframe.show();
-				// if a message is triggerd, refresh
-				var messages = iframe.contents().find('.messagelist li');
-				if(messages.length || that.enforceReload) {
-					that.enforceReload = true;
-				} else {
-					that.enforceReload = false;
-				}
-
-				// add debug infos
-				if(that.options.debug) iframe.contents().find('body').addClass('cms_debug');
-
-				// save url in settings
-				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
-				that.setSettings();
-
-				// bind extra events
-				iframe.contents().find('body').bind(that.click, function () {
-					$(document).trigger(that.click);
-				});
-			});
-
-			// cancel animation if sideframe is already shown
-			if(this.sideframe.is(':visible')) {
-				// sideframe is already open
-				insertHolder(iframe);
-				// reanimate the frame
-				if(parseInt(this.sideframe.css('width')) <= width) this._showSideframe(width, animate);
-			} else {
-				// load iframe after frame animation is done
-				setTimeout(function () {
-					insertHolder(iframe);
-				}, this.options.sideframeDuration);
-				// display the frame
-				this._showSideframe(width, animate);
-			}
-
-			function insertHolder(iframe) {
-				// show iframe after animation
-				that.sideframe.find('.cms_sideframe-frame').addClass('cms_loader');
-				holder.html(iframe);
-			}
-		},
-
-		closeSideframe: function () {
-			this._hideSideframe(true);
-
-			// remove url in settings
-			this.settings.sideframe = {
-				'url': null,
-				'hidden': false,
-				'maximized': false,
-				'width': this.options.sideframeWidth
-			};
-
-			this.setSettings();
 		},
 
 		openMessage: function (msg, dir, delay, error) {
@@ -424,7 +244,7 @@ $(document).ready(function () {
 			if(this.settings.toolbar === 'collapsed') top = 0;
 
 			// do we need to add debug styles?
-			if(this.options.debug) top = top + 5;
+			if(this.config.debug) top = top + 5;
 
 			// set correct position and show
 			this.messages.css('top', -height).show();
@@ -532,27 +352,28 @@ $(document).ready(function () {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
 			// animate html
-			this.body.animate({ 'margin-top': (this.options.debug) ? 35 : 30 }, (init) ? 0 : speed);
+			this.body.animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed);
 			// set messages top to toolbar height
 			this.messages.css('top', 31);
 			// set new settings
 			this.settings.toolbar = 'expanded';
-			if(!init) this.setSettings();
+			if(!init) this.setSettings(this.settings);
 		},
 
 		_hideToolbar: function (speed, init) {
 			// cancel if sideframe is active
+			// TODO check if toolbar is locked from sideframe
 			if(this.lockToolbar) return false;
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideUp(speed);
 			// animate html
-			this.body.animate({ 'margin-top': (this.options.debug) ? 5 : 0 }, speed);
+			this.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
 			// set messages top to 0
 			this.messages.css('top', 0);
 			// set new settings
 			this.settings.toolbar = 'collapsed';
-			if(!init) this.setSettings();
+			if(!init) this.setSettings(this.settings);
 		},
 
 		_enableEditMode: function (speed, init) {
@@ -567,7 +388,7 @@ $(document).ready(function () {
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
 
-			if(!init) this.setSettings();
+			if(!init) this.setSettings(this.settings);
 		},
 
 		_enableDragMode: function (speed, init) {
@@ -582,7 +403,7 @@ $(document).ready(function () {
 			// show clipboard in build mode
 			this.container.find('.cms_clipboard').fadeIn(speed);
 
-			if(!init) this.setSettings();
+			if(!init) this.setSettings(this.settings);
 		},
 
 		_setSwitcher: function (el) {
@@ -645,7 +466,8 @@ $(document).ready(function () {
 					this.openMessage(el.attr('data-text'));
 					break;
 				case 'sideframe':
-					this.openSideframe(el.attr('href'), true);
+					var sideframe = new CMS.Sideframe();
+						sideframe.open(el.attr('href'), true);
 					break;
 				case 'ajax':
 					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
@@ -662,115 +484,6 @@ $(document).ready(function () {
 				'hidden': false,
 				'maximized': this.settings.sideframe.maximized // we need to keep the default value
 			};
-		},
-
-		_showSideframe: function (width, animate) {
-			// add class
-			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
-
-			// check if sideframe should be hidden
-			if(this.settings.sideframe.hidden) this._hideSideframe();
-			// check if sideframe should be maximized
-			if(this.settings.sideframe.maximized) this._maximizeSideframe();
-			// otherwise do normal behaviour
-			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-				this.sideframe.show();
-				if(animate) {
-					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
-					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
-				} else {
-					this.sideframe.animate({ 'width': width }, 0);
-					this.body.animate({ 'margin-left': width }, 0);
-				}
-				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
-			}
-
-			this._lockToolbar(true);
-		},
-
-		_hideSideframe: function (close) {
-			// add class
-			this.sideframe.find('.cms_sideframe-hide').addClass('cms_sideframe-hidden');
-
-			var duration = this.options.sideframeDuration;
-			// remove the iframe
-			if(close && this.sideframe.width() <= 0) duration = 0;
-			if(close) this.sideframe.find('iframe').remove();
-			this.sideframe.animate({ 'width': 0 }, duration, function () {
-				if(close) $(this).hide();
-			});
-			this.body.animate({ 'margin-left': 0 }, duration);
-			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
-
-			// should we reload
-			if(this.enforceReload) CMS.API.Helpers.reloadBrowser();
-
-			// lock toolbar
-			this._lockToolbar(false);
-		},
-
-		_minimizeSideframe: function () {
-			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').show();
-
-			// hide scrollbar
-			this._disableScroll(false);
-
-			// reset to first state
-			this._showSideframe(this.settings.sideframe.position || this.options.sideframeWidth, true);
-
-			// remove event
-			$(window).unbind('resize.cms');
-		},
-
-		_maximizeSideframe: function () {
-			var that = this;
-
-			this.sideframe.find('.cms_sideframe-maximize').addClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').hide();
-
-			// reset scrollbar
-			this._disableScroll(true);
-
-			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
-			// do custom animation
-			this.sideframe.animate({ 'width': $(window).width() }, 0);
-			this.body.animate({ 'margin-left': 0 }, 0);
-			// invert icon position
-			this.sideframe.find('.cms_sideframe-btn').css('right', -2);
-			// attach resize event
-			$(window).bind('resize.cms', function () {
-				that.sideframe.css('width', $(window).width());
-			});
-		},
-
-		_startSideframeResize: function () {
-			var that = this;
-			var timer = function () {};
-			// this prevents the iframe from being focusable
-			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
-
-			$(document).bind('mousemove.cms', function (e) {
-				if(e.clientX <= 320) e.clientX = 320;
-
-				that.sideframe.css('width', e.clientX);
-				that.body.css('margin-left', e.clientX);
-
-				// update settings
-				that.settings.sideframe.position = e.clientX;
-
-				// save position
-				clearTimeout(timer);
-				timer = setTimeout(function () {
-					that.setSettings();
-				}, 500);
-			});
-		},
-
-		_stopSideframeResize: function () {
-			this.sideframe.find('.cms_sideframe-shim').css('z-index', 1);
-
-			$(document).unbind('mousemove.cms');
 		},
 
 		_disableScroll: function (disable) {
@@ -818,7 +531,7 @@ $(document).ready(function () {
 
 					if(e.type === 'mouseenter') {
 						timer = setTimeout(function () {
-							that.openMessage(that.options.lang.debug);
+							that.openMessage(that.config.lang.debug);
 						}, timeout);
 					}
 				});
