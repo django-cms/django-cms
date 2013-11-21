@@ -432,7 +432,7 @@ $(document).ready(function () {
 			this.options = $.extend(true, {}, this.options, options);
 
 			this.body = $(document);
-			this.csrf = CMS.API.Toolbar.options.csrf;
+			this.csrf = CMS.config.csrf;
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
@@ -628,7 +628,7 @@ $(document).ready(function () {
 				 // this is a hack: when moving to different languages use the global language
 				'plugin_language': this.options.page_language,
 				'plugin_order': plugin_order,
-				'csrfmiddlewaretoken': CMS.API.Toolbar.options.csrf
+				'csrfmiddlewaretoken': this.csrf
 			};
 
 			$.ajax({
