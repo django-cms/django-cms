@@ -583,7 +583,11 @@ $(document).ready(function () {
 			this.container.bind('mouseenter.cms.placeholder mouseleave.cms.placeholder', function (e) {
 				// add tooltip event to every placeholder
 				var name = $(this).data('settings').plugin_name;
-				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show().find('span').html(name) : CMS.API.Placeholders.tooltip.hide();
+				if(e.type === 'mouseenter') {
+					CMS.API.Placeholders.tooltip.css('visibility', 'visible').show().find('span').html(name);
+				} else {
+					CMS.API.Placeholders.tooltip.css('visibility', 'hidden').hide();
+				}
 			});
 		},
 
