@@ -210,7 +210,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').show();
 
 			// hide scrollbar
-			CMS.API.Toolbar._disableScroll(false);
+			this.preventScroll(false);
 
 			// reset to first state
 			this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
@@ -226,7 +226,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-hide').hide();
 
 			// reset scrollbar
-			CMS.API.Toolbar._disableScroll(true);
+			this.preventScroll(true);
 
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
 			// do custom animation

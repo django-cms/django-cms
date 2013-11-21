@@ -45,7 +45,7 @@ $(document).ready(function () {
 	};
 
 	// initialize toolbar and pass required options
-	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {
+	CMS.API.Toolbar = new CMS.Toolbar({
 		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}'
 	});
 

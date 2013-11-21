@@ -158,7 +158,7 @@ $(document).ready(function () {
 			});
 
 			// prevent scrolling
-			CMS.API.Toolbar._disableScroll(true);
+			this.preventScroll(true);
 
 			// add esc close event
 			$(document).bind('keydown.cms', function (e) {
@@ -174,7 +174,7 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-frame iframe').remove();
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 			// prevent scrolling
-			CMS.API.Toolbar._disableScroll(false);
+			this.preventScroll(false);
 		},
 
 		_minimize: function () {

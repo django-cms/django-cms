@@ -19,8 +19,8 @@ $(document).ready(function () {
 			'messageDelay': 2000
 		},
 
-		initialize: function (container, options) {
-			this.container = $(container);
+		initialize: function (options) {
+			this.container = $('#cms_toolbar');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
 			this.settings = this.getSettings();
@@ -59,8 +59,8 @@ $(document).ready(function () {
 			// setup toolbar mode
 			(this.settings.mode === 'drag') ? this._enableDragMode(300, true) : this._enableEditMode(300, true);
 
-			// load initial states
-			this._load();
+			// check if we should reset stuff
+			if(!this.config.auth) this._reset();
 
 			// check if modes should be visible
 			if($('.cms_placeholder-bar').length) {
@@ -77,11 +77,6 @@ $(document).ready(function () {
 
 			// check if debug is true
 			if(this.config.debug) this._debug();
-		},
-
-		_load: function () {
-			// reset some settings if not authenticated
-			if(!this.config.auth) this._reset();
 		},
 
 		_events: function () {
@@ -479,24 +474,11 @@ $(document).ready(function () {
 
 		_reset: function () {
 			// reset sideframe settings
-			this.settings.sideframe = {
+			CMS.config.settings.sideframe = {
 				'url': null,
 				'hidden': false,
 				'maximized': this.settings.sideframe.maximized // we need to keep the default value
 			};
-		},
-
-		_disableScroll: function (disable) {
-			// cancel if scrollbar is not visible
-			if($(document).height() <= $(window).height()) return false;
-
-			var scrollTop = $(window).scrollTop();
-			if(disable) {
-				this.body.addClass('cms_toolbar-noscroll').css('top',-scrollTop).data('scroll', scrollTop);
-			} else {
-				this.body.removeClass('cms_toolbar-noscroll');
-				$(window).scrollTop(this.body.data('scroll'));
-			}
 		},
 
 		_lockToolbar: function (lock) {

@@ -699,7 +699,7 @@ $(document).ready(function () {
 
 				// show loader and make sure scroll doesn't jump
 				CMS.API.Toolbar._showLoader(true);
-				CMS.API.Toolbar._disableScroll(false);
+				this.preventScroll(false);
 
 				var el = $(this);
 
@@ -814,7 +814,7 @@ $(document).ready(function () {
 			}
 
 			// enable scroll
-			CMS.API.Toolbar._disableScroll(true);
+			this.preventScroll(true);
 
 			// set relativity
 			$('.cms_placeholder').css({
@@ -844,7 +844,7 @@ $(document).ready(function () {
 			}, this.timeout);
 
 			// enable scroll
-			CMS.API.Toolbar._disableScroll(false);
+			this.preventScroll(false);
 
 			// reset relativity
 			$('.cms_placeholder').css('position', '');
