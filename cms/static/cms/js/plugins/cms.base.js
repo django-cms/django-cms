@@ -61,7 +61,7 @@ $(document).ready(function () {
 			});
 		},
 
-		// handles the tooltip within the cms-wrapper
+		// handles the tooltip for the plugins
 		showTooltip: function (name, id) {
 			var tooltip = $('.cms_placeholders-tooltip');
 
