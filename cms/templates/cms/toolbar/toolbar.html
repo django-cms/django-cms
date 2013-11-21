@@ -23,7 +23,7 @@
 // CMS.$ will be passed for $
 $(document).ready(function () {
 	// this is a global shared settings
-	CMS.settings = {
+	CMS.config = {
 		'debug': {% if debug %}true{% else %}false{% endif %},
 		'csrf': '{{ csrf_token }}',
 		'lang': {
