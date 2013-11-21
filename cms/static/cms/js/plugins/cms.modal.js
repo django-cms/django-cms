@@ -23,7 +23,7 @@ $(document).ready(function () {
 			this.options = $.extend(true, {}, this.options, options);
 			this.modal = $('.cms_modal');
 			this.toolbar = $('.cms_toolbar');
-			this.settings = CMS.settings;
+			this.config = CMS.config;
 			this.body = $('html');
 
 			// helpers
@@ -46,23 +46,23 @@ $(document).ready(function () {
 			// attach events to window
 			this.modal.find('.cms_modal-collapse').bind(this.click, function (e) {
 				e.preventDefault();
-				that._minimizeModal();
+				that._minimize();
 			});
 			this.modal.find('.cms_modal-title').bind('mousedown.cms', function (e) {
 				e.preventDefault();
-				that._startModalMove(e);
+				that._startMove(e);
 			});
 			this.modal.find('.cms_modal-resize').bind('mousedown.cms', function (e) {
 				e.preventDefault();
-				that._startModalResize(e);
+				that._startResize(e);
 			});
 			this.modal.find('.cms_modal-maximize').bind(this.click, function (e) {
 				e.preventDefault();
-				that._maximizeModal();
+				that._maximize();
 			});
 			this.modal.find('.cms_modal-breadcrumb-items a').live(this.click, function (e) {
 				e.preventDefault();
-				that._changeModalContent($(this));
+				that._changeContent($(this));
 			});
 			this.modal.find('.cms_modal-close, .cms_modal-cancel').bind(this.click, function (e) {
 				e.preventDefault();
@@ -71,8 +71,8 @@ $(document).ready(function () {
 
 			// stopper events
 			$(document).bind('mouseup.cms', function (e) {
-				that._endModalMove(e);
-				that._endModalResize(e);
+				that._endMove(e);
+				that._endResize(e);
 			});
 		},
 
@@ -93,10 +93,10 @@ $(document).ready(function () {
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
 				contents.show();
 
-			this._loadModalContent(url, name);
+			this._loadContent(url, name);
 
 			// insure modal is not maximized
-			if(this.modal.find('.cms_modal-collapsed').length) this._minimizeModal();
+			if(this.modal.find('.cms_modal-collapsed').length) this._minimize();
 
 			// reset styles
 			this.modal.css({
@@ -115,7 +115,7 @@ $(document).ready(function () {
 			this.maximized = false;
 
 			// we need to render the breadcrumb
-			this._setModalBreadcrumb(breadcrumb);
+			this._setBreadcrumb(breadcrumb);
 
 			// display modal
 			this._show(this.options.modalDuration);
@@ -177,7 +177,7 @@ $(document).ready(function () {
 			CMS.API.Toolbar._disableScroll(false);
 		},
 
-		_minimizeModal: function () {
+		_minimize: function () {
 			var trigger = this.modal.find('.cms_modal-collapse');
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
 
@@ -199,7 +199,7 @@ $(document).ready(function () {
 				this.modal.css({
 					// TODO figure out why we need this left pos from toolbar
 					'left': this.toolbar.find('.cms_toolbar-left').outerWidth(true) + 50,
-					'top': (this.settings.debug) ? 6 : 1,
+					'top': (this.config.debug) ? 6 : 1,
 					'margin': 0
 				});
 
@@ -222,8 +222,8 @@ $(document).ready(function () {
 			}
 		},
 
-		_maximizeModal: function () {
-			var debug = (this.settings.debug) ? 5 : 0;
+		_maximize: function () {
+			var debug = (this.config.debug) ? 5 : 0;
 			var container = this.modal.find('.cms_modal-body');
 			var trigger = this.modal.find('.cms_modal-maximize');
 			var btnCk = this.modal.find('iframe').contents().find('.cke_button__maximize');
@@ -279,7 +279,7 @@ $(document).ready(function () {
 			}
 		},
 
-		_startModalMove: function (initial) {
+		_startMove: function (initial) {
 			// cancel if maximized
 			if(this.maximized) return false;
 			// cancel action when minimized
@@ -301,13 +301,13 @@ $(document).ready(function () {
 			});
 		},
 
-		_endModalMove: function () {
+		_endMove: function () {
 			this.modal.find('.cms_modal-shim').hide();
 
 			$(document).unbind('mousemove.cms');
 		},
 
-		_startModalResize: function (initial) {
+		_startResize: function (initial) {
 			// cancel if in fullscreen
 			if(this.maximized) return false;
 			// continue
@@ -343,13 +343,13 @@ $(document).ready(function () {
 			});
 		},
 
-		_endModalResize: function () {
+		_endResize: function () {
 			this.modal.find('.cms_modal-shim').hide();
 
 			$(document).unbind('mousemove.cms');
 		},
 
-		_setModalBreadcrumb: function (breadcrumb) {
+		_setBreadcrumb: function (breadcrumb) {
 			var bread = this.modal.find('.cms_modal-breadcrumb');
 			var crumb = '';
 
@@ -372,7 +372,7 @@ $(document).ready(function () {
 			bread.show();
 		},
 
-		_setModalButtons: function (iframe) {
+		_setButtons: function (iframe) {
 			var that = this;
 			var row = iframe.contents().find('.submit-row:eq(0)');
 			var buttons = row.find('input, a');
@@ -432,7 +432,7 @@ $(document).ready(function () {
 			});
 
 			// manually add cancel button at the end
-			var cancel = $('<div class="cms_btn">'+that.settings.lang.cancel+'</div>');
+			var cancel = $('<div class="cms_btn">'+that.config.lang.cancel+'</div>');
 				cancel.bind(that.click, function () {
 					that.close();
 				});
@@ -445,7 +445,7 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-buttons').html(render);
 		},
 
-		_loadModalContent: function (url, name) {
+		_loadContent: function (url, name) {
 			var that = this;
 
 			// now refresh the content
@@ -475,7 +475,7 @@ $(document).ready(function () {
 				}
 
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.settings.urls.static + that.options.urls.css_modal + '" />'));
+				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
 
 				// set title of not provided
 				var innerTitle = iframe.contents().find('#content h1:eq(0)');
@@ -483,7 +483,7 @@ $(document).ready(function () {
 				innerTitle.remove();
 
 				// set modal buttons
-				that._setModalButtons($(this));
+				that._setButtons($(this));
 
 				// than show
 				iframe.show();
@@ -497,7 +497,7 @@ $(document).ready(function () {
 				});
 
 				// if its only text, maximize modal
-				if(title.text() === that.settings.lang.text) {
+				if(title.text() === that.config.lang.text) {
 					setTimeout(function () {
 						iframe.contents().find('.cke_button__maximize').trigger('click');
 					}, 100);
@@ -511,7 +511,7 @@ $(document).ready(function () {
 			}, this.options.modalDuration);
 		},
 
-		_changeModalContent: function (el) {
+		_changeContent: function (el) {
 			if(el.hasClass('cms_modal-breadcrumb-last')) return false;
 
 			var parents = el.parent().find('a');
@@ -519,7 +519,7 @@ $(document).ready(function () {
 
 			el.addClass('cms_modal-breadcrumb-last');
 
-			this._loadModalContent(el.attr('href'));
+			this._loadContent(el.attr('href'));
 
 			// update title
 			this.modal.find('.cms_modal-title').text(el.text());
