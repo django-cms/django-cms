@@ -60,7 +60,6 @@ $(document).ready(function () {
 			this.sideframe = this.container.find('.cms_sideframe');
 			this.messages = this.container.find('.cms_messages');
 			this.modal = this.container.find('.cms_modal');
-			this.tooltip = this.container.find('.cms_placeholders-tooltip');
 			this.bars = $('.cms_placeholder-bar');
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 
@@ -529,7 +528,7 @@ $(document).ready(function () {
 			this._showLoader(true);
 
 			// hide tooltip
-			this.tooltip.hide();
+			CMS.API.Helpers.hideTooltip();
 
 			// reset breadcrumb
 			this.modal.find('.cms_modal-breadcrumb').hide();

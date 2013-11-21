@@ -16,7 +16,6 @@ $(document).ready(function () {
 			this.options = $.extend(true, {}, this.options, options);
 
 			this.toolbar = $('#cms_toolbar');
-			this.tooltip = this.toolbar.find('.cms_placeholders-tooltip');
 			this.bars = this.placeholders.find('.cms_placeholder-bar');
 			this.sortables = $('.cms_draggables'); // use global scope
 			this.clipboard = this.toolbar.find('.cms_clipboard');
@@ -33,7 +32,6 @@ $(document).ready(function () {
 			this._setupPlaceholders(this.placeholders);
 			this._setupPlugins(this.plugins);
 
-			this._events();
 			this._preventEvents();
 			this._drag();
 			this._clipboard();
@@ -62,22 +60,15 @@ $(document).ready(function () {
 		},
 
 		_setupPlugins: function (plugins) {
-			var that = this;
-
 			plugins.bind('mouseover mouseout', function (e) {
 				e.stopPropagation();
 				if(e.type === 'mouseover') {
 					var name = $(this).data('settings').plugin_name;
-					that.tooltip.css('visibility', 'visible').show().find('span').html(name);
-					that.tooltip.data('plugin_id', $(this).data('settings').plugin_id);
+					var id = $(this).data('settings').plugin_id;
+					CMS.API.Helpers.showTooltip(name, id);
 				} else {
-					that.tooltip.css('visibility', 'hidden').hide();
+					CMS.API.Helpers.hideTooltip();
 				}
-			});
-
-			// attach tooltip event for touch devices
-			this.tooltip.bind('touchstart.cms', function () {
-				$('#cms_plugin-' + $(this).data('plugin_id')).trigger('dblclick');
 			});
 		},
 
@@ -100,23 +91,6 @@ $(document).ready(function () {
 		},
 
 		// private methods
-		_events: function () {
-			var that = this;
-
-			// this sets the correct position for the edit tooltip
-			$(document.body).bind('mousemove.cms', function (e) {
-				// so lets figure out where we are
-				var offset = 20;
-				var bound = $(document).width();
-				var pos = e.pageX + that.tooltip.outerWidth(true) + offset;
-
-				that.tooltip.css({
-					'left': (pos >= bound) ? e.pageX - that.tooltip.outerWidth(true) - offset : e.pageX + offset,
-					'top': e.pageY - 12
-				});
-			});
-		},
-
 		_drag: function () {
 			var that = this;
 			var dropped = false;
@@ -583,7 +557,8 @@ $(document).ready(function () {
 			this.container.bind('mouseenter.cms.placeholder mouseleave.cms.placeholder', function (e) {
 				// add tooltip event to every placeholder
 				var name = $(this).data('settings').plugin_name;
-				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show().find('span').html(name) : CMS.API.Placeholders.tooltip.hide();
+				var id = $(this).data('settings').plugin_id;
+				(e.type === 'mouseenter') ? CMS.API.Helpers.showTooltip(name, id) : CMS.API.Helpers.hideTooltip();
 			});
 		},
 

@@ -58,7 +58,55 @@ $(document).ready(function () {
 					xhr.setRequestHeader("X-CSRFToken", csrf_token);
 				}
 			});
+		},
+
+		// handles the tooltip within the cms-wrapper
+		showTooltip: function (name, id) {
+			var tooltip = $('.cms_placeholders-tooltip');
+
+			// change css and attributes
+			tooltip.css('visibility', 'visible')
+				.data('plugin_id', id)
+				.show()
+				.find('span').html(name);
+
+			// attaches move event
+			// this sets the correct position for the edit tooltip
+			$('body').bind('mousemove.cms', function (e) {
+				// so lets figure out where we are
+				var offset = 20;
+				var bound = $(document).width();
+				var pos = e.pageX + tooltip.outerWidth(true) + offset;
+
+				tooltip.css({
+					'left': (pos >= bound) ? e.pageX - tooltip.outerWidth(true) - offset : e.pageX + offset,
+					'top': e.pageY - 12
+				});
+			});
+
+			// attach tooltip event for touch devices
+			tooltip.bind('touchstart.cms', function () {
+				$('#cms_plugin-' + $(this).data('plugin_id')).trigger('dblclick');
+			});
+		},
+
+		hideTooltip: function () {
+			var tooltip = $('.cms_placeholders-tooltip');
+
+			// change css
+			tooltip.css('visibility', 'hidden').hide();
+
+			// unbind events
+			$('body').unbind('mousemove.cms');
+			tooltip.unbind('touchstart.cms');
 		}
+
+		// sends or retrieves a JSON from localStorage or the session if local storage is not available
+		//setSettings: function () {},
+
+		//getSettings: function () {},
+
+		//resetSettings: function () {}
 
 	};
 
