@@ -590,7 +590,8 @@ $(document).ready(function () {
 
 		editPlugin: function (url, name, breadcrumb) {
 			// trigger modal window
-			this._openModal(url, name, breadcrumb);
+			var modal = new CMS.Modal();
+				modal.open(url, name, breadcrumb);
 		},
 
 		movePlugin: function () {
@@ -900,10 +901,6 @@ $(document).ready(function () {
 				array.push(CMS.API.Placeholders.getId($(this)));
 			});
 			return array;
-		},
-
-		_openModal: function (url, name, breadcrumb) {
-			return CMS.API.Toolbar.openModal(url, name, breadcrumb);
 		},
 
 		_showError: function (msg) {
