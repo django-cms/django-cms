@@ -100,14 +100,43 @@ $(document).ready(function () {
 			// unbind events
 			$('body').unbind('mousemove.cms');
 			tooltip.unbind('touchstart.cms');
-		}
+		},
 
 		// sends or retrieves a JSON from localStorage or the session if local storage is not available
-		//setSettings: function () {},
+		setSettings: function (settings) {
+			// cancel if local storage is not available
+			if(!window.localStorage) return false;
 
-		//getSettings: function () {},
+			// TODO IMPLEMENT
+			// if(this.settings.version !== this.options.settings.version) this.resetSettings();
 
-		//resetSettings: function () {}
+			// set settings
+			settings = $.extend({}, CMS.config.settings, settings);
+			// save inside local storage
+			localStorage.setItem('cms_cookie', JSON.stringify(settings));
+
+			return settings;
+		},
+
+		getSettings: function () {
+			// cancel if local storage is not available
+			if(!window.localStorage) return false;
+
+			// get settings
+			return JSON.parse(localStorage.getItem('cms_cookie'));
+		},
+
+		resetSettings: function () {
+			// cancel if local storage is not available
+			if(!window.localStorage) return false;
+
+			// reset settings
+			window.localStorage.removeItem('cms_cookie');
+			this.setSettings(CMS.config.settings);
+
+			// enforce reload to apply changes
+			CMS.API.Helpers.reloadBrowser();
+		}
 
 	};
 
