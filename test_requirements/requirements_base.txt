@@ -1,4 +1,4 @@
-coverage==3.4
+coverage==3.7
 python-coveralls==2.4.0
 docopt==0.6.1
 unittest-xml-reporting==1.0.3
