@@ -23,9 +23,9 @@ install:
     - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install -q psycopg2 ; fi
     - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python ; fi
 script:
-    coverage run --rcfile=coverage.rc develop.py test --migrate
+    coverage run --rcfile=.coverage.rc develop.py test --migrate
 after_success:
-    coveralls --config_file=coverage.rc
+    coveralls --config_file=.coverage.rc
 notifications:
     email:
         recipients:
