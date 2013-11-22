@@ -14,7 +14,6 @@ $(document).ready(function () {
 		options: {
 			'preventSwitch': false,
 			'preventSwitchMessage': 'Switching is disabled.',
-			'clipboard': null,
 			'messageDelay': 2000
 		},
 

@@ -17,7 +17,6 @@ $(document).ready(function () {
 			this.toolbar = $('#cms_toolbar');
 			this.bars = this.placeholders.find('.cms_placeholder-bar');
 			this.sortables = $('.cms_draggables'); // use global scope
-			this.clipboard = this.toolbar.find('.cms_clipboard');
 			this.dragging = false;
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 
@@ -33,7 +32,6 @@ $(document).ready(function () {
 
 			this._preventEvents();
 			this._drag();
-			this._clipboard();
 		},
 
 		// initial methods
@@ -157,7 +155,7 @@ $(document).ready(function () {
 						plugin.trigger('cms.placeholder.update');
 
 					// update clipboard entries
-					that._updateClipboard(ui.item);
+					CMS.API.Clipboard._update(ui.item);
 
 					// reset placeholder without entries
 					$('.cms_draggables').each(function () {
@@ -218,82 +216,6 @@ $(document).ready(function () {
 					droparea = $(event.target).parent().nextAll('.cms_draggables').first();
 				}
 			});
-		},
-
-		_clipboard: function () {
-			var that = this;
-			var remove = this.clipboard.find('.cms_clipboard-empty a');
-			var triggers = this.clipboard.find('.cms_clipboard-triggers a');
-			var containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
-			var position = 220;
-			var speed = 100;
-			var timer = function () {};
-
-			// add remove event
-			remove.bind(this.click, function (e) {
-				e.preventDefault();
-				CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
-			});
-
-			// add animation events
-			triggers.bind('mouseenter mouseleave', function (e) {
-				e.preventDefault();
-				// clear timeout
-				clearTimeout(timer);
-
-				if(e.type === 'mouseleave') hide();
-
-				triggers = that.clipboard.find('.cms_clipboard-triggers a');
-				containers = that.clipboard.find('.cms_clipboard-containers > .cms_draggable');
-				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
-				var el = containers.eq(index);
-				// cancel if element is already open
-				if(el.data('open') === true) return false;
-
-				// show element
-				containers.stop().css({ 'margin-left': -position }).data('open', false);
-				el.stop().animate({ 'margin-left': 0 }, speed);
-				el.data('open', true);
-			});
-			containers.bind('mouseover mouseleave', function (e) {
-				// clear timeout
-				clearTimeout(timer);
-
-				// cancel if we trigger mouseover
-				if(e.type === 'mouseover') return false;
-
-				// we need a little timer to detect if we should hide the menu
-				hide();
-			});
-
-			function hide() {
-				timer = setTimeout(function () {
-					containers.stop().css({ 'margin-left': -position }).data('open', false);
-				}, speed);
-			}
-		},
-
-		_updateClipboard: function () {
-			// cancel if there is no clipboard available
-			if(!this.clipboard.length) return false;
-
-			var containers = this.clipboard.find('.cms_clipboard-containers .cms_draggable');
-			var triggers = this.clipboard.find('.cms_clipboard-triggers .cms_clipboard-numbers');
-
-			var lengthContainers = containers.length;
-			var lengthTriggers = triggers.length;
-
-			// only proceed if the items are not in sync
-			if(lengthContainers === lengthTriggers) return false;
-
-			// set visible elements
-			triggers.hide();
-			for(var i = 0; i < lengthContainers; i++) {
-				triggers.eq(i).show();
-			}
-
-			// remove clipboard if empty
-			if(lengthContainers <= 0) this.clipboard.remove();
 		},
 
 		_collapsables: function (draggables) {
@@ -697,7 +619,7 @@ $(document).ready(function () {
 
 				// show loader and make sure scroll doesn't jump
 				CMS.API.Toolbar._loader(true);
-				this.preventScroll(false);
+				CMS.API.Helpers.preventScroll(false);
 
 				var el = $(this);
 
@@ -917,6 +839,23 @@ $(document).ready(function () {
 		_delegate: function (el) {
 			return CMS.API.Toolbar._delegate(el);
 		}
+
+	});
+
+
+	// handles drag & drop, mode switching and
+	CMS.Modes = new CMS.Class({
+
+	});
+
+
+	// for created plugins or generics (static content)
+	CMS.Plugin = new CMS.Class({
+
+	});
+
+	// for {% placeholder %} and {% stack %}
+	CMS.Placeholder = new CMS.Class({
 
 	});
 
