@@ -248,7 +248,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=False)
         response = detail_view(request, ex1.pk)
         self.assertContains(response, "<h1>char_1</h1>")
-        self.assertNotContains(response, "CMS.API.Toolbar")
+        self.assertNotContains(response, "CMS.API")
 
     def test_noedit(self):
         user = self.get_staff()
@@ -259,7 +259,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=False)
         response = detail_view(request, ex1.pk)
         self.assertContains(response, "<h1>char_1</h1>")
-        self.assertContains(response, "CMS.API.Toolbar")
+        self.assertContains(response, "CMS.API")
 
     def test_edit(self):
         user = self.get_staff()
