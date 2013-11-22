@@ -358,7 +358,6 @@ $(document).ready(function () {
 
 		_hideToolbar: function (speed, init) {
 			// cancel if sideframe is active
-			// TODO check if toolbar is locked from sideframe
 			if(this.lockToolbar) return false;
 
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
@@ -372,7 +371,6 @@ $(document).ready(function () {
 			if(!init) this.setSettings(this.settings);
 		},
 
-		// TODO should be one function _setModes or so
 		_enableEditMode: function (speed, init) {
 			this.bars.hide();
 			this.plugins.stop(true, true).fadeIn(speed);

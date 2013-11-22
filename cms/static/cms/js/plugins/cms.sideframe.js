@@ -76,7 +76,7 @@ $(document).ready(function () {
 			});
 
 			// stopper events
-			$(document).bind('mouseup.cms', function (e) {
+			$(document).bind('mouseup.cms', function () {
 				that._stopResize();
 			});
 		},
