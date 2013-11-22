@@ -3,7 +3,7 @@ django CMS
 ##########
 .. image:: https://api.travis-ci.org/divio/django-cms.png?branch=master
     :target: http://travis-ci.org/divio/django-cms
-.. image:: https://coveralls.io/repos/divio/django-cms/badge.png?branch=master
+.. image:: https://coveralls.io/repos/divio/django-cms/badge.png?branch=develop
     :target: https://coveralls.io/r/divio/django-cms
 .. image:: https://pypip.in/v/django-cms/badge.png
    :target: https://crate.io/packages/django-cms/
