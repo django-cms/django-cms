@@ -57,9 +57,6 @@ $(document).ready(function () {
 			// setup toolbar mode
 			(this.settings.mode === 'drag') ? this._enableDragMode(300, true) : this._enableEditMode(300, true);
 
-			// check if we should reset stuff
-			if(!this.config.auth) this._reset();
-
 			// check if modes should be visible
 			if($('.cms_placeholder-bar').length) {
 				this.container.find('.cms_toolbar-item-cms-mode-switcher').show();
@@ -449,9 +446,6 @@ $(document).ready(function () {
 			// save local vars
 			var target = el.attr('data-rel');
 
-			// reset states
-			this._reset();
-
 			switch(target) {
 				case 'modal':
 					var modal = new CMS.Modal();
@@ -470,16 +464,6 @@ $(document).ready(function () {
 				default:
 					window.location.href = el.attr('href');
 			}
-		},
-
-		// TODO figure out if this still works correctly
-		_reset: function () {
-			// reset sideframe settings
-			CMS.config.settings.sideframe = {
-				'url': null,
-				'hidden': false,
-				'maximized': this.settings.sideframe.maximized // we need to keep the default value
-			};
 		},
 
 		_lockToolbar: function (lock) {
