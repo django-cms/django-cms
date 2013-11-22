@@ -73,6 +73,12 @@ $(document).ready(function () {
 			// add toolbar ready class to body
 			$('body').addClass('cms_toolbar-ready');
 
+			// check if we need to reset the current settings depending on a new release
+			if(CMS.config.settings.version !== this.getSettings().version) {
+				this.setSettings(CMS.config.settings);
+				this.reloadBrowser();
+			}
+
 			// check if debug is true
 			if(CMS.config.debug) this._debug();
 
@@ -86,6 +92,12 @@ $(document).ready(function () {
 			if(CMS.config.publisher) {
 				this.openMessage(CMS.config.publisher, 'right');
 				setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
+			}
+
+			// open sideframe if it was previously opened
+			if(this.settings.sideframe.url) {
+				var sideframe = new CMS.Sideframe();
+					sideframe.open(this.settings.sideframe.url, false);
 			}
 		},
 

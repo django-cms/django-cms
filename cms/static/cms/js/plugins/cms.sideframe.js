@@ -17,7 +17,6 @@ $(document).ready(function () {
 			'urls': {
 				'css_sideframe': 'cms/css/plugins/cms.toolbar.sideframe.css'
 			}
-			// TODO add modalWidth and modalHeight minimum
 		},
 
 		initialize: function (options) {
@@ -36,11 +35,6 @@ $(document).ready(function () {
 
 			// ready modal
 			this.sideframe.data('ready', true);
-
-			// check if we should show the sideframe
-			if(this.settings.sideframe.url) {
-				this.open(this.settings.sideframe.url, false);
-			}
 		},
 
 		_events: function () {
@@ -183,7 +177,10 @@ $(document).ready(function () {
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
 
-			CMS.API.Toolbar._lockToolbar(true);
+			// lock toolbar, set timeout to make sure CMS.API is ready
+			setTimeout(function () {
+				CMS.API.Toolbar._lockToolbar(true);
+			}, 100);
 		},
 
 		_hide: function (close) {
@@ -203,8 +200,10 @@ $(document).ready(function () {
 			// should we reload
 			if(this.enforceReload) that.reloadBrowser();
 
-			// lock toolbar
-			CMS.API.Toolbar._lockToolbar(false);
+			// lock toolbar, set timeout to make sure CMS.API is ready
+			setTimeout(function () {
+				CMS.API.Toolbar._lockToolbar(false);
+			}, 100);
 		},
 
 		_minimize: function () {

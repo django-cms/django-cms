@@ -559,9 +559,6 @@ $(document).ready(function () {
 			}
 			settings.states = filteredArray;
 
-			// save cleaned array
-			CMS.API.Toolbar.setSettings(settings);
-
 			// loop through the items
 			$.each(CMS.API.Toolbar.getSettings().states, function (index, id) {
 				var el = $('#cms_draggable-' + id);

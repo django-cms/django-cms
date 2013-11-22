@@ -42,7 +42,9 @@ $(document).ready(function () {
 		'settings': {
 			'version': '{{ cms_version }}',
 			'toolbar': 'expanded',
-			'mode': 'edit'
+			'mode': 'edit',
+			'sideframe': { 'url': '' },
+			'states': []
 		},
 		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}',
 		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
@@ -52,8 +54,8 @@ $(document).ready(function () {
 	// extends API
 	$.extend(CMS.API, {
 		'Toolbar': new CMS.Toolbar(),
-		'StructureBoard': new CMS.StructureBoard(),
-		'Clipboard': new CMS.Clipboard()
+		'Clipboard': new CMS.Clipboard(),
+		'StructureBoard': new CMS.StructureBoard()
 	});
 });
 })(CMS.$);

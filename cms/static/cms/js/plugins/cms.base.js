@@ -105,35 +105,24 @@ $(document).ready(function () {
 			// cancel if local storage is not available
 			if(!window.localStorage) return false;
 
-			// TODO IMPLEMENT
-			// if(this.settings.version !== this.options.settings.version) this.resetSettings();
-
 			// set settings
 			settings = $.extend({}, CMS.config.settings, settings);
 			// save inside local storage
 			localStorage.setItem('cms_cookie', JSON.stringify(settings));
-
-			return settings;
 		},
 
 		getSettings: function () {
 			// cancel if local storage is not available
 			if(!window.localStorage) return false;
 
-			// get settings
+			// check if there are settings defined
+			var settings = localStorage.getItem('cms_cookie');
+
+			// set settings are not defined, ensure they are
+			if(settings === null) this.setSettings(CMS.config.settings);
+
+			// finally get settings
 			return JSON.parse(localStorage.getItem('cms_cookie'));
-		},
-
-		resetSettings: function () {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
-
-			// reset settings
-			window.localStorage.removeItem('cms_cookie');
-			this.setSettings(CMS.config.settings);
-
-			// enforce reload to apply changes
-			CMS.API.Helpers.reloadBrowser();
 		},
 
 		// prevents scrolling when another scrollbar is used (for better ux)

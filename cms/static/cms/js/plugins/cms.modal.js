@@ -199,7 +199,6 @@ $(document).ready(function () {
 				});
 
 				this.modal.css({
-					// TODO figure out why we need this left pos from toolbar
 					'left': this.toolbar.find('.cms_toolbar-left').outerWidth(true) + 50,
 					'top': (this.config.debug) ? 6 : 1,
 					'margin': 0
