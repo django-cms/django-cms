@@ -44,7 +44,9 @@ $(document).ready(function () {
 			'toolbar': 'expanded',
 			'mode': 'edit'
 		},
-		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}'
+		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}',
+		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
+		'publisher': '{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}'
 	};
 
 	// extend API
@@ -53,19 +55,6 @@ $(document).ready(function () {
 		'StructureBoard': new CMS.StructureBoard(),
 		'Clipboard': new CMS.Clipboard()
 	});
-
-	// TODO move this to toolbar initializer
-	// open django messages if provided
-	{% if messages %}CMS.API.Toolbar.openMessage('{% for message in messages %}{{ message }}{% endfor %}');{% endif %}
-
-	// special message for published status
-	{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}
-	CMS.API.Toolbar.openMessage('{% trans "This page has unpublished changes." %}', 'right');
-	setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
-	{% endif %}
-
-	// ensure toolbar is shown when not logged in
-	{% if not user.is_authenticated %}CMS.API.Toolbar.toggleToolbar(true);{% endif %}
 });
 })(CMS.$);
 </script>

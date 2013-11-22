@@ -74,7 +74,19 @@ $(document).ready(function () {
 			$('body').addClass('cms_toolbar-ready');
 
 			// check if debug is true
-			if(this.config.debug) this._debug();
+			if(CMS.config.debug) this._debug();
+
+			// check if there are messages and display them
+			if(CMS.config.messages) this.openMessage(CMS.config.messages);
+
+			// enforce open state if user is not logged in but requests the toolbar
+			if(!CMS.config.auth) this.toggleToolbar(true);
+
+			// should switcher indicate that there is an unpublished page?
+			if(CMS.config.publisher) {
+				this.openMessage(CMS.config.publisher, 'right');
+				setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
+			}
 		},
 
 		_events: function () {
