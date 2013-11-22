@@ -10,15 +10,15 @@ django CMS
 .. image:: https://pypip.in/d/django-cms/badge.png
    :target: https://crate.io/packages/django-cms/
 
-A Content Management System based on the django framework.
+Open source enterprise content management system based on the django framework.
 
 Features
 --------
 
 - Hierarchical pages
 - Extensive support for multilingual websites
-- Multi Site
-- Draft/Publish
+- Multi site support
+- Draft/Published workflows
 - Undo/Redo
 - Use the content blocks (placeholders) in your own apps (models)
 - Use the content blocks (stacks) anywhere in your templates
@@ -62,5 +62,5 @@ Credits
   `django-mptt <https://github.com/django-mptt/django-mptt>`_.
 * Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
-  `over 350 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
+  `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!
