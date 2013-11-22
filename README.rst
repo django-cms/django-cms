@@ -1,7 +1,7 @@
 ##########
 django CMS
 ##########
-.. image:: https://api.travis-ci.org/divio/django-cms.png?branch=master
+.. image:: https://api.travis-ci.org/divio/django-cms.png?branch=develop
     :target: http://travis-ci.org/divio/django-cms
 .. image:: https://coveralls.io/repos/divio/django-cms/badge.png?branch=develop
     :target: https://coveralls.io/r/divio/django-cms
@@ -29,7 +29,8 @@ Features
 - Highly integrative into your own apps
 
 
-You can define editable areas, called placeholders, in your templates which you
+You can define editable areas, called placeholders, in your templates which you fill
+with many different so called CMS content plugins.
 A list of all the plugins can be found here:
 
 `3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_ 
