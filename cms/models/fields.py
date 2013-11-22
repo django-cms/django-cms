@@ -38,6 +38,9 @@ class PlaceholderField(models.ForeignKey):
         else:
             slot = self._get_placeholder_slot(model_instance)
             placeholder = getattr(model_instance, self.name)
+            if not placeholder:
+                setattr(model_instance, self.name, self._get_new_placeholder(model_instance))
+                placeholder = getattr(model_instance, self.name)
             if placeholder.slot != slot:
                 placeholder.slot = slot
                 placeholder.save()

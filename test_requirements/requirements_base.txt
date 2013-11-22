@@ -1,5 +1,6 @@
 coverage==3.4
 python-coveralls==2.4.0
+docopt==0.6.1
 unittest-xml-reporting==1.0.3
 sphinx
 Pillow==2.0
@@ -10,7 +11,7 @@ html5lib>=0.90
 django-sekizai>=0.7
 argparse
 dj-database-url
-djangocms-admin-style
+-e git+https://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
 -e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column

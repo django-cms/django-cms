@@ -7,6 +7,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("cms", "0048_auto__add_field_page_application_namespace__add_unique_page_publisher_"),
+    )
+
     def forwards(self, orm):
         # Adding model 'Picture'
         db.create_table('cmsplugin_picture', (

@@ -77,8 +77,6 @@ $(document).ready(function () {
 				rtl: false,
 				animation: 0,
 				hover_mode: true,
-				theme_path: false,
-				theme_name: "default",
 				a_class: "title"
 			},
 			cookies : {

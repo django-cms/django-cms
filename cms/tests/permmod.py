@@ -20,6 +20,13 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 
 
+def fake_mptt_attrs(page):
+    page.level = page.level or 0
+    page.lft = page.lft or 1
+    page.rght = page.rght or 2
+    page.tree_id = page.tree_id or 1
+
+
 class PermissionModeratorTests(SettingsOverrideTestCase):
     """Permissions and moderator together
     
@@ -778,6 +785,7 @@ class ViewPermissionTests(PermissionTestsBase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
+        fake_mptt_attrs(page)
         self.assertTrue(page.has_view_permission(request))
 
     def test_public_for_all_staff_assert_num_queries(self):
@@ -785,7 +793,8 @@ class ViewPermissionTests(PermissionTestsBase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
-        with self.assertNumQueries(0):
+        fake_mptt_attrs(page)
+        with self.assertNumQueries(1):
             page.has_view_permission(request)
 
     def test_public_for_all(self):
@@ -795,6 +804,7 @@ class ViewPermissionTests(PermissionTestsBase):
         page.pk = 1
         page.level = 0
         page.tree_id = 1
+        fake_mptt_attrs(page)
         self.assertTrue(page.has_view_permission(request))
 
     def test_public_for_all_num_queries(self):
@@ -806,6 +816,7 @@ class ViewPermissionTests(PermissionTestsBase):
         page.pk = 1
         page.level = 0
         page.tree_id = 1
+        fake_mptt_attrs(page)
         with self.assertNumQueries(3):
             """
             The queries are:
@@ -821,6 +832,7 @@ class ViewPermissionTests(PermissionTestsBase):
         page.pk = 1
         page.level = 0
         page.tree_id = 1
+        fake_mptt_attrs(page)
         self.assertTrue(page.has_view_permission(request))
 
     def test_unauthed_num_queries(self):
@@ -831,6 +843,7 @@ class ViewPermissionTests(PermissionTestsBase):
         page.pk = 1
         page.level = 0
         page.tree_id = 1
+        fake_mptt_attrs(page)
         with self.assertNumQueries(1):
             """
             The query is:
@@ -847,6 +860,7 @@ class ViewPermissionTests(PermissionTestsBase):
             page.pk = 1
             page.level = 0
             page.tree_id = 1
+            fake_mptt_attrs(page)
             self.assertTrue(page.has_view_permission(request))
 
     def test_authed_basic_perm_num_queries(self):
@@ -860,6 +874,7 @@ class ViewPermissionTests(PermissionTestsBase):
             page.pk = 1
             page.level = 0
             page.tree_id = 1
+            fake_mptt_attrs(page)
             with self.assertNumQueries(5):
                 """
                 The queries are:
@@ -879,6 +894,7 @@ class ViewPermissionTests(PermissionTestsBase):
             page.pk = 1
             page.level = 0
             page.tree_id = 1
+            fake_mptt_attrs(page)
             self.assertFalse(page.has_view_permission(request))
 
     def test_unauthed_no_access(self):
@@ -888,6 +904,7 @@ class ViewPermissionTests(PermissionTestsBase):
             page.pk = 1
             page.level = 0
             page.tree_id = 1
+            fake_mptt_attrs(page)
             self.assertFalse(page.has_view_permission(request))
 
     def test_unauthed_no_access_num_queries(self):
@@ -898,6 +915,7 @@ class ViewPermissionTests(PermissionTestsBase):
         page.pk = 1
         page.level = 0
         page.tree_id = 1
+        fake_mptt_attrs(page)
         with self.assertNumQueries(1):
             page.has_view_permission(request)
 
@@ -928,6 +946,7 @@ class ViewPermissionTests(PermissionTestsBase):
             page.pk = 1
             page.level = 0
             page.tree_id = 1
+            fake_mptt_attrs(page)
             self.assertTrue(page.has_view_permission(request))
 
 

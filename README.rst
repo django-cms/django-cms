@@ -6,7 +6,7 @@ A Django application for managing hierarchical pages of content, possibly in
 multiple languages and/or on multiple sites.
 
 Django CMS handles the navigation rendering for you with clean, slug based URLs,
-and this navigation can be extended by custom Django applications
+and this navigation can be extended by custom Django applications.
 
 You can define editable areas, called placeholders, in your templates which you
 can fill with CMS plugins, by default we ship the following plugins:

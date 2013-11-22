@@ -21,6 +21,7 @@ $(document).ready(function () {
 			this.sortables = $('.cms_draggables'); // use global scope
 			this.clipboard = this.toolbar.find('.cms_clipboard');
 			this.dragging = false;
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 
 			// this.dragitems = $('.cms_draggable');
 			this.dropareas = $('.cms_droppable');
@@ -46,15 +47,8 @@ $(document).ready(function () {
 			this._collapsables(placeholders.find('.cms_draggable'));
 
 			// add global collapsable events
-			placeholders.find('.cms_expandmenu').bind('click', function () {
-				var el = $(this);
-				if(el.hasClass('cms_expandmenu-collapsed')) {
-					that._collapseAll(el.closest('.cms_placeholder'));
-					el.removeClass('cms_expandmenu-collapsed');
-				} else {
-					that._expandAll(el.closest('.cms_placeholder'));
-					el.addClass('cms_expandmenu-collapsed');
-				}
+			placeholders.find('.cms_placeholder-title').bind(this.click, function () {
+				($(this).hasClass('cms_placeholder-title-expanded')) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
 
 			// check which button should be shown for collapsemenu
@@ -62,7 +56,7 @@ $(document).ready(function () {
 				var els = $(item).find('.cms_dragitem-collapsable');
 				var open = els.filter('.cms_dragitem-expanded');
 				if(els.length === open.length && (els.length + open.length !== 0)) {
-					$(item).find('.cms_expandmenu').addClass('cms_expandmenu-collapsed');
+					$(item).find('.cms_placeholder-title').addClass('cms_placeholder-title-expanded');
 				}
 			});
 		},
@@ -72,8 +66,18 @@ $(document).ready(function () {
 
 			plugins.bind('mouseover mouseout', function (e) {
 				e.stopPropagation();
-				// add events to placeholder
-				(e.type === 'mouseover') ? that.tooltip.show() : that.tooltip.hide();
+				if(e.type === 'mouseover') {
+					var name = $(this).data('settings').plugin_name;
+					that.tooltip.css('visibility', 'visible').show().find('span').html(name);
+					that.tooltip.data('plugin_id', $(this).data('settings').plugin_id);
+				} else {
+					that.tooltip.css('visibility', 'hidden').hide();
+				}
+			});
+
+			// attach tooltip event for touch devices
+			this.tooltip.bind('touchstart.cms', function () {
+				$('#cms_plugin-' + $(this).data('plugin_id')).trigger('dblclick');
 			});
 		},
 
@@ -213,6 +217,14 @@ $(document).ready(function () {
 				}
 			});
 
+			// attach escape event to cancel dragging
+			$(document).bind('keyup.cms', function(e, cancel){
+				if(e.keyCode === 27 || cancel) {
+					that.state = false;
+					that.sortables.sortable('cancel');
+				}
+			});
+
 			// define droppable helpers
 			this.dropareas.droppable({
 				'greedy': true,
@@ -245,7 +257,7 @@ $(document).ready(function () {
 			var timer = function () {};
 
 			// add remove event
-			remove.bind('click', function (e) {
+			remove.bind(this.click, function (e) {
 				e.preventDefault();
 				CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
 			});
@@ -316,7 +328,7 @@ $(document).ready(function () {
 			var settings = CMS.API.Toolbar.getSettings();
 
 			// attach events to draggable
-			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
+			draggables.find('> .cms_dragitem-collapsable').bind(this.click, function () {
 				var el = $(this);
 				var id = that.getId($(this).parent());
 				var settings = CMS.API.Toolbar.getSettings();
@@ -333,6 +345,11 @@ $(document).ready(function () {
 
 				// save settings
 				CMS.API.Toolbar.setSettings(settings);
+			});
+			// adds double click event
+			draggables.bind('dblclick', function (e) {
+				e.stopPropagation();
+				$('#cms_plugin-' + that.getId($(this))).trigger('dblclick');
 			});
 
 			// removing dublicate entries
@@ -356,46 +373,54 @@ $(document).ready(function () {
 			});
 		},
 
-		_expandAll: function (placeholder) {
-			var items = placeholder.find('.cms_dragitem-collapsable');
-				items.each(function () {
-					if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
-				});
+		_expandAll: function (el) {
+			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			// cancel if there are no items
+			if(!items.length) return false;
+			items.each(function () {
+				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+			});
+
+			el.addClass('cms_placeholder-title-expanded');
 		},
 
-		_collapseAll: function (placeholder) {
-			var items = placeholder.find('.cms_dragitem-collapsable');
-				items.each(function () {
-					if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
-				});
+		_collapseAll: function (el) {
+			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			items.each(function () {
+				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+			});
+
+			el.removeClass('cms_placeholder-title-expanded');
 		},
 
 		_preventEvents: function () {
 			var clicks = 0;
 			var delay = 500;
 			var timer = function () {};
-			var prevent = true;
 
 			// unbind click event if already initialized
-			this.plugins.find('a, button, input[type="submit"], input[type="button"]').bind('click', function (e) {
-				if(prevent) {
-					e.preventDefault();
+			this.plugins.find('a').bind(this.click, function (e) {
+				e.preventDefault();
 
-					// clear timeout after click and increment
-					clearTimeout(timer);
+				// increment
+				clicks++;
 
+				// single click
+				if(clicks === 1) {
 					timer = setTimeout(function () {
-						// if there is only one click use standard event
-						if(clicks === 1) {
-							prevent = false;
-
-							$(e.currentTarget)[0].click();
-						}
-						// reset
 						clicks = 0;
+						// cancel if link contains a hash
+						if($(e.currentTarget).attr('href').indexOf('#') === 0) return false;
+						// we need to redirect to the default behaviours
+						// all events will be lost in edit mode, use '#' if href should not be triggered
+						window.location.href = $(e.currentTarget).attr('href');
 					}, delay);
+				}
 
-					clicks++;
+				// double click
+				if(clicks === 2) {
+					clearTimeout(timer);
+					clicks = 0;
 				}
 			});
 		}
@@ -429,7 +454,7 @@ $(document).ready(function () {
 		},
 
 		initialize: function (container, options) {
-			this.container = $(container);
+			this.container = $('[id="' + container + '"]');
 			this.options = $.extend(true, {}, this.options, options);
 
 			this.body = $(document);
@@ -437,6 +462,7 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 
 			// bind data element to the container
 			this.container.data('settings', this.options);
@@ -510,7 +536,7 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseenter' || e.type === 'mouseover') $(this).data('active', true);
 				if(e.type === 'mouseleave') {
-					 $(this).data('active', false);
+					$(this).data('active', false);
 					allOptions.hide();
 				}
 
@@ -520,6 +546,23 @@ $(document).ready(function () {
 						$(e.currentTarget).find('.cms_submenu:eq(0)').hide();
 					}
 				}, 100);
+			});
+			draggable.find('> .cms_dragitem').bind('mousedown mouseup mousemove', function (e) {
+				if(e.type === 'mousedown') {
+					// start countdown
+					timer = setTimeout(function () {
+						CMS.API.Toolbar._enableEditMode(300);
+						CMS.API.Toolbar.setActive(plugin.data('settings').plugin_id);
+						$(document).bind('mousemove.keypress', function () {
+							$(document).trigger('keyup.cms', [true]);
+							setTimeout(function () {
+								$(document).unbind('mousemove.keypress');
+							}, 1000);
+						});
+					}, 500);
+				} else {
+					clearTimeout(timer);
+				}
 			});
 
 			// update plugin position
@@ -532,13 +575,15 @@ $(document).ready(function () {
 		_setGeneric: function () {
 			var that = this;
 
-			this.container.bind('dblclick', function () {
+			this.container.bind('dblclick', function (e) {
+				e.preventDefault();
 				that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
 			});
 
 			this.container.bind('mouseenter.cms.placeholder mouseleave.cms.placeholder', function (e) {
 				// add tooltip event to every placeholder
-				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show() : CMS.API.Placeholders.tooltip.hide();
+				var name = $(this).data('settings').plugin_name;
+				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show().find('span').html(name) : CMS.API.Placeholders.tooltip.hide();
 			});
 		},
 
@@ -639,7 +684,7 @@ $(document).ready(function () {
 				'source_plugin_id': this.options.plugin_id || '',
 				'source_language': this.options.plugin_language,
 				'target_placeholder_id': CMS.API.Toolbar.options.clipboard,
-				'target_language':  this.options.plugin_language,
+				'target_language': this.options.plugin_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
 
@@ -666,15 +711,19 @@ $(document).ready(function () {
 		_setSubnav: function (nav) {
 			var that = this;
 
-			nav.bind('mouseenter mouseleave', function (e) {
+			nav.bind('mouseenter mouseleave tap.cms', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
 				(e.type === 'mouseenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
 			});
 
-			nav.find('a').bind('click', function (e) {
+			nav.find('a').bind('click.cms tap.cms', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
+
+				// show loader and make sure scroll doesn't jump
+				CMS.API.Toolbar._showLoader(true);
+				CMS.API.Toolbar._disableScroll(false);
 
 				var el = $(this);
 
@@ -689,10 +738,11 @@ $(document).ready(function () {
 					case 'copy':
 						that.copyPlugin();
 						break;
-					case 'stack':
-						// that.stackPlugin();
-						break;
+					/*case 'stack':
+						//that.stackPlugin();
+						break;*/
 					default:
+						CMS.API.Toolbar._showLoader(false);
 						that._delegate(el);
 				}
 			});
@@ -712,13 +762,23 @@ $(document).ready(function () {
 				}
 			});
 
+			// set data attributes
+			nav.find('.cms_submenu-dropdown').each(function () {
+				$(this).data('top', $(this).css('top'))
+			});
+
 			// prevent propagnation
-			nav.bind('click', function (e) {
+			nav.bind(this.click, function (e) {
 				e.stopPropagation();
 			});
 		},
 
 		_showSubnav: function (nav) {
+			var that = this;
+			var dropdown = nav.find('.cms_submenu-dropdown');
+			var offset = parseInt(dropdown.data('top'));
+
+			// clearing
 			clearTimeout(this.timer);
 
 			// add small delay before showing submenu
@@ -736,6 +796,49 @@ $(document).ready(function () {
 				// set visible states
 				nav.find('> .cms_submenu-dropdown').show();
 			}, 100);
+
+			// add key events
+			$(document).unbind('keydown.cms');
+			$(document).bind('keydown.cms', function (e) {
+				var anchors = nav.find('.cms_submenu-item:visible a');
+				var index = anchors.index(anchors.filter(':focus'));
+
+				// bind arrow down and tab keys
+				if(e.keyCode === 40 || e.keyCode === 9) {
+					e.preventDefault();
+					if(index >= 0 && index < anchors.length - 1) {
+						anchors.eq(index + 1).focus();
+					} else {
+						anchors.eq(0).focus();
+					}
+				}
+
+				// bind arrow up keys
+				if(e.keyCode === 38) {
+					e.preventDefault();
+					if(anchors.is(':focus')) {
+						anchors.eq(index - 1).focus();
+					} else {
+						anchors.eq(anchors.length).focus();
+					}
+				}
+
+				// hide subnav when hitting enter or escape
+				if(e.keyCode === 13 || e.keyCode === 27) {
+					that._hideSubnav(nav);
+				}
+			});
+
+			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10) {
+				dropdown.css('top', 'auto');
+				dropdown.css('bottom', offset + 4);
+			} else {
+				dropdown.css('top', offset);
+				dropdown.css('bottom', 'auto');
+			}
+
+			// enable scroll
+			CMS.API.Toolbar._disableScroll(true);
 
 			// set relativity
 			$('.cms_placeholder').css({
@@ -764,44 +867,51 @@ $(document).ready(function () {
 				that._searchSubnav(nav, '');
 			}, this.timeout);
 
+			// enable scroll
+			CMS.API.Toolbar._disableScroll(false);
+
 			// reset relativity
 			$('.cms_placeholder').css('position', '');
 		},
 
 		_searchSubnav: function (nav, value) {
+			var items = nav.find('.cms_submenu-item');
+			var titles = nav.find('.cms_submenu-item-title');
+
+			// cancel if value is zero
+			if(value === '') {
+				items.add(titles).show();
+				return false;
+			}
+
 			// loop through items and figure out if we need to hide items
-			nav.find('.cms_submenu-item a').each(function (index, item) {
-				var text = $(item).text().toLowerCase();
+			items.find('a, span').each(function (index, item) {
+				item = $(item);
+				var text = item.text().toLowerCase();
 				var search = value.toLowerCase();
 
-				(text.indexOf(search) >= 0 || search === '') ? $(this).parent().show() : $(this).parent().hide();
+				(text.indexOf(search) >= 0) ? item.parent().show() : item.parent().hide();
 			});
 
-			// show all titles
-			nav.find('.cms_submenu-item-title').show();
+			// check if a title is matching
+			titles.filter(':visible').each(function (index, item) {
+				titles.hide();
+				$(item).nextUntil('.cms_submenu-item-title').show();
+			});
 
-			// cancel here if there is no value
-			if(value === '') return false;
-
-			// check if any title should be hidden
-			nav.find('.cms_submenu-item').each(function (index, item) {
-				item = $(item);
-				// check if we have a title
-				var title = item.find('span');
-				if(title.length) {
-					var entries = item.nextUntil('.cms_submenu-item-title');
-
-					if(entries.filter(':visible').length === 0) {
-						title.parent().hide();
-					} else {
-						title.parent().show();
-					}
+			// always display title of a category
+			items.filter(':visible').each(function (index, item) {
+				if($(item).prev().hasClass('cms_submenu-item-title')) {
+					$(item).prev().show();
+				} else {
+					$(item).prevUntil('.cms_submenu-item-title').last().prev().show();
 				}
 			});
 
-			// check for empty entries
-			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
-				nav.find('.cms_submenu-item-title:eq(0)').show();
+			// if there is no element visible, show only first categoriy
+			nav.find('.cms_submenu-dropdown').show();
+			if(items.add(titles).filter(':visible').length <= 0) {
+				nav.find('.cms_submenu-dropdown').hide();
 			}
 		},
 

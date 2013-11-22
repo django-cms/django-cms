@@ -352,8 +352,9 @@ HTML tag.
 
 .. _django-sekizai: https://github.com/ojii/django-sekizai 
 
+**********************
 Initial database setup
-======================
+**********************
 
 This command depends on whether you **upgrade** your installation or do a
 **fresh install**. We recommend that you get familiar with the way `South`_ works, 
@@ -361,7 +362,7 @@ as it is a very powerful, easy and convenient tool. django CMS uses it extensive
 
 
 Fresh install
--------------
+=============
 
 Run::
 
@@ -371,9 +372,8 @@ Run::
 The first command will prompt you to create a super user. Choose 'yes' and enter
 appropriate values.
 
-
 Upgrade
--------
+=======
 
 Run::
 
@@ -381,16 +381,18 @@ Run::
     python manage.py migrate
 
 
+******************************
 Check you did everything right
-==============================
+******************************
 
 Now, use the following command to check if you did everything correctly::
 
     python manage.py cms check
 
 
+***************
 Up and running!
-===============
+***************
 
 That should be it. Restart your development server using ``python manage.py runserver`` 
 and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ : you should get 

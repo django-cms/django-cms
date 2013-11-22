@@ -96,7 +96,7 @@ Example::
             'plugin_modules': {
                 'LinkPlugin': 'Extra',
             }.
-            'plugin_labes': {
+            'plugin_labels': {
                 'LinkPlugin': 'Add a link',
             }.
         },
@@ -139,7 +139,7 @@ plugins, as shown above with ``base.html content``.
     A dictionary of plugins and custom module names to group plugin in the
     toolbar UI.
 
-``plugin_labes``
+``plugin_labels``
     A dictionary of plugins and custom labels to show in the toolbar UI.
 
 ``child_classes``
@@ -274,6 +274,12 @@ Example::
     }
 
 .. note:: Make sure you only define languages which are also in :setting:`django:LANGUAGES`.
+
+.. warning::
+
+    Make sure you use **language codes** (`en-us`) and not **locale names**
+    (`en_US`) here and in :setting:`django:LANGUAGES`.
+    Use :ref:`check command <cms-check-command>` to check for correct syntax.
 
 ``CMS_LANGUAGES`` has different options where you can define how different
 languages behave, with granular control.

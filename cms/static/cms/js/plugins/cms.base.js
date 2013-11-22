@@ -42,7 +42,7 @@ $(document).ready(function () {
 
 		// disable multiple form submissions
 		preventSubmit: function () {
-			$('form').submit(function () {
+			$('#cms_toolbar form').submit(function () {
 				// we cannot use disabled as the name action will be ignored
 				$('input[type="submit"]').bind('click', function (e) {
 					e.preventDefault();
@@ -67,3 +67,13 @@ $(document).ready(function () {
 
 });
 })(CMS.$);
+
+// this will be fixed in jQuery 1.6+
+(function ( $ ) {
+    var filters = $.expr[":"];
+    if ( !filters.focus ) {
+        filters.focus = function( elem ) {
+           return elem === document.activeElement && ( elem.type || elem.href );
+        };
+    }
+})( jQuery );

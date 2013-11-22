@@ -122,8 +122,6 @@ class PublisherCommandTests(TestCase):
 
 
 class PublishingTests(TestCase):
-    settings_overrides = {'USE_I18N': False}
-
     def create_page(self, title=None, **kwargs):
         return create_page(title or self._testMethodName,
                            "nav_playground.html", "en", **kwargs)
@@ -430,7 +428,7 @@ class PublishingTests(TestCase):
         child = self.create_page("Child", parent=page, published=True)
         self.create_page("Grandchild", parent=child, published=True)
         page = page.reload()
-        child = child.reload()
+        child.reload()
         drafts = Page.objects.drafts()
         public = Page.objects.public()
         published = Page.objects.public().published()
