@@ -88,7 +88,7 @@ $(document).ready(function () {
 					// start countdown
 					timer = setTimeout(function () {
 						CMS.API.Toolbar._enableDragMode(300);
-						CMS.API.Toolbar.setActive(plugin.data('settings').plugin_id);
+						CMS.API.StructureBoard.setActive(plugin.data('settings').plugin_id);
 					}, 500);
 				} else {
 					clearTimeout(timer);
@@ -130,7 +130,7 @@ $(document).ready(function () {
 					// start countdown
 					timer = setTimeout(function () {
 						CMS.API.Toolbar._enableEditMode(300);
-						CMS.API.Toolbar.setActive(plugin.data('settings').plugin_id);
+						CMS.API.StructureBoard.setActive(plugin.data('settings').plugin_id);
 						$(document).bind('mousemove.keypress', function () {
 							$(document).trigger('keyup.cms', [true]);
 							setTimeout(function () {

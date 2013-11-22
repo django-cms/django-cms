@@ -327,28 +327,6 @@ $(document).ready(function () {
 			});
 		},
 
-		// TODO move this to new
-		setActive: function (id) {
-			// reset active statesdragholders
-			$('.cms_draggable').removeClass('cms_draggable-selected');
-			$('.cms_plugin').removeClass('cms_plugin-active');
-
-			// if false is provided, only remove classes
-			if(id === false) return false;
-
-			// attach active class to current element
-			var dragitem = $('#cms_draggable-' + id);
-			var plugin = $('#cms_plugin-' + id);
-
-			// collapse all previous elements
-			var collapsed = dragitem.parents().siblings().not('.cms_dragitem-expanded');
-				collapsed.trigger(this.click);
-
-			// set new classes
-			dragitem.addClass('cms_draggable-selected');
-			plugin.addClass('cms_plugin-active');
-		},
-
 		showError: function (msg) {
 			this.openMessage(msg, 'center', this.options.messageDelay, true);
 		},
