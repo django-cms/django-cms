@@ -595,11 +595,7 @@ $(document).ready(function () {
 		},
 
 		_getIds: function (els) {
-			var array = [];
-			els.each(function () {
-				array.push(CMS.API.StructureBoard.getId($(this)));
-			});
-			return array;
+			return CMS.API.StructureBoard.getIds(els);
 		},
 
 		_showError: function (msg) {

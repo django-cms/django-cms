@@ -46,6 +46,15 @@ $(document).ready(function () {
 			return id;
 		},
 
+		getIds: function (els) {
+			var that = this;
+			var array = [];
+			els.each(function () {
+				array.push(that.getId($(this)));
+			});
+			return array;
+		},
+
 		// private methods
 		_drag: function () {
 			var that = this;
