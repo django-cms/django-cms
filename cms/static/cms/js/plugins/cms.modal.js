@@ -76,6 +76,7 @@ $(document).ready(function () {
 			});
 		},
 
+		// public methods
 		open: function (url, name, breadcrumb) {
 			// show loader
 			CMS.API.Toolbar._loader(true);
@@ -125,6 +126,7 @@ $(document).ready(function () {
 			this._hide(100);
 		},
 
+		// private methods
 		_show: function (speed) {
 			// we need to position the modal in the center
 			var that = this;

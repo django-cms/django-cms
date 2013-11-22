@@ -14,8 +14,9 @@
 {% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.modal.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.sideframe.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.clipboard.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.plugins.js" %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.structureboard.js" %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.toolbar.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.placeholders.js" %}"></script>{% endaddtoblock %}
 
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/plugins/cms.toolbar.css" %}" />{% endaddtoblock %}
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/plugins/cms.placeholders.css" %}" />{% endaddtoblock %}
@@ -42,19 +43,18 @@ $(document).ready(function () {
 			'version': '{{ cms_version }}',
 			'toolbar': 'expanded',
 			'mode': 'edit'
-		}
+		},
+		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}'
 	};
 
-	// initialize toolbar and pass required options
-	CMS.API.Toolbar = new CMS.Toolbar({
-		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}'
+	// extend API
+	$.extend(CMS.API, {
+		'Toolbar': new CMS.Toolbar(),
+		'StructureBoard': new CMS.StructureBoard(),
+		'Clipboard': new CMS.Clipboard()
 	});
 
-	CMS.API.Clipboard = new CMS.Clipboard({ 'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}' });
-
-	// initialize placeholder helpers
-	CMS.API.Placeholders = new CMS.Placeholders('.cms_placeholder', '.cms_plugin');
-
+	// TODO move this to toolbar initializer
 	// open django messages if provided
 	{% if messages %}CMS.API.Toolbar.openMessage('{% for message in messages %}{{ message }}{% endfor %}');{% endif %}
 

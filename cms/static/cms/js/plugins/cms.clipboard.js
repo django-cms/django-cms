@@ -23,6 +23,7 @@ $(document).ready(function () {
 			this._setup();
 		},
 
+		// private methods
 		_setup: function () {
 			var that = this;
 			var remove = this.clipboard.find('.cms_clipboard-empty a');

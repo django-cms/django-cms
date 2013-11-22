@@ -87,6 +87,7 @@ $(document).ready(function () {
 			});
 		},
 
+		// public methods
 		open: function (url, animate) {
 			// prepare iframe
 			var that = this;
@@ -160,6 +161,7 @@ $(document).ready(function () {
 			this.setSettings(this.settings);
 		},
 
+		// private methods
 		_show: function (width, animate) {
 			// add class
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
