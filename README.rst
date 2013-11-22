@@ -16,18 +16,18 @@ Open source enterprise content management system based on the django framework.
 Features
 ********
 
--* Hierarchical pages
--* Extensive support for multilingual websites
--* Multi site support
--* Draft/Published workflows
--* Undo/Redo
--* Use the content blocks (placeholders) in your own apps (models)
--* Use the content blocks (stacks) anywhere in your templates
--* Edit the content in the frontend directly on your pages
--* Hierarchical content plugins (columns, style changes etc)
--* Navigation rendering and extending from your apps
--* SEO friendly urls
--* Highly integrative into your own apps
+* Hierarchical pages
+* Extensive support for multilingual websites
+* Multi site support
+* Draft/Published workflows
+* Undo/Redo
+* Use the content blocks (placeholders) in your own apps (models)
+* Use the content blocks (stacks) anywhere in your templates
+* Edit the content in the frontend directly on your pages
+* Hierarchical content plugins (columns, style changes etc)
+* Navigation rendering and extending from your apps
+* SEO friendly urls
+* Highly integrative into your own apps
 
 
 You can define editable areas, called placeholders, in your templates which you fill
