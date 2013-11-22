@@ -61,7 +61,7 @@ $(document).ready(function () {
 				e.preventDefault();
 				that._maximize();
 			});
-			this.modal.find('.cms_modal-breadcrumb-items a').live(this.click, function (e) {
+			this.modal.find('.cms_modal-breadcrumb-items').on(this.click, 'a', function (e) {
 				e.preventDefault();
 				that._changeContent($(this));
 			});
