@@ -140,7 +140,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
         self.assertContains(response, '<div id="cms_toolbar"')
-        self.assertContains(response, 'cms.placeholders.js')
+        self.assertContains(response, 'cms.plugins.js')
         self.assertContains(response, 'cms.placeholders.css')
 
     def test_markup_generic_module(self):
