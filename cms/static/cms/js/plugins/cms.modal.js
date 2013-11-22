@@ -15,8 +15,9 @@ $(document).ready(function () {
 			'modalDuration': 300,
 			'urls': {
 				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
-			}
-			// TODO add modalWidth and modalHeight minimum
+			},
+			'minHeight': 400,
+			'minWidth': 600
 		},
 
 		initialize: function (options) {
@@ -107,9 +108,13 @@ $(document).ready(function () {
 				'margin-right': 0
 			});
 			// lets set the modal width and height to the size of the browser
+			var widthOffset = 300;
+			var heightOffset = 350;
+			var width = ($(window).width() >= this.options.minWidth + widthOffset) ? $(window).width() - widthOffset : this.options.minWidth;
+			var height = ($(window).height() >= this.options.minHeight + heightOffset) ? $(window).height() - heightOffset : this.options.minHeight;
 			this.modal.find('.cms_modal-body').css({
-				'width': $(window).width() - 300,
-				'height': $(window).height() - 350
+				'width': width,
+				'height': height
 			});
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 			this.modal.find('.cms_modal-maximize').removeClass('cms_modal-maximize-active');
