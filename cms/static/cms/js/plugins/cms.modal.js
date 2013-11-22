@@ -1,5 +1,5 @@
 /*##################################################|*/
-/* #CMS.TOOLBAR# */
+/* #CMS# */
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {

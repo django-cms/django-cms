@@ -1,12 +1,11 @@
 /*##################################################|*/
-/* #CMS.PLACEHOLDERS# */
+/* #CMS# */
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
 	/*!
 	 * Placeholders
-	 * @version: 2.0.0
-	 * @description: Adds one-time placeholder handling
+	 * Adds one-time placeholder handling
 	 */
 	CMS.Placeholders = new CMS.Class({
 
@@ -403,8 +402,7 @@ $(document).ready(function () {
 
 	/*!
 	 * PlaceholderItem
-	 * @version: 2.0.0
-	 * @description: Adds individual handling
+	 * Adds individual handling
 	 */
 	CMS.PlaceholderItem = new CMS.Class({
 
