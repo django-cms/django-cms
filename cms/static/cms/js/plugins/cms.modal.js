@@ -78,7 +78,7 @@ $(document).ready(function () {
 
 		open: function (url, name, breadcrumb) {
 			// show loader
-			CMS.API.Toolbar._showLoader(true);
+			CMS.API.Toolbar._loader(true);
 
 			// hide tooltip
 			this.hideTooltip();
@@ -154,7 +154,7 @@ $(document).ready(function () {
 				that.modal.show();
 
 				// hide loader
-				CMS.API.Toolbar._showLoader(false);
+				CMS.API.Toolbar._loader(false);
 			});
 
 			// prevent scrolling
@@ -450,7 +450,7 @@ $(document).ready(function () {
 
 			// now refresh the content
 			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
-				iframe.hide();
+				iframe.css('visibility', 'hidden');
 			var holder = this.modal.find('.cms_modal-frame');
 
 			// set correct title
@@ -458,7 +458,7 @@ $(document).ready(function () {
 				title.html(name || '&nbsp;');
 
 			// insure previous iframe is hidden
-			holder.find('iframe').hide();
+			holder.find('iframe').css('visibility', 'hidden');
 
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
@@ -486,7 +486,7 @@ $(document).ready(function () {
 				that._setButtons($(this));
 
 				// than show
-				iframe.show();
+				iframe.css('visibility','visible');
 
 				// append ready state
 				iframe.data('ready', true);

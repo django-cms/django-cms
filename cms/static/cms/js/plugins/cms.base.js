@@ -24,9 +24,7 @@ var CMS = {
 $(document).ready(function () {
 	/*!
 	 * CNS.API.Helpers
-	 * @version: 1.0.0
-	 * @public_methods:
-	 *	- CMS.API.Helpers.reloadBrowser();
+	 * Multiple helpers used accross all CMS features
 	 */
 	CMS.API.Helpers = {
 
@@ -138,6 +136,7 @@ $(document).ready(function () {
 			CMS.API.Helpers.reloadBrowser();
 		},
 
+		// prevents scrolling when another scrollbar is used (for better ux)
 		preventScroll: function (disable) {
 			// cancel if scrollbar is not visible
 			if($(document).height() <= $(window).height()) return false;

@@ -698,7 +698,7 @@ $(document).ready(function () {
 				e.stopPropagation();
 
 				// show loader and make sure scroll doesn't jump
-				CMS.API.Toolbar._showLoader(true);
+				CMS.API.Toolbar._loader(true);
 				this.preventScroll(false);
 
 				var el = $(this);
@@ -718,7 +718,7 @@ $(document).ready(function () {
 						//that.stackPlugin();
 						break;*/
 					default:
-						CMS.API.Toolbar._showLoader(false);
+						CMS.API.Toolbar._loader(false);
 						that._delegate(el);
 				}
 			});

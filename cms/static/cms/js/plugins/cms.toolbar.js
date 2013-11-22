@@ -5,8 +5,7 @@
 $(document).ready(function () {
 	/*!
 	 * Toolbar
-	 * @version: 2.0.0
-	 * @description: Adds toolbar, sideframe, messages
+	 * Handles all features related to the toolbar
 	 */
 	CMS.Toolbar = new CMS.Class({
 
@@ -317,6 +316,7 @@ $(document).ready(function () {
 			});
 		},
 
+		// TODO move this to new
 		setActive: function (id) {
 			// reset active statesdragholders
 			$('.cms_draggable').removeClass('cms_draggable-selected');
@@ -371,6 +371,7 @@ $(document).ready(function () {
 			if(!init) this.setSettings(this.settings);
 		},
 
+		// TODO should be one function _setModes or so
 		_enableEditMode: function (speed, init) {
 			this.bars.hide();
 			this.plugins.stop(true, true).fadeIn(speed);
@@ -472,6 +473,7 @@ $(document).ready(function () {
 			}
 		},
 
+		// TODO figure out if this still works correctly
 		_reset: function () {
 			// reset sideframe settings
 			CMS.config.settings.sideframe = {
@@ -493,7 +495,7 @@ $(document).ready(function () {
 			}
 		},
 
-		_showLoader: function (loader) {
+		_loader: function (loader) {
 			if(loader) {
 				this.toolbarTrigger.addClass('cms_toolbar-loader');
 			} else {
