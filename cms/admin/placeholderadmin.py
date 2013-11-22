@@ -110,6 +110,17 @@ class FrontendEditableAdmin(object):
             return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
         return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        response = super(FrontendEditableAdmin, self).change_view(request, object_id, form_url, extra_context)
+        if response.status_code == 302 and response._headers['location'][1] == reverse('admin:%s_%s_changelist' % (self.model._meta.app_label, self.model._meta.module_name)):
+            context = {
+                'plugin': None,
+                'plugin_id': None,
+                'is_popup': True,
+            }
+            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+        return response
+
 
 class PlaceholderAdmin(ModelAdmin):
     def get_urls(self):
