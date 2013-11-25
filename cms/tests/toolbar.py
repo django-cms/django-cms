@@ -140,7 +140,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
         self.assertContains(response, '<div id="cms_toolbar"')
-        self.assertContains(response, 'cms.placeholders.js')
+        self.assertContains(response, 'cms.plugins.js')
         self.assertContains(response, 'cms.placeholders.css')
 
     def test_markup_generic_module(self):
@@ -248,7 +248,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=False)
         response = detail_view(request, ex1.pk)
         self.assertContains(response, "<h1>char_1</h1>")
-        self.assertNotContains(response, "CMS.API.Toolbar")
+        self.assertNotContains(response, "CMS.API")
 
     def test_noedit(self):
         user = self.get_staff()
@@ -259,7 +259,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=False)
         response = detail_view(request, ex1.pk)
         self.assertContains(response, "<h1>char_1</h1>")
-        self.assertContains(response, "CMS.API.Toolbar")
+        self.assertContains(response, "CMS.API")
 
     def test_edit(self):
         user = self.get_staff()
