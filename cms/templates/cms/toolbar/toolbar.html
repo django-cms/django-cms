@@ -40,7 +40,8 @@ $(document).ready(function () {
 			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
 			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
 			'cancel': {% javascript_string %}{% trans "Cancel" %}{% end_javascript_string %},
-			'debug': {% javascript_string %}{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}{% end_javascript_string %}
+			'debug': {% javascript_string %}{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}{% end_javascript_string %},
+			'text': '{% trans "Text" %}' // for detecting the text plugin
 		}
 	});
 
@@ -183,7 +184,7 @@ $(document).ready(function () {
 	<!-- end: modal -->
 
 	<!-- start: placeholder -->
-	<div class="cms_placeholders-tooltip">Double-click to edit<span></span></div>
+	<div class="cms_placeholders-tooltip">{% trans "Double-click to edit" %}<span></span></div>
 	<!-- end: placeholder -->
 </div>
 

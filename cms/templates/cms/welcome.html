@@ -63,7 +63,7 @@
 	if(window.CMS !== undefined) {
 		CMS.$('#add-page').bind('click', function (e) {
 			e.preventDefault();
-			CMS.API.Toolbar.openModal('{% url "admin:cms_page_add" %}?title=Home', 'Add page');
+			CMS.API.Toolbar.openSideframe('{% url "admin:cms_page_add" %}?title=Home', true);
 			CMS.API.Toolbar.closeModal = function () {
 				CMS.API.Helpers.reloadBrowser();
 			};

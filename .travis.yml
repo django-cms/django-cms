@@ -19,10 +19,15 @@ before_script:
 install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
-    - pip install -q -r "test_requirements/django-$DJANGO.txt" --use-mirrors
-    - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python --use-mirrors; fi
+    - pip install -q -r "test_requirements/django-$DJANGO.txt" 
+    - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install -q psycopg2 ; fi
+    - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python ; fi
 script:
-    python develop.py test --migrate
+    coverage run --rcfile=.coverage.rc develop.py test --migrate
+
+after_success:
+    coveralls --config_file=.coverage.rc --coveralls_yaml=.coveralls.yml
+
 notifications:
     email:
         recipients:

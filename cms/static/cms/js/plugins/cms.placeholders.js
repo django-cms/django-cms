@@ -21,6 +21,7 @@ $(document).ready(function () {
 			this.sortables = $('.cms_draggables'); // use global scope
 			this.clipboard = this.toolbar.find('.cms_clipboard');
 			this.dragging = false;
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 
 			// this.dragitems = $('.cms_draggable');
 			this.dropareas = $('.cms_droppable');
@@ -46,7 +47,7 @@ $(document).ready(function () {
 			this._collapsables(placeholders.find('.cms_draggable'));
 
 			// add global collapsable events
-			placeholders.find('.cms_placeholder-title').bind('click', function () {
+			placeholders.find('.cms_placeholder-title').bind(this.click, function () {
 				($(this).hasClass('cms_placeholder-title-expanded')) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
 
@@ -65,13 +66,18 @@ $(document).ready(function () {
 
 			plugins.bind('mouseover mouseout', function (e) {
 				e.stopPropagation();
-
 				if(e.type === 'mouseover') {
 					var name = $(this).data('settings').plugin_name;
-					that.tooltip.show().find('span').text(name);
+					that.tooltip.css('visibility', 'visible').show().find('span').html(name);
+					that.tooltip.data('plugin_id', $(this).data('settings').plugin_id);
 				} else {
-					that.tooltip.hide();
+					that.tooltip.css('visibility', 'hidden').hide();
 				}
+			});
+
+			// attach tooltip event for touch devices
+			this.tooltip.bind('touchstart.cms', function () {
+				$('#cms_plugin-' + $(this).data('plugin_id')).trigger('dblclick');
 			});
 		},
 
@@ -251,7 +257,7 @@ $(document).ready(function () {
 			var timer = function () {};
 
 			// add remove event
-			remove.bind('click', function (e) {
+			remove.bind(this.click, function (e) {
 				e.preventDefault();
 				CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
 			});
@@ -322,7 +328,7 @@ $(document).ready(function () {
 			var settings = CMS.API.Toolbar.getSettings();
 
 			// attach events to draggable
-			draggables.find('> .cms_dragitem-collapsable').bind('click', function () {
+			draggables.find('> .cms_dragitem-collapsable').bind(this.click, function () {
 				var el = $(this);
 				var id = that.getId($(this).parent());
 				var settings = CMS.API.Toolbar.getSettings();
@@ -372,7 +378,7 @@ $(document).ready(function () {
 			// cancel if there are no items
 			if(!items.length) return false;
 			items.each(function () {
-				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
 			el.addClass('cms_placeholder-title-expanded');
@@ -381,7 +387,7 @@ $(document).ready(function () {
 		_collapseAll: function (el) {
 			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
 			items.each(function () {
-				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click');
+				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
 			el.removeClass('cms_placeholder-title-expanded');
@@ -393,7 +399,7 @@ $(document).ready(function () {
 			var timer = function () {};
 
 			// unbind click event if already initialized
-			this.plugins.find('a').bind('click', function (e) {
+			this.plugins.find('a').bind(this.click, function (e) {
 				e.preventDefault();
 
 				// increment
@@ -448,7 +454,7 @@ $(document).ready(function () {
 		},
 
 		initialize: function (container, options) {
-			this.container = $(container);
+			this.container = $('[id="' + container + '"]');
 			this.options = $.extend(true, {}, this.options, options);
 
 			this.body = $(document);
@@ -456,6 +462,7 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 
 			// bind data element to the container
 			this.container.data('settings', this.options);
@@ -575,7 +582,8 @@ $(document).ready(function () {
 
 			this.container.bind('mouseenter.cms.placeholder mouseleave.cms.placeholder', function (e) {
 				// add tooltip event to every placeholder
-				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show() : CMS.API.Placeholders.tooltip.hide();
+				var name = $(this).data('settings').plugin_name;
+				(e.type === 'mouseenter') ? CMS.API.Placeholders.tooltip.show().find('span').html(name) : CMS.API.Placeholders.tooltip.hide();
 			});
 		},
 
@@ -703,13 +711,13 @@ $(document).ready(function () {
 		_setSubnav: function (nav) {
 			var that = this;
 
-			nav.bind('mouseenter mouseleave', function (e) {
+			nav.bind('mouseenter mouseleave tap.cms', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
 				(e.type === 'mouseenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
 			});
 
-			nav.find('a').bind('click', function (e) {
+			nav.find('a').bind('click.cms tap.cms', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
 
@@ -754,13 +762,23 @@ $(document).ready(function () {
 				}
 			});
 
+			// set data attributes
+			nav.find('.cms_submenu-dropdown').each(function () {
+				$(this).data('top', $(this).css('top'))
+			});
+
 			// prevent propagnation
-			nav.bind('click', function (e) {
+			nav.bind(this.click, function (e) {
 				e.stopPropagation();
 			});
 		},
 
 		_showSubnav: function (nav) {
+			var that = this;
+			var dropdown = nav.find('.cms_submenu-dropdown');
+			var offset = parseInt(dropdown.data('top'));
+
+			// clearing
 			clearTimeout(this.timer);
 
 			// add small delay before showing submenu
@@ -778,6 +796,46 @@ $(document).ready(function () {
 				// set visible states
 				nav.find('> .cms_submenu-dropdown').show();
 			}, 100);
+
+			// add key events
+			$(document).unbind('keydown.cms');
+			$(document).bind('keydown.cms', function (e) {
+				var anchors = nav.find('.cms_submenu-item:visible a');
+				var index = anchors.index(anchors.filter(':focus'));
+
+				// bind arrow down and tab keys
+				if(e.keyCode === 40 || e.keyCode === 9) {
+					e.preventDefault();
+					if(index >= 0 && index < anchors.length - 1) {
+						anchors.eq(index + 1).focus();
+					} else {
+						anchors.eq(0).focus();
+					}
+				}
+
+				// bind arrow up keys
+				if(e.keyCode === 38) {
+					e.preventDefault();
+					if(anchors.is(':focus')) {
+						anchors.eq(index - 1).focus();
+					} else {
+						anchors.eq(anchors.length).focus();
+					}
+				}
+
+				// hide subnav when hitting enter or escape
+				if(e.keyCode === 13 || e.keyCode === 27) {
+					that._hideSubnav(nav);
+				}
+			});
+
+			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10) {
+				dropdown.css('top', 'auto');
+				dropdown.css('bottom', offset + 4);
+			} else {
+				dropdown.css('top', offset);
+				dropdown.css('bottom', 'auto');
+			}
 
 			// enable scroll
 			CMS.API.Toolbar._disableScroll(true);
@@ -817,39 +875,43 @@ $(document).ready(function () {
 		},
 
 		_searchSubnav: function (nav, value) {
+			var items = nav.find('.cms_submenu-item');
+			var titles = nav.find('.cms_submenu-item-title');
+
+			// cancel if value is zero
+			if(value === '') {
+				items.add(titles).show();
+				return false;
+			}
+
 			// loop through items and figure out if we need to hide items
-			nav.find('.cms_submenu-item a').each(function (index, item) {
-				var text = $(item).text().toLowerCase();
+			items.find('a, span').each(function (index, item) {
+				item = $(item);
+				var text = item.text().toLowerCase();
 				var search = value.toLowerCase();
 
-				(text.indexOf(search) >= 0 || search === '') ? $(this).parent().show() : $(this).parent().hide();
+				(text.indexOf(search) >= 0) ? item.parent().show() : item.parent().hide();
 			});
 
-			// show all titles
-			nav.find('.cms_submenu-item-title').show();
+			// check if a title is matching
+			titles.filter(':visible').each(function (index, item) {
+				titles.hide();
+				$(item).nextUntil('.cms_submenu-item-title').show();
+			});
 
-			// cancel here if there is no value
-			if(value === '') return false;
-
-			// check if any title should be hidden
-			nav.find('.cms_submenu-item').each(function (index, item) {
-				item = $(item);
-				// check if we have a title
-				var title = item.find('span');
-				if(title.length) {
-					var entries = item.nextUntil('.cms_submenu-item-title');
-
-					if(entries.filter(':visible').length === 0) {
-						title.parent().hide();
-					} else {
-						title.parent().show();
-					}
+			// always display title of a category
+			items.filter(':visible').each(function (index, item) {
+				if($(item).prev().hasClass('cms_submenu-item-title')) {
+					$(item).prev().show();
+				} else {
+					$(item).prevUntil('.cms_submenu-item-title').last().prev().show();
 				}
 			});
 
-			// check for empty entries
-			if(nav.find('.cms_submenu-item-title').filter(':visible').length === 0) {
-				nav.find('.cms_submenu-item-title:eq(0)').show();
+			// if there is no element visible, show only first categoriy
+			nav.find('.cms_submenu-dropdown').show();
+			if(items.add(titles).filter(':visible').length <= 0) {
+				nav.find('.cms_submenu-dropdown').hide();
 			}
 		},
 

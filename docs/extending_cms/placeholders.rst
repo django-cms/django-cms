@@ -58,6 +58,11 @@ placeholder (configuration is the same as for placeholders in the CMS) or you ca
     ``'+'`` to allow the cms to check permissions properly. Attempting to do
     so will raise a :exc:`ValueError`.
 
+.. note::
+
+    If you add a PlaceholderField to an existing model, you'll be able to see
+    the placeholder on the frontend editor only after saving each instance.
+
 
 Admin Integration
 =================

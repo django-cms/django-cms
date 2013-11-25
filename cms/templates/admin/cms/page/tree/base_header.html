@@ -24,3 +24,8 @@
 	</ul>
 </div>
 </div>
+
+{% if not cl.get_items %}
+<br />
+<p class="sitemap-noentry">{% blocktrans %}<em>There is no page around yet.</em><br /><a href="add/" class="addlink">Add page</a> now.{% endblocktrans %}</p>
+{% endif %}
