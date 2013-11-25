@@ -29,9 +29,6 @@ Usage:
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
-    develop.py schemamigration
-    develop.py migrate
-    develop.py datamigration
 
 Options:
     -h --help                   Show this screen.
