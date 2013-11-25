@@ -67,7 +67,7 @@ def get_site_id(site):
         return site.id
     try:
         return int(site)
-    except TypeError:
+    except (TypeError, ValueError):
         pass
     return settings.SITE_ID
 
