@@ -44,7 +44,8 @@ def assign_plugins(request, placeholders, lang=None):
         return
     lang = lang or get_language_from_request(request)
     request_lang = lang
-    if hasattr(request, "current_page") and request.current_page is not None:
+    if hasattr(request, "current_page") and not request.current_page == None:
+        # == is required since request.current_page may be a SimpleLazyObject
         languages = request.current_page.get_languages()
         if not lang in languages and not get_redirect_on_fallback(lang):
             fallbacks = get_fallback_languages(lang)
@@ -55,7 +56,7 @@ def assign_plugins(request, placeholders, lang=None):
                     # get all plugins for the given placeholders
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
         'placeholder', 'tree_id', 'level', 'position')
-    plugin_list = downcast_plugins(qs)
+    plugin_list = downcast_plugins(qs, placeholders)
 
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
@@ -84,7 +85,7 @@ def build_plugin_tree(plugin_list):
     return root
 
 
-def downcast_plugins(queryset, select_placeholder=False):
+def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
 
@@ -102,6 +103,11 @@ def downcast_plugins(queryset, select_placeholder=False):
         # downcasted versions
         for instance in plugin_qs:
             plugin_lookup[instance.pk] = instance
+            # cache the placeholder
+            if placeholders:
+                for pl in placeholders:
+                    if instance.placeholder_id == pl.pk:
+                        instance.placeholder = pl
             # make the equivalent list of qs, but with downcasted instances
     plugin_list = [plugin_lookup[p.pk] for p in queryset if p.pk in plugin_lookup]
     return plugin_list

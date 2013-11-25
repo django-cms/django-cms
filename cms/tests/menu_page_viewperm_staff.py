@@ -5,6 +5,10 @@ from cms.tests.menu_page_viewperm import ViewPermissionTests
 
 from django.contrib.auth.models import  User
 
+__all__ = [
+    'ViewPermissionComplexMenuStaffNodeTests',
+]
+
 
 class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
     """

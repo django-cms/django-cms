@@ -4,7 +4,7 @@
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.PlaceholderItem('#cms_plugin-{{ instance.pk|unlocalize }}', {
+	new CMS.PlaceholderItem('cms_plugin-{{ instance.pk|unlocalize }}', {
 		'type': 'plugin',
 		'page_language': '{{ LANGUAGE_CODE }}',
 		'placeholder_id': '{{ instance.placeholder_id|unlocalize }}',

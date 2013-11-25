@@ -83,12 +83,13 @@ class PagesTestCase(CMSTestCase):
         }
         page = create_page(**page_data)
 
-        self.assertFalse(page.is_home(), "The page should not be marked as "
+        self.assertFalse(page.is_home, "The page should not be marked as "
                                          "home before being published")
         page.publish(settings.LANGUAGES[0][0])
-
-        assert page.is_home()
-        assert page.publisher_public.is_home()
+        page = page.reload()
+        assert Page.objects.count() == 2
+        assert page.is_home
+        assert page.publisher_public.is_home
 
         self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
         self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
@@ -389,6 +390,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page1.get_path(), page_data1['slug'])
             page2 = Page.objects.get(pk=page2.pk)
             # Check that page2 is now at the root of the tree
+            self.assertTrue(page2.is_home)
             self.assertEqual(page2.get_path(), '')
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data3['slug'])

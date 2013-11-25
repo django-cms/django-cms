@@ -328,19 +328,26 @@ class PagePermissionManager(BasicPagePermissionManager):
         """
         # permissions should be managed on the draft page only
         page = page.get_draft_object()
-        from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, \
-            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE
+        from cms.models import (ACCESS_DESCENDANTS, ACCESS_CHILDREN,
+            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE)
 
-        parents = Q(page__tree_id=page.tree_id, page__lft__lte=page.lft, page__rght__gte=page.rght) & (
+        if page.level is None or page.lft is None or page.rght is None:
+            raise ValueError("Cannot use unsaved page for permission lookup, missing MPTT attributes.")
+
+        parents = Q(page__tree_id=page.tree_id) & (
             Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
         direct_parents = Q(
             page__tree_id=page.tree_id,
-            page__lft__lte=page.lft,
-            page__rght__gte=page.rght,
-            page__level=page.level - 1) & \
-            (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
+            page__level=page.level - 1) & (
+                Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)
+            )
         page_qs = Q(page=page) & (
             Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) | Q(grant_on=ACCESS_PAGE))
+
+        parents = parents & Q(page__lft__lte=page.lft)
+        direct_parents = direct_parents & Q(page__lft__lte=page.lft)
+        parents = parents & Q(page__rght__gte=page.rght)
+        direct_parents = direct_parents & Q(page__rght__gte=page.rght)
 
         query = (parents | direct_parents | page_qs)
         return self.filter(query).order_by('page__level')

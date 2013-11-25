@@ -4,7 +4,7 @@ from cms import constants
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
-from cms.exceptions import NoHomeFound, PublicIsUnmodifiable, PublicVersionNeeded
+from cms.exceptions import PublicIsUnmodifiable
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -57,6 +57,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
+    is_home = models.BooleanField(editable=False, db_index=True)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
 
@@ -518,6 +519,21 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 pl.cmsplugin_set.filter(language=language).delete()
             public_page.published_languages = self.published_languages
             public_page.save()
+
+            # Go through all children of our public instance
+            descendants = public_page.get_descendants()
+            for child in descendants:
+                child.published = False
+                child.save()
+                draft = child.publisher_public
+                if (draft and draft.published and
+                        draft.publisher_state == Page.PUBLISHER_STATE_DEFAULT):
+                    draft.publisher_state = Page.PUBLISHER_STATE_PENDING
+                    draft._publisher_keep_state = True
+                    draft.save()
+        from cms.signals import post_unpublish
+        post_unpublish.send(sender=Page, instance=self)
+        #post_unpublish.send(sender=Page, instance=public_page)
         return True
 
     def revert(self, language):

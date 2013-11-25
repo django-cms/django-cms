@@ -117,10 +117,6 @@ class CMSChangeList(ChangeList):
         root_pages = []
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
-        try:
-            home_pk = Page.objects.drafts().get_home(site).pk
-        except NoHomeFound:
-            home_pk = 0
 
         # page moderator states
         pm_qs = PageModeratorState.objects.filter(page__in=pages).order_by('page')
@@ -169,8 +165,7 @@ class CMSChangeList(ChangeList):
                     page.get_cached_ancestors(ascending=True)
                 else:
                     page.ancestors_ascending = []
-                page.home_pk_cache = home_pk
-            
+
             # Because 'children' is the reverse-FK accessor for the 'parent'
             # FK from Page->Page, we have to use wrong English here and set
             # an attribute called 'childrens'. We are aware that this is WRONG

@@ -56,13 +56,13 @@ class DumbFixturePlugin(CMSPluginBase):
 class DumbFixturePluginWithUrls(DumbFixturePlugin):
     name = DumbFixturePlugin.name + " With custom URLs."
 
-    def test_view(self, request):
+    def _test_view(self, request):
         return http.HttpResponse("It works")
 
     def get_plugin_urls(self):
         from django.conf.urls.defaults import patterns, url
         return patterns('',
-            url(r'^testview/$', admin.site.admin_view(self.test_view), name='dumbfixtureplugin'),
+            url(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
         )
 plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 

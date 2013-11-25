@@ -122,8 +122,6 @@ class PublisherCommandTests(TestCase):
 
 
 class PublishingTests(TestCase):
-    settings_overrides = {'USE_I18N': False}
-
     def create_page(self, title=None, **kwargs):
         return create_page(title or self._testMethodName,
                            "nav_playground.html", "en", **kwargs)
@@ -168,7 +166,7 @@ class PublishingTests(TestCase):
 
     def test_publish_admin(self):
         page = self.create_page("test_admin", published=False)
-        page.save()
+        #page.save()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
@@ -357,6 +355,8 @@ class PublishingTests(TestCase):
         gc = self.reload(gc)
 
         self.assertTrue(child.publisher_public_id)
+        self.assertTrue(gc.published)
+        self.assertTrue(child.publisher_public.published)
         self.assertTrue(gc.publisher_public_id)
         self.assertEqual(child.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
         self.assertEqual(gc.publisher_state, Page.PUBLISHER_STATE_DEFAULT)
@@ -382,6 +382,8 @@ class PublishingTests(TestCase):
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
         self.assertTrue(dirty1.publisher_public_id)
+        self.assertTrue(dirty2.published)
+        self.assertTrue(dirty1.publisher_public.published)
         self.assertTrue(dirty2.publisher_public_id)
         self.assertEqual(dirty1.publisher_state, Page.PUBLISHER_STATE_DIRTY)
         self.assertEqual(dirty2.publisher_state, Page.PUBLISHER_STATE_DIRTY)
@@ -421,7 +423,7 @@ class PublishingTests(TestCase):
         child = self.create_page("Child", parent=page, published=True)
         self.create_page("Grandchild", parent=child, published=True)
         page = page.reload()
-        child = child.reload()
+        child.reload()
         drafts = Page.objects.drafts()
         public = Page.objects.public()
         published = Page.objects.public().published()

@@ -96,7 +96,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 6, admin_items)
+        self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
@@ -106,7 +106,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 3)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 8, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -213,7 +213,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 6, admin_items)
+        self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_button_consistency_staff(self):
         """
@@ -270,6 +270,40 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk)
         self.assertContains(response, '<h1><span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic">char_1</span></h1>' % (ex1.pk, 'char_1'))
+
+    def test_invalid_item(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model fake "char_1" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<span id="cms_placeholder-model--%s-" class="cms_placeholder-generic"></span>' % ex1.pk)
+
+    def test_invalid_attribute(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load placeholder_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "fake_field" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<span id="cms_placeholder-model-placeholderapp-%s-%s" class="cms_placeholder-generic"></span>' % (ex1.pk, 'fake_field'))
 
     def test_callable_item(self):
         user = self.get_staff()
