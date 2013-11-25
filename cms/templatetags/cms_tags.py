@@ -549,6 +549,9 @@ class CMSToolbar(Tag):
     )
 
     def render_tag(self, context, nodelist):
+        # render JS
+        context['cms_version'] = __version__
+        js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
         # render everything below the tag
         rendered_contents = nodelist.render(context)
         # sanity checks
@@ -564,7 +567,7 @@ class CMSToolbar(Tag):
         language = request.toolbar.language
         with force_language(language):
             request.toolbar.populate()
-            context['cms_version'] = __version__
+
             content = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below
         return '%s\n%s' % (content, rendered_contents)
