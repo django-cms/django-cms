@@ -1,26 +1,24 @@
 {% load i18n l10n sekizai_tags admin_static %}
 
-{% addtoblock "js" %}
-<script type="text/javascript">
-	var _jQuery = window.jQuery || undefined;
-	var _$ = window.$ || undefined;
-</script>
-{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "admin/js/jquery.min.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/libs/class.min.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/jquery.ui.nestedsortable.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.base.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.modal.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.sideframe.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.clipboard.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.plugins.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.structureboard.js" %}"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script src="{% static "cms/js/plugins/cms.toolbar.js" %}"></script>{% endaddtoblock %}
-
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/plugins/cms.toolbar.css" %}" />{% endaddtoblock %}
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/plugins/cms.placeholders.css" %}" />{% endaddtoblock %}
+
 {% addtoblock "js" %}
+<script>
+var _jQuery = window.jQuery || undefined;
+var _$ = window.$ || undefined;
+</script>
+<script src="{% static "admin/js/jquery.min.js" %}"></script>
+<script src="{% static "cms/js/libs/class.min.js" %}"></script>
+<script src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>
+<script src="{% static "cms/js/plugins/jquery.ui.nestedsortable.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.base.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.modal.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.sideframe.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.clipboard.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.plugins.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.structureboard.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.toolbar.js" %}"></script>
 <script>
 (function($) {
 // CMS.$ will be passed for $
@@ -46,7 +44,7 @@ $(document).ready(function () {
 			'sideframe': { 'url': '' },
 			'states': []
 		},
-		//'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}',
+		// 'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}', not required yet and not in context anymore
 		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
 		'publisher': '{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}'
 	};
@@ -60,10 +58,8 @@ $(document).ready(function () {
 });
 })(CMS.$);
 </script>
-{% endaddtoblock %}
-{% addtoblock "js" %}
-<script type="text/javascript">
-	window.jQuery = _jQuery;
-	window.$ = _$;
+<script>
+window.jQuery = _jQuery;
+window.$ = _$;
 </script>
 {% endaddtoblock %}
