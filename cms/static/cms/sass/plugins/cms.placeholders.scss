@@ -153,10 +153,7 @@ body > .cms_draggable .cms_draggables { display:none !important; }
 
 //##################################################
 // #RETINA#
-@media print,
-	(-o-min-device-pixel-ratio: 5/4),
-	(-webkit-min-device-pixel-ratio: 1.25),
-	(min-resolution: 120dpi) {
+@media (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dppx) {
 
 	.cms_submenu, .cms_submenu-quicksearch, .cms_placeholder-title:before,
 	.cms_placeholder .cms_dragitem-collapsable, body .cms_dragitem-collapsable,
