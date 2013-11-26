@@ -438,7 +438,7 @@
 	}
 
 	// #TOOLBAR/tooltip#
-	.cms_placeholders-tooltip { visibility:hidden; position:absolute; left:0; top:0; @include border-radius(3px);
+	.cms_tooltip { visibility:hidden; position:absolute; left:0; top:0; @include border-radius(3px);
 		font-size:11px; line-height:11px; font-weight:bold; white-space:nowrap; padding:5px 7px 7px 24px; margin:0;
 		color:$color-grey-10;
 		background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
@@ -463,7 +463,7 @@
 	.cms_modal-collapse, .cms_modal-close, .cms_modal-maximize, .cms_modal-resize,
 	.cms_modal-breadcrumb a, .cms_modal-breadcrumb-title,
 	.cms_toolbar-item-logo a, .cms_toolbar-trigger a,
-	.cms_placeholders-tooltip, .cms_placeholders-menu,
+	.cms_tooltip, .cms_placeholders-menu,
 	.cms_toolbar-debug .cms_debug-bar {
 		background-image:url('../../img/toolbar/sprite_toolbar@2x.png') !important;
 		background-size:190px !important; }

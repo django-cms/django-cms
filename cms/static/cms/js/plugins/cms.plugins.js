@@ -33,7 +33,10 @@ $(document).ready(function () {
 			this.container = $('.' + container);
 			this.options = $.extend(true, {}, this.options, options);
 
+			// elements
 			this.body = $(document);
+
+			// states
 			this.csrf = CMS.config.csrf;
 			this.timer = function () {};
 			this.timeout = 250;
