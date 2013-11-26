@@ -231,7 +231,7 @@ class CMSMenu(Menu):
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
 
-        pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
+        pages = page_queryset.published(lang).filter(**filters).order_by("tree_id", "lft")
         ids = {}
         nodes = []
         first = True

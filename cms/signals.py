@@ -45,9 +45,9 @@ def update_home(instance, **kwargs):
         else:
             qs = Page.objects.public()
         try:
-            home_pk = qs.filter(published=True).get_home(instance.site).pk
+            home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site).pk
         except NoHomeFound:
-            if instance.publisher_is_draft and not instance.published:
+            if instance.publisher_is_draft and not instance.published_languages:
                 return
             home_pk = instance.pk
             instance.is_home = True

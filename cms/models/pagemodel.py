@@ -75,6 +75,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
+    published_languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
     # Managers
@@ -172,10 +173,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             title.page = target
             title.publisher_is_draft = False
             title.publisher_public_id = old_pk
+            title.published = True
             title.save()
             old_title = Title.objects.get(pk=old_pk)
             old_title.publisher_public = title
             old_title.publisher_state = 0
+            old_title.published = True
             old_title.save()
         if old_titles:
             Title.objects.filter(id__in=old_titles.values()).delete()
@@ -448,7 +451,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         else:
             self.publisher_state = Page.PUBLISHER_STATE_PENDING
         if published:
-            if not "|%s|" % language in self.published_languages:
+            if not self.published_languages or not "|%s|" % language in self.published_languages:
                 if self.published_languages:
                     self.published_languages += "%s|" % language
                 else:
@@ -500,20 +503,18 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # First, make sure we are in the correct state
         title = self.title_set.get(language=language)
         public_title = title.publisher_public
-        title.publisher_public = None
+        title.published = False
         title.save()
-        public_title.publisher_public = None
-        public_title.delete()
+        public_title.published = False
+        public_title.save()
         public_page = self.publisher_public
         public_placeholders = public_page.placeholders.all()
         published_languages = self.published_languages.split("|")
         published_languages.remove(language)
         self.published_languages = "|".join(published_languages)
-        if not self.title_set.filter(publisher_public_id__gt=0).count() and self.lft + 1 == self.rght:
-            print "delete", self.lft, self.rght, self, self.pk, public_page.pk
-            self.publisher_public = None
+        if not self.title_set.filter(published=True).count() and self.lft + 1 == self.rght:
+            self.published = False
             self.save()
-            public_page.delete()
         else:
             for pl in public_placeholders:
                 pl.cmsplugin_set.filter(language=language).delete()
@@ -523,11 +524,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             # Go through all children of our public instance
             descendants = public_page.get_descendants()
             for child in descendants:
-                child.published = False
+                child.title_set.filter(language=language).update(published=False)
                 child.save()
                 draft = child.publisher_public
-                if (draft and draft.published and
-                        draft.publisher_state == Page.PUBLISHER_STATE_DEFAULT):
+                if draft and draft.publisher_state == Page.PUBLISHER_STATE_DEFAULT:
+                    draft.title_set.filter(language=language).update(published=False)
                     draft.publisher_state = Page.PUBLISHER_STATE_PENDING
                     draft._publisher_keep_state = True
                     draft.save()
@@ -909,32 +910,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
-
-    def is_home(self, language=None):
-        if self.parent_id:
-            return False
-        else:
-            try:
-                return self.get_home_pk_cache(language) == self.pk
-            except NoHomeFound:
-                pass
-        return False
-
-    def get_home_pk_cache(self, language=None):
-        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        if getattr(self, attr, None) is None:
-            setattr(self, attr, self.get_object_queryset().get_home(self.site, language).pk)
-        return getattr(self, attr)
-
-    def set_home_pk_cache(self, value):
-
-        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        setattr(self, attr, value)
-
-    home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
-
-    def clear_home_pk_cache(self):
-        self.home_pk_cache = None
 
     def get_media_path(self, filename):
         """

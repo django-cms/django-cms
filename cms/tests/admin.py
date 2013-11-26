@@ -434,7 +434,7 @@ class AdminTests(AdminTestsBase):
             self.assertEqual(response.status_code, 200)
 
             page = self.reload(page)
-            self.assertFalse(page.publisher_public_id > 0)
+            self.assertFalse(page.title_set.filter(published=True).count() > 0)
 
     def test_change_status_adds_log_entry(self):
         page = self.get_page()
