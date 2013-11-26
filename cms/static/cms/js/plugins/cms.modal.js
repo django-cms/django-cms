@@ -245,7 +245,8 @@ $(document).ready(function () {
 				this.modal.data('css', {
 					'left': this.modal.css('left'),
 					'top': this.modal.css('top'),
-					'margin': this.modal.css('margin')
+					'margin-left': this.modal.css('margin-left'),
+					'margin-top': this.modal.css('margin-top')
 				});
 				container.data('css', {
 					'width': container.width(),
