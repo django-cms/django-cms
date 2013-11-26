@@ -38,8 +38,6 @@ class PageMigrationTestCase(CMSTestCase):
         Test correct content type is set for Page object
         """
         from django.contrib.contenttypes.models import ContentType
-        for x in ContentType.objects.all():
-            print x.model, x.name
         self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
         self.assertTrue(ContentType.objects.filter(model='page', name='page', app_label='cms').exists())
 
