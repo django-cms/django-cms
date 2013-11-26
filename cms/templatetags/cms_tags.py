@@ -315,7 +315,7 @@ register.tag(RenderPlugin)
 
 
 class PluginChildClasses(InclusionTag):
-    template = "cms/toolbar/draggable_menu.html"
+    template = "cms/toolbar/dragitem_menu.html"
     name = "plugin_child_classes"
     options = Options(
         Argument('plugin')

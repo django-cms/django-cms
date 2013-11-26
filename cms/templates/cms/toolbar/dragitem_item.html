@@ -1,4 +1,4 @@
-{% load cms_tags i18n l10n %}
+{% load i18n l10n cms_tags %}
 {% load url from future %}
 
 <div id="cms_draggable-{{ plugin.pk|unlocalize }}" class="cms_draggable cms_reset{% if not plugin.child_plugin_instances %} cms_draggable-disabled{% endif %}">
@@ -29,7 +29,7 @@
 	{% if plugin.child_plugin_instances %}
 		{% for child in plugin.child_plugin_instances %}
 			{# workaround because include tag does not allow recursive includes #}
-			{% with template_name="cms/toolbar/draggable_item.html" %}{% include template_name with plugin=child %}{% endwith %}
+			{% with template_name="cms/toolbar/dragitem_item.html" %}{% include template_name with plugin=child %}{% endwith %}
 		{% endfor %}
 	{% endif %}
 	{% if plugin.get_plugin_class.allow_children %}</div>{% endif %}

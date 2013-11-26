@@ -1,0 +1,7 @@
+{# render the placeholder within placeholder.html - this is optional, you need to pass the edit context #}
+{% if edit and placeholder %}
+	{% with edit as edit %}{{ placeholder }}{% endwith %}
+{% endif %}
+
+{# render the content within plugin.html #}
+{{ plugins }}

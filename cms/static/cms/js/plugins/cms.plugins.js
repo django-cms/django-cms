@@ -29,7 +29,7 @@ $(document).ready(function () {
 		},
 
 		initialize: function (container, options) {
-			this.container = $('[id="' + container + '"]');
+			this.container = $('.' + container);
 			this.options = $.extend(true, {}, this.options, options);
 
 			this.body = $(document);

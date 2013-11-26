@@ -1,11 +1,26 @@
-{% load i18n %}{% if edit %}
-<div class="cms_placeholder cms_reset">
-	{{ bar }}
-	{% language request.toolbar.language %}
-	<div class="cms_droppable-empty-wrapper">
-		<div class="cms_droppable cms_droppable-empty">{% trans "Drop a plugin here" %}</div>
-	</div>
-	{% endlanguage %}
-</div>
-<div class="cms_plugins">{{ plugins }}</div>
-{% else %}{{ plugins }}{% endif %}
+{% load i18n l10n sekizai_tags %}
+{% load url from future %}
+
+<div class="cms_placeholder cms_placeholder-{{ placeholder.pk|unlocalize }}"></div>
+
+{% addtoblock "js" %}
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+	new CMS.Plugin('cms_placeholder-{{ placeholder.pk|unlocalize }}', {
+		'type': 'bar',
+		'placeholder_id': '{{ placeholder.pk|unlocalize }}',
+		'plugin_language': '{{ language }}',
+		'plugin_restriction': [{% for module in allowed_plugins %}"{{ module}}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+		'urls': {
+			'add_plugin': '{{ placeholder.get_add_url }}',
+			'edit_plugin': '{{ placeholder.get_changelist_url }}',
+			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}',
+			'stack_plugin': '{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'
+		}
+	});
+});
+})(CMS.$);
+</script>
+{% endaddtoblock %}
