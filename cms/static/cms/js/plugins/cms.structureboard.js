@@ -107,8 +107,7 @@ $(document).ready(function () {
 			this.setSettings(this.settings);
 
 			// show canvas
-
-			console.log('show');
+			this._showBoard();
 		},
 
 		hide: function () {
@@ -123,8 +122,7 @@ $(document).ready(function () {
 			this.setSettings(this.settings);
 
 			// hide canvas
-
-			console.log('hide');
+			this._hideBoard();
 		},
 
 		getId: function (el) {
@@ -175,6 +173,14 @@ $(document).ready(function () {
 		},
 
 		// private methods
+		_showBoard: function () {
+			console.log('show');
+		},
+
+		_hideBoard: function () {
+			console.log('hide');
+		},
+
 		_drag: function () {
 			var that = this;
 			var dropped = false;

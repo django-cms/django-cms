@@ -55,7 +55,7 @@ $(document).ready(function () {
 			if($('.cms_btn-publish-active').length) publishBtn.show();
 
 			// add toolbar ready class to body
-			$('body').addClass('cms_toolbar-ready');
+			this.body.addClass('cms_toolbar-ready');
 
 			// check if we need to reset the current settings depending on a new release
 			if(CMS.config.settings.version !== this.getSettings().version) {
@@ -75,7 +75,9 @@ $(document).ready(function () {
 			// should switcher indicate that there is an unpublished page?
 			if(CMS.config.publisher) {
 				this.openMessage(CMS.config.publisher, 'right');
-				setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
+				setInterval(function () {
+					CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight');
+				}, this.options.messageDelay);
 			}
 
 			// open sideframe if it was previously opened
