@@ -3,12 +3,11 @@ from contextlib import contextmanager
 
 from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import LanguageError
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_cms_setting, get_site_id
 
 
 @contextmanager
@@ -60,16 +59,6 @@ def get_current_language():
     """
     language_code = translation.get_language()
     return get_language_code(language_code)
-
-
-def get_site_id(site):
-    if isinstance(site, Site):
-        return site.id
-    try:
-        return int(site)
-    except (TypeError, ValueError):
-        pass
-    return settings.SITE_ID
 
 
 def get_language_list(site_id=None):

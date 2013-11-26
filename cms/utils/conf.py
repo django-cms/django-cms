@@ -4,6 +4,7 @@ import pprint
 from cms.utils.compat.urls import urljoin
 from cms import constants
 from cms.exceptions import CMSDeprecationWarning
+from django.contrib.sites.models import Site
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
@@ -224,3 +225,13 @@ def get_cms_setting(name):
         return COMPLEX[name]()
     else:
         return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
+
+
+def get_site_id(site):
+    if isinstance(site, Site):
+        return site.id
+    try:
+        return int(site)
+    except (TypeError, ValueError):
+        pass
+    return settings.SITE_ID
