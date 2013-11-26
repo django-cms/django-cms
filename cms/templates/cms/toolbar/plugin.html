@@ -9,10 +9,8 @@
 // CMS.$ will be passed for $
 $(document).ready(function () {
 	new CMS.Plugin('cms_plugin-{{ instance.pk|unlocalize }}', {
-		// always required
 		'type': 'plugin',
 		'page_language': '{{ LANGUAGE_CODE }}',
-		// optional per type (plugin, generic, model)
 		'placeholder_id': '{{ instance.placeholder.pk|unlocalize }}',
 		'plugin_type': '{{ instance.plugin_type }}',
 		'plugin_name': '{{ instance.get_plugin_name }}',

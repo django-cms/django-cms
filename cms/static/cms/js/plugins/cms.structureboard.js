@@ -9,26 +9,124 @@ $(document).ready(function () {
 	 */
 	CMS.StructureBoard = new CMS.Class({
 
-		initialize: function (options) {
-			this.options = $.extend(true, {}, this.options, options);
+		implement: [CMS.API.Helpers],
 
-			this.plugins = $('.cms_plugin');
+		options: {
+			'speed': 300
+		},
+
+		initialize: function (options) {
+			this.container = $('.cms-structure');
+			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+			this.settings = this.getSettings();
+
+			// elements
 			this.toolbar = $('#cms_toolbar');
 			this.sortables = $('.cms_draggables'); // use global scope
-			this.dragging = false;
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
-
-			// this.dragitems = $('.cms_draggable');
+			this.plugins = $('.cms_plugin');
+			this.placeholders = $('.cms_placeholder');
+			this.dragitems = $('.cms_draggable');
 			this.dropareas = $('.cms_droppable');
 
+			// states
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 			this.timer = function () {};
 			this.state = false;
+			this.dragging = false;
 
-			this._preventEvents();
+			// setup initial stuff
+			this._setup();
+
+			// setup events
+			this._events();
+		},
+
+		_setup: function () {
+			// setup toolbar mode
+			if(this.settings.mode === 'structure') this.show();
+
+			// check if modes should be visible
+			if(this.placeholders.length) {
+				this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').show();
+			}
+
+			// add drag & drop functionality
 			this._drag();
+			// prevent click events to detect double click
+			this._preventEvents();
+		},
+
+		_events: function () {
+			var that = this;
+			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+
+			// show edit mode
+			modes.eq(0).bind(this.click, function (e) {
+				e.preventDefault();
+				// cancel if already active
+				if(that.settings.mode === 'edit') return false;
+				// otherwise hide
+				that.hide();
+			});
+			// show structure mode
+			modes.eq(1).bind(this.click, function (e) {
+				e.preventDefault();
+				// cancel if already active
+				if(that.settings.mode === 'structure') return false;
+				// otherwise show
+				that.show();
+			});
+
+			// keyboard handling
+			$(document).bind('keydown', function (e) {
+				// check if we have an important focus
+				var fields = $('*:focus');
+				// 32 = space
+				if(e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
+					e.preventDefault();
+					that.hide();
+				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
+					e.preventDefault();
+					that.show();
+				}
+			});
 		},
 
 		// public methods
+		show: function () {
+			// set active item
+			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
+
+			// show clipboard in structure mode
+			this.container.find('.cms_clipboard').fadeIn(this.options.speed);
+
+			// apply new settings
+			this.settings.mode = 'structure';
+			this.setSettings(this.settings);
+
+			// show canvas
+
+			console.log('show');
+		},
+
+		hide: function () {
+			// set active item
+			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
+
+			// hide clipboard if in edit mode
+			this.container.find('.cms_clipboard').hide();
+
+			this.settings.mode = 'edit';
+			this.setSettings(this.settings);
+
+			// hide canvas
+
+			console.log('hide');
+		},
+
 		getId: function (el) {
 			// cancel if no element is defined
 			if(el === undefined || el === null || el.length <= 0) return false;
@@ -40,7 +138,7 @@ $(document).ready(function () {
 			} else if(el.hasClass('cms_draggable')) {
 				id = el.attr('id').replace('cms_draggable-', '');
 			} else {
-				id = el.attr('id').replace('cms_placeholder-bar-', '');
+				id = el.attr('id').replace('cms_placeholder-', '');
 			}
 
 			return id;
@@ -57,8 +155,8 @@ $(document).ready(function () {
 
 		setActive: function (id) {
 			// reset active statesdragholders
-			$('.cms_draggable').removeClass('cms_draggable-selected');
-			$('.cms_plugin').removeClass('cms_plugin-active');
+			this.dragitems.removeClass('cms_draggable-selected');
+			this.plugins.removeClass('cms_plugin-active');
 
 			// if false is provided, only remove classes
 			if(id === false) return false;

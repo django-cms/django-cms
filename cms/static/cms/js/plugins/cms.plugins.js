@@ -10,6 +10,7 @@ $(document).ready(function () {
 	CMS.Plugin = new CMS.Class({
 
 		options: {
+			// TODO define whats required and whats optional
 			'type': '', // bar, plugin or generic
 			'placeholder_id': null,
 			'plugin_type': '',
@@ -87,7 +88,7 @@ $(document).ready(function () {
 				if(e.type === 'mousedown' && (e.which !== 3 || e.button !== 2)) {
 					// start countdown
 					timer = setTimeout(function () {
-						CMS.API.Toolbar._enableDragMode(300);
+						CMS.API.StructureBoard.show();
 						CMS.API.StructureBoard.setActive(plugin.data('settings').plugin_id);
 					}, 500);
 				} else {
@@ -129,7 +130,7 @@ $(document).ready(function () {
 				if(e.type === 'mousedown') {
 					// start countdown
 					timer = setTimeout(function () {
-						CMS.API.Toolbar._enableEditMode(300);
+						CMS.API.StructureBoard.hide();
 						CMS.API.StructureBoard.setActive(plugin.data('settings').plugin_id);
 						$(document).bind('mousemove.keypress', function () {
 							$(document).trigger('keyup.cms', [true]);
