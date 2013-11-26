@@ -170,7 +170,7 @@ $(document).ready(function () {
 				e.stopPropagation();
 				var name = $(this).data('settings').plugin_name;
 				var id = $(this).data('settings').plugin_id;
-				(e.type === 'mouseenter') ? CMS.API.Helpers.showTooltip(name, id) : CMS.API.Helpers.hideTooltip();
+				(e.type === 'mouseover') ? CMS.API.Helpers.showTooltip(name, id) : CMS.API.Helpers.hideTooltip();
 			});
 		},
 
