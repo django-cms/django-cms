@@ -232,7 +232,6 @@ $(document).ready(function () {
 			var debug = (this.config.debug) ? 5 : 0;
 			var container = this.modal.find('.cms_modal-body');
 			var trigger = this.modal.find('.cms_modal-maximize');
-			var btnCk = this.modal.find('iframe').contents().find('.cke_button__maximize');
 
 			// cancel action when minimized
 			if(this.minimized) return false;
@@ -266,9 +265,6 @@ $(document).ready(function () {
 					});
 				});
 				$(window).trigger('resize.cms.modal');
-
-				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_off')) btnCk.trigger('click');
 			} else {
 				// minimize
 				this.maximized = false;
@@ -279,9 +275,6 @@ $(document).ready(function () {
 				// reattach css
 				this.modal.css(this.modal.data('css'));
 				container.css(container.data('css'));
-
-				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_on')) btnCk.trigger('click');
 			}
 		},
 
@@ -501,13 +494,6 @@ $(document).ready(function () {
 				iframe.contents().find('body').bind('keydown.cms', function (e) {
 					if(e.keyCode === 27) that.close();
 				});
-
-				// if its only text, maximize modal
-				if(title.text() === that.config.lang.text) {
-					setTimeout(function () {
-						iframe.contents().find('.cke_button__maximize').trigger('click');
-					}, 100);
-				}
 			});
 
 			// inject
