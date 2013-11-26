@@ -1,7 +1,6 @@
 {% load i18n l10n %}
 
 {% language request.toolbar.toolbar_language %}
-<div class="cms-wrapper">
 <div id="cms_toolbar" class="cms_reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}{% if debug %} cms_toolbar-debug{% endif %}">
 
 	{# debug, tooltip #}
@@ -116,19 +115,25 @@
 	</div>
 	{# end: modal #}
 
-	{% endlanguage %}
-	{% comment %}
-	<div class="draggables">
-		{% for placeholder in request.toolbar.placeholders.values %}
-			{% with placeholder.slot as slot %}
-			<div class="placeholder" id="{{ placeholder.pk }}">
-			{% for plugin in placeholder.get_cached_plugins %}
-				{% include "cms/toolbar/draggable_item.html" with plugin=plugin %}
-			{% endfor %}
+	{# start: structure #}
+	<div class="cms_structure">
+		<div class="cms_structure-content">
+
+			<div class="draggables">
+				{% for placeholder in request.toolbar.placeholders.values %}
+					{% with placeholder.slot as slot %}
+					<div class="placeholder" id="{{ placeholder.pk }}">
+					{% for plugin in placeholder.get_cached_plugins %}
+						{% include "cms/toolbar/dragitem.html" with plugin=plugin %}
+					{% endfor %}
+					</div>
+					{% endwith %}
+				{% endfor %}
 			</div>
-			{% endwith %}
-		{% endfor %}
+
+		</div>
 	</div>
-	{% endcomment %}
+	{# end: structure #}
+
 </div>
-</div>
+{% endlanguage %}

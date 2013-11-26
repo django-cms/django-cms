@@ -16,7 +16,7 @@ $(document).ready(function () {
 		},
 
 		initialize: function (options) {
-			this.container = $('.cms-structure');
+			this.container = $('.cms_structure');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
 			this.settings = this.getSettings();
@@ -174,11 +174,25 @@ $(document).ready(function () {
 
 		// private methods
 		_showBoard: function () {
-			console.log('show');
+			var body = $('body');
+
+			// apply correct width and height to the structure container
+			var width = $(window).width();
+			var height = $(window).height();
+			// determine if we should use body width or height
+			if(width <= body.width()) width = body.width();
+			if(height <= body.height()) height = body.height();
+
+			this.container.css({
+				'width': width,
+				'height': height + this.toolbar.find('.cms_toolbar').height()
+			});
+
+			this.container.stop(true, true).fadeIn(this.options.speed);
 		},
 
 		_hideBoard: function () {
-			console.log('hide');
+			this.container.stop(true, true).fadeOut(this.options.speed / 2);
 		},
 
 		_drag: function () {
