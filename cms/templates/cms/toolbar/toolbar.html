@@ -4,10 +4,11 @@
 <div class="cms-wrapper">
 <div id="cms_toolbar" class="cms_reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}{% if debug %} cms_toolbar-debug{% endif %}">
 
-	<!-- debug bar -->
+	{# debug, tooltip #}
 	<div class="cms_debug-bar"></div>
+	<div class="cms_tooltip">{% trans "Double-click to edit" %}<span></span></div>
 
-	<!-- start: toolbar -->
+	{# start: toolbar #}
 	<div class="cms_toolbar">
 		<div class="cms_toolbar-left">
 			{% include "cms/toolbar/items/logo.html" %}
@@ -39,9 +40,9 @@
 		</div>
 	</div>
 	<div class="cms_toolbar-trigger"><a href="#">{% trans "Toggle toolbar" %}</a></div>
-	<!-- end: toolbar -->
+	{# end: toolbar #}
 
-	<!-- start: sidebar -->
+	{# start: sidebar #}
 	<div class="cms_sideframe">
 		<div class="cms_sideframe-resize"><span class="cms_sideframe-knob"></span></div>
 		<div class="cms_sideframe-frame"></div>
@@ -53,16 +54,15 @@
 		</div>
 		<div class="cms_sideframe-copy"></div>
 	</div>
-	<!-- end: sidebar -->
+	{# end: sidebar #}
 
+	{# start: clipboard #}
 	{% if request.toolbar.edit_mode or request.toolbar.build_mode %}
 	{% if request.toolbar.get_clipboard_plugins %}
 	{% with slot="clipbaord" %}
-	<!-- start: clipboard -->
 	<div class="cms_clipboard">
 		<div class="cms_clipboard-triggers">
-			<!-- maximum of 5 -->
-			<!-- delete link -->
+			{# maximum of 5, delete link #}
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
 				{% if not plugin.parent_id %}
 				<div class="cms_clipboard-numbers"><a href="#">{{ forloop.index }}</a></div>
@@ -81,19 +81,19 @@
 		</div>
 		<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>{% trans "Empty Clipboard" %}</a></p>
 	</div>
-	<!-- end: clipboard -->
 	{% endwith %}
 	{% endif %}
 	{% endif %}
+	{# end: clipboard #}
 
-	<!-- start: messages -->
+	{# start: messages #}
 	<div class="cms_messages">
 		<div class="cms_messages-close"></div>
 		<div class="cms_messages-inner"></div>
 	</div>
-	<!-- end: messages -->
+	{# end: messages #}
 
-	<!-- start: modal -->
+	{# start: modal #}
 	<div class="cms_modal">
 		<div class="cms_modal-head">
 			<span class="cms_modal-title">&nbsp;</span>
@@ -114,11 +114,8 @@
 			<div class="cms_modal-resize"></div>
 		</div>
 	</div>
-	<!-- end: modal -->
+	{# end: modal #}
 
-	<!-- start: placeholder -->
-	<div class="cms_tooltip">{% trans "Double-click to edit" %}<span></span></div>
-	<!-- end: placeholder -->
 	{% endlanguage %}
 	{% comment %}
 	<div class="draggables">
