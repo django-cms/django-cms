@@ -43,8 +43,10 @@ $(document).ready(function () {
 		},
 
 		_setup: function () {
+			var that = this;
+
 			// setup toolbar mode
-			if(this.settings.mode === 'structure') this.show();
+			if(this.settings.mode === 'structure') setTimeout(function () { that.show(); }, 100);
 
 			// check if modes should be visible
 			if(this.placeholders.length) {
@@ -179,16 +181,33 @@ $(document).ready(function () {
 			// apply correct width and height to the structure container
 			var width = $(window).width();
 			var height = $(window).height();
+			var toolbarHeight = this.toolbar.find('.cms_toolbar').height();
 			// determine if we should use body width or height
 			if(width <= body.width()) width = body.width();
 			if(height <= body.height()) height = body.height();
 
 			this.container.css({
+				'top': (this.settings.toolbar === 'collapsed') ? 0 : toolbarHeight,
 				'width': width,
-				'height': height + this.toolbar.find('.cms_toolbar').height()
+				'height': height
 			});
 
 			this.container.stop(true, true).fadeIn(this.options.speed);
+
+			// TODO this is gonna be funny
+			// loop over all placeholders
+			this.placeholders.show();
+			this.placeholders.each(function () {
+				var id = $(this).data('settings').placeholder_id;
+				var area = $('.cms_dragarea-' + id);
+
+				area.css({
+				// todo we need to calculate top offspace
+					'top': $(this).offset().top - 25,
+					'left': $(this).offset().left,
+					'width': $(this).width()
+				});
+			});
 		},
 
 		_hideBoard: function () {
@@ -227,11 +246,11 @@ $(document).ready(function () {
 				'start': function (e, ui) {
 					that.dragging = true;
 					// show empty
-					$('.cms_droppable-empty-wrapper').show();
+					$('.cms_dragbar-empty-wrapper').show();
 					// ensure all menus are closed
 					$('.cms_dragitem .cms_submenu').hide();
 					// remove classes from empty dropzones
-					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
+					$('.cms_dragbar-empty').removeClass('cms_draggable-disallowed');
 					// fixes placeholder height
 					ui.placeholder.height(ui.item.height());
 					// show placeholder without entries
@@ -245,7 +264,7 @@ $(document).ready(function () {
 				'stop': function (event, ui) {
 					that.dragging = false;
 					// hide empty
-					$('.cms_droppable-empty-wrapper').hide();
+					$('.cms_dragbar-empty-wrapper').hide();
 
 					// cancel if isAllowed returns false
 					if(!that.state) return false;

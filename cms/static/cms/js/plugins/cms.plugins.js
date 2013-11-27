@@ -229,7 +229,7 @@ $(document).ready(function () {
 			}
 
 			// SAVING POSITION
-			var placeholder_id = this._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_placeholder-bar').first());
+			var placeholder_id = this._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_dragbar').first());
 			var plugin_parent = this._getId(dragitem.parent().closest('.cms_draggable'));
 			var plugin_order = this._getIds(dragitem.siblings('.cms_draggable').andSelf());
 
@@ -376,10 +376,10 @@ $(document).ready(function () {
 			// add small delay before showing submenu
 			this.timer = setTimeout(function () {
 				// reset z indexes
-				var reset = $('.cms_placeholder .cms_submenu').parentsUntil('.cms_placeholder');
+				var reset = $('.cms_dragbar .cms_submenu').parentsUntil('.cms_dragbar');
 					reset.css('z-index', 0);
 
-				var parents = nav.parentsUntil('.cms_placeholder');
+				var parents = nav.parentsUntil('.cms_dragbar');
 					parents.css('z-index', 999);
 
 				// show subnav
@@ -433,11 +433,11 @@ $(document).ready(function () {
 			this.preventScroll(true);
 
 			// set relativity
-			$('.cms_placeholder').css({
+			$('.cms_dragbar').css({
 				'position': 'relative',
 				'z-index': 99
 			});
-			nav.closest('.cms_placeholder').css('z-index', 999);
+			nav.closest('.cms_dragbar').css('z-index', 999);
 		},
 
 		_hideSubnav: function (nav) {
@@ -463,7 +463,7 @@ $(document).ready(function () {
 			this.preventScroll(false);
 
 			// reset relativity
-			$('.cms_placeholder').css('position', '');
+			$('.cms_dragbar').css('position', '');
 		},
 
 		_searchSubnav: function (nav, value) {
@@ -514,15 +514,15 @@ $(document).ready(function () {
 
 			// ONLY FOR BARS
 			// add global collapsable events
-			this.container.find('.cms_placeholder-title').bind(this.click, function () {
-				($(this).hasClass('cms_placeholder-title-expanded')) ? that._collapseAll($(this)) : that._expandAll($(this));
+			this.container.find('.cms_dragbar-title').bind(this.click, function () {
+				($(this).hasClass('cms_dragbar-title-expanded')) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
 			// check which button should be shown for collapsemenu
 			this.container.each(function (index, item) {
 				var els = $(item).find('.cms_dragitem-collapsable');
 				var open = els.filter('.cms_dragitem-expanded');
 				if(els.length === open.length && (els.length + open.length !== 0)) {
-					$(item).find('.cms_placeholder-title').addClass('cms_placeholder-title-expanded');
+					$(item).find('.cms_dragbar-title').addClass('cms_dragbar-title-expanded');
 				}
 			});
 
@@ -572,23 +572,23 @@ $(document).ready(function () {
 		},
 
 		_expandAll: function (el) {
-			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			var items = el.closest('.cms_dragbar').find('.cms_dragitem-collapsable');
 			// cancel if there are no items
 			if(!items.length) return false;
 			items.each(function () {
 				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
-			el.addClass('cms_placeholder-title-expanded');
+			el.addClass('cms_dragbar-title-expanded');
 		},
 
 		_collapseAll: function (el) {
-			var items = el.closest('.cms_placeholder').find('.cms_dragitem-collapsable');
+			var items = el.closest('.cms_dragbar').find('.cms_dragitem-collapsable');
 			items.each(function () {
 				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
-			el.removeClass('cms_placeholder-title-expanded');
+			el.removeClass('cms_dragbar-title-expanded');
 		},
 
 		_getId: function (el) {

@@ -118,19 +118,21 @@
 	{# start: structure #}
 	<div class="cms_structure">
 		<div class="cms_structure-content">
+			{% for placeholder in request.toolbar.placeholders.values %}
+			<div class="cms_dragarea cms_dragarea-{{ placeholder.pk }}">
+				{% include "cms/toolbar/dragbar.html" with placeholder=placeholder %}
 
-			<div class="draggables">
-				{% for placeholder in request.toolbar.placeholders.values %}
-					{% with placeholder.slot as slot %}
-					<div class="placeholder" id="{{ placeholder.pk }}">
-					{% for plugin in placeholder.get_cached_plugins %}
-						{% include "cms/toolbar/dragitem.html" with plugin=plugin %}
-					{% endfor %}
-					</div>
-					{% endwith %}
+				{# <div class="cms_dragitem cms_dragitem-1888"> #}
+				<div class="cms_draggables">
+				{% with placeholder.slot as slot %}
+				{% for plugin in placeholder.get_cached_plugins %}
+					{% include "cms/toolbar/dragitem_item.html" with plugin=plugin %}
 				{% endfor %}
+				{% endwith %}
+				</div>
+				{# </div> #}
 			</div>
-
+			{% endfor %}
 		</div>
 	</div>
 	{# end: structure #}
