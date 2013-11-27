@@ -162,7 +162,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if edit:
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, '', name_fallback=name_fallback))
     content = mark_safe("".join(content))
-    context['plugins'] = content
+    context['content'] = content
     context['placeholder'] = toolbar_content
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)

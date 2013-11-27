@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
-from cms.utils.placeholder import PlaceholderNoAction
+from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
+from django.template.defaultfilters import title
 from django.utils.translation import ugettext_lazy as _, get_language
 import operator
 
@@ -19,6 +20,11 @@ class Placeholder(models.Model):
 
     def __str__(self):
         return self.slot
+
+    def get_label(self):
+        name = get_placeholder_conf("name", self.slot, default=title(self.slot))
+        name = _(name)
+        return name
 
     def get_add_url(self):
         return self._get_url('add_plugin')
