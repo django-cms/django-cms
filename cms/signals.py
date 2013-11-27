@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from cms.exceptions import NoHomeFound
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import signals
+from django.db.models import signals, Q
 from django.dispatch import Signal
 
 from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
@@ -17,7 +18,8 @@ application_post_changed = Signal(providing_args=["instance"])
 
 # fired after page gets published - copied to public model - there may be more
 # than one instances published before this signal gets called
-post_publish = Signal(providing_args=["instance"])
+post_publish = Signal(providing_args=["instance", "language"])
+post_unpublish = Signal(providing_args=["instance"])
 
 
 def update_plugin_positions(**kwargs):
@@ -34,6 +36,45 @@ def update_plugin_positions(**kwargs):
 signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin, dispatch_uid="cms.plugin.update_position")
 
 
+def update_home(instance, **kwargs):
+    if getattr(instance, '_home_checked', False):
+        return
+    if not instance.parent_id or (getattr(instance, 'old_page', False) and not instance.old_page.parent_id):
+        if instance.publisher_is_draft:
+            qs = Page.objects.drafts()
+        else:
+            qs = Page.objects.public()
+        try:
+            home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site).pk
+        except NoHomeFound:
+            if instance.publisher_is_draft and not instance.published_languages:
+                return
+            home_pk = instance.pk
+            instance.is_home = True
+        for page in qs.filter(site=instance.site, is_home=True).exclude(pk=home_pk):
+            if instance.pk == page.pk:
+                instance.is_home = False
+            page.is_home = False
+            page._publisher_keep_state = True
+            page._home_checked = True
+            page.save()
+        try:
+            page = qs.get(pk=home_pk, site=instance.site)
+        except Page.DoesNotExist:
+            return
+        page.is_home = True
+        if instance.pk == home_pk:
+            instance.is_home = True
+        page._publisher_keep_state = True
+        page._home_checked = True
+        page.save()
+
+
+page_moved.connect(update_home, sender=Page, dispatch_uid="cms.page.update_home")
+signals.post_delete.connect(update_home, sender=Page)
+
+
+
 def update_title_paths(instance, **kwargs):
     """Update child pages paths in case when page was moved.
     """
@@ -46,13 +87,11 @@ page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.upda
 
 def update_title(title):
     slug = u'%s' % title.slug
-
-    if title.page.is_home():
+    if title.page.is_home:
         title.path = ''
     elif not title.has_url_overwrite:
         title.path = u'%s' % slug
         parent_page_id = title.page.parent_id
-
         if parent_page_id:
             parent_title = Title.objects.get_title(parent_page_id,
                                                    language=title.language, language_fallback=True)
@@ -63,6 +102,14 @@ def update_title(title):
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
+    if instance.page.languages:
+        languages = instance.page.languages.split(',')
+    else:
+        languages = []
+    if not instance.language in languages:
+        languages.append(instance.language)
+        instance.page.languages = ",".join(languages)
+        instance.page.save()
     if not instance.page.publisher_is_draft:
         menu_pool.clear(instance.page.site_id)
     if instance.id and not hasattr(instance, "tmp_path"):
@@ -78,6 +125,18 @@ def pre_save_title(instance, raw, **kwargs):
     else:
         update_title(instance)
 
+
+def pre_delete_title(instance, **kwargs):
+    """Save old state to instance and setup path
+    """
+    if instance.page.languages:
+        languages = instance.page.languages.split(',')
+    else:
+        languages = []
+    if instance.language in languages:
+        languages.remove(instance.language)
+        instance.page.languages = ",".join(languages)
+        instance.page.save()
 
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
@@ -162,7 +221,6 @@ def pre_save_page(instance, raw, **kwargs):
     except ObjectDoesNotExist:
         pass
 
-
 def post_save_page_moderator(instance, raw, created, **kwargs):
     """Helper post save signal.
     """
@@ -176,9 +234,10 @@ def post_save_page_moderator(instance, raw, created, **kwargs):
 
 
 def post_save_page(instance, **kwargs):
-    if instance.old_page is None or instance.old_page.parent_id != instance.parent_id:
+    update_home(instance)
+    if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
         for page in instance.get_descendants(include_self=True):
-            for title in page.title_set.all():
+            for title in page.title_set.all().select_related('page'):
                 update_title(title)
                 title.save()
     if instance.old_page is None or instance.old_page.application_urls != instance.application_urls:
@@ -186,8 +245,7 @@ def post_save_page(instance, **kwargs):
 
 
 def update_placeholders(instance, **kwargs):
-    if not kwargs.get('raw'):
-        instance.rescan_placeholders()
+    instance.page.rescan_placeholders(instance.language)
 
 
 def invalidate_menu_cache(instance, **kwargs):
@@ -197,9 +255,10 @@ def invalidate_menu_cache(instance, **kwargs):
 signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
 signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
 signals.post_save.connect(post_save_page, sender=Page)
-signals.post_save.connect(update_placeholders, sender=Page)
+signals.post_save.connect(update_placeholders, sender=Title)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
+signals.pre_delete.connect(pre_delete_title, sender=Title)
 
 
 def pre_save_user(instance, raw, **kwargs):

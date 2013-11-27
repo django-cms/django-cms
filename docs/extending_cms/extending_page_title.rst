@@ -17,6 +17,18 @@ every field you want but make sure you doesn't use a unique constraint on any
 of your added fields because uniqueness prevents the copy mechanism of the
 extension. This forbids the use of OneToOne relations on the ExtensionModel.
 
+Example::
+
+    from cms.extensions import extension_pool
+    from cms.extensions.models import PageExtension
+    from filer.fields.image import FilerImageField
+
+
+    class Icon(PageExtension):
+        icon = models.ImageField("icon", upload_to="icons")
+
+    extension_pool.register(Icon)
+
 
 ***************************************
 Hooking the extension to the admin site
@@ -24,12 +36,31 @@ Hooking the extension to the admin site
 
 To make your created extension editable, create an admin that subclasses
 ``cms.admin.pageextensionadmin.PageExtensionAdmin``. This admin handles
-Permissions and if you want to use your own admin class make sure to exclude
-the live versions of the extensions by using
-``filter(extended_page__publisher_is_draft=True)`` on the queryset.
+Permissions and copying of draft version to public versions.
 
-If you save an extension, the corresponding page is marked as having
-unpublished changes. To see your extension live make sure to publish the page.
+Example::
+
+    from cms.extensions import PageExtensionAdmin
+    from django.contrib import admin
+    from .models import Icon
+
+    class IconAdmin(PageExtensionAdmin):
+        list_display = ('extended_object', 'icon', 'is_draft_page')
+
+        def is_draft_page(self, obj):
+            return obj.extended_object.publisher_is_draft
+
+    admin.site.register(Icon, IconAdmin)
+
+
+.. warning::
+    If you want to use your own admin class make sure to exclude
+    the live versions of the extensions by using
+    ``filter(extended_page__publisher_is_draft=True)`` on the queryset.
+
+.. note::
+    If you save an extension, the corresponding page is marked as having
+    unpublished changes. To see your extension live make sure to publish the page.
 
 To make your model editable from the cms toolbar, add a menu entry as in the
 example below::
@@ -84,4 +115,48 @@ Advices
 *******
 
 
-If you want the extension to show up in the menu e.g. if you had created an extension that added an icon to the page use MenuModifiers. Every node.id corresponds to their related page.id. ``Page.objects.get(pk=node.id)`` is the way to get the page object. Every page extension has a OneToOne relationship with the page so you can access it by using the reverse relation e.g. ``extension = page.yourextensionlowercased``. Now you can hook this extension by storing it on the node: ``node.extension = extension``. In the menu template you can access your icon on the child object: ``child.extension.icon``. 
+If you want the extension to show up in the menu e.g. if you had created an extension that added an icon to the page use
+MenuModifiers. Every node.id corresponds to their related page.id. ``Page.objects.get(pk=node.id)`` is the way to get
+the page object. Every page extension has a OneToOne relationship with the page so you can access it by using the
+reverse relation e.g. ``extension = page.yourextensionlowercased``. Now you can hook this extension by storing it on
+the node: ``node.extension = extension``. In the menu template you can access your icon on the child object:
+``child.extension.icon``.
+
+Example::
+
+    from menus.menu_pool import menu_pool
+    from menus.base import Modifier
+    from .models import Icon
+
+
+    class PageIconModifier(Modifier):
+        """
+        adds page icons to menu nodes
+        """
+        post_cut = True
+
+        def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+            if breadcrumb:
+                return nodes
+            # collect all node ids, so we can get all Icons in one query
+            ids = []
+            for node in nodes:
+                try:
+                    ids.append(int(node.id))  # cms-pages have numeric ids
+                except ValueError:
+                    pass
+            if not ids:
+                # there are no cms pages that could have icon extensions. return early
+                return nodes
+            # one query to get all Icons
+            icon_extensions = {
+                icon_extension.extended_object_id: icon_extension.icon.url for icon_extension in Icon.objects.filter(
+                                                                        extended_object__in=ids, icon__isnull=False
+                                                                        ).select_related('icon')
+            }
+            for node in nodes:
+                if node.id in icon_extensions.keys():
+                    node.icon_url = icon_extensions[node.id]
+            return nodes
+
+    menu_pool.register_modifier(PageIconModifier)

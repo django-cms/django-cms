@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import sys
+import json
+
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
@@ -13,9 +16,7 @@ from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 from cms.utils.compat.urls import urljoin, unquote
-import sys
 import warnings
-import json
 from cms.utils.permissions import set_current_user
 
 
@@ -25,8 +26,8 @@ URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
 URL_CMS_PAGE_ADVANCED_CHANGE = urljoin(URL_CMS_PAGE, "%d/advanced-settings/")
 URL_CMS_PAGE_PERMISSION_CHANGE = urljoin(URL_CMS_PAGE, "%d/permission-settings/")
 URL_CMS_PAGE_CHANGE_LANGUAGE = URL_CMS_PAGE_CHANGE + "?language=%s"
-URL_CMS_PAGE_CHANGE_TEMPLATE = URL_CMS_PAGE_CHANGE + "change_template/"
-URL_CMS_PAGE_PUBLISH = URL_CMS_PAGE_CHANGE + "publish/"
+URL_CMS_PAGE_CHANGE_TEMPLATE = URL_CMS_PAGE_CHANGE + "%s/change_template/"
+URL_CMS_PAGE_PUBLISH = URL_CMS_PAGE_CHANGE + "%s/publish/"
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
 URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE, "edit-plugin/")
@@ -50,7 +51,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     def showWarning(message, category, filename, lineno, file=None, line=None):
         assert isinstance(message, Warning)
         observeWarning(_Warning(
-                message.args[0], category, filename, lineno))
+            message.args[0], category, filename, lineno))
 
     # Disable the per-module cache for every module otherwise if the warning
     # which the caller is expecting us to collect was already emitted it won't
@@ -109,7 +110,7 @@ class CMSTestCase(testcases.TestCase):
         Set `permissions` parameter to an iterable of permission codes to add
         custom permissios.
         """
-        user = User(username=username, email=username+'@django-cms.org',
+        user = User(username=username, email=username + '@django-cms.org',
                     is_staff=is_staff, is_active=is_active, is_superuser=is_superuser)
         user.set_password(username)
         user.save()
@@ -155,23 +156,22 @@ class CMSTestCase(testcases.TestCase):
             'slug': 'test-page-%d' % self.counter,
             'language': settings.LANGUAGES[0][0],
             'template': 'nav_playground.html',
-            'parent': parent_id,
-            'site': 1,
+            'parent': parent_id, 'site': 1,
+            'pagepermission_set-TOTAL_FORMS': 0,
+            'pagepermission_set-INITIAL_FORMS': 0,
+            'pagepermission_set-MAX_NUM_FORMS': 0,
+            'pagepermission_set-2-TOTAL_FORMS': 0,
+            'pagepermission_set-2-INITIAL_FORMS': 0,
+            'pagepermission_set-2-MAX_NUM_FORMS': 0
         }
         # required only if user haves can_change_permission
-        page_data['pagepermission_set-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
-        self.counter = self.counter + 1
+        self.counter += 1
         return page_data
 
-    
+
     def get_new_page_data_dbfields(self, parent=None, site=None,
                                    language=None,
-                                   template='nav_playground.html',):
+                                   template='nav_playground.html', ):
         page_data = {
             'title': 'test page %d' % self.counter,
             'slug': 'test-page-%d' % self.counter,
@@ -182,8 +182,8 @@ class CMSTestCase(testcases.TestCase):
         }
         self.counter = self.counter + 1
         return page_data
-    
-    
+
+
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
         created from get_new_page_data so you can switch between test cases
@@ -198,7 +198,7 @@ class CMSTestCase(testcases.TestCase):
         page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         return page_data
-    
+
 
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
@@ -206,7 +206,7 @@ class CMSTestCase(testcases.TestCase):
         for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
             print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-                                    page.pk, page.lft, page.rght, page.tree_id))
+            page.pk, page.lft, page.rght, page.tree_id))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -216,6 +216,7 @@ class CMSTestCase(testcases.TestCase):
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
                 print(u"%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
+
         _rec(nodes)
 
     def assertObjectExist(self, qs, **filter):
@@ -331,18 +332,18 @@ class CMSTestCase(testcases.TestCase):
 
         # TODO: add check for siblings
         draft_siblings = list(page.get_siblings(True).filter(
-                publisher_is_draft=True
-            ).order_by('tree_id', 'parent', 'lft'))
+            publisher_is_draft=True
+        ).order_by('tree_id', 'parent', 'lft'))
         public_siblings = list(public_page.get_siblings(True).filter(
-                publisher_is_draft=False
-            ).order_by('tree_id', 'parent', 'lft'))
+            publisher_is_draft=False
+        ).order_by('tree_id', 'parent', 'lft'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1
                 continue
             self.assertEqual(sibling.id,
-                public_siblings[i - skip].publisher_draft.id)
+                             public_siblings[i - skip].publisher_draft.id)
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
@@ -359,6 +360,7 @@ class CMSTestCase(testcases.TestCase):
         self.assertTrue(first.category is category)
 
         return result
+
     assertWarns = failUnlessWarns
 
 

@@ -72,16 +72,14 @@ class PageForm(forms.ModelForm):
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
 
-
     class Meta:
         model = Page
-        fields = ["parent", "site", 'template']
+        fields = ["parent", "site"]
 
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)
         self.fields['parent'].widget = HiddenInput()
         self.fields['site'].widget = HiddenInput()
-        self.fields['template'].widget = HiddenInput()
         self.fields['language'].widget = HiddenInput()
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
@@ -116,7 +114,7 @@ class PageForm(forms.ModelForm):
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
-        if self.instance and self.instance.published and page.title_set.count():
+        if self.instance and page.title_set.count():
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
@@ -150,12 +148,6 @@ class PageForm(forms.ModelForm):
         if not language in get_language_list():
             raise ValidationError("Given language does not match language settings.")
         return language
-
-
-class PublicationForm(forms.ModelForm):
-    class Meta:
-        model = Page
-        fields = ["publication_date", "publication_end_date"]
 
 
 class AdvancedSettingsForm(forms.ModelForm):
@@ -217,7 +209,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = [
-            'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'site', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
             'application_urls', 'application_namespace'
         ]
 

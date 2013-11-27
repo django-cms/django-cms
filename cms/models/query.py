@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-from cms.utils.conf import get_cms_setting
-from django.db.models import Q
 from django.contrib.sites.models import Site
 from cms.publisher.query import PublisherQuerySet
-from django.conf import settings
 from cms.exceptions import NoHomeFound
-from django.utils import timezone
 
 
 class PageQuerySet(PublisherQuerySet):
@@ -48,28 +43,22 @@ class PageQuerySet(PublisherQuerySet):
         else:
             return self.exclude(id__in=exclude_list)
 
-    def published(self, site=None):
+    def published(self, language, site=None):
         pub = self.on_site(site).filter(
-            Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
-            Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
-            published=True,
+            publisher_public_id__gt=0, title_set__language=language, title_set__publisher_public_id__gt=0
         )
         return pub
-
-    def expired(self):
-        return self.on_site().filter(
-            publication_end_date__lte=timezone.now())
 
     def get_all_pages_with_application(self):
         """Returns all pages containing applications for all sites.
 
         Doesn't cares about the application language.
         """
-        return self.published().filter(title_set__application_urls__gt='').distinct()
+        return self.published().filter(application_urls__gt='').distinct()
 
-    def get_home(self, site=None):
+    def get_home(self, site=None, language=None):
         try:
-            home = self.published(site).all_root().order_by("tree_id")[0]
+            home = self.published(language, site).all_root().order_by("tree_id")[0]
         except IndexError:
             raise NoHomeFound('No Root page found. Publish at least one page!')
         return home

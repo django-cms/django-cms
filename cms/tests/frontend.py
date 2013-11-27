@@ -91,7 +91,7 @@ class ToolbarBasicTests(CMSLiveTests):
 
     @skipIf(not WebDriver, 'Selenium not found or Django too old')
     def test_toolbar_login(self):
-        create_page('Home', 'simple.html', 'en', published=True).publish()
+        create_page('Home', 'simple.html', 'en', published=True).publish('en')
         user = User()
         user.username = 'admin'
         user.set_password('admin')

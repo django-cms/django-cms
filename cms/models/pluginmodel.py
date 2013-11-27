@@ -346,7 +346,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
     def get_breadcrumb(self):
         from cms.models import Page
-
         models = self.placeholder._get_attached_models()
         if models:
             model = models[0]

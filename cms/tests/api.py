@@ -82,12 +82,6 @@ class PythonAPITests(TestCase):
                                **self._get_default_create_page_arguments())
             self.assertEqual(page.get_application_urls('en'), APP_NAME)
 
-    def test_invalid_dates(self):
-        self.assertRaises(AssertionError, create_page, publication_date=1,
-                          **self._get_default_create_page_arguments())
-        self.assertRaises(AssertionError, create_page, publication_end_date=1,
-                          **self._get_default_create_page_arguments())
-
     def test_nav_extenders_invalid_type(self):
         if not menu_pool.discovered:
             menu_pool.discover_menus()

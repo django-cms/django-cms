@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.utils import get_cms_setting
 from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils import timezone
@@ -10,6 +12,8 @@ from cms.utils.helpers import reversion_register
 
 @python_2_unicode_compatible
 class Title(models.Model):
+    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+
     language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
     page_title = models.CharField(_("title"), max_length=255, blank=True, null=True,
@@ -24,6 +28,18 @@ class Title(models.Model):
     redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
+
+     # Publisher fields
+    publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
+    # This is misnamed - the one-to-one relation is populated on both ends
+    publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
+    publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
+    published = models.BooleanField(default=False, db_index=True)
+    # If the draft is loaded from a reversion version save the revision id here.
+    revision_id = models.PositiveIntegerField(default=0, editable=False)
+    template = models.CharField(_("template"), max_length=100, choices=template_choices,
+                                help_text=_('The template used to render the content.'),
+                                default=TEMPLATE_INHERITANCE_MAGIC)
     objects = TitleManager()
 
     class Meta:
@@ -53,6 +69,9 @@ class Title(models.Model):
         if self.has_url_overwrite:
             return self.path
         return None
+
+    def is_dirty(self):
+        return self.publisher_state == self.PUBLISHER_STATE_DIRTY
 
 
 class EmptyTitle(object):

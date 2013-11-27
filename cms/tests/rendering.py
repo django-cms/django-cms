@@ -84,13 +84,13 @@ class RenderingTestCase(SettingsOverrideTestCase):
                    body=self.test_data['text_main'])
         add_plugin(self.test_placeholders['sub'], 'TextPlugin', 'en',
                    body=self.test_data['text_sub'])
-        p.publish()
+        p.publish('en')
 
         # Insert another page that is not the home page
         p2 = create_page(self.test_data2['title'], TEMPLATE_NAME, 'en',
                          parent=p, slug=self.test_data2['slug'], published=True,
                          reverse_id=self.test_data2['reverse_id'])
-        p2.publish()
+        p2.publish('en')
 
         # Insert another page that is not the home page
         p3 = create_page(self.test_data3['title'], TEMPLATE_NAME, 'en',
@@ -103,7 +103,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
                    body=self.test_data3['text_sub'])
-        p3.publish()
+        p3.publish('en')
 
         # Insert another page that is not the home
         p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
@@ -113,7 +113,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             self.test_placeholders4[placeholder.slot] = placeholder
             # Insert some test plugins
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')
-        p4.publish()
+        p4.publish('en')
 
         # Reload test pages
         self.test_page = self.reload(p.publisher_public)

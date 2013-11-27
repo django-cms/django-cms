@@ -24,7 +24,7 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
     """
     template = None
     if page:
-        template = page.template
+        template = page.get_template()
     main_list = []
     for plugin in plugins_list:
         if parent:

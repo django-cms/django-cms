@@ -86,7 +86,7 @@ class ExtensionsTestCase(TestCase):
         page.mypageextension = page_extension
 
         # publish first time
-        page.publish()
+        page.publish('en')
         self.assertEqual(page_extension.extra, page.publisher_public.mypageextension.extra)
 
         # change and publish again
@@ -94,7 +94,7 @@ class ExtensionsTestCase(TestCase):
         page_extension = page.mypageextension
         page_extension.extra = 'page extension 1 - changed'
         page_extension.save()
-        page.publish()
+        page.publish('en')
 
         # delete
         page_extension.delete()
@@ -108,7 +108,7 @@ class ExtensionsTestCase(TestCase):
         page.mytitleextension = title_extension
 
         # publish first time
-        page.publish()
+        page.publish('en')
         # import ipdb; ipdb.set_trace()
         self.assertEqual(title_extension.extra_title, page.publisher_public.get_title_obj().mytitleextension.extra_title)
 
@@ -118,7 +118,7 @@ class ExtensionsTestCase(TestCase):
         title_extension = title.mytitleextension
         title_extension.extra_title = 'title extension 1 - changed'
         title_extension.save()
-        page.publish()
+        page.publish('en')
 
         # delete
         title_extension.delete()

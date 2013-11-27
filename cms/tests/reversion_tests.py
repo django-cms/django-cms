@@ -81,7 +81,7 @@ class ReversionTestCase(CMSTestCase):
             p_data = self.page_data.copy()
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page.publish()
+            page.publish('en')
 
     def test_revert(self):
         """

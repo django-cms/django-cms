@@ -168,11 +168,13 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         page_1 = create_page('Page 1', 'nav_playground.html', 'en', published=True,
                              in_navigation=True, reverse_id='page1')
         create_title("de", "Seite 1", page_1, slug="seite-1")
-        page_1.publish()
+        page_1.publish('en')
+        page_1.publish('de')
         page_2 = create_page('Page 2', 'nav_playground.html', 'en', page_1, published=True,
                              in_navigation=True, reverse_id='page2')
         create_title("de", "Seite 2", page_2, slug="seite-2")
-        page_2.publish()
+        page_2.publish('en')
+        page_2.publish('de')
         page_3 = create_page('Page 3', 'nav_playground.html', 'en', page_2, published=True,
                              in_navigation=True, reverse_id='page3')
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
@@ -214,7 +216,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         """
         page = create_page('Test', 'col_two.html', 'en')
         # I need to make it seem like the user added another plcaeholder to the SAME template.
-        page._template_cache = 'col_three.html'
+        page._template_cache['en'] = 'col_three.html'
 
         class FakeRequest(object):
             current_page = page
@@ -263,7 +265,7 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         template = Template(
             "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
@@ -281,12 +283,12 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         request = RequestFactory().get('/')
         user = User(username="admin", password="admin", is_superuser=True, is_staff=True, is_active=True)
         user.save()
-        request.current_page = page.publisher_public
+        request.current_page = page
         request.user = user
         template = Template(
             "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}")
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')
@@ -294,6 +296,6 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         request.current_page = page
         request.user = user
         context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(3):
             output = template.render(context)
         self.assertIn('<b>Test2</b>', output)

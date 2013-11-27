@@ -98,7 +98,6 @@ class AdminTestCase(AdminTestsBase):
             'slug': page.get_slug(),
             'language': title.language,
             'site': page.site.pk,
-            'template': page.template,
             'pagepermission_set-TOTAL_FORMS': 0,
             'pagepermission_set-INITIAL_FORMS': 0,
             'pagepermission_set-MAX_NUM_FORMS': 0,
@@ -126,7 +125,6 @@ class AdminTestCase(AdminTestsBase):
                 'slug': page.get_slug(),
                 'language': title.language,
                 'site': page.site.pk,
-                'template': page.template,
                 'reverse_id': page.reverse_id,
                 'pagepermission_set-TOTAL_FORMS': 0, # required only if user haves can_change_permission
                 'pagepermission_set-INITIAL_FORMS': 0,
@@ -183,15 +181,11 @@ class AdminTestCase(AdminTestsBase):
             'slug': page.get_slug(),
             'language': title.language,
             'site': page.site.pk,
-            'template': page.template,
+            'pagepermission_set-TOTAL_FORMS': 0, 'pagepermission_set-INITIAL_FORMS': 0,
+            'pagepermission_set-MAX_NUM_FORMS': 0, 'pagepermission_set-2-TOTAL_FORMS': 0,
+            'pagepermission_set-2-INITIAL_FORMS': 0, 'pagepermission_set-2-MAX_NUM_FORMS': 0
         }
         # required only if user haves can_change_permission
-        page_data['pagepermission_set-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
 
         with self.login_user_context(normal_guy):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
@@ -209,7 +203,6 @@ class AdminTestCase(AdminTestsBase):
                 'slug': page.get_slug(),
                 'language': title.language,
                 'site': page.site.pk,
-                'template': page.template,
                 'reverse_id': page.reverse_id,
             }
 
@@ -280,11 +273,11 @@ class AdminTestCase(AdminTestsBase):
         request.method = "POST"
         pageadmin = site._registry[Page]
         with self.login_user_context(staff):
-            self.assertRaises(Http404, pageadmin.change_template, request, 1)
+            self.assertRaises(Http404, pageadmin.change_template, request, 1, 'en')
             page = create_page('test-page', 'nav_playground.html', 'en')
-            response = pageadmin.change_template(request, page.pk)
+            response = pageadmin.change_template(request, page.pk, 'en')
             self.assertEqual(response.status_code, 403)
-        url = reverse('admin:cms_page_change_template', args=(page.pk,))
+        url = reverse('admin:cms_page_change_template', args=(page.pk, 'en'))
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
             self.assertEqual(response.status_code, 400)
@@ -412,36 +405,36 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.get_moderation_states(request, page.pk)
             self.assertEqual(response.status_code, 200)
 
-    def test_change_status(self):
+    def test_change_publish_unpublish(self):
         page = self.get_page()
         permless = self.get_permless()
         with self.login_user_context(permless):
             request = self.get_request()
-            response = self.admin_class.change_status(request, page.pk)
-            self.assertEqual(response.status_code, 405)
+            response = self.admin_class.publish_page(request, page.pk, "en")
+            self.assertEqual(response.status_code, 403)
             page = self.reload(page)
-            self.assertFalse(page.published)
+            self.assertFalse(page.publisher_public_id > 0)
 
             request = self.get_request(post_data={'no': 'data'})
-            response = self.admin_class.change_status(request, page.pk)
+            response = self.admin_class.publish_page(request, page.pk, "en")
             # Forbidden
             self.assertEqual(response.status_code, 403)
-            self.assertFalse(page.published)
+            self.assertFalse(page.publisher_public_id > 0)
 
         admin = self.get_admin()
         with self.login_user_context(admin):
             request = self.get_request(post_data={'no': 'data'})
-            response = self.admin_class.change_status(request, page.pk)
+            response = self.admin_class.publish_page(request, page.pk, "en")
+            self.assertEqual(response.status_code, 302)
+
+            page = self.reload(page)
+            self.assertTrue(page.publisher_public_id > 0)
+
+            response = self.admin_class.unpublish(request, page.pk, "en")
             self.assertEqual(response.status_code, 200)
 
             page = self.reload(page)
-            self.assertTrue(page.published)
-
-            response = self.admin_class.change_status(request, page.pk)
-            self.assertEqual(response.status_code, 200)
-
-            page = self.reload(page)
-            self.assertFalse(page.published)
+            self.assertFalse(page.title_set.filter(published=True).count() > 0)
 
     def test_change_status_adds_log_entry(self):
         page = self.get_page()
@@ -449,8 +442,8 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(admin):
             request = self.get_request(post_data={'no': 'data'})
             self.assertFalse(LogEntry.objects.count())
-            response = self.admin_class.change_status(request, page.pk)
-            self.assertEqual(response.status_code, 200)
+            response = self.admin_class.publish_page(request, page.pk, "en")
+            self.assertEqual(response.status_code, 302)
             self.assertEqual(1, LogEntry.objects.count())
             self.assertEqual(page.pk, int(LogEntry.objects.all()[0].object_id))
 
@@ -483,7 +476,7 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             request.method = "POST"
-            response = self.admin_class.publish_page(request, Page.objects.all()[0].pk)
+            response = self.admin_class.publish_page(request, Page.objects.all()[0].pk, "en")
             self.assertEqual(response.status_code, 403)
 
     def test_revert_page_requires_perms(self):
@@ -491,14 +484,14 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             request.method = "POST"
-            response = self.admin_class.revert_page(request, Page.objects.all()[0].pk)
+            response = self.admin_class.revert_page(request, Page.objects.all()[0].pk, 'en')
             self.assertEqual(response.status_code, 403)
 
     def test_revert_page_redirects(self):
         admin = self.get_admin()
-        self.page.publish() # Ensure public copy exists before reverting
+        self.page.publish("en")  # Ensure public copy exists before reverting
         with self.login_user_context(admin):
-            response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk,)))
+            response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk, 'en')))
             self.assertEqual(response.status_code, 302)
             url = response['Location']
             self.assertTrue(url.endswith('?edit_off'))
@@ -582,7 +575,7 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(Http404, self.admin_class.preview_page, request,
                               404)
         page = self.get_page()
-        page.publish()
+        page.publish("en")
         base_url = page.get_absolute_url()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
@@ -596,8 +589,8 @@ class AdminTests(AdminTestsBase):
             site = Site.objects.create(domain='django-cms.org', name='django-cms')
             page.site = site
             page.save()
-            page.publish()
-            self.assertTrue(page.is_home())
+            page.publish("en")
+            self.assertTrue(page.is_home)
             response = self.admin_class.preview_page(request, page.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'],
@@ -658,7 +651,7 @@ class AdminTests(AdminTestsBase):
         page = create_page('A', 'nav_playground.html', language)
         page_admin = PageAdmin(Page, None)
         page_admin._current_page = page
-        page.publish()
+        page.publish("en")
         draft_page = page.get_draft_object()
         admin_url = reverse("admin:cms_page_edit_title", args=(
             draft_page.pk, language
@@ -678,7 +671,7 @@ class AdminTests(AdminTestsBase):
         page = create_page('A', 'nav_playground.html', language)
         page_admin = PageAdmin(Page, None)
         page_admin._current_page = page
-        page.publish()
+        page.publish("en")
         draft_page = page.get_draft_object()
         admin_url = reverse("admin:cms_page_edit_title", args=(
             draft_page.pk, language
@@ -968,7 +961,6 @@ class AdminFormsTests(AdminTestsBase):
         site0 = Site.objects.create(domain='foo.com', name='foo.com')
         site1 = Site.objects.create(domain='foo.com', name='foo.com')
         parent_page = Page.objects.create(
-            template='nav_playground.html',
             site=site0)
         new_page_data = {
             'title': 'Title',

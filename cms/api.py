@@ -111,7 +111,6 @@ def _verify_plugin_type(plugin_type):
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, apphook_namespace=None, redirect=None, meta_description=None,
                 created_by='python-api', parent=None,
-                publication_date=None, publication_end_date=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
@@ -128,8 +127,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     else:
         _thread_locals.user = None
 
-    # validate template
-    assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+
 
     # validate site
     if not site:
@@ -148,14 +146,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     if parent:
         assert isinstance(parent, Page)
         parent = Page.objects.get(pk=parent.pk)
-
-    # validate publication date
-    if publication_date:
-        assert isinstance(publication_date, datetime.date)
-
-    # validate publication end date
-    if publication_end_date:
-        assert isinstance(publication_end_date, datetime.date)
 
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
@@ -178,14 +168,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         created_by=created_by,
         changed_by=created_by,
         parent=parent,
-        publication_date=publication_date,
-        publication_end_date=publication_end_date,
         in_navigation=in_navigation,
         soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        published=False, # will be published later
-        template=template,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
         site=site,
@@ -203,11 +189,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
-        overwrite_url=overwrite_url
+        overwrite_url=overwrite_url,
+        template=template,
     )
 
     if published:
-        page.publish()
+        page.publish(language)
 
     del _thread_locals.user
     return page.reload()
@@ -215,7 +202,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None,
-                 parent=None, overwrite_url=None):
+                 parent=None, overwrite_url=None, template=None):
     """
     Create a title.
     
@@ -229,6 +216,11 @@ def create_title(language, title, page, menu_title=None, slug=None,
     # validate language:
     assert language in get_language_list(page.site_id)
 
+    # validate template
+    assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')] or page.title_set.count() > 0
+
+    if not template:
+        template = page.title_set.all()[0].template
     # set default slug:
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
@@ -240,7 +232,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
         slug=slug,
         redirect=redirect,
         meta_description=meta_description,
-        page=page
+        page=page,
+        template=template,
     )
 
     if overwrite_url:
@@ -360,7 +353,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     return page_permission
 
 
-def publish_page(page, user):
+def publish_page(page, user, language):
     """
     Publish a page. This sets `page.published` to `True` and calls publish()
     which does the actual publishing.
@@ -376,9 +369,7 @@ def publish_page(page, user):
     request = FakeRequest(user)
     if not page.has_publish_permission(request):
         raise PermissionDenied()
-    page.published = True
-    page.save()
-    page.publish()
+    page.publish(language)
     return page.reload()
 
 

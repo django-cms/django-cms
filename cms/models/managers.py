@@ -70,10 +70,10 @@ class PageManager(PublisherManager):
 
         Doesn't cares about the application language.
         """
-        return self.get_query_set().filter(title_set__application_urls__gt='').distinct()
+        return self.get_query_set().filter(application_urls__gt='').distinct()
 
-    def get_home(self, site=None):
-        return self.get_query_set().get_home(site)
+    def get_home(self, site=None, language=None):
+        return self.get_query_set().get_home(site, language)
 
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
@@ -153,10 +153,10 @@ class TitleManager(PublisherManager):
 
     # created new public method to meet test case requirement and to get a list of titles for published pages
     def public(self):
-        return self.get_query_set().filter(page__publisher_is_draft=False, page__published=True)
+        return self.get_query_set().filter(publisher_is_draft=False)
 
     def drafts(self):
-        return self.get_query_set().filter(page__publisher_is_draft=True)
+        return self.get_query_set().filter(publisher_is_draft=True)
 
     def set_or_create(self, request, page, form, language):
         """
@@ -167,7 +167,8 @@ class TitleManager(PublisherManager):
             'title',
             'meta_description',
             'page_title',
-            'menu_title'
+            'menu_title',
+            'template',
         ]
         advanced_fields = [
             'redirect',

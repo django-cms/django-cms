@@ -102,14 +102,15 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context.push()
     request = context['request']
     page = placeholder.page if placeholder else None
-    if page:
-        template = page.template
-    else:
-        template = None
+
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work
     if not lang:
         lang = get_language_from_request(request)
+    if page:
+        template = page.get_template(lang)
+    else:
+        template = None
     plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
@@ -171,7 +172,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
     if not page:
         page = getattr(request, 'current_page', None)
     if page:
-        template = page.template
+        template = page.get_template(get_language_from_request(request, page))
         if name_fallback and not placeholder:
             placeholder = Placeholder.objects.create(slot=name_fallback)
             page.placeholders.add(placeholder)

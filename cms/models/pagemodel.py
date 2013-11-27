@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
 
 from cms import constants
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied
-from cms.exceptions import NoHomeFound, PublicIsUnmodifiable
+from cms.exceptions import PublicIsUnmodifiable
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -21,7 +19,6 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
@@ -43,43 +40,33 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     # Page was marked published, but some of page parents are not.
     PUBLISHER_STATE_PENDING = 4
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
-
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
     changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     changed_date = models.DateTimeField(auto_now=True)
-
-    publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_(
-        'When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
-    publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True,
-                                                help_text=_('When to expire the page. Leave empty to never expire.'),
-                                                db_index=True)
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
                                     help_text=_("All ancestors will not be displayed in the navigation"))
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
         "An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
-    published = models.BooleanField(_("is published"), blank=True)
-
-    template = models.CharField(_("template"), max_length=100, choices=template_choices,
-                                help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_INHERITANCE_MAGIC)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"))
 
     login_required = models.BooleanField(_("login required"), default=False)
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
+    is_home = models.BooleanField(editable=False, db_index=True)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
+
+    is_home = models.BooleanField(_("Is homepage"), db_index=True)
+
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
-
     # Placeholders (plugins)
     placeholders = models.ManyToManyField(Placeholder, editable=False)
 
@@ -88,8 +75,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
-    # If the draft is loaded from a reversion version save the revision id here.
-    revision_id = models.PositiveIntegerField(default=0, editable=False)
+    published_languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
+    languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
+
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -126,7 +114,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.publisher_state == self.PUBLISHER_STATE_DIRTY
 
     def get_absolute_url(self, language=None, fallback=True):
-        if self.is_home():
+        if self.is_home:
             return reverse('pages-root')
         path = self.get_path(language, fallback) or self.get_slug(language, fallback)
         return reverse('pages-details-by-slug', kwargs={"slug": path})
@@ -143,17 +131,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         """
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
-
-        # readability counts :)
-        is_inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
-
-        # make sure move_page does not break when using INHERIT template
-        # and moving to a top level position
-
-        if (position in ('left', 'right') and not target.parent and is_inherited_template):
-            self.template = self.get_template()
+        # if we move a page to root be sure that it takes its template with it
+        for title in self.title_set.all():
+            is_inherited_template = title.template == constants.TEMPLATE_INHERITANCE_MAGIC
+            if position in ('left', 'right') and not target.parent and is_inherited_template:
+                title.template = self.get_template(title.language)
+                title.save()
+                self._template_cache = {}
         self.move_to(target, position)
-
         # fire signal
         import cms.signals as cms_signals
 
@@ -173,32 +158,41 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             public_page.save()
             page_utils.check_title_slugs(public_page)
 
-    def _copy_titles(self, target):
+    def _copy_titles(self, target, language):
         """
         Copy all the titles to a new page (which must have a pk).
         :param target: The page where the new titles should be stored
         """
-        old_titles = dict(target.title_set.values_list('language', 'pk'))
-        for title in self.title_set.all():
+        from .titlemodels import Title
+
+        old_titles = dict(target.title_set.filter(language=language).values_list('language', 'pk'))
+        for title in self.title_set.filter(language=language):
+            old_pk = title.pk
             # If an old title exists, overwrite. Otherwise create new
             title.pk = old_titles.pop(title.language, None)
             title.page = target
+            title.publisher_is_draft = False
+            title.publisher_public_id = old_pk
+            title.published = True
             title.save()
+            old_title = Title.objects.get(pk=old_pk)
+            old_title.publisher_public = title
+            old_title.publisher_state = 0
+            old_title.published = True
+            old_title.save()
         if old_titles:
-            from .titlemodels import Title
-
             Title.objects.filter(id__in=old_titles.values()).delete()
 
-    def _copy_contents(self, target):
+    def _copy_contents(self, target, language):
         """
         Copy all the plugins to a new page.
         :param target: The page where the new content should be stored
         """
         # TODO: Make this into a "graceful" copy instead of deleting and overwriting
         # copy the placeholders (and plugins on those placeholders!)
-        CMSPlugin.objects.filter(placeholder__page=target).delete()
+        CMSPlugin.objects.filter(placeholder__page=target, language=language).delete()
         for ph in self.placeholders.all():
-            plugins = ph.get_plugins_list()
+            plugins = ph.get_plugins_list(language)
             try:
                 ph = target.placeholders.get(slot=ph.slot)
             except Placeholder.DoesNotExist:
@@ -215,8 +209,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         that are specific to an exact instance.
         :param target: The Page to copy the attributes to
         """
-        target.publication_date = self.publication_date
-        target.publication_end_date = self.publication_end_date
         target.in_navigation = self.in_navigation
         target.login_required = self.login_required
         target.limit_visibility_in_menu = self.limit_visibility_in_menu
@@ -225,7 +217,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
         target.application_namespace = self.application_namespace
-        target.template = self.template
         target.site_id = self.site_id
 
     def copy_page(self, target, site, position='first-child',
@@ -275,7 +266,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             page.rght = None
             page.lft = None
             page.tree_id = None
-            page.published = False
             page.publisher_public_id = None
             # only set reverse_id on standard copy
             if page.reverse_id in site_reverse_ids:
@@ -314,13 +304,29 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     permission.save()
 
             # copy titles of this page
+            draft_titles = {}
+            public_titles = []
             for title in titles:
+                if title.publisher_is_draft:
+                    title.pk = None  # setting pk = None creates a new instance
+                    title.page = page
+                    if title.publisher_public_id:
+                        draft_titles[title.publisher_public_id] = title
+                        title.publisher_public = None
+                        # create slug-copy for standard copy
+                    title.slug = page_utils.get_available_slug(title)
+                    title.save()
+                else:
+                    public_titles.append(title)
+            for title in public_titles:
+                draft_title = draft_titles[title.pk]
                 title.pk = None  # setting pk = None creates a new instance
                 title.page = page
-
-                # create slug-copy for standard copy
                 title.slug = page_utils.get_available_slug(title)
+                title.publisher_public_id = draft_title.pk
                 title.save()
+                draft_title.publisher_public = title
+                draft_title.save()
 
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
@@ -351,11 +357,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             delattr(self, '_template_cache')
 
         created = not bool(self.pk)
-        # Published pages should always have a publication date
-        # if the page is published we set the publish date if not set yet.
-        if self.publication_date is None and self.published:
-            self.publication_date = timezone.now() - timedelta(seconds=5)
-
         if self.reverse_id == "":
             self.reverse_id = None
         if self.application_namespace == "":
@@ -394,23 +395,19 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
-    def publish(self):
+    def publish(self, language):
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible.
 
         :returns: True if page was successfully published.
         """
         # Publish can only be called on draft pages
+        published = False
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be published. Use draft.')
 
-        # publish, but only if all parents are published!!
-        published = None
-
         if not self.pk:
             self.save()
-        if not self.parent_id:
-            self.clear_home_pk_cache()
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -425,41 +422,45 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
             # Ensure that the page is in the right position and save it
             public_page = self._publisher_save_public(public_page)
-            public_page.published = (public_page.parent_id is None or public_page.parent.published)
-            public_page.save()
+            published = public_page.parent_id is None or public_page.parent.publisher_public_id
+            if published:
+                public_page.save()
 
-            # The target page now has a pk, so can be used as a target
-            self._copy_titles(public_page)
-            self._copy_contents(public_page)
+                # The target page now has a pk, so can be used as a target
+                self._copy_titles(public_page, language)
+                self._copy_contents(public_page, language)
 
-            # invalidate the menu for this site
-            menu_pool.clear(site_id=self.site_id)
+                # invalidate the menu for this site
+                menu_pool.clear(site_id=self.site_id)
 
-            # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
-            # insert_at() was maybe calling _create_tree_space() method, in this
-            # case may tree_id change, so we must update tree_id from db first
-            # before save
-            if getattr(self, 'tree_id', None):
-                me = self._default_manager.get(pk=self.pk)
-                self.tree_id = me.tree_id
+                # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
+                # insert_at() was maybe calling _create_tree_space() method, in this
+                # case may tree_id change, so we must update tree_id from db first
+                # before save
+                if getattr(self, 'tree_id', None):
+                    me = self._default_manager.get(pk=self.pk)
+                    self.tree_id = me.tree_id
 
-            self.publisher_public = public_page
-            published = True
+                self.publisher_public = public_page
         else:
             # Nothing left to do
             pass
 
-        if self.publisher_public and self.publisher_public.published:
+        if self.publisher_public:
             self.publisher_state = Page.PUBLISHER_STATE_DEFAULT
         else:
             self.publisher_state = Page.PUBLISHER_STATE_PENDING
-
-        self.published = True
+        if published:
+            if not self.published_languages or not "|%s|" % language in self.published_languages:
+                if self.published_languages:
+                    self.published_languages += "%s|" % language
+                else:
+                    self.published_languages = "|%s|" % language
         self._publisher_keep_state = True
         self.save()
         # If we are publishing, this page might have become a "home" which
         # would change the path
-        if self.is_home():
+        if self.is_home:
             for title in self.title_set.all():
                 if title.path != '':
                     title.save()
@@ -473,28 +474,24 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         # Check if there are some children which are waiting for parents to
         # become published.
-        publish_set = self.get_descendants().filter(published=True).select_related('publisher_public')
+        publish_set = self.get_descendants().filter(
+            level=self.level + 1,
+            publisher_state=Page.PUBLISHER_STATE_PENDING
+        ).select_related(
+            'publisher_public'
+        )
         for page in publish_set:
-            if page.publisher_public:
-                if page.publisher_public.parent.published:
-                    if not page.publisher_public.published:
-                        page.publisher_public.published = True
-                        page.publisher_public.save()
-                    if page.publisher_state == Page.PUBLISHER_STATE_PENDING:
-                        page.publisher_state = Page.PUBLISHER_STATE_DEFAULT
-                        page._publisher_keep_state = True
-                        page.save()
-            elif page.publisher_state == Page.PUBLISHER_STATE_PENDING:
-                page.publish()
+            if not page.publisher_public_id and page.publisher_state == Page.PUBLISHER_STATE_PENDING:
+                page.publish(language)
 
         # fire signal after publishing is done
         import cms.signals as cms_signals
 
-        cms_signals.post_publish.send(sender=Page, instance=self)
+        cms_signals.post_publish.send(sender=Page, instance=self, language=language)
 
         return published
 
-    def unpublish(self):
+    def unpublish(self, language):
         """
         Removes this page from the public site
         :returns: True if this page was successfully unpublished
@@ -504,46 +501,54 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             raise PublicIsUnmodifiable('The public instance cannot be unpublished. Use draft.')
 
         # First, make sure we are in the correct state
-        self.published = False
-        self.save()
-        public_page = self.get_public_object()
-        if public_page:
-            public_page.published = False
+        title = self.title_set.get(language=language)
+        public_title = title.publisher_public
+        title.published = False
+        title.save()
+        public_title.published = False
+        public_title.save()
+        public_page = self.publisher_public
+        public_placeholders = public_page.placeholders.all()
+        published_languages = self.published_languages.split("|")
+        published_languages.remove(language)
+        self.published_languages = "|".join(published_languages)
+        if not self.title_set.filter(published=True).count() and self.lft + 1 == self.rght:
+            self.published = False
+            self.save()
+        else:
+            for pl in public_placeholders:
+                pl.cmsplugin_set.filter(language=language).delete()
+            public_page.published_languages = self.published_languages
             public_page.save()
 
             # Go through all children of our public instance
             descendants = public_page.get_descendants()
             for child in descendants:
-                child.published = False
+                child.title_set.filter(language=language).update(published=False)
                 child.save()
                 draft = child.publisher_public
-                if (draft and draft.published and
-                        draft.publisher_state == Page.PUBLISHER_STATE_DEFAULT):
+                if draft and draft.publisher_state == Page.PUBLISHER_STATE_DEFAULT:
+                    draft.title_set.filter(language=language).update(published=False)
                     draft.publisher_state = Page.PUBLISHER_STATE_PENDING
                     draft._publisher_keep_state = True
                     draft.save()
-
+        from cms.signals import post_unpublish
+        post_unpublish.send(sender=Page, instance=self)
+        #post_unpublish.send(sender=Page, instance=public_page)
         return True
 
-    def revert(self):
+    def revert(self, language):
         """Revert the draft version to the same state as the public version
         """
         # Revert can only be called on draft pages
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
         if not self.publisher_public:
-            # TODO: Issue an error
-            return
-
+            raise PublicVersionNeeded('A public version of this page is needed')
         public = self.publisher_public
-        public._copy_titles(self)
-        if self.parent != (self.publisher_public.parent_id and
-            self.publisher_public.parent.publisher_draft):
-            # We don't send the signals here
-            self.move_to(public.parent.publisher_draft)
-        public._copy_contents(self)
+        public._copy_titles(self, language)
+        public._copy_contents(self, language)
         public._copy_attributes(self)
-        self.published = True
         self.publisher_state = self.PUBLISHER_STATE_DEFAULT
         self._publisher_keep_state = True
         self.revision_id = 0
@@ -609,14 +614,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.publisher_public
 
     def get_languages(self):
-        """
-        get the list of all existing languages for this page
-        """
-        from cms.models.titlemodels import Title
-
-        if not hasattr(self, "all_languages"):
-            self.all_languages = list(sorted(Title.objects.filter(page=self).values_list("language", flat=True).distinct()))
-        return self.all_languages
+        return sorted(self.languages.split(','))
 
     def get_cached_ancestors(self, ascending=True):
         if ascending:
@@ -752,26 +750,44 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     language = title.language
         return language
 
-    def get_template(self):
+    def set_template(self, template, language):
+        title = self.title_set.get(language=language, publisher_is_draft=self.publisher_is_draft)
+        title.template = template
+        title.save()
+
+    def get_template(self, language=None, fallback=True, version_id=None, force_reload=False, raw=False):
         """
         get the template of this page if defined or if closer parent if
         defined or DEFAULT_PAGE_TEMPLATE otherwise
         """
-        if hasattr(self, '_template_cache'):
-            return self._template_cache
-        template = None
-        if self.template:
-            if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
-                template = self.template
-            else:
-                try:
-                    template = self.get_ancestors(ascending=True).exclude(
-                        template=constants.TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
-                except IndexError:
-                    pass
-        if not template:
+        if not language:
+            language = get_language()
+        if hasattr(self, '_template_cache') and not force_reload and not raw:
+            if language in self._template_cache:
+                return self._template_cache[language]
+        else:
+            self._template_cache = {}
+
+        template = self.get_title_obj_attribute("template", language, fallback, version_id, force_reload)
+        if template and template == constants.TEMPLATE_INHERITANCE_MAGIC and not raw:
+            try:
+                from cms.models.titlemodels import Title
+
+                template = Title.objects.filter(
+                    page__rght__gt=self.rght,
+                    page__lft__lt=self.lft,
+                    language=language
+                ).exclude(
+                    template=constants.TEMPLATE_INHERITANCE_MAGIC
+                ).order_by(
+                    'page__lft'
+                ).values_list('template', flat=True)[0]
+            except IndexError:
+                pass
+        if not template or template == constants.TEMPLATE_INHERITANCE_MAGIC and not raw:
             template = get_cms_setting('TEMPLATES')[0][0]
-        self._template_cache = template
+        if not raw:
+            self._template_cache[language] = template
         return template
 
     def get_template_name(self):
@@ -895,32 +911,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
 
-    def is_home(self):
-        if self.parent_id:
-            return False
-        else:
-            try:
-                return self.home_pk_cache == self.pk
-            except NoHomeFound:
-                pass
-        return False
-
-    def get_home_pk_cache(self):
-        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        if getattr(self, attr, None) is None:
-            setattr(self, attr, self.get_object_queryset().get_home(self.site).pk)
-        return getattr(self, attr)
-
-    def set_home_pk_cache(self, value):
-
-        attr = "%s_home_pk_cache_%s" % (self.publisher_is_draft and "draft" or "public", self.site_id)
-        setattr(self, attr, value)
-
-    home_pk_cache = property(get_home_pk_cache, set_home_pk_cache)
-
-    def clear_home_pk_cache(self):
-        self.home_pk_cache = None
-
     def get_media_path(self, filename):
         """
         Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
@@ -966,7 +956,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             return self._public_published_cache
             # If we have a public version it will be published as well.
         # If it isn't published, it should be deleted.
-        return self.published and self.publisher_public_id and self.publisher_public.published
+        return self.publisher_public_id
 
     def reload(self):
         """
@@ -985,7 +975,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         """
         if self.parent_id:
             try:
-                return bool(self.parent.publisher_public_id)
+                return bool(self.parent.publisher_public_id > 0)
             except AttributeError:
                 raise MpttPublisherCantPublish
         return True
@@ -1101,14 +1091,27 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         return obj
 
-    def rescan_placeholders(self):
+    def rescan_placeholders(self, language=None):
         """
         Rescan and if necessary create placeholders in the current template.
         """
         # inline import to prevent circular imports
         from cms.utils.plugins import get_placeholders
 
-        placeholders = get_placeholders(self.get_template())
+        templates = []
+        if language:
+            templates = [self.get_template(language)]
+        else:
+            for language in self.get_languages():
+                template = self.get_template(language)
+                if not template in templates:
+                    templates.append(template)
+        placeholders = []
+        for template in templates:
+            tmp_pls = get_placeholders(template)
+            for pl in tmp_pls:
+                if not pl in placeholders:
+                    placeholders.append(pl)
         found = {}
         for placeholder in self.placeholders.all():
             if placeholder.slot in placeholders:
