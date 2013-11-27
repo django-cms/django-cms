@@ -180,10 +180,7 @@ def page_to_node(page, home, cut):
     else:
         attr['visible_for_authenticated'] = page.limit_visibility_in_menu == 1
         attr['visible_for_anonymous'] = page.limit_visibility_in_menu == 2
-
-    if page.pk == home.pk:
-        attr['is_home'] = True
-
+    attr['is_home'] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
@@ -253,7 +250,6 @@ class CMSMenu(Menu):
                 continue
             if not home:
                 home = page
-            page.home_pk_cache = home.pk
             if first and page.pk != home.pk:
                 home_cut = True
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:

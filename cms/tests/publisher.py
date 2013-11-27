@@ -166,7 +166,6 @@ class PublishingTests(TestCase):
 
     def test_publish_admin(self):
         page = self.create_page("test_admin", published=False)
-        page.save()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk]))
@@ -174,7 +173,6 @@ class PublishingTests(TestCase):
         page = Page.objects.get(pk=page.pk)
 
         self.assertEqual(page.publisher_state, 0)
-
 
     def test_publish_child_first(self):
         parent = self.create_page('parent', published=False)
@@ -505,8 +503,8 @@ class PublishingTests(TestCase):
         other = self.create_page("Another Page", published=True)
         child = self.create_page("Child", published=True, parent=home)
         child2 = self.create_page("Child", published=True, parent=other)
-        self.assertTrue(home.is_home())
-        self.assertTrue(home.publisher_public.is_home())
+        self.assertTrue(home.is_home)
+        self.assertTrue(home.publisher_public.is_home)
         root = reverse('pages-root')
         self.assertEqual(home.get_absolute_url(), root)
         self.assertEqual(home.get_public_object().get_absolute_url(), root)
@@ -516,16 +514,15 @@ class PublishingTests(TestCase):
         self.assertEqual(other.get_public_object().get_absolute_url(), root + 'another-page/')
         self.assertEqual(child2.get_absolute_url(), root + 'another-page/child/')
         self.assertEqual(child2.get_public_object().get_absolute_url(), root + 'another-page/child/')
-
         home.unpublish()
         home = self.reload(home)
         other = self.reload(other)
         child = self.reload(child)
         child2 = self.reload(child2)
-        self.assertFalse(home.is_home())
-        self.assertFalse(home.publisher_public.is_home())
-        self.assertTrue(other.is_home())
-        self.assertTrue(other.publisher_public.is_home())
+        self.assertFalse(home.is_home)
+        self.assertFalse(home.publisher_public.is_home)
+        self.assertTrue(other.is_home)
+        self.assertTrue(other.publisher_public.is_home)
 
         self.assertEqual(other.get_absolute_url(), root)
         self.assertEqual(other.get_public_object().get_absolute_url(), root)
@@ -542,8 +539,8 @@ class PublishingTests(TestCase):
         other = self.reload(other)
         child = self.reload(child)
         child2 = self.reload(child2)
-        self.assertTrue(home.is_home())
-        self.assertTrue(home.publisher_public.is_home())
+        self.assertTrue(home.is_home)
+        self.assertTrue(home.publisher_public.is_home)
         self.assertEqual(home.get_absolute_url(), root)
         self.assertEqual(home.get_public_object().get_absolute_url(), root)
         self.assertEqual(child.get_absolute_url(), root + 'child/')
