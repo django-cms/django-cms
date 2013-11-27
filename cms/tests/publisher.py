@@ -166,7 +166,6 @@ class PublishingTests(TestCase):
 
     def test_publish_admin(self):
         page = self.create_page("test_admin", published=False)
-        #page.save()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk]))
@@ -174,7 +173,6 @@ class PublishingTests(TestCase):
         page = Page.objects.get(pk=page.pk)
 
         self.assertEqual(page.publisher_state, 0)
-
 
     def test_publish_child_first(self):
         parent = self.create_page('parent', published=False)

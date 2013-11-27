@@ -83,9 +83,7 @@ class PagesTestCase(CMSTestCase):
 
         }
         page = create_page(**page_data)
-
-        self.assertFalse(page.is_home, "The page should not be marked as "
-                                         "home before being published")
+        self.assertFalse(page.is_home, "The page should not be marked as home before being published")
         page.publish()
         page = page.reload()
         assert Page.objects.count() == 2

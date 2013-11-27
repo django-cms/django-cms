@@ -250,7 +250,6 @@ class CMSMenu(Menu):
                 continue
             if not home:
                 home = page
-            page.home_pk_cache = home.pk
             if first and page.pk != home.pk:
                 home_cut = True
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
