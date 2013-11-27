@@ -18,6 +18,7 @@ $(document).ready(function () {
 			},
 			'minHeight': 400,
 			'minWidth': 600
+			'onClose': false
 		},
 
 		initialize: function (options) {
@@ -129,6 +130,11 @@ $(document).ready(function () {
 
 		close: function () {
 			this._hide(100);
+			switch(this.options.onClose) {
+				case 'REFRESH_PAGE':
+					this.reloadBrowser();
+					break;
+			}
 		},
 
 		// private methods
