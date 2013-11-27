@@ -6,20 +6,6 @@
 //######################################################################################################################
 // #TOOLBAR#
 
-// debug mode
-.cms_toolbar-debug {
-	.cms_toolbar { top:5px !important; }
-	.cms_toolbar-trigger { top:5px !important; }
-
-	.cms_debug-bar { position:fixed; left:0; top:0; z-index:99999999; width:100%; height:4px;
-		border-bottom:1px solid #ddd; background:#fdffc8 url('../img/toolbar/sprite_toolbar.png') repeat-x left -444px; }
-}
-.cms_toolbar-debug #container { padding-top:35px !important; }
-
-// helpers
-.cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
-#djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
-
 // toolbar
 #cms_toolbar { position:absolute; left:0; top:5px; z-index:9999999; width:100%; }
 #cms_toolbar {

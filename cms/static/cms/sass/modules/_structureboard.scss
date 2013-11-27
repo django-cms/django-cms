@@ -7,6 +7,8 @@
 // #DRAGAREA
 .cms_dragarea {}
 
+.cms_placeholder { display:none; height:0px; overflow:hidden; }
+
 .cms_dragbar { position:relative; display:none; padding:5px 5px 1px; margin:0 0 5px;
 	@include border-radius(3px); background:$color-grey-70; }
 
@@ -134,7 +136,7 @@
 	.cms_dragitem { cursor:move; }
 	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
 	.cms_dragitem-collapsable { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 1px -358px; }
-	.cms_dragitem-expanded { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 0 -389px; }
+	.cms_dragitem-expanded { background:url('../../img/toolbar/sprite_toolbar.png') no-repeat 0 -389px; }
 	.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
 		width:100%; height:100%;
 		@include opacity(0.6); }
