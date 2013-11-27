@@ -4,13 +4,23 @@
  */
 
 //######################################################################################################################
-// #IMPORT SETTINGS#
-@import "partials/settings";
+// #DRAGAREA
+.cms_dragarea {}
+
+.cms_dragbar { position:relative; display:none; padding:5px 5px 1px; margin:0 0 5px;
+	@include border-radius(3px); background:$color-grey-70; }
+
+
+
+
+
+
+
+
+
 
 //######################################################################################################################
 // #PLACEHOLDER
-.cms_placeholder { position:relative; display:none; padding:5px 5px 1px; margin:0 0 5px;
-	@include border-radius(3px); background:$color-grey-70; }
 .cms_placeholder-generic,
 .cms_plugin { display:inline; }
 .cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
@@ -27,7 +37,7 @@
 		color:white; @include text-shadow(0px 1px 0px black);
 
 		&:before { content:" "; position:absolute; left:0; top:0; width:15px; height:20px;
-			background:url('../../img/toolbar/sprite_toolbar.png') no-repeat -85px -113px;
+			background:url('../img/toolbar/sprite_toolbar.png') no-repeat -85px -113px;
 		}
 		&:hover {
 			&:before { background-position:-105px -113px; }
@@ -43,9 +53,9 @@
 
 //######################################################################################################################
 // #PLACEHOLDER/subnav#
-.cms_placeholder, body {
+.cms_dragbar {
 	.cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer; position:relative;
-		background:url('../../img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
+		background:url('../img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
 
 	.cms_submenu-lang { float:right; padding:0 5px;position:relative; top:-1px; right:-1px;
 		border:1px solid $color-grey-10; @include border-radius(3px); }
@@ -68,7 +78,7 @@
 
 	.cms_submenu-quicksearch { display:none; position:absolute; right:-5px; top:-5px; z-index:1000;
 		cursor:default; text-align:right; height:25px; @include border-radius(4px);
-		background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
+		background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
 	.cms_submenu-quicksearch label { cursor:pointer; }
 	.cms_submenu-quicksearch input { font-size:12px; color:white; text-align:right; -webkit-appearance:none;
 		width:109px; padding:3px 1px 1px 5px; margin-right:25px; border:none; background:none; }
@@ -76,7 +86,7 @@
 
 //######################################################################################################################
 // #DRAGGABLES#
-.cms_placeholder, body { // we need body to overwrite cms_reset
+.cms_dragbar { // we need body to overwrite cms_reset
 	.cms_draggables { list-style-type:none; padding:0; margin:0; }
 	.cms_draggables .cms_draggables { display:none; min-height:25px; padding-left:6px; }
 
@@ -101,7 +111,7 @@
 		.cms_submenu { display:none; margin-top:2px; }
 		.cms_submenu-dropdown { right:-6px; top:22px; }
 		.cms_submenu-quicksearch { right:-5px; top:-6px; @include border-radius(0); height:28px; border-left:1px dotted $color-grey-10;
-			background:$color-grey-5 url('../../img/toolbar/sprite_toolbar.png') no-repeat right -415px; }
+			background:$color-grey-5 url('../img/toolbar/sprite_toolbar.png') no-repeat right -415px; }
 		.cms_submenu-quicksearch input { color:black; margin-top:1px; }
 
 		.cms_draggable .cms_submenu-quicksearch,
@@ -123,8 +133,8 @@
 
 	.cms_dragitem { cursor:move; }
 	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
-	.cms_dragitem-collapsable { background:url('../../img/toolbar/sprite_toolbar.png') no-repeat 1px -358px; }
-	.cms_dragitem-expanded { background:url('../../img/toolbar/sprite_toolbar.png') no-repeat 0 -389px; }
+	.cms_dragitem-collapsable { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 1px -358px; }
+	.cms_dragitem-expanded { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 0 -389px; }
 	.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
 		width:100%; height:100%;
 		@include opacity(0.6); }
@@ -150,16 +160,3 @@
 body > .cms_draggable .cms_switcher { display:none !important; }
 body > .cms_draggable .cms_submenu { display:none !important; }
 body > .cms_draggable .cms_draggables { display:none !important; }
-
-//##################################################
-// #RETINA#
-@media (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dppx) {
-
-	.cms_submenu, .cms_submenu-quicksearch, .cms_placeholder-title:before,
-	.cms_placeholder .cms_dragitem-collapsable, body .cms_dragitem-collapsable,
-	.cms_placeholder .cms_dragitem-collapsed, body .cms_dragitem-collapsed {
-		background-image:url('../../img/toolbar/sprite_toolbar@2x.png') !important;
-		background-size:190px !important; }
-
-// end of retina
-}

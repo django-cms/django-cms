@@ -4,23 +4,6 @@
  */
 
 //######################################################################################################################
-// #IMPORT SETTINGS#
-@import "partials/settings";
-
-//######################################################################################################################
-// #RESET#
-.cms_reset {
-	div, p, a, a:hover, a:active, a:focus, ul, li,
-	form, fieldset, label, input, textarea {
-		font:normal 13px/20px "Helvetica Neue",Helvetica,Arial,sans-serif;
-		color:#222; font-weight:normal; text-decoration:none; text-align:left; outline:none;
-		list-style-type:none; list-style-type:none; height:auto; padding:0; margin:0; border:none; background:none;
-	}
-
-// end of reset
-}
-
-//######################################################################################################################
 // #TOOLBAR#
 
 // debug mode
@@ -29,7 +12,7 @@
 	.cms_toolbar-trigger { top:5px !important; }
 
 	.cms_debug-bar { position:fixed; left:0; top:0; z-index:99999999; width:100%; height:4px;
-		border-bottom:1px solid #ddd; background:#fdffc8 url('../../img/toolbar/sprite_toolbar.png') repeat-x left -444px; }
+		border-bottom:1px solid #ddd; background:#fdffc8 url('../img/toolbar/sprite_toolbar.png') repeat-x left -444px; }
 }
 .cms_toolbar-debug #container { padding-top:35px !important; }
 
@@ -85,7 +68,7 @@
 			.cms_toolbar-item-navigation-children {
 				ul { display:none; left:100%; top:-5px; }
 				> a { cursor:default; }
-				> a span { display:block; background:url('../../img/toolbar/sprite_toolbar.png') no-repeat right -270px; }
+				> a span { display:block; background:url('../img/toolbar/sprite_toolbar.png') no-repeat right -270px; }
 			}
 
 			// anchor hover
@@ -129,7 +112,7 @@
 		.cms_sideframe-btn { position:absolute; right:-20px; top:50px; z-index:40; }
 		.cms_sideframe-btn {
 			div { cursor:pointer; width:20px; height:20px; margin-bottom:2px; @include border-radius(0 3px 3px 0);
-				background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat; }
+				background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat; }
 			div:hover { background-color:$color-grey-90; }
 
 			.cms_sideframe-close { background-position:-80px -90px; }
@@ -155,13 +138,13 @@
 		.cms_clipboard-numbers { margin:0 0 2px; }
 		.cms_clipboard-numbers a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
 			border:5px solid $color-grey-70; border-left:none; border-right:none; overflow:hidden;
-			background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat left -130px;
+			background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat left -130px;
 			&:hover, &:active, &:focus { background-color:$color-grey-90; background-position:-20px -130px; }
 		}
 		cms_clipboard-numbers .cms_clipboard-numbers { display:none !important; }
 
 		.cms_clipboard-empty a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
-			background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat left -110px; cursor:pointer;
+			background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat left -110px; cursor:pointer;
 			&:hover, &:active, &:focus { background-color:$color-grey-90; background-position:-20px -110px; }
 		}
 
@@ -197,7 +180,7 @@
 
 		.cms_messages-close { display:none; float:right; cursor:pointer;
 			width:20px; height:14px; margin-left:10px; position:relative; top:-2px; left:3px;
-			background:url('../../img/toolbar/sprite_toolbar.png') no-repeat -100px -90px; }
+			background:url('../img/toolbar/sprite_toolbar.png') no-repeat -100px -90px; }
 		.cms_messages-close:hover { background-position:-120px -90px; }
 	}
 	.cms_messages-error strong { color:$color-red; }
@@ -224,7 +207,7 @@
 
 		.cms_modal-collapse, .cms_modal-close, .cms_modal-maximize { display:block; position:absolute; right:3px; top:3px;
 			@include hide-text(); cursor:pointer; width:20px; height:20px;
-			background:url('../../img/toolbar/sprite_toolbar.png') no-repeat left top; }
+			background:url('../img/toolbar/sprite_toolbar.png') no-repeat left top; }
 		.cms_modal-collapse { right:40px; background-position:0 -70px; }
 		.cms_modal-collapse:hover, .cms_modal-collapse:active, .cms_modal-collapse:focus { background-position:-20px -70px; }
 		.cms_modal-collapsed { background-position:-100px -70px; }
@@ -238,7 +221,7 @@
 		.cms_modal-close:hover, .cms_modal-close:active, .cms_modal-close:focus { background-position:-60px -70px; }
 
 		.cms_modal-resize { position:absolute; right:0; bottom:0; z-index:102; width:20px; height:20px; cursor:nw-resize;
-			background:url('../../img/toolbar/sprite_toolbar.png') no-repeat -117px -67px;
+			background:url('../img/toolbar/sprite_toolbar.png') no-repeat -117px -67px;
 			&:hover { background-position:-137px -67px; }
 		}
 
@@ -248,7 +231,7 @@
 			.cms_modal-breadcrumb-items { position:absolute; left:35px; top:0; width:9999px; background:$color-window; }
 
 			a { float:left; font-size:12px; line-height:12px; margin-left:-10px; position:relative; z-index:100; padding-right:10px;
-				color:$color-grey; background:url('../../img/toolbar/sprite_toolbar.png') no-repeat right -200px; }
+				color:$color-grey; background:url('../img/toolbar/sprite_toolbar.png') no-repeat right -200px; }
 			a span { float:left; padding:10px 15px 10px 25px; color:black; }
 
 			// z-index ordering
@@ -267,7 +250,7 @@
 			a span, .cms_modal-breadcrumb-title { float:left; position:relative; z-index:120; color:$color-grey; }
 			.cms_modal-breadcrumb-title { padding:10px 20px 10px 15px;
 				border-right:1px solid $color-grey-10; @include border-radius(0 0 0 5px);
-				background:white url('../../img/toolbar/sprite_toolbar.png') no-repeat -133px -84px; @include hide-text(); }
+				background:white url('../img/toolbar/sprite_toolbar.png') no-repeat -133px -84px; @include hide-text(); }
 
 			a:hover { color:black; background-position:right -232px !important; }
 			a:hover span { color:black; background-color:white; }
@@ -329,14 +312,14 @@
 
 	//##################################################################################################################
 	// #TOOLBAR/elements#
-	.cms_loader { background:$color-window url('../../img/loader.gif') no-repeat center center !important; }
+	.cms_loader { background:$color-window url('../img/loader.gif') no-repeat center center !important; }
 
 	// #TOOLBAR/logo#
 	.cms_toolbar-item-logo {
 		margin:0 !important;
 
 		a { display:block; width:92px; height:20px; margin:5px 0; @include hide-text();
-			background:url('../../img/toolbar/sprite_toolbar.png') no-repeat left top;
+			background:url('../img/toolbar/sprite_toolbar.png') no-repeat left top;
 			&:hover, &:active, &:focus { background-position:left -20px; } }
 	}
 
@@ -387,7 +370,7 @@
 		a { display:block; width:30px; height:29px; @include hide-text();
 			color:$color-grey-70;
 			border-left:1px solid white; border-top:1px solid white;
-			background:$color-grey-5 url('../../img/toolbar/sprite_toolbar.png') no-repeat -60px -40px;
+			background:$color-grey-5 url('../img/toolbar/sprite_toolbar.png') no-repeat -60px -40px;
 			&:hover, &:active, &:focus { background-position:-90px -40px; background-color:white; }
 		}
 	 }
@@ -395,7 +378,7 @@
 	.cms_toolbar-trigger-expanded a { background-position:0 -40px;
 		&:hover, &:active, &:focus { background-position:-30px -40px; }
 	}
-	.cms_toolbar-loader a { background:#fcfcfc url('../../img/loader.gif') no-repeat center center !important;
+	.cms_toolbar-loader a { background:#fcfcfc url('../img/loader.gif') no-repeat center center !important;
 		background-size:20px 20px !important; }
 
 	// #TOOLBAR/switch#
@@ -441,7 +424,7 @@
 	.cms_tooltip { visibility:hidden; position:absolute; left:0; top:0; @include border-radius(3px);
 		font-size:11px; line-height:11px; font-weight:bold; white-space:nowrap; padding:5px 7px 7px 24px; margin:0;
 		color:$color-grey-10;
-		background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
+		background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
 		span { float:right; position:absolute; right:0; top:20px; @include border-radius(3px 0 3px 3px);
 			color:white; font-weight:normal; padding:5px 7px; background:$color-grey-70; }
 	}
@@ -450,31 +433,8 @@
 	// #TOOLBAR/structure#
 	.cms_structure { display:none;
 		background:rgba(255, 255, 255, 0.8); z-index:99999; position:absolute; left:0; top:0; width:100%; height:100%;
-		.cms_structure-content { display:none; }
+		//.cms_structure-content { display:none; }
 	}
 
 // end of toolbar
-}
-
-//######################################################################################################################
-// #RETINA#
-@media (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dppx) {
-
-	.cms_toolbar-item-navigation-children > a span,
-	.cms_sideframe-btn div,
-	.cms_clipboard ul a, .cms_clipboard-empty a,
-	.cms_messages .cms_messages-close,
-	.cms_modal-collapse, .cms_modal-close, .cms_modal-maximize, .cms_modal-resize,
-	.cms_modal-breadcrumb a, .cms_modal-breadcrumb-title,
-	.cms_toolbar-item-logo a, .cms_toolbar-trigger a,
-	.cms_tooltip, .cms_placeholders-menu,
-	.cms_toolbar-debug .cms_debug-bar {
-		background-image:url('../../img/toolbar/sprite_toolbar@2x.png') !important;
-		background-size:190px !important; }
-
-	#cms_toolbar .cms_loader {
-		background-image:url('../../img/loader@2x.gif') !important;
-		background-size:32px !important; }
-
-// end of retina
 }
