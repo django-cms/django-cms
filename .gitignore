@@ -37,3 +37,4 @@ include/
 lib/
 man/
 share/
+echo .tox
