@@ -46,14 +46,6 @@ background:rgba(255, 255, 255, 0.8); z-index:99999;
 	padding-top:0; padding-bottom:0; }
 .cms_dragbar-empty-wrapper { display:none; }
 
-
-
-
-
-
-
-
-
 //######################################################################################################################
 // #DRAGITEM#
 .cms_draggables { list-style-type:none; padding:0; margin:0; }
@@ -125,7 +117,7 @@ background:rgba(255, 255, 255, 0.8); z-index:99999;
 // end of dragarea
 }
 
-// hide additional elements when dragging
+// hide elements when dragging
 body > .cms_draggable .cms_switcher { display:none !important; }
 body > .cms_draggable .cms_submenu { display:none !important; }
 body > .cms_draggable .cms_draggables { display:none !important; }
