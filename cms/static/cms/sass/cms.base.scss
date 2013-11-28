@@ -20,7 +20,6 @@
 
 //##################################################
 // #TABS#
-
 // used in: /cms/admin/page/change_form
 #page_form_lang_tabs {
 	position:relative;
@@ -38,7 +37,6 @@
 
 //##################################################
 // #DOALOG#
-
 // used in: /cms/admin/page/tree/copy_premissions
 .cms_dialog {
 	position:absolute; left:50%; top:50%; z-index:99999;
@@ -50,9 +48,18 @@
 }
 
 //##################################################
+// #GLOBALS#
+.cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
+#djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
+
+//##################################################
 // #TOOLBAR#
+@import "modules/common";
 @import "modules/content";
 @import "modules/toolbar";
+@import "modules/modal";
+@import "modules/sideframe";
+@import "modules/clipboard";
 @import "modules/structureboard";
 @import "modules/subnav";
 @import "modules/retina";
