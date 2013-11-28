@@ -3,6 +3,7 @@
  * @copyright:	https://github.com/divio/django-cms
  */
 
+#cms_toolbar {
 //######################################################################################################################
 // #SUBNAV#
 .cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer; position:relative;
@@ -34,3 +35,6 @@
 .cms_submenu-quicksearch label { cursor:pointer; }
 .cms_submenu-quicksearch input { font-size:12px; color:white; text-align:right; -webkit-appearance:none;
 	width:109px; padding:3px 1px 1px 5px; margin-right:25px; border:none; background:none; }
+
+// end of toolbar
+}
