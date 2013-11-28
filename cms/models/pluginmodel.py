@@ -173,7 +173,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
+
         instance, plugin = self.get_plugin_instance()
+
         if instance and not (admin and not plugin.admin_preview):
             if not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
@@ -193,6 +195,13 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             else:
                 template = None
             return render_plugin(context, instance, placeholder, template, processors, context.current_app)
+        else:
+            from cms.middleware.toolbar import toolbar_plugin_processor
+            if toolbar_plugin_processor in processors:
+                current_app = context.current_app if context else None
+                context = PluginContext(context, self, placeholder, current_app=current_app)
+                template = None
+            return render_plugin(context, self, placeholder, template, processors, context.current_app)
         return ""
 
     def get_media_path(self, filename):
