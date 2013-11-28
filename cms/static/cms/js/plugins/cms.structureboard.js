@@ -196,18 +196,29 @@ $(document).ready(function () {
 
 			// TODO this is gonna be funny
 			// loop over all placeholders
-			this.placeholders.show();
-			this.placeholders.each(function () {
-				var id = $(this).data('settings').placeholder_id;
-				var area = $('.cms_dragarea-' + id);
+			var id = null;
+			var area = null;
+			var previous = null;
+			var offset = null;
 
+			this.plugins.hide();
+			this.placeholders.show();
+			this.placeholders.each(function (index, item) {
+				item = $(item);
+				id = item.data('settings').placeholder_id;
+				area = $('.cms_dragarea-' + id);
+				offset = (previous) ? previous.outerHeight(true)-25 : -25;
+
+				// set correct width and height
 				area.css({
-				// todo we need to calculate top offspace
-					'top': $(this).offset().top - 25,
-					'left': $(this).offset().left,
-					'width': $(this).width()
+					'top': item.offset().top + offset,
+					'left': item.offset().left,
+					'width': item.width()
 				});
+
+				previous = area;
 			});
+			this.plugins.show();
 		},
 
 		_hideBoard: function () {
