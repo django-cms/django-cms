@@ -198,26 +198,25 @@ $(document).ready(function () {
 			// loop over all placeholders
 			var id = null;
 			var area = null;
-			var previous = null;
-			var offset = null;
 
+			// start calculating
 			this.plugins.hide();
 			this.placeholders.show();
 			this.placeholders.each(function (index, item) {
 				item = $(item);
 				id = item.data('settings').placeholder_id;
 				area = $('.cms_dragarea-' + id);
-				offset = (previous) ? previous.outerHeight(true)-25 : -25;
-
-				// set correct width and height
+				// to calculate the correct offset, we need to set the
+				// placeholders correct heights and than set the according position
+				item.height(area.outerHeight(true));
 				area.css({
-					'top': item.offset().top + offset,
+					'top': item.offset().top,
 					'left': item.offset().left,
 					'width': item.width()
 				});
-
-				previous = area;
 			});
+			// reset calculating
+			this.placeholders.height(0);
 			this.plugins.show();
 		},
 
