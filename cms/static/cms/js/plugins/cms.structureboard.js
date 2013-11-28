@@ -162,11 +162,11 @@ $(document).ready(function () {
 			if(id === false) return false;
 
 			// attach active class to current element
-			var dragitem = $('#cms_draggable-' + id);
-			var plugin = $('#cms_plugin-' + id);
+			var dragitem = $('.cms_draggable-' + id);
+			var plugin = $('.cms_plugin-' + id);
 
 			// collapse all previous elements
-			var collapsed = dragitem.parents().siblings().not('.cms_dragitem-expanded');
+			var collapsed = dragitem.parentsUntil('.cms_dragarea').siblings().not('.cms_dragitem-expanded');
 				collapsed.trigger(this.click);
 
 			// set new classes
@@ -277,7 +277,7 @@ $(document).ready(function () {
 
 					// we pass the id to the updater which checks within the backend the correct place
 					var id = ui.item.attr('id').replace('cms_draggable-', '');
-					var plugin = $('#cms_plugin-' + id);
+					var plugin = $('.cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
 
 					// update clipboard entries
@@ -294,13 +294,13 @@ $(document).ready(function () {
 					// getting restriction array
 					var bounds = [];
 					// save original state events
-					var original = $('#cms_plugin-' + that.getId(originalItem));
+					var original = $('.cms_plugin-' + that.getId(originalItem));
 					// cancel if item has no settings
 					if(original.data('settings') === undefined) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
 					var holder = placeholder.parent().prevAll('.cms_placeholder-bar').first();
-					var plugin = $('#cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
+					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
 					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
