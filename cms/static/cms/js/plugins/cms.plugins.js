@@ -65,14 +65,16 @@ $(document).ready(function () {
 
 		// initial methods
 		_setPlaceholder: function () {
+			var that = this;
 			var title = '.cms_dragbar-title';
 			var expanded = 'cms_dragbar-title-expanded';
+			var dragbar = $('.cms_dragbar-' + this.options.placeholder_id);
 
 			// register the subnav on the placeholder
-			this._setSubnav($('.cms_dragbar-' + this.options.placeholder_id).find('.cms_submenu'));
+			this._setSubnav(dragbar.find('.cms_submenu'));
 
 			// enable expanding/collapsing globally within the placeholder
-			this.container.find(title).bind(this.click, function () {
+			dragbar.find(title).bind(this.click, function () {
 				($(this).hasClass(expanded)) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
 		},
@@ -155,6 +157,13 @@ $(document).ready(function () {
 				submenu.show();
 			});
 
+			// adds double click to edit
+			dragitem.bind('dblclick', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
+			});
+
 			// adds longclick events
 			dragitem.bind('mousedown mouseup mousemove', function (e) {
 				if(e.type === 'mousedown') {
@@ -162,6 +171,7 @@ $(document).ready(function () {
 					timer = setTimeout(function () {
 						CMS.API.StructureBoard.hide();
 						CMS.API.StructureBoard.setActive(that.options.plugin_id);
+						// prevent dragging
 						$(document).bind('mousemove.keypress', function () {
 							$(document).trigger('keyup.cms', [true]);
 							setTimeout(function () {
@@ -345,9 +355,6 @@ $(document).ready(function () {
 					case 'copy':
 						that.copyPlugin();
 						break;
-					/*case 'stack':
-						//that.stackPlugin();
-						break;*/
 					default:
 						CMS.API.Toolbar._loader(false);
 						CMS.API.Toolbar._delegate(el);
@@ -369,7 +376,7 @@ $(document).ready(function () {
 				}
 			});
 
-			// set data attributes
+			// set data attributes for original top positioning
 			nav.find('.cms_submenu-dropdown').each(function () {
 				$(this).data('top', $(this).css('top'))
 			});
@@ -524,20 +531,19 @@ $(document).ready(function () {
 			// check which button should be shown for collapsemenu
 			this.container.each(function (index, item) {
 				var els = $(item).find('.cms_dragitem-collapsable');
-				// TODO check functionality
-				// console.log(els);
 				var open = els.filter('.cms_dragitem-expanded');
 				if(els.length === open.length && (els.length + open.length !== 0)) {
 					$(item).find('.cms_dragbar-title').addClass('cms_dragbar-title-expanded');
 				}
 			});
-
+			// cancel here if its not a draggable
 			if(!draggable.length) return false;
 
 			// attach events to draggable
 			draggable.find('> .cms_dragitem-collapsable').bind(this.click, function () {
 				var el = $(this);
 				var id = that._getId($(this).parent());
+
 				var settings = CMS.API.Toolbar.getSettings();
 					settings.states = settings.states || [];
 
@@ -578,7 +584,7 @@ $(document).ready(function () {
 		},
 
 		_expandAll: function (el) {
-			var items = el.closest('.cms_dragbar').find('.cms_dragitem-collapsable');
+			var items = el.closest('.cms_dragarea').find('.cms_dragitem-collapsable');
 			// cancel if there are no items
 			if(!items.length) return false;
 			items.each(function () {
@@ -589,7 +595,7 @@ $(document).ready(function () {
 		},
 
 		_collapseAll: function (el) {
-			var items = el.closest('.cms_dragbar').find('.cms_dragitem-collapsable');
+			var items = el.closest('.cms_dragarea').find('.cms_dragitem-collapsable');
 			items.each(function () {
 				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
 			});
