@@ -134,11 +134,11 @@ $(document).ready(function () {
 			var id = null;
 
 			if(el.hasClass('cms_plugin')) {
-				id = el.attr('id').replace('cms_plugin-', '');
+				id = el.attr('class').replace('cms_plugin cms_plugin-', '');
 			} else if(el.hasClass('cms_draggable')) {
-				id = el.attr('id').replace('cms_draggable-', '');
+				id = el.attr('class').replace('cms_draggable cms_draggable-', '');
 			} else {
-				id = el.attr('id').replace('cms_placeholder-', '');
+				id = el.attr('class').replace('cms_placeholder cms_placeholder-', '');
 			}
 
 			return id;
