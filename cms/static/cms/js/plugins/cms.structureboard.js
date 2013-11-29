@@ -214,6 +214,8 @@ $(document).ready(function () {
 					'left': item.offset().left,
 					'width': item.width()
 				});
+
+				console.log();
 			});
 			// reset calculating
 			this.placeholders.height(0);
@@ -286,7 +288,9 @@ $(document).ready(function () {
 					}
 
 					// we pass the id to the updater which checks within the backend the correct place
-					var id = ui.item.attr('id').replace('cms_draggable-', '');
+					//var id = ui.item.attr('class').replace('cms_draggable cms_draggable-', '');
+					var id = that.getId(ui.item);
+					console.log(id);
 					var plugin = $('.cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
 
@@ -309,7 +313,8 @@ $(document).ready(function () {
 					if(original.data('settings') === undefined) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
-					var holder = placeholder.parent().prevAll('.cms_placeholder-bar').first();
+					var holder = placeholder.parent().prevAll('.cms_dragarea').first();
+					console.log(placeholder);
 					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
