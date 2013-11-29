@@ -197,11 +197,11 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             return render_plugin(context, instance, placeholder, template, processors, context.current_app)
         else:
             from cms.middleware.toolbar import toolbar_plugin_processor
-            if toolbar_plugin_processor in processors:
+            if processors and toolbar_plugin_processor in processors:
                 current_app = context.current_app if context else None
                 context = PluginContext(context, self, placeholder, current_app=current_app)
                 template = None
-            return render_plugin(context, self, placeholder, template, processors, context.current_app)
+                return render_plugin(context, self, placeholder, template, processors, context.current_app)
         return ""
 
     def get_media_path(self, filename):
