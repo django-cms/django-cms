@@ -31,7 +31,7 @@ import re
 from sekizai.helpers import Watcher, get_varname
 from cms.utils.placeholder import get_toolbar_plugin_struct
 from sekizai.templatetags.sekizai_tags import SekizaiParser
-
+from cms.models import CMSPlugin
 
 register = template.Library()
 
@@ -315,24 +315,41 @@ register.tag(RenderPlugin)
 
 
 class PluginChildClasses(InclusionTag):
+    """
+    Accepts a placeholder or a plugin and renders the allowed plugins for this.
+    """
+
     template = "cms/toolbar/dragitem_menu.html"
     name = "plugin_child_classes"
     options = Options(
-        Argument('plugin')
+        Argument('obj')
     )
 
-    def get_context(self, context, plugin):
+    def get_context(self, context, obj):
         # Prepend frontedit toolbar output if applicable
         request = context['request']
         page = request.current_page
-        slot = context['slot']
         child_plugin_classes = []
-        plugin_class = plugin.get_plugin_class()
-        if plugin_class.allow_children:
-            instance, plugin = plugin.get_plugin_instance()
-            childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
+        if isinstance(obj, CMSPlugin):
+            slot = context['slot']
+            plugin = obj
+            plugin_class = plugin.get_plugin_class()
+            if plugin_class.allow_children:
+                instance, plugin = plugin.get_plugin_instance()
+                childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
+                # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
+                child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
+        elif isinstance(obj, PlaceholderModel):
+            placeholder = obj
+            page = placeholder.page if placeholder else None
+            if not page:
+                page = getattr(request, 'current_page', None)
+            if placeholder:
+                slot = placeholder.slot
+            else:
+                slot = None
             # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-            child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
+            child_plugin_classes = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
         return {'plugin_classes': child_plugin_classes}
 
 

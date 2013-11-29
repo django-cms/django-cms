@@ -1,4 +1,4 @@
-{% load i18n l10n %}
+{% load i18n l10n cms_tags %}
 {% load url from future %}
 
 <div class="cms_dragbar cms_dragbar-{{ placeholder.pk|unlocalize }}">
@@ -11,7 +11,7 @@
 			<div class="cms_submenu-item"><a data-rel="modal" href="{% url "admin:cms_page_clear_placeholder" placeholder.pk %}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
 			<div class="cms_submenu-item"><a data-rel="modal" href='{% url "admin:stacks_stack_create_stack" placeholder_id=placeholder.pk %}?_popup'>{% trans "Create stack" %}</a></div>
 			<div class="cms_submenu-item"><a data-rel="modal" href='{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'>{% trans "Insert stack" %}</a></div>
-			{% include "cms/toolbar/dragitem_menu.html" with plugin_classes=installed_plugins %}
+			{% plugin_child_classes placeholder %}
 		</div>
 	</div>
 	{% endlanguage %}

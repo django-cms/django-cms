@@ -172,34 +172,24 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
 def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
-
     request = context['request']
     page = placeholder.page if placeholder else None
     if not page:
         page = getattr(request, 'current_page', None)
     if page:
-        template = page.template
         if name_fallback and not placeholder:
             placeholder = Placeholder.objects.create(slot=name_fallback)
             page.placeholders.add(placeholder)
             placeholder.page = page
-    else:
-        template = None
     if placeholder:
         slot = placeholder.slot
     else:
         slot = None
-    # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-    installed_plugins = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
-
-    name = get_placeholder_conf("name", slot, template, title(slot))
-    name = _(name)
     context.push()
-    context['installed_plugins'] = installed_plugins
+
     ## to restrict child-only plugins from draggables..
     context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
     context['language'] = get_language_from_request(request)
-    context['placeholder_label'] = name
     context['placeholder'] = placeholder
     context['page'] = page
     toolbar = render_to_string("cms/toolbar/placeholder.html", context)
