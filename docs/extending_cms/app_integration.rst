@@ -202,7 +202,7 @@ under "Application". Save the page.
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import *
 
     urlpatterns = patterns('sampleapp.views',
         url(r'^$', 'main_view', name='app_main'),

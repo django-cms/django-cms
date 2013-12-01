@@ -149,7 +149,7 @@ What you need to do:
   and that it comes after the SessionMiddleware.
 - Be sure that the ``cms.urls`` is included in a ``i18n_patterns``::
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import *
         from django.conf.urls.i18n import i18n_patterns
         from django.contrib import admin
         from django.conf import settings
