@@ -24,7 +24,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
             if not conf:
                 continue
             value = conf.get(setting)
-            if value:
+            if value is not None:
                 return value
     return default
 
