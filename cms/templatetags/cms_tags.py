@@ -567,15 +567,18 @@ class CMSToolbar(Tag):
 
     def render_tag(self, context, nodelist):
         # render JS
+        request = context.get('request', None)
+        toolbar = getattr(request, 'toolbar', None)
         context['cms_version'] = __version__
-        js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
+        if toolbar and toolbar.show_toolbar:
+            js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
+        else:
+            js = ''
         # render everything below the tag
         rendered_contents = nodelist.render(context)
         # sanity checks
-        request = context.get('request', None)
         if not request:
             return rendered_contents
-        toolbar = getattr(request, 'toolbar', None)
         if not toolbar:
             return rendered_contents
         if not toolbar.show_toolbar:
