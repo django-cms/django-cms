@@ -126,15 +126,20 @@ class PageToolbar(CMSToolbar):
                     # publish button
                     if self.page.has_publish_permission(self.request):
                         classes = ["cms_btn-action", "cms_btn-publish"]
-                        if self.page.is_dirty():
+                        dirty_stacks = getattr(self.request, 'dirty_stacks', [])
+                        dirty = self.page.is_dirty() or len(dirty_stacks) > 0
+                        if dirty:
                             classes.append("cms_btn-publish-active")
                         if self.page.published:
-                            title = _("Publish Changes")
+                            title = _("Publish changes")
                         else:
-                            title = _("Publish Page now")
+                            title = _("Publish page now")
+
                         publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk,))
+                        if dirty_stacks:
+                            publish_url += "?stacks=%s" % ','.join(stack.pk for stack in dirty_stacks)
                         self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
-                                                disabled=not self.page.is_dirty())
+                                                disabled=not dirty)
                 self.add_draft_live()
 
     def add_draft_live(self):

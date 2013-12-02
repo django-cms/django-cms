@@ -56,6 +56,8 @@ class Stack(models.Model):
         CMSPlugin.objects.filter(placeholder=self.public).delete()
         plugins = self.draft.get_plugins_list()
         copy_plugins_to(plugins, self.public)
+        self.dirty = False
+        self.save()
 
 
 @python_2_unicode_compatible
