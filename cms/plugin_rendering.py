@@ -87,8 +87,11 @@ def render_plugins(plugins, context, placeholder, processors=None):
     return out
 
 
-def render_dragables(plugins, slot, request):
-    return render_to_string("cms/toolbar/draggable.html", {'plugins': plugins, 'slot': slot, 'request': request})
+def render_dragables(plugins, slot, request, context):
+    context['plugins'] = plugins
+    context['slot'] = slot
+
+    return render_to_string("cms/toolbar/dragitem.html", context)
 
 
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None):
@@ -150,51 +153,45 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     content.extend(render_plugins(plugins, context, placeholder, processors))
     toolbar_content = ''
-    draggable_content = ''
+
+    if edit:
+        if not hasattr(request.toolbar, 'placeholders'):
+            request.toolbar.placeholders = {}
+        if not placeholder.pk in request.toolbar.placeholders:
+            request.toolbar.placeholders[placeholder.pk] = placeholder
     if edit:
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, '', name_fallback=name_fallback))
-        draggable_content = mark_safe(render_dragables(plugins, slot, request))
     content = mark_safe("".join(content))
-
-    result = render_to_string("cms/toolbar/placeholder.html",
-                              {'plugins': content, "bar": toolbar_content, "draggables": draggable_content,
-                              'edit': edit})
+    context['content'] = content
+    context['placeholder'] = toolbar_content
+    context['edit'] = edit
+    result = render_to_string("cms/toolbar/content.html", context)
     context.pop()
     return result
 
 
 def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
     from cms.plugin_pool import plugin_pool
-
     request = context['request']
     page = placeholder.page if placeholder else None
     if not page:
         page = getattr(request, 'current_page', None)
     if page:
-        template = page.template
         if name_fallback and not placeholder:
             placeholder = Placeholder.objects.create(slot=name_fallback)
             page.placeholders.add(placeholder)
             placeholder.page = page
-    else:
-        template = None
     if placeholder:
         slot = placeholder.slot
     else:
         slot = None
-    # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-    installed_plugins = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
-
-    name = get_placeholder_conf("name", slot, template, title(slot))
-    name = _(name)
     context.push()
-    context['installed_plugins'] = installed_plugins
+
     ## to restrict child-only plugins from draggables..
     context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
     context['language'] = get_language_from_request(request)
-    context['placeholder_label'] = name
     context['placeholder'] = placeholder
     context['page'] = page
-    toolbar = render_to_string("cms/toolbar/placeholder_bar.html", context)
+    toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()
     return toolbar
