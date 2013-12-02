@@ -102,4 +102,7 @@ class StackAdmin(PlaceholderAdmin):
             'form': form,
         })
 
+    def post_edit_plugin(self, request, plugin):
+        stack = plugin.placeholder.stack_draft.update(dirty=True)
+
 admin.site.register(Stack, StackAdmin)
