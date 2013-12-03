@@ -29,6 +29,7 @@ $(document).ready(function () {
 			this.dragitems = $('.cms_draggable');
 			this.dropareas = $('.cms_droppable');
 			this.dimmer = this.container.find('.cms_structure-dimmer');
+			this.clipboard = $('.cms_clipboard');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
@@ -109,6 +110,9 @@ $(document).ready(function () {
 			// show clipboard in structure mode
 			this.container.find('.cms_clipboard').fadeIn(this.options.speed);
 
+			// show clipboard
+			this.clipboard.show();
+
 			// apply new settings
 			this.settings.mode = 'structure';
 			this.setSettings(this.settings);
@@ -127,6 +131,9 @@ $(document).ready(function () {
 
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
+
+			// hide clipboard
+			this.clipboard.hide();
 
 			this.settings.mode = 'edit';
 			this.setSettings(this.settings);
@@ -189,6 +196,7 @@ $(document).ready(function () {
 		_showBoard: function () {
 			var that = this;
 			var interval = 10;
+			var timer = function () {};
 
 			// show container
 			this.container.show();
@@ -196,8 +204,13 @@ $(document).ready(function () {
 
 			// add dimmer close
 			// TODO add longlick
-			this.dimmer.bind('click', function () {
-				//that.hide();
+			this.dimmer.bind('mousedown mouseup', function (e) {
+				clearTimeout(timer);
+				timer = setTimeout(function () {
+					that.hide();
+				}, 500);
+
+				if(e.type === 'mouseup') clearTimeout(timer);
 			});
 
 			// hide stuff
@@ -332,6 +345,10 @@ $(document).ready(function () {
 					var bounds = [];
 					// save original state events
 					var original = $('.cms_plugin-' + that.getId(originalItem));
+
+console.log(original);
+
+
 					// cancel if item has no settings
 					if(original.data('settings') === undefined) return false;
 					var type = original.data('settings').plugin_type;
