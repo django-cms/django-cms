@@ -97,6 +97,9 @@ $(document).ready(function () {
 
 		// public methods
 		show: function () {
+			// cancel show if live modus is active
+			if(CMS.config.mode === 'live') return false;
+
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
 				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
@@ -113,6 +116,9 @@ $(document).ready(function () {
 		},
 
 		hide: function () {
+			// cancel show if live modus is active
+			if(CMS.config.mode === 'live') return false;
+
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
 				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
