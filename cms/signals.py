@@ -2,7 +2,7 @@
 from cms.exceptions import NoHomeFound
 from cms.utils.conf import get_cms_setting
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import signals, Q
+from django.db.models import signals
 from django.dispatch import Signal
 
 from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
@@ -37,6 +37,13 @@ signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin, dispatch_
 
 
 def update_home(instance, **kwargs):
+    """
+    Updates the is_home flag of page instances after they are saved or moved.
+
+    :param instance: Page instance
+    :param kwargs:
+    :return:
+    """
     if getattr(instance, '_home_checked', False):
         return
     if not instance.parent_id or (getattr(instance, 'old_page', False) and not instance.old_page.parent_id):
@@ -72,7 +79,6 @@ def update_home(instance, **kwargs):
 
 page_moved.connect(update_home, sender=Page, dispatch_uid="cms.page.update_home")
 signals.post_delete.connect(update_home, sender=Page)
-
 
 
 def update_title_paths(instance, **kwargs):
@@ -138,7 +144,7 @@ def post_save_title(instance, raw, created, **kwargs):
             descendant_title.path = ''  # just reset path
             descendant_title.tmp_prevent_descendant_update = True
             descendant_title.save()
-        # remove temporary attributes
+            # remove temporary attributes
     if hasattr(instance, 'tmp_path'):
         del instance.tmp_path
     if prevent_descendants:
@@ -200,6 +206,7 @@ def pre_save_page(instance, raw, **kwargs):
         instance.old_page = Page.objects.get(pk=instance.pk)
     except ObjectDoesNotExist:
         pass
+
 
 def post_save_page_moderator(instance, raw, created, **kwargs):
     """Helper post save signal.

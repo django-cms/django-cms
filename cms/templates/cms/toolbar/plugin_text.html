@@ -4,7 +4,7 @@
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.PlaceholderItem('cms_placeholder-generic-{{ current_page.pk|unlocalize }}', {
+	new CMS.Plugin('cms_placeholder-generic-{{ current_page.pk|unlocalize }}', {
 		'type': 'generic',
 		'plugin_name': 'Page Title',
 		'urls': {
