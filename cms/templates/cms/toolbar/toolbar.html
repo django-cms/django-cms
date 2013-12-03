@@ -78,14 +78,12 @@
 		{% for plugin in request.toolbar.get_clipboard_plugins %}
 		<div class="cms_plugins">{% include "cms/toolbar/plugin.html" with instance=plugin %}</div>
 		{% endfor %}
-		<div class="cms_clipboard-containers cms_dragarea">
-			<div class="cms_draggables">
+		<div class="cms_clipboard-containers cms_dragarea cms_draggables">
 			{% for plugin in request.toolbar.get_clipboard_plugins %}
 				{% if forloop.counter <= 5 %}
 				{% with show_language="true" %}{% include "cms/toolbar/dragitem_item.html" with plugin=plugin %}{% endwith %}
 				{% endif %}
 			{% endfor %}
-			</div>
 		</div>
 		<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>{% trans "Empty Clipboard" %}</a></p>
 	</div>
