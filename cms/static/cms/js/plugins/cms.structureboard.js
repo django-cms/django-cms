@@ -33,6 +33,7 @@ $(document).ready(function () {
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 			this.timer = function () {};
+			this.interval = function () {};
 			this.state = false;
 			this.dragging = false;
 
@@ -184,6 +185,7 @@ $(document).ready(function () {
 		// private methods
 		_showBoard: function () {
 			var that = this;
+			var interval = 10;
 
 			// show container
 			this.container.show();
@@ -192,21 +194,28 @@ $(document).ready(function () {
 			// hide stuff
 			this.plugins.hide();
 			this.placeholders.show();
-			// TODO demo
-			this.placeholders.css({
-				'background': '#f00'
-			});
+
 			// attach event
 			$(window).bind('resize', function () {
 				that._resizeBoard();
 			}).trigger('resize');
+
+			// setup an interval
+			this.interval = setInterval(function () {
+				$(window).trigger('resize');
+			}, interval);
 		},
 
 		_hideBoard: function () {
 			this.container.hide();
 			this.plugins.show();
+			this.placeholders.hide();
 
+			// detach event
 			$(window).unbind('resize');
+
+			// clear interval
+			clearInterval(this.interval);
 		},
 
 		_resizeBoard: function () {
