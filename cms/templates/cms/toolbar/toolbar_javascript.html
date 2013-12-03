@@ -24,6 +24,7 @@ var _$ = window.$ || undefined;
 $(document).ready(function () {
 	// this is a global shared configuration
 	CMS.config = {
+		'mode': {% if request.toolbar.edit_mode %}'draft'{% else %}'live'{% endif %},
 		'auth': {% if user.is_authenticated %}true{% else %}false{% endif %},
 		'debug': {% if debug %}true{% else %}false{% endif %},
 		'csrf': '{{ csrf_token }}',
