@@ -140,13 +140,16 @@ $(document).ready(function () {
 			if(el === undefined || el === null || el.length <= 0) return false;
 
 			var id = null;
+			var cls = el.attr('class').split(' ')[1];
 
 			if(el.hasClass('cms_plugin')) {
-				id = el.attr('class').replace('cms_plugin cms_plugin-', '');
+				id = cls.replace('cms_plugin-', '');
 			} else if(el.hasClass('cms_draggable')) {
-				id = el.attr('class').replace('cms_draggable cms_draggable-', '');
+				id = cls.replace('cms_draggable-', '');
+			} else if(el.hasClass('cms_dragbar')) {
+				id = cls.replace('cms_dragbar-', '');
 			} else {
-				id = el.attr('class').replace('cms_placeholder cms_placeholder-', '');
+				id = cls.replace('cms_placeholder-', '');
 			}
 
 			return id;
@@ -189,7 +192,7 @@ $(document).ready(function () {
 
 			// show container
 			this.container.show();
-			// this.dimmer.show();
+			// this.dimmer.fadeIn(300);
 
 			// hide stuff
 			this.plugins.hide();
@@ -207,9 +210,11 @@ $(document).ready(function () {
 		},
 
 		_hideBoard: function () {
+			// hide elements
 			this.container.hide();
 			this.plugins.show();
 			this.placeholders.hide();
+			this.dimmer.hide();
 
 			// detach event
 			$(window).unbind('resize');
@@ -222,7 +227,6 @@ $(document).ready(function () {
 			// calculate placeholder position
 			var id = null;
 			var area = null;
-			var offset = 5;
 
 			// start calculating
 			this.placeholders.each(function (index, item) {
@@ -233,7 +237,7 @@ $(document).ready(function () {
 				// placeholders correct heights and than set the according position
 				item.height(area.outerHeight(true));
 				area.css({
-					'top': item.offset().top - offset,
+					'top': item.offset().top - 5,
 					'left': item.offset().left,
 					'width': item.width()
 				});
@@ -304,7 +308,6 @@ $(document).ready(function () {
 					// we pass the id to the updater which checks within the backend the correct place
 					//var id = ui.item.attr('class').replace('cms_draggable cms_draggable-', '');
 					var id = that.getId(ui.item);
-					console.log(id);
 					var plugin = $('.cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
 
@@ -328,7 +331,6 @@ $(document).ready(function () {
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
 					var holder = placeholder.parent().prevAll('.cms_dragarea').first();
-					console.log(placeholder);
 					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
@@ -359,7 +361,7 @@ $(document).ready(function () {
 				'activeClass': 'cms_draggable-allowed',
 				'hoverClass': 'cms_draggable-hover-allowed',
 				'over': function (event) {
-					dropzone = $(event.target).parent().prev();
+					dropzone = $('.cms_placeholder-' + that.getId($(event.target).parent().prev()));
 					if(!that.state) $(event.target).addClass('cms_draggable-disallowed');
 				},
 				'out': function (event) {
