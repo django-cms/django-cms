@@ -6,7 +6,7 @@
 #cms_toolbar {
 //##################################################################################################################
 // #CLIPBOARD#
-.cms_clipboard { position:fixed; left:0; top:130px; z-index:99;
+.cms_clipboard { position:fixed; left:0; top:130px; z-index:99999;
 	p { padding:0; margin:0; }
 
 	.cms_clipboard-numbers { margin:0 0 2px; }
@@ -15,7 +15,7 @@
 		background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat left -130px;
 		&:hover, &:active, &:focus { background-color:$color-grey-90; background-position:-20px -130px; }
 	}
-	cms_clipboard-numbers .cms_clipboard-numbers { display:none !important; }
+	.cms_clipboard-numbers .cms_clipboard-numbers { display:none !important; }
 
 	.cms_clipboard-empty a { display:block; width:20px; height:20px; @include hide-text(); @include border-radius(0 3px 3px 0);
 		background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat left -110px; cursor:pointer;
