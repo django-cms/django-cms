@@ -21,19 +21,21 @@ $(document).ready(function () {
 
 		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
-			this.sideframe = $('.cms_sideframe');
 			this.config = CMS.config;
 			this.settings = this.getSettings();
+
+			// elements
+			this.sideframe = $('.cms_sideframe');
 			this.body = $('html');
 
-			// helpers
+			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 			this.enforceReload = false;
 
 			// if the modal is initialized the first time, set the events
 			if(!this.sideframe.data('ready')) this._events();
 
-			// ready modal
+			// ready sideframe
 			this.sideframe.data('ready', true);
 		},
 

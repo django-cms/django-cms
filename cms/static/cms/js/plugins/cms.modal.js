@@ -22,12 +22,14 @@ $(document).ready(function () {
 
 		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+
+			// elements
+			this.body = $('html');
 			this.modal = $('.cms_modal');
 			this.toolbar = $('.cms_toolbar');
-			this.config = CMS.config;
-			this.body = $('html');
 
-			// helpers
+			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 			this.maximized = false;
 			this.minimized = false;
