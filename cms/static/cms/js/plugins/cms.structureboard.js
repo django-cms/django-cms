@@ -28,6 +28,7 @@ $(document).ready(function () {
 			this.placeholders = $('.cms_placeholder');
 			this.dragitems = $('.cms_draggable');
 			this.dropareas = $('.cms_droppable');
+			this.dimmer = this.container.find('.cms_structure-dimmer');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
@@ -184,39 +185,37 @@ $(document).ready(function () {
 		_showBoard: function () {
 			var that = this;
 
+			// show container
+			this.container.show();
+			// this.dimmer.show();
+
+			// hide stuff
+			this.plugins.hide();
+			this.placeholders.show();
+			// TODO demo
+			this.placeholders.css({
+				'background': '#f00'
+			});
+			// attach event
 			$(window).bind('resize', function () {
 				that._resizeBoard();
 			}).trigger('resize');
 		},
 
+		_hideBoard: function () {
+			this.container.hide();
+			this.plugins.show();
+
+			$(window).unbind('resize');
+		},
+
 		_resizeBoard: function () {
-			var body = $('body');
-
-			// apply correct width and height to the structure container
-			var width = $(window).width();
-			var height = $(window).height();
-			var toolbarHeight = this.toolbar.find('.cms_toolbar').height();
-
-			// determine if we should use body width or height
-			if(width <= body.width()) width = body.width();
-			if(height <= body.height()) height = body.height();
-
-			this.container.css({
-				'top': (this.settings.toolbar === 'collapsed') ? 0 : toolbarHeight,
-				'width': width,
-				'height': height
-			});
-
-			this.container.stop(true, true).fadeIn(this.options.speed);
-
-			// TODO this is gonna be funny
-			// loop over all placeholders
+			// calculate placeholder position
 			var id = null;
 			var area = null;
+			var offset = 5;
 
 			// start calculating
-			this.plugins.hide();
-			this.placeholders.show();
 			this.placeholders.each(function (index, item) {
 				item = $(item);
 				id = item.data('settings').placeholder_id;
@@ -225,21 +224,11 @@ $(document).ready(function () {
 				// placeholders correct heights and than set the according position
 				item.height(area.outerHeight(true));
 				area.css({
-					'top': item.offset().top,
+					'top': item.offset().top - offset,
 					'left': item.offset().left,
 					'width': item.width()
 				});
-
-				console.log();
 			});
-			// reset calculating
-			this.placeholders.height(0);
-			this.plugins.show();
-		},
-
-		_hideBoard: function () {
-			this.container.stop(true, true).fadeOut(this.options.speed / 2);
-			$(window).unbind('resize');
 		},
 
 		_drag: function () {
