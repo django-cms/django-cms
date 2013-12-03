@@ -44,7 +44,7 @@ $(document).ready(function () {
 			'sideframe': { 'url': '' },
 			'states': []
 		},
-		// 'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}', not required yet and not in context anymore
+		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}', // required for copy plugin
 		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
 		'publisher': '{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}'
 	};

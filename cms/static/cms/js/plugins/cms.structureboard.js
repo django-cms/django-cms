@@ -146,10 +146,10 @@ $(document).ready(function () {
 				id = cls.replace('cms_plugin-', '');
 			} else if(el.hasClass('cms_draggable')) {
 				id = cls.replace('cms_draggable-', '');
+			} else if(el.hasClass('cms_placeholder')) {
+				id = cls.replace('cms_placeholder-', '');
 			} else if(el.hasClass('cms_dragbar')) {
 				id = cls.replace('cms_dragbar-', '');
-			} else {
-				id = cls.replace('cms_placeholder-', '');
 			}
 
 			return id;
@@ -192,7 +192,13 @@ $(document).ready(function () {
 
 			// show container
 			this.container.show();
-			// this.dimmer.fadeIn(300);
+			this.dimmer.fadeIn(100);
+
+			// add dimmer close
+			// TODO add longlick
+			this.dimmer.bind('click', function () {
+				//that.hide();
+			});
 
 			// hide stuff
 			this.plugins.hide();
