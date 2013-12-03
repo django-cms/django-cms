@@ -345,10 +345,6 @@ $(document).ready(function () {
 					var bounds = [];
 					// save original state events
 					var original = $('.cms_plugin-' + that.getId(originalItem));
-
-console.log(original);
-
-
 					// cancel if item has no settings
 					if(original.data('settings') === undefined) return false;
 					var type = original.data('settings').plugin_type;
