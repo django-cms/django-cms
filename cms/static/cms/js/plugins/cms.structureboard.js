@@ -182,12 +182,21 @@ $(document).ready(function () {
 
 		// private methods
 		_showBoard: function () {
+			var that = this;
+
+			$(window).bind('resize', function () {
+				that._resizeBoard();
+			}).trigger('resize');
+		},
+
+		_resizeBoard: function () {
 			var body = $('body');
 
 			// apply correct width and height to the structure container
 			var width = $(window).width();
 			var height = $(window).height();
 			var toolbarHeight = this.toolbar.find('.cms_toolbar').height();
+
 			// determine if we should use body width or height
 			if(width <= body.width()) width = body.width();
 			if(height <= body.height()) height = body.height();
@@ -230,6 +239,7 @@ $(document).ready(function () {
 
 		_hideBoard: function () {
 			this.container.stop(true, true).fadeOut(this.options.speed / 2);
+			$(window).unbind('resize');
 		},
 
 		_drag: function () {
