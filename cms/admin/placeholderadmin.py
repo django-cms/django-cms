@@ -371,8 +371,12 @@ class PlaceholderAdmin(ModelAdmin):
             # change_view method, is better if it will be loaded again, so
             # just pass id to plugin_admin
             response = plugin_admin.change_view(request, str(plugin_id))
+        print plugin_admin.object_successfully_changed
+        print request.method
         if request.method == "POST" and plugin_admin.object_successfully_changed:
+            print 'call post edit'
             self.post_edit_plugin(request, plugin_admin.saved_object)
+            print 'post call post edit'
             saved_object = plugin_admin.saved_object
             context = {
                 'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),

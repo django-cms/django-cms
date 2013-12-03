@@ -34,14 +34,14 @@ class StackNode(Tag):
             stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code,
                 'creation_method': Stack.CREATION_BY_TEMPLATE})
         toolbar = request.toolbar
-        if stack.dirty:
+        if stack.dirty and toolbar.edit_mode:
             if not hasattr(request, 'dirty_stacks'):
                 request.dirty_stacks = []
             request.dirty_stacks.append(stack)
-        if toolbar.edit:
+        if toolbar.edit_mode:
             placeholder = stack.draft
         else:
-            placeholder = stack.live
+            placeholder = stack.public
         return render_placeholder(placeholder, context, name_fallback=code)
 
 

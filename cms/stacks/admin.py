@@ -102,7 +102,27 @@ class StackAdmin(PlaceholderAdmin):
             'form': form,
         })
 
+    def post_add_plugin(self, request, placeholder, plugin):
+        self.mark_dirty(placeholder)
+
+    def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
+        self.mark_dirty(target_placeholder)
+
     def post_edit_plugin(self, request, plugin):
-        stack = plugin.placeholder.stack_draft.update(dirty=True)
+        print "post edit"
+        self.mark_dirty(plugin.placeholder)
+
+    def post_move_plugin(self, request, plugin):
+        self.mark_dirty(plugin.placeholder)
+
+    def post_delete_plugin(self, request, plugin):
+        self.mark_dirty(plugin.placeholder)
+
+    def post_clear_placeholder(self, request, placeholder):
+        self.mark_dirty(placeholder)
+
+    @staticmethod
+    def mark_dirty(placeholder):
+        placeholder.stacks_draft.update(dirty=True)
 
 admin.site.register(Stack, StackAdmin)

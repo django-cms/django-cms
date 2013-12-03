@@ -137,7 +137,7 @@ class PageToolbar(CMSToolbar):
 
                         publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk,))
                         if dirty_stacks:
-                            publish_url += "?stacks=%s" % ','.join(stack.pk for stack in dirty_stacks)
+                            publish_url += "?stacks=%s" % ','.join(str(stack.pk) for stack in dirty_stacks)
                         self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
                                                 disabled=not dirty)
                 self.add_draft_live()

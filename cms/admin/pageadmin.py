@@ -4,6 +4,7 @@ from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
+from cms.stacks.models import Stack
 from django.contrib.admin.helpers import AdminForm
 
 import django
@@ -915,6 +916,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(_("You do not have permission to publish this page"))
         published = page.publish()
+        stacks = request.GET.get('stacks', '')
+        if stacks:
+            stack_ids = stacks.split(',')
+            for id in stack_ids:
+                stack = Stack.objects.get(pk=id)
+                stack.publish()
         messages.info(request, _('The page "%s" was successfully published.') % page)
         if "reversion" in settings.INSTALLED_APPS:
             # delete revisions that are not publish revisions

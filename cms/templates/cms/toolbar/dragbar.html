@@ -8,7 +8,7 @@
 		<div class="cms_submenu-dropdown">
 			<div class="cms_submenu-item cms_submenu-item-title"><span>{% trans "Settings" %}</span></div>
 			<div class="cms_submenu-item"><a data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
-			<div class="cms_submenu-item"><a data-rel="modal" href="{% url "admin:cms_page_clear_placeholder" placeholder.pk %}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
+			<div class="cms_submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
 			<div class="cms_submenu-item"><a data-rel="modal" href='{% url "admin:stacks_stack_create_stack" placeholder_id=placeholder.pk %}?_popup'>{% trans "Create stack" %}</a></div>
 			<div class="cms_submenu-item"><a data-rel="modal" href='{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'>{% trans "Insert stack" %}</a></div>
 			{% plugin_child_classes placeholder %}
