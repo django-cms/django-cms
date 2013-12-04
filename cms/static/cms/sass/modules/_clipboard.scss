@@ -7,6 +7,8 @@
 //##################################################################################################################
 // #CLIPBOARD#
 .cms_clipboard { position:fixed; left:0; top:130px; z-index:99999; display:none;
+	background:rgba(255,255,255,0.6); padding:3px 3px 3px 0; @include border-radius(0 3px 3px 0);
+
 	p { padding:0; margin:0; }
 
 	.cms_clipboard-numbers { margin:0 0 2px; }
@@ -30,6 +32,7 @@
 	.cms_clipboard-containers .cms_draggable { margin-left:-220px; width:190px; }
 
 	// custom style for draggable item
+	.cms_dragarea { padding-top:3px; }
 	.cms_draggable { position:relative; left:0; top:0; z-index:99; cursor:move;
 		@include border-radius(3px); padding:4px 5px 3px 5px; margin:0 0 2px;
 		background:$color-grey-5; border:1px solid $color-grey-70; }
