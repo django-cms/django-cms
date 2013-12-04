@@ -130,11 +130,7 @@ $(document).ready(function () {
 
 		close: function () {
 			this._hide(100);
-			switch(this.options.onClose) {
-				case 'REFRESH_PAGE':
-					this.reloadBrowser();
-					break;
-			}
+			if(this.options.onClose === 'REFRESH_PAGE') this.reloadBrowser();
 		},
 
 		// private methods
