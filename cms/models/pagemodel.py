@@ -850,7 +850,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
                self.has_generic_permission(request, "delete")
 
-    def has_publish_permission(self, request):
+    def  has_publish_permission(self, request):
         if request.user.is_superuser:
             return True
         opts = self._meta

@@ -34,10 +34,9 @@ class StackNode(Tag):
             stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code,
                 'creation_method': Stack.CREATION_BY_TEMPLATE})
         toolbar = request.toolbar
-        if stack.dirty and toolbar.edit_mode:
-            if not hasattr(request, 'dirty_stacks'):
-                request.dirty_stacks = []
-            request.dirty_stacks.append(stack)
+        if not hasattr(request, 'stacks'):
+            request.stacks = []
+        request.stacks.append(stack)
         if toolbar.edit_mode:
             placeholder = stack.draft
         else:

@@ -52,12 +52,22 @@ class Stack(models.Model):
         if not self.code:
             self.code = u'stack-%s' % uuid.uuid4()
 
-    def publish(self):
-        CMSPlugin.objects.filter(placeholder=self.public).delete()
-        plugins = self.draft.get_plugins_list()
-        copy_plugins_to(plugins, self.public)
-        self.dirty = False
-        self.save()
+    def publish(self, request):
+        if self.has_publish_permission(request):
+            CMSPlugin.objects.filter(placeholder=self.public).delete()
+            plugins = self.draft.get_plugins_list()
+            copy_plugins_to(plugins, self.public)
+            self.dirty = False
+            self.save()
+            return True
+        return False
+
+    def has_publish_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        opts = self._meta
+        return request.user.has_perm(opts.app_label + '.' + "change") and \
+               self.has_generic_permission(request, "publish")
 
 
 @python_2_unicode_compatible
