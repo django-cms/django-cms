@@ -558,9 +558,14 @@ class CMSToolbar(Tag):
         toolbar = getattr(request, 'toolbar', None)
         context['cms_version'] = __version__
         if toolbar and toolbar.show_toolbar:
-            js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
+            language = toolbar.language
+            with force_language(language):
+                js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
+                clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
         else:
+            language = None
             js = ''
+            clipboard = ''
         # render everything below the tag
         rendered_contents = nodelist.render(context)
         # sanity checks
@@ -571,10 +576,10 @@ class CMSToolbar(Tag):
         if not toolbar.show_toolbar:
             return rendered_contents
         # render the toolbar content
-        language = request.toolbar.language
+
         with force_language(language):
             request.toolbar.populate()
-
+            context['clipboard'] = clipboard
             content = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below
         return '%s\n%s' % (content, rendered_contents)
