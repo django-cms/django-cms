@@ -17,7 +17,7 @@ $(document).ready(function () {
 				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
 			},
 			'minHeight': 400,
-			'minWidth': 600
+			'minWidth': 600,
 			'onClose': false
 		},
 
