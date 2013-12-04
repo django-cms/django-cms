@@ -62,7 +62,7 @@ class StackAdmin(PlaceholderAdmin):
                     placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
                     plugin_list = list(placeholder.get_plugins())
                 stack = form.save()
-                copy_plugins_to(plugin_list, stack.content)
+                copy_plugins_to(plugin_list, stack.draft)
                 stack.save()
                 return HttpResponse('OK') # TODO: close the window
         return self.add_view(request)
@@ -95,7 +95,7 @@ class StackAdmin(PlaceholderAdmin):
                         'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
                     })
                 else:
-                    plugin_ziplist = copy_plugins_to(list(form.cleaned_data['stack'].content.get_plugins()), placeholder)
+                    plugin_ziplist = copy_plugins_to(list(form.cleaned_data['stack'].draft.get_plugins()), placeholder)
                     # TODO: once we actually use the plugin context in the frontend, we have to support multiple plugins
                 return TemplateResponse(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return TemplateResponse(request, 'admin/stacks/insert_stack.html', {

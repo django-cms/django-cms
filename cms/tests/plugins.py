@@ -18,6 +18,7 @@ from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
 from cms.plugins.link.models import Link
 from cms.plugins.picture.models import Picture
+from cms.toolbar.toolbar import CMSToolbar
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
 from cms.test_utils.project.pluginapp.models import Article, Section
@@ -95,6 +96,7 @@ class PluginsTestBaseCase(CMSTestCase):
     def get_request(self, *args, **kwargs):
         request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
         request.placeholder_media = Media()
+        request.toolbar = CMSToolbar(request)
         return request
 
     def get_response_pk(self, response):

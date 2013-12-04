@@ -44,12 +44,12 @@ class StacksTestCase(PluginsTestBaseCase):
         t = Template('{% load stack_tags %}{% stack "foobar" %}')
         t.render(self.get_context('/'))
         self.assertObjectExist(Stack.objects.all(), code='foobar', creation_method=Stack.CREATION_BY_TEMPLATE)
-        self.assertObjectExist(Placeholder.objects.all(), slot='foobar')
+        self.assertEqual(Placeholder.objects.filter(slot='foobar').count(), 2)
 
     def test_create_stack_from_placeholder(self):
         placeholder = self.fill_placeholder()
         response = self.client.post(reverse('admin:stacks_stack_create_stack', kwargs={'placeholder_id': placeholder.pk}), data={'name': 'foo', 'code': 'bar'})
-        new_placeholder = Placeholder.objects.get(stacks_contents__code='bar')
+        new_placeholder = Placeholder.objects.get(stacks_draft__code='bar')
         self.assertEqual(len(placeholder.get_plugins()), len(new_placeholder.get_plugins()))
         self.assertEqual(new_placeholder.slot, 'bar')
 
@@ -57,18 +57,28 @@ class StacksTestCase(PluginsTestBaseCase):
         placeholder = self.fill_placeholder()
         plugin = placeholder.get_plugins().filter(parent=None).get()
         response = self.client.post(reverse('admin:stacks_stack_create_stack_from_plugin', kwargs={'placeholder_id': placeholder.pk, 'plugin_id': plugin.pk}), data={'name': 'foo', 'code': 'bar'})
-        new_placeholder = Placeholder.objects.get(stacks_contents__code='bar')
+        new_placeholder = Placeholder.objects.get(stacks_draft__code='bar')
         self.assertEqual(len(placeholder.get_plugins()), len(new_placeholder.get_plugins()))
         self.assertEqual(new_placeholder.slot, 'bar')
 
     def test_insert_stack_plugin(self):
         placeholder = self.fill_placeholder()
         stack = Stack.objects.create(name='foo', code='bar')
-        self.fill_placeholder(stack.content)
+        self.fill_placeholder(stack.draft)
         new_placeholder = Placeholder.objects.create(slot='some_other_slot')
         response = self.client.post(reverse('admin:stacks_stack_insert_stack', kwargs={'placeholder_id': new_placeholder.pk}), data={'insertion_type': StackInsertionForm.INSERT_LINK, 'stack': stack.pk, 'language_code': 'en'})
         self.assertEquals(len(new_placeholder.get_plugins()), 1)
-        self.assertEquals(len(StackLink.objects.get(placeholder=new_placeholder).stack.content.get_plugins()), len(placeholder.get_plugins()))
+        self.assertEquals(len(StackLink.objects.get(placeholder=new_placeholder).stack.draft.get_plugins()), len(placeholder.get_plugins()))
         another_new_placeholder = Placeholder.objects.create(slot='some_other_slot')
         response = self.client.post(reverse('admin:stacks_stack_insert_stack', kwargs={'placeholder_id': another_new_placeholder.pk}), data={'insertion_type': StackInsertionForm.INSERT_COPY, 'stack': stack.pk, 'language_code': 'en'})
-        self.assertEquals(len(stack.content.get_plugins()), len(another_new_placeholder.get_plugins()))
+        self.assertEquals(len(stack.draft.get_plugins()), len(another_new_placeholder.get_plugins()))
+
+    def test_publish_stack(self):
+        stack = Stack.objects.create(name='foo', code='bar')
+        self.fill_placeholder(stack.draft)
+        stack.dirty = True
+        stack.save()
+        self.assertEqual(stack.draft.cmsplugin_set.all().count(), 2)
+        self.assertEqual(stack.public.cmsplugin_set.all().count(), 0)
+        request = self.get_request()
+        stack.publish(request)
