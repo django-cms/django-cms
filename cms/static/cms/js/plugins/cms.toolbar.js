@@ -384,7 +384,7 @@ $(document).ready(function () {
 
 			switch(target) {
 				case 'modal':
-					var modal = new CMS.Modal();
+					var modal = new CMS.Modal({'onClose': el.attr('data-on-close')});
 						modal.open(el.attr('href'), el.attr('data-name'));
 					break;
 				case 'message':
