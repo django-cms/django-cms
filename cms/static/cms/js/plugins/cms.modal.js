@@ -17,17 +17,20 @@ $(document).ready(function () {
 				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
 			},
 			'minHeight': 400,
-			'minWidth': 600
+			'minWidth': 600,
+			'onClose': false
 		},
 
 		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+
+			// elements
+			this.body = $('html');
 			this.modal = $('.cms_modal');
 			this.toolbar = $('.cms_toolbar');
-			this.config = CMS.config;
-			this.body = $('html');
 
-			// helpers
+			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 			this.maximized = false;
 			this.minimized = false;
@@ -129,6 +132,7 @@ $(document).ready(function () {
 
 		close: function () {
 			this._hide(100);
+			if(this.options.onClose === 'REFRESH_PAGE') this.reloadBrowser();
 		},
 
 		// private methods

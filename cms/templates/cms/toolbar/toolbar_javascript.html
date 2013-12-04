@@ -24,6 +24,7 @@ var _$ = window.$ || undefined;
 $(document).ready(function () {
 	// this is a global shared configuration
 	CMS.config = {
+		'mode': {% if request.toolbar.edit_mode %}'draft'{% else %}'live'{% endif %},
 		'auth': {% if user.is_authenticated %}true{% else %}false{% endif %},
 		'debug': {% if debug %}true{% else %}false{% endif %},
 		'csrf': '{{ csrf_token }}',
@@ -43,7 +44,7 @@ $(document).ready(function () {
 			'sideframe': { 'url': '' },
 			'states': []
 		},
-		// 'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}', not required yet and not in context anymore
+		'clipboard': '{{ request.toolbar.clipboard.pk|unlocalize }}', // required for copy plugin
 		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
 		'publisher': '{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}'
 	};
