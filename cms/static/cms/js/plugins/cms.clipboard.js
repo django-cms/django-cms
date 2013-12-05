@@ -42,6 +42,8 @@ $(document).ready(function () {
 
 		// private methods
 		_setup: function () {
+			var that = this;
+
 			// attach visual events
 			this.triggers.bind('mouseenter mouseleave', function (e) {
 				e.preventDefault();
