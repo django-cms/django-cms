@@ -179,6 +179,9 @@ $(document).ready(function () {
 			this.plugins.removeClass('cms_plugin-active');
 			this.dragitems.unbind('mousedown.cms.longclick');
 
+			// only reset if no id is provided
+			if(id === false) return false;
+
 			// attach active class to current element
 			var dragitem = $('.cms_draggable-' + id);
 			var plugin = $('.cms_plugin-' + id);
@@ -198,6 +201,7 @@ $(document).ready(function () {
 				// attach event to switch to fullmode when dragging
 				this.dragitems.bind('mousedown.cms.longclick', function () {
 					that.show();
+					that.setActive(false);
 				});
 
 			// otherwise hide and reset the board
