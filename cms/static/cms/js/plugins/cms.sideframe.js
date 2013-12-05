@@ -181,7 +181,7 @@ $(document).ready(function () {
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
-				CMS.API.Toolbar._lockToolbar(true);
+				CMS.API.Toolbar._lock(true);
 			}, 100);
 		},
 
@@ -204,7 +204,7 @@ $(document).ready(function () {
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
-				CMS.API.Toolbar._lockToolbar(false);
+				CMS.API.Toolbar._lock(false);
 			}, 100);
 		},
 

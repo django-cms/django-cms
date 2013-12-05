@@ -201,7 +201,7 @@ $(document).ready(function () {
 
 		openMessage: function (msg, dir, delay, error) {
 			// set toolbar freeze
-			this._lockToolbar(true);
+			this._lock(true);
 
 			// add content to element
 			this.messages.find('.cms_messages-inner').html(msg);
@@ -278,7 +278,7 @@ $(document).ready(function () {
 		closeMessage: function () {
 			this.messages.fadeOut(300);
 			// unlock toolbar
-			this._lockToolbar(false);
+			this._lock(false);
 		},
 
 		openAjax: function (url, post, text) {
@@ -402,7 +402,7 @@ $(document).ready(function () {
 			}
 		},
 
-		_lockToolbar: function (lock) {
+		_lock: function (lock) {
 			if(lock) {
 				this.lockToolbar = true;
 				// make button look disabled
