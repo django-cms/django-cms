@@ -165,7 +165,7 @@ class Placeholder(models.Model):
 
     def get_cached_plugins(self):
         language = get_language()
-        return getattr(self, '_%s_plugins_cache' % language)
+        return getattr(self, '_%s_plugins_cache' % language, [])
 
     @property
     def actions(self):
