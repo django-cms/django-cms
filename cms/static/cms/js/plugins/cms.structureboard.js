@@ -355,9 +355,6 @@ $(document).ready(function () {
 					var plugin = $('.cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
 
-					// update clipboard entries
-					CMS.API.Clipboard._update(ui.item);
-
 					// reset placeholder without entries
 					$('.cms_draggables').each(function () {
 						if($(this).children().length === 0) {
