@@ -11,57 +11,68 @@ $(document).ready(function () {
 
 		implement: [CMS.API.Helpers],
 
-		options: {},
+		options: {
+			'position': 220, // offset to top
+			'speed': 100
+		},
 
 		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
+
+			// elements
 			this.clipboard = $('.cms_clipboard');
+			this.triggerRemove = this.clipboard.find('.cms_clipboard-empty a');
+			this.triggers = this.clipboard.find('.cms_clipboard-triggers a');
+			this.containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
+			this.timer = function () {};
 
+			// setup initial stuff
 			this._setup();
+
+			// setup events
+			this._events();
 		},
 
 		// private methods
 		_setup: function () {
+			// nothing here yet
+		},
+
+		_events: function () {
 			var that = this;
-			var remove = this.clipboard.find('.cms_clipboard-empty a');
-			var triggers = this.clipboard.find('.cms_clipboard-triggers a');
-			var containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
-			var position = 220;
-			var speed = 100;
-			var timer = function () {};
 
 			// add remove event
-			remove.bind(this.click, function (e) {
+			this.triggerRemove.bind(this.click, function (e) {
 				e.preventDefault();
 				CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
 			});
 
 			// add animation events
-			triggers.bind('mouseenter mouseleave', function (e) {
+			this.triggers.bind('mouseenter mouseleave', function (e) {
 				e.preventDefault();
 				// clear timeout
-				clearTimeout(timer);
+				clearTimeout(that.timer);
 
 				if(e.type === 'mouseleave') hide();
 
-				triggers = that.clipboard.find('.cms_clipboard-triggers a');
-				containers = that.clipboard.find('.cms_clipboard-containers > .cms_draggable');
+				that.triggers = that.clipboard.find('.cms_clipboard-triggers a');
+				that.containers = that.clipboard.find('.cms_clipboard-containers > .cms_draggable');
 				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
-				var el = containers.eq(index);
+				var el = that.containers.eq(index);
 				// cancel if element is already open
 				if(el.data('open') === true) return false;
 
 				// show element
-				containers.stop().css({ 'margin-left': -position }).data('open', false);
-				el.stop().animate({ 'margin-left': 0 }, speed);
+				that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
+				el.stop().animate({ 'margin-left': 0 }, that.options.speed);
 				el.data('open', true);
 			});
-			containers.bind('mouseover mouseleave', function (e) {
+			that.containers.bind('mouseover mouseleave', function (e) {
 				// clear timeout
-				clearTimeout(timer);
+				clearTimeout(that.timer);
 
 				// cancel if we trigger mouseover
 				if(e.type === 'mouseover') return false;
@@ -71,12 +82,13 @@ $(document).ready(function () {
 			});
 
 			function hide() {
-				timer = setTimeout(function () {
-					containers.stop().css({ 'margin-left': -position }).data('open', false);
-				}, speed);
+				that.timer = setTimeout(function () {
+					that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
+				}, that.options.speed);
 			}
 		},
 
+		// TODO from stop on drag & drop
 		_update: function () {
 			// cancel if there is no clipboard available
 			if(!this.clipboard.length) return false;
