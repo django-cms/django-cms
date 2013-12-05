@@ -3,6 +3,7 @@ from classytags.arguments import Argument
 from classytags.core import Tag, Options
 from django import template
 from django.template.defaultfilters import safe
+from django.utils.encoding import smart_text
 from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 from classytags.helpers import InclusionTag
@@ -76,7 +77,7 @@ class CMSEditableObject(InclusionTag):
         # If the toolbar is not enabled the following part is just skipped: it
         # would cause a perfomance hit for no reason
         if self._is_editable(context.get('request', None)):
-            instance.get_plugin_name = u"%s %s" % (force_unicode(_('Edit')), unicode(instance._meta.verbose_name))
+            instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
             context['instance'] = instance
             context['generic'] = instance._meta
             # view_method has the precedence and we retrieve the corresponding
