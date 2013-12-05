@@ -171,13 +171,13 @@ $(document).ready(function () {
 			return array;
 		},
 
-		setActive: function (id) {
-			// reset active statesdragholders
+		setActive: function (id, state) {
+			// resets
 			this.dragitems.removeClass('cms_draggable-selected');
 			this.plugins.removeClass('cms_plugin-active');
 
-			// if false is provided, only remove classes
-			if(id === false) return false;
+			// check wheter we should show or hide the board
+			(state) ? this.show() : this.hide();
 
 			// attach active class to current element
 			var dragitem = $('.cms_draggable-' + id);

@@ -110,8 +110,7 @@ $(document).ready(function () {
 				if(e.type === 'mousedown' && (e.which !== 3 || e.button !== 2)) {
 					// start countdown
 					timer = setTimeout(function () {
-						CMS.API.StructureBoard.show();
-						CMS.API.StructureBoard.setActive(that.options.plugin_id);
+						CMS.API.StructureBoard.setActive(that.options.plugin_id, true);
 					}, 500);
 				} else {
 					clearTimeout(timer);
@@ -169,8 +168,7 @@ $(document).ready(function () {
 				if(e.type === 'mousedown') {
 					// start countdown
 					timer = setTimeout(function () {
-						CMS.API.StructureBoard.hide();
-						CMS.API.StructureBoard.setActive(that.options.plugin_id);
+						CMS.API.StructureBoard.setActive(that.options.plugin_id, false);
 						// prevent dragging
 						$(document).bind('mousemove.keypress', function () {
 							$(document).trigger('keyup.cms', [true]);
