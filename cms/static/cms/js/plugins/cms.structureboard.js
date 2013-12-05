@@ -307,7 +307,7 @@ $(document).ready(function () {
 				'appendTo': 'body',
 				'cursor': 'move',
 				'opacity': 0.4,
-				'zIndex': 999999,
+				'zIndex': 9999999,
 				'delay': 100,
 				'refreshPositions': true,
 				// nestedSortable
