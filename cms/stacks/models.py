@@ -62,6 +62,12 @@ class Stack(models.Model):
             return True
         return False
 
+    def has_change_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        opts = self._meta
+        return request.user.has_perm(opts.app_label + '.' + "change")
+
     def has_publish_permission(self, request):
         if request.user.is_superuser:
             return True
