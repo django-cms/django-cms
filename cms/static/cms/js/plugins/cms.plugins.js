@@ -444,7 +444,7 @@ $(document).ready(function () {
 			// calculate subnav bounds
 			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10) {
 				dropdown.css('top', 'auto');
-				dropdown.css('bottom', offset + 4);
+				dropdown.css('bottom', offset - 1);
 			} else {
 				dropdown.css('top', offset);
 				dropdown.css('bottom', 'auto');
