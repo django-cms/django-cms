@@ -11,6 +11,7 @@ from cms.test_utils.util.mock import AttributeObject
 from django.contrib.auth.models import User
 from django.template import Template, RequestContext
 from sekizai.context import SekizaiContext
+from cms.toolbar.toolbar import CMSToolbar
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -323,36 +324,9 @@ class RenderingTestCase(SettingsOverrideTestCase):
             method='GET',
         )
         classes = [
-            "cms_placeholder-bar-%s" % placeholder.pk,
-            '"cms_placeholder-bar"',
+            "cms_placeholder-%s" % placeholder.pk,
+            'cms_placeholder',
         ]
         output = render_placeholder_toolbar(placeholder, context, '', 'test')
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
-
-    def test_placeholder_name_toolbar(self):
-        placeholder_conf_name = 'test_placeholder'
-        placeholder_conf_tag = '<div class="cms_placeholder-title">%s</div>' % placeholder_conf_name
-        with SettingsOverride(CMS_PLACEHOLDER_CONF={
-            'test': {'name': placeholder_conf_name}
-        }):
-            placeholder = Placeholder()
-            placeholder.slot = 'test'
-            placeholder.pk = placeholder.id = 99
-            context = SekizaiContext()
-            context['request'] = AttributeObject(
-                REQUEST={'language': 'en'},
-                GET=[],
-                session={},
-                path='/',
-                user=self.test_user,
-                current_page=None,
-                method='GET',
-            )
-            classes = [
-                "cms_placeholder-bar-%s" % placeholder.pk,
-                "cms_placeholder_slot::test",
-            ]
-            output = render_placeholder_toolbar(placeholder, context, '', 'test')
-            self.assertTrue(placeholder_conf_tag in output,
-                            'placeholder name %r is not in %r' % (placeholder_conf_name, output))

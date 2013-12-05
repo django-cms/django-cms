@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _, get_language
 import re
 from sekizai.helpers import Watcher, get_varname
 from cms.utils.placeholder import get_toolbar_plugin_struct
-from sekizai.templatetags.sekizai_tags import SekizaiParser
+from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 from cms.models import CMSPlugin
 
 register = template.Library()
@@ -544,14 +544,15 @@ register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 
 
-class CMSToolbar(Tag):
+class CMSToolbar(RenderBlock):
     name = 'cms_toolbar'
 
     options = Options(
+        Argument('name', required=False), # just here so sekizai thinks this is a RenderBlock
         parser_class=SekizaiParser,
     )
 
-    def render_tag(self, context, nodelist):
+    def render_tag(self, context, name, nodelist):
         # render JS
         request = context.get('request', None)
         toolbar = getattr(request, 'toolbar', None)

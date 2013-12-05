@@ -27,6 +27,7 @@ $(document).ready(function () {
 			this.plugins = $('.cms_plugin');
 			this.placeholders = $('.cms_placeholder');
 			this.dragitems = $('.cms_draggable');
+			this.dragareas = $('.cms_dragarea');
 			this.dropareas = $('.cms_droppable');
 			this.dimmer = this.container.find('.cms_structure-dimmer');
 			this.clipboard = $('.cms_clipboard');
@@ -107,15 +108,15 @@ $(document).ready(function () {
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
 				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
 
-			// show clipboard in structure mode
-			this.container.find('.cms_clipboard').fadeIn(this.options.speed);
-
 			// show clipboard
-			this.clipboard.show();
+			this.clipboard.fadeIn(this.options.speed);
 
 			// apply new settings
 			this.settings.mode = 'structure';
 			this.setSettings(this.settings);
+
+			// ensure all elements are visible
+			this.dragareas.show();
 
 			// show canvas
 			this._showBoard();
@@ -171,17 +172,42 @@ $(document).ready(function () {
 			return array;
 		},
 
-		setActive: function (id) {
-			// reset active statesdragholders
+		setActive: function (id, state) {
+			var that = this;
+			// resets
 			this.dragitems.removeClass('cms_draggable-selected');
 			this.plugins.removeClass('cms_plugin-active');
+			this.dragitems.unbind('mousedown.cms.longclick');
 
-			// if false is provided, only remove classes
+			// only reset if no id is provided
 			if(id === false) return false;
 
 			// attach active class to current element
 			var dragitem = $('.cms_draggable-' + id);
 			var plugin = $('.cms_plugin-' + id);
+
+			// if we switch from content to edit, show only a single plcaeholder
+			if(state) {
+				// quick show
+				this._showBoard();
+
+				// prevent default visibility
+				this.dimmer.hide();
+				this.dragareas.hide();
+
+				// show single placeholder
+				dragitem.closest('.cms_dragarea').show();
+
+				// attach event to switch to fullmode when dragging
+				this.dragitems.bind('mousedown.cms.longclick', function () {
+					that.show();
+					that.setActive(false);
+				});
+
+			// otherwise hide and reset the board
+			} else {
+				this.hide();
+			}
 
 			// collapse all previous elements
 			var collapsed = dragitem.parentsUntil('.cms_dragarea').siblings().not('.cms_dragitem-expanded');
@@ -203,7 +229,6 @@ $(document).ready(function () {
 			this.dimmer.fadeIn(100);
 
 			// add dimmer close
-			// TODO add longlick
 			this.dimmer.bind('mousedown mouseup', function (e) {
 				clearTimeout(timer);
 				timer = setTimeout(function () {
