@@ -298,7 +298,7 @@ $(document).ready(function () {
 				'source_placeholder_id': this.options.placeholder_id,
 				'source_plugin_id': this.options.plugin_id || '',
 				'source_language': this.options.plugin_language,
-				'target_placeholder_id': CMS.config.clipboard,
+				'target_placeholder_id': CMS.config.clipboard.id,
 				'target_language': this.options.plugin_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
