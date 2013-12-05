@@ -19,10 +19,12 @@ $(document).ready(function () {
 		},
 
 		initialize: function (options) {
+			this.clipboard = $('.cms_clipboard');
 			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+			this.settings = this.getSettings();
 
 			// elements
-			this.clipboard = $('.cms_clipboard');
 			this.containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
 			this.triggers = this.clipboard.find('.cms_clipboard-triggers a');
 			this.triggerRemove = this.clipboard.find('.cms_clipboard-empty a');
@@ -88,9 +90,9 @@ $(document).ready(function () {
 
 		clear: function () {
 			// post needs to be a string, it will be converted using JSON.parse
-			var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
+			var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
 			// redirect to ajax
-			CMS.API.Toolbar.openAjax(CMS.config.clipboard.url, post);
+			CMS.API.Toolbar.openAjax(this.config.clipboard.url, post);
 		}
 
 	});
