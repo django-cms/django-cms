@@ -230,6 +230,9 @@ $(document).ready(function () {
 
 			// add dimmer close
 			this.dimmer.bind('mousedown mouseup', function (e) {
+				// cancel on rightclick
+				if(e.which === 3 || e.button === 2) return false;
+				// proceed
 				clearTimeout(timer);
 				timer = setTimeout(function () {
 					that.hide();
