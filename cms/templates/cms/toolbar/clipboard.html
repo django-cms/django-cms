@@ -2,7 +2,7 @@
 
 {% if request.toolbar.edit_mode or request.toolbar.build_mode %}
 {% if request.toolbar.get_clipboard_plugins %}
-{% with slot="clipbaord" %}
+{% with slot="clipboard" %}
 <div class="cms_clipboard">
 	<div class="cms_clipboard-triggers">
 		{# maximum of 5, delete link #}
