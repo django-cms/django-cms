@@ -46,6 +46,7 @@ $(document).ready(function () {
 			this._events();
 		},
 
+		// initial methods
 		_setup: function () {
 			var that = this;
 

@@ -40,7 +40,7 @@ $(document).ready(function () {
 			this._events();
 		},
 
-		// private methods
+		// initial methods
 		_setup: function () {
 			var that = this;
 
@@ -90,6 +90,7 @@ $(document).ready(function () {
 			});
 		},
 
+		// public methods
 		clear: function () {
 			// post needs to be a string, it will be converted using JSON.parse
 			var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
