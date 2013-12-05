@@ -1,9 +1,10 @@
+{% spaceless %}
 {% load i18n l10n sekizai_tags %}
 {% load url from future %}
 
 <div class="cms_placeholder cms_placeholder-{{ placeholder.pk|unlocalize }}"></div>
 
-{% addtoblock "js" %}
+{% endspaceless %}{% addtoblock "js" %}
 <script>
 (function($) {
 // CMS.$ will be passed for $
