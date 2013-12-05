@@ -109,7 +109,6 @@ class StackAdmin(PlaceholderAdmin):
         self.mark_dirty(target_placeholder)
 
     def post_edit_plugin(self, request, plugin):
-        print "post edit"
         self.mark_dirty(plugin.placeholder)
 
     def post_move_plugin(self, request, plugin):
