@@ -29,23 +29,35 @@ class Placeholder(models.Model):
     def get_add_url(self):
         return self._get_url('add_plugin')
 
+    def get_edit_url(self, plugin_pk):
+        return self._get_url('edit_plugin', plugin_pk)
+
     def get_move_url(self):
         return self._get_url('move_plugin')
 
-    def get_remove_url(self):
-        return self._get_url('remove_plugin')
+    def get_delete_url(self, plugin_pk):
+        return self._get_url('delete_plugin', plugin_pk)
 
     def get_changelist_url(self):
         return self._get_url('changelist')
 
-    def _get_url(self, key):
+    def get_clear_url(self):
+        return self._get_url('clear_placeholder', self.pk)
+
+    def get_copy_url(self):
+        return ''
+
+    def _get_url(self, key, pk=None):
         model = self._get_attached_model()
+        args = []
+        if pk:
+            args.append(pk)
         if not model:
-            return reverse('admin:cms_page_%s' % key)
+            return reverse('admin:cms_page_%s' % key, args=args)
         else:
             app_label = model._meta.app_label
             model_name = model.__name__.lower()
-            return reverse('admin:%s_%s_%s' % (app_label, model_name, key))
+            return reverse('admin:%s_%s_%s' % (app_label, model_name, key), args=args)
 
     def _get_permission(self, request, key):
         """

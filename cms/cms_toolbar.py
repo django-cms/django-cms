@@ -43,6 +43,29 @@ class PlaceholderToolbar(CMSToolbar):
     """
 
     def populate(self):
+        self.page = get_page_draft(self.request.current_page)
+        stacks = getattr(self.request, 'stacks', [])
+        placeholders = getattr(self.request, 'placeholders', [])
+        if self.page:
+            if self.page.has_change_permission(self.request):
+                self.add_structure_mode()
+            elif stacks:
+                for stack in stacks:
+                    if stack.has_change_permission(self.request):
+                        self.add_structure_mode()
+                        break
+        else:
+            added = False
+            if stacks:
+                for stack in stacks:
+                    if stack.has_change_permission(self.request):
+                        self.add_structure_mode()
+                        added = True
+                        break
+            if not added and placeholders:
+                self.add_structure_mode()
+
+    def add_structure_mode(self):
         switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                 extra_classes=['cms_toolbar-item-cms-mode-switcher'])
         switcher.add_button(_("Content"), '?edit', active=not self.toolbar.build_mode,
@@ -118,23 +141,59 @@ class PageToolbar(CMSToolbar):
             self.change_admin_menu()
             if self.page:
                 self.add_page_menu()
-
-                if self.toolbar.edit_mode:
-                    # history menu
+        stacks = getattr(self.request, 'stacks', [])
+        dirty_stacks = [stack for stack in stacks if stack.dirty]
+        placeholders = getattr(self.request, 'placeholders', [])
+        if self.page or stacks:
+            if self.toolbar.edit_mode:
+                # history menu
+                if self.page:
                     self.add_history_menu()
                     self.change_language_menu()
-                    # publish button
-                    if self.page.has_publish_permission(self.request):
-                        classes = ["cms_btn-action", "cms_btn-publish"]
-                        if self.page.is_dirty():
-                            classes.append("cms_btn-publish-active")
-                        if self.page.published:
-                            title = _("Publish Changes")
-                        else:
-                            title = _("Publish Page now")
-                        publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk,))
-                        self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
-                                                disabled=not self.page.is_dirty())
+                # publish button
+                publish_permission = True
+                if self.page and not self.page.has_publish_permission(self.request):
+                    publish_permission = False
+
+                for stack in dirty_stacks:
+                    if not stack.has_publish_permission(self.request):
+                        publish_permission = False
+
+                classes = ["cms_btn-action", "cms_btn-publish"]
+
+                dirty = bool(self.page and self.page.is_dirty()) or len(dirty_stacks) > 0
+                if dirty:
+                    classes.append("cms_btn-publish-active")
+                if dirty_stacks or (self.page and self.page.published):
+                    title = _("Publish changes")
+                else:
+                    title = _("Publish page now")
+                pk = 0
+                if self.page:
+                    pk = self.page.pk
+                publish_url = reverse('admin:cms_page_publish_page', args=(pk,))
+                if dirty_stacks:
+                    publish_url += "?stacks=%s" % ','.join(str(stack.pk) for stack in dirty_stacks)
+                if publish_permission:
+                    self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
+                                        disabled=not dirty)
+        if self.page:
+            if self.page.has_change_permission(self.request):
+                self.add_draft_live()
+            elif stacks:
+                for stack in stacks:
+                    if stack.has_change_permission(self.request):
+                        self.add_draft_live()
+                        break
+        else:
+            added = False
+            if stacks:
+                for stack in stacks:
+                    if stack.has_change_permission(self.request):
+                        self.add_draft_live()
+                        added = True
+                        break
+            if not added and placeholders:
                 self.add_draft_live()
 
     def add_draft_live(self):

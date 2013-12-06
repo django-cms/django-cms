@@ -104,6 +104,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context = context_to_copy
     context.push()
     request = context['request']
+    if not hasattr(request, 'placeholder'):
+        request.placeholders = []
+    request.placeholders.append(placeholder)
     page = placeholder.page if placeholder else None
     if page:
         template = page.template
