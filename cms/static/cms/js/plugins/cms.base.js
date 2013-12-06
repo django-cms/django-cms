@@ -153,13 +153,3 @@ $(document).ready(function () {
 
 });
 })(CMS.$);
-
-// this will be fixed in jQuery 1.6+
-(function ( $ ) {
-    var filters = $.expr[":"];
-    if ( !filters.focus ) {
-        filters.focus = function( elem ) {
-           return elem === document.activeElement && ( elem.type || elem.href );
-        };
-    }
-})( CMS.$ );
