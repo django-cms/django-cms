@@ -39,6 +39,7 @@ $(document).ready(function () {
 			this.sideframe.data('ready', true);
 		},
 
+		// initial methods
 		_events: function () {
 			var that = this;
 

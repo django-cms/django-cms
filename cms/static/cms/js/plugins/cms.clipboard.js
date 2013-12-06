@@ -11,57 +11,60 @@ $(document).ready(function () {
 
 		implement: [CMS.API.Helpers],
 
-		options: {},
+		options: {
+			'position': 220, // offset to top
+			'speed': 100,
+			'id': null,
+			'url': ''
+		},
 
 		initialize: function (options) {
-			this.options = $.extend(true, {}, this.options, options);
 			this.clipboard = $('.cms_clipboard');
+			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+			this.settings = this.getSettings();
+
+			// elements
+			this.containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
+			this.triggers = this.clipboard.find('.cms_clipboard-triggers a');
+			this.triggerRemove = this.clipboard.find('.cms_clipboard-empty a');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
+			this.timer = function () {};
 
+			// setup initial stuff
 			this._setup();
+
+			// setup events
+			this._events();
 		},
 
-		// private methods
+		// initial methods
 		_setup: function () {
 			var that = this;
-			var remove = this.clipboard.find('.cms_clipboard-empty a');
-			var triggers = this.clipboard.find('.cms_clipboard-triggers a');
-			var containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
-			var position = 220;
-			var speed = 100;
-			var timer = function () {};
 
-			// add remove event
-			remove.bind(this.click, function (e) {
-				e.preventDefault();
-				CMS.API.Toolbar.openAjax($(this).attr('href'), $(this).attr('data-post'));
-			});
-
-			// add animation events
-			triggers.bind('mouseenter mouseleave', function (e) {
+			// attach visual events
+			this.triggers.bind('mouseenter mouseleave', function (e) {
 				e.preventDefault();
 				// clear timeout
-				clearTimeout(timer);
+				clearTimeout(that.timer);
 
 				if(e.type === 'mouseleave') hide();
 
-				triggers = that.clipboard.find('.cms_clipboard-triggers a');
-				containers = that.clipboard.find('.cms_clipboard-containers > .cms_draggable');
 				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
-				var el = containers.eq(index);
+				var el = that.containers.eq(index);
 				// cancel if element is already open
 				if(el.data('open') === true) return false;
 
 				// show element
-				containers.stop().css({ 'margin-left': -position }).data('open', false);
-				el.stop().animate({ 'margin-left': 0 }, speed);
+				that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
+				el.stop().animate({ 'margin-left': 0 }, that.options.speed);
 				el.data('open', true);
 			});
-			containers.bind('mouseover mouseleave', function (e) {
+			that.containers.bind('mouseover mouseleave', function (e) {
 				// clear timeout
-				clearTimeout(timer);
+				clearTimeout(that.timer);
 
 				// cancel if we trigger mouseover
 				if(e.type === 'mouseover') return false;
@@ -71,33 +74,28 @@ $(document).ready(function () {
 			});
 
 			function hide() {
-				timer = setTimeout(function () {
-					containers.stop().css({ 'margin-left': -position }).data('open', false);
-				}, speed);
+				that.timer = setTimeout(function () {
+					that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
+				}, that.options.speed);
 			}
 		},
 
-		_update: function () {
-			// cancel if there is no clipboard available
-			if(!this.clipboard.length) return false;
+		_events: function () {
+			var that = this;
 
-			var containers = this.clipboard.find('.cms_clipboard-containers .cms_draggable');
-			var triggers = this.clipboard.find('.cms_clipboard-triggers .cms_clipboard-numbers');
+			// add remove event
+			this.triggerRemove.bind(this.click, function (e) {
+				e.preventDefault();
+				that.clear();
+			});
+		},
 
-			var lengthContainers = containers.length;
-			var lengthTriggers = triggers.length;
-
-			// only proceed if the items are not in sync
-			if(lengthContainers === lengthTriggers) return false;
-
-			// set visible elements
-			triggers.hide();
-			for(var i = 0; i < lengthContainers; i++) {
-				triggers.eq(i).show();
-			}
-
-			// remove clipboard if empty
-			if(lengthContainers <= 0) this.clipboard.remove();
+		// public methods
+		clear: function () {
+			// post needs to be a string, it will be converted using JSON.parse
+			var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+			// redirect to ajax
+			CMS.API.Toolbar.openAjax(this.config.clipboard.url, post);
 		}
 
 	});
