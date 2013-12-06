@@ -5,11 +5,21 @@
 
 //##################################################
 // #IMPORT SETTINGS#
-@import "partials/settings";
+@import "settings";
+
+//##################################################
+// #RESET#
+.cms_reset {
+	div, p, a, a:hover, a:active, a:focus, ul, li,
+	form, fieldset, label, input, textarea {
+		font:normal 13px/20px "Helvetica Neue",Helvetica,Arial,sans-serif;
+		color:#222; font-weight:normal; text-decoration:none; text-align:left; outline:none;
+		list-style-type:none; list-style-type:none; height:auto; padding:0; margin:0; border:none; background:none;
+	}
+}
 
 //##################################################
 // #TABS#
-
 // used in: /cms/admin/page/change_form
 #page_form_lang_tabs {
 	position:relative;
@@ -27,7 +37,6 @@
 
 //##################################################
 // #DOALOG#
-
 // used in: /cms/admin/page/tree/copy_premissions
 .cms_dialog {
 	position:absolute; left:50%; top:50%; z-index:99999;
@@ -37,3 +46,20 @@
 	h1 { padding:0; margin:0 0 15px; }
 	form { padding:15px 0; margin:15px 0; border-top:1px solid #f3f3f3; }
 }
+
+//##################################################
+// #GLOBALS#
+.cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
+#djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
+
+//##################################################
+// #TOOLBAR#
+@import "modules/common";
+@import "modules/content";
+@import "modules/toolbar";
+@import "modules/modal";
+@import "modules/sideframe";
+@import "modules/clipboard";
+@import "modules/structureboard";
+@import "modules/subnav";
+@import "modules/retina";

@@ -79,7 +79,7 @@ class SiteTestCase(CMSTestCase):
                 for page in pages["2"]:
                     page.publish()
                 for page in pages["2"]:
-                    if page.is_home():
+                    if page.is_home:
                         page_url = "/de/"
                     else:
                         page_url = page.get_absolute_url(language='de')
@@ -102,7 +102,7 @@ class SiteTestCase(CMSTestCase):
                 for page in pages["3"]:
                     page.publish()
                 for page in pages["3"]:
-                    if page.is_home():
+                    if page.is_home:
                         page_url = "/de/"
                     else:
                         page_url = page.get_absolute_url(language='de')

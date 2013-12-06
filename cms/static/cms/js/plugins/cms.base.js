@@ -61,7 +61,7 @@ $(document).ready(function () {
 
 		// handles the tooltip for the plugins
 		showTooltip: function (name, id) {
-			var tooltip = $('.cms_placeholders-tooltip');
+			var tooltip = $('.cms_tooltip');
 
 			// change css and attributes
 			tooltip.css('visibility', 'visible')
@@ -90,7 +90,7 @@ $(document).ready(function () {
 		},
 
 		hideTooltip: function () {
-			var tooltip = $('.cms_placeholders-tooltip');
+			var tooltip = $('.cms_tooltip');
 
 			// change css
 			tooltip.css('visibility', 'hidden').hide();
@@ -127,6 +127,9 @@ $(document).ready(function () {
 
 		// prevents scrolling when another scrollbar is used (for better ux)
 		preventScroll: function (disable) {
+			// disable
+			return false;
+
 			// cancel if scrollbar is not visible
 			if($(document).height() <= $(window).height()) return false;
 
@@ -148,3 +151,13 @@ $(document).ready(function () {
 
 });
 })(CMS.$);
+
+// this will be fixed in jQuery 1.6+
+(function ( $ ) {
+    var filters = $.expr[":"];
+    if ( !filters.focus ) {
+        filters.focus = function( elem ) {
+           return elem === document.activeElement && ( elem.type || elem.href );
+        };
+    }
+})( CMS.$ );

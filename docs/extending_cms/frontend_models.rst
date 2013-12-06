@@ -16,14 +16,19 @@ changeform.
 Complete changeform edit
 ************************
 
-After creating the admin class for the model (see
-:mod:`Django admin documentation <django.contrib.admin>`), you just have to set
-up the your model's template.
+You need to properly setup your admin class by adding the
+``FrontendEditableAdmin`` mixin to the parents of your admin class (see
+:mod:`Django admin documentation <django.contrib.admin>` for further information)
+on Django admin::
 
-Set up the template
-===================
+    from cms.admin.placeholderadmin import FrontendEditableAdmin
+    from django.contrib import admin
 
-Add ``show_editable_model``::
+
+    class MyModelAdmin(FrontendEditableAdmin, admin.ModelAdmin):
+        ...
+
+Then setup the templates adding ``show_editable_model`` templatetag::
 
     {% load placeholder_tags %}
 
@@ -37,15 +42,13 @@ See `templatetag reference <show_editable_model_reference>`_ for arguments docum
 Selected fields edit
 ********************
 
-Frontend editing is also possible for a set of fields, although not as
-automatic as the example above.
+Frontend editing is also possible for a set of fields.
 
 Set up the admin
 ================
 
-First you need to properly setup your admin class by adding the
-``FrontendEditableAdmin`` mixin to the parents of your admin class and declaring
-a tuple of fields editable from the frontend admin::
+You need to add to your model admin a tuple of fields editable from the frontend
+admin::
 
     from cms.admin.placeholderadmin import FrontendEditableAdmin
     from django.contrib import admin

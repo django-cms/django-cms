@@ -21,7 +21,7 @@ def is_valid_page_slug(page, parent, lang, slug, site, path=None):
         qs = qs.filter(language=lang)
 
     if parent:
-        if parent.is_home():
+        if parent.is_home:
             qs = qs.filter(Q(page__parent=parent) |
                            Q(page__parent__isnull=True))
         else:

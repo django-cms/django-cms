@@ -4,15 +4,15 @@
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.PlaceholderItem('cms_placeholder-generic-{{ current_page.pk|unlocalize }}', {
+	new CMS.Plugin('cms_placeholder-generic-{{ request.current_page.pk|unlocalize }}', {
 		'type': 'generic',
 		'plugin_name': 'Page Title',
 		'urls': {
-			'edit_plugin': '{% url "admin:cms_page_edit_title" current_page.pk lang %}'
+			'edit_plugin': '{% url "admin:cms_page_edit_title" request.current_page.pk LANGUAGE_CODE %}'
 		}
 	});
 });
 })(CMS.$);
 </script>
 {% endaddtoblock %}
-<span id="cms_placeholder-generic-{{ current_page.pk|unlocalize }}" class="cms_placeholder-generic">{% page_attribute title %}</span>
+<span id="cms_placeholder-generic-{{ request.current_page.pk|unlocalize }}" class="cms_placeholder-generic">{% page_attribute title %}</span>

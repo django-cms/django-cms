@@ -17,17 +17,20 @@ $(document).ready(function () {
 				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
 			},
 			'minHeight': 400,
-			'minWidth': 600
+			'minWidth': 600,
+			'onClose': false
 		},
 
 		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+
+			// elements
+			this.body = $('html');
 			this.modal = $('.cms_modal');
 			this.toolbar = $('.cms_toolbar');
-			this.config = CMS.config;
-			this.body = $('html');
 
-			// helpers
+			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 			this.maximized = false;
 			this.minimized = false;
@@ -129,6 +132,7 @@ $(document).ready(function () {
 
 		close: function () {
 			this._hide(100);
+			if(this.options.onClose === 'REFRESH_PAGE') this.reloadBrowser();
 		},
 
 		// private methods
@@ -232,7 +236,6 @@ $(document).ready(function () {
 			var debug = (this.config.debug) ? 5 : 0;
 			var container = this.modal.find('.cms_modal-body');
 			var trigger = this.modal.find('.cms_modal-maximize');
-			var btnCk = this.modal.find('iframe').contents().find('.cke_button__maximize');
 
 			// cancel action when minimized
 			if(this.minimized) return false;
@@ -245,7 +248,8 @@ $(document).ready(function () {
 				this.modal.data('css', {
 					'left': this.modal.css('left'),
 					'top': this.modal.css('top'),
-					'margin': this.modal.css('margin')
+					'margin-left': this.modal.css('margin-left'),
+					'margin-top': this.modal.css('margin-top')
 				});
 				container.data('css', {
 					'width': container.width(),
@@ -266,9 +270,6 @@ $(document).ready(function () {
 					});
 				});
 				$(window).trigger('resize.cms.modal');
-
-				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_off')) btnCk.trigger('click');
 			} else {
 				// minimize
 				this.maximized = false;
@@ -279,9 +280,6 @@ $(document).ready(function () {
 				// reattach css
 				this.modal.css(this.modal.data('css'));
 				container.css(container.data('css'));
-
-				// trigger wysiwyg fullscreen
-				if(btnCk.hasClass('cke_button_on')) btnCk.trigger('click');
 			}
 		},
 
@@ -420,7 +418,7 @@ $(document).ready(function () {
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
 						if(item.is('input')) item.click();
-						if(item.is('a')) iframe.attr('src', item.attr('href'));
+						if(item.is('a')) that._loadContent(item.attr('href'), title);
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
@@ -501,13 +499,6 @@ $(document).ready(function () {
 				iframe.contents().find('body').bind('keydown.cms', function (e) {
 					if(e.keyCode === 27) that.close();
 				});
-
-				// if its only text, maximize modal
-				if(title.text() === that.config.lang.text) {
-					setTimeout(function () {
-						iframe.contents().find('.cke_button__maximize').trigger('click');
-					}, 100);
-				}
 			});
 
 			// inject
