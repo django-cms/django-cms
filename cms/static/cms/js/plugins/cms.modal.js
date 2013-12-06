@@ -23,12 +23,14 @@ $(document).ready(function () {
 
 		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+
+			// elements
+			this.body = $('html');
 			this.modal = $('.cms_modal');
 			this.toolbar = $('.cms_toolbar');
-			this.config = CMS.config;
-			this.body = $('html');
 
-			// helpers
+			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 			this.maximized = false;
 			this.minimized = false;
@@ -416,7 +418,7 @@ $(document).ready(function () {
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
 						if(item.is('input')) item.click();
-						if(item.is('a')) iframe.attr('src', item.attr('href'));
+						if(item.is('a')) that._loadContent(item.attr('href'), title);
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {

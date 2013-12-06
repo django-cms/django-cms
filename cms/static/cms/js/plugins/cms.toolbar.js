@@ -22,26 +22,20 @@ $(document).ready(function () {
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
 			this.settings = this.getSettings();
-			// class variables
-			this.toolbar = this.container.find('.cms_toolbar');
-			this.toolbar.hide();
-			this.toolbarTrigger = this.container.find('.cms_toolbar-trigger');
 
+			// elements
+			this.body = $('html');
+			this.toolbar = this.container.find('.cms_toolbar').hide();
+			this.toolbarTrigger = this.container.find('.cms_toolbar-trigger');
 			this.navigations = this.container.find('.cms_toolbar-item-navigation');
 			this.buttons = this.container.find('.cms_toolbar-item-buttons');
-			this.modes = this.container.find('.cms_toolbar-item-cms-mode-switcher a');
 			this.switcher = this.container.find('.cms_toolbar-item_switch');
-
-			this.body = $('html');
 			this.messages = this.container.find('.cms_messages');
-			this.bars = $('.cms_placeholder-bar');
+
+			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
-
-			this.plugins = $('.cms_plugin');
-			this.placeholders = $('.cms_placeholder');
-
-			this.lockToolbar = false;
 			this.timer = function () {};
+			this.lockToolbar = false;
 
 			// setup initial stuff
 			this._setup();
@@ -54,13 +48,6 @@ $(document).ready(function () {
 		_setup: function () {
 			// setup toolbar visibility, we need to reverse the options to set the correct state
 			(this.settings.toolbar === 'expanded') ? this._showToolbar(0, true) : this._hideToolbar(0, true);
-			// setup toolbar mode
-			(this.settings.mode === 'drag') ? this._enableDragMode(300, true) : this._enableEditMode(300, true);
-
-			// check if modes should be visible
-			if($('.cms_placeholder-bar').length) {
-				this.container.find('.cms_toolbar-item-cms-mode-switcher').show();
-			}
 
 			// hide publish button
 			var publishBtn = $('.cms_btn-publish').parent();
@@ -68,7 +55,7 @@ $(document).ready(function () {
 			if($('.cms_btn-publish-active').length) publishBtn.show();
 
 			// add toolbar ready class to body
-			$('body').addClass('cms_toolbar-ready');
+			this.body.addClass('cms_toolbar-ready');
 
 			// check if we need to reset the current settings depending on a new release
 			if(CMS.config.settings.version !== this.getSettings().version) {
@@ -88,7 +75,9 @@ $(document).ready(function () {
 			// should switcher indicate that there is an unpublished page?
 			if(CMS.config.publisher) {
 				this.openMessage(CMS.config.publisher, 'right');
-				setInterval(function () { CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight'); }, 2000);
+				setInterval(function () {
+					CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight');
+				}, this.options.messageDelay);
 			}
 
 			// open sideframe if it was previously opened
@@ -200,29 +189,6 @@ $(document).ready(function () {
 					that._setSwitcher($(e.currentTarget));
 				});
 			});
-
-			this.modes.eq(0).bind(this.click, function (e) {
-				e.preventDefault();
-				that._enableEditMode(300);
-			});
-			this.modes.eq(1).bind(this.click, function (e) {
-				e.preventDefault();
-				that._enableDragMode(300);
-			});
-
-			// keyboard handling
-			$(document).bind('keydown', function (e) {
-				// check if we have an important focus
-				var fields = $('*:focus');
-				// 32 = space
-				if(e.keyCode === 32 && that.settings.mode === 'drag' && !fields.length) {
-					e.preventDefault();
-					that._enableEditMode(300);
-				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
-					e.preventDefault();
-					that._enableDragMode(300);
-				}
-			});
 		},
 
 		// public methods
@@ -235,7 +201,7 @@ $(document).ready(function () {
 
 		openMessage: function (msg, dir, delay, error) {
 			// set toolbar freeze
-			this._lockToolbar(true);
+			this._lock(true);
 
 			// add content to element
 			this.messages.find('.cms_messages-inner').html(msg);
@@ -312,7 +278,7 @@ $(document).ready(function () {
 		closeMessage: function () {
 			this.messages.fadeOut(300);
 			// unlock toolbar
-			this._lockToolbar(false);
+			this._lock(false);
 		},
 
 		openAjax: function (url, post, text) {
@@ -365,36 +331,6 @@ $(document).ready(function () {
 			this.messages.css('top', 0);
 			// set new settings
 			this.settings.toolbar = 'collapsed';
-			if(!init) this.setSettings(this.settings);
-		},
-
-		_enableEditMode: function (speed, init) {
-			this.bars.hide();
-			this.plugins.stop(true, true).fadeIn(speed);
-			this.placeholders.hide();
-
-			// set active item
-			this.modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
-			this.settings.mode = 'edit';
-
-			// hide clipboard if in edit mode
-			this.container.find('.cms_clipboard').hide();
-
-			if(!init) this.setSettings(this.settings);
-		},
-
-		_enableDragMode: function (speed, init) {
-			this.bars.fadeIn(speed);
-			this.plugins.hide();
-			this.placeholders.stop(true, true).fadeIn(speed);
-
-			// set active item
-			this.modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
-			this.settings.mode = 'drag';
-
-			// show clipboard in build mode
-			this.container.find('.cms_clipboard').fadeIn(speed);
-
 			if(!init) this.setSettings(this.settings);
 		},
 
@@ -466,7 +402,7 @@ $(document).ready(function () {
 			}
 		},
 
-		_lockToolbar: function (lock) {
+		_lock: function (lock) {
 			if(lock) {
 				this.lockToolbar = true;
 				// make button look disabled

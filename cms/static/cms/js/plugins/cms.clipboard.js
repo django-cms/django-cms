@@ -17,7 +17,7 @@ $(document).ready(function () {
 			this.options = $.extend(true, {}, this.options, options);
 			this.clipboard = $('.cms_clipboard');
 
-			// helpers
+			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 
 			this._setup();

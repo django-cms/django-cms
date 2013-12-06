@@ -700,7 +700,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         expected = sorted([plugins[4].pk, plugins[5].pk])
         self.assertEquals(idlist, expected)
 
-    def test_empty_plugin_is_ignored(self):
+    def test_empty_plugin_is_not_ignored(self):
         page = create_page("page", "nav_playground.html", "en")
 
         placeholder = page.placeholders.get(slot='body')
@@ -715,7 +715,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # this should not raise any errors, but just ignore the empty plugin
         out = placeholder.render(self.get_context(), width=300)
         self.assertFalse(len(out))
-        self.assertFalse(len(placeholder._en_plugins_cache))
+        self.assertTrue(len(placeholder._en_plugins_cache))
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()

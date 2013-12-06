@@ -23,13 +23,15 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
+from django.template.loader import render_to_string
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 import re
 from sekizai.helpers import Watcher, get_varname
 from cms.utils.placeholder import get_toolbar_plugin_struct
-
+from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
+from cms.models import CMSPlugin
 
 register = template.Library()
 
@@ -300,24 +302,41 @@ register.tag(RenderPlugin)
 
 
 class PluginChildClasses(InclusionTag):
-    template = "cms/toolbar/draggable_menu.html"
+    """
+    Accepts a placeholder or a plugin and renders the allowed plugins for this.
+    """
+
+    template = "cms/toolbar/dragitem_menu.html"
     name = "plugin_child_classes"
     options = Options(
-        Argument('plugin')
+        Argument('obj')
     )
 
-    def get_context(self, context, plugin):
+    def get_context(self, context, obj):
         # Prepend frontedit toolbar output if applicable
         request = context['request']
         page = request.current_page
-        slot = context['slot']
         child_plugin_classes = []
-        plugin_class = plugin.get_plugin_class()
-        if plugin_class.allow_children:
-            instance, plugin = plugin.get_plugin_instance()
-            childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
+        if isinstance(obj, CMSPlugin):
+            slot = context['slot']
+            plugin = obj
+            plugin_class = plugin.get_plugin_class()
+            if plugin_class.allow_children:
+                instance, plugin = plugin.get_plugin_instance()
+                childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
+                # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
+                child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
+        elif isinstance(obj, PlaceholderModel):
+            placeholder = obj
+            page = placeholder.page if placeholder else None
+            if not page:
+                page = getattr(request, 'current_page', None)
+            if placeholder:
+                slot = placeholder.slot
+            else:
+                slot = None
             # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-            child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
+            child_plugin_classes = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
         return {'plugin_classes': child_plugin_classes}
 
 
@@ -526,29 +545,45 @@ register.tag(ShowUncachedPlaceholderById)
 register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 
 
-class CMSToolbar(InclusionTag):
-    template = 'cms/toolbar/toolbar.html'
+class CMSToolbar(RenderBlock):
     name = 'cms_toolbar'
 
-    def render(self, context):
+    options = Options(
+        Argument('name', required=False), # just here so sekizai thinks this is a RenderBlock
+        parser_class=SekizaiParser,
+    )
+
+    def render_tag(self, context, name, nodelist):
+        # render JS
         request = context.get('request', None)
-        if not request:
-            return ''
         toolbar = getattr(request, 'toolbar', None)
+        context['cms_version'] = __version__
+        if toolbar and toolbar.show_toolbar:
+            language = toolbar.language
+            with force_language(language):
+                js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
+                clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
+        else:
+            language = None
+            js = ''
+            clipboard = ''
+        # render everything below the tag
+        rendered_contents = nodelist.render(context)
+        # sanity checks
+        if not request:
+            return rendered_contents
         if not toolbar:
-            return ''
+            return rendered_contents
         if not toolbar.show_toolbar:
-            return ''
-        language = request.toolbar.language
+            return rendered_contents
+        # render the toolbar content
+
         with force_language(language):
             request.toolbar.populate()
-            context['cms_version'] = __version__
-            content = super(CMSToolbar, self).render(context)
-        return content
-
-    def get_context(self, context):
-        return context
-
+            context['clipboard'] = clipboard
+            content = render_to_string('cms/toolbar/toolbar.html', context)
+        # return the toolbar content and the content below
+        return '%s\n%s' % (content, rendered_contents)
 
 register.tag(CMSToolbar)
 

@@ -9,38 +9,155 @@ $(document).ready(function () {
 	 */
 	CMS.StructureBoard = new CMS.Class({
 
-		initialize: function (options) {
-			this.options = $.extend(true, {}, this.options, options);
+		implement: [CMS.API.Helpers],
 
-			this.plugins = $('.cms_plugin');
+		options: {
+			'speed': 300
+		},
+
+		initialize: function (options) {
+			this.container = $('.cms_structure');
+			this.options = $.extend(true, {}, this.options, options);
+			this.config = CMS.config;
+			this.settings = this.getSettings();
+
+			// elements
 			this.toolbar = $('#cms_toolbar');
 			this.sortables = $('.cms_draggables'); // use global scope
-			this.dragging = false;
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
-
-			// this.dragitems = $('.cms_draggable');
+			this.plugins = $('.cms_plugin');
+			this.placeholders = $('.cms_placeholder');
+			this.dragitems = $('.cms_draggable');
+			this.dragareas = $('.cms_dragarea');
 			this.dropareas = $('.cms_droppable');
+			this.dimmer = this.container.find('.cms_structure-dimmer');
+			this.clipboard = $('.cms_clipboard');
 
+			// states
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
 			this.timer = function () {};
+			this.interval = function () {};
 			this.state = false;
+			this.dragging = false;
 
-			this._preventEvents();
+			// setup initial stuff
+			this._setup();
+
+			// setup events
+			this._events();
+		},
+
+		_setup: function () {
+			var that = this;
+
+			// setup toolbar mode
+			if(this.settings.mode === 'structure') setTimeout(function () { that.show(); }, 100);
+
+			// check if modes should be visible
+			if(this.placeholders.length) {
+				this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').show();
+			}
+
+			// add drag & drop functionality
 			this._drag();
+			// prevent click events to detect double click
+			this._preventEvents();
+		},
+
+		_events: function () {
+			var that = this;
+			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+
+			// show edit mode
+			modes.eq(0).bind(this.click, function (e) {
+				e.preventDefault();
+				// cancel if already active
+				if(that.settings.mode === 'edit') return false;
+				// otherwise hide
+				that.hide();
+			});
+			// show structure mode
+			modes.eq(1).bind(this.click, function (e) {
+				e.preventDefault();
+				// cancel if already active
+				if(that.settings.mode === 'structure') return false;
+				// otherwise show
+				that.show();
+			});
+
+			// keyboard handling
+			$(document).bind('keydown', function (e) {
+				// check if we have an important focus
+				var fields = $('*:focus');
+				// 32 = space
+				if(e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
+					e.preventDefault();
+					that.hide();
+				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
+					e.preventDefault();
+					that.show();
+				}
+			});
 		},
 
 		// public methods
+		show: function () {
+			// cancel show if live modus is active
+			if(CMS.config.mode === 'live') return false;
+
+			// set active item
+			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
+
+			// show clipboard
+			this.clipboard.fadeIn(this.options.speed);
+
+			// apply new settings
+			this.settings.mode = 'structure';
+			this.setSettings(this.settings);
+
+			// ensure all elements are visible
+			this.dragareas.show();
+
+			// show canvas
+			this._showBoard();
+		},
+
+		hide: function () {
+			// cancel show if live modus is active
+			if(CMS.config.mode === 'live') return false;
+
+			// set active item
+			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
+
+			// hide clipboard if in edit mode
+			this.container.find('.cms_clipboard').hide();
+
+			// hide clipboard
+			this.clipboard.hide();
+
+			this.settings.mode = 'edit';
+			this.setSettings(this.settings);
+
+			// hide canvas
+			this._hideBoard();
+		},
+
 		getId: function (el) {
 			// cancel if no element is defined
 			if(el === undefined || el === null || el.length <= 0) return false;
 
 			var id = null;
+			var cls = el.attr('class').split(' ')[1];
 
 			if(el.hasClass('cms_plugin')) {
-				id = el.attr('id').replace('cms_plugin-', '');
+				id = cls.replace('cms_plugin-', '');
 			} else if(el.hasClass('cms_draggable')) {
-				id = el.attr('id').replace('cms_draggable-', '');
-			} else {
-				id = el.attr('id').replace('cms_placeholder-bar-', '');
+				id = cls.replace('cms_draggable-', '');
+			} else if(el.hasClass('cms_placeholder')) {
+				id = cls.replace('cms_placeholder-', '');
+			} else if(el.hasClass('cms_dragbar')) {
+				id = cls.replace('cms_dragbar-', '');
 			}
 
 			return id;
@@ -55,20 +172,45 @@ $(document).ready(function () {
 			return array;
 		},
 
-		setActive: function (id) {
-			// reset active statesdragholders
-			$('.cms_draggable').removeClass('cms_draggable-selected');
-			$('.cms_plugin').removeClass('cms_plugin-active');
+		setActive: function (id, state) {
+			var that = this;
+			// resets
+			this.dragitems.removeClass('cms_draggable-selected');
+			this.plugins.removeClass('cms_plugin-active');
+			this.dragitems.unbind('mousedown.cms.longclick');
 
-			// if false is provided, only remove classes
+			// only reset if no id is provided
 			if(id === false) return false;
 
 			// attach active class to current element
-			var dragitem = $('#cms_draggable-' + id);
-			var plugin = $('#cms_plugin-' + id);
+			var dragitem = $('.cms_draggable-' + id);
+			var plugin = $('.cms_plugin-' + id);
+
+			// if we switch from content to edit, show only a single plcaeholder
+			if(state) {
+				// quick show
+				this._showBoard();
+
+				// prevent default visibility
+				this.dimmer.hide();
+				this.dragareas.hide();
+
+				// show single placeholder
+				dragitem.closest('.cms_dragarea').show();
+
+				// attach event to switch to fullmode when dragging
+				this.dragitems.bind('mousedown.cms.longclick', function () {
+					that.show();
+					that.setActive(false);
+				});
+
+			// otherwise hide and reset the board
+			} else {
+				this.hide();
+			}
 
 			// collapse all previous elements
-			var collapsed = dragitem.parents().siblings().not('.cms_dragitem-expanded');
+			var collapsed = dragitem.parentsUntil('.cms_dragarea').siblings().not('.cms_dragitem-expanded');
 				collapsed.trigger(this.click);
 
 			// set new classes
@@ -77,6 +219,75 @@ $(document).ready(function () {
 		},
 
 		// private methods
+		_showBoard: function () {
+			var that = this;
+			var interval = 10;
+			var timer = function () {};
+
+			// show container
+			this.container.show();
+			this.dimmer.fadeIn(100);
+
+			// add dimmer close
+			this.dimmer.bind('mousedown mouseup', function (e) {
+				clearTimeout(timer);
+				timer = setTimeout(function () {
+					that.hide();
+				}, 500);
+
+				if(e.type === 'mouseup') clearTimeout(timer);
+			});
+
+			// hide stuff
+			this.plugins.hide();
+			this.placeholders.show();
+
+			// attach event
+			$(window).bind('resize', function () {
+				that._resizeBoard();
+			}).trigger('resize');
+
+			// setup an interval
+			this.interval = setInterval(function () {
+				$(window).trigger('resize');
+			}, interval);
+		},
+
+		_hideBoard: function () {
+			// hide elements
+			this.container.hide();
+			this.plugins.show();
+			this.placeholders.hide();
+			this.dimmer.hide();
+
+			// detach event
+			$(window).unbind('resize');
+
+			// clear interval
+			clearInterval(this.interval);
+		},
+
+		_resizeBoard: function () {
+			// calculate placeholder position
+			var id = null;
+			var area = null;
+
+			// start calculating
+			this.placeholders.each(function (index, item) {
+				item = $(item);
+				id = item.data('settings').placeholder_id;
+				area = $('.cms_dragarea-' + id);
+				// to calculate the correct offset, we need to set the
+				// placeholders correct heights and than set the according position
+				item.height(area.outerHeight(true));
+				area.css({
+					'top': item.offset().top - 5,
+					'left': item.offset().left,
+					'width': item.width()
+				});
+			});
+		},
+
 		_drag: function () {
 			var that = this;
 			var dropped = false;
@@ -96,7 +307,7 @@ $(document).ready(function () {
 				'appendTo': 'body',
 				'cursor': 'move',
 				'opacity': 0.4,
-				'zIndex': 999999,
+				'zIndex': 9999999,
 				'delay': 100,
 				'refreshPositions': true,
 				// nestedSortable
@@ -109,11 +320,11 @@ $(document).ready(function () {
 				'start': function (e, ui) {
 					that.dragging = true;
 					// show empty
-					$('.cms_droppable-empty-wrapper').show();
+					$('.cms_dragbar-empty-wrapper').show();
 					// ensure all menus are closed
 					$('.cms_dragitem .cms_submenu').hide();
 					// remove classes from empty dropzones
-					$('.cms_droppable-empty').removeClass('cms_draggable-disallowed');
+					$('.cms_dragbar-empty').removeClass('cms_draggable-disallowed');
 					// fixes placeholder height
 					ui.placeholder.height(ui.item.height());
 					// show placeholder without entries
@@ -127,7 +338,7 @@ $(document).ready(function () {
 				'stop': function (event, ui) {
 					that.dragging = false;
 					// hide empty
-					$('.cms_droppable-empty-wrapper').hide();
+					$('.cms_dragbar-empty-wrapper').hide();
 
 					// cancel if isAllowed returns false
 					if(!that.state) return false;
@@ -139,8 +350,9 @@ $(document).ready(function () {
 					}
 
 					// we pass the id to the updater which checks within the backend the correct place
-					var id = ui.item.attr('id').replace('cms_draggable-', '');
-					var plugin = $('#cms_plugin-' + id);
+					//var id = ui.item.attr('class').replace('cms_draggable cms_draggable-', '');
+					var id = that.getId(ui.item);
+					var plugin = $('.cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
 
 					// update clipboard entries
@@ -157,13 +369,13 @@ $(document).ready(function () {
 					// getting restriction array
 					var bounds = [];
 					// save original state events
-					var original = $('#cms_plugin-' + that.getId(originalItem));
+					var original = $('.cms_plugin-' + that.getId(originalItem));
 					// cancel if item has no settings
 					if(original.data('settings') === undefined) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
-					var holder = placeholder.parent().prevAll('.cms_placeholder-bar').first();
-					var plugin = $('#cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
+					var holder = placeholder.parent().prevAll('.cms_dragarea').first();
+					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
 					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
@@ -193,7 +405,7 @@ $(document).ready(function () {
 				'activeClass': 'cms_draggable-allowed',
 				'hoverClass': 'cms_draggable-hover-allowed',
 				'over': function (event) {
-					dropzone = $(event.target).parent().prev();
+					dropzone = $('.cms_placeholder-' + that.getId($(event.target).parent().prev()));
 					if(!that.state) $(event.target).addClass('cms_draggable-disallowed');
 				},
 				'out': function (event) {
