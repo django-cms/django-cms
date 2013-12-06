@@ -161,7 +161,7 @@ class Placeholder(models.Model):
         return list(self.get_plugins())
 
     def get_plugins(self):
-        return self.cmsplugin_set.all().order_by('tree_id', 'lft')
+        return self.cmsplugin_set.all().order_by('tree_id', 'level', 'position')
 
     def get_cached_plugins(self):
         language = get_language()

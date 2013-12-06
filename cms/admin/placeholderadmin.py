@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+from cms.models.placeholderpluginmodel import PlaceholderReference
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
 from django.db import transaction
@@ -300,8 +301,13 @@ class PlaceholderAdmin(ModelAdmin):
         if source_plugin_id:
             source_plugin = get_object_or_404(CMSPlugin, pk=source_plugin_id)
             reload_required = requires_reload(PLUGIN_COPY_ACTION, [source_plugin])
-            plugins = list(
-                source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
+            if source_plugin.plugin_type == "PlaceholderReference":
+                # if it is a PlaceholderReference plugin only copy the plugins it references
+                inst, cls = source_plugin.get_plugin_instance(self)
+                plugins = inst.placeholder_ref.get_plugins_list()
+            else:
+                plugins = list(
+                    source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
                                                         rght__lte=source_plugin.rght).order_by('tree_id', 'level', 'position'))
         else:
             plugins = list(
@@ -309,7 +315,16 @@ class PlaceholderAdmin(ModelAdmin):
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
-        copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
+        if target_placeholder.pk == request.toolbar.clipboard.pk and not source_plugin_id and not target_plugin_id:
+            # if we copy a whole placeholder to the clipboard create PlaceholderReference plugin instead and fill it
+            # the content of the source_placeholder.
+            ref = PlaceholderReference()
+            ref.name = source_placeholder.get_label()
+            ref.placeholder = target_placeholder
+            ref.save()
+            ref.copy_from(source_placeholder)
+        else:
+            copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
             'tree_id', 'level', 'position')
         reduced_list = []
