@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
@@ -12,11 +11,11 @@ from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import cms_static_url, get_cms_setting
+from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.plugins.utils import has_reached_plugin_limit, requires_reload
 from django.contrib.admin import ModelAdmin
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
@@ -73,7 +72,7 @@ class FrontendEditableAdmin(object):
             return HttpResponseBadRequest(_("Fields %s not editabled in the frontend") % raw_fields)
         if not request.user.has_perm("%s_change" % self.model._meta.module_name):
             return HttpResponseForbidden(_("You do not have permission to edit this item"))
-        # Dinamically creates the form class with only `field_name` field
+            # Dinamically creates the form class with only `field_name` field
         # enabled
         form_class = self.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
@@ -113,7 +112,8 @@ class FrontendEditableAdmin(object):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         response = super(FrontendEditableAdmin, self).change_view(request, object_id, form_url, extra_context)
-        if response.status_code == 302 and response._headers['location'][1] == reverse('admin:%s_%s_changelist' % (self.model._meta.app_label, self.model._meta.module_name)):
+        if response.status_code == 302 and response._headers['location'][1] == reverse(
+                        'admin:%s_%s_changelist' % (self.model._meta.app_label, self.model._meta.module_name)):
             context = {
                 'plugin': None,
                 'plugin_id': None,
@@ -301,17 +301,19 @@ class PlaceholderAdmin(ModelAdmin):
         if source_plugin_id:
             source_plugin = get_object_or_404(CMSPlugin, pk=source_plugin_id)
             reload_required = requires_reload(PLUGIN_COPY_ACTION, [source_plugin])
-            if source_plugin.plugin_type == "PlaceholderReference":
+            if source_plugin.plugin_type == "PlaceholderPlugin":
                 # if it is a PlaceholderReference plugin only copy the plugins it references
                 inst, cls = source_plugin.get_plugin_instance(self)
                 plugins = inst.placeholder_ref.get_plugins_list()
             else:
                 plugins = list(
                     source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
-                                                        rght__lte=source_plugin.rght).order_by('tree_id', 'level', 'position'))
+                                                            rght__lte=source_plugin.rght).order_by('tree_id', 'level',
+                                                                                                   'position'))
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level',
+                                                                                           'position'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
@@ -320,6 +322,7 @@ class PlaceholderAdmin(ModelAdmin):
             # the content of the source_placeholder.
             ref = PlaceholderReference()
             ref.name = source_placeholder.get_label()
+            ref.plugin_type = "PlaceholderPlugin"
             ref.placeholder = target_placeholder
             ref.save()
             ref.copy_from(source_placeholder)
@@ -330,8 +333,12 @@ class PlaceholderAdmin(ModelAdmin):
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(
-                {'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id, 'position': plugin.position,
-                    'desc': force_unicode(plugin.get_short_description())})
+                {
+                    'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id,
+                    'position': plugin.position, 'desc': force_unicode(plugin.get_short_description()),
+                    'language': plugin.language, 'placeholder_id': plugin.placeholder_id
+                }
+            )
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
         return HttpResponse(simplejson.dumps(json_response), content_type='application/json')
@@ -540,7 +547,7 @@ class PlaceholderAdmin(ModelAdmin):
 
 class LanguageTabsAdmin(ModelAdmin):
     render_placeholder_language_tabs = True
-#    change_form_template = 'admin/placeholders/placeholder/change_form.html'
+    #    change_form_template = 'admin/placeholders/placeholder/change_form.html'
 
     def get_language_from_request(self, request):
         language = request.REQUEST.get('language', None)
