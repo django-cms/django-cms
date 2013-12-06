@@ -62,7 +62,8 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 .cms_draggables .cms_draggables > .cms_draggable:only-child,
 .cms_draggable > .cms_draggable { margin-top:0; }
 
-.cms_draggables > .cms_draggable:last-child { margin-bottom:2px; }
+.cms_draggables > .cms_draggable:last-child { margin-bottom:1px; }
+.cms_draggables .cms_draggables > .cms_draggable:last-child { margin-bottom:2px; }
 
 // #DRAGGABLES/general#
 .cms_draggable, .cms_droppable { list-style-type:none;
