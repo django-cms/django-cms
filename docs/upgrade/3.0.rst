@@ -99,12 +99,6 @@ options available directly in the toolbar. These can now revert *plugin*
 content as well as *page* content.
 
 
-show_editable_page_title
-========================
-
-New ``show_editable_page_title`` to edit page title from the frontend.
-
-
 Stacks
 ======
 

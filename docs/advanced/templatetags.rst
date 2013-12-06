@@ -249,19 +249,6 @@ Plugins need the ``allow_children`` attribute to set to `True` for this to be en
 .. templatetag:: show_editable_page_title
 .. versionadded:: 3.0
 
-show_editable_page_title
-========================
-
-This templatetags enables editing the page title from the frontend.
-If in edit mode you can double click on the title and modify in an overlay window; if in live mode
-it fallbacks to ``page_attribute title``.
-
-Example::
-
-	{% load cms_tags %}
-
-	{% show_editable_page_title %}
-
 ******************
 Stack Templatetags
 ******************
