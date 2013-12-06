@@ -275,6 +275,7 @@ $(document).ready(function () {
 			// calculate placeholder position
 			var id = null;
 			var area = null;
+			var min = null;
 
 			// start calculating
 			this.placeholders.each(function (index, item) {
@@ -284,10 +285,12 @@ $(document).ready(function () {
 				// to calculate the correct offset, we need to set the
 				// placeholders correct heights and than set the according position
 				item.height(area.outerHeight(true));
+				// set min width
+				min = (item.width()) ? 0 : 150;
 				area.css({
 					'top': item.offset().top - 5,
-					'left': item.offset().left,
-					'width': item.width()
+					'left': item.offset().left - min,
+					'width': item.width() + min
 				});
 			});
 		},
