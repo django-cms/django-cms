@@ -193,11 +193,10 @@ $(document).ready(function () {
 				this._showBoard();
 
 				// prevent default visibility
-				this.dimmer.hide();
-				this.dragareas.hide();
+				this.dragareas.css('opacity', 0.2);
 
 				// show single placeholder
-				dragitem.closest('.cms_dragarea').show();
+				dragitem.closest('.cms_dragarea').show().css('opacity', 1);
 
 				// attach event to switch to fullmode when dragging
 				this.dragitems.bind('mousedown.cms.longclick', function () {
@@ -228,6 +227,7 @@ $(document).ready(function () {
 			// show container
 			this.container.show();
 			this.dimmer.fadeIn(100);
+			this.dragareas.css('opacity', 1);
 
 			// add dimmer close
 			this.dimmer.bind('mousedown mouseup', function (e) {
