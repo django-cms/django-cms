@@ -46,6 +46,7 @@ $(document).ready(function () {
 			this._events();
 		},
 
+		// initial methods
 		_setup: function () {
 			var that = this;
 
@@ -192,11 +193,10 @@ $(document).ready(function () {
 				this._showBoard();
 
 				// prevent default visibility
-				this.dimmer.hide();
-				this.dragareas.hide();
+				this.dragareas.css('opacity', 0.2);
 
 				// show single placeholder
-				dragitem.closest('.cms_dragarea').show();
+				dragitem.closest('.cms_dragarea').show().css('opacity', 1);
 
 				// attach event to switch to fullmode when dragging
 				this.dragitems.bind('mousedown.cms.longclick', function () {
@@ -227,9 +227,13 @@ $(document).ready(function () {
 			// show container
 			this.container.show();
 			this.dimmer.fadeIn(100);
+			this.dragareas.css('opacity', 1);
 
 			// add dimmer close
 			this.dimmer.bind('mousedown mouseup', function (e) {
+				// cancel on rightclick
+				if(e.which === 3 || e.button === 2) return false;
+				// proceed
 				clearTimeout(timer);
 				timer = setTimeout(function () {
 					that.hide();
@@ -271,6 +275,7 @@ $(document).ready(function () {
 			// calculate placeholder position
 			var id = null;
 			var area = null;
+			var min = null;
 
 			// start calculating
 			this.placeholders.each(function (index, item) {
@@ -280,10 +285,12 @@ $(document).ready(function () {
 				// to calculate the correct offset, we need to set the
 				// placeholders correct heights and than set the according position
 				item.height(area.outerHeight(true));
+				// set min width
+				min = (item.width()) ? 0 : 150;
 				area.css({
 					'top': item.offset().top - 5,
-					'left': item.offset().left,
-					'width': item.width()
+					'left': item.offset().left - min,
+					'width': item.width() + min
 				});
 			});
 		},
@@ -354,9 +361,6 @@ $(document).ready(function () {
 					var id = that.getId(ui.item);
 					var plugin = $('.cms_plugin-' + id);
 						plugin.trigger('cms.placeholder.update');
-
-					// update clipboard entries
-					CMS.API.Clipboard._update(ui.item);
 
 					// reset placeholder without entries
 					$('.cms_draggables').each(function () {

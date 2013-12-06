@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load url from future %}
 
 {% if request.toolbar.edit_mode or request.toolbar.build_mode %}
 {% if request.toolbar.get_clipboard_plugins %}
@@ -22,7 +23,7 @@
 			{% endif %}
 		{% endfor %}
 	</div>
-	<p class="cms_clipboard-empty"><a href="{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}" data-post='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>{% trans "Empty Clipboard" %}</a></p>
+	<p class="cms_clipboard-empty"><a href="#">{% trans "Empty Clipboard" %}</a></p>
 </div>
 {% endwith %}
 {% endif %}

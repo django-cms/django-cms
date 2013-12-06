@@ -586,23 +586,3 @@ class CMSToolbar(RenderBlock):
         return '%s\n%s' % (content, rendered_contents)
 
 register.tag(CMSToolbar)
-
-
-class CMSEditablePageTitle(InclusionTag):
-    template = 'cms/toolbar/plugin_text_noedit.html'
-    edit_template = 'cms/toolbar/plugin_text.html'
-    name = 'show_editable_page_title'
-
-    def get_template(self, context, **kwargs):
-        request = context.get('request', None)
-        if request and hasattr(request, 'toolbar'):
-            if request.toolbar.edit_mode:
-                return self.edit_template
-        return self.template
-
-    def get_context(self, context):
-
-        return context
-
-
-register.tag(CMSEditablePageTitle)

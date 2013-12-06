@@ -298,7 +298,7 @@ $(document).ready(function () {
 				'source_placeholder_id': this.options.placeholder_id,
 				'source_plugin_id': this.options.plugin_id || '',
 				'source_language': this.options.plugin_language,
-				'target_placeholder_id': CMS.config.clipboard,
+				'target_placeholder_id': CMS.config.clipboard.id,
 				'target_language': this.options.plugin_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
@@ -437,6 +437,7 @@ $(document).ready(function () {
 
 				// hide subnav when hitting enter or escape
 				if(e.keyCode === 13 || e.keyCode === 27) {
+					nav.find('input').blur();
 					that._hideSubnav(nav);
 				}
 			});
@@ -444,7 +445,7 @@ $(document).ready(function () {
 			// calculate subnav bounds
 			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10) {
 				dropdown.css('top', 'auto');
-				dropdown.css('bottom', offset + 4);
+				dropdown.css('bottom', offset - 1);
 			} else {
 				dropdown.css('top', offset);
 				dropdown.css('bottom', 'auto');

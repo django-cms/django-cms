@@ -2,7 +2,7 @@
 {% load cms_tags placeholder_tags %}
 
 {% block content %}
-<h2 class="page_title">{% show_editable_page_title %}</h2>
+<h2 class="page_title">{% page_attribute "page_title" %}</h2>
 {% for example in examples %}
 <h2><a href="{{example.get_absolute_url}}">{{example}}</a></h2>
 {% endfor %}
