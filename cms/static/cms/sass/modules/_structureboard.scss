@@ -68,7 +68,7 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 // #DRAGGABLES/general#
 .cms_draggable, .cms_droppable { list-style-type:none;
 	position:relative; left:0; top:0; z-index:99; @include border-radius(3px);
-	padding:4px 5px 3px 5px; margin:5px 0 0;
+	padding:4px 5px 3px 5px; margin:5px 0 0; margin-left:0 !important;
 
 	// levels
 	.cms_draggable { position:relative; z-index:99; white-space:nowrap;
