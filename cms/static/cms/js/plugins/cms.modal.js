@@ -144,7 +144,7 @@ $(document).ready(function () {
 			var height = this.modal.height();
 
 			// animates and sets the modal
-			this.modal.css({
+			this.modal.show().css({
 				'width': 0,
 				'height': 0,
 				'margin-left': 0,
