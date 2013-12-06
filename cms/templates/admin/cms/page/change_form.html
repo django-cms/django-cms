@@ -6,9 +6,9 @@
 
 {% block extrahead %}
 {{ block.super }}
-<script type="text/javascript" src="{% static "admin/js/urlify.js" %}"></script>
-<script type="text/javascript" src="{% static "cms/js/plugins/cms.base.js" %}"></script>
-<script type="text/javascript" src="{% static "cms/js/plugins/cms.changeform.js" %}"></script>
+<script src="{% static "admin/js/urlify.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.base.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.changeform.js" %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -93,9 +93,9 @@
 </form>
 </div>
 
-{% for url in unihandecode_urls %}<script type="text/javascript" src="{{ url }}"></script>{% endfor %}
+{% for url in unihandecode_urls %}<script src="{{ url }}"></script>{% endfor %}
 {% if unihandecode_urls %}
-<script type="text/javascript">
+<script>
 	var UNIHANDECODER = unihandecode.Unihan('{{ unihandecode_lang }}');
 </script>
 {% endif %}
