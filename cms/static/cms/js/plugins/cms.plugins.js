@@ -437,6 +437,7 @@ $(document).ready(function () {
 
 				// hide subnav when hitting enter or escape
 				if(e.keyCode === 13 || e.keyCode === 27) {
+					nav.find('input').blur();
 					that._hideSubnav(nav);
 				}
 			});
