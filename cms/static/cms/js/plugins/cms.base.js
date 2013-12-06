@@ -41,7 +41,9 @@ $(document).ready(function () {
 		// disable multiple form submissions
 		preventSubmit: function () {
 			var forms = $('#cms_toolbar').find('form');
-			forms.submit(function () {
+			forms.submit(function (e) {
+				// show loader
+				CMS.API.Toolbar._loader(true);
 				// we cannot use disabled as the name action will be ignored
 				$('input[type="submit"]').bind('click', function (e) {
 					e.preventDefault();

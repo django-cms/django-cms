@@ -44,6 +44,7 @@ $(document).ready(function () {
 			this.modal.data('ready', true);
 		},
 
+		// initial methods
 		_events: function () {
 			var that = this;
 
