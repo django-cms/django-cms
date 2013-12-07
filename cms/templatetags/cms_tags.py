@@ -598,9 +598,14 @@ class CMSEditableObject(InclusionTag):
         Argument('attribute'),
         Argument('edit_fields', default=None, required=False),
         Argument('language', default=None, required=False),
+        Argument('filters', default=None, resolve=False, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
     )
+
+    def __init__(self, parser, tokens):
+        self.parser = parser
+        return super(CMSEditableObject, self).__init__(parser, tokens)
 
     def _is_editable(self, request):
         return (request and hasattr(request, 'toolbar') and
@@ -623,7 +628,7 @@ class CMSEditableObject(InclusionTag):
         return output
 
     def get_context(self, context, instance, attribute, edit_fields, language,
-                    view_url, view_method):
+                    filters, view_url, view_method):
         if not language:
             language = get_language_from_request(context['request'])
         # This allow the requested item to be a method, a property or an
@@ -655,7 +660,11 @@ class CMSEditableObject(InclusionTag):
                 context['content'] = context['content'](language)
             else:
                 context['content'] = context['content'](context['request'])
-        context['rendered_content'] = context['content']
+        context['rendered_content'] = mark_safe(context['content'])
+        if filters:
+            expression = self.parser.compile_filter("rendered_content|%s" % (filters))
+            out = expression.resolve(context)
+            context['rendered_content'] = mark_safe(out)
         # If the toolbar is not enabled the following part is just skipped: it
         # would cause a perfomance hit for no reason
         if self._is_editable(context.get('request', None)):
