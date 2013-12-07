@@ -5,8 +5,9 @@ from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from cms import __version__
 from cms.exceptions import PlaceholderNotFound
-from cms.models import Page, Placeholder as PlaceholderModel
+from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
@@ -16,22 +17,22 @@ from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.placeholder import validate_placeholder_name
-from cms import __version__
+from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import mail_managers
+from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
+from django.utils.encoding import smart_text
 from django.utils.html import escape
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 import re
 from sekizai.helpers import Watcher, get_varname
-from cms.utils.placeholder import get_toolbar_plugin_struct
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
-from cms.models import CMSPlugin
 
 register = template.Library()
 
@@ -586,3 +587,104 @@ class CMSToolbar(RenderBlock):
         return '%s\n%s' % (content, rendered_contents)
 
 register.tag(CMSToolbar)
+
+
+class CMSEditableObject(InclusionTag):
+    template = 'cms/toolbar/content.html'
+    edit_template = 'cms/toolbar/plugin.html'
+    name = 'show_editable_model'
+    options = Options(
+        Argument('instance'),
+        Argument('attribute'),
+        Argument('edit_fields', default=None, required=False),
+        Argument('language', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+    )
+
+    def _is_editable(self, request):
+        return (request and hasattr(request, 'toolbar') and
+                request.toolbar.edit_mode)
+
+    def get_template(self, context, **kwargs):
+        if self._is_editable(context.get('request', None)):
+            return self.edit_template
+        return self.template
+
+    def render_tag(self, context, **kwargs):
+        """
+        Overridden from InclusionTag to push / pop context to avoid leaks
+        """
+        context.push()
+        template = self.get_template(context, **kwargs)
+        data = self.get_context(context, **kwargs)
+        output = render_to_string(template, data)
+        context.pop()
+        return output
+
+    def get_context(self, context, instance, attribute, edit_fields, language,
+                    view_url, view_method):
+        if not language:
+            language = get_language_from_request(context['request'])
+        # This allow the requested item to be a method, a property or an
+        # attribute
+        if not instance:
+            return context
+        if not attribute:
+            return context
+        attribute = attribute.strip()
+        # ugly-ish
+        if isinstance(instance, Page):
+            if attribute == 'title':
+                attribute = 'get_title'
+                edit_fields = 'title'
+            elif attribute == 'page_title':
+                attribute = 'get_page_title'
+                edit_fields = 'page_title'
+            elif attribute == 'menu_title':
+                attribute = 'get_menu_title'
+                edit_fields = 'menu_title'
+            view_url = 'admin:cms_page_edit_title_fields'
+        context['attribute_name'] = attribute
+        querystring = {'language': language}
+        if edit_fields:
+            context['edit_fields'] = edit_fields.strip().split(",")
+        context['content'] = getattr(instance, attribute, '')
+        if callable(context['content']):
+            if isinstance(instance, Page):
+                context['content'] = context['content'](language)
+            else:
+                context['content'] = context['content'](context['request'])
+        context['rendered_content'] = context['content']
+        # If the toolbar is not enabled the following part is just skipped: it
+        # would cause a perfomance hit for no reason
+        if self._is_editable(context.get('request', None)):
+            instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+            context['instance'] = instance
+            context['generic'] = instance._meta
+            # view_method has the precedence and we retrieve the corresponding
+            # attribute in the instance class.
+            # If view_method refers to a method it will be called passing the
+            # request; if it's an attribute, it's stored for later use
+            if view_method:
+                method = getattr(instance, view_method)
+                if callable(method):
+                    url_base = method(context['request'])
+                else:
+                    url_base = method
+            else:
+                # The default view_url is the default admin changeform for the
+                # current instance
+                if not edit_fields:
+                    view_url = 'admin:%s_%s_change' % (
+                        instance._meta.app_label, instance._meta.module_name)
+                    url_base = reverse(view_url, args=(instance.pk,))
+                else:
+                    if not view_url:
+                        view_url = 'admin:%s_%s_edit_field' % (
+                            instance._meta.app_label, instance._meta.module_name)
+                    url_base = reverse(view_url, args=(instance.pk, language))
+                    querystring['edit_fields'] = ",".join(context['edit_fields'])
+            context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+        return context
+register.tag(CMSEditableObject)
