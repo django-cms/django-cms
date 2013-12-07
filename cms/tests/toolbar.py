@@ -311,7 +311,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "char_1" "" "" 'truncatewords:5'  %}</h1>
+<h1>{% show_editable_model instance "char_1" "" "" truncatewords:5  %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)

@@ -642,13 +642,20 @@ class CMSEditableObject(InclusionTag):
         if isinstance(instance, Page):
             if attribute == 'title':
                 attribute = 'get_title'
-                edit_fields = 'title'
+                if not edit_fields:
+                    edit_fields = 'title'
             elif attribute == 'page_title':
                 attribute = 'get_page_title'
-                edit_fields = 'page_title'
+                if not edit_fields:
+                    edit_fields = 'page_title'
             elif attribute == 'menu_title':
                 attribute = 'get_menu_title'
-                edit_fields = 'menu_title'
+                if not edit_fields:
+                    edit_fields = 'menu_title'
+            elif attribute == 'titles':
+                attribute = 'get_page_title'
+                if not edit_fields:
+                    edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         context['attribute_name'] = attribute
         querystring = {'language': language}
