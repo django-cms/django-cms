@@ -1,20 +1,60 @@
 .. _frontend-editable-fields:
 
-##################################
-Frontend editing for Django models
-##################################
+###########################################
+Frontend editing for Page and Django models
+###########################################
 
 .. versionadded:: 3.0
 
-django CMS frontend editing can also be used for your standard Django models.
+django CMS frontend editing can also be used to edit non-placeholder fields from
+the frontend, both for pages and your standard Django models.
 
 By enabling it, it's possible to double click on a value of a model instance in
 the frontend and access the instance changeform in a popup window, like the page
 changeform.
 
-************************
+
+****************
+Page titles edit
+****************
+
+For CMS pages you can edit the titles from the frontend; according to the
+attribute specified a overridable default field will be editable.
+
+Main title::
+
+    {% show_editable_model request.current_page "title" %}
+
+
+Page title::
+
+    {% show_editable_model request.current_page "page_title" %}
+
+Menu title::
+
+    {% show_editable_model request.current_page "menu_title" %}
+
+All three titles::
+
+    {% show_editable_model request.current_page "titles" %}
+
+
+You can always customize the editable fields by providing the
+`edit_field` parameter::
+
+    {% show_editable_model request.current_page "title" "page_title,menu_title" %}
+
+
+
+******************
+Django models edit
+******************
+
+For Django models you can further customize what's editable on the frontend
+and the resulting forms.
+
 Complete changeform edit
-************************
+========================
 
 You need to properly setup your admin class by adding the
 ``FrontendEditableAdmin`` mixin to the parents of your admin class (see
@@ -36,16 +76,16 @@ Then setup the templates adding ``show_editable_model`` templatetag::
     <h1>{% show_editable_model instance "some_attribute" %}</h1>
     {% endblock content %}
 
-See `templatetag reference <show_editable_model_reference>`_ for arguments documentation.
+See :ttag:`templatetag reference <show_editable_model>` for arguments documentation.
 
-********************
+
 Selected fields edit
-********************
+====================
 
 Frontend editing is also possible for a set of fields.
 
 Set up the admin
-================
+----------------
 
 You need to add to your model admin a tuple of fields editable from the frontend
 admin::
@@ -59,7 +99,7 @@ admin::
         ...
 
 Set up the template
-===================
+-------------------
 
 Then add comma separated list of fields (or just the name of one field) to
 the templatetag::
@@ -72,19 +112,18 @@ the templatetag::
 
 
 
-******************
 Special attributes
-******************
+==================
 
 The ``attribute`` argument of the templatetag is not required to be a model field,
 property or method can also be used as target; in case of a method, it will be
 called with request as argument.
 
+
 .. _custom-views:
 
-************
 Custom views
-************
+============
 
 You can link any field to a custom view (not necessarily an admin view) to handle
 model-specific editing workflow.
@@ -98,7 +137,7 @@ evaluated with ``request`` as parameter.
 The custom view does not need to obey any specific interface; it will get
 ``edit_fields`` value as a ``GET`` parameter.
 
-See `templatetag reference <show_editable_model_reference>`_ for arguments documentation.
+See :ttag:`templatetag reference <show_editable_model>` for arguments documentation.
 
 Example ``view_url``::
 
@@ -124,35 +163,19 @@ Example ``view_method``::
     <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "" "some_method" %}</h1>
     {% endblock content %}
 
-.. _show_editable_model_reference:
 
-*********************
-templatetag reference
-*********************
+.. filters:
 
-``show_editable_model`` works by showing the content of the given attribute in
-the model instance.
+*******
+Filters
+*******
 
-If the toolbar is not enabled, the value of the attribute is rendered in the
-template without further action.
+If you need to apply filters to the output value of the templateag, add the
+string with chained filters as in Django :ttag:`django:filter` templatetag::
 
-If the toolbar is enabled, frontend code is added to make the attribute value
-clickable.
+    {% load placeholder_tags %}
 
-Arguments:
+    {% block content %}
+    <h1>{% show_editable_model instance "attribute" "" "" truncatechars:9 %}</h1>
+    {% endblock content %}
 
-* ``instance``: instance of your model in the template
-* ``attribute``: the name of the attribute you want to show in the template; it
-  can be a context variable name; it's possible to target field, property or
-  callable for the specified model;
-* ``edit_fields`` (optional): a comma separated list of fields editable in the
-  popup editor;
-* ``language`` (optional): the admin language tab to be linked. Useful only for
-  `django-hvad`_ enabled models.
-* ``view_url`` (optional): the name of a url that will be reversed using the
-  instance ``pk`` and the ``language`` as arguments;
-* ``view_method`` (optional): a method name that will return a URL to a view;
-  the method must accept ``request`` as first parameter.
-
-
-.. _django-hvad: https://github.com/kristianoellegaard/django-hvad
