@@ -290,7 +290,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model fake "char_1" %}</h1>
@@ -307,7 +307,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model instance "fake_field" %}</h1>
@@ -324,7 +324,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model instance "callable_item" %}</h1>
@@ -341,7 +341,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model instance "callable_item" "char_1" %}</h1>
@@ -358,7 +358,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model instance "callable_item" "char_2" %}</h1>
@@ -377,7 +377,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model instance "callable_item" "char_1,char_2" "en" "admin:placeholderapp_example1_edit_field" %}</h1>
@@ -397,7 +397,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model instance "callable_item" %}</h1>
@@ -414,7 +414,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load placeholder_tags %}
+{% load cms_tags %}
 
 {% block content %}
 <h1>{% show_editable_model instance item_name %}</h1>
