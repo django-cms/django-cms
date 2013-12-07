@@ -1,5 +1,6 @@
 from __future__ import with_statement
 import re
+from django.template.defaultfilters import truncatewords
 from cms.views import details
 from cms.utils.compat.dj import force_unicode
 import re
@@ -300,6 +301,23 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response, '<div class="cms_plugin cms_plugin-%s"></div>' % ex1.pk)
 
+    def test_filters(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% show_editable_model instance "char_1" "" "" 'truncatewords:5'  %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">%s</div>' % ('placeholderapp', 'char_1', ex1.pk, truncatewords(ex1.char_1, 5)))
+
     def test_invalid_attribute(self):
         user = self.get_staff()
         page = create_page('Test', 'col_two.html', 'en', published=True)
@@ -380,7 +398,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "char_1,char_2" "en" "admin:placeholderapp_example1_edit_field" %}</h1>
+<h1>{% show_editable_model instance "callable_item" "char_1,char_2" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
