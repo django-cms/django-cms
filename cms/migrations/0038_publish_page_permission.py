@@ -9,14 +9,10 @@ class Migration(DataMigration):
     def forwards(self, orm):
         "Write your forwards methods here."
         # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-        try:
-            ct = orm['contenttypes.ContentType'].objects.get(model='page', app_label='cms')
-        except orm['contenttypes.ContentType'].DoesNotExist:
-            ct = orm['contenttypes.ContentType'].objects.create(name='page', model='page', app_label='cms')
-        try:
-            perm = orm['auth.permission'].objects.get(codename='publish_page')
-        except orm['auth.permission'].DoesNotExist:
-            perm = orm['auth.permission'].objects.create(content_type=ct, codename='publish_page', name=u'Can publish Page')
+        ct, created = orm['contenttypes.ContentType'].objects.get_or_create(
+            model='page', app_label='cms', defaults={'name': u'Page'})
+        perm, created = orm['auth.permission'].objects.get_or_create(
+            content_type=ct, codename='publish_page', defaults={'name': u'Can publish Page'})
 
     def backwards(self, orm):
         "Write your backwards methods here."
