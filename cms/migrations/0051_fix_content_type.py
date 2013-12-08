@@ -8,13 +8,15 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
-        ct_qs = orm['contenttypes.ContentType'].objects.filter(model='page',
-                                                               name='',
-                                                               app_label='cms')
-        if ct_qs.exists():
-            for ct in ct_qs:
-                ct.name = 'page'
-                ct.save()
+        try:
+            # Let's fix the brokem page entry
+            ct = orm['contenttypes.ContentType'].objects.get(
+                model='page', name='', app_label='cms')
+            ct.name = 'page'
+            ct.save()
+        except orm['contenttypes.ContentType'].DoesNotExist:
+            # No content type to fix
+            pass
 
     def backwards(self, orm):
         "Write your backwards methods here."
