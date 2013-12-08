@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
+from os.path import join
 from cms import constants
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.utils.compat.metaclasses import with_metaclass
-from cms.utils.conf import get_cms_setting
-from django.core.exceptions import PermissionDenied
 from cms.exceptions import PublicIsUnmodifiable
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
@@ -12,11 +10,14 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
+from cms.utils.compat import DJANGO_1_5
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.utils.compat.metaclasses import with_metaclass
+from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.utils.compat import DJANGO_1_5
 from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
@@ -25,8 +26,6 @@ from django.utils import timezone
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
-from os.path import join
-
 
 
 @python_2_unicode_compatible

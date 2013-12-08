@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 from classytags.core import Tag, Options
+from cms.utils.compat import DJANGO_1_4
 from django import template
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.text import javascript_quote
-from cms.utils.compat import DJANGO_1_4
-
-
 if DJANGO_1_4:
     from django.utils import simplejson as json
 else:
     import json
-
 register = template.Library()
+
 
 @register.filter
 def js(value):
     return json.dumps(value, cls=DjangoJSONEncoder)
+
 
 @register.filter
 def bool(value):

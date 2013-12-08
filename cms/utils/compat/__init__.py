@@ -2,7 +2,6 @@ import sys
 from distutils.version import LooseVersion
 import django
 
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
 

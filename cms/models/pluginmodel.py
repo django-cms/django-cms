@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-from cms.utils.compat.metaclasses import with_metaclass
-
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.utils.safestring import mark_safe
 import os
 import warnings
+import json
+
+from cms.exceptions import DontUsePageAttributeWarning
+from cms.models.placeholdermodel import Placeholder
+from cms.plugin_rendering import PluginContext, render_plugin
+from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_5
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.utils.compat.metaclasses import with_metaclass
+from cms.utils.helpers import reversion_register
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
-from cms.utils.compat import DJANGO_1_5
-import json as simplejson
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from cms.exceptions import DontUsePageAttributeWarning
-from cms.models.placeholdermodel import Placeholder
-from cms.plugin_rendering import PluginContext, render_plugin
-from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.utils import get_cms_setting
 from mptt.models import MPTTModel, MPTTModelBase
+
 
 class BoundRenderMeta(object):
     def __init__(self, meta):
@@ -390,7 +391,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return breadcrumb
 
     def get_breadcrumb_json(self):
-        result = simplejson.dumps(self.get_breadcrumb())
+        result = json.dumps(self.get_breadcrumb())
         result = mark_safe(result)
         return result
 
