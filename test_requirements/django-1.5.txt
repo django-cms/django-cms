@@ -1,4 +1,4 @@
 -r requirements_base.txt
 Django>=1.5,<1.6
-django-reversion>=1.7,<1.8
+django-reversion>=1.7
 psycopg2==2.4
