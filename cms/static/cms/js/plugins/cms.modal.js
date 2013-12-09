@@ -44,6 +44,7 @@ $(document).ready(function () {
 			this.modal.data('ready', true);
 		},
 
+		// initial methods
 		_events: function () {
 			var that = this;
 
@@ -64,7 +65,7 @@ $(document).ready(function () {
 				e.preventDefault();
 				that._maximize();
 			});
-			this.modal.find('.cms_modal-breadcrumb-items a').live(this.click, function (e) {
+			this.modal.find('.cms_modal-breadcrumb-items').on(this.click, 'a', function (e) {
 				e.preventDefault();
 				that._changeContent($(this));
 			});
@@ -143,7 +144,7 @@ $(document).ready(function () {
 			var height = this.modal.height();
 
 			// animates and sets the modal
-			this.modal.css({
+			this.modal.show().css({
 				'width': 0,
 				'height': 0,
 				'margin-left': 0,
@@ -418,7 +419,7 @@ $(document).ready(function () {
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
 						if(item.is('input')) item.click();
-						if(item.is('a')) iframe.attr('src', item.attr('href'));
+						if(item.is('a')) that._loadContent(item.attr('href'), title);
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {

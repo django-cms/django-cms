@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.utils.compat.metaclasses import with_metaclass
+try:
+    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
+                                              ModelAdminMetaClass)
+except ImportError:
+    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
 import re
 
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_4
+from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
-import django
-from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
@@ -18,9 +21,8 @@ from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
-class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
+class CMSPluginBaseMetaclass(ModelAdminMetaClass):
     """
     Ensure the CMSPlugin subclasses have sane values and set some defaults if 
     they're not given.

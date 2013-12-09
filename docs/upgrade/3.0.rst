@@ -28,6 +28,8 @@ In addition, the system now offer two editing views:
 * **content** view, for editing the configuration and content of plugins
 * **structure** view, in which plugins can be added and rearranged
 
+Page titles can also be modified directly from the frontend.
+
 
 New Toolbar
 ===========
@@ -97,12 +99,6 @@ Undo and Redo
 If you have ``django-reversion`` installed you now have **undo** and **redo**
 options available directly in the toolbar. These can now revert *plugin*
 content as well as *page* content.
-
-
-show_editable_page_title
-========================
-
-New ``show_editable_page_title`` to edit page title from the frontend.
 
 
 Stacks
@@ -223,5 +219,11 @@ Please read :ref:`cms-copy-lang-command` before using.
 Frontedit editor for Django models
 ==================================
 
-Starting from 3.0 you can use :ref:`show_editable_model <frontend-editable-fields>` templatetag
-to edit any Django models in the frontend editor.
+Starting from 3.0 you can use :ref:`show_editable_model <frontend-editable-fields>`
+templatetag to edit any Django models in the frontend editor.
+
+Frontedit editor for Django models
+==================================
+
+Starting from 3.0 you can use :ref:`show_editable_model <frontend-editable-fields>`
+templatetag to edit any Django models in the frontend editor.

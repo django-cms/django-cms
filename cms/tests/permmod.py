@@ -812,6 +812,7 @@ class ViewPermissionTests(PermissionTestsBase):
         request = self.get_request(user)
         site = Site()
         site.pk = 1
+        site.save()
         page = Page()
         page.pk = 1
         page.level = 0
@@ -866,6 +867,7 @@ class ViewPermissionTests(PermissionTestsBase):
     def test_authed_basic_perm_num_queries(self):
         site = Site()
         site.pk = 1
+        site.save()
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
             user.user_permissions.add(Permission.objects.get(codename='view_page'))

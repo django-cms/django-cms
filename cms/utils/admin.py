@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from distutils.version import LooseVersion
 import json
 
+import django
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -12,7 +14,7 @@ from cms.utils.permissions import has_global_page_permission
 from django.utils.encoding import smart_str
 
 NOT_FOUND_RESPONSE = "NotFound"
-
+DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 def jsonify_request(response):
     """ Turn any response in a 200 response to let jQuery code handle it nicely.
@@ -112,4 +114,7 @@ def render_admin_menu_item(request, page, template=None):
     filtered = 'filtered' in request.REQUEST
     context.update(get_admin_menu_item_context(request, page, filtered))
     # add mimetype to help out IE
-    return render_to_response(template, context, mimetype="text/html; charset=utf-8")
+    if DJANGO_1_4:
+        return render_to_response(template, context, mimetype="text/html; charset=utf-8")
+    else:
+        return render_to_response(template, context, content_type="text/html; charset=utf-8")

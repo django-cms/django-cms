@@ -246,21 +246,46 @@ Example::
 Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
-.. templatetag:: show_editable_page_title
+.. templatetag:: show_editable_model
 .. versionadded:: 3.0
 
-show_editable_page_title
-========================
+show_editable_model
+===================
 
-This templatetags enables editing the page title from the frontend.
-If in edit mode you can double click on the title and modify in an overlay window; if in live mode
-it fallbacks to ``page_attribute title``.
+``show_editable_model`` works by showing the content of the given attribute in
+the model instance and eventually makes it clickable to edit the related model.
 
-Example::
+If the toolbar is not enabled, the value of the attribute is rendered in the
+template without further action.
 
-	{% load cms_tags %}
+If the toolbar is enabled, frontend code is added to make the attribute value
+clickable.
 
-	{% show_editable_page_title %}
+Using this templatetag you can show and edit page titles as well as fields in
+standard django models, see :ref:`frontend-editable-fields` for examples and
+further documentation.
+
+Arguments:
+
+* ``instance``: instance of your model in the template
+* ``attribute``: the name of the attribute you want to show in the template; it
+  can be a context variable name; it's possible to target field, property or
+  callable for the specified model;
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor;
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``filters`` (optional): a string containing chained filters to apply to the
+  output content; works the same way as :ttag:`django:filter` templatetag;
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+
+
+.. _django-hvad: https://github.com/kristianoellegaard/django-hvad
+
+
 
 ******************
 Stack Templatetags

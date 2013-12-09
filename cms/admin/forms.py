@@ -483,9 +483,3 @@ class PageUserGroupForm(GenericCmsPermissionForm):
         save_permissions(self.cleaned_data, group)
 
         return group
-
-
-class PageTitleForm(forms.ModelForm):
-    class Meta:
-        model = Title
-        fields = ('title', )
