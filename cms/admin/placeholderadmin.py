@@ -3,7 +3,7 @@ from cms.models.placeholderpluginmodel import PlaceholderReference
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
 from django.db import transaction
-from django.utils import simplejson
+import json
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
@@ -16,6 +16,7 @@ from cms.utils.compat.dj import force_unicode
 from cms.plugins.utils import has_reached_plugin_limit, requires_reload
 from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+                         HttpResponseForbidden)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
@@ -272,7 +273,7 @@ class PlaceholderAdmin(ModelAdmin):
                         args=[plugin.pk])),
             'breadcrumb': plugin.get_breadcrumb(),
         }
-        return HttpResponse(simplejson.dumps(response), content_type='application/json')
+        return HttpResponse(json.dumps(response), content_type='application/json')
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
@@ -341,7 +342,7 @@ class PlaceholderAdmin(ModelAdmin):
             )
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
-        return HttpResponse(simplejson.dumps(json_response), content_type='application/json')
+        return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
@@ -462,7 +463,7 @@ class PlaceholderAdmin(ModelAdmin):
                 x += 1
         self.post_move_plugin(request, plugin)
         json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
-        return HttpResponse(simplejson.dumps(json_response), content_type='application/json')
+        return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):

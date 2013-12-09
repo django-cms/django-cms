@@ -70,7 +70,7 @@ class PagePermissionInlineAdmin(TabularInline):
             if not obj.has_move_page_permission(request):
                 exclude.append('can_move_page')
         formset_cls = super(PagePermissionInlineAdmin, self
-        ).get_formset(request, obj=None, exclude=exclude, *kwargs)
+        ).get_formset(request, obj=None, exclude=exclude, **kwargs)
         qs = self.queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
 from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
@@ -7,7 +6,6 @@ from cms.plugin_pool import plugin_pool
 from cms.stacks.models import Stack
 from django.contrib.admin.helpers import AdminForm
 
-import django
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
@@ -32,7 +30,7 @@ from cms.utils.compat.urls import unquote
 from cms.utils.helpers import find_placeholder_relation
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
-from cms.admin.forms import PageForm, PageTitleForm, AdvancedSettingsForm, PagePermissionForm
+from cms.admin.forms import PageForm, AdvancedSettingsForm, PagePermissionForm
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
@@ -45,8 +43,8 @@ from cms.utils.admin import jsonify_request
 
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
+from cms.utils.compat import DJANGO_1_4
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -82,11 +80,11 @@ else:  # pragma: no cover
 
             return do_revision_context
 
-
     def create_revision():
         return ReversionContext()
 
 PUBLISH_COMMENT = "Publish"
+INITIAL_COMMENT = "Initial version."
 
 
 class PageAdmin(PlaceholderAdmin, ModelAdmin):
@@ -97,6 +95,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
     list_filter = ['published', 'in_navigation', 'template', 'changed_by', 'soft_root']
+    title_frontend_editable_fields = ['title', 'menu_title', 'page_title']
 
     inlines = PERMISSION_ADMIN_INLINES
 
@@ -110,7 +109,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
         url_patterns = patterns(
             '',
-            pat(r'^([0-9]+)/([a-z\-]+)/edit-title/$', self.edit_title),
+            pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
             pat(r'^([0-9]+)/permission-settings/$', self.permissions),
             pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
@@ -143,6 +142,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     def get_revision_instances(self, request, object):
         """Returns all the instances to be used in the object's revision."""
+        if isinstance(object, Title):
+            object = object.page
         placeholder_relation = find_placeholder_relation(object)
         data = [object]
         filters = {'placeholder__%s' % placeholder_relation: object}
@@ -942,9 +943,10 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             from reversion.models import Version
 
             content_type = ContentType.objects.get_for_model(Page)
-            versions_qs = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk)
+            # reversion 1.8+ removes type field, revision filtering must be based on comments
+            versions_qs = Version.objects.filter(content_type=content_type, object_id_int=page.pk)
             deleted = []
-            for version in versions_qs.exclude(revision__comment__exact=PUBLISH_COMMENT):
+            for version in versions_qs.exclude(revision__comment__in=(INITIAL_COMMENT,  PUBLISH_COMMENT)):
                 if not version.revision_id in deleted:
                     revision = version.revision
                     revision.delete()
@@ -1180,14 +1182,30 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             return True
         return super(PageAdmin, self).lookup_allowed(key, *args, **kwargs)
 
-    def edit_title(self, request, page_id, language):
+    def edit_title_fields(self, request, page_id, language):
         title = Title.objects.get(page_id=page_id, language=language)
         saved_successfully = False
+        raw_fields = request.GET.get("edit_fields", 'title')
+        edit_fields = [field for field in raw_fields.split(",") if field in self.title_frontend_editable_fields]
         cancel_clicked = request.POST.get("_cancel", False)
         opts = Title._meta
+
+        if not edit_fields:
+            # Defaults to title
+            edit_fields = ('title',)
+
         if not has_generic_permission(title.page.pk, request.user, "change",
                                       title.page.site.pk):
             return HttpResponseForbidden(_("You do not have permission to edit this page"))
+
+        class PageTitleForm(django.forms.ModelForm):
+            """
+            Dynamic form showing only the fields to be edited
+            """
+            class Meta:
+                model = Title
+                fields = edit_fields
+
         if not cancel_clicked and request.method == 'POST':
             form = PageTitleForm(instance=title, data=request.POST)
             if form.is_valid():
@@ -1197,7 +1215,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=title)
-        admin_form = AdminForm(form, fieldsets=[(None, {'fields': ('title',)})], prepopulated_fields={},
+        admin_form = AdminForm(form, fieldsets=[(None, {'fields': edit_fields})], prepopulated_fields={},
                                model_admin=self)
         media = self.media + admin_form.media
         context = {

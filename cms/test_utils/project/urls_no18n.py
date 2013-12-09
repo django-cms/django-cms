@@ -1,6 +1,6 @@
 from cms.utils.conf import get_cms_setting
 from django.conf import settings
-from django.conf.urls.defaults import patterns, include, \
+from django.conf.urls import patterns, include, \
     url
 from django.contrib import admin
 

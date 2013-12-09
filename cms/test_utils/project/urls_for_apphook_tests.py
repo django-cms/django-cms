@@ -1,6 +1,6 @@
 from cms.utils.conf import get_cms_setting
 from django.conf import settings
-from django.conf.urls.defaults import handler500, handler404, patterns, include, \
+from django.conf.urls import handler500, handler404, patterns, include, \
     url
 try:
     from django.conf.urls.i18n import i18n_patterns

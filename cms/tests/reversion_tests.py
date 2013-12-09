@@ -7,7 +7,7 @@ from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from djangocms_text_ckeditor.models import Text
 from cms.test_utils.project.fileapp.models import FileModel
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
+from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
@@ -17,7 +17,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from os.path import join
 import reversion
-from reversion.models import Revision, Version, VERSION_CHANGE
+from reversion.models import Revision, Version
+if hasattr(reversion.models, 'VERSION_CHANGE'):
+    from reversion.models import VERSION_CHANGE
 
 
 class BasicReversionTestCase(CMSTestCase):
@@ -40,7 +42,7 @@ class BasicReversionTestCase(CMSTestCase):
             self.assertEquals(Revision.objects.all().count(), 1)
 
 
-class ReversionTestCase(CMSTestCase):
+class ReversionTestCase(TransactionCMSTestCase):
     def setUp(self):
         u = User(username="test", is_staff=True, is_active=True,
                  is_superuser=True)
@@ -246,9 +248,14 @@ class ReversionFileFieldTests(CMSTestCase):
             # manually add a revision because we use the explicit way
             # django-cms uses too.
             adapter = reversion.get_adapter(FileModel)
-            reversion.revision_context_manager.add_to_context(
-                reversion.default_revision_manager, file1,
-                adapter.get_version_data(file1, VERSION_CHANGE))
+            if hasattr(reversion.models, 'VERSION_CHANGE'):
+                reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1, VERSION_CHANGE))
+            else:
+                reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1))
             # reload the instance from db
         file2 = FileModel.objects.all()[0]
         # delete the instance.
