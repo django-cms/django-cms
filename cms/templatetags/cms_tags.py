@@ -667,11 +667,9 @@ class CMSEditableObject(InclusionTag):
                 context['content'] = context['content'](language)
             else:
                 context['content'] = context['content'](context['request'])
-        context['rendered_content'] = mark_safe(context['content'])
         if filters:
-            expression = self.parser.compile_filter("rendered_content|%s" % (filters))
-            out = expression.resolve(context)
-            context['rendered_content'] = mark_safe(out)
+            expression = self.parser.compile_filter("content|%s" % (filters))
+            context['content'] = expression.resolve(context)
         # If the toolbar is not enabled the following part is just skipped: it
         # would cause a perfomance hit for no reason
         if self._is_editable(context.get('request', None)):
@@ -702,5 +700,7 @@ class CMSEditableObject(InclusionTag):
                     url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+        context['content'] = mark_safe(context['content'])
+        context['rendered_content'] = context['content']
         return context
 register.tag(CMSEditableObject)
