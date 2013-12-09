@@ -16,7 +16,6 @@ from cms.utils.compat.dj import force_unicode
 from cms.plugins.utils import has_reached_plugin_limit, requires_reload
 from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-                         HttpResponseForbidden)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
