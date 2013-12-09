@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
 from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
 from django.contrib.admin.helpers import AdminForm
 
-import django
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
@@ -44,8 +42,8 @@ from cms.utils.admin import jsonify_request
 
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
+from cms.utils.compat import DJANGO_1_4
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 require_POST = method_decorator(require_POST)
 
 if 'reversion' in settings.INSTALLED_APPS:
@@ -85,6 +83,7 @@ else:  # pragma: no cover
         return ReversionContext()
 
 PUBLISH_COMMENT = "Publish"
+INITIAL_COMMENT = "Initial version."
 
 
 class PageAdmin(PlaceholderAdmin, ModelAdmin):
@@ -142,6 +141,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     def get_revision_instances(self, request, object):
         """Returns all the instances to be used in the object's revision."""
+        if isinstance(object, Title):
+            object = object.page
         placeholder_relation = find_placeholder_relation(object)
         data = [object]
         filters = {'placeholder__%s' % placeholder_relation: object}
@@ -921,9 +922,10 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             from reversion.models import Version
 
             content_type = ContentType.objects.get_for_model(Page)
-            versions_qs = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk)
+            # reversion 1.8+ removes type field, revision filtering must be based on comments
+            versions_qs = Version.objects.filter(content_type=content_type, object_id_int=page.pk)
             deleted = []
-            for version in versions_qs.exclude(revision__comment__exact=PUBLISH_COMMENT):
+            for version in versions_qs.exclude(revision__comment__in=(INITIAL_COMMENT,  PUBLISH_COMMENT)):
                 if not version.revision_id in deleted:
                     revision = version.revision
                     revision.delete()

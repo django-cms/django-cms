@@ -77,11 +77,11 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class CMSTestCase(testcases.TestCase):
+class BaseCMSTestCase(object):
     counter = 1
 
     def _fixture_setup(self):
-        super(CMSTestCase, self)._fixture_setup()
+        super(BaseCMSTestCase, self)._fixture_setup()
         self.create_fixtures()
         activate("en")
 
@@ -92,7 +92,7 @@ class CMSTestCase(testcases.TestCase):
     def _post_teardown(self):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
-        super(CMSTestCase, self)._post_teardown()
+        super(BaseCMSTestCase, self)._post_teardown()
         set_current_user(None)
 
     def login_user_context(self, user):
@@ -360,6 +360,14 @@ class CMSTestCase(testcases.TestCase):
 
         return result
     assertWarns = failUnlessWarns
+
+
+class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
+    pass
+
+
+class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
+    pass
 
 
 class SettingsOverrideTestCase(CMSTestCase):

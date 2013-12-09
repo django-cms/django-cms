@@ -188,7 +188,8 @@ class PageSubmitRow(InclusionTag):
         advanced_settings = context.get('basic_info', False)
         language = context['language']
         return {
-            'onclick_attrib': (opts.get_ordered_objects() and change
+            # TODO check this (old code: opts.get_ordered_objects() )
+            'onclick_attrib': (opts and change
                                and 'onclick="submitOrderForm();"' or ''),
             'show_delete_link': False,
             'show_save_as_new': not is_popup and change and save_as,

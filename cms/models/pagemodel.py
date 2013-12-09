@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
-
+from os.path import join
 from cms import constants
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.utils.compat.metaclasses import with_metaclass
-from cms.utils.conf import get_cms_setting
-from django.core.exceptions import PermissionDenied
 from cms.exceptions import PublicIsUnmodifiable
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
@@ -13,10 +10,14 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
+from cms.utils.compat import DJANGO_1_5
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.utils.compat.metaclasses import with_metaclass
+from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
@@ -25,7 +26,6 @@ from django.utils import timezone
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
-from os.path import join
 
 
 @python_2_unicode_compatible
@@ -62,7 +62,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
         "An unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
-    published = models.BooleanField(_("is published"), blank=True)
+    published = models.BooleanField(_("is published"), blank=True, default=False)
 
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
@@ -73,7 +73,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
-    is_home = models.BooleanField(editable=False, db_index=True)
+    is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
@@ -373,7 +373,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if commit:
             if no_signals:  # ugly hack because of mptt
-                self.save_base(cls=self.__class__, **kwargs)
+                if DJANGO_1_5:
+                    self.save_base(cls=self.__class__, **kwargs)
+                else:
+                    self.save_base(**kwargs)
             else:
                 super(Page, self).save(**kwargs)
 
@@ -392,6 +395,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         if keep_state:
             delattr(self, '_publisher_keep_state')
 
+        if not DJANGO_1_5 and 'cls' in kwargs:
+            del(kwargs['cls'])
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
