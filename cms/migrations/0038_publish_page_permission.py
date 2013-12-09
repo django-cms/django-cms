@@ -11,7 +11,7 @@ class Migration(DataMigration):
         try:
              ct = orm['contenttypes.ContentType'].objects.get(model='page', app_label='cms')
         except orm['contenttypes.ContentType'].DoesNotExist:
-             ct = orm['contenttypes.ContentType'].objects.create(name='Page', model='page', app_label='cms')
+             ct = orm['contenttypes.ContentType'].objects.create(name='page', model='page', app_label='cms')
         try:
              perm = orm['auth.permission'].objects.get(codename='publish_page')
         except orm['auth.permission'].DoesNotExist:

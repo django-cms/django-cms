@@ -39,7 +39,7 @@ class PageMigrationTestCase(CMSTestCase):
         """
         from django.contrib.contenttypes.models import ContentType
         self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
-        self.assertTrue(ContentType.objects.filter(model='page', name='Page', app_label='cms').exists())
+        self.assertTrue(ContentType.objects.filter(model='page', name='page', app_label='cms').exists())
 
 
 class PagesTestCase(CMSTestCase):
