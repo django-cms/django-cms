@@ -294,7 +294,10 @@ $(document).ready(function () {
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
 				'success': function () {
+					// reload
 					CMS.API.Helpers.reloadBrowser();
+					// close loader
+					CMS.API.Toolbar._loader(false);
 				},
 				'error': function (jqXHR) {
 					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);

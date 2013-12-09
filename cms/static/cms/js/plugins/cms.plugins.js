@@ -12,7 +12,6 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
-			// TODO define whats required and whats optional
 			'type': '', // bar, plugin or generic
 			'placeholder_id': null,
 			'plugin_type': '',
@@ -26,8 +25,7 @@ $(document).ready(function () {
 				'add_plugin': '',
 				'edit_plugin': '',
 				'move_plugin': '',
-				'copy_plugin': '',
-				'cut_plugin': ''
+				'copy_plugin': ''
 			}
 		},
 
@@ -101,7 +99,7 @@ $(document).ready(function () {
 			// adds listener for update event
 			this.container.bind('cms.placeholder.update', function (e) {
 				e.stopPropagation();
-				that.movePlugin();
+				that.updatePlugins();
 			});
 
 			// adds longclick events
@@ -220,7 +218,7 @@ $(document).ready(function () {
 					that.editPlugin(data.url, name, data.breadcrumb);
 				},
 				'error': function (jqXHR) {
-					var msg = 'The following error occured while adding a new plugin: ';
+					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
 				}
@@ -233,7 +231,68 @@ $(document).ready(function () {
 				modal.open(url, name, breadcrumb);
 		},
 
-		movePlugin: function () {
+		copyPlugin: function () {
+			var that = this;
+			var data = {
+				'source_placeholder_id': this.options.placeholder_id,
+				'source_plugin_id': this.options.plugin_id || '',
+				'source_language': this.options.plugin_language,
+				'target_placeholder_id': CMS.config.clipboard.id,
+				'target_language': this.options.plugin_language,
+				'csrfmiddlewaretoken': this.csrf
+			};
+
+			// ensure clipboard is cleaned
+			CMS.API.Clipboard.clear();
+
+			// save plugin
+			$.ajax({
+				'type': 'POST',
+				'url': this.options.urls.copy_plugin,
+				'data': data,
+				'success': function () {
+					CMS.API.Toolbar.openMessage(CMS.config.lang.clipboard);
+				},
+				'error': function (jqXHR) {
+					var msg = CMS.config.lang.error;
+					// trigger error
+					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+				}
+			});
+		},
+
+		cutPlugin: function () {
+			var that = this;
+			var data = {
+				'placeholder_id': CMS.config.clipboard.id,
+				'plugin_id': this.options.plugin_id,
+				'plugin_parent': '',
+				'plugin_language': this.options.page_language,
+				'plugin_order': [this.options.plugin_id],
+				'csrfmiddlewaretoken': this.csrf
+			};
+
+			// ensure clipboard is cleaned
+			CMS.API.Clipboard.clear();
+
+			// move plugin
+			$.ajax({
+				'type': 'POST',
+				'url': this.options.urls.move_plugin,
+				'data': data,
+				'success': function (response) {
+					// if response is reload
+					if(response.reload) CMS.API.Helpers.reloadBrowser();
+				},
+				'error': function (jqXHR) {
+					var msg = CMS.config.lang.error;
+					// trigger error
+					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+				}
+			});
+		},
+
+		updatePlugins: function () {
 			var that = this;
 
 			var plugin = $('.cms_plugin-' + this.options.plugin_id);
@@ -282,7 +341,7 @@ $(document).ready(function () {
 					that._showSuccess(dragitem);
 				},
 				'error': function (jqXHR) {
-					var msg = 'An error occured during the update.';
+					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
 				}
@@ -290,36 +349,6 @@ $(document).ready(function () {
 
 			// show publish button
 			$('.cms_btn-publish').addClass('cms_btn-publish-active').parent().show();
-		},
-
-		copyPlugin: function (cut) {
-			var that = this;
-			var data = {
-				'source_placeholder_id': this.options.placeholder_id,
-				'source_plugin_id': this.options.plugin_id || '',
-				'source_language': this.options.plugin_language,
-				'target_placeholder_id': CMS.config.clipboard.id,
-				'target_language': this.options.plugin_language,
-				'csrfmiddlewaretoken': this.csrf
-			};
-
-			// determine if we are using copy or cut
-			var url = (cut) ? this.options.urls.cut_plugin : this.options.urls.copy_plugin;
-
-			$.ajax({
-				'type': 'POST',
-				'url': url,
-				'data': data,
-				'success': function () {
-					// refresh browser after success
-					CMS.API.Helpers.reloadBrowser();
-				},
-				'error': function (jqXHR) {
-					var msg = 'The following error occured while copying the plugin: ';
-					// trigger error
-					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
-				}
-			});
 		},
 
 		// private methods
@@ -352,6 +381,9 @@ $(document).ready(function () {
 						break;
 					case 'copy':
 						that.copyPlugin();
+						break;
+					case 'cut':
+						that.cutPlugin();
 						break;
 					default:
 						CMS.API.Toolbar._loader(false);
