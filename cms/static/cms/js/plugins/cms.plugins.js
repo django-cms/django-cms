@@ -96,10 +96,23 @@ $(document).ready(function () {
 				(e.type === 'mouseover') ? that.showTooltip(name, id) : that.hideTooltip();
 			});
 
-			// adds listener for update event
-			this.container.bind('cms.placeholder.update', function (e) {
+			// adds listener for all plugin updates
+			this.container.bind('cms.plugins.update', function (e) {
 				e.stopPropagation();
-				that.updatePlugins();
+				that.movePlugin();
+			});
+			// adds listener for copy/paste updates
+			this.container.bind('cms.plugin.update', function (e) {
+				e.stopPropagation();
+
+				var el = $(e.delegateTarget);
+				var dragitem = $('.cms_draggable-' + el.data('settings').plugin_id);
+				var placeholder_id = that._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_dragbar').first());
+				var data = el.data('settings');
+					data.target = placeholder_id;
+					data.parent= that._getId(dragitem.parent().closest('.cms_draggable'));
+
+				that.copyPlugin(data);
 			});
 
 			// adds longclick events
@@ -231,34 +244,45 @@ $(document).ready(function () {
 				modal.open(url, name, breadcrumb);
 		},
 
-		copyPlugin: function () {
+		copyPlugin: function (options) {
 			var that = this;
+			var move = (options) ? true : false;
+			// set correct options
+			options = options || this.options;
+
 			var data = {
-				'source_placeholder_id': this.options.placeholder_id,
-				'source_plugin_id': this.options.plugin_id || '',
-				'source_language': this.options.plugin_language,
-				'target_placeholder_id': CMS.config.clipboard.id,
-				'target_language': this.options.plugin_language,
+				'source_placeholder_id': options.placeholder_id,
+				'source_plugin_id': options.plugin_id || '',
+				'source_language': options.plugin_language,
+				'target_plugin_parent': options.parent || '',
+				'target_placeholder_id': options.target || CMS.config.clipboard.id,
+				'target_language': options.plugin_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
-
-			// ensure clipboard is cleaned
-			CMS.API.Clipboard.clear();
-
-			// save plugin
-			$.ajax({
+			var request = {
 				'type': 'POST',
-				'url': this.options.urls.copy_plugin,
+				'url': options.urls.copy_plugin,
 				'data': data,
 				'success': function () {
 					CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+					// reload
+					CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
 					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
 				}
-			});
+			};
+
+			if(move) {
+				$.ajax(request);
+			} else {
+				// ensure clipboard is cleaned
+				CMS.API.Clipboard.clear(function () {
+					$.ajax(request);
+				});
+			}
 		},
 
 		cutPlugin: function () {
@@ -273,30 +297,33 @@ $(document).ready(function () {
 			};
 
 			// ensure clipboard is cleaned
-			CMS.API.Clipboard.clear();
-
-			// move plugin
-			$.ajax({
-				'type': 'POST',
-				'url': this.options.urls.move_plugin,
-				'data': data,
-				'success': function (response) {
-					// if response is reload
-					if(response.reload) CMS.API.Helpers.reloadBrowser();
-				},
-				'error': function (jqXHR) {
-					var msg = CMS.config.lang.error;
-					// trigger error
-					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
-				}
+			CMS.API.Clipboard.clear(function () {
+				// move plugin
+				$.ajax({
+					'type': 'POST',
+					'url': that.options.urls.move_plugin,
+					'data': data,
+					'success': function (response) {
+						CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+						// if response is reload
+						if(response.reload) CMS.API.Helpers.reloadBrowser();
+					},
+					'error': function (jqXHR) {
+						var msg = CMS.config.lang.error;
+						// trigger error
+						that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+					}
+				});
 			});
 		},
 
-		updatePlugins: function () {
+		movePlugin: function (options) {
 			var that = this;
+			// set correct options
+			options = options || this.options;
 
-			var plugin = $('.cms_plugin-' + this.options.plugin_id);
-			var dragitem = $('.cms_draggable-' + this.options.plugin_id);
+			var plugin = $('.cms_plugin-' + options.plugin_id);
+			var dragitem = $('.cms_draggable-' + options.plugin_id);
 
 			// SETTING POSITION
 			// after we insert the plugin onto its new place, we need to figure out whats above it
@@ -321,17 +348,17 @@ $(document).ready(function () {
 			// gather the data for ajax request
 			var data = {
 				'placeholder_id': placeholder_id,
-				'plugin_id': this.options.plugin_id,
+				'plugin_id': options.plugin_id,
 				'plugin_parent': plugin_parent || '',
 				 // this is a hack: when moving to different languages use the global language
-				'plugin_language': this.options.page_language,
+				'plugin_language': options.page_language,
 				'plugin_order': plugin_order,
 				'csrfmiddlewaretoken': this.csrf
 			};
 
 			$.ajax({
 				'type': 'POST',
-				'url': this.options.urls.move_plugin,
+				'url': options.urls.move_plugin,
 				'data': data,
 				'success': function (response) {
 					// if response is reload

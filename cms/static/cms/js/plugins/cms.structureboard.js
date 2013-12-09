@@ -360,7 +360,13 @@ $(document).ready(function () {
 					//var id = ui.item.attr('class').replace('cms_draggable cms_draggable-', '');
 					var id = that.getId(ui.item);
 					var plugin = $('.cms_plugin-' + id);
-						plugin.trigger('cms.placeholder.update');
+
+					// check if we copy/paste a plugin or not
+					if(plugin.closest('.cms_clipboard').length) {
+						plugin.trigger('cms.plugin.update');
+					} else {
+						plugin.trigger('cms.plugins.update');
+					}
 
 					// reset placeholder without entries
 					$('.cms_draggables').each(function () {

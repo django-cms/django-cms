@@ -281,7 +281,7 @@ $(document).ready(function () {
 			this._lock(false);
 		},
 
-		openAjax: function (url, post, text) {
+		openAjax: function (url, post, text, callback) {
 			var that = this;
 
 			// check if we have a confirmation text
@@ -294,10 +294,12 @@ $(document).ready(function () {
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
 				'success': function () {
-					// reload
-					CMS.API.Helpers.reloadBrowser();
-					// close loader
-					CMS.API.Toolbar._loader(false);
+					if(callback) {
+						callback(that);
+					} else {
+						// reload
+						CMS.API.Helpers.reloadBrowser();
+					}
 				},
 				'error': function (jqXHR) {
 					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
