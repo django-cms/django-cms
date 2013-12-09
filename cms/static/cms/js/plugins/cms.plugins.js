@@ -251,7 +251,7 @@ $(document).ready(function () {
 				'url': this.options.urls.copy_plugin,
 				'data': data,
 				'success': function () {
-					CMS.API.Toolbar.openMessage(CMS.config.lang.clipboard);
+					CMS.API.Toolbar.openMessage(CMS.config.lang.success);
 				},
 				'error': function (jqXHR) {
 					var msg = CMS.config.lang.error;
