@@ -23,7 +23,7 @@ Configuration and setup
 Preparing the environment
 =========================
 
-Gathering the requirements is a good start, but we now need to give the CMS a 
+Gathering the requirements is a good start, but we now need to give the CMS a
 Django project to live in, and configure it.
 
 
@@ -52,7 +52,7 @@ nice "It Worked" message from Django.
 Installing and configuring django CMS in your Django project
 ------------------------------------------------------------
 
-Open the file ``~/workspace/myproject/settings.py``.
+Open the file ``~/workspace/myproject/myproject/settings.py``.
 
 To make your life easier, add the following at the top of the file::
 
@@ -161,7 +161,7 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
     )
 
 .. note::
-    
+
     This setting will be missing from automatically generated Django settings
     files, so you will have to add it.
 
@@ -173,9 +173,9 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
     Django ``messages`` framework is now required for the toolbar to work
     properly.
-    
+
     To enable it you must be check the following settings:
-        
+
         * ``INSTALLED_APPS``: must contain ``'django.contrib.messages'``
         * ``MIDDLEWARE_CLASSES``: must contain ``'django.contrib.messages.middleware.MessageMiddleware'``
         * ``TEMPLATE_CONTEXT_PROCESSORS``: must contain ``'django.contrib.messages.context_processors.messages'``
@@ -213,7 +213,7 @@ Add at least one template to :setting:`CMS_TEMPLATES`; for example::
         ('template_2.html', 'Template Two'),
     )
 
-We will create the actual template files at a later step, don't worry about it for 
+We will create the actual template files at a later step, don't worry about it for
 now. Simply paste this code into your settings file.
 
 .. note::
@@ -221,7 +221,7 @@ now. Simply paste this code into your settings file.
     The templates you define in :setting:`CMS_TEMPLATES` have to exist at runtime and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
     for django CMS. For more details see `Creating templates`_
-    
+
 The django CMS allows you to edit all languages for which Django has built in
 translations. Since these are numerous, we'll limit it to English for now::
 
@@ -310,7 +310,7 @@ Here is a simple example for a base template called ``base.html``:
     </body>
   </html>
 
-Now, create a file called ``template_1.html`` in the same directory. This will use 
+Now, create a file called ``template_1.html`` in the same directory. This will use
 your base template, and add extra content to it:
 
 .. code-block:: html+django
@@ -350,14 +350,14 @@ as the last thing before the closing ``</head>`` HTML tag and the
 HTML tag.
 
 
-.. _django-sekizai: https://github.com/ojii/django-sekizai 
+.. _django-sekizai: https://github.com/ojii/django-sekizai
 
 **********************
 Initial database setup
 **********************
 
 This command depends on whether you **upgrade** your installation or do a
-**fresh install**. We recommend that you get familiar with the way `South`_ works, 
+**fresh install**. We recommend that you get familiar with the way `South`_ works,
 as it is a very powerful, easy and convenient tool. django CMS uses it extensively.
 
 
@@ -394,8 +394,8 @@ Now, use the following command to check if you did everything correctly::
 Up and running!
 ***************
 
-That should be it. Restart your development server using ``python manage.py runserver`` 
-and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ : you should get 
+That should be it. Restart your development server using ``python manage.py runserver``
+and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ : you should get
 the django CMS "It Worked" screen.
 
 |it-works-cms|
@@ -414,13 +414,13 @@ Creating your first CMS Page!
 *****************************
 
 That's it. Now the best part: you can start using the CMS!
-Run your server with ``python manage.py runserver``, then point a web browser to 
-`127.0.0.1:8000/admin/ <http://127.0.0.1:8000/admin/>`_ , and log in using the super 
+Run your server with ``python manage.py runserver``, then point a web browser to
+`127.0.0.1:8000/admin/ <http://127.0.0.1:8000/admin/>`_ , and log in using the super
 user credentials you defined when you ran ``syncdb`` earlier.
 
 Once in the admin part of your site, you should see something like the following:
 
-|first-admin| 
+|first-admin|
 
 .. |first-admin| image:: ../images/first-admin.png
 
@@ -472,13 +472,13 @@ Adding content to a page
 So far, our page doesn't do much. Make sure it's marked as "published", then
 click on the page's "edit" button.
 
-Ignore most of the interface for now and click the "view on site" button at the 
+Ignore most of the interface for now and click the "view on site" button at the
 top right-hand corner of the screen. As expected, your page is blank for the
 time being, since our template is a really minimal one.
 
 Let's get to it now then!
 
-Press your browser's back button, so as to see the page's admin interface. If you followed 
+Press your browser's back button, so as to see the page's admin interface. If you followed
 the tutorial so far, your template (``template_1.html``) defines two placeholders.
 The admin interfaces shows you theses placeholders as sub menus:
 
@@ -509,7 +509,7 @@ Go back to your website using the top right-hand "View on site" button. That's i
 Where to go from here
 =====================
 
-Congratulations, you now have a fully functional CMS! Feel free to play around 
+Congratulations, you now have a fully functional CMS! Feel free to play around
 with the different plugins provided out of the box and to build great websites!
 
 
