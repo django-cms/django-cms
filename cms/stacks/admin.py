@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import force_escape
 from django.template.response import TemplateResponse
 from django.utils.html import escapejs
@@ -64,7 +64,7 @@ class StackAdmin(PlaceholderAdmin):
                 stack = form.save()
                 copy_plugins_to(plugin_list, stack.draft)
                 stack.save()
-                return render_to_response('admin/cms/page/close_frame.html')
+                return HttpResponse('OK') # TODO: close the window
         return self.add_view(request)
 
     def create_stack_from_plugin(self, request, placeholder_id, plugin_id):
