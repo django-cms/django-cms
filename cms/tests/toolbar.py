@@ -94,8 +94,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + edit-mode + admin-menu + logout
-        self.assertEqual(len(items), 3, items)
+        # Logo + admin-menu + logout
+        self.assertEqual(len(items), 2, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 7, admin_items)
 
@@ -105,7 +105,7 @@ class ToolbarTests(ToolbarTestBase):
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
-        self.assertEqual(len(items), 3)
+        self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 8, admin_items)
 

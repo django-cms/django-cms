@@ -13,7 +13,6 @@ from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting, get_site_id
 from cms.utils.compat.type_checks import string_types, int_types
-from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset

@@ -132,7 +132,7 @@ class CMSToolbar(ToolbarAPIMixin):
         """
         Get the CMS items on the toolbar
         """
-        if self.right_items is not None and self.left_items is not None:
+        if self.right_items is not None or self.left_items is not None:
             return
         self.right_items = []
         self.left_items = []

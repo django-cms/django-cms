@@ -33,7 +33,13 @@ class StackNode(Tag):
         else:
             stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code,
                 'creation_method': Stack.CREATION_BY_TEMPLATE})
-        placeholder = stack.content
+        if not hasattr(request, 'stacks'):
+            request.stacks = []
+        request.stacks.append(stack)
+        if request.toolbar.edit_mode:
+            placeholder = stack.draft
+        else:
+            placeholder = stack.public
         return render_placeholder(placeholder, context, name_fallback=code)
 
 

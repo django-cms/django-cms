@@ -3,6 +3,7 @@ from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
+from cms.stacks.models import Stack
 from django.contrib.admin.helpers import AdminForm
 
 import django
@@ -912,13 +913,33 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     @transaction.commit_on_success
     @create_revision()
     def publish_page(self, request, page_id):
-        page = get_object_or_404(Page, id=page_id)
+        try:
+            page = Page.objects.get(id=page_id, publisher_is_draft=True)
+        except Page.DoesNotExist:
+            page = None
         # ensure user has permissions to publish this page
-        if not page.has_publish_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to publish this page"))
-        published = page.publish()
-        messages.info(request, _('The page "%s" was successfully published.') % page)
-        if "reversion" in settings.INSTALLED_APPS:
+        all_published = True
+        if page:
+            if not page.has_publish_permission(request):
+                return HttpResponseForbidden(_("You do not have permission to publish this page"))
+            published = page.publish()
+            if not published:
+                all_published = False
+        stacks = request.GET.get('stacks', '')
+        if not stacks and not page:
+            return Http404("No page or stack found for publishing.")
+        if stacks:
+            stack_ids = stacks.split(',')
+            for pk in stack_ids:
+                stack = Stack.objects.get(pk=pk)
+                published = stack.publish(request)
+                if not published:
+                    all_published = False
+        if all_published:
+            messages.info(request, _('The content was successfully published.'))
+        else:
+            messages.warning(request, _("There was a problem publishing your content"))
+        if "reversion" in settings.INSTALLED_APPS and page:
             # delete revisions that are not publish revisions
             from reversion.models import Version
 
@@ -949,9 +970,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         referrer = request.META.get('HTTP_REFERER', '')
         path = '../../'
         if 'admin' not in referrer:
-            if published:
-                public_page = Page.objects.get(publisher_public=page.pk)
-                path = '%s?edit_off' % public_page.get_absolute_url()
+            if all_published:
+                if page:
+                    public_page = Page.objects.get(publisher_public=page.pk)
+                    path = '%s?edit_off' % public_page.get_absolute_url()
+                else:
+                    path = '%s?edit_off' % referrer
             else:
                 path = '/?edit_off'
 
