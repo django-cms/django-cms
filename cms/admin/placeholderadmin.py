@@ -323,6 +323,7 @@ class PlaceholderAdmin(ModelAdmin):
             ref = PlaceholderReference()
             ref.name = source_placeholder.get_label()
             ref.plugin_type = "PlaceholderPlugin"
+            ref.language = target_language
             ref.placeholder = target_placeholder
             ref.save()
             ref.copy_from(source_placeholder)
@@ -547,7 +548,6 @@ class PlaceholderAdmin(ModelAdmin):
 
 class LanguageTabsAdmin(ModelAdmin):
     render_placeholder_language_tabs = True
-    #    change_form_template = 'admin/placeholders/placeholder/change_form.html'
 
     def get_language_from_request(self, request):
         language = request.REQUEST.get('language', None)
