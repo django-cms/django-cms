@@ -254,7 +254,7 @@ $(document).ready(function () {
 				'source_placeholder_id': options.placeholder_id,
 				'source_plugin_id': options.plugin_id || '',
 				'source_language': options.plugin_language,
-				'target_plugin_parent': options.parent || '',
+				'target_plugin_id': options.parent || '',
 				'target_placeholder_id': options.target || CMS.config.clipboard.id,
 				'target_language': options.plugin_language,
 				'csrfmiddlewaretoken': this.csrf
