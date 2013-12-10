@@ -1,0 +1,19 @@
+###################
+2.3.8 release notes
+###################
+
+*******************
+What's new in 2.3.8
+*******************
+
+Fixture loading in Postgres
+===========================
+
+Placeholder rescan is skipped when loading fixtures.
+
+Fix placeholder primary keys formatting
+=======================================
+
+Fixed a bug when the Django setting USE_THOUSAND_SEPARATOR = True, which caused
+placeholders primary keys to be formatted according to locale, breaking frontend
+editing.

@@ -118,7 +118,12 @@
 - Fixed page change form (jQuery and permissions)
 - Fixed placeholder field permission checks
 
-==== 2.3.7 (upcoming) ===
+==== 2.3.7 (2013-05-30) ===
 
 - Fixed a bug in the cache handling of plugins using django-sekizai
 - Fixed a performance bug in the permission cache
+
+==== 2.3.8 (2013-10-29) ===
+
+- Fixed a bug in fixture loading signals handling
+- Fixed a bug in thousands formatting in placeholders primary keys
