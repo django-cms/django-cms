@@ -547,7 +547,6 @@ class PlaceholderAdmin(ModelAdmin):
 
 class LanguageTabsAdmin(ModelAdmin):
     render_placeholder_language_tabs = True
-    #    change_form_template = 'admin/placeholders/placeholder/change_form.html'
 
     def get_language_from_request(self, request):
         language = request.REQUEST.get('language', None)
