@@ -323,6 +323,7 @@ class PlaceholderAdmin(ModelAdmin):
             ref = PlaceholderReference()
             ref.name = source_placeholder.get_label()
             ref.plugin_type = "PlaceholderPlugin"
+            ref.language = target_language
             ref.placeholder = target_placeholder
             ref.save()
             ref.copy_from(source_placeholder)
