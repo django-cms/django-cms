@@ -6,6 +6,7 @@ from cms.plugin_pool import plugin_pool
 from cms.stacks.models import Stack
 from django.contrib.admin.helpers import AdminForm
 
+import django
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE

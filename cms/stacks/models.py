@@ -34,7 +34,7 @@ class Stack(models.Model):
         help_text=_(u'To render the stack in templates.'))
     draft = PlaceholderField(stack_slotname, verbose_name=_(u'stack content'), related_name='stacks_draft')
     public = PlaceholderField(stack_slotname, editable=False, related_name='stacks_public')
-    dirty = models.BooleanField(default=False)
+    dirty = models.BooleanField(default=False, editable=False)
     creation_method = models.CharField(
         verbose_name=_('creation_method'), choices=CREATION_METHODS,
         default=CREATION_BY_CODE, max_length=20, blank=True,
