@@ -590,6 +590,10 @@ register.tag(CMSToolbar)
 
 
 class CMSEditableObject(InclusionTag):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+    """
     template = 'cms/toolbar/content.html'
     edit_template = 'cms/toolbar/plugin.html'
     name = 'show_editable_model'
@@ -700,6 +704,9 @@ class CMSEditableObject(InclusionTag):
                     url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+	# content is for non-edit template content.html
+	# rendered_content is for edit template plugin.html
+	# in this templatetag both hold the same content
         context['content'] = mark_safe(context['content'])
         context['rendered_content'] = context['content']
         return context
