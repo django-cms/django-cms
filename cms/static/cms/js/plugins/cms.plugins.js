@@ -582,6 +582,7 @@ $(document).ready(function () {
 		},
 
 		_collapsables: function () {
+			// TODO this is called multiple times, needs performance update
 			var that = this;
 			var settings = CMS.API.Toolbar.getSettings();
 			var draggable = $('.cms_draggable-' + this.options.plugin_id);
@@ -636,8 +637,11 @@ $(document).ready(function () {
 			// loop through the items
 			$.each(CMS.API.Toolbar.getSettings().states, function (index, id) {
 				var el = $('.cms_draggable-' + id);
+				// only add this class to elements which have a draggable area
+				if(el.find('.cms_draggables').length) {
 					el.find('> .cms_draggables').show();
 					el.find('> .cms_dragitem').addClass('cms_dragitem-expanded');
+				}
 			});
 		},
 
