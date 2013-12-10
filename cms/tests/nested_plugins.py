@@ -138,17 +138,17 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         First we create the structure:
         
              11
-             1 
-                 2 
+             1
+                 2
                      12
-                     4 
-                          10  
-                     8 
-                 3 
-                     9 
-              5 
-                 6 
-                 7 
+                     4
+                          10
+                     8
+                 3
+                     9
+              5
+                 6
+                 7
                  13
               14
         
