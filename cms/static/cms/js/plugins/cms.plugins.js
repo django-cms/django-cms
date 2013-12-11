@@ -418,9 +418,9 @@ $(document).ready(function () {
 				}
 			});
 
-			nav.find('input').bind('keyup focus blur click', function (e) {
+			nav.find('input').bind('keyup keydown focus blur click', function (e) {
 				if(e.type === 'focus') that.focused = true;
-				if(e.type === 'blur') {
+				if(e.type === 'blur' && !that.traverse) {
 					that.focused = false;
 					that._hideSubnav(nav);
 				}
@@ -476,6 +476,7 @@ $(document).ready(function () {
 
 				// bind arrow down and tab keys
 				if(e.keyCode === 40 || e.keyCode === 9) {
+					that.traverse = true;
 					e.preventDefault();
 					if(index >= 0 && index < anchors.length - 1) {
 						anchors.eq(index + 1).focus();
@@ -496,6 +497,7 @@ $(document).ready(function () {
 
 				// hide subnav when hitting enter or escape
 				if(e.keyCode === 13 || e.keyCode === 27) {
+					that.traverse = false;
 					nav.find('input').blur();
 					that._hideSubnav(nav);
 				}
