@@ -1,6 +1,6 @@
 coverage==3.7
 python-coveralls==2.4.0
-docopt==0.6.1
+docopt==0.6.1s
 unittest-xml-reporting==1.0.3
 sphinx
 Pillow==2.0
