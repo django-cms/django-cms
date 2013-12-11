@@ -11,6 +11,13 @@
  *
  */
 
+// browser fix
+jQuery.browser = {};
+jQuery.browser.mozilla = /mozilla/.test(navigator.userAgent.toLowerCase()) && !/webkit/.test(navigator.userAgent.toLowerCase());
+jQuery.browser.webkit = /webkit/.test(navigator.userAgent.toLowerCase());
+jQuery.browser.opera = /opera/.test(navigator.userAgent.toLowerCase());
+jQuery.browser.msie = /msie/.test(navigator.userAgent.toLowerCase());
+
 // jQuery plugin
 jQuery.fn.tree = function (opts) {
 	return this.each(function() {
@@ -446,9 +453,9 @@ function tree_component () {
 				this.container.css({ position : "relative" });
 				this.offset = this.container.offset();
 				var tmp = 0;
-				tmp = parseInt(jQuery.curCSS(this.container.get(0), "paddingTop", true),10);
+				tmp = parseInt(jQuery.css(this.container.get(0), "paddingTop", true),10);
 				if(tmp) this.offset.top += tmp;
-				tmp = parseInt(jQuery.curCSS(this.container.get(0), "borderTopWidth", true),10);
+				tmp = parseInt(jQuery.css(this.container.get(0), "borderTopWidth", true),10);
 				if(tmp) this.offset.top += tmp;
 				this.container.css({ position : "" });
 			}
