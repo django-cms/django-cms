@@ -4,13 +4,15 @@
 # 
 # Translators:
 # jui <appukonrad@gmail.com>, 2012-2013
+# QB <jdornak@redhat.com>, 2013
+# xlu <xlu@seznam.cz>, 2013
 # xlu <xlu@seznam.cz>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2013-07-04 09:54+0200\n"
-"PO-Revision-Date: 2013-07-04 08:50+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-11 18:44+0200\n"
+"PO-Revision-Date: 2013-12-06 08:54+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django-cms/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -24,31 +26,31 @@ msgstr ""
 
 #: cms_toolbar.py:45
 msgid "Content"
-msgstr ""
+msgstr "Obsah"
 
 #: cms_toolbar.py:47
 msgid "Structure"
-msgstr ""
+msgstr "Struktura"
 
 #: cms_toolbar.py:65
 msgid "Users"
-msgstr ""
+msgstr "Uživatelé"
 
 #: cms_toolbar.py:72
 msgid "Sites"
-msgstr ""
+msgstr "Weby"
 
 #: cms_toolbar.py:73
 msgid "Admin Sites"
-msgstr ""
+msgstr "Správa webů"
 
 #: cms_toolbar.py:79
 msgid "Administration"
-msgstr ""
+msgstr "Administrace"
 
 #: cms_toolbar.py:82
 msgid "User settings"
-msgstr ""
+msgstr "Uživatelská nastavení"
 
 #: cms_toolbar.py:85
 msgid "Logout"
@@ -61,115 +63,107 @@ msgstr "Jazyk"
 
 #: cms_toolbar.py:134
 msgid "Publish Changes"
-msgstr "požad. publikace"
+msgstr "Publikovat změny"
 
 #: cms_toolbar.py:136
 msgid "Publish Page now"
-msgstr "požad. publikace"
+msgstr "Publikovat nyní"
 
 #: cms_toolbar.py:160
 #, python-format
 msgid "Add %(language)s Translation"
-msgstr ""
+msgstr "Přidat překlad do jazyka %(language)s"
 
 #: cms_toolbar.py:168
 #, python-format
 msgid "Delete %(language)s Translation"
-msgstr ""
+msgstr "Smazat překlad do jazyka %(language)s"
 
 #: cms_toolbar.py:180
 #, python-format
 msgid "Are you sure you want copy all plugins from %s?"
-msgstr ""
+msgstr "Opravdu chcete kopírovat všechny položky obsahu z %s?"
 
 #: cms_toolbar.py:181
 #, python-format
 msgid "Copy all plugins from %s"
-msgstr ""
+msgstr "Kopírovat všechny položky obsahu z %s"
 
 #: cms_toolbar.py:188
 msgid "Pages"
-msgstr ""
+msgstr "Stránky"
 
-#: cms_toolbar.py:189
-msgid "Manage pages"
-msgstr ""
-
-#: cms_toolbar.py:191
-msgid "Add new page"
-msgstr ""
-
-#: cms_toolbar.py:196 templates/admin/cms/page/permissions.html:5
+#: cms_toolbar.py:193 templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "Stránka"
 
-#: cms_toolbar.py:197
+#: cms_toolbar.py:194
 msgid "Edit this Page"
-msgstr ""
+msgstr "Upravit stránku"
 
-#: cms_toolbar.py:199
+#: cms_toolbar.py:196
 msgid "Page settings"
-msgstr ""
+msgstr "Nastavení stránky"
 
-#: cms_toolbar.py:203
+#: cms_toolbar.py:200
 msgid "Templates"
-msgstr ""
+msgstr "Šablony"
 
-#: cms_toolbar.py:214
+#: cms_toolbar.py:211
 msgid "Advanced settings"
-msgstr ""
+msgstr "Pokročilé nastavení"
 
-#: cms_toolbar.py:221
+#: cms_toolbar.py:218
 msgid "Permissions"
-msgstr ""
+msgstr "Oprávnění"
 
-#: cms_toolbar.py:227
+#: cms_toolbar.py:224
 msgid "Hide in navigation"
-msgstr ""
+msgstr "Skrýt v navigaci"
 
-#: cms_toolbar.py:229
+#: cms_toolbar.py:226
 msgid "Display in navigation"
-msgstr ""
+msgstr "Zobrazit v navigaci"
 
-#: cms_toolbar.py:234
+#: cms_toolbar.py:231
 msgid "Unpublish page"
-msgstr "požad. depublikace"
+msgstr "Vrátit publikování"
 
-#: cms_toolbar.py:236
+#: cms_toolbar.py:233
 msgid "Publish page"
-msgstr "požad. publikace"
+msgstr "Publikovat stránku"
 
-#: cms_toolbar.py:242
+#: cms_toolbar.py:239
 msgid "Delete page"
 msgstr "Smazat stránku"
 
-#: cms_toolbar.py:247 templates/admin/cms/page/history/revision_header.html:10
+#: cms_toolbar.py:244 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
 msgstr "Historie"
 
-#: cms_toolbar.py:262
+#: cms_toolbar.py:259
 msgid "Undo"
-msgstr ""
+msgstr "Zpět"
+
+#: cms_toolbar.py:260
+msgid "Redo"
+msgstr "Vpřed"
 
 #: cms_toolbar.py:263
-msgid "Redo"
-msgstr ""
+msgid "Are you sure you want to revert to live?"
+msgstr "Opravdu se chcete zahodit rozpracované změny?"
+
+#: cms_toolbar.py:264
+msgid "Revert to live"
+msgstr "Zahodit rozpracované změny"
 
 #: cms_toolbar.py:266
-msgid "Are you sure you want to revert to live?"
-msgstr ""
-
-#: cms_toolbar.py:267
-msgid "Revert to live"
-msgstr ""
-
-#: cms_toolbar.py:269
 msgid "View history"
-msgstr ""
+msgstr "Prohlížet historii"
 
 #: plugin_base.py:73
 msgid "Advanced options"
-msgstr "Pokročilé nastavení"
+msgstr "Pokročilá nastavení"
 
 #: admin/forms.py:59
 msgid "Title"
@@ -246,11 +240,11 @@ msgstr "Stránka s takovu hodnotou reverse URL id již existuje."
 
 #: admin/forms.py:205
 msgid "You selected an apphook with an \"app_name\". You must enter a namespace."
-msgstr ""
+msgstr "Přiřadili jste aplikaci. Musíte zadat jmenný prostor."
 
 #: admin/forms.py:208
 msgid "If you enter a namespace you need an application url as well."
-msgstr ""
+msgstr "Pokud zadáte jmenný prostor, je nutné rovněž zadat url aplikace."
 
 #: admin/forms.py:238 models/permissionmodels.py:40
 msgid "user"
@@ -289,7 +283,7 @@ msgstr "Změnit"
 #: admin/forms.py:354 admin/forms.py:361 admin/forms.py:365
 #: templates/admin/cms/page/submit_row.html:8
 #: templates/admin/cms/page/plugin/delete_confirmation.html:9
-#: templates/admin/cms/page/tree/menu_item.html:51
+#: templates/admin/cms/page/tree/menu_item.html:52
 #: templates/cms/toolbar/draggable_item.html:14
 msgid "Delete"
 msgstr "Odstranit"
@@ -340,39 +334,39 @@ msgstr "Rozšířené možnosti"
 
 #: admin/pageadmin.py:269
 msgid "Change Permissions"
-msgstr ""
+msgstr "Změnit oprávnění"
 
 #: admin/pageadmin.py:512
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr "Zásuvný modul %(plugin_name)s byl přidaný do %(placeholder)s"
+msgstr "Položka %(plugin_name)s byla přidána do %(placeholder)s"
 
 #: admin/pageadmin.py:519
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
-msgstr ""
+msgstr "Položky obsahu byly zkopírovány do %(placeholder)s"
 
 #: admin/pageadmin.py:531
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr "Zásuvný modul %(plugin_name)s byl změněný na pozici%(position)s v %(placeholder)s"
+msgstr "Položka %(plugin_name)s byla změněna na pozici %(position)s v %(placeholder)s"
 
 #: admin/pageadmin.py:542
 msgid "Plugins were moved"
-msgstr "Pluginy byly přesunuty"
+msgstr "Položky byly přesunuty"
 
 #: admin/pageadmin.py:549
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
-msgstr "Zásuvný modul %(plugin_name)s na pozici %(position)s v %(placeholder)s byl vymazán."
+msgstr "Položka %(plugin_name)s na pozici %(position)s v %(placeholder)s byla vymazána."
 
 #: admin/pageadmin.py:562
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
-msgstr ""
+msgstr "Všechny položky v bloku \"%(name)s\" byly smazány."
 
 #: admin/pageadmin.py:581
 msgid "You do not have permission to change pages."
@@ -413,19 +407,19 @@ msgstr "Chyba! Nemáte oprávnění k přesunu na tuto stránku. Načtěte si pr
 msgid "Page moved"
 msgstr "Stránka přesunuta"
 
-#: admin/pageadmin.py:848 admin/placeholderadmin.py:170
-#: admin/placeholderadmin.py:201
+#: admin/pageadmin.py:848 admin/placeholderadmin.py:167
+#: admin/placeholderadmin.py:198
 msgid "Language must be set to a supported language!"
 msgstr "Zadaný jazyk není podporovaný, zvolte jiný."
 
-#: admin/pageadmin.py:853 admin/placeholderadmin.py:211
+#: admin/pageadmin.py:853 admin/placeholderadmin.py:208
 msgid "You do not have permission to copy these plugins."
-msgstr ""
+msgstr "Nemáte oprávnění kopírovat tyto položky obsahu."
 
 #: admin/pageadmin.py:856
 #, python-format
 msgid "Copied plugins from %(source_language)s to %(target_language)s"
-msgstr ""
+msgstr "Položky obsahu byly zkopírovány z jazyka %(source_language)s do jazyka %(target_language)s"
 
 #: admin/pageadmin.py:913 admin/pageadmin.py:1095
 msgid "You do not have permission to publish this page"
@@ -453,10 +447,10 @@ msgstr "Tato stránka existuje pouze v jedné jazykové variantě"
 #: admin/pageadmin.py:1032
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr "Název a zásuvné moduly pro jazyk %(language)s byli vymazané"
+msgstr "Název a položky obsahu pro jazyk %(language)s byli vymazané"
 
-#: admin/pageadmin.py:1054 admin/placeholderadmin.py:364
-#: admin/placeholderadmin.py:403
+#: admin/pageadmin.py:1054 admin/placeholderadmin.py:367
+#: admin/placeholderadmin.py:406
 msgid "Are you sure?"
 msgstr "Jste si jist?"
 
@@ -472,11 +466,11 @@ msgstr "Stránka \"%s\" byla úspěšně publikována"
 
 #: admin/pageadmin.py:1133
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Nemáte oprávnění měnit tuto vlastno dané stránky."
+msgstr "Nemáte oprávnění měnit zobrazení této stránky v navigaci."
 
 #: admin/pageadmin.py:1159
 msgid "You do not have permission to edit this page"
-msgstr ""
+msgstr "Nemáte oprávnění tuto stránku upravovat"
 
 #: admin/permissionadmin.py:84
 msgid "View restriction"
@@ -500,42 +494,42 @@ msgstr "Správa práv stránky"
 
 #: admin/placeholderadmin.py:143
 msgid "You do not have permission to add a plugin"
-msgstr "Nemáte oprávnění přidávat zásuvné moduly"
+msgstr "Nemáte oprávnění přidávat položky obsahu"
 
-#: admin/placeholderadmin.py:230
+#: admin/placeholderadmin.py:227
 msgid "You do not have permission to edit this plugin"
-msgstr ""
+msgstr "Nemáte oprávnění editovat tuto položku obsahu"
 
-#: admin/placeholderadmin.py:308
+#: admin/placeholderadmin.py:307
 msgid "You have no permission to move this plugin"
-msgstr ""
+msgstr "Nemáte oprávnění přesouvat tuto položku obsahu"
 
-#: admin/placeholderadmin.py:341 admin/placeholderadmin.py:352
+#: admin/placeholderadmin.py:344 admin/placeholderadmin.py:355
 msgid "You do not have permission to delete this plugin"
-msgstr ""
+msgstr "Nemáte oprávnění smazat tuto položku obsahu"
 
-#: admin/placeholderadmin.py:356
+#: admin/placeholderadmin.py:359
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "Položka obsahu \"%(obj)s\" typu %(name)s byla úspěšně smazána."
 
-#: admin/placeholderadmin.py:362 admin/placeholderadmin.py:401
+#: admin/placeholderadmin.py:365 admin/placeholderadmin.py:404
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Není možné smazat položku %(name)s"
 
-#: admin/placeholderadmin.py:382 admin/placeholderadmin.py:392
+#: admin/placeholderadmin.py:385 admin/placeholderadmin.py:395
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "Nemáte oprávnění k vyprázdnění tohoto bloku"
 
-#: admin/placeholderadmin.py:396
+#: admin/placeholderadmin.py:399
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "Blok \"%(obj)s\" byl úspěšně vymazán."
 
-#: admin/placeholderadmin.py:406
+#: admin/placeholderadmin.py:409
 msgid "placeholder"
-msgstr ""
+msgstr "blok"
 
 #: admin/useradmin.py:26
 msgid "User details"
@@ -575,11 +569,11 @@ msgstr "změněno"
 
 #: models/moderatormodels.py:39
 msgid "Page moderator state"
-msgstr ""
+msgstr "Fáze publikčaního procesu"
 
 #: models/moderatormodels.py:40
 msgid "Page moderator states"
-msgstr ""
+msgstr "Fáze publikčaního procesu"
 
 #: models/pagemodel.py:37
 msgid "for logged in users only"
@@ -605,7 +599,7 @@ msgstr "datum publikace"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
+msgstr "Kdy má být stránka publikována. Stav musí být \"Publikováno\", aby k publikování došlo."
 
 #: models/pagemodel.py:56
 msgid "publication end date"
@@ -621,7 +615,7 @@ msgstr "v navigaci"
 
 #: models/pagemodel.py:60
 msgid "soft root"
-msgstr ""
+msgstr "soft root"
 
 #: models/pagemodel.py:61
 msgid "All ancestors will not be displayed in the navigation"
@@ -635,7 +629,7 @@ msgstr "id"
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
+msgstr "Unikátní identifikátor použitý pro odkazování na tuto stránku pomocí tagu page_url"
 
 #: models/pagemodel.py:64
 msgid "attached menu"
@@ -671,7 +665,7 @@ msgstr "viditelnost nabídky"
 
 #: models/pagemodel.py:75
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "omezuje zobrazení této stránky v menu"
 
 #: models/pagemodel.py:76
 msgid "application"
@@ -679,7 +673,7 @@ msgstr "aplikace"
 
 #: models/pagemodel.py:77
 msgid "application namespace"
-msgstr ""
+msgstr "jmenný prostor aplikace"
 
 #: models/pagemodel.py:103 models/permissionmodels.py:94
 #: models/titlemodels.py:25 plugins/inherit/forms.py:9 plugins/link/forms.py:9
@@ -828,7 +822,7 @@ msgstr "jazyk"
 
 #: models/pluginmodel.py:86
 msgid "plugin_name"
-msgstr "nazev_typu_obsahu"
+msgstr "Název typu obsahu"
 
 #: models/pluginmodel.py:87 models/titlemodels.py:26
 msgid "creation date"
@@ -836,30 +830,29 @@ msgstr "datum vytvoření"
 
 #: models/pluginmodel.py:147
 msgid "<Empty>"
-msgstr "<Empty>"
+msgstr "<Prázdný>"
 
 #: models/settingmodels.py:13
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "Jazyk administračního rozhraní a panelu nástrojů"
 
 #: models/settingmodels.py:17
 msgid "user setting"
-msgstr ""
+msgstr "uživatelské nastavení"
 
 #: models/settingmodels.py:18
 msgid "user settings"
-msgstr ""
+msgstr "uživatelská nastavení"
 
 #: models/titlemodels.py:14 models/titlemodels.py:15 models/titlemodels.py:17
 #: plugins/file/models.py:29 plugins/teaser/models.py:12
-#: plugins/twitter/models.py:9 plugins/twitter/models.py:19
 #: templates/admin/cms/page/tree/base_header.html:7
 msgid "title"
 msgstr "popisek"
 
 #: models/titlemodels.py:16
 msgid "overwrite the title (html title tag)"
-msgstr ""
+msgstr "přepsat titulek (html tag title)"
 
 #: models/titlemodels.py:18
 msgid "overwrite the title in the menu"
@@ -871,11 +864,11 @@ msgstr "popis (description)"
 
 #: models/titlemodels.py:20
 msgid "The text displayed in search engines."
-msgstr ""
+msgstr "Text zobrazovaný ve vyhledávačích."
 
 #: models/titlemodels.py:21
 msgid "slug"
-msgstr "podoba URL"
+msgstr "URL identifikátor"
 
 #: models/titlemodels.py:22
 msgid "Path"
@@ -892,14 +885,14 @@ msgstr "přesměrování"
 #: plugins/utils.py:125
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Tento blok už obsahuje maximální povolený počet položek obsahu (%s)."
 
 #: plugins/utils.py:135
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "Tento blok už obsahuje maximální povolený počet (%(limit)s) položek typu %(plugin_name)s."
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
@@ -994,7 +987,7 @@ msgstr "zeměpisná délka"
 
 #: plugins/googlemap/models.py:33
 msgid "route planer title"
-msgstr ""
+msgstr "popisek plánovače cesty"
 
 #: plugins/googlemap/models.py:35
 msgid "Calculate your fastest way to here"
@@ -1030,13 +1023,13 @@ msgstr "Podědit typy obsahu ze stránky"
 
 #: plugins/inherit/forms.py:23
 msgid "Language or Page must be filled out"
-msgstr ""
+msgstr "Jazyk nebo Stránka musí být vyplněny"
 
 #: plugins/inherit/models.py:10
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
+msgstr "Vyberte stránku, jejíž položky obsahu budou zahrnuty v tomto bloku, pro aktuální stránku ponechte prázdné"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1110,12 +1103,12 @@ msgstr "obrázek"
 
 #: plugins/picture/models.py:24
 msgid "If present, clicking on image will take user to link."
-msgstr ""
+msgstr "Pokud je vyplněno, použije se jako odkaz po kliknutí na obrázek."
 
 #: plugins/picture/models.py:27
 msgid ""
 "If present, clicking on image will take user         to specified page."
-msgstr ""
+msgstr "Pokud je vybrána, zobrazí se stránka po kliknutí na obrázek"
 
 #: plugins/picture/models.py:29
 msgid "alternate text"
@@ -1135,7 +1128,7 @@ msgstr "dlouhý popis"
 #: plugins/picture/models.py:34
 msgid ""
 "When user hovers above picture,        this text will appear in a popup."
-msgstr ""
+msgstr "Tento text se objeví při najetí myší na obrázek."
 
 #: plugins/picture/models.py:36
 msgid "side"
@@ -1178,7 +1171,7 @@ msgstr "Upoutávka"
 
 #: plugins/teaser/models.py:17
 msgid "If present image will be clickable"
-msgstr ""
+msgstr "Pokud je vybrána stránka, obrázek na ni bude odkazovat"
 
 #: plugins/teaser/models.py:22
 msgid "If present image will be clickable."
@@ -1187,70 +1180,6 @@ msgstr "Pokud se vyskytne obrázek bude klikací."
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
 msgid "more"
 msgstr "více"
-
-#: plugins/twitter/cms_plugins.py:10
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:30
-msgid "Twitter"
-msgstr "Twitter"
-
-#: plugins/twitter/cms_plugins.py:23
-msgid "Twitter Search"
-msgstr "Vyhledávání na Twitteru"
-
-#: plugins/twitter/models.py:10
-msgid "twitter user"
-msgstr "Twitter: uživatelské jméno"
-
-#: plugins/twitter/models.py:11 plugins/twitter/models.py:21
-msgid "count"
-msgstr "počet"
-
-#: plugins/twitter/models.py:11 plugins/twitter/models.py:21
-msgid "Number of entries to display"
-msgstr "Počet položek ku zobrazení"
-
-#: plugins/twitter/models.py:12
-msgid "link hint"
-msgstr ""
-
-#: plugins/twitter/models.py:12
-msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-
-#: plugins/twitter/models.py:20
-msgid "query"
-msgstr "dotaz"
-
-#: plugins/twitter/models.py:20
-msgid ""
-"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
-"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
-"\"brains\" and \"zombies\""
-msgstr "Příklad: \"brains AND zombies from: umbrella AND to:nemesis\": tweety od uživatele \"umbrella\" uživateli \"nemesis\" které obsahují slova \"brains\" a \"zombies\" "
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
-msgid "we said,"
-msgstr "my říkáme,"
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:15
-msgid "we"
-msgstr "my"
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
-msgid "we were"
-msgstr "my jsme byli"
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
-msgid "we replied to"
-msgstr "odpovídáme"
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:18
-msgid "we were checking out"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
-msgid "loading tweets..."
-msgstr "načítání tweetů ..."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1339,69 +1268,69 @@ msgstr "barva zvýrazněného tlačítka"
 
 #: stacks/admin.py:34
 msgid "linked plugins"
-msgstr ""
+msgstr "pripojené položky obsahu"
 
 #: stacks/cms_plugins.py:12
 msgid "Stack"
-msgstr ""
+msgstr "Skupina položek"
 
-#: stacks/forms.py:12 templates/admin/cms/page/tree/menu_item.html:41
+#: stacks/forms.py:12 templates/admin/cms/page/tree/menu_item.html:42
 msgid "copy"
 msgstr "kopírovat"
 
 #: stacks/forms.py:15 stacks/models.py:34 stacks/models.py:48
 msgid "stack"
-msgstr ""
+msgstr "skupina položek"
 
 #: stacks/forms.py:16
 msgid "insertion type"
-msgstr ""
+msgstr "způsob připojení"
 
 #: stacks/forms.py:17
 msgid "language code"
-msgstr ""
+msgstr "kód jazyka"
 
 #: stacks/models.py:16
 msgid "by template"
-msgstr ""
+msgstr "podle šablony"
 
 #: stacks/models.py:17
 msgid "by code"
-msgstr ""
+msgstr "podlé kódu"
 
 #: stacks/models.py:20
 msgid "stack name"
-msgstr ""
+msgstr "název skupiny položek"
 
 #: stacks/models.py:21
 msgid "Descriptive name to identify this stack. Not displayed to users."
-msgstr ""
+msgstr "Podrobnější popis k identifikaci skupiny. Nezobrazuje se uživatelům."
 
 #: stacks/models.py:23
 msgid "stack code"
-msgstr ""
+msgstr "kód skupiny"
 
 #: stacks/models.py:24
 msgid "To render the stack in templates."
-msgstr ""
+msgstr "Slouží k vykreslování skupiny v šablonách."
 
 #: stacks/models.py:26
 msgid "stack content"
-msgstr ""
+msgstr "obsah skupiny položek"
 
 #: stacks/models.py:35
 msgid "stacks"
-msgstr ""
+msgstr "skupiny položek"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr "<a href=\"%(login_url)s\">Přihlášení do zázemí</a>"
+msgstr "<a href=\"%(login_url)s\">Přihlášení do administrace</a>"
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr "Login url: %(login_url)s"
+msgstr "Přihlašovací URL: %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1430,9 +1359,9 @@ msgstr "Domů"
 #: templates/admin/cms/page/change_form.html:53
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Opravte prosím následující chybu."
+msgstr[1] "Opravte prosím následující chyby."
+msgstr[2] "Opravte prosím následující chyby."
 
 #: templates/admin/cms/page/change_form.html:71
 msgid "All permissions"
@@ -1446,7 +1375,7 @@ msgstr "Načítání..."
 
 #: templates/admin/cms/page/change_form.html:80
 msgid "Page states"
-msgstr ""
+msgstr "Stavy stránky"
 
 #: templates/admin/cms/page/change_form.html:91
 #: templates/admin/cms/page/submit_row.html:5
@@ -1484,7 +1413,7 @@ msgstr "Vzkaz"
 
 #: templates/admin/cms/page/moderation_states.html:25
 msgid "Page doesn't have any states."
-msgstr ""
+msgstr "Stránka nemá žádné stavy."
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
@@ -1537,7 +1466,7 @@ msgstr "Stránka nemá žádná další kritéria"
 
 #: templates/admin/cms/page/submit_row.html:9
 msgid "Basic Infos"
-msgstr ""
+msgstr "Základní info"
 
 #: templates/admin/cms/page/submit_row.html:13
 msgid "Save as new"
@@ -1559,11 +1488,11 @@ msgstr "Použijte tlačítko 'uložit' pro obnovu této verze objektu."
 #: templates/admin/cms/page/history/revision_header.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "Vrátit %(verbose_name)s"
 
 #: templates/admin/cms/page/history/revision_header.html:20
 msgid "Press the save button below to revert to this version of the object."
-msgstr ""
+msgstr "Pro vrácení k předchozí verzi objektu klikněte na tlačítko uložit."
 
 #: templates/admin/cms/page/tree/base.html:4
 msgid "List of pages"
@@ -1591,19 +1520,19 @@ msgstr "Přidat %(name)s"
 msgid "Pages on:"
 msgstr "Stránky na:"
 
-#: templates/admin/cms/page/tree/base.html:111
+#: templates/admin/cms/page/tree/base.html:116
 msgid "Filter:"
 msgstr "Filtr:"
 
-#: templates/admin/cms/page/tree/base.html:111
+#: templates/admin/cms/page/tree/base.html:116
 msgid "on"
 msgstr "zap."
 
-#: templates/admin/cms/page/tree/base.html:111
+#: templates/admin/cms/page/tree/base.html:116
 msgid "off"
 msgstr "vyp."
 
-#: templates/admin/cms/page/tree/base.html:113
+#: templates/admin/cms/page/tree/base.html:118
 msgid "Filter"
 msgstr "Filtr"
 
@@ -1641,7 +1570,7 @@ msgstr "Zvolte volby pro zkopírování"
 
 #: templates/admin/cms/page/tree/copy_premissions.html:20
 msgid "Close"
-msgstr ""
+msgstr "Zavřít"
 
 #: templates/admin/cms/page/tree/menu_item.html:6
 msgid "select this page"
@@ -1670,65 +1599,70 @@ msgstr "vložit do"
 
 #: templates/admin/cms/page/tree/menu_item.html:24
 msgid "softroot"
-msgstr ""
+msgstr "soft root"
 
 #: templates/admin/cms/page/tree/menu_item.html:24
 msgid "home"
 msgstr "domů"
 
-#: templates/admin/cms/page/tree/menu_item.html:29
+#: templates/admin/cms/page/tree/menu_item.html:25
+#, python-format
+msgid "Application: %(apphook)s"
+msgstr "Aplikace: %(apphook)s"
+
+#: templates/admin/cms/page/tree/menu_item.html:30
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr "Upravit stránku v jazyce:  %(language)s"
+msgstr "Upravit stránku v jazyce %(language)s"
 
-#: templates/admin/cms/page/tree/menu_item.html:39
+#: templates/admin/cms/page/tree/menu_item.html:40
 msgid "Cut"
 msgstr "Vyjmout"
 
-#: templates/admin/cms/page/tree/menu_item.html:39
+#: templates/admin/cms/page/tree/menu_item.html:40
 msgid "cut"
 msgstr "vyjmout"
 
-#: templates/admin/cms/page/tree/menu_item.html:41
+#: templates/admin/cms/page/tree/menu_item.html:42
 #: templates/cms/toolbar/draggable_item.html:12
 msgid "Copy"
 msgstr "Kopírovat"
 
-#: templates/admin/cms/page/tree/menu_item.html:44
-#: templates/admin/cms/page/tree/menu_item.html:48
+#: templates/admin/cms/page/tree/menu_item.html:45
+#: templates/admin/cms/page/tree/menu_item.html:49
 msgid "Add Child"
 msgstr "Přidat potomka"
 
-#: templates/admin/cms/page/tree/menu_item.html:44
-#: templates/admin/cms/page/tree/menu_item.html:48
+#: templates/admin/cms/page/tree/menu_item.html:45
+#: templates/admin/cms/page/tree/menu_item.html:49
 msgid "add"
 msgstr "přidání"
 
-#: templates/admin/cms/page/tree/menu_item.html:51
+#: templates/admin/cms/page/tree/menu_item.html:52
 msgid "delete"
 msgstr "smazat"
 
-#: templates/admin/cms/page/tree/menu_item.html:64
+#: templates/admin/cms/page/tree/menu_item.html:65
 msgid "Unpublish"
 msgstr "Depublikovat"
 
-#: templates/admin/cms/page/tree/menu_item.html:65
-#: templates/admin/cms/page/tree/menu_item.html:79
+#: templates/admin/cms/page/tree/menu_item.html:66
+#: templates/admin/cms/page/tree/menu_item.html:80
 msgid "Publish"
 msgstr "Publikovat"
 
-#: templates/admin/cms/page/tree/menu_item.html:70
+#: templates/admin/cms/page/tree/menu_item.html:71
 msgid "View on page"
 msgstr "Zobrazit"
 
-#: templates/admin/cms/page/tree/menu_item.html:70
+#: templates/admin/cms/page/tree/menu_item.html:71
 msgid "view"
 msgstr "zobrazit"
 
 #: templates/admin/stacks/insert_stack.html:4
 #: templates/admin/stacks/insert_stack.html:24
 msgid "Insert Stack"
-msgstr ""
+msgstr "Vložit skupinu položek"
 
 #: templates/cms/toolbar/delete_confirmation.html:13
 #, python-format
@@ -1736,44 +1670,44 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr ""
+msgstr "Smazání objektu %(object_name)s '%(escaped_object)s' vyžaduje smazání přidružených objektů. Ke smazání následujících typů objektů nemáte oprávnění:"
 
 #: templates/cms/toolbar/delete_confirmation.html:21
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
 " following protected related objects:"
-msgstr ""
+msgstr "Smazání objektu %(object_name)s '%(escaped_object)s' vyžaduje smazání následujících přidružených chráněných objektů:"
 
 #: templates/cms/toolbar/delete_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr ""
+msgstr "Opravdu chcete smazat objekt %(object_name)s \"%(escaped_object)s\"? Všechny následující přidružené objekty budou smazány:"
 
 #: templates/cms/toolbar/delete_confirmation.html:34
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "Ano, vím, co dělám"
 
 #: templates/cms/toolbar/draggable_item.html:9
 #: templates/cms/toolbar/placeholder_bar.html:8
 msgid "Quicksearch"
-msgstr ""
+msgstr "Rychlé hledání"
 
 #: templates/cms/toolbar/draggable_item.html:11
 #: templates/cms/toolbar/placeholder_bar.html:10
 msgid "Settings"
-msgstr ""
+msgstr "Nastavení"
 
 #: templates/cms/toolbar/draggable_item.html:13
 msgid "Edit"
-msgstr ""
+msgstr "Upravit"
 
 #: templates/cms/toolbar/draggable_item.html:15
 #: templates/cms/toolbar/placeholder_bar.html:13
 msgid "Create stack"
-msgstr ""
+msgstr "Vytvořit skupinu položek"
 
 #: templates/cms/toolbar/draggable_menu.html:3
 msgid "Add Plugin"
@@ -1781,23 +1715,23 @@ msgstr "Přidat typ obsahu"
 
 #: templates/cms/toolbar/placeholder.html:6
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "Přesuňte pložku obsahu sem"
 
 #: templates/cms/toolbar/placeholder_bar.html:11
 msgid "Copy all"
-msgstr ""
+msgstr "Kopírovat vše"
 
 #: templates/cms/toolbar/placeholder_bar.html:12
 msgid "Empty all"
-msgstr ""
+msgstr "Odebrat vše"
 
 #: templates/cms/toolbar/placeholder_bar.html:14
 msgid "Insert stack"
-msgstr ""
+msgstr "Vložit skupinu položek"
 
 #: templates/cms/toolbar/placeholder_bar.html:16
 msgid "Available plugins"
-msgstr "Dostupné zásuvné moduly"
+msgstr "Dostupné typy obsahu"
 
 #: templates/cms/toolbar/toolbar.html:38
 msgid "The selected element can not be moved to the desired location."
@@ -1813,29 +1747,29 @@ msgstr "Storno"
 
 #: templates/cms/toolbar/toolbar.html:52
 msgid "This page has unpublished changes."
-msgstr ""
+msgstr "Tato stránka obsahuje neuveřejněné změny."
 
 #: templates/cms/toolbar/toolbar.html:89
 #: templates/cms/toolbar/items/live_draft.html:4
 msgid "Live"
-msgstr ""
+msgstr "Veřejné"
 
 #: templates/cms/toolbar/toolbar.html:90
 #: templates/cms/toolbar/items/live_draft.html:5
 msgid "Draft"
-msgstr ""
+msgstr "Rozpracované"
 
 #: templates/cms/toolbar/toolbar.html:97
 msgid "Toggle toolbar"
-msgstr ""
+msgstr "Přepnout zobrazení panelu nástrojů"
 
 #: templates/cms/toolbar/toolbar.html:138
 msgid "Empty Clipboard"
-msgstr ""
+msgstr "Vyprázdnit schránku"
 
 #: templates/cms/toolbar/toolbar.html:166
 msgid "Start"
-msgstr ""
+msgstr "Začátek"
 
 #: templates/cms/toolbar/items/login.html:4 toolbar/toolbar.py:19
 msgid "Username"
@@ -1844,7 +1778,7 @@ msgstr "Uživatelské jmeno"
 #: templates/cms/toolbar/items/login.html:15
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr ""
+msgstr "<strong>Přihlášení se nezdařilo.</strong> Zkontrolujte prosím jméno a heslo a zkuste to znovu."
 
 #: templates/cms/toolbar/items/logo.html:2
 msgid "django CMS"
@@ -1853,7 +1787,7 @@ msgstr "django CMS"
 #: templatetags/cms_admin.py:135 templatetags/cms_admin.py:142
 #, python-format
 msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
-msgstr "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
+msgstr "<span title=\"Omezení: %(title)s\">%(icon)s</span>"
 
 #: templatetags/cms_tags.py:108
 #, python-format
@@ -1867,48 +1801,48 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr "Template tag nemůže najít stránku s argumenty vyhledávání `%(page_lookup)s`. URL požadavku bylo: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:114 test_utils/cli.py:124
+#: test_utils/cli.py:113 test_utils/cli.py:123
 msgid "English"
 msgstr "Anglicky"
 
-#: test_utils/cli.py:115 test_utils/cli.py:136 test_utils/cli.py:154
+#: test_utils/cli.py:114 test_utils/cli.py:135 test_utils/cli.py:153
 msgid "French"
 msgstr "Francouzsky"
 
-#: test_utils/cli.py:116 test_utils/cli.py:130 test_utils/cli.py:148
-#: test_utils/cli.py:167
+#: test_utils/cli.py:115 test_utils/cli.py:129 test_utils/cli.py:147
+#: test_utils/cli.py:166
 msgid "German"
 msgstr "Německy"
 
-#: test_utils/cli.py:117 test_utils/cli.py:141
+#: test_utils/cli.py:116 test_utils/cli.py:140
 msgid "Brazilian Portuguese"
 msgstr "Brazilská Portugalština"
 
-#: test_utils/cli.py:118 test_utils/cli.py:161
+#: test_utils/cli.py:117 test_utils/cli.py:160
 msgid "Dutch"
 msgstr "Holandsky"
 
-#: test_utils/cli.py:177
+#: test_utils/cli.py:176
 msgid "two columns"
 msgstr "dva sloupce"
 
-#: test_utils/cli.py:178
+#: test_utils/cli.py:177
 msgid "three columns"
 msgstr "tři sloupce"
 
-#: test_utils/cli.py:179
+#: test_utils/cli.py:178
 msgid "navigation examples"
 msgstr "příklady navigace"
 
-#: test_utils/cli.py:187
+#: test_utils/cli.py:186
 msgid "sidebar column"
 msgstr "barva pozadí"
 
-#: test_utils/cli.py:193
+#: test_utils/cli.py:192
 msgid "left column"
 msgstr "barva pozadí"
 
-#: test_utils/cli.py:199
+#: test_utils/cli.py:198
 msgid "right column"
 msgstr "barva pozadí"
 
@@ -1934,20 +1868,20 @@ msgstr "Ukázková aplikace 2"
 
 #: test_utils/project/sampleapp/cms_app.py:22
 msgid "Namespaced App"
-msgstr ""
+msgstr "Namespaced App"
 
 #: test_utils/project/sampleapp/cms_toolbar.py:17
 #: test_utils/project/sampleapp/views.py:21
 msgid "Category"
-msgstr ""
+msgstr "Kategorie"
 
 #: test_utils/project/sampleapp/cms_toolbar.py:18
 msgid "Categories"
-msgstr ""
+msgstr "Kategorie"
 
 #: test_utils/project/sampleapp/cms_toolbar.py:19
 msgid "Add Category"
-msgstr ""
+msgstr "Přidat kategorii"
 
 #: test_utils/project/sampleapp/menu.py:16
 msgid "sample root page"
@@ -1979,7 +1913,7 @@ msgstr "^account/$"
 
 #: test_utils/project/sampleapp/views.py:23
 msgid "Change Category"
-msgstr ""
+msgstr "Upravit kategorii"
 
 #: utils/conf.py:78
 msgid "Inherit the template of the nearest ancestor"
@@ -1987,7 +1921,7 @@ msgstr "Podědit šablonu nejbližšího předka"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
-msgstr "CMS - Vaše uživatelské konto bylo vytvořeno."
+msgstr "CMS - Váš uživatelský účet byl vytvořen."
 
 #: utils/mail.py:39
 msgid "CMS - your user account was changed."
