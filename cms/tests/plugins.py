@@ -201,7 +201,8 @@ class PluginsTestCase(PluginsTestBaseCase):
                     "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
                     "title": "Text"
                 }
-            ]
+            ],
+            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
         }
         output = json.loads(response.content.decode('utf8'))
         self.assertEquals(output, expected)
@@ -1087,7 +1088,8 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
                     "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
                     "title": "Articles"
                 }
-            ]
+            ],
+            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
         }
         self.assertEquals(json.loads(response.content.decode('utf8')), expected)
         # now edit the plugin
@@ -1130,7 +1132,8 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
                     "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
                     "title": "Articles"
                 }
-            ]
+            ],
+            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
         }
         self.assertEquals(json.loads(response.content.decode('utf8')), expected)
 
