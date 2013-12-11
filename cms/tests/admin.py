@@ -7,6 +7,7 @@ from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
 from cms.constants import PLUGIN_MOVE_ACTION
+from cms.models import UserSettings
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -836,6 +837,57 @@ class PluginPermissionTests(AdminTestsBase):
         self._give_permission(normal_guy, Text, 'add')
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugins_copy_placeholder_ref(self):
+        """User copies a placeholder into a clipboard. A PlaceholderReferencePlugin is created. Afterwards he copies this
+         into a placeholder and the PlaceholderReferencePlugin unpacks its content. After that he clear the clipboard"""
+        self.assertEqual(Placeholder.objects.count(), 2)
+        plugin = self._create_plugin()
+        plugin2 = self._create_plugin()
+        admin = self.get_superuser()
+        clipboard = Placeholder()
+        clipboard.save()
+        self.assertEqual(CMSPlugin.objects.count(), 2)
+        settings = UserSettings(language="fr", clipboard=clipboard, user=admin)
+        settings.save()
+        self.assertEqual(Placeholder.objects.count(), 3)
+        self.client.login(username='admin', password='admin')
+        url = reverse('admin:cms_page_copy_plugins')
+        data = dict(source_plugin_id='',
+                    source_placeholder_id=self._placeholder.pk,
+                    source_language='en',
+                    target_language='en',
+                    target_placeholder_id=clipboard.pk,
+        )
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        clipboard_plugins = clipboard.get_plugins()
+        self.assertEqual(CMSPlugin.objects.count(), 5)
+        self.assertEqual(clipboard_plugins.count(), 1)
+        self.assertEqual(clipboard_plugins[0].plugin_type, "PlaceholderPlugin")
+        placeholder_plugin, _ = clipboard_plugins[0].get_plugin_instance()
+        ref_placeholder = placeholder_plugin.placeholder_ref
+        copied_plugins = ref_placeholder.get_plugins()
+        self.assertEqual(copied_plugins.count(), 2)
+        data = dict(source_plugin_id=placeholder_plugin.pk,
+                    source_placeholder_id=clipboard.pk,
+                    source_language='en',
+                    target_language='fr',
+                    target_placeholder_id=self._placeholder.pk,
+        )
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        plugins = self._placeholder.get_plugins()
+        self.assertEqual(plugins.count(), 4)
+        self.assertEqual(CMSPlugin.objects.count(), 7)
+        self.assertEqual(Placeholder.objects.count(), 4)
+        url = reverse('admin:cms_page_clear_placeholder', args=[clipboard.pk])
+        response = self.client.post(url, {'test':0})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CMSPlugin.objects.count(), 4)
+        self.assertEqual(Placeholder.objects.count(), 3)
+
+
 
     def test_plugins_copy_language(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""

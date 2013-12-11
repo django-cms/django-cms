@@ -6,7 +6,7 @@ from django.db.models import signals
 from django.dispatch import Signal
 
 from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
-from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, PageUser, PageUserGroup
+from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, PageUser, PageUserGroup, PlaceholderReference, Placeholder
 from django.conf import settings
 from menus.menu_pool import menu_pool
 
@@ -24,7 +24,7 @@ post_unpublish = Signal(providing_args=["instance"])
 
 def update_plugin_positions(**kwargs):
     plugin = kwargs['instance']
-    plugins = CMSPlugin.objects.filter(language=plugin.language, placeholder=plugin.placeholder).order_by("position")
+    plugins = CMSPlugin.objects.filter(language=plugin.language, placeholder=plugin.placeholder_id).order_by("position")
     last = 0
     for p in plugins:
         if p.position != last:
@@ -246,6 +246,18 @@ signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
+
+
+def clear_placeholder_ref(instance, **kwargs):
+    instance.placeholder_ref_id_later = instance.placeholder_ref_id
+
+signals.pre_delete.connect(clear_placeholder_ref, sender=PlaceholderReference)
+
+
+def clear_placeholder_ref_placeholder(instance, **kwargs):
+    Placeholder.objects.filter(pk=instance.placeholder_ref_id_later).delete()
+
+signals.post_delete.connect(clear_placeholder_ref_placeholder, sender=PlaceholderReference)
 
 
 def pre_save_user(instance, raw, **kwargs):

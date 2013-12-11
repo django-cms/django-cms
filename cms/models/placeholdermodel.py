@@ -45,7 +45,7 @@ class Placeholder(models.Model):
         return self._get_url('clear_placeholder', self.pk)
 
     def get_copy_url(self):
-        return ''
+        return self._get_url('copy_plugins')
 
     def _get_url(self, key, pk=None):
         model = self._get_attached_model()

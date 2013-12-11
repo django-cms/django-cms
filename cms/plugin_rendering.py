@@ -6,13 +6,10 @@ from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.i18n import get_fallback_languages, get_default_language
+from cms.utils.i18n import get_fallback_languages
 from django.template import Template, Context
-from django.template.defaultfilters import title
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
-from cms.utils.placeholder import get_toolbar_plugin_struct
 
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (

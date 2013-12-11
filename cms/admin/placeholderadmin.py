@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
+from cms.models.placeholderpluginmodel import PlaceholderReference
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
 from django.db import transaction
@@ -11,12 +11,11 @@ from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import cms_static_url, get_cms_setting
+from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.plugins.utils import has_reached_plugin_limit, requires_reload
 from django.contrib.admin import ModelAdmin
-from django.http import (HttpResponse, Http404, HttpResponseBadRequest,
-                         HttpResponseForbidden)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
@@ -73,7 +72,7 @@ class FrontendEditableAdmin(object):
             return HttpResponseBadRequest(_("Fields %s not editabled in the frontend") % raw_fields)
         if not request.user.has_perm("%s_change" % self.model._meta.module_name):
             return HttpResponseForbidden(_("You do not have permission to edit this item"))
-        # Dinamically creates the form class with only `field_name` field
+            # Dinamically creates the form class with only `field_name` field
         # enabled
         form_class = self.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
@@ -113,7 +112,8 @@ class FrontendEditableAdmin(object):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         response = super(FrontendEditableAdmin, self).change_view(request, object_id, form_url, extra_context)
-        if response.status_code == 302 and response._headers['location'][1] == reverse('admin:%s_%s_changelist' % (self.model._meta.app_label, self.model._meta.module_name)):
+        if response.status_code == 302 and response._headers['location'][1] == reverse(
+                        'admin:%s_%s_changelist' % (self.model._meta.app_label, self.model._meta.module_name)):
             context = {
                 'plugin': None,
                 'plugin_id': None,
@@ -301,23 +301,45 @@ class PlaceholderAdmin(ModelAdmin):
         if source_plugin_id:
             source_plugin = get_object_or_404(CMSPlugin, pk=source_plugin_id)
             reload_required = requires_reload(PLUGIN_COPY_ACTION, [source_plugin])
-            plugins = list(
-                source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
-                                                        rght__lte=source_plugin.rght).order_by('tree_id', 'level', 'position'))
+            if source_plugin.plugin_type == "PlaceholderPlugin":
+                # if it is a PlaceholderReference plugin only copy the plugins it references
+                inst, cls = source_plugin.get_plugin_instance(self)
+                plugins = inst.placeholder_ref.get_plugins_list()
+            else:
+                plugins = list(
+                    source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
+                                                            rght__lte=source_plugin.rght).order_by('tree_id', 'level',
+                                                                                                   'position'))
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level',
+                                                                                           'position'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
-        copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
+        if target_placeholder.pk == request.toolbar.clipboard.pk and not source_plugin_id and not target_plugin_id:
+            # if we copy a whole placeholder to the clipboard create PlaceholderReference plugin instead and fill it
+            # the content of the source_placeholder.
+            ref = PlaceholderReference()
+            ref.name = source_placeholder.get_label()
+            ref.plugin_type = "PlaceholderPlugin"
+            ref.language = target_language
+            ref.placeholder = target_placeholder
+            ref.save()
+            ref.copy_from(source_placeholder)
+        else:
+            copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
             'tree_id', 'level', 'position')
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(
-                {'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id, 'position': plugin.position,
-                    'desc': force_unicode(plugin.get_short_description())})
+                {
+                    'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id,
+                    'position': plugin.position, 'desc': force_unicode(plugin.get_short_description()),
+                    'language': plugin.language, 'placeholder_id': plugin.placeholder_id
+                }
+            )
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
         return HttpResponse(json.dumps(json_response), content_type='application/json')
@@ -522,45 +544,3 @@ class PlaceholderAdmin(ModelAdmin):
         }
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
-
-
-class LanguageTabsAdmin(ModelAdmin):
-    render_placeholder_language_tabs = True
-#    change_form_template = 'admin/placeholders/placeholder/change_form.html'
-
-    def get_language_from_request(self, request):
-        language = request.REQUEST.get('language', None)
-        if not language:
-            language = get_language()
-        return language
-
-    def placeholder_plugin_filter(self, request, queryset):
-        if self.render_placeholder_language_tabs:
-            language = self.get_language_from_request(request)
-            if language:
-                queryset = queryset.filter(language=language)
-        return queryset
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        extra_context.update(self.language_tab_context(request))
-        tab_language = request.GET.get("language", None)
-        response = super(PlaceholderAdmin, self).change_view(
-            request, object_id, form_url=form_url, extra_context=extra_context)
-
-        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
-            location = response._headers['location']
-            response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
-        return response
-
-    def language_tab_context(self, request):
-        language = self.get_language_from_request(request)
-        languages = [(lang, lang_name) for lang, lang_name in settings.LANGUAGES]
-        context = {
-            'language': language,
-            'language_tabs': languages,
-            'show_language_tabs': len(languages) > 1 and self.render_placeholder_language_tabs,
-        }
-        return context
-
-

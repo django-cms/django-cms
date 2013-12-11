@@ -4,7 +4,7 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_rendering import render_placeholder
 
-from cms.stacks.models import StackLink, Stack
+from cms.stacks.models import StackLink
 
 
 class StackPlugin(CMSPluginBase):
@@ -21,6 +21,5 @@ class StackPlugin(CMSPluginBase):
             'content': html_content,
         })
         return context
-
 
 plugin_pool.register_plugin(StackPlugin)
