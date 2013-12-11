@@ -1368,6 +1368,11 @@ class NoDatabasePluginTests(TestCase):
                                        {'__module__': 'cms.tests.plugins'})
         self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin2')
 
+    def test_pickle(self):
+        text = Text()
+        a = text.__reduce__()
+        print a
+
 
 class PicturePluginTests(PluginsTestBaseCase):
     def test_link_or_page(self):

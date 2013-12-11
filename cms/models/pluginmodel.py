@@ -314,25 +314,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         """
         pass
 
-    def delete_with_public(self):
-        """
-            Delete the public copy of this plugin if it exists,
-            then delete the draft
-        """
-        position = self.position
-        slot = self.placeholder.slot
-        page = self.placeholder.page
-        if page and getattr(page, 'publisher_public'):
-            try:
-                placeholder = Placeholder.objects.get(page=page.publisher_public, slot=slot)
-            except Placeholder.DoesNotExist:
-                pass
-            else:
-                public_plugin = CMSPlugin.objects.filter(placeholder=placeholder, position=position)
-                public_plugin.delete()
-        self.placeholder = None
-        self.delete()
-
     def has_change_permission(self, request):
         page = self.placeholder.page if self.placeholder else None
         if page:
