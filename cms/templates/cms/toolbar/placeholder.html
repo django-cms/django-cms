@@ -16,9 +16,7 @@ $(document).ready(function () {
 		'plugin_restriction': [{% for module in allowed_plugins %}"{{ module}}"{% if not forloop.last %}, {% endif %}{% endfor %}],
 		'urls': {
 			'add_plugin': '{{ placeholder.get_add_url }}',
-            'clear_plugins': '{{ placeholder.get_clear_url }}',
-			'copy_plugin': '{{ placeholder.get_copy_url }}',
-			'stack_plugin': '{% url "admin:stacks_stack_insert_stack" placeholder_id=placeholder.pk %}?language_code={{ language }}'
+			'copy_plugin': '{{ placeholder.get_copy_url }}'
 		}
 	});
 });

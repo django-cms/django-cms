@@ -18,7 +18,8 @@ $(document).ready(function () {
 			},
 			'minHeight': 400,
 			'minWidth': 600,
-			'onClose': false
+			'onClose': false,
+			'newPlugin': false
 		},
 
 		initialize: function (options) {
@@ -132,7 +133,21 @@ $(document).ready(function () {
 		},
 
 		close: function () {
-			this._hide(100);
+			var that = this;
+			// handle remove option when plugin is new
+			if(this.options.newPlugin) {
+				var data = this.options.newPlugin;
+				var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+				var text = this.config.lang.confirm;
+
+				// trigger an ajax request
+				CMS.API.Toolbar.openAjax(data.delete, post, text, function () {
+					that._hide(100);
+				});
+			} else {
+				this._hide(100);
+			}
+			// handle refresh option
 			if(this.options.onClose === 'REFRESH_PAGE') this.reloadBrowser();
 		},
 

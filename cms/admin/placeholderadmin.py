@@ -270,6 +270,9 @@ class PlaceholderAdmin(ModelAdmin):
             'url': force_unicode(
                 reverse("admin:%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
                         args=[plugin.pk])),
+            'delete': force_unicode(
+                reverse("admin:%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                        args=[plugin.pk])),
             'breadcrumb': plugin.get_breadcrumb(),
         }
         return HttpResponse(json.dumps(response), content_type='application/json')

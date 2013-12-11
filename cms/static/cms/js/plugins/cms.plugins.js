@@ -12,7 +12,6 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
-			// TODO define whats required and whats optional
 			'type': '', // bar, plugin or generic
 			'placeholder_id': null,
 			'plugin_type': '',
@@ -26,8 +25,7 @@ $(document).ready(function () {
 				'add_plugin': '',
 				'edit_plugin': '',
 				'move_plugin': '',
-				'copy_plugin': '',
-				'cut_plugin': ''
+				'copy_plugin': ''
 			}
 		},
 
@@ -98,10 +96,23 @@ $(document).ready(function () {
 				(e.type === 'mouseover') ? that.showTooltip(name, id) : that.hideTooltip();
 			});
 
-			// adds listener for update event
-			this.container.bind('cms.placeholder.update', function (e) {
+			// adds listener for all plugin updates
+			this.container.bind('cms.plugins.update', function (e) {
 				e.stopPropagation();
 				that.movePlugin();
+			});
+			// adds listener for copy/paste updates
+			this.container.bind('cms.plugin.update', function (e) {
+				e.stopPropagation();
+
+				var el = $(e.delegateTarget);
+				var dragitem = $('.cms_draggable-' + el.data('settings').plugin_id);
+				var placeholder_id = that._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_dragbar').first());
+				var data = el.data('settings');
+					data.target = placeholder_id;
+					data.parent= that._getId(dragitem.parent().closest('.cms_draggable'));
+
+				that.copyPlugin(data);
 			});
 
 			// adds longclick events
@@ -217,10 +228,11 @@ $(document).ready(function () {
 				'url': this.options.urls.add_plugin,
 				'data': data,
 				'success': function (data) {
+					that.newPlugin = data;
 					that.editPlugin(data.url, name, data.breadcrumb);
 				},
 				'error': function (jqXHR) {
-					var msg = 'The following error occured while adding a new plugin: ';
+					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
 				}
@@ -229,15 +241,90 @@ $(document).ready(function () {
 
 		editPlugin: function (url, name, breadcrumb) {
 			// trigger modal window
-			var modal = new CMS.Modal();
+			var modal = new CMS.Modal({ 'newPlugin': this.newPlugin || false });
 				modal.open(url, name, breadcrumb);
 		},
 
-		movePlugin: function () {
+		copyPlugin: function (options) {
 			var that = this;
+			var move = (options) ? true : false;
+			// set correct options
+			options = options || this.options;
 
-			var plugin = $('.cms_plugin-' + this.options.plugin_id);
-			var dragitem = $('.cms_draggable-' + this.options.plugin_id);
+			var data = {
+				'source_placeholder_id': options.placeholder_id,
+				'source_plugin_id': options.plugin_id || '',
+				'source_language': options.plugin_language,
+				'target_plugin_id': options.parent || '',
+				'target_placeholder_id': options.target || CMS.config.clipboard.id,
+				'target_language': options.plugin_language,
+				'csrfmiddlewaretoken': this.csrf
+			};
+			var request = {
+				'type': 'POST',
+				'url': options.urls.copy_plugin,
+				'data': data,
+				'success': function () {
+					CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+					// reload
+					CMS.API.Helpers.reloadBrowser();
+				},
+				'error': function (jqXHR) {
+					var msg = CMS.config.lang.error;
+					// trigger error
+					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+				}
+			};
+
+			if(move) {
+				$.ajax(request);
+			} else {
+				// ensure clipboard is cleaned
+				CMS.API.Clipboard.clear(function () {
+					$.ajax(request);
+				});
+			}
+		},
+
+		cutPlugin: function () {
+			var that = this;
+			var data = {
+				'placeholder_id': CMS.config.clipboard.id,
+				'plugin_id': this.options.plugin_id,
+				'plugin_parent': '',
+				'plugin_language': this.options.page_language,
+				'plugin_order': [this.options.plugin_id],
+				'csrfmiddlewaretoken': this.csrf
+			};
+
+			// ensure clipboard is cleaned
+			CMS.API.Clipboard.clear(function () {
+				// move plugin
+				$.ajax({
+					'type': 'POST',
+					'url': that.options.urls.move_plugin,
+					'data': data,
+					'success': function (response) {
+						CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+						// if response is reload
+						if(response.reload) CMS.API.Helpers.reloadBrowser();
+					},
+					'error': function (jqXHR) {
+						var msg = CMS.config.lang.error;
+						// trigger error
+						that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+					}
+				});
+			});
+		},
+
+		movePlugin: function (options) {
+			var that = this;
+			// set correct options
+			options = options || this.options;
+
+			var plugin = $('.cms_plugin-' + options.plugin_id);
+			var dragitem = $('.cms_draggable-' + options.plugin_id);
 
 			// SETTING POSITION
 			// after we insert the plugin onto its new place, we need to figure out whats above it
@@ -262,17 +349,17 @@ $(document).ready(function () {
 			// gather the data for ajax request
 			var data = {
 				'placeholder_id': placeholder_id,
-				'plugin_id': this.options.plugin_id,
+				'plugin_id': options.plugin_id,
 				'plugin_parent': plugin_parent || '',
 				 // this is a hack: when moving to different languages use the global language
-				'plugin_language': this.options.page_language,
+				'plugin_language': options.page_language,
 				'plugin_order': plugin_order,
 				'csrfmiddlewaretoken': this.csrf
 			};
 
 			$.ajax({
 				'type': 'POST',
-				'url': this.options.urls.move_plugin,
+				'url': options.urls.move_plugin,
 				'data': data,
 				'success': function (response) {
 					// if response is reload
@@ -282,7 +369,7 @@ $(document).ready(function () {
 					that._showSuccess(dragitem);
 				},
 				'error': function (jqXHR) {
-					var msg = 'An error occured during the update.';
+					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
 				}
@@ -290,36 +377,6 @@ $(document).ready(function () {
 
 			// show publish button
 			$('.cms_btn-publish').addClass('cms_btn-publish-active').parent().show();
-		},
-
-		copyPlugin: function (cut) {
-			var that = this;
-			var data = {
-				'source_placeholder_id': this.options.placeholder_id,
-				'source_plugin_id': this.options.plugin_id || '',
-				'source_language': this.options.plugin_language,
-				'target_placeholder_id': CMS.config.clipboard.id,
-				'target_language': this.options.plugin_language,
-				'csrfmiddlewaretoken': this.csrf
-			};
-
-			// determine if we are using copy or cut
-			var url = (cut) ? this.options.urls.cut_plugin : this.options.urls.copy_plugin;
-
-			$.ajax({
-				'type': 'POST',
-				'url': url,
-				'data': data,
-				'success': function () {
-					// refresh browser after success
-					CMS.API.Helpers.reloadBrowser();
-				},
-				'error': function (jqXHR) {
-					var msg = 'The following error occured while copying the plugin: ';
-					// trigger error
-					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
-				}
-			});
 		},
 
 		// private methods
@@ -353,15 +410,18 @@ $(document).ready(function () {
 					case 'copy':
 						that.copyPlugin();
 						break;
+					case 'cut':
+						that.cutPlugin();
+						break;
 					default:
 						CMS.API.Toolbar._loader(false);
 						CMS.API.Toolbar._delegate(el);
 				}
 			});
 
-			nav.find('input').bind('keyup focus blur click', function (e) {
+			nav.find('input').bind('keyup keydown focus blur click', function (e) {
 				if(e.type === 'focus') that.focused = true;
-				if(e.type === 'blur') {
+				if(e.type === 'blur' && !that.traverse) {
 					that.focused = false;
 					that._hideSubnav(nav);
 				}
@@ -417,6 +477,7 @@ $(document).ready(function () {
 
 				// bind arrow down and tab keys
 				if(e.keyCode === 40 || e.keyCode === 9) {
+					that.traverse = true;
 					e.preventDefault();
 					if(index >= 0 && index < anchors.length - 1) {
 						anchors.eq(index + 1).focus();
@@ -437,6 +498,7 @@ $(document).ready(function () {
 
 				// hide subnav when hitting enter or escape
 				if(e.keyCode === 13 || e.keyCode === 27) {
+					that.traverse = false;
 					nav.find('input').blur();
 					that._hideSubnav(nav);
 				}
@@ -523,6 +585,7 @@ $(document).ready(function () {
 		},
 
 		_collapsables: function () {
+			// TODO this is called multiple times, needs performance update
 			var that = this;
 			var settings = CMS.API.Toolbar.getSettings();
 			var draggable = $('.cms_draggable-' + this.options.plugin_id);
@@ -577,8 +640,11 @@ $(document).ready(function () {
 			// loop through the items
 			$.each(CMS.API.Toolbar.getSettings().states, function (index, id) {
 				var el = $('.cms_draggable-' + id);
+				// only add this class to elements which have a draggable area
+				if(el.find('.cms_draggables').length) {
 					el.find('> .cms_draggables').show();
 					el.find('> .cms_dragitem').addClass('cms_dragitem-expanded');
+				}
 			});
 		},
 

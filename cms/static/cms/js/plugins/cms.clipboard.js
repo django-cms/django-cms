@@ -91,11 +91,11 @@ $(document).ready(function () {
 		},
 
 		// public methods
-		clear: function () {
+		clear: function (callback) {
 			// post needs to be a string, it will be converted using JSON.parse
 			var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
 			// redirect to ajax
-			CMS.API.Toolbar.openAjax(this.config.clipboard.url, post);
+			CMS.API.Toolbar.openAjax(this.config.clipboard.url, post, '', callback);
 		}
 
 	});

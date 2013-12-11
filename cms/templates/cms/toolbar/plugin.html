@@ -26,8 +26,7 @@ $(document).ready(function () {
 			'edit_plugin': '{% if edit_url %}{{ edit_url }}{% else %}{% url "admin:cms_page_edit_plugin" instance.pk %}{% endif %}',
 			'move_plugin': '{% if move_url %}{{ move_url }}{% else %}{% url "admin:cms_page_move_plugin" %}{% endif %}',
             'delete_plugin': '{% if delete_url %}{{ delete_url }}{% else %}{% url "admin:cms_page_delete_plugin" instance.pk %}{% endif %}',
-			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}',
-			'stack_plugin': ''
+			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}'
 		}
 	});
 });
