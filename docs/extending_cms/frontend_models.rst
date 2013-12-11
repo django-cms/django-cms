@@ -70,7 +70,7 @@ on Django admin::
 
 Then setup the templates adding ``show_editable_model`` templatetag::
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% block content %}
     <h1>{% show_editable_model instance "some_attribute" %}</h1>
@@ -104,7 +104,7 @@ Set up the template
 Then add comma separated list of fields (or just the name of one field) to
 the templatetag::
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% block content %}
     <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" %}</h1>
@@ -141,7 +141,7 @@ See :ttag:`templatetag reference <show_editable_model>` for arguments documentat
 
 Example ``view_url``::
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% block content %}
     <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "admin:exampleapp_example1_some_view" %}</h1>
@@ -157,7 +157,7 @@ Example ``view_method``::
             return "/some/url"
     
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% block content %}
     <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "" "some_method" %}</h1>
@@ -173,7 +173,7 @@ Filters
 If you need to apply filters to the output value of the templateag, add the
 string with chained filters as in Django :ttag:`django:filter` templatetag::
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% block content %}
     <h1>{% show_editable_model instance "attribute" "" "" truncatechars:9 %}</h1>
