@@ -228,6 +228,7 @@ $(document).ready(function () {
 				'url': this.options.urls.add_plugin,
 				'data': data,
 				'success': function (data) {
+					that.newPlugin = data;
 					that.editPlugin(data.url, name, data.breadcrumb);
 				},
 				'error': function (jqXHR) {
@@ -240,7 +241,7 @@ $(document).ready(function () {
 
 		editPlugin: function (url, name, breadcrumb) {
 			// trigger modal window
-			var modal = new CMS.Modal();
+			var modal = new CMS.Modal({ 'newPlugin': this.newPlugin || false });
 				modal.open(url, name, breadcrumb);
 		},
 
