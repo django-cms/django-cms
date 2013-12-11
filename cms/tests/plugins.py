@@ -1385,7 +1385,6 @@ class NoDatabasePluginTests(TestCase):
     def test_pickle(self):
         text = Text()
         a = text.__reduce__()
-        print a
 
 
 class PicturePluginTests(PluginsTestBaseCase):
