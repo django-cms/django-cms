@@ -703,6 +703,20 @@ class PluginsTestCase(PluginsTestBaseCase):
         expected = sorted([plugins[4].pk, plugins[5].pk])
         self.assertEquals(idlist, expected)
 
+    def test_search_pages(self):
+        """
+        Test search for pages
+        """
+        page = create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        text = Text(body="hello", language="en", placeholder=placeholder, plugin_type="TextPlugin", position=1)
+        text.save()
+        page.publish()
+        pages = Page.objects.search("hi")
+        self.assertEqual(pages.count(), 0)
+        self.assertEqual(Page.objects.search("hello").count(),1)
+
     def test_empty_plugin_is_not_ignored(self):
         page = create_page("page", "nav_playground.html", "en")
 
