@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
-from cms import constants
+from cms import constants, api
 import os.path
 
 from django.conf import settings
@@ -94,12 +94,11 @@ class PagesTestCase(CMSTestCase):
 
         }
         page = create_page(**page_data)
-        self.assertFalse(page.is_home, "The page should not be marked as home before being published")
-        page.publish()
         page = page.reload()
-        assert Page.objects.count() == 2
-        assert page.is_home
-        assert page.publisher_public.is_home
+        page.publish()
+        self.assertEqual(Page.objects.count(), 2)
+        self.assertTrue(page.is_home)
+        self.assertTrue(page.publisher_public.is_home)
 
         self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
         self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
@@ -221,6 +220,7 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be edited multiple times with moderator
         """
+        home = api.create_page("home", "nav_playground.html", "en")
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
@@ -348,15 +348,18 @@ class PagesTestCase(CMSTestCase):
     def test_move_page(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
+            page_home = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_home)
             page_data1 = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data1)
             page_data2 = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data2)
             page_data3 = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data3)
-            page1 = Page.objects.all()[0]
-            page2 = Page.objects.all()[1]
-            page3 = Page.objects.all()[2]
+            home = Page.objects.all()[0]
+            page1 = Page.objects.all()[2]
+            page2 = Page.objects.all()[3]
+            page3 = Page.objects.all()[4]
 
             # move pages
             response = self.client.post("/en/admin/cms/page/%s/move-page/" % page3.pk,
@@ -378,6 +381,7 @@ class PagesTestCase(CMSTestCase):
                                  'slug'] + "/")
 
             # publish page 1 (becomes home)
+            home.delete()
             page1.publish()
             public_page1 = page1.publisher_public
             self.assertEqual(page1.get_path(), '')
@@ -526,6 +530,7 @@ class PagesTestCase(CMSTestCase):
         Check that plugins and placeholders get correctly deleted when we delete
         a page!
         """
+        home = create_page("home", "nav_playground.html", "en")
         page = create_page("page", "nav_playground.html", "en")
         page.rescan_placeholders() # create placeholders
         placeholder = page.placeholders.all()[0]
@@ -544,6 +549,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Text.objects.count(), 1)
         self.assertTrue(Placeholder.objects.count() > 0)
         page.delete()
+        home.delete()
         self.assertEqual(CMSPlugin.objects.count(), 0)
         self.assertEqual(Text.objects.count(), 0)
         self.assertEqual(Placeholder.objects.count(), 0)

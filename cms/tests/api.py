@@ -178,6 +178,7 @@ class PythonAPITests(TestCase):
         self.assertTrue(page.has_add_permission(request))
 
     def test_page_overwrite_url_default(self):
+        home = create_page('home', 'nav_playground.html', 'en')
         page = create_page(**self._get_default_create_page_arguments())
         self.assertFalse(page.get_title_obj_attribute('has_url_overwrite'))
         self.assertEqual(page.get_title_obj_attribute('path'), 'test')

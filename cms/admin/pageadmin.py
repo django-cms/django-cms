@@ -186,7 +186,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 obj.rght = old_obj.rght
                 obj.lft = old_obj.lft
                 obj.tree_id = old_obj.tree_id
+        new = False
+        if not obj.pk:
+            new = True
         obj.save()
+        if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
+            obj.publish()
         if 'recover' in request.path or 'history' in request.path:
             obj.pagemoderatorstate_set.all().delete()
             moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
