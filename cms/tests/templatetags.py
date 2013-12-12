@@ -1,6 +1,7 @@
 from __future__ import with_statement
 import copy
 from cms.middleware.toolbar import ToolbarMiddleware
+from cms.toolbar.toolbar import CMSToolbar
 from django.test import RequestFactory, TestCase
 import os
 from cms.api import create_page, create_title, add_plugin
@@ -224,7 +225,6 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         db_placeholder = page.placeholders.get(slot='col_right')
         self.assertEqual(placeholder.slot, 'col_right')
 
-
 class NoFixtureDatabaseTemplateTagTests(TestCase):
     def test_cached_show_placeholder_sekizai(self):
         from django.core.cache import cache
@@ -297,3 +297,23 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         with self.assertNumQueries(5):
             output = template.render(context)
         self.assertIn('<b>Test2</b>', output)
+
+    def test_render_plugin(self):
+        from django.core.cache import cache
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        placeholder = page.placeholders.all()[0]
+        plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+        template = Template(
+            "{% load cms_tags %}{% render_plugin plugin %}")
+        request = RequestFactory().get('/')
+        user = User(username="admin", password="admin", is_superuser=True, is_staff=True, is_active=True)
+        user.save()
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        context = RequestContext(request, {'plugin':plugin})
+        with self.assertNumQueries(0):
+            output = template.render(context)
+        self.assertIn('<b>Test</b>', output)

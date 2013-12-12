@@ -703,6 +703,20 @@ class PluginsTestCase(PluginsTestBaseCase):
         expected = sorted([plugins[4].pk, plugins[5].pk])
         self.assertEquals(idlist, expected)
 
+    def test_search_pages(self):
+        """
+        Test search for pages
+        """
+        page = create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        text = Text(body="hello", language="en", placeholder=placeholder, plugin_type="TextPlugin", position=1)
+        text.save()
+        page.publish()
+        pages = Page.objects.search("hi")
+        self.assertEqual(pages.count(), 0)
+        self.assertEqual(Page.objects.search("hello").count(),1)
+
     def test_empty_plugin_is_not_ignored(self):
         page = create_page("page", "nav_playground.html", "en")
 
@@ -1367,6 +1381,10 @@ class NoDatabasePluginTests(TestCase):
         plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin),
                                        {'__module__': 'cms.tests.plugins'})
         self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin2')
+
+    def test_pickle(self):
+        text = Text()
+        a = text.__reduce__()
 
 
 class PicturePluginTests(PluginsTestBaseCase):

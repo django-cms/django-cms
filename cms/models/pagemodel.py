@@ -924,20 +924,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             self._moderator_state_cache = result
         return result[:5]
 
-    def delete_requested(self):
-        """ Checks whether there are any delete requests for this page.
-        Uses the same cache as last_page_states to minimize DB requests
-        """
-        from cms.models import PageModeratorState
-
-        result = getattr(self, '_moderator_state_cache', None)
-        if result is None:
-            return self.pagemoderatorstate_set.get_delete_actions().exists()
-        for state in result:
-            if state.action == PageModeratorState.ACTION_DELETE:
-                return True
-        return False
-
     def is_public_published(self):
         """Returns true if public model is published.
         """

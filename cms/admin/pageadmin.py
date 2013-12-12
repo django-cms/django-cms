@@ -37,7 +37,7 @@ from cms.admin.views import revert_plugins
 from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
     titlemodels
 from cms.models.managers import PagePermissionsPermissionManager
-from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, cms_static_url, copy_plugins
+from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
