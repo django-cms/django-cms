@@ -2,6 +2,7 @@
 from cms.api import create_page
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.utils import unittest
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from django.test import LiveServerTestCase
@@ -11,6 +12,9 @@ import os
 class CMSLiveTests(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
+        if os.environ.get('SELENIUM', '1') == '0':
+            #skip selenium tests
+            raise unittest.SkipTest("Selenium env is set to 0")
         capabilities = webdriver.DesiredCapabilities.CHROME
         capabilities['version'] = '31'
         capabilities['platform'] = 'OS X 10.9'
