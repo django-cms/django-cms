@@ -443,9 +443,6 @@ $(document).ready(function () {
 						} else {
 							that.enforceClose = false;
 						}
-
-						// hide iframe again
-						that.modal.find('iframe').hide();
 					});
 
 				// append element
