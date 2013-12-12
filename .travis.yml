@@ -4,8 +4,9 @@ python:
   - 2.7
   - 3.3
 env:
-  - SAUCE_USERNAME = digi604
-  - secure: "FbKqXw5MDEps6AavVRyB9MTQdMCXLWmA0oe33Ar38/1v4tljVMC2drMyWjj4O0epfCKxy9su++pQB8/NSdEBVsy+358CjJbvAxy6M73Wih5qPjPk47b/Cw2K2rj0GPHgn8/KXiU38whV2TiZIpNdtOB9/6HXjNM5K18LVp4D5v8="
+  global:
+    - SAUCE_USERNAME = digi604
+    - secure: "FbKqXw5MDEps6AavVRyB9MTQdMCXLWmA0oe33Ar38/1v4tljVMC2drMyWjj4O0epfCKxy9su++pQB8/NSdEBVsy+358CjJbvAxy6M73Wih5qPjPk47b/Cw2K2rj0GPHgn8/KXiU38whV2TiZIpNdtOB9/6HXjNM5K18LVp4D5v8="
   matrix:
     - DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=1
     - DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
