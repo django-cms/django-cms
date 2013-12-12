@@ -1,52 +1,41 @@
 # -*- coding: utf-8 -*-
 from cms.api import create_page
-from cms.models import Page
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.utils.unittest import skipIf
-
-try:
-    from selenium.webdriver.firefox.webdriver import WebDriver
-    from selenium.common.exceptions import NoSuchElementException
-    from django.test import LiveServerTestCase
-except ImportError:
-    from django.test import TestCase as LiveServerTestCase
-
-    WebDriver = NoSuchElementException = False
-
-try:
-    # allow xvfb
-    from pyvirtualdisplay import Display
-except ImportError:
-    Display = None
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from django.test import LiveServerTestCase
+import os
 
 
 class CMSLiveTests(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
-        if Display:
-            cls.display = Display(visible=0, size=(800, 600))
-            cls.display.start()
-        if WebDriver:
-            cls.selenium = WebDriver()
+        capabilities = webdriver.DesiredCapabilities.CHROME
+        capabilities['version'] = '31'
+        capabilities['platform'] = 'OS X 10.9'
+        capabilities['name'] = 'django CMS'
+        if os.environ.get("TRAVIS_BUILD_NUMBER"):
+            capabilities['build'] = [os.environ.get("TRAVIS_BUILD_NUMBER", "")]
+            capabilities['tags'] = [os.environ.get("TRAVIS_PYTHON_VERSION", ""), "CI"]
+            username = os.environ.get("SAUCE_USERNAME", "")
+            access_key = os.environ.get("SAUCE_ACCESS_KEY", "")
+            capabilities["tunnel-identifier"] = [os.environ.get("TRAVIS_JOB_NUMBER", "")]
+            hub_url = "%s:%s@localhost:4445" % (username, access_key)
+            cls.driver = webdriver.Remote(desired_capabilities=capabilities, command_executor="http://%s/wd/hub" % hub_url)
+            cls.driver.implicitly_wait(30)
+        else:
+            cls.driver = webdriver.Firefox()
         super(CMSLiveTests, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        if hasattr(cls, 'selenium'):
-            cls.selenium.quit()
-        if hasattr(cls, 'display'):
-            cls.display.stop()
-        super(CMSLiveTests, cls).tearDownClass()
-
-    def tearDown(self):
-        super(CMSLiveTests, self).tearDown()
-        Page.objects.all().delete() # not 100% sure why this is needed, but it is
-
 
     def stop_server(self):
         if hasattr(self, 'server_thread'):
             self.server_thread.join()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+        super(CMSLiveTests, cls).tearDownClass()
 
     def wait_until(self, callback, timeout=10):
         """
@@ -57,7 +46,7 @@ class CMSLiveTests(LiveServerTestCase):
         """
         from selenium.webdriver.support.wait import WebDriverWait
 
-        WebDriverWait(self.selenium, timeout).until(callback)
+        WebDriverWait(self.driver, timeout).until(callback)
 
     def wait_loaded_tag(self, tag_name, timeout=10):
         """
@@ -88,8 +77,9 @@ class CMSLiveTests(LiveServerTestCase):
 class ToolbarBasicTests(CMSLiveTests):
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
+        super(ToolbarBasicTests, self).setUp()
 
-    @skipIf(not WebDriver, 'Selenium not found or Django too old')
+    #@skipIf(not WebDriver, 'Selenium not found or Django too old')
     def test_toolbar_login(self):
         create_page('Home', 'simple.html', 'en', published=True).publish()
         user = User()
@@ -98,13 +88,13 @@ class ToolbarBasicTests(CMSLiveTests):
         user.is_superuser = user.is_staff = user.is_active = True
         user.save()
         url = '%s/?edit' % self.live_server_url
-        self.selenium.get(url)
-        self.assertRaises(NoSuchElementException, self.selenium.find_element_by_class_name, 'cms_toolbar-item_logout')
-        username_input = self.selenium.find_element_by_id("id_cms-username")
+        self.driver.get(url)
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys('admin')
-        password_input = self.selenium.find_element_by_id("id_cms-password")
+        password_input = self.driver.find_element_by_id("id_cms-password")
         password_input.send_keys('admin')
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.selenium.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
 
