@@ -1,2 +1,0 @@
--r django-1.4.txt
-selenium
