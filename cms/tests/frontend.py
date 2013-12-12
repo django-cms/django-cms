@@ -20,12 +20,12 @@ class CMSLiveTests(LiveServerTestCase):
         capabilities['platform'] = 'OS X 10.9'
         capabilities['name'] = 'django CMS'
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
-            capabilities['build'] = [os.environ.get("TRAVIS_BUILD_NUMBER", "")]
-            capabilities['tags'] = [os.environ.get("TRAVIS_PYTHON_VERSION", ""), "CI"]
-            username = os.environ.get("SAUCE_USERNAME", "")
-            access_key = os.environ.get("SAUCE_ACCESS_KEY", "")
-            capabilities["tunnel-identifier"] = [os.environ.get("TRAVIS_JOB_NUMBER", "")]
-            hub_url = "%s:%s@localhost:4445" % (username, access_key)
+            capabilities['build'] = [os.environ.get("TRAVIS_BUILD_NUMBER")]
+            capabilities['tags'] = [os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"]
+            username = os.environ.get("SAUCE_USERNAME")
+            access_key = os.environ.get("SAUCE_ACCESS_KEY")
+            capabilities["tunnel-identifier"] = [os.environ.get("TRAVIS_JOB_NUMBER")]
+            hub_url = "%s:%s@ondemand.saucelabs.com/wd/hub" % (username, access_key)
             cls.driver = webdriver.Remote(desired_capabilities=capabilities, command_executor="http://%s/wd/hub" % hub_url)
             cls.driver.implicitly_wait(30)
         else:
