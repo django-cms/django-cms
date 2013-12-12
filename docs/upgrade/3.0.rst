@@ -222,3 +222,17 @@ Frontedit editor for Django models
 Starting from 3.0 you can use :ref:`show_editable_model <frontend-editable-fields>`
 templatetag to edit any Django models in the frontend editor.
 
+
+New Page related_name to Site
+=============================
+
+`Page` object used tohave the default (`page`) **related_name** to the `Site`
+model which may cause clashing with other Django apps; **related_name** is now
+``djangocms_pages``.
+
+.. warning:: Potential backward incompatibility
+
+    This change may cause you code to break, if you relied on ``Site.page_set``
+    to access cms pages from a Site model instance: update it to use
+    ``Site.djangocms_pages``
+
