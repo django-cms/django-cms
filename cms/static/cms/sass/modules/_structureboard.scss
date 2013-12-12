@@ -22,13 +22,14 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 	@include border-radius(3px); background:$color-grey-70;
 	@include box-sizing(border-box);
 }
+.cms_dragarea-stack { background:$color-grey-70 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAGElEQVQIW2NkgID/QMzICGOAREAcGPgPADZsAwNt4b8uAAAAAElFTkSuQmCC); }
 
 //######################################################################################################################
 // #DRAGBAR#
 .cms_dragbar {
 	font-size:13px; line-height:20px;
 	position:relative; left:0; top:0; z-index:9999;
-	@include border-radius(3px); background:$color-grey-70;
+	@include border-radius(3px);
 
 	.cms_dragbar-title { font-size:12px; line-height:16px; text-transform:uppercase;
 		font-weight:500; padding:0 0 0 15px; height:16px; cursor:pointer;
