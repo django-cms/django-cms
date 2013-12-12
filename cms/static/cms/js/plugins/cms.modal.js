@@ -438,6 +438,7 @@ $(document).ready(function () {
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
+ 							that.options.newPlugin = null;
 							that.enforceClose = true;
 						} else {
 							that.enforceClose = false;
