@@ -38,7 +38,7 @@ class BasicReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
 
             self.assertRedirects(response, URL_CMS_PAGE)
-            self.assertEquals(Page.objects.all().count(), 1)
+            self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(Revision.objects.all().count(), 1)
 
 

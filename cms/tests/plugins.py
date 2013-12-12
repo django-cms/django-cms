@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import datetime
 import json
+from cms import api
 
 from cms.api import create_page, publish_page, add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
@@ -419,6 +420,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_remove_plugin_after_published(self):
         # add a page
+        home = api.create_page("home", "nav_playground.html", "en")
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
@@ -442,7 +444,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # publish page
         response = self.client.post(URL_CMS_PAGE + "%d/change-status/" % page.pk, {1: 1})
         self.assertEqual(response.status_code, 200)
-        self.assertEquals(Page.objects.count(), 2)
+        self.assertEquals(Page.objects.count(), 3)
 
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(CMSPlugin.objects.all().count(), 2)
