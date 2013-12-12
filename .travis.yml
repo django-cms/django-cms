@@ -50,33 +50,33 @@ notifications:
 matrix:
   exclude:
     - python: 3.3
-      env: DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:'
+      env: DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=1
     - python: 3.3
-      env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+      env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 3.3
-      env: DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+      env: DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 3.3
-      env: DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+      env: DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 3.3
-      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 2.6
-      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=1
     - python: 2.6
-      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 2.6
-      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
   allow_failures:
     - python: 3.3
-      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=1
     - python: 3.3
-      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 3.3
-      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 2.7
-      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=1
     - python: 2.7
-      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 2.7
-      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
 addons:
   sauce_connect: True
