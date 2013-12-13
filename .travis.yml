@@ -30,6 +30,7 @@ before_script:
   fi"
 - sh -c "if [ '$DATABASE_URL' = 'sqlite://localhost/:memory:']; then; [ '$TRAVIS_PYTHON_VERSION'
   = '2.7']; then; export SELENIUM=1; else; export SELENIUM=0; fi; fi;"
+- sh -c "echo $DATABASE_URL; echo $TRAVIS_PYTHON_VERSION;"
 install:
 - pip install -q -r "test_requirements/django-$DJANGO.txt"
 - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip
