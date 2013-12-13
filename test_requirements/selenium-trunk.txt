@@ -1,2 +1,0 @@
--r django-trunk.txt
-selenium
