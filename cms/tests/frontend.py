@@ -22,7 +22,7 @@ class CMSLiveTests(LiveServerTestCase):
         capabilities['platform'] = 'OS X 10.9'
         capabilities['name'] = 'django CMS'
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
-            capabilities['build'] = [os.environ.get("TRAVIS_BUILD_NUMBER")]
+            capabilities['build'] = os.environ.get("TRAVIS_BUILD_NUMBER")
             capabilities['tags'] = [os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"]
             username = os.environ.get("SAUCE_USERNAME")
             access_key = os.environ.get("SAUCE_ACCESS_KEY")
