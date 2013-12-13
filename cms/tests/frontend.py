@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.api import create_page
 from cms.models import Page
+from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils import unittest
@@ -114,20 +115,21 @@ class ToolbarBasicTests(CMSLiveTests):
         self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
 
     def test_basic_add_pages(self):
-        self.assertEqual(Page.objects.all().count(), 0)
-        driver = self.driver
-        driver.get(self.base_url + "/de/")
-        driver.find_element_by_id("add-page").click()
-        driver.find_element_by_id("id_username").clear()
-        driver.find_element_by_id("id_username").send_keys("admin")
-        driver.find_element_by_id("id_password").clear()
-        driver.find_element_by_id("id_password").send_keys("admin")
-        driver.find_element_by_css_selector("input[type=\"submit\"]").click()
-        driver.find_element_by_name("_save").click()
-        driver.find_element_by_link_text(u"Seite hinzufügen").click()
-        driver.find_element_by_id("id_title").clear()
-        driver.find_element_by_id("id_title").send_keys("SubPage")
-        driver.find_element_by_name("_save").click()
+        with SettingsOverride(DEBUG=True):
+            self.assertEqual(Page.objects.all().count(), 0)
+            driver = self.driver
+            driver.get(self.base_url + "/de/")
+            driver.find_element_by_id("add-page").click()
+            driver.find_element_by_id("id_username").clear()
+            driver.find_element_by_id("id_username").send_keys("admin")
+            driver.find_element_by_id("id_password").clear()
+            driver.find_element_by_id("id_password").send_keys("admin")
+            driver.find_element_by_css_selector("input[type=\"submit\"]").click()
+            driver.find_element_by_name("_save").click()
+            driver.find_element_by_link_text(u"Seite hinzufügen").click()
+            driver.find_element_by_id("id_title").clear()
+            driver.find_element_by_id("id_title").send_keys("SubPage")
+            driver.find_element_by_name("_save").click()
 
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)

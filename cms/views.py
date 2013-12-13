@@ -19,7 +19,7 @@ from django.utils.http import urlquote
 
 
 def _handle_no_page(request, slug):
-    if not slug:
+    if not slug and settings.DEBUG:
         return TemplateResponse(request, "cms/welcome.html", RequestContext(request))
     raise Http404('CMS: Page not found for "%s"' % slug)
 
