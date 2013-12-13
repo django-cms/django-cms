@@ -41,7 +41,6 @@ def compile_messages():
                         bits = ['msgfmt', '--check-format',  '-o',  pf + '.mo', pf + '.po']
                     else:
                         bits = ['msgfmt', '--check-format',  '-o',  pf + '.mo', pf + '.po']
-                    print bits
                     pipe = subprocess.Popen(bits, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stderr = pipe.communicate()[-1]
                     if pipe.returncode != 0:
