@@ -104,27 +104,64 @@ $(document).ready(function () {
 
 		// sends or retrieves a JSON from localStorage or the session if local storage is not available
 		setSettings: function (settings) {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
+			// merge settings
+			settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
 
-			// set settings
-			settings = $.extend({}, CMS.config.settings, settings);
-			// save inside local storage
-			localStorage.setItem('cms_cookie', JSON.stringify(settings));
+			// use local storage or session
+			if(window.localStorage) {
+				// save within local storage
+				localStorage.setItem('cms_cookie', settings);
+			} else {
+				// save within session
+				$.ajax({
+					'type': 'POST',
+					'url': CMS.config.urls.settings,
+					'data': {
+						'type': 'set',
+						'settings': settings
+					},
+					'success': function (data) {
+						console.log('setSettings');
+						settings = data;
+					},
+					'error': function (jqXHR) {
+						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+					}
+				});
+			}
+
+			// ensure new settings are returned
+			return settings;
 		},
 
 		getSettings: function () {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
+			var settings;
 
-			// check if there are settings defined
-			var settings = localStorage.getItem('cms_cookie');
+			// use local storage or session
+			if(window.localStorage) {
+				// get from local storage
+				settings = JSON.parse(localStorage.getItem('cms_cookie'));
+			} else {
+				// get from session
+				$.ajax({
+					'type': 'POST',
+					'url': CMS.config.urls.settings,
+					'data': { 'type': 'get' },
+					'success': function (data) {
+						console.log('getSettings');
+						settings = JSON.parse(data);
+					},
+					'error': function (jqXHR) {
+						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+					}
+				});
+			}
 
 			// set settings are not defined, ensure they are
-			if(settings === null) this.setSettings(CMS.config.settings);
+			if(settings === null) settings = this.setSettings(CMS.config.settings);
 
-			// finally get settings
-			return JSON.parse(localStorage.getItem('cms_cookie'));
+			// ensure new settings are returned
+			return settings;
 		},
 
 		// prevents scrolling when another scrollbar is used (for better ux)
