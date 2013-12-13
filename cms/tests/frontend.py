@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils import unittest
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 from django.test import LiveServerTestCase
 import os
 
@@ -32,6 +32,7 @@ class CMSLiveTests(LiveServerTestCase):
             cls.driver.implicitly_wait(30)
         else:
             cls.driver = webdriver.Firefox()
+        cls.accept_next_alert = True
         super(CMSLiveTests, cls).setUpClass()
 
     def stop_server(self):
@@ -79,27 +80,45 @@ class CMSLiveTests(LiveServerTestCase):
             # ignore it.
             pass
 
+    def is_element_present(self, how, what):
+        try:
+            self.driver.find_element(by=how, value=what)
+        except NoSuchElementException:
+            return False
+        return True
+
+    def is_alert_present(self):
+        try:
+            self.driver.switch_to_alert()
+        except NoAlertPresentException:
+            return False
+        return True
+
+    def close_alert_and_get_its_text(self):
+        try:
+            alert = self.driver.switch_to_alert()
+            alert_text = alert.text
+            if self.accept_next_alert:
+                alert.accept()
+            else:
+                alert.dismiss()
+            return alert_text
+        finally:
+            self.accept_next_alert = True
+
 
 class ToolbarBasicTests(CMSLiveTests):
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
         self.driver.implicitly_wait(2)
-        self.verificationErrors = []
-        self.accept_next_alert = True
-
         user = User()
         user.username = 'admin'
         user.set_password('admin')
         user.is_superuser = user.is_staff = user.is_active = True
         user.save()
-
         super(ToolbarBasicTests, self).setUp()
 
-    def tearDown(self):
-        self.assertEqual([], self.verificationErrors)
-
-    #@skipIf(not WebDriver, 'Selenium not found or Django too old')
     def test_toolbar_login(self):
         create_page('Home', 'simple.html', 'en', published=True).publish()
         url = '%s/?edit' % self.live_server_url
@@ -130,23 +149,3 @@ class ToolbarBasicTests(CMSLiveTests):
             driver.find_element_by_id("id_title").send_keys("SubPage")
             driver.find_element_by_name("_save").click()
 
-    def is_element_present(self, how, what):
-        try: self.driver.find_element(by=how, value=what)
-        except NoSuchElementException, e: return False
-        return True
-
-    def is_alert_present(self):
-        try: self.driver.switch_to_alert()
-        except NoAlertPresentException, e: return False
-        return True
-
-    def close_alert_and_get_its_text(self):
-        try:
-            alert = self.driver.switch_to_alert()
-            alert_text = alert.text
-            if self.accept_next_alert:
-                alert.accept()
-            else:
-                alert.dismiss()
-            return alert_text
-        finally: self.accept_next_alert = True
