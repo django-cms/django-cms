@@ -29,6 +29,7 @@ class CMSLiveTests(LiveServerTestCase):
             capabilities["tunnel-identifier"] = [os.environ.get("TRAVIS_JOB_NUMBER")]
             hub_url = "http://%s:%s@ondemand.saucelabs.com/wd/hub" % (username, access_key)
             print hub_url
+            print os.environ
             cls.driver = webdriver.Remote(desired_capabilities=capabilities, command_executor=hub_url)
             cls.driver.implicitly_wait(30)
         else:
