@@ -6,7 +6,7 @@ python:
 env:
   global:
     - SAUCE_USERNAME=digi604
-    - secure:"FbKqXw5MDEps6AavVRyB9MTQdMCXLWmA0oe33Ar38/1v4tljVMC2drMyWjj4O0epfCKxy9su++pQB8/NSdEBVsy+358CjJbvAxy6M73Wih5qPjPk47b/Cw2K2rj0GPHgn8/KXiU38whV2TiZIpNdtOB9/6HXjNM5K18LVp4D5v8="
+    - secure:"TNvlzFnFmOrtN3jgub0HFNDDPZePcYLHqDiEuS0uNzGlqsA8gzNJed0ocdmvIGT+8TgzIL2Le9Vr808Ko2bHDdTLYl63p5iCAjEYYYFiQmgHmOXMPhoqkcI3GefAdiaE7Zh1nR247+BiymOxlp0/d3Zm+12qXD8FznRKmzyevG0="
   matrix:
     - DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
