@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.contrib.auth.admin import csrf_protect_m
 from django.contrib.admin import ModelAdmin
 
@@ -31,6 +31,9 @@ class SettingsAdmin(ModelAdmin):
             url(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
+            url(r'^session_store/$',
+                wrap(self.session_store),
+                name='%s_%s_session_store' % info),
         )
         return urlpatterns
 
@@ -43,6 +46,20 @@ class SettingsAdmin(ModelAdmin):
         except model.DoesNotExist:
             return self.add_view(request)
         return super(SettingsAdmin, self).change_view(request, str(obj.pk))
+
+    def session_store(self, request):
+        """
+        either POST or GET
+        POST should have a settings parameter
+        """
+        if not request.user.is_staff:
+            return HttpResponseForbidden('Forbidden')
+        if request.method == "POST":
+            request.session['cms_settings'] = request.POST['settings']
+            request.session.commit()
+            return HttpResponse("{data:'ok'}", mimetype="application/json")
+        else:
+            return HttpResponse(request.session.get('cms_settings', ''), mimetype="application/json")
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
