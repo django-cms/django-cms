@@ -1,83 +1,82 @@
 language: python
 python:
-  - 2.6
-  - 2.7
-  - 3.3
+- 2.6
+- 2.7
+- 3.3
 env:
   global:
-    - SAUCE_USERNAME=digi604
-    - secure:"TNvlzFnFmOrtN3jgub0HFNDDPZePcYLHqDiEuS0uNzGlqsA8gzNJed0ocdmvIGT+8TgzIL2Le9Vr808Ko2bHDdTLYl63p5iCAjEYYYFiQmgHmOXMPhoqkcI3GefAdiaE7Zh1nR247+BiymOxlp0/d3Zm+12qXD8FznRKmzyevG0="
+  - SAUCE_USERNAME=digi604
+  - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
   matrix:
-    - DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:'
-    - DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-    - DJANGO=1.5 DATABASE_URL='sqlite://localhost/:memory:'
-    - DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.5 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-    - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:'
-    - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-    - DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
-    - DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-
+  - DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:'
+  - DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+  - DJANGO=1.5 DATABASE_URL='sqlite://localhost/:memory:'
+  - DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - DJANGO=1.5 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+  - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:'
+  - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+  - DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+  - DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
 before_script:
-  - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
-  - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ]; then psql -c 'create database djangocms_test;' -U postgres; fi"
-  - sh -c "if [ '$DATABASE_URL' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi"
-  - sh -c "if [ '$DATABASE_URL' = 'sqlite://localhost/:memory:'] && [ '$TRAVIS_PYTHON_VERSION' = '2.7']; then export SELENIUM=1; else export SELENIUM=0; fi"
-
+- sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ];
+  then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
+- sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ];
+  then psql -c 'create database djangocms_test;' -U postgres; fi"
+- sh -c "if [ '$DATABASE_URL' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql
+  -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
+  fi"
+- sh -c "if [ '$DATABASE_URL' = 'sqlite://localhost/:memory:'] && [ '$TRAVIS_PYTHON_VERSION'
+  = '2.7']; then export SELENIUM=1; else export SELENIUM=0; fi"
 install:
-  - pip install -q -r "test_requirements/django-$DJANGO.txt"
-  - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install -q psycopg2 ; fi
-  - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install -q mysql-python ; fi
-
-script:
-  coverage run --rcfile=.coverage.rc develop.py test --migrate
-
-after_success:
-  coveralls --config_file=.coverage.rc --coveralls_yaml=.coveralls.yml
-
+- pip install -q -r "test_requirements/django-$DJANGO.txt"
+- if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip
+  install -q psycopg2 ; fi
+- if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install
+  -q mysql-python ; fi
+script: coverage run --rcfile=.coverage.rc develop.py test --migrate
+after_success: coveralls --config_file=.coverage.rc --coveralls_yaml=.coveralls.yml
 notifications:
-    email:
-        recipients:
-          - digi@treepy.com
-        on_success: never
-        on_failure: always
-    irc:
-        - irc.freenode.org#django-cms
-        - irc.freenode.org#django-cms-sprint
-
+  email:
+    recipients:
+    - digi@treepy.com
+    on_success: never
+    on_failure: always
+  irc:
+  - irc.freenode.org#django-cms
+  - irc.freenode.org#django-cms-sprint
 matrix:
   exclude:
-    - python: 3.3
-      env: DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:'
-    - python: 3.3
-      env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - python: 3.3
-      env: DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-    - python: 3.3
-      env: DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - python: 3.3
-      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - python: 2.6
-      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
-    - python: 2.6
-      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-    - python: 2.6
-      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - python: 3.3
+    env: DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:'
+  - python: 3.3
+    env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - python: 3.3
+    env: DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+  - python: 3.3
+    env: DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - python: 3.3
+    env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - python: 2.6
+    env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+  - python: 2.6
+    env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+  - python: 2.6
+    env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
   allow_failures:
-    - python: 3.3
-      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
-    - python: 3.3
-      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - python: 3.3
-      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-    - python: 2.7
-      env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
-    - python: 2.7
-      env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - python: 2.7
-      env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+  - python: 3.3
+    env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+  - python: 3.3
+    env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - python: 3.3
+    env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+  - python: 2.7
+    env: DJANGO=trunk DATABASE_URL='sqlite://localhost/:memory:'
+  - python: 2.7
+    env: DJANGO=trunk DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - python: 2.7
+    env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
 addons:
   sauce_connect: true
