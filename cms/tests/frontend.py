@@ -4,24 +4,26 @@ from cms.models import Page
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db import connections
 from django.utils import unittest
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, TestCase
 import os
 
 
-class CMSLiveTests(LiveServerTestCase):
+class CMSLiveTests(LiveServerTestCase, TestCase):
     @classmethod
     def setUpClass(cls):
+        super(CMSLiveTests, cls).setUpClass()
         if os.environ.get('SELENIUM', '1') == '0':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
-        capabilities = webdriver.DesiredCapabilities.CHROME
-        capabilities['version'] = '31'
-        capabilities['platform'] = 'OS X 10.9'
-        capabilities['name'] = 'django CMS'
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
+            capabilities = webdriver.DesiredCapabilities.CHROME
+            capabilities['version'] = '31'
+            capabilities['platform'] = 'OS X 10.9'
+            capabilities['name'] = 'django CMS'
             capabilities['build'] = os.environ.get("TRAVIS_BUILD_NUMBER")
             capabilities['tags'] = [os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"]
             username = os.environ.get("SAUCE_USERNAME")
@@ -32,17 +34,18 @@ class CMSLiveTests(LiveServerTestCase):
             cls.driver.implicitly_wait(30)
         else:
             cls.driver = webdriver.Firefox()
+            cls.driver.implicitly_wait(5)
         cls.accept_next_alert = True
-        super(CMSLiveTests, cls).setUpClass()
-
-    def stop_server(self):
-        if hasattr(self, 'server_thread'):
-            self.server_thread.join()
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
         super(CMSLiveTests, cls).tearDownClass()
+
+    def tearDown(self):
+        super(CMSLiveTests, self).tearDown()
+        Page.objects.all().delete() # somehow the sqlite transaction got lost.
+
 
     def wait_until(self, callback, timeout=10):
         """
@@ -108,6 +111,7 @@ class CMSLiveTests(LiveServerTestCase):
 
 
 class ToolbarBasicTests(CMSLiveTests):
+
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
