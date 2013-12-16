@@ -9,6 +9,7 @@ from django.contrib import admin
 from cms.models import UserSettings
 from django.core.urlresolvers import reverse
 from django.db import transaction
+import json
 
 
 class SettingsAdmin(ModelAdmin):
@@ -25,15 +26,15 @@ class SettingsAdmin(ModelAdmin):
 
         urlpatterns = patterns(
             '',
+            url(r'^session_store/$',
+                wrap(self.session_store),
+                name='%s_%s_session_store' % info),
             url(r'^$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
             url(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-            url(r'^session_store/$',
-                wrap(self.session_store),
-                name='%s_%s_session_store' % info),
         )
         return urlpatterns
 
@@ -56,10 +57,8 @@ class SettingsAdmin(ModelAdmin):
             return HttpResponseForbidden('Forbidden')
         if request.method == "POST":
             request.session['cms_settings'] = request.POST['settings']
-            request.session.commit()
-            return HttpResponse("{data:'ok'}", mimetype="application/json")
-        else:
-            return HttpResponse(request.session.get('cms_settings', ''), mimetype="application/json")
+            request.session.save()
+        return HttpResponse(json.dumps(request.session.get('cms_settings', '')), mimetype="application/json")
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
