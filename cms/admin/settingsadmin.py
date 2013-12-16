@@ -27,7 +27,7 @@ class SettingsAdmin(ModelAdmin):
         urlpatterns = patterns(
             '',
             url(r'^session_store/$',
-                wrap(self.session_store),
+                self.session_store,
                 name='%s_%s_session_store' % info),
             url(r'^$',
                 wrap(self.change_view),
@@ -54,7 +54,7 @@ class SettingsAdmin(ModelAdmin):
         POST should have a settings parameter
         """
         if not request.user.is_staff:
-            return HttpResponseForbidden('Forbidden')
+            return HttpResponse(json.dumps(""), mimetype="application/json")
         if request.method == "POST":
             request.session['cms_settings'] = request.POST['settings']
             request.session.save()

@@ -111,7 +111,7 @@ $(document).ready(function () {
 			if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
 
 			// use local storage or session
-			if(!window.localStorage) {
+			if(window.localStorage) {
 				// save within local storage
 				localStorage.setItem('cms_cookie', settings);
 			} else {
@@ -125,7 +125,8 @@ $(document).ready(function () {
 						'settings': settings
 					},
 					'success': function (data) {
-						settings = JSON.parse(data);
+						// determine if logged in or not
+						settings = (data) ? JSON.parse(data) : CMS.config.settings;
 						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 					},
 					'error': function (jqXHR) {
@@ -148,7 +149,7 @@ $(document).ready(function () {
 			if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
 
 			// use local storage or session
-			if(!window.localStorage) {
+			if(window.localStorage) {
 				// get from local storage
 				settings = JSON.parse(localStorage.getItem('cms_cookie'));
 			} else {
@@ -158,7 +159,8 @@ $(document).ready(function () {
 					'type': 'GET',
 					'url': CMS.config.urls.settings,
 					'success': function (data) {
-						settings = JSON.parse(data);
+						// determine if logged in or not
+						settings = (data) ? JSON.parse(data) : CMS.config.settings;
 						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 					},
 					'error': function (jqXHR) {
