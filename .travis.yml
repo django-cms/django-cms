@@ -92,8 +92,3 @@ matrix:
   - python: 2.7
     env: DJANGO=trunk DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
   fast_finish: true
-addons:
-  sauce_connect:
-    username: "digi604"
-    access_key:
-      secure: "prykNrl6INj6kaQYY03jwCfSvwhdjVB8vYIVrFxO8YvNmzhF+7n2laO6qsxhmcTp+HXlfdbQamHKIlbKacrD1CHGzFh5DWQAvpsVFiPEAqrw0YLTxPmoMZF4yirGFN51856fQMMX75L7s175PLB3bx1hX8BtpHpJcdol+r09Dts="
