@@ -40,7 +40,7 @@ class StackNode(Tag):
             placeholder = stack.draft
         else:
             placeholder = stack.public
-        placeholder.is_stack = True
+        placeholder.is_static = True
         return render_placeholder(placeholder, context, name_fallback=code)
 
 
