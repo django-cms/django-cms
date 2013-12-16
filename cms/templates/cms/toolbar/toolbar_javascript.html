@@ -37,7 +37,7 @@ $(document).ready(function () {
 			'confirm': '{% trans "Are you sure you want to delete this plugin?" %}'
 		},
 		'urls': {
-			'settings': '', // url to save settings
+			'settings': '{% url "admin:cms_usersettings_session_store" %}', // url to save settings
 			'static': '{{ STATIC_URL }}'
 		},
 		'settings': {
