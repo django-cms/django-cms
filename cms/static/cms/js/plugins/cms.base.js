@@ -104,11 +104,12 @@ $(document).ready(function () {
 
 		// sends or retrieves a JSON from localStorage or the session if local storage is not available
 		setSettings: function (settings) {
+			var that = this;
 			// merge settings
 			settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
 
 			// use local storage or session
-			if(window.localStorage) {
+			if(!window.localStorage) {
 				// save within local storage
 				localStorage.setItem('cms_cookie', settings);
 			} else {
@@ -117,11 +118,10 @@ $(document).ready(function () {
 					'type': 'POST',
 					'url': CMS.config.urls.settings,
 					'data': {
-						'type': 'set',
+						'csrfmiddlewaretoken': this.config.csrf,
 						'settings': settings
 					},
 					'success': function (data) {
-						console.log('setSettings');
 						settings = data;
 					},
 					'error': function (jqXHR) {
@@ -135,21 +135,20 @@ $(document).ready(function () {
 		},
 
 		getSettings: function () {
+			var that = this;
 			var settings;
 
 			// use local storage or session
-			if(window.localStorage) {
+			if(!window.localStorage) {
 				// get from local storage
 				settings = JSON.parse(localStorage.getItem('cms_cookie'));
 			} else {
 				// get from session
 				$.ajax({
-					'type': 'POST',
+					'type': 'GET',
 					'url': CMS.config.urls.settings,
-					'data': { 'type': 'get' },
 					'success': function (data) {
-						console.log('getSettings');
-						settings = JSON.parse(data);
+						settings = data;
 					},
 					'error': function (jqXHR) {
 						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
@@ -157,7 +156,6 @@ $(document).ready(function () {
 				});
 			}
 
-			// set settings are not defined, ensure they are
 			if(settings === null) settings = this.setSettings(CMS.config.settings);
 
 			// ensure new settings are returned
