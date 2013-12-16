@@ -17,7 +17,6 @@ class Migration(DataMigration):
             ph.save()
             stack.public_id = ph.pk
             stack.save()
-            stack.publish(force=True)
 
     def backwards(self, orm):
         "Write your backwards methods here."
