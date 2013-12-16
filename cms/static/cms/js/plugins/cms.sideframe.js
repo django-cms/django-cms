@@ -22,7 +22,7 @@ $(document).ready(function () {
 		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
-			this.settings = this.getSettings();
+			this.settings = CMS.settings;
 
 			// elements
 			this.sideframe = $('.cms_sideframe');

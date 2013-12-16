@@ -22,7 +22,7 @@ $(document).ready(function () {
 			this.clipboard = $('.cms_clipboard');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
-			this.settings = this.getSettings();
+			this.settings = CMS.settings;
 
 			// elements
 			this.containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');

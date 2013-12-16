@@ -107,6 +107,8 @@ $(document).ready(function () {
 			var that = this;
 			// merge settings
 			settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
+			// set loader
+			if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
 
 			// use local storage or session
 			if(!window.localStorage) {
@@ -115,6 +117,7 @@ $(document).ready(function () {
 			} else {
 				// save within session
 				$.ajax({
+					'async': false,
 					'type': 'POST',
 					'url': CMS.config.urls.settings,
 					'data': {
@@ -122,13 +125,17 @@ $(document).ready(function () {
 						'settings': settings
 					},
 					'success': function (data) {
-						settings = data;
+						settings = JSON.parse(data);
+						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 					},
 					'error': function (jqXHR) {
 						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
 					}
 				});
 			}
+
+			// save settings
+			CMS.settings = settings;
 
 			// ensure new settings are returned
 			return settings;
@@ -137,6 +144,8 @@ $(document).ready(function () {
 		getSettings: function () {
 			var that = this;
 			var settings;
+			// set loader
+			if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
 
 			// use local storage or session
 			if(!window.localStorage) {
@@ -145,10 +154,12 @@ $(document).ready(function () {
 			} else {
 				// get from session
 				$.ajax({
+					'async': false,
 					'type': 'GET',
 					'url': CMS.config.urls.settings,
 					'success': function (data) {
-						settings = data;
+						settings = JSON.parse(data);
+						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 					},
 					'error': function (jqXHR) {
 						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
@@ -157,6 +168,9 @@ $(document).ready(function () {
 			}
 
 			if(settings === null) settings = this.setSettings(CMS.config.settings);
+
+			// save settings
+			CMS.settings = settings;
 
 			// ensure new settings are returned
 			return settings;
