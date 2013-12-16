@@ -16,7 +16,7 @@ class CMSLiveTests(LiveServerTestCase, TestCase):
     @classmethod
     def setUpClass(cls):
         super(CMSLiveTests, cls).setUpClass()
-        if os.environ.get('SELENIUM', '1') == '0':
+        if os.environ.get('SELENIUM', '') != '':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
