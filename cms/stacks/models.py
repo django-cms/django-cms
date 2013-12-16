@@ -52,8 +52,8 @@ class Stack(models.Model):
         if not self.code:
             self.code = u'stack-%s' % uuid.uuid4()
 
-    def publish(self, request):
-        if self.has_publish_permission(request):
+    def publish(self, request, force=False):
+        if force or self.has_publish_permission(request):
             CMSPlugin.objects.filter(placeholder=self.public).delete()
             plugins = self.draft.get_plugins_list()
             copy_plugins_to(plugins, self.public)
