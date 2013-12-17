@@ -1008,12 +1008,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         CMS_PLACEHOLDER_CONF = {
             'body': {
                 'parent_classes': {
-                    'ParentClassesPlugin': ['StackPlugin'],
+                    'ParentClassesPlugin': ['TestPlugin'],
                 }
             }
         }
         with SettingsOverride(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
-            self.assertEquals(['StackPlugin'],
+            self.assertEquals(['TestPlugin'],
                                 plugin.get_parent_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ParentClassesPlugin)
 

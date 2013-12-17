@@ -3,7 +3,6 @@ from functools import wraps
 import sys
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.plugin_pool import plugin_pool
-from cms.stacks.models import Stack
 from django.contrib.admin.helpers import AdminForm
 
 import django
@@ -35,7 +34,7 @@ from cms.admin.forms import PageForm, AdvancedSettingsForm, PagePermissionForm
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
-    titlemodels
+    titlemodels, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
@@ -930,14 +929,14 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             published = page.publish()
             if not published:
                 all_published = False
-        stacks = request.GET.get('stacks', '')
-        if not stacks and not page:
+        statics = request.GET.get('statics', '')
+        if not statics  and not page:
             return Http404("No page or stack found for publishing.")
-        if stacks:
-            stack_ids = stacks.split(',')
-            for pk in stack_ids:
-                stack = Stack.objects.get(pk=pk)
-                published = stack.publish(request)
+        if statics :
+            static_ids = statics .split(',')
+            for pk in static_ids:
+                static_placeholder = StaticPlaceholder.objects.get(pk=pk)
+                published = static_placeholder.publish(request)
                 if not published:
                     all_published = False
         if all_published:
