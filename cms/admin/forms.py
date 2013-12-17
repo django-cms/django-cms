@@ -152,10 +152,26 @@ class PageForm(forms.ModelForm):
         return language
 
 
-class PublicationForm(forms.ModelForm):
+class PublicationDatesForm(forms.ModelForm):
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
+                                 help_text=_('The current language of the content fields.'))
+
+    def __init__(self, *args, **kwargs):
+        # Dates are not language dependent, so let's just fake the language to
+        # make the ModelAdmin happy
+        super(PublicationDatesForm, self).__init__(*args, **kwargs)
+        self.fields['language'].widget = HiddenInput()
+        self.fields['site'].widget = HiddenInput()
+        site_id = self.fields['site'].initial
+
+        languages = get_language_tuple(site_id)
+        self.fields['language'].choices = languages
+        if not self.fields['language'].initial:
+            self.fields['language'].initial = get_language()
+
     class Meta:
         model = Page
-        fields = ["publication_date", "publication_end_date"]
+        fields = ['site', 'publication_date', 'publication_end_date']
 
 
 class AdvancedSettingsForm(forms.ModelForm):
