@@ -59,6 +59,9 @@ $(document).ready(function () {
 				default: // handler for static content
 					this._setGeneric();
 			}
+
+			// set global setup
+			CMS.Toolbar.ready = true;
 		},
 
 		// initial methods
@@ -585,9 +588,9 @@ $(document).ready(function () {
 		},
 
 		_collapsables: function () {
-			// TODO this is called multiple times, needs performance update
+			// one time setup
 			var that = this;
-			var settings = CMS.API.Toolbar.getSettings();
+			var settings = CMS.settings;
 			var draggable = $('.cms_draggable-' + this.options.plugin_id);
 
 			// check which button should be shown for collapsemenu
@@ -606,7 +609,7 @@ $(document).ready(function () {
 				var el = $(this);
 				var id = that._getId($(this).parent());
 
-				var settings = CMS.API.Toolbar.getSettings();
+				var settings = CMS.settings;
 					settings.states = settings.states || [];
 
 				// collapsable function and save states
@@ -627,6 +630,9 @@ $(document).ready(function () {
 				$('.cms_plugin-' + that._getId($(this))).trigger('dblclick');
 			});
 
+			// only needs to be excecuted once
+			if(CMS.Toolbar.ready) return false;
+
 			// removing dublicate entries
 			var sortedArr = settings.states.sort();
 			var filteredArray = [];
@@ -638,7 +644,7 @@ $(document).ready(function () {
 			settings.states = filteredArray;
 
 			// loop through the items
-			$.each(CMS.API.Toolbar.getSettings().states, function (index, id) {
+			$.each(CMS.settings.states, function (index, id) {
 				var el = $('.cms_draggable-' + id);
 				// only add this class to elements which have a draggable area
 				if(el.find('.cms_draggables').length) {

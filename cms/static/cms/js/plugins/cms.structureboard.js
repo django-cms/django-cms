@@ -19,7 +19,7 @@ $(document).ready(function () {
 			this.container = $('.cms_structure');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
-			this.settings = this.getSettings();
+			this.settings = CMS.settings;
 
 			// elements
 			this.toolbar = $('#cms_toolbar');
@@ -51,7 +51,7 @@ $(document).ready(function () {
 			var that = this;
 
 			// setup toolbar mode
-			if(this.settings.mode === 'structure') setTimeout(function () { that.show(); }, 100);
+			if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
 
 			// check if modes should be visible
 			if(this.placeholders.length) {
@@ -101,7 +101,7 @@ $(document).ready(function () {
 		},
 
 		// public methods
-		show: function () {
+		show: function (init) {
 			// cancel show if live modus is active
 			if(CMS.config.mode === 'live') return false;
 
@@ -114,7 +114,7 @@ $(document).ready(function () {
 
 			// apply new settings
 			this.settings.mode = 'structure';
-			this.setSettings(this.settings);
+			if(!init) this.setSettings(this.settings);
 
 			// ensure all elements are visible
 			this.dragareas.show();
@@ -123,7 +123,7 @@ $(document).ready(function () {
 			this._showBoard();
 		},
 
-		hide: function () {
+		hide: function (init) {
 			// cancel show if live modus is active
 			if(CMS.config.mode === 'live') return false;
 
@@ -138,7 +138,7 @@ $(document).ready(function () {
 			this.clipboard.hide();
 
 			this.settings.mode = 'edit';
-			this.setSettings(this.settings);
+			if(!init) this.setSettings(this.settings);
 
 			// hide canvas
 			this._hideBoard();

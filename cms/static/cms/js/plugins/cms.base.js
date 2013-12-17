@@ -104,27 +104,78 @@ $(document).ready(function () {
 
 		// sends or retrieves a JSON from localStorage or the session if local storage is not available
 		setSettings: function (settings) {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
+			var that = this;
+			// merge settings
+			settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
+			// set loader
+			if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
 
-			// set settings
-			settings = $.extend({}, CMS.config.settings, settings);
-			// save inside local storage
-			localStorage.setItem('cms_cookie', JSON.stringify(settings));
+			// use local storage or session
+			if(window.localStorage) {
+				// save within local storage
+				localStorage.setItem('cms_cookie', settings);
+			} else {
+				// save within session
+				$.ajax({
+					'async': false,
+					'type': 'POST',
+					'url': CMS.config.urls.settings,
+					'data': {
+						'csrfmiddlewaretoken': this.config.csrf,
+						'settings': settings
+					},
+					'success': function (data) {
+						// determine if logged in or not
+						settings = (data) ? JSON.parse(data) : CMS.config.settings;
+						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
+					},
+					'error': function (jqXHR) {
+						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+					}
+				});
+			}
+
+			// save settings
+			CMS.settings = settings;
+
+			// ensure new settings are returned
+			return settings;
 		},
 
 		getSettings: function () {
-			// cancel if local storage is not available
-			if(!window.localStorage) return false;
+			var that = this;
+			var settings;
+			// set loader
+			if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
 
-			// check if there are settings defined
-			var settings = localStorage.getItem('cms_cookie');
+			// use local storage or session
+			if(window.localStorage) {
+				// get from local storage
+				settings = JSON.parse(localStorage.getItem('cms_cookie'));
+			} else {
+				// get from session
+				$.ajax({
+					'async': false,
+					'type': 'GET',
+					'url': CMS.config.urls.settings,
+					'success': function (data) {
+						// determine if logged in or not
+						settings = (data) ? JSON.parse(data) : CMS.config.settings;
+						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
+					},
+					'error': function (jqXHR) {
+						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+					}
+				});
+			}
 
-			// set settings are not defined, ensure they are
-			if(settings === null) this.setSettings(CMS.config.settings);
+			if(settings === null) settings = this.setSettings(CMS.config.settings);
 
-			// finally get settings
-			return JSON.parse(localStorage.getItem('cms_cookie'));
+			// save settings
+			CMS.settings = settings;
+
+			// ensure new settings are returned
+			return settings;
 		},
 
 		// prevents scrolling when another scrollbar is used (for better ux)

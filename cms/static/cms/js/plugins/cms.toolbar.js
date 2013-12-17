@@ -21,7 +21,7 @@ $(document).ready(function () {
 			this.container = $('#cms_toolbar');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
-			this.settings = this.getSettings();
+			this.settings = CMS.settings;
 
 			// elements
 			this.body = $('html');
@@ -58,7 +58,7 @@ $(document).ready(function () {
 			this.body.addClass('cms_toolbar-ready');
 
 			// check if we need to reset the current settings depending on a new release
-			if(CMS.config.settings.version !== this.getSettings().version) {
+			if(CMS.config.settings.version !== this.settings.version) {
 				this.setSettings(CMS.config.settings);
 				this.reloadBrowser();
 			}
