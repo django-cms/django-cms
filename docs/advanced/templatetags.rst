@@ -64,6 +64,27 @@ See also the :setting:`CMS_PLACEHOLDER_CONF` setting where you can also add extr
 context variables and change some other placeholder behavior.
 
 
+static_placeholder
+==================
+
+The static_placeholder templatetag can be used anywhere in any template and is not bound to any page or model.
+It needs a name and it will create a placeholder that you can fill with plugins afterwards.
+The static_placeholder tag is normally used to display the same content on
+multiple locations or inside of apphooks or other 3rd party apps. Static_placeholder need to be published
+to show up on live pages.
+
+Example::
+
+    {% load cms_tags %}
+
+    {% static_placeholder "footer" %}
+
+
+.. warning::
+
+    Static_placeholders are not included in the undo/redo and page history pages
+
+
 .. templatetag:: show_placeholder
 
 
@@ -284,26 +305,6 @@ Arguments:
 
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
-
-
-
-******************
-Stack Templatetags
-******************
-
-stack
-=====
-
-The stack templatetag can be used anywhere in any template. It needs a name and it will create a placeholder
-that you can fill with plugins afterwards. The stack tag is normally used to display the same content on
-multiple locations.
-
-
-Example::
-
-    {% load stack_tags %}
-
-    {% stack "footer" %}
 
 
 *****************
@@ -533,4 +534,11 @@ Example::
     {% cms_toolbar %}
     {% placeholder "home" %}
     ...
+
+
+.. note::
+
+    Be aware that you can not surround the cms_toolbar tag with block tags.
+    The toolbar tag will render everything below it to collect all plugins and placeholders, before
+    it renders itself. Block tags interfere with this.
 

@@ -101,6 +101,8 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
+        # static placeholders
+        admin_menu.add_sideframe_item(_('Static Placeholders'), url=reverse('admin:cms_staticplaceholder_changelist'))
         # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)

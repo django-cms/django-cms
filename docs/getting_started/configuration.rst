@@ -81,7 +81,7 @@ Example::
                 'TextPlugin': ['PicturePlugin', 'LinkPlugin'],
             },
             'parent_classes': {
-                'LinkPlugin': ['TextPlugin', 'StackPlugin'],
+                'LinkPlugin': ['TextPlugin',],
             }
         },
         'right-column': {
