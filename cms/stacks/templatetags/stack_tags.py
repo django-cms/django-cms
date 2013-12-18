@@ -18,30 +18,7 @@ class StackNode(Tag):
     )
 
     def render_tag(self, context, code, varname):
-        # TODO: language override (the reason this is not implemented, is that language selection is buried way
-        #       down somewhere in some method called in render_plugins. There it gets extracted from the request
-        #       and a language in request.GET always overrides everything.)
-        if not code:
-            # an empty string was passed in or the variable is not available in the context
-            return ''
-            # TODO: caching?
-        request = context.get('request', False)
-        if not request:
-            return ''
-        if isinstance(code, Stack):
-            stack = code
-        else:
-            stack, __ = Stack.objects.get_or_create(code=code, defaults={'name': code,
-                'creation_method': Stack.CREATION_BY_TEMPLATE})
-        if not hasattr(request, 'stacks'):
-            request.stacks = []
-        request.stacks.append(stack)
-        if request.toolbar.edit_mode:
-            placeholder = stack.draft
-        else:
-            placeholder = stack.public
-        placeholder.is_stack = True
-        return render_placeholder(placeholder, context, name_fallback=code)
+        raise DeprecationWarning('stack templatetag is deprecated. Use static_placeholder instead.')
 
 
 register.tag(StackNode)

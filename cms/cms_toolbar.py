@@ -38,27 +38,27 @@ COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 @toolbar_pool.register
 class PlaceholderToolbar(CMSToolbar):
     """
-    Adds placeholder edit buttons if placeholders or stacks are detected in the template
+    Adds placeholder edit buttons if placeholders or static placeholders are detected in the template
 
     """
 
     def populate(self):
         self.page = get_page_draft(self.request.current_page)
-        stacks = getattr(self.request, 'stacks', [])
+        statics = getattr(self.request, 'static_placeholders', [])
         placeholders = getattr(self.request, 'placeholders', [])
         if self.page:
             if self.page.has_change_permission(self.request):
                 self.add_structure_mode()
-            elif stacks:
-                for stack in stacks:
-                    if stack.has_change_permission(self.request):
+            elif statics:
+                for static_placeholder in statics:
+                    if static_placeholder.has_change_permission(self.request):
                         self.add_structure_mode()
                         break
         else:
             added = False
-            if stacks:
-                for stack in stacks:
-                    if stack.has_change_permission(self.request):
+            if statics:
+                for static_placeholder in statics:
+                    if static_placeholder.has_change_permission(self.request):
                         self.add_structure_mode()
                         added = True
                         break
@@ -101,8 +101,8 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-        # stacks
-        admin_menu.add_sideframe_item(_('Stacks'), url=reverse('admin:stacks_stack_changelist'))
+        # static placeholders
+        admin_menu.add_sideframe_item(_('Static Placeholders'), url=reverse('admin:cms_staticplaceholder_changelist'))
         # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)
@@ -141,10 +141,10 @@ class PageToolbar(CMSToolbar):
             self.change_admin_menu()
             if self.page:
                 self.add_page_menu()
-        stacks = getattr(self.request, 'stacks', [])
-        dirty_stacks = [stack for stack in stacks if stack.dirty]
+        statics = getattr(self.request, 'static_placeholders', [])
+        dirty_statics = [stpl for stpl in statics if stpl.dirty]
         placeholders = getattr(self.request, 'placeholders', [])
-        if self.page or stacks:
+        if self.page or statics:
             if self.toolbar.edit_mode:
                 # history menu
                 if self.page:
@@ -155,16 +155,16 @@ class PageToolbar(CMSToolbar):
                 if self.page and not self.page.has_publish_permission(self.request):
                     publish_permission = False
 
-                for stack in dirty_stacks:
-                    if not stack.has_publish_permission(self.request):
+                for static_placeholder in dirty_statics:
+                    if not static_placeholder.has_publish_permission(self.request):
                         publish_permission = False
 
                 classes = ["cms_btn-action", "cms_btn-publish"]
 
-                dirty = bool(self.page and self.page.is_dirty()) or len(dirty_stacks) > 0
+                dirty = bool(self.page and self.page.is_dirty()) or len(dirty_statics) > 0
                 if dirty:
                     classes.append("cms_btn-publish-active")
-                if dirty_stacks or (self.page and self.page.published):
+                if dirty_statics or (self.page and self.page.published):
                     title = _("Publish changes")
                 else:
                     title = _("Publish page now")
@@ -172,24 +172,24 @@ class PageToolbar(CMSToolbar):
                 if self.page:
                     pk = self.page.pk
                 publish_url = reverse('admin:cms_page_publish_page', args=(pk,))
-                if dirty_stacks:
-                    publish_url += "?stacks=%s" % ','.join(str(stack.pk) for stack in dirty_stacks)
+                if dirty_statics:
+                    publish_url += "?statics=%s" % ','.join(str(static.pk) for static in dirty_statics)
                 if publish_permission:
                     self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
                                         disabled=not dirty)
         if self.page:
             if self.page.has_change_permission(self.request):
                 self.add_draft_live()
-            elif stacks:
-                for stack in stacks:
-                    if stack.has_change_permission(self.request):
+            elif statics:
+                for static_placeholder in statics:
+                    if static_placeholder.has_change_permission(self.request):
                         self.add_draft_live()
                         break
         else:
             added = False
-            if stacks:
-                for stack in stacks:
-                    if stack.has_change_permission(self.request):
+            if statics:
+                for static_placeholder in statics:
+                    if static_placeholder.has_change_permission(self.request):
                         self.add_draft_live()
                         added = True
                         break

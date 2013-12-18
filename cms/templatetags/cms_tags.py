@@ -7,7 +7,7 @@ from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from cms import __version__
 from cms.exceptions import PlaceholderNotFound
-from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin
+from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.plugins.utils import get_plugins, assign_plugins
@@ -161,7 +161,7 @@ def _get_placeholder(current_page, page, context, name):
     placeholder = placeholder_cache[page.pk].get(name, None)
     if page.application_urls and not placeholder:
         raise PlaceholderNotFound(
-            '"%s" placeholder not found in an apphook application. Please use stacks instead.' % name)
+            '"%s" placeholder not found in an apphook application. Please use a static placeholder instead.' % name)
     return placeholder
 
 
@@ -710,3 +710,43 @@ class CMSEditableObject(InclusionTag):
         context['rendered_content'] = context['content']
         return context
 register.tag(CMSEditableObject)
+
+
+
+
+class StaticPlaceholderNode(Tag):
+    name = 'static_placeholder'
+    options = Options(
+        Argument('code', required=True),
+        'as',
+        Argument('varname', required=False, resolve=False)
+    )
+
+    def render_tag(self, context, code, varname):
+        # TODO: language override (the reason this is not implemented, is that language selection is buried way
+        #       down somewhere in some method called in render_plugins. There it gets extracted from the request
+        #       and a language in request.GET always overrides everything.)
+        if not code:
+            # an empty string was passed in or the variable is not available in the context
+            return ''
+            # TODO: caching?
+        request = context.get('request', False)
+        if not request:
+            return ''
+        if isinstance(code, StaticPlaceholder):
+            static_placeholder = code
+        else:
+            static_placeholder, __ = StaticPlaceholder.objects.get_or_create(code=code, defaults={'name': code,
+                'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE})
+        if not hasattr(request, 'static_placeholders'):
+            request.static_placeholders = []
+        request.static_placeholders.append(static_placeholder)
+        if request.toolbar.edit_mode:
+            placeholder = static_placeholder.draft
+        else:
+            placeholder = static_placeholder.public
+        placeholder.is_static = True
+        return render_placeholder(placeholder, context, name_fallback=code)
+
+
+register.tag(StaticPlaceholderNode)

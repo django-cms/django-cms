@@ -101,16 +101,6 @@ options available directly in the toolbar. These can now revert *plugin*
 content as well as *page* content.
 
 
-Stacks
-======
-
-Stacks are a way to display the same content on multiple locations.
-
-When upgrading from previous django CMS version, you need to add ``cms.stacks``
-to ``INSTALLED_APPS``.
-
-See :ref:`stacks-reference` for in depth information about stacks.
-
 Plugins removed
 ===============
 
