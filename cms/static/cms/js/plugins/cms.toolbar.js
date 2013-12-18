@@ -69,6 +69,9 @@ $(document).ready(function () {
 			// check if there are messages and display them
 			if(CMS.config.messages) this.openMessage(CMS.config.messages);
 
+			// check if there are error messages and display them
+			if(CMS.config.error) this.showError(CMS.config.error);
+
 			// enforce open state if user is not logged in but requests the toolbar
 			if(!CMS.config.auth) this.toggleToolbar(true);
 
