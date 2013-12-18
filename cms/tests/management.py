@@ -3,9 +3,8 @@ from __future__ import with_statement
 import uuid
 from django.contrib.sites.models import Site
 from django.core.management import CommandError
-from cms.models import Page
+from cms.models import Page, StaticPlaceholder
 from django.core import management
-from cms.stacks.models import Stack
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
 
 from cms.test_utils.testcases import CMSTestCase
@@ -244,9 +243,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         # add a *nested* link plugin
         link_plugin_en = add_plugin(ph_en, "LinkPlugin", lang, target=col4,
                                     name="A Link", url="https://www.django-cms.org")
-        stack = Stack(code=str(uuid.uuid4()))
-        stack.save()
-        stack_text_plugin = add_plugin(stack.draft, "TextPlugin", lang, body="example content")
+        static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()))
+        static_placeholder.save()
+        stack_text_plugin = add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
 
     def setUp(self):
         pages = Page.objects.drafts()
@@ -290,7 +289,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(link_en.url, link_de.url)
         self.assertEqual(link_en.get_position_in_placeholder(), link_de.get_position_in_placeholder())
 
-        stack_plugins = CMSPlugin.objects.filter(placeholder=Stack.objects.order_by('?')[0].draft)
+        stack_plugins = CMSPlugin.objects.filter(placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
 
         stack_text_en, _ = stack_plugins.get(language='en', plugin_type='TextPlugin').get_plugin_instance()
         stack_text_de, _ = stack_plugins.get(language='de', plugin_type='TextPlugin').get_plugin_instance()
