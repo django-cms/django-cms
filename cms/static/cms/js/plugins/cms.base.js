@@ -114,6 +114,7 @@ $(document).ready(function () {
 			if(window.localStorage) {
 				// save within local storage
 				localStorage.setItem('cms_cookie', settings);
+				if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 			} else {
 				// save within session
 				$.ajax({
@@ -152,6 +153,7 @@ $(document).ready(function () {
 			if(window.localStorage) {
 				// get from local storage
 				settings = JSON.parse(localStorage.getItem('cms_cookie'));
+				if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 			} else {
 				// get from session
 				$.ajax({
