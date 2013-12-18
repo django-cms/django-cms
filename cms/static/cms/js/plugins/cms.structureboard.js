@@ -61,7 +61,7 @@ $(document).ready(function () {
 			// add drag & drop functionality
 			this._drag();
 			// prevent click events to detect double click
-			this._preventEvents();
+			this.preventEvents(this.plugins);
 		},
 
 		_events: function () {
@@ -216,6 +216,38 @@ $(document).ready(function () {
 			// set new classes
 			dragitem.addClass('cms_draggable-selected');
 			plugin.addClass('cms_plugin-active');
+		},
+
+		preventEvents: function (elements) {
+			var clicks = 0;
+			var delay = 500;
+			var timer = function () {};
+
+			// unbind click event if already initialized
+			elements.find('a').bind(this.click, function (e) {
+				e.preventDefault();
+
+				// increment
+				clicks++;
+
+				// single click
+				if(clicks === 1) {
+					timer = setTimeout(function () {
+						clicks = 0;
+						// cancel if link contains a hash
+						if($(e.currentTarget).attr('href').indexOf('#') === 0) return false;
+						// we need to redirect to the default behaviours
+						// all events will be lost in edit mode, use '#' if href should not be triggered
+						window.location.href = $(e.currentTarget).attr('href');
+					}, delay);
+				}
+
+				// double click
+				if(clicks === 2) {
+					clearTimeout(timer);
+					clicks = 0;
+				}
+			});
 		},
 
 		// private methods
@@ -425,38 +457,6 @@ $(document).ready(function () {
 				'drop': function (event) {
 					dropped = true;
 					droparea = $(event.target).parent().nextAll('.cms_draggables').first();
-				}
-			});
-		},
-
-		_preventEvents: function () {
-			var clicks = 0;
-			var delay = 500;
-			var timer = function () {};
-
-			// unbind click event if already initialized
-			this.plugins.find('a').bind(this.click, function (e) {
-				e.preventDefault();
-
-				// increment
-				clicks++;
-
-				// single click
-				if(clicks === 1) {
-					timer = setTimeout(function () {
-						clicks = 0;
-						// cancel if link contains a hash
-						if($(e.currentTarget).attr('href').indexOf('#') === 0) return false;
-						// we need to redirect to the default behaviours
-						// all events will be lost in edit mode, use '#' if href should not be triggered
-						window.location.href = $(e.currentTarget).attr('href');
-					}, delay);
-				}
-
-				// double click
-				if(clicks === 2) {
-					clearTimeout(timer);
-					clicks = 0;
 				}
 			});
 		}
