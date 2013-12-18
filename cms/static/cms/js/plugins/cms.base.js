@@ -67,7 +67,7 @@ $(document).ready(function () {
 
 			// change css and attributes
 			tooltip.css('visibility', 'visible')
-				.data('plugin_id', id)
+				.data('plugin_id', id || null)
 				.show()
 				.find('span').html(name);
 
