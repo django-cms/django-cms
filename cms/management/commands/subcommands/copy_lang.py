@@ -7,6 +7,8 @@ from django.core.management.base import BaseCommand, CommandError
 
 from cms.api import copy_plugins_to_language
 from cms.models import Title, Page
+from cms.stacks.models import Stack
+from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import get_language_list
 
 
@@ -59,5 +61,17 @@ class CopyLangCommand(BaseCommand):
             else:
                 if verbose:
                     self.stdout.write('Skipping page %s, language %s not defined\n' % (page, from_lang))
+
+        for stack in Stack.objects.all():
+            plugin_list = []
+            for plugin in stack.draft.get_plugins():
+                if plugin.language == from_lang:
+                    plugin_list.append(plugin)
+
+            if plugin_list:
+                if verbose:
+                    self.stdout.write("copying plugins from stack '%s' in '%s' to '%s'\n" % (stack.name, from_lang,
+                                                                                             to_lang))
+                copy_plugins_to(plugin_list, stack.draft, to_lang)
 
         self.stdout.write(u"all done")
