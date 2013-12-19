@@ -137,10 +137,10 @@ $(document).ready(function () {
 			}
 
 			// save settings
-			CMS.settings = settings;
+			CMS.settings = JSON.parse(settings);
 
 			// ensure new settings are returned
-			return settings;
+			return CMS.settings;
 		},
 
 		getSettings: function () {
@@ -177,7 +177,7 @@ $(document).ready(function () {
 			CMS.settings = settings;
 
 			// ensure new settings are returned
-			return settings;
+			return CMS.settings;
 		},
 
 		// prevents scrolling when another scrollbar is used (for better ux)

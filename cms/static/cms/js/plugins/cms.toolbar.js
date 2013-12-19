@@ -58,7 +58,9 @@ $(document).ready(function () {
 			this.body.addClass('cms_toolbar-ready');
 
 			// check if we need to reset the current settings depending on a new release
-			if(CMS.config.settings.version !== this.settings.version) this.setSettings(CMS.config.settings);
+			if(CMS.config.settings.version !== this.settings.version) {
+				this.settings = this.setSettings(CMS.config.settings);
+			}
 
 			// check if debug is true
 			if(CMS.config.debug) this._debug();
@@ -321,7 +323,7 @@ $(document).ready(function () {
 			this.messages.css('top', 31);
 			// set new settings
 			this.settings.toolbar = 'expanded';
-			if(!init) this.setSettings(this.settings);
+			if(!init) this.settings = this.setSettings(this.settings);
 		},
 
 		_hideToolbar: function (speed, init) {
@@ -336,7 +338,7 @@ $(document).ready(function () {
 			this.messages.css('top', 0);
 			// set new settings
 			this.settings.toolbar = 'collapsed';
-			if(!init) this.setSettings(this.settings);
+			if(!init) this.settings = this.setSettings(this.settings);
 		},
 
 		_setSwitcher: function (el) {

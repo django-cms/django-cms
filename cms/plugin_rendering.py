@@ -84,20 +84,12 @@ def render_plugins(plugins, context, placeholder, processors=None):
     return out
 
 
-def render_dragables(plugins, slot, request, context):
-    context['plugins'] = plugins
-    context['slot'] = slot
-
-    return render_to_string("cms/toolbar/dragitem.html", context)
-
-
 def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
     """
     from cms.plugins.utils import get_plugins
-
     context = context_to_copy
     context.push()
     request = context['request']
