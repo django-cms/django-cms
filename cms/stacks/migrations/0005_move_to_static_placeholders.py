@@ -13,7 +13,10 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         for stack in orm['stacks.Stack'].objects.all():
-            sp = StaticPlaceholder()
+            try:
+                sp = StaticPlaceholder.objects.get(code=stack.code)
+            except StaticPlaceholder.DoesNotExist:
+                sp = StaticPlaceholder()
             sp.code = stack.code
             sp.is_dirty = True
             sp.draft_id = stack.draft_id
