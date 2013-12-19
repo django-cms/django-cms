@@ -17,13 +17,5 @@ class RenderPlaceholder(Tag):
     )
 
     def render_tag(self, context, placeholder, width, language=None):
-        request = context.get('request', None)
-        if not request:
-            return ''
-        if not placeholder:
-            return ''
-        if not hasattr(request, 'placeholder'):
-            request.placeholders = []
-        request.placeholders.append(placeholder)
-        return safe(placeholder.render(context, width, lang=language))
+        raise DeprecationWarning('render_placeholder is now located in cms_tags. Please do not load placeholder_tags anymore')
 register.tag(RenderPlaceholder)

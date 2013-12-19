@@ -201,7 +201,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
 
     def test_placeholder_tag(self):
-        template = Template("{% load placeholder_tags %}{% render_placeholder placeholder %}")
+        template = Template("{% load cms_tags %}{% render_placeholder placeholder %}")
         ctx = Context()
         self.assertEqual(template.render(ctx), "")
         request = self.get_request('/')
@@ -219,7 +219,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(template.render(rctx).strip(), "test")
 
     def test_placeholder_tag_language(self):
-        template = Template("{% load placeholder_tags %}{% render_placeholder placeholder language language %}")
+        template = Template("{% load cms_tags %}{% render_placeholder placeholder language language %}")
         placeholder = Placeholder.objects.create(slot="test")
         add_plugin(placeholder, "TextPlugin", 'en', body="English")
         add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
