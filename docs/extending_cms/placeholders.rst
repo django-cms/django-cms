@@ -127,11 +127,11 @@ Templates
 
 Now to render the placeholder in a template you use the
 :ttag:`render_placeholder` tag from the
-:mod:`~cms.templatetags.placeholder_tags` template tag library:
+:mod:`~cms.templatetags.cms_tags` template tag library:
 
 .. code-block:: html+django
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% render_placeholder mymodel_instance.my_placeholder "640" %}
 
@@ -162,7 +162,7 @@ like this:
 
 .. code-block:: html+django
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 
