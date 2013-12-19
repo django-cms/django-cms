@@ -58,10 +58,7 @@ $(document).ready(function () {
 			this.body.addClass('cms_toolbar-ready');
 
 			// check if we need to reset the current settings depending on a new release
-			if(CMS.config.settings.version !== this.settings.version) {
-				this.setSettings(CMS.config.settings);
-				this.reloadBrowser();
-			}
+			if(CMS.config.settings.version !== this.settings.version) this.setSettings(CMS.config.settings);
 
 			// check if debug is true
 			if(CMS.config.debug) this._debug();
