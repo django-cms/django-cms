@@ -114,7 +114,7 @@ $(document).ready(function () {
 
 			// apply new settings
 			this.settings.mode = 'structure';
-			if(!init) this.setSettings(this.settings);
+			if(!init) this.settings = this.setSettings(this.settings);
 
 			// ensure all elements are visible
 			this.dragareas.show();
@@ -138,7 +138,7 @@ $(document).ready(function () {
 			this.clipboard.hide();
 
 			this.settings.mode = 'edit';
-			if(!init) this.setSettings(this.settings);
+			if(!init) this.settings = this.setSettings(this.settings);
 
 			// hide canvas
 			this._hideBoard();
