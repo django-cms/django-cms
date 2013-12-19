@@ -16,10 +16,9 @@ from cms.utils.compat.dj import force_unicode
 def get_plugins(request, placeholder, lang=None):
     if not placeholder:
         return []
-    lang = lang or get_language_from_request(request)
-    if not hasattr(placeholder, '_%s_plugins_cache' % lang):
+    if not hasattr(placeholder, '_plugins_cache'):
         assign_plugins(request, [placeholder], lang)
-    return getattr(placeholder, '_%s_plugins_cache' % lang)
+    return getattr(placeholder, '_plugins_cache')
 
 
 def requires_reload(action, plugins):
@@ -64,7 +63,7 @@ def assign_plugins(request, placeholders, lang=None):
     for group in groups:
         groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
-        setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
+        setattr(placeholder, '_plugins_cache', list(groups.get(placeholder.pk, [])))
 
 def build_plugin_tree(plugin_list):
     root = []
