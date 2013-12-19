@@ -201,7 +201,7 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 
 			// should we reload
-			if(this.enforceReload) that.reloadBrowser();
+			if(this.enforceReload) this.reloadBrowser();
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
