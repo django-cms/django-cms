@@ -19,11 +19,8 @@ class Migration(DataMigration):
             sp.draft_id = stack.draft_id
             sp.public_id = stack.public_id
             sp.name = stack.name
-            sp.creation_method = stakc.creation_method
+            sp.creation_method = stack.creation_method
             sp.save()
-        # Note: Don't use "from appname.models import ModelName".
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
 
     def backwards(self, orm):
         "Write your backwards methods here."
