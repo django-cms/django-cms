@@ -43,16 +43,6 @@ def assign_plugins(request, placeholders, lang=None):
         return
     lang = lang or get_language_from_request(request)
     request_lang = lang
-    if hasattr(request, "current_page") and not request.current_page == None:
-        # == is required since request.current_page may be a SimpleLazyObject
-        languages = request.current_page.get_languages()
-        if not lang in languages and not get_redirect_on_fallback(lang):
-            fallbacks = get_fallback_languages(lang)
-            for fallback in fallbacks:
-                if fallback in languages:
-                    request_lang = fallback
-                    break
-                    # get all plugins for the given placeholders
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
         'placeholder', 'tree_id', 'level', 'position')
     plugin_list = downcast_plugins(qs, placeholders)

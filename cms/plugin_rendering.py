@@ -112,6 +112,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
             get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
         fallbacks = get_fallback_languages(lang)
         for fallback_language in fallbacks:
+            del(placeholder._plugins_cache)
             plugins = [plugin for plugin in get_plugins(request, placeholder, fallback_language)]
             if plugins:
                 break
