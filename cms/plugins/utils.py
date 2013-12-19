@@ -16,10 +16,9 @@ from cms.utils.compat.dj import force_unicode
 def get_plugins(request, placeholder, lang=None):
     if not placeholder:
         return []
-    lang = lang or get_language_from_request(request)
-    if not hasattr(placeholder, '_%s_plugins_cache' % lang):
+    if not hasattr(placeholder, '_plugins_cache'):
         assign_plugins(request, [placeholder], lang)
-    return getattr(placeholder, '_%s_plugins_cache' % lang)
+    return getattr(placeholder, '_plugins_cache')
 
 
 def requires_reload(action, plugins):
@@ -44,16 +43,6 @@ def assign_plugins(request, placeholders, lang=None):
         return
     lang = lang or get_language_from_request(request)
     request_lang = lang
-    if hasattr(request, "current_page") and not request.current_page == None:
-        # == is required since request.current_page may be a SimpleLazyObject
-        languages = request.current_page.get_languages()
-        if not lang in languages and not get_redirect_on_fallback(lang):
-            fallbacks = get_fallback_languages(lang)
-            for fallback in fallbacks:
-                if fallback in languages:
-                    request_lang = fallback
-                    break
-                    # get all plugins for the given placeholders
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
         'placeholder', 'tree_id', 'level', 'position')
     plugin_list = downcast_plugins(qs, placeholders)
@@ -64,7 +53,7 @@ def assign_plugins(request, placeholders, lang=None):
     for group in groups:
         groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
-        setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
+        setattr(placeholder, '_plugins_cache', list(groups.get(placeholder.pk, [])))
 
 def build_plugin_tree(plugin_list):
     root = []

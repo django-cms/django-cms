@@ -734,7 +734,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # this should not raise any errors, but just ignore the empty plugin
         out = placeholder.render(self.get_context(), width=300)
         self.assertFalse(len(out))
-        self.assertTrue(len(placeholder._en_plugins_cache))
+        self.assertTrue(len(placeholder._plugins_cache))
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()

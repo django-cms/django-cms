@@ -57,7 +57,7 @@ $(document).ready(function () {
 					that.settings.sideframe.hidden = true;
 					that._hide();
 				}
-				that.setSettings(that.settings);
+				that.settings = that.setSettings(that.settings);
 			});
 
 			// attach maximize event
@@ -70,7 +70,7 @@ $(document).ready(function () {
 					that.settings.sideframe.hidden = false;
 					that._maximize();
 				}
-				that.setSettings(that.settings);
+				that.settings = that.setSettings(that.settings);
 			});
 
 			this.sideframe.find('.cms_sideframe-resize').bind('mousedown', function (e) {
@@ -114,7 +114,7 @@ $(document).ready(function () {
 
 				// save url in settings
 				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
-				that.setSettings(that.settings);
+				that.settings = that.setSettings(that.settings);
 
 				// bind extra events
 				iframe.contents().find('body').bind(that.click, function () {
@@ -155,7 +155,7 @@ $(document).ready(function () {
 				'width': this.options.sideframeWidth
 			};
 
-			this.setSettings(this.settings);
+			this.settings = this.setSettings(this.settings);
 		},
 
 		// private methods
@@ -262,7 +262,7 @@ $(document).ready(function () {
 				// save position
 				clearTimeout(timer);
 				timer = setTimeout(function () {
-					that.setSettings(that.settings);
+					that.settings = that.setSettings(that.settings);
 				}, 500);
 			});
 		},

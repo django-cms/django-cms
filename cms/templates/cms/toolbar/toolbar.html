@@ -100,7 +100,7 @@
 				<div class="cms_draggables">
 				{% with placeholder.slot as slot %}
 				{% for plugin in placeholder.get_cached_plugins %}
-					{% include "cms/toolbar/dragitem_item.html" with plugin=plugin %}
+					{% include "cms/toolbar/dragitem.html" with plugin=plugin %}
 				{% endfor %}
 				{% endwith %}
 				</div>

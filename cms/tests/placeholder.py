@@ -228,6 +228,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         rctx['placeholder'] = placeholder
         rctx['language'] = 'en'
         self.assertEqual(template.render(rctx).strip(), "English")
+        del(placeholder._plugins_cache)
         rctx['language'] = 'de'
         self.assertEqual(template.render(rctx).strip(), "Deutsch")
 
@@ -336,7 +337,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertRegexpMatches(content_de, "^en body$")
 
             # remove the cached plugins instances
-            del(placeholder_de._de_plugins_cache)
+            del(placeholder_de._plugins_cache)
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
@@ -347,7 +348,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         page_en = create_page('page_en', 'col_two.html', 'en')
         title_de = create_title("de", "page_de", page_en)
         placeholder_en = page_en.placeholders.get(slot='col_left')
-        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        placeholder_de = page_en.placeholders.get(slot='col_left')
         add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
 
         class NoPushPopContext(Context):
@@ -365,12 +366,12 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ## Deutsch page should have the text plugin
         content_de = render_placeholder(placeholder_en, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
-
+        del(placeholder_en._plugins_cache)
         ## English page should have no text
         content_en = render_placeholder(placeholder_en, context_en)
         self.assertNotRegex(content_en, "^de body$")
         self.assertEqual(len(content_en), 0)
-
+        del(placeholder_en._plugins_cache)
         conf = {
             'col_left': {
                 'language_fallback': True,
@@ -382,7 +383,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertRegexpMatches(content_en, "^de body$")
 
             # remove the cached plugins instances
-            del(placeholder_en._en_plugins_cache)
+            del(placeholder_en._plugins_cache)
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
             content_en = render_placeholder(placeholder_en, context_en)
