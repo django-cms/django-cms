@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from cms.models import StaticPlaceholder
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
@@ -12,7 +13,7 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         for stack in orm['stacks.Stack'].objects.all():
-            sp = orm['cms.StaticPlaceholder']()
+            sp = StaticPlaceholder()
             sp.code = stack.code
             sp.is_dirty = True
             sp.draft_id = stack.draft_id
