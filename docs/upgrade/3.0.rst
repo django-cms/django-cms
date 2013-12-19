@@ -212,3 +212,15 @@ Frontedit editor for Django models
 Starting from 3.0 you can use :ref:`show_editable_model <frontend-editable-fields>`
 templatetag to edit any Django models in the frontend editor.
 
+
+Moved all templatetags to cms_tags
+==================================
+
+All templatetats are now in the cms_tags namespace.
+So to use any cms templatetags you can do just::
+
+    {% load cms_tags %}
+
+
+    
+
