@@ -15,7 +15,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from os.path import join
 import reversion
-from reversion.models import Revision, Version, VERSION_CHANGE
+from reversion.models import Revision, Version
+if hasattr(reversion.models, 'VERSION_CHANGE'):
+    from reversion.models import VERSION_CHANGE
 
 
 class BasicReversionTestCase(CMSTestCase):
@@ -191,9 +193,14 @@ class ReversionFileFieldTests(CMSTestCase):
             # manually add a revision because we use the explicit way
             # django-cms uses too.
             adapter = reversion.get_adapter(FileModel)
-            reversion.revision_context_manager.add_to_context(
-                reversion.default_revision_manager, file1,
-                adapter.get_version_data(file1, VERSION_CHANGE))
+            if hasattr(reversion.models, 'VERSION_CHANGE'):
+                reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1, VERSION_CHANGE))
+            else:
+                reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1))
             # reload the instance from db
         file2 = FileModel.objects.all()[0]
         # delete the instance.

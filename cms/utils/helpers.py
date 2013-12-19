@@ -15,8 +15,7 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
     # reversion's merely recommended, not required
     if not 'reversion' in settings.INSTALLED_APPS:
         return
-    
-    from reversion.models import VERSION_CHANGE
+
     if fields and exclude_fields:
         raise ValueError("Just one of fields, exclude_fields arguments can be passed.")
     
@@ -38,7 +37,8 @@ def make_revision_with_plugins(obj, user=None, message=None):
     # we can safely import reversion - calls here always check for 
     # reversion in installed_applications first
     import reversion
-    from reversion.models import VERSION_CHANGE
+    if hasattr(reversion.models, 'VERSION_CHANGE'):
+        from reversion.models import VERSION_CHANGE
     """
     Only add to revision if it is a draft.
     """
@@ -58,16 +58,25 @@ def make_revision_with_plugins(obj, user=None, message=None):
                 revision_context.set_comment(message)
             # add toplevel object to the revision
             adapter = revision_manager.get_adapter(obj.__class__)
-            revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))
+            if hasattr(reversion.models, 'VERSION_CHANGE'):
+                revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))
+            else:
+                revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj))
             # add plugins and subclasses to the revision
             filters = {'placeholder__%s' % placeholder_relation: obj}
             for plugin in CMSPlugin.objects.filter(**filters):
                 plugin_instance, admin = plugin.get_plugin_instance()
                 if plugin_instance:
                     padapter = revision_manager.get_adapter(plugin_instance.__class__)
-                    revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
+                    if hasattr(reversion.models, 'VERSION_CHANGE'):
+                        revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
+                    else:
+                        revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance))
                 bpadapter = revision_manager.get_adapter(plugin.__class__)
-                revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
+                if hasattr(reversion.models, 'VERSION_CHANGE'):
+                    revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
+                else:
+                    revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin))
                 
 def find_placeholder_relation(obj):
     return 'page'
