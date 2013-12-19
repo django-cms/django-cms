@@ -178,7 +178,7 @@ class PageToolbar(CMSToolbar):
                     self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
                                         disabled=not dirty)
         if self.page:
-            if self.page.has_change_permission(self.request):
+            if self.page.has_change_permission(self.request) and self.page.published:
                 self.add_draft_live()
             elif statics:
                 for static_placeholder in statics:
