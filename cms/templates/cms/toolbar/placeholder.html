@@ -12,7 +12,7 @@ $(document).ready(function () {
 	new CMS.Plugin('cms_placeholder-{{ placeholder.pk|unlocalize }}', {
 		'type': 'placeholder',
 		'placeholder_id': '{{ placeholder.pk|unlocalize }}',
-		'plugin_language': '{{ placeholder.get_plugin_cache_language }}',
+		'plugin_language': '{{ language }}',
 		'plugin_restriction': [{% for module in allowed_plugins %}"{{ module}}"{% if not forloop.last %}, {% endif %}{% endfor %}],
 		'urls': {
 			'add_plugin': '{{ placeholder.get_add_url }}',

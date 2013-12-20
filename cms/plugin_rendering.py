@@ -105,17 +105,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     # to have a valid language in this function for `get_fallback_languages` to work
     if not lang:
         lang = get_language_from_request(request)
-    plugins = [plugin for plugin in get_plugins(request, placeholder, lang=lang)]
-    # If no plugin is present in the current placeholder we loop in the fallback languages
-    # and get the first available set of plugins
-    if (len(plugins) == 0 and placeholder and
-            get_placeholder_conf("language_fallback", placeholder.slot, template, False)):
-        fallbacks = get_fallback_languages(lang)
-        for fallback_language in fallbacks:
-            del(placeholder._plugins_cache)
-            plugins = [plugin for plugin in get_plugins(request, placeholder, fallback_language)]
-            if plugins:
-                break
+    plugins = [plugin for plugin in get_plugins(request, placeholder, template, lang=lang)]
+
     # Add extra context as defined in settings, but do not overwrite existing context variables,
     # since settings are general and database/template are specific
     # TODO this should actually happen as a plugin context processor, but these currently overwrite

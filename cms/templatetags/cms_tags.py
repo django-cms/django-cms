@@ -154,7 +154,7 @@ def _get_placeholder(current_page, page, context, name):
             return placeholder
     placeholder_cache[page.pk] = {}
     placeholders = page.rescan_placeholders().values()
-    assign_plugins(context['request'], placeholders, get_language())
+    assign_plugins(context['request'], placeholders, page.get_template(),  get_language())
     for placeholder in placeholders:
         placeholder_cache[page.pk][placeholder.slot] = placeholder
         placeholder.page = page
@@ -178,7 +178,7 @@ def get_placeholder_content(context, request, current_page, name, inherit):
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
             continue
-        if not get_plugins(request, placeholder):
+        if not get_plugins(request, placeholder, page.get_template()):
             continue
         content = render_placeholder(placeholder, context, name)
         if content:

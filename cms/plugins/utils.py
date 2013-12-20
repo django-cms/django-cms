@@ -13,11 +13,11 @@ from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode
 
 
-def get_plugins(request, placeholder, lang=None):
+def get_plugins(request, placeholder, template, lang=None):
     if not placeholder:
         return []
     if not hasattr(placeholder, '_plugins_cache'):
-        assign_plugins(request, [placeholder], lang)
+        assign_plugins(request, [placeholder], template, lang)
     return getattr(placeholder, '_plugins_cache')
 
 
@@ -32,7 +32,7 @@ def requires_reload(action, plugins):
     return False
 
 
-def assign_plugins(request, placeholders, lang=None):
+def assign_plugins(request, placeholders, template, lang=None, no_fallback=False):
     """
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
@@ -45,8 +45,27 @@ def assign_plugins(request, placeholders, lang=None):
     request_lang = lang
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
         'placeholder', 'tree_id', 'level', 'position')
-    plugin_list = downcast_plugins(qs, placeholders)
+    plugins = list(qs)
+    # If no plugin is present in the current placeholder we loop in the fallback languages
+    # and get the first available set of plugins
 
+    if not no_fallback:
+        for placeholder in placeholders:
+            found = False
+            for plugin in plugins:
+                if plugin.placeholder_id == placeholder.pk:
+                    found = True
+                    break
+            if found:
+                continue
+            elif placeholder and get_placeholder_conf("language_fallback", placeholder.slot, template, False):
+                fallbacks = get_fallback_languages(lang)
+                for fallback_language in fallbacks:
+                    assign_plugins(request, [placeholder], template, fallback_language, no_fallback=True)
+                    plugins = placeholder._plugins_cache
+                    if plugins:
+                        break
+    plugin_list = downcast_plugins(plugins, placeholders)
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
 
@@ -54,7 +73,7 @@ def assign_plugins(request, placeholders, lang=None):
         groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
         setattr(placeholder, '_plugins_cache', list(groups.get(placeholder.pk, [])))
-        placeholder._plugin_cache_language = lang
+
 
 
 def build_plugin_tree(plugin_list):

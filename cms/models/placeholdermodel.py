@@ -178,9 +178,6 @@ class Placeholder(models.Model):
     def get_cached_plugins(self):
         return getattr(self, '_plugins_cache', [])
 
-    def get_plugin_cache_language(self):
-        return getattr(self, '_plugins_cache_language', get_language())
-
     @property
     def actions(self):
         if not hasattr(self, '_actions_cache'):
