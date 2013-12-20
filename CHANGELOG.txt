@@ -192,9 +192,11 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - PageAdmin uses the same Plugin API as PlaceholderAdmin
 - Toolbar API for your own apps added
 - twitter plugin removed
-- New stacks application
 - Object level permission support for Placeholder
 - Configuration for plugin custom modules and labels in the toolbar UI
 - Added copy-lang subcommand to copy content between languages
 - Added static_placeholder templatetag
 - Moved render_placeholder from placeholder_tags to cms_tags
+- django 1.6 support added
+- Frontedit editor for Django models
+- Extending the page & title model API

@@ -2,6 +2,8 @@
 Extending the page & title model
 ################################
 
+.. versionadded:: 3.0
+
 If you want to extend the page or title model with your own fields e.g. adding
 an icon for every page the extension models are the way to go.
 

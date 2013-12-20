@@ -190,12 +190,6 @@ See :setting:`CMS_PLACEHOLDER_CONF` for details.
 New copy-lang subcommand
 ========================
 
-A new copy-lang subcommand exists to copy content between languages.
-
-
-Added language copy command
-===========================
-
 Added a management command to copy content (titles and plugins) from one
 language to another.
 

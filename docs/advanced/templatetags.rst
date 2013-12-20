@@ -87,6 +87,30 @@ Example::
 
 .. templatetag:: show_placeholder
 
+render_placeholder
+==================
+
+`{% render_placeholder %}` is used if you have a PlaceholderField in your own model and want
+to render it in the template.
+
+The :ttag:`render_placeholder` tag takes the following parameters:
+
+* :class:`~cms.models.fields.PlaceholderField` instance
+* ``width`` parameter for context sensitive plugins (optional)
+* ``language`` keyword plus ``language-code`` string to render content in the
+  specified language (optional)
+
+
+The following example renders the my_placeholder field from the mymodel_instance and will render
+only the english plugins:
+
+.. code-block:: html+django
+
+    {% load cms_tags %}
+
+    {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
+
+
 
 show_placeholder
 ================
