@@ -103,8 +103,11 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         template = None
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work
-    if not lang:
+    if lang:
+        save_language = lang
+    else:
         lang = get_language_from_request(request)
+        save_language = lang
     plugins = [plugin for plugin in get_plugins(request, placeholder, template, lang=lang)]
 
     # Add extra context as defined in settings, but do not overwrite existing context variables,
@@ -144,7 +147,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         if not placeholder.pk in request.toolbar.placeholders:
             request.toolbar.placeholders[placeholder.pk] = placeholder
     if edit:
-        toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, '', name_fallback=name_fallback))
+        toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback, save_language))
     content = mark_safe("".join(content))
     context['content'] = content
     context['placeholder'] = toolbar_content
@@ -154,7 +157,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     return result
 
 
-def render_placeholder_toolbar(placeholder, context, content, name_fallback=None):
+def render_placeholder_toolbar(placeholder, context, name_fallback, save_language):
     from cms.plugin_pool import plugin_pool
     request = context['request']
     page = placeholder.page if placeholder else None
@@ -173,8 +176,8 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
 
     ## to restrict child-only plugins from draggables..
     context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
-    context['language'] = get_language_from_request(request)
     context['placeholder'] = placeholder
+    context['language'] = save_language
     context['page'] = page
     toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()

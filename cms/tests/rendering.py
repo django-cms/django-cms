@@ -327,6 +327,6 @@ class RenderingTestCase(SettingsOverrideTestCase):
             "cms_placeholder-%s" % placeholder.pk,
             'cms_placeholder',
         ]
-        output = render_placeholder_toolbar(placeholder, context, '', 'test')
+        output = render_placeholder_toolbar(placeholder, context, 'test', 'en')
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
