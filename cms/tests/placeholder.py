@@ -333,6 +333,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         }
         with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
+            del(placeholder_de._plugins_cache)
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^en body$")
 
