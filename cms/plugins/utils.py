@@ -54,6 +54,8 @@ def assign_plugins(request, placeholders, lang=None):
         groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
         setattr(placeholder, '_plugins_cache', list(groups.get(placeholder.pk, [])))
+        placeholder._plugin_cache_language = lang
+
 
 def build_plugin_tree(plugin_list):
     root = []
