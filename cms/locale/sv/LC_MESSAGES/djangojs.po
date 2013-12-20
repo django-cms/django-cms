@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-14 09:44-0500\n"
-"PO-Revision-Date: 2013-11-20 12:10+0000\n"
+"POT-Creation-Date: 2013-12-11 14:32+0100\n"
+"PO-Revision-Date: 2013-12-12 08:53+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django-cms/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -18,22 +18,6 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/cms/js/change_form.js:31
-msgid ""
-"Are you sure you want to change the %(field_name)s without saving the page "
-"first?"
-msgstr "Är du säker att du vill ändra %(field_name)s utan att spara sidan först?"
-
-#: static/cms/js/change_form.js:69
-msgid ""
-"Not all plugins are saved. Are you sure you want to save the page?\n"
-"All unsaved plugin content will tried to save."
-msgstr "Alla plugins är inte sparade. Är du säker på att du vill spara sidan?⏎ Allt innehåll i osparade plugins kommer försöka sparas."
-
-#: static/cms/js/change_form.js:127
+#: static/cms/js/plugins/cms.changeform.js:60
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Är du säker på att du vill ändra tabb utan att spara sidan först?"
-
-#: static/cms/js/plugin_editor.js:132
-msgid "Are you sure you want to delete this plugin?"
-msgstr "Är du säker på att du vill radera detta plugin?"
