@@ -22,6 +22,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.contrib.auth.views import redirect_to_login
+from django.utils import translation
 from django.utils.http import urlquote
 
 
@@ -119,16 +120,18 @@ def details(request, slug):
         # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
-        if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
-            and not redirect_url.startswith('/%s/' % current_language)):
-            # add language prefix to url
-            redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
-            # prevent redirect to self
+        language_prefix = translation.get_language_from_path(request.path)
+
+        if is_language_prefix_patterns_used() and redirect_url.startswith('/'):
+            if not language_prefix:
+                # add current language prefix to url
+                redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
         own_urls = [
             'http%s://%s%s' % ('s' if request.is_secure() else '', request.get_host(), request.path),
             '/%s' % request.path,
             request.path,
         ]
+         # prevent redirect to self
         if redirect_url not in own_urls:
             return HttpResponseRedirect(redirect_url + attrs)
 
