@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import json
+import datetime
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
@@ -28,6 +29,7 @@ from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
+from django.utils import timezone
 
 
 class AdminTestsBase(CMSTestCase):
@@ -271,6 +273,58 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(response.status_code, 200)
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
+
+    def test_change_dates(self):
+        admin, staff = self._get_guys()
+        page = create_page('test-page', 'nav_playground.html', 'en')
+        page.publish()
+        draft = page.get_draft_object()
+
+        with self.settings(USE_TZ=False):
+            original_date = draft.publication_date
+            original_end_date = draft.publication_end_date
+            new_date = timezone.now() - datetime.timedelta(days=1)
+            new_end_date = timezone.now() + datetime.timedelta(days=1)
+            url = reverse('admin:cms_page_dates', args=(draft.pk,))
+            with self.login_user_context(admin):
+                response = self.client.post(url, {
+                    'language': 'en',
+                    'site': draft.site.pk,
+                    'publication_date_0': new_date.date(),
+                    'publication_date_1': new_date.strftime("%H:%M:%S"),
+                    'publication_end_date_0': new_end_date.date(),
+                    'publication_end_date_1': new_end_date.strftime("%H:%M:%S"),
+                })
+                self.assertEqual(response.status_code, 302)
+                draft = Page.objects.get(pk=draft.pk)
+                self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
+                self.assertEqual(draft.publication_date.timetuple(), new_date.timetuple())
+                self.assertEqual(draft.publication_end_date.timetuple(), new_end_date.timetuple())
+                if original_end_date:
+                    self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
+
+        with self.settings(USE_TZ=True):
+            original_date = draft.publication_date
+            original_end_date = draft.publication_end_date
+            new_date = timezone.localtime(timezone.now()) - datetime.timedelta(days=1)
+            new_end_date = timezone.localtime(timezone.now()) + datetime.timedelta(days=1)
+            url = reverse('admin:cms_page_dates', args=(draft.pk,))
+            with self.login_user_context(admin):
+                response = self.client.post(url, {
+                    'language': 'en',
+                    'site': draft.site.pk,
+                    'publication_date_0': new_date.date(),
+                    'publication_date_1': new_date.strftime("%H:%M:%S"),
+                    'publication_end_date_0': new_end_date.date(),
+                    'publication_end_date_1': new_end_date.strftime("%H:%M:%S"),
+                })
+                self.assertEqual(response.status_code, 302)
+                draft = Page.objects.get(pk=draft.pk)
+                self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
+                self.assertEqual(timezone.localtime(draft.publication_date).timetuple(), new_date.timetuple())
+                self.assertEqual(timezone.localtime(draft.publication_end_date).timetuple(), new_end_date.timetuple())
+                if original_end_date:
+                    self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
 
     def test_change_template(self):
         admin, staff = self._get_guys()
