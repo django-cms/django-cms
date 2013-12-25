@@ -166,7 +166,10 @@ $(document).ready(function () {
 			// check if sideframe should be hidden
 			if(this.settings.sideframe.hidden) this._hide();
 			// check if sideframe should be maximized
-			if(this.settings.sideframe.maximized) this._maximize();
+			if(this.settings.sideframe.maximized) {
+				this.sideframe.show();
+				this._maximize();
+			}
 			// otherwise do normal behaviour
 			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
 				this.sideframe.show();
