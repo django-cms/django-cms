@@ -23,11 +23,11 @@ can fill with CMS plugins, by default we ship the following plugins:
 * Twitter
 
 However this is not the end of the list, there are many
-`3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_ 
+`3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_
 already available for you to use. Should you be unable to find a suitable plugin
 for you needs, writing your own is very simple.
 
-More information on `our website <http://www.django-cms.org>`_. 
+More information on `our website <http://www.django-cms.org>`_.
 
 *************
 Documentation
@@ -63,4 +63,3 @@ Credits
 .. image:: https://d2weczhvl823v0.cloudfront.net/divio/django-cms/trend.png
    :alt: Bitdeli badge
    :target: https://bitdeli.com/free
-
