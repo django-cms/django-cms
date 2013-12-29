@@ -16,6 +16,27 @@ module do sanity checks on arguments.
              possible, however permission checks should be implemented manually
              before calling any of these functions.
 
+.. warning:: Due to potential circular dependency issues, it's recommended
+             to import the api in the functions that uses its function.
+
+             e.g. use:
+
+             ::
+
+                 def my_function():
+                     from cms.api import api_function
+
+                     api_function(...)
+
+             instead of:
+
+             ::
+
+                 from cms.api import api_function
+
+                 def my_function():
+                     api_function(...)
+
 
 Functions and constants
 =======================
