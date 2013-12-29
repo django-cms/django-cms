@@ -23,7 +23,7 @@ module do sanity checks on arguments.
 
              ::
 
-                     def my_function():
+                 def my_function():
                      from cms.api import api_function
 
                      api_function(...)
