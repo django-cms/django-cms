@@ -86,13 +86,13 @@ Installing in a virtualenv using pip
 
     As django CMS 3.0 is still unreleased, you need to pick it from the github repository.
     Use ::
-        
+
         pip install https://github.com/divio/django-cms/archive/3.0.0.beta3.zip
-        
+
     to install django CMS 3.0 beta3 or::
-        
+
         pip install https://github.com/divio/django-cms/archive/develop.zip
-        
+
     to target the development branch.
 
 Installing inside a `virtualenv`_ is the preferred way to install any Django installation. This should work on
@@ -109,7 +109,7 @@ You can switch to your virtualenv at the command line by typing:
 .. code-block:: bash
 
   source env/bin/activate
-  
+
 Next, you can install packages one at a time using `pip`_, but we recommend using a `requirements.txt`_ file. The
 following is an example requirements.txt file that can be used with pip to install django CMS and its dependencies:
 
@@ -117,7 +117,7 @@ following is an example requirements.txt file that can be used with pip to insta
 
     # Bare minimum
     django-cms==3.0
-    
+
     #These dependencies are brought in by django CMS, but if you want to lock-in their version, specify them
     Django==1.5.1
     django-classy-tags==0.4
@@ -127,19 +127,19 @@ following is an example requirements.txt file that can be used with pip to insta
     django-sekizai==0.7
     six==1.3.0
     djangocms-admin-style==0.1.2
-    
-    #Optional, recommended packages                
+
+    #Optional, recommended packages
     Pillow==2.0.0
-    django-filer==0.9.4      
-    cmsplugin-filer==0.9.5   
+    django-filer==0.9.4
+    cmsplugin-filer==0.9.5
     django-reversion==1.7
-    
+
 for Postgresql you would also add:
 
 ::
 
     psycopg2==2.5
-    
+
 and install libpq-dev (on Debian-based distro)
 
 for MySQL you would also add:
