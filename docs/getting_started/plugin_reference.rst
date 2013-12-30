@@ -251,6 +251,28 @@ running.
 Text
 ****
 
+.. warning::
+
+    The text plugin has been removed. You must Install
+    `djangocms-text-ckeditor`_ for a replacement of the text plugin.
+
+To install djangocms-text-editor you can do it directly with pip on your
+virtualenv:
+
+    pip install djangocms-text-ckeditor
+
+Once installed, enable it before the 'cms' entry in
+:setting:`django:INSTALLED_APPS` setting::
+
+    INSTALLED_APPS = (
+        # ...
+        'djangocms_text_ckeditor'
+        # ...
+        'cms',
+    )
+
+.. _djangocms-text-ckeditor: https://github.com/divio/djangocms-text-ckeditor
+
 Displays text. If plugins are text-enabled they can be placed inside the
 text-flow. At this moment the following core plugins are text-enabled:
 
