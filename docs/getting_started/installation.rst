@@ -196,6 +196,28 @@ This will install Django, django CMS, South, Pillow, and your database's driver 
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
+**********
+On Mac OSX
+**********
+
+If you're using `Macports`_ you can install pip and virtualenv. Then create
+an enviroment instead of install the packages in the system path:
+
+.. code-block:: bash
+
+    $ sudo port install py27-pip
+    $ sudo port install py27-virtualenv
+
+.. code-block:: bash
+
+    $ virtualenv djangocms-env
+    $ ./djangocms-env/bin/activate
+    (djangocms-env)$ pip install Django==1.5 South Django-CMS
+
+.. _Macports: http://www.macports.org/
+
+**TODO** (Should setup everything up to but not including
+"pip install django-cms" like the above.)
 
 *********
 Databases
