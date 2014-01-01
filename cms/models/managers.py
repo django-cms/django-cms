@@ -414,28 +414,6 @@ class PagePermissionsPermissionManager(models.Manager):
         """
         return self.__get_id_list(user, site, "can_view")
 
-    '''
-    def get_change_list_id_list(self, user, site):
-        """This is used just in admin now. Gives all ids where user haves can_edit
-        and can_add merged together.
-
-        There is for sure a better way how to do this over sql, need to be
-        optimized...
-        """
-        can_change = self.get_change_id_list(user)
-        can_add = self.get_add_id_list(user)
-        if can_change is can_add:
-            # GRANT_ALL case
-            page_id_list = can_change
-        else:
-            permission_set = filter(lambda i: not i is PagePermissionsPermissionManager.GRANT_ALL, [can_change, can_add])
-            if len(permission_set) is 1:
-                page_id_list = permission_set[0]
-            else:
-                page_id_list = list(set(can_change).union(set(can_add)))
-        return page_id_list
-    '''
-
     def __get_id_list(self, user, site, attr):
         from cms.models import (GlobalPagePermission, PagePermission,
             MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
