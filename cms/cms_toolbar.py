@@ -273,6 +273,10 @@ class PageToolbar(CMSToolbar):
                     templates_menu.add_break(TEMPLATE_MENU_BREAK)
                 templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active)
         current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
+        # dates settings
+        dates_url = reverse('admin:cms_page_dates', args=(self.page.pk,))
+        current_page_menu.add_modal_item(_('Publishing dates'), url=dates_url, close_on_url=self.toolbar.URL_CHANGE,
+                                         disabled=(not self.toolbar.edit_mode))
         # advanced settings
         advanced_url = reverse('admin:cms_page_advanced', args=(self.page.pk,))
         advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not self.toolbar.edit_mode

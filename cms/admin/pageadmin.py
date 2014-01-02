@@ -30,7 +30,8 @@ from cms.utils.compat.urls import unquote
 from cms.utils.helpers import find_placeholder_relation
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
-from cms.admin.forms import PageForm, AdvancedSettingsForm, PagePermissionForm
+from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
+                             PublicationDatesForm)
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
 from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
@@ -111,6 +112,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             '',
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
+            pat(r'^([0-9]+)/dates/$', self.dates),
             pat(r'^([0-9]+)/permission-settings/$', self.permissions),
             pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
             pat(r'^([0-9]+)/move-page/$', self.move_page),
@@ -224,6 +226,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             form = super(PageAdmin, self).get_form(request, obj, form=AdvancedSettingsForm, **kwargs)
         elif "permission" in request.path:
             form = super(PageAdmin, self).get_form(request, obj, form=PagePermissionForm, **kwargs)
+        elif "dates" in request.path:
+            form = super(PageAdmin, self).get_form(request, obj, form=PublicationDatesForm, **kwargs)
         else:
             form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
         if 'language' in form.base_fields:
@@ -271,6 +275,9 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not page.has_advanced_settings_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'advanced_settings': True, 'title': _("Advanced Settings")})
+
+    def dates(self, request, object_id):
+        return self.change_view(request, object_id, extra_context={'publishing_dates': True, 'title': _("Publishing dates")})
 
     def permissions(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
@@ -392,7 +399,9 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         context.update({
             'language': language,
             'language_tabs': languages,
-            'show_language_tabs': len(list(languages)) > 1,
+            # Dates are not language dependent, thus we hide the language
+            # selection bar: the language is forced through the form class
+            'show_language_tabs': len(list(languages)) > 1 and not context.get('publishing_dates', False),
         })
         return context
 
