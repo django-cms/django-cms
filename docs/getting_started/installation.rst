@@ -104,6 +104,12 @@ any platform where python in installed. The first step is to create the virtuale
   sudo pip install --upgrade virtualenv
   virtualenv --distribute --no-site-packages env
 
+.. note:: Since virtualenv v1.10 (2013-07-23) --distribute or --setuptools are
+          the same because the new setuptools has been merged with Distribute.
+          Since virtualenv v1.7 (2011-11-30) --no-site-packages was made the
+          default behavior. By the way, we can create a virtualenv typing in our
+          console only `virtualenv env`.
+
 You can switch to your virtualenv at the command line by typing:
 
 .. code-block:: bash
