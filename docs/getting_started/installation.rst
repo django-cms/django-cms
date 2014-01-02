@@ -200,13 +200,21 @@ You have now everything that is needed for you to follow the :doc:`tutorial`.
 On Mac OSX
 **********
 
-If you're using `Macports`_ you can install pip and virtualenv. Then create
-an enviroment instead of install the packages in the system path:
+All you need to do is
 
 .. code-block:: bash
 
-    $ sudo port install py27-pip
-    $ sudo port install py27-virtualenv
+    $ sudo easy_install pip
+
+If you're using `Homebrew`_ you can install pip and virtualenv with the python
+generic package:
+
+.. code-block:: bash
+
+    $ sudo brew install python
+
+Then create an enviroment and work on it instead of install the packages in the
+system path:
 
 .. code-block:: bash
 
@@ -214,10 +222,10 @@ an enviroment instead of install the packages in the system path:
     $ ./djangocms-env/bin/activate
     (djangocms-env)$ pip install Django==1.5 South Django-CMS
 
-.. _Macports: http://www.macports.org/
+.. note:: You can see the general instructions on how to pip install packages
+          after creating the virtualenv :ref:`Installing in a virtualenv using pip <installing-in-a-virtualenv-using-pip>`
 
-**TODO** (Should setup everything up to but not including
-"pip install django-cms" like the above.)
+.. _Homebrew: http://brew.sh/
 
 *********
 Databases
