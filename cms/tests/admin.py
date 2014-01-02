@@ -35,7 +35,7 @@ class AdminTestsBase(CMSTestCase):
     def admin_class(self):
         return site._registry[Page]
 
-    def _get_guys(self, admin_only=False):
+    def _get_guys(self, admin_only=False, use_global_permissions=True):
         admin = self.get_superuser()
         if admin_only:
             return admin
@@ -48,20 +48,39 @@ class AdminTestsBase(CMSTestCase):
         normal_guy.user_permissions = Permission.objects.filter(
             codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
         )
-        gpp = GlobalPagePermission.objects.create(
-            user=normal_guy,
-            can_change=True,
-            can_delete=True,
-            can_change_advanced_settings=False,
-            can_publish=True,
-            can_change_permissions=False,
-            can_move_page=True,
-        )
-        gpp.sites = Site.objects.all()
+        if use_global_permissions:
+            gpp = GlobalPagePermission.objects.create(
+                user=normal_guy,
+                can_change=True,
+                can_delete=True,
+                can_change_advanced_settings=False,
+                can_publish=True,
+                can_change_permissions=False,
+                can_move_page=True,
+            )
+            gpp.sites = Site.objects.all()
         return admin, normal_guy
 
 
 class AdminTestCase(AdminTestsBase):
+
+    def test_permissioned_page_list(self):
+        """
+        Makes sure that a user with restricted page permissions can view
+        the page list.
+        """
+        admin, normal_guy = self._get_guys(use_global_permissions=False)
+
+        site = Site.objects.get(pk=1)
+        page = create_page("Test page", "nav_playground.html", "en",
+                           site=site, created_by=admin)
+
+        PagePermission.objects.create(page=page, user=normal_guy)
+
+        with self.login_user_context(normal_guy):
+            resp = self.client.get(URL_CMS_PAGE)
+            self.assertEqual(resp.status_code, 200)
+
     def test_edit_does_not_reset_page_adv_fields(self):
         """
         Makes sure that if a non-superuser with no rights to edit advanced page
@@ -1129,4 +1148,3 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(foundcount, 2,
                                  "Username %s appeared %s times in response.content, expected 2 times" % (
                                      USER_NAME, foundcount))
-
