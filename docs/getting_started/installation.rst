@@ -44,7 +44,7 @@ minimal additional configuration and are well-proven.
 Text Editors
 ------------
 
-* `Django CMS CKEditor`_ for a WYSIWYG editor
+* `Django CMS CKEditor`_ for a WYSIWYG editor 2.0.5 or higher
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
