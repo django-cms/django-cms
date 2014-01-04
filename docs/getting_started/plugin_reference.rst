@@ -237,7 +237,7 @@ running.
 
 .. note:: For more advanced use cases where you would like to upload your media
           to a central location, consider using  `django-filer`_ with
-          `django CMS plugin`_ and its ``cmsplugin_filer_video`` component
+          `django CMS plugin`_ and its ``cmsplugin_filer_teaser`` component
           instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
