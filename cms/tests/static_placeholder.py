@@ -3,9 +3,10 @@ from __future__ import with_statement
 import json
 from cms.api import add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION
-from cms.models import StaticPlaceholder, Placeholder
+from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.stacks.models import Stack
 from cms.tests.plugins import PluginsTestBaseCase
+from cms.utils.compat.dj import force_unicode
 from django.contrib.auth.models import User
 from django.contrib.admin.sites import site
 from django.template.base import Template
@@ -71,13 +72,13 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
     def test_move_plugin(self):
         static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar')
         static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo')
-        pageplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test')
-        plugin_class = pageplugin.get_plugin_class_instance()
+        sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test')
+        plugin_class = sourceplugin.get_plugin_class_instance()
         expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
         admin = self.get_admin()
 
         with self.login_user_context(admin):
-            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
+            request = self.get_request(post_data={'plugin_id': sourceplugin.pk,
                 'placeholder_id': static_placeholder_target.draft.id,
                 'plugin_parent': '', 'plugin_language': 'en'})
             response = self.admin_class.move_plugin(request)
@@ -86,4 +87,47 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             source = StaticPlaceholder.objects.get(pk=static_placeholder_source.pk)
             target = StaticPlaceholder.objects.get(pk=static_placeholder_target.pk)
             self.assertTrue(source.dirty)
+            self.assertTrue(target.dirty)
+
+    def test_copy_plugin(self):
+        static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar')
+        static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo')
+        sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test source')
+        targetplugin = add_plugin(static_placeholder_target.draft, 'TextPlugin', 'en', body='test dest')
+
+        plugin_class = sourceplugin.get_plugin_class_instance()
+        admin = self.get_admin()
+
+        with self.login_user_context(admin):
+            request = self.get_request(post_data={
+                'source_language': 'en',
+                'source_placeholder_id': static_placeholder_source.draft.pk,
+                'source_plugin_id': sourceplugin.pk,
+                'target_language': 'en',
+                'target_placeholder_id': static_placeholder_target.draft.pk,
+                'targetplugin_id': targetplugin.pk,
+            })
+            response = self.admin_class.copy_plugins(request)
+
+            # generate the expected response
+            plugin_list = CMSPlugin.objects.filter(
+                language='en', placeholder_id=static_placeholder_target.draft.pk).order_by(
+                'tree_id', 'level', 'position')
+            reduced_list = []
+            for plugin in plugin_list:
+                reduced_list.append(
+                    {
+                        'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id,
+                        'position': plugin.position, 'desc': force_unicode(plugin.get_short_description()),
+                        'language': plugin.language, 'placeholder_id': static_placeholder_target.draft.pk
+                    }
+                )
+            expected = json.loads(json.dumps({'plugin_list': reduced_list, 'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}))
+            self.assertEqual(response.status_code, 200)
+            self.assertEquals(json.loads(response.content.decode('utf8')), expected)
+
+            # Check dirty bit
+            source = StaticPlaceholder.objects.get(pk=static_placeholder_source.pk)
+            target = StaticPlaceholder.objects.get(pk=static_placeholder_target.pk)
+            self.assertFalse(source.dirty)
             self.assertTrue(target.dirty)
