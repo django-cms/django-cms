@@ -602,7 +602,7 @@ class CMSEditableObject(InclusionTag):
         Argument('attribute'),
         Argument('edit_fields', default=None, required=False),
         Argument('language', default=None, required=False),
-        Argument('filters', default=None, resolve=False, required=False),
+        Argument('filters', default=None, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
     )
@@ -704,15 +704,13 @@ class CMSEditableObject(InclusionTag):
                     url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
-	# content is for non-edit template content.html
-	# rendered_content is for edit template plugin.html
-	# in this templatetag both hold the same content
+        # content is for non-edit template content.html
+        # rendered_content is for edit template plugin.html
+        # in this templatetag both hold the same content
         context['content'] = mark_safe(context['content'])
         context['rendered_content'] = context['content']
         return context
 register.tag(CMSEditableObject)
-
-
 
 
 class StaticPlaceholderNode(Tag):
