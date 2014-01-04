@@ -328,6 +328,12 @@ Arguments:
   the method must accept ``request`` as first parameter.
 
 
+.. warning::
+
+    ``show_editable_model`` marks as safe the content of the rendered model
+    attribute. This may be a security risk if used on fields which may hold
+    non-trusted content. Be aware, and use the templatetag accordingly.
+
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
 
