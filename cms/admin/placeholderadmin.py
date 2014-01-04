@@ -184,7 +184,7 @@ class PlaceholderAdmin(ModelAdmin):
     def post_edit_plugin(self, request, plugin):
         pass
 
-    def post_move_plugin(self, request, plugin):
+    def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
         pass
 
     def post_delete_plugin(self, request, plugin):
@@ -416,6 +416,7 @@ class PlaceholderAdmin(ModelAdmin):
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
         parent_id = request.POST.get('plugin_parent', None)
         language = request.POST.get('plugin_language', plugin.language)
+        source_placeholder = plugin.placeholder
         if not parent_id:
             parent_id = None
         else:
@@ -452,7 +453,7 @@ class PlaceholderAdmin(ModelAdmin):
                     level_plugin.save()
                     break
                 x += 1
-        self.post_move_plugin(request, plugin)
+        self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 

@@ -554,8 +554,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                           }
                 helpers.make_revision_with_plugins(page, request.user, message)
 
-    def post_move_plugin(self, request, plugin):
-        page = plugin.placeholder.page
+    def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
+        page = target_placeholder.page
         if page and 'reversion' in settings.INSTALLED_APPS:
             moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
@@ -939,9 +939,9 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             if not published:
                 all_published = False
         statics = request.GET.get('statics', '')
-        if not statics  and not page:
+        if not statics and not page:
             return Http404("No page or stack found for publishing.")
-        if statics :
+        if statics:
             static_ids = statics .split(',')
             for pk in static_ids:
                 static_placeholder = StaticPlaceholder.objects.get(pk=pk)

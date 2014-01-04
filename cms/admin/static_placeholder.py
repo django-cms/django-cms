@@ -18,8 +18,9 @@ class StaticPlaceholderAdmin(PlaceholderAdmin):
     def post_edit_plugin(self, request, plugin):
         self.mark_dirty(plugin.placeholder)
 
-    def post_move_plugin(self, request, plugin):
-        self.mark_dirty(plugin.placeholder)
+    def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
+        self.mark_dirty(source_placeholder)
+        self.mark_dirty(target_placeholder)
 
     def post_delete_plugin(self, request, plugin):
         self.mark_dirty(plugin.placeholder)
