@@ -153,7 +153,7 @@ class TitleManager(PublisherManager):
 
     # created new public method to meet test case requirement and to get a list of titles for published pages
     def public(self):
-        return self.get_query_set().filter(page__publisher_is_draft=False, page__published=True)
+        return self.get_query_set().filter(page__published=True)
 
     def drafts(self):
         return self.get_query_set().filter(page__publisher_is_draft=True)
