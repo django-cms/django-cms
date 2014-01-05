@@ -251,9 +251,10 @@ URL configuration
 =================
 
 You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
-urlpatterns. We suggest starting with the following ``urls.py``::
+urlpatterns. We suggest starting with the following
+``~/workspace/myproject/myproject/urls.py``::
 
-    from django.conf.urls import *
+    from django.conf.urls import include, patterns, url
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib import admin
     from django.conf import settings
