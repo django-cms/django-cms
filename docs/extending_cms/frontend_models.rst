@@ -14,6 +14,12 @@ the frontend and access the instance changeform in a popup window, like the page
 changeform.
 
 
+.. warning::
+
+    ``show_editable_model`` marks as safe the content of the rendered model
+    attribute. This may be a security risk if used on fields which may hold
+    non-trusted content. Be aware, and use the templatetag accordingly.
+
 ****************
 Page titles edit
 ****************
@@ -170,12 +176,12 @@ Example ``view_method``::
 Filters
 *******
 
-If you need to apply filters to the output value of the templateag, add the
-string with chained filters as in Django :ttag:`django:filter` templatetag::
+If you need to apply filters to the output value of the templatetag, add quoted
+sequence of filters as in Django :ttag:`django:filter` templatetag::
 
     {% load cms_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "attribute" "" "" truncatechars:9 %}</h1>
+    <h1>{% show_editable_model instance "attribute" "" "" "truncatechars:9" %}</h1>
     {% endblock content %}
 

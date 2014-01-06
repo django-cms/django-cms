@@ -18,6 +18,7 @@ class Example1(models.Model):
     char_2 = models.CharField(u'char_2', max_length=255)
     char_3 = models.CharField(u'char_3', max_length=255)
     char_4 = models.CharField(u'char_4', max_length=255)
+    date_field = models.DateField(null=True)
     placeholder = PlaceholderField('placeholder')
 
     def callable_item(self, request):
