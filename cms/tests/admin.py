@@ -1161,3 +1161,14 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 # 2 forms contain usernames as options
                 self.assertEqual(foundcount, 2, "Username %s appeared %s times in response.content, expected 2 times" % (USER_NAME, foundcount))
 
+class UtilTestCase(TestCase):
+    def test(self):
+        page = Page()
+        page.pk = 1
+        page.template = "random_template"
+        request = RequestFactory().get('admin/cms/page/%d/?template=%s' %
+                (page.pk, settings.CMS_TEMPLATE_INHERITANCE_MAGIC))
+
+        from cms.utils import get_template_from_request
+        ret = get_template_from_request(request, page)
+        self.assertEqual(ret, settings.CMS_TEMPLATES[0][0])
