@@ -195,31 +195,6 @@ Example::
         'sampleapp.cms_app.SampleApp',
     )
 
-********************
-Editor configuration
-********************
-
-The Wymeditor from :mod:`cms.plugins.text` plugin can take the same
-configuration as vanilla Wymeditor. Therefore you will need to learn 
-how to configure that. The best thing to do is to head 
-over to the `Wymeditor examples page 
-<http://files.wymeditor.org/wymeditor-1.0.0b2/examples/>`_
-in order to understand how Wymeditor works. 
-
-The :mod:`cms.plugins.text` plugin exposes several variables named
-WYM_* that correspond to the wym configuration. The simplest 
-way to get started with this is to go to ``cms/plugins/text/settings.py``
-and copy over the WYM_* variables and you will realize they 
-match one to one to Wymeditor's.
-
-Currently the following variables are available:
-
-* ``WYM_TOOLS``
-* ``WYM_CONTAINERS``
-* ``WYM_CLASSES``
-* ``WYM_STYLES``
-* ``WYM_STYLESHEET``
-
 *************
 I18N and L10N
 *************
@@ -297,7 +272,7 @@ Every language node needs at least a ``code`` and a ``name`` property. ``code``
 is the ISO 2 code for the language, and ``name`` is the verbose name of the
 language.
 
-.. note:: 
+.. note::
 
     With a gettext() lambda function you can make language names translatable.
     To enable this add ``gettext = lambda s: s`` at the beginning of your
@@ -610,7 +585,7 @@ CMS_MAX_PAGE_PUBLISH_REVERSIONS
 Default: ``25``
 
 If `django-reversion`_ is installed everything you do with a page and all
-plugin changes will be saved in a revision. 
+plugin changes will be saved in a revision.
 
 In the page admin there is a ``History`` button to revert to previous version
 of a page. In the past, databases using django-reversion could grow huge. To
@@ -637,4 +612,3 @@ toolbar as import paths.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
-

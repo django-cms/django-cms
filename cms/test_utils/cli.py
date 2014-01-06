@@ -83,7 +83,6 @@ def configure(db_url, **extra):
             'cms.stacks',
             'menus',
             'mptt',
-            #'cms.plugins.text',
             'djangocms_text_ckeditor',
             'djangocms_column',
             'djangocms_style',
