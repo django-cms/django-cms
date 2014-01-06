@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.utils import timezone
 
-from cms.admin.forms import PageForm, AdvancedSettingsForm
+from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
 from cms.middleware.user import CurrentUserMiddleware
@@ -333,7 +333,6 @@ class PagesTestCase(CMSTestCase):
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
 
-
     def test_language_change(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -417,7 +416,6 @@ class PagesTestCase(CMSTestCase):
         child.move_page(parent, 'left')
         self.assertEqual(child.get_template(), parent.get_template())
 
-
     def test_add_placeholder(self):
         # create page
         page = create_page("Add Placeholder", "nav_playground.html", "en",
@@ -467,11 +465,12 @@ class PagesTestCase(CMSTestCase):
         now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         sitemap = CMSSitemap()
-        actual_last_modification_time = sitemap.lastmod(page)
-        self.assertEqual(actual_last_modification_time, now)
+        actual_last_modification_time = sitemap.lastmod(title)
+        self.assertEqual(actual_last_modification_time.date(), now.date())
 
     def test_edit_page_other_site_and_language(self):
         """

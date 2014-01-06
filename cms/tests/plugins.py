@@ -740,16 +740,15 @@ class PluginsTestCase(PluginsTestBaseCase):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
+        title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
-
         plugin_id = self._create_text_plugin_on_page(page)
         plugin = self._edit_text_plugin(plugin_id, "fnord")
 
-        actual_last_modification_time = CMSSitemap().lastmod(page)
-        self.assertEqual(plugin.changed_date - datetime.timedelta(microseconds=plugin.changed_date.microsecond),
-                         actual_last_modification_time - datetime.timedelta(
-                             microseconds=actual_last_modification_time.microsecond))
+        actual_last_modification_time = CMSSitemap().lastmod(title)
+        actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
+        self.assertEqual(plugin.changed_date.date(), actual_last_modification_time.date())
 
     def test_moving_plugin_to_different_placeholder(self):
         plugin_pool.register_plugin(DumbFixturePlugin)
