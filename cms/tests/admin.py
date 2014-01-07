@@ -1161,14 +1161,46 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 # 2 forms contain usernames as options
                 self.assertEqual(foundcount, 2, "Username %s appeared %s times in response.content, expected 2 times" % (USER_NAME, foundcount))
 
-class UtilTestCase(TestCase):
-    def test(self):
-        page = Page()
-        page.pk = 1
-        page.template = "random_template"
+
+class ChangeTemplateTests(TestCase):
+    def setUp(self):
+        self.saved_cms_templates = settings.CMS_TEMPLATES
+
+    def test_orphan_retrieves_default_templ(self):
+        page = create_page(title = "child_template",
+                                 template = "col_two.html",
+                                 language = settings.LANGUAGES[0][0])
+
         request = RequestFactory().get('admin/cms/page/%d/?template=%s' %
                 (page.pk, settings.CMS_TEMPLATE_INHERITANCE_MAGIC))
+    
+        settings.CMS_TEMPLATES = tuple([t for t in settings.CMS_TEMPLATES 
+            if t[0] != "col_two.html"])
 
         from cms.utils import get_template_from_request
         ret = get_template_from_request(request, page)
         self.assertEqual(ret, settings.CMS_TEMPLATES[0][0])
+
+    def test_child_retrieves_parent_templ(self):
+        parent_page = create_page(title = "parent_template",
+                                  template = "nav_playground.html",
+                                  language = settings.LANGUAGES[0][0])
+
+        child_page = create_page(title = "child_template",
+                                 template = "col_two.html",
+                                 language = settings.LANGUAGES[0][0],
+                                 parent = parent_page)
+
+        request = RequestFactory().get('admin/cms/page/%d/?template=%s' %
+                (child_page.pk, settings.CMS_TEMPLATE_INHERITANCE_MAGIC))
+
+        settings.CMS_TEMPLATES = tuple([t for t in settings.CMS_TEMPLATES 
+            if t[0] != "col_two.html"])
+
+        from cms.utils import get_template_from_request
+
+        ret = get_template_from_request(request, child_page)
+        self.assertEqual(ret, 'nav_playground.html')   
+    
+    def tearDown(self):
+        settings.CMS_TEMPLATES = self.saved_cms_templates 
