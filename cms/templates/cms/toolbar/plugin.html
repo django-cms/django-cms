@@ -2,14 +2,14 @@
 {% load i18n l10n sekizai_tags %}
 {% load url from future %}
 
-<div class="cms_plugin cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.object_name|slugify}}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk }}">{{ rendered_content }}</div>
+<div class="cms_plugin cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk }}">{{ rendered_content }}</div>
 
 {% endspaceless %}{% addtoblock "js" %}
 <script>
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.Plugin('cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.object_name|slugify}}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}', {
+	new CMS.Plugin('cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}', {
 		'type': {% if generic %}'generic'{% else %}'plugin'{% endif %},
 		'page_language': '{{ LANGUAGE_CODE }}',
 		'placeholder_id': '{{ instance.placeholder.pk|unlocalize }}',
