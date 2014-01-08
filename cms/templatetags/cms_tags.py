@@ -72,6 +72,8 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     if page_lookup is None:
         return request.current_page
     if isinstance(page_lookup, Page):
+        if request.current_page.pk == page_lookup.pk:
+            return request.current_page
         return page_lookup
     if isinstance(page_lookup, string_types):
         page_lookup = {'reverse_id': page_lookup}

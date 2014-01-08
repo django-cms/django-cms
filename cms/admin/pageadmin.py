@@ -95,7 +95,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     recover_form_template = "admin/cms/page/history/recover_header.html"
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
-    list_filter = ['published', 'in_navigation', 'template', 'changed_by', 'soft_root']
+    list_filter = ['in_navigation', 'template', 'changed_by', 'soft_root']
     title_frontend_editable_fields = ['title', 'menu_title', 'page_title']
 
     inlines = PERMISSION_ADMIN_INLINES
@@ -118,19 +118,19 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/copy-language/$', self.copy_language),
-            pat(r'^([0-9]+)/change-status/$', self.change_status),
+            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
+            pat(r'^([0-9]+)/descendants/$', self.descendants),  # menu html for page descendants
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/publish/$', self.publish_page), # publish page
-            pat(r'^([0-9]+)/revert/$', self.revert_page), # publish page
-            pat(r'^([0-9]+)/undo/$', self.undo),
-            pat(r'^([0-9]+)/redo/$', self.redo),
-            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog), # copy dialog
-            pat(r'^([0-9]+)/preview/$', self.preview_page), # copy dialog
-            pat(r'^([0-9]+)/descendants/$', self.descendants), # menu html for page descendants
-            pat(r'^(?P<object_id>\d+)/change_template/$', self.change_template), # copy dialog
+            pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),  # publish page
+            pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),  # unpublish page
+            pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
+            pat(r'^([0-9]+)/([a-z\-]+)/undo/$', self.undo),
+            pat(r'^([0-9]+)/([a-z\-]+)/redo/$', self.redo),
+            pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),  # copy dialog
+            pat(r'^([0-9]+)/change_template/$', self.change_template), # copy dialog
         )
 
         if plugin_pool.get_all_plugins():
@@ -925,7 +925,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     #@require_POST
     @transaction.commit_on_success
     @create_revision()
-    def publish_page(self, request, page_id):
+    def publish_page(self, request, page_id, language):
         try:
             page = Page.objects.get(id=page_id, publisher_is_draft=True)
         except Page.DoesNotExist:
@@ -935,7 +935,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if page:
             if not page.has_publish_permission(request):
                 return HttpResponseForbidden(_("You do not have permission to publish this page"))
-            published = page.publish()
+            published = page.publish(language)
             if not published:
                 all_published = False
         statics = request.GET.get('statics', '')
@@ -994,16 +994,48 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
         return HttpResponseRedirect(path)
 
+    @require_POST
+    def unpublish(self, request, page_id, language):
+        """
+        Publish or unpublish a language of a page
+        """
+        site = Site.objects.get_current()
+        page = get_object_or_404(Page, pk=page_id)
+        if not page.has_publish_permission(request):
+            return HttpResponseForbidden(_("You do not have permission to unpublish this page"))
+        if not page.publisher_public_id:
+            return HttpResponseForbidden(_("This page was never published"))
+        try:
+            page.unpublish(language)
+            message = _('The %s page "%s" was successfully unpublished') % (
+            get_language_object(language, site)['name'], page)
+            messages.info(request, message)
+            LogEntry.objects.log_action(
+                user_id=request.user.id,
+                content_type_id=ContentType.objects.get_for_model(Page).pk,
+                object_id=page_id,
+                object_repr=page.get_title(),
+                action_flag=CHANGE,
+                change_message=message,
+            )
+        except RuntimeError:
+            exc = sys.exc_info()[1]
+            messages.error(request, exc.message)
+        except ValidationError:
+            exc = sys.exc_info()[1]
+            messages.error(request, exc.message)
+        return admin_utils.render_admin_menu_item(request, page)
+
     #TODO: Make the change form buttons use POST
     #@require_POST
     @transaction.commit_on_success
-    def revert_page(self, request, page_id):
+    def revert_page(self, request, page_id, language):
         page = get_object_or_404(Page, id=page_id)
         # ensure user has permissions to publish this page
         if not page.has_change_permission(request):
             return HttpResponseForbidden(_("You do not have permission to change this page"))
 
-        page.revert()
+        page.revert(language)
 
         messages.info(request, _('The page "%s" was successfully reverted.') % page)
 

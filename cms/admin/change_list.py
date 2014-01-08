@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import bisect
 from collections import defaultdict
-from cms.exceptions import NoHomeFound
 from cms.models import Title, Page, PageModeratorState
 from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset
-from django.conf import settings
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
@@ -127,7 +125,7 @@ class CMSChangeList(ChangeList):
             pm_states[state.page_id].append(state)
 
         public_page_id_set = Page.objects.public().filter(
-            published=True, publisher_public__in=pages).values_list('id', flat=True)
+            publisher_public_id__gt=0, publisher_public__in=pages).values_list('id', flat=True)
 
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'

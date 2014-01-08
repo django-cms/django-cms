@@ -62,7 +62,7 @@
 			<div class="col-published">
 			<label>{{ page.is_public_published|boolean_icon }}
 				{% if has_publish_permission %}
-					{% if page.published %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
+					{% if page.publisher_public_id %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
 					{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
 					{% endif %}
 				{% endif %}

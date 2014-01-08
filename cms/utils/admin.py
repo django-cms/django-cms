@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
 import json
+from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 
 import django
 from django.http import HttpResponse
@@ -8,7 +9,7 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.contrib.sites.models import Site
 
-from cms.models import Page
+from cms.models import Page, Title
 from cms.utils import permissions, get_language_from_request, get_language_list, get_cms_setting
 from cms.utils.permissions import has_global_page_permission
 from django.utils.encoding import smart_str
@@ -28,8 +29,8 @@ def jsonify_request(response):
 
 
 publisher_classes = {
-    Page.PUBLISHER_STATE_DIRTY: "publisher_dirty",
-    Page.PUBLISHER_STATE_PENDING: "publisher_pending",
+    PUBLISHER_STATE_DIRTY: "publisher_dirty",
+    PUBLISHER_STATE_PENDING: "publisher_pending",
 }
 
 
@@ -65,7 +66,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
 
-    if not page.published:
+    if not page.publisher_public_id:
         css_class = "publisher_draft"
     else:
         css_class = publisher_classes.get(page.publisher_state, "")

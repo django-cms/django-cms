@@ -287,6 +287,11 @@ def configure(db_url, **extra):
                     'level': 'ERROR',
                     'propagate': False,
                 },
+                'django.db': {
+                    'handlers': ['console'],
+                    'level': 'ERROR',
+                    'propagate': False,
+                },
                 'cms': {
                     'handlers': ['console'],
                     'level': 'INFO',

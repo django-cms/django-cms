@@ -130,6 +130,10 @@ class PageToolbar(CMSToolbar):
         self.current_site = Site.objects.get_current()
         # always use draft if we have a page
         self.page = get_page_draft(self.request.current_page)
+        try:
+            self.title = Title.objects.get(page=self.page, language=self.current_lang, publisher_is_draft=True)
+        except Title.DoesNotExist:
+            self.title = None
         # check global permissions if CMS_PERMISSIONS is active
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)
@@ -299,11 +303,13 @@ class PageToolbar(CMSToolbar):
         nav_action = reverse('admin:cms_page_change_innavigation', args=(self.page.pk,))
         current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
         # publisher
-        if self.page.published:
+        if self.title.published:
             publish_title = _('Unpublish page')
+            publish_url = reverse('admin:cms_page_unpublish', args=(self.page.pk, current_lang['code']))
         else:
             publish_title = _('Publish page')
-        publish_url = reverse('admin:cms_page_change_status', args=(self.page.pk,))
+            publish_url = reverse('admin:cms_page_publish', args=(self.page.pk, current_lang['code']))
+
         current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
         current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
         # delete
@@ -333,19 +339,19 @@ class PageToolbar(CMSToolbar):
             from reversion.models import Revision
 
             versions = reversion.get_for_object(self.page)
-            if self.page.revision_id:
-                current_revision = Revision.objects.get(pk=self.page.revision_id)
+            if self.title.revision_id:
+                current_revision = Revision.objects.get(pk=self.title.revision_id)
                 has_undo = versions.filter(revision__pk__lt=current_revision.pk).count() > 0
                 has_redo = versions.filter(revision__pk__gt=current_revision.pk).count() > 0
             else:
                 has_redo = False
                 has_undo = versions.count() > 1
-            undo_action = reverse('admin:cms_page_undo', args=(self.page.pk,))
-            redo_action = reverse('admin:cms_page_redo', args=(self.page.pk,))
+            undo_action = reverse('admin:cms_page_undo', args=(self.page.pk, self.current_lang))
+            redo_action = reverse('admin:cms_page_redo', args=(self.page.pk, self.current_lang))
             history_menu.add_ajax_item(_('Undo'), action=undo_action, disabled=not has_undo)
             history_menu.add_ajax_item(_('Redo'), action=redo_action, disabled=not has_redo)
             history_menu.add_break(HISTORY_MENU_BREAK)
-        revert_action = reverse('admin:cms_page_revert_page', args=(self.page.pk,))
+        revert_action = reverse('admin:cms_page_revert_page', args=(self.page.pk, self.current_lang))
         revert_question = _('Are you sure you want to revert to live?')
         history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
                                    disabled=not self.page.is_dirty())

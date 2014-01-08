@@ -122,7 +122,7 @@ class TestNoI18N(SettingsOverrideTestCase):
         self.client.login(username="test", password="test")
         response = self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
         page = Page.objects.all()[0]
-        response = self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
+        response = self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % (page.pk, 'en-us'), page_data)
         page = Page.objects.all()[0]
 
         plugin_data = {

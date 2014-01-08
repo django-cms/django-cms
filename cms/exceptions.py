@@ -54,6 +54,11 @@ class PublicIsUnmodifiable(Exception):
     pass
 
 
+class PublicVersionNeeded(Exception):
+    """A Public version of this page is needed"""
+    pass
+
+
 class Deprecated(Exception): pass
 
 

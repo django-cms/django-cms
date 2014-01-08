@@ -59,11 +59,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertNotEqual(title, None)
         
         # Publish and unpublish the page
-        page.published = True
-        page.save()
-        page.published = False
-        page.save()
+        page.publish(TESTLANG)
         
+        page.unpublish(TESTLANG)
+        page = page.reload()
+
         # Has correct title and slug after calling save()?
         self.assertEqual(page.get_title(), page_data['title'])
         self.assertEqual(page.get_slug(), page_data['slug'])

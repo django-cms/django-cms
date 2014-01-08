@@ -73,9 +73,8 @@ class PagesTestCase(CMSTestCase):
             self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
 
             page = title.page
-            page.published = True
             page.save()
-            page.publish()
+            page.publish('en')
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.placeholders.all().count(), 2)
@@ -95,7 +94,7 @@ class PagesTestCase(CMSTestCase):
         }
         page = create_page(**page_data)
         page = page.reload()
-        page.publish()
+        page.publish('en')
         self.assertEqual(Page.objects.count(), 2)
         self.assertTrue(page.is_home)
         self.assertTrue(page.publisher_public.is_home)
@@ -187,10 +186,10 @@ class PagesTestCase(CMSTestCase):
             response = self.client.get(self.get_pages_root())
             self.assertEqual(response.status_code, 404)
             page = create_page('test page 1', "nav_playground.html", "en")
-            page.publish()
+            page.publish('en')
             response = self.client.get(self.get_pages_root())
             self.assertEqual(response.status_code, 200)
-            self.assertTrue(page.publish())
+            self.assertTrue(page.publish('en'))
             page2 = create_page("test page 2", "nav_playground.html", "en",
                                 parent=page, published=True)
             homepage = Page.objects.get_home()
@@ -236,7 +235,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page.get_absolute_url(), '/en/hello/')
             title = Title.objects.all()[0]
             page = page.reload()
-            page.publish()
+            page.publish('en')
             page_data['title'] = 'new title'
             response = self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
@@ -276,8 +275,8 @@ class PagesTestCase(CMSTestCase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %}")
             req = HttpRequest()
-            page.published = True
             page.save()
+            page.publish('en')
             req.current_page = page
             req.REQUEST = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")

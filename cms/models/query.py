@@ -48,13 +48,21 @@ class PageQuerySet(PublisherQuerySet):
         else:
             return self.exclude(id__in=exclude_list)
 
-    def published(self, site=None):
-        pub = self.on_site(site).filter(
-            Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
-            Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
-            published=True,
-        )
-        return pub
+    def published(self, language=None, site=None):
+
+        if language:
+            pub = self.on_site(site).filter(
+                Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
+                title_set__published=True, title_set__language=language
+            )
+        else:
+            pub = self.on_site(site).filter(
+                Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
+                title_set__published=True
+            )
+        return pub.distinct()
 
     def expired(self):
         return self.on_site().filter(
@@ -69,7 +77,7 @@ class PageQuerySet(PublisherQuerySet):
 
     def get_home(self, site=None):
         try:
-            home = self.published(site).all_root().order_by("tree_id")[0]
+            home = self.published(site=site).all_root().order_by("tree_id")[0]
         except IndexError:
             raise NoHomeFound('No Root page found. Publish at least one page!')
         return home
