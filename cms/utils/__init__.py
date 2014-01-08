@@ -39,7 +39,10 @@ def get_template_from_request(request, obj=None, no_current_page=False):
             if hasattr(obj,"_template_cache"):
                 del obj._template_cache 
             obj.template = template
-            return obj.get_template()
+            request_template = obj.get_template()
+            if request_template in [t[0] for t in settings.CMS_TEMPLATES]:
+                return request_template
+            return settings.CMS_TEMPLATES[0][0]
         return template    
     return settings.CMS_TEMPLATES[0][0]
 
