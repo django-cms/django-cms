@@ -34,6 +34,11 @@ def get_template_from_request(request, obj=None, no_current_page=False):
         if template == settings.CMS_TEMPLATE_INHERITANCE_MAGIC and obj:
             # Happens on admin's request when changing the template for a page
             # to "inherit".
+
+            # enforce returning ancestor template
+            if hasattr(obj,"_template_cache"):
+                del obj._template_cache 
+            obj.template = template
             return obj.get_template()
         return template    
     return settings.CMS_TEMPLATES[0][0]
