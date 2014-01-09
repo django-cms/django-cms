@@ -1,0 +1,168 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//######################################################################################################################
+// #IMPORT SETTINGS#
+@import "partials/settings";
+
+//######################################################################################################################
+// #PLACEHOLDER
+.cms_placeholder { position:relative; display:none; padding:5px 5px 1px; margin:0 0 5px;
+	@include border-radius(3px); background:$color-grey-70; }
+.cms_placeholder-generic,
+.cms_plugin { display:inline; }
+.cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
+
+//######################################################################################################################
+// #PLACEHOLDER/bar#
+.cms_placeholder-bar {
+	font-size:13px; line-height:20px;
+	position:relative; left:0; top:0; z-index:9999;
+	@include border-radius(3px); background:$color-grey-70;
+
+	.cms_placeholder-title { font-size:12px; line-height:16px; text-transform:uppercase;
+		font-weight:500; padding:0 0 0 15px; height:20px; cursor:pointer;
+		color:white; @include text-shadow(0px 1px 0px black);
+
+		&:before { content:" "; position:absolute; left:0; top:0; width:15px; height:20px;
+			background:url('../../img/toolbar/sprite_toolbar.png') no-repeat -85px -113px;
+		}
+		&:hover {
+			&:before { background-position:-105px -113px; }
+		}
+	}
+	.cms_placeholder-title-expanded {
+		&:before { background-position:-124px -114px; }
+		&:hover {
+			&:before { background-position:-144px -114px !important; }
+		}
+	}
+}
+
+//######################################################################################################################
+// #PLACEHOLDER/subnav#
+.cms_placeholder, body {
+	.cms_submenu { display:block; float:right; width:20px; height:20px; cursor:pointer; position:relative;
+		background:url('../../img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
+
+	.cms_submenu-lang { float:right; padding:0 5px;position:relative; top:-1px; right:-1px;
+		border:1px solid $color-grey-10; @include border-radius(3px); }
+	.cms_submenu-dropdown {
+		display:none; zoom:1; position:absolute; right:0; top:20px; z-index:999;
+		min-width:140px; max-height:230px; overflow:auto;
+		border:1px solid $color-grey-10; background:white;
+		@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+
+		.cms_submenu-item { zoom:1; }
+		.cms_submenu-item a, span { display:block; font-size:12px; line-height:15px; text-align:left; padding:4px 8px 3px 8px; }
+
+		.cms_submenu-item a { color:black;
+			&:hover, &:focus { color:white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
+			&:first-child { border-top:none; } }
+		.cms_submenu-item span { cursor:default; font-weight:bold; color:black;
+			border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }
+		.cms_submenu-item:first-child span { border-top:none; }
+	}
+
+	.cms_submenu-quicksearch { display:none; position:absolute; right:-5px; top:-5px; z-index:1000;
+		cursor:default; text-align:right; height:25px; @include border-radius(4px);
+		background:$color-grey-70 url('../../img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
+	.cms_submenu-quicksearch label { cursor:pointer; }
+	.cms_submenu-quicksearch input { font-size:12px; color:white; text-align:right; -webkit-appearance:none;
+		width:109px; padding:3px 1px 1px 5px; margin-right:25px; border:none; background:none; }
+}
+
+//######################################################################################################################
+// #DRAGGABLES#
+.cms_placeholder, body { // we need body to overwrite cms_reset
+	.cms_draggables { list-style-type:none; padding:0; margin:0; }
+	.cms_draggables .cms_draggables { display:none; min-height:25px; padding-left:6px; }
+
+	// #DRAGGABLES/general#
+	.cms_draggable, .cms_droppable { list-style-type:none;
+		position:relative; left:0; top:0; z-index:99; @include border-radius(3px);
+		padding:4px 5px 3px 5px; margin:0 0 5px;
+
+		// levels
+		.cms_draggable { position:relative; z-index:99; white-space:nowrap;
+			border-color:$color-grey-10; background:white;
+			&:hover { border-color:$color-grey-20; }
+		}
+		.cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable { background:$color-grey-5; }
+		.cms_draggable .cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable { background:white; }
+
+		// menu overwrites
+		.cms_submenu { display:none; margin-top:2px; }
+		.cms_submenu-dropdown { right:-6px; top:22px; }
+		.cms_submenu-quicksearch { right:-5px; top:-6px; @include border-radius(0); height:28px; border-left:1px dotted $color-grey-10;
+			background:$color-grey-5 url('../../img/toolbar/sprite_toolbar.png') no-repeat right -415px; }
+		.cms_submenu-quicksearch input { color:black; margin-top:1px; }
+
+		.cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:white; }
+		.cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+		.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:$color-grey-5; }
+	}
+
+	// #DRAGGABLES/specific#
+	.cms_draggable { z-index:100; color:black; border:1px solid $color-grey-5; background:$color-grey-5;
+		&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); } }
+	.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
+
+	.cms_droppable-empty { font-size:11px; text-transform:uppercase;
+		padding-top:0; padding-bottom:0; }
+	.cms_droppable-empty-wrapper { display:none; }
+
+	.cms_dragitem { cursor:move; }
+	.cms_dragitem-collapsable { cursor:pointer; padding-left:15px; }
+	.cms_dragitem-collapsable { background:url('../../img/toolbar/sprite_toolbar.png') no-repeat 1px -358px; }
+	.cms_dragitem-expanded { background:url('../../img/toolbar/sprite_toolbar.png') no-repeat 0 -389px; }
+	.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
+		width:100%; height:100%;
+		@include opacity(0.6); }
+
+	// #DRAGGABLES/states#
+	.cms_draggable-selected {}
+	.cms_draggable-selected .cms_dragitem,
+	.cms_draggable-selected .cms_dragitem strong { color:adjust-hue($color-blue, 15deg); }
+	.cms_draggable-selected .cms_draggable .cms_dragitem,
+	.cms_draggable-selected .cms_draggable .cms_dragitem strong { color:black; }
+
+	.cms_draggable-allowed, .cms_draggable-hover-allowed, .cms_draggable-placeholder {
+		color:lighten($color-green, 40%); border-color:lighten($color-green, 40%); }
+	.cms_draggable-hover-allowed, .cms_draggable-placeholder { color:white; background:rgba(102, 153, 51, 0.2); }
+	.cms_dragitem-success { border:1px solid lighten($color-green, 40%); background:lighten($color-green, 40%); }
+
+	.cms_draggable-disallowed, .cms_draggable-hover-disallowed {
+		color:saturate($color-red, 80%); border:1px dashed saturate($color-red, 80%);
+		background:rgba(255, 0, 0, 0.1); }
+}
+.cms_placeholder .cms_draggables .cms_draggable { margin-left:0 !important; }
+// hide additional elements when dragging
+body > .cms_draggable .cms_switcher { display:none !important; }
+body > .cms_draggable .cms_submenu { display:none !important; }
+body > .cms_draggable .cms_draggables { display:none !important; }
+
+//##################################################
+// #RETINA#
+@media print,
+	(-o-min-device-pixel-ratio: 5/4),
+	(-webkit-min-device-pixel-ratio: 1.25),
+	(min-resolution: 120dpi) {
+
+	.cms_submenu, .cms_submenu-quicksearch, .cms_placeholder-title:before,
+	.cms_placeholder .cms_dragitem-collapsable, body .cms_dragitem-collapsable,
+	.cms_placeholder .cms_dragitem-collapsed, body .cms_dragitem-collapsed {
+		background-image:url('../../img/toolbar/sprite_toolbar@2x.png') !important;
+		background-size:190px !important; }
+
+// end of retina
+}
