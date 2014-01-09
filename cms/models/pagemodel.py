@@ -39,7 +39,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         (2, _('for anonymous users only')),
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    X_FRAME_OPTIONS_INHERIT = 0
+    X_FRAME_OPTIONS_DENY = 1
+    X_FRAME_OPTIONS_SAMEORIGIN = 2
+    X_FRAME_OPTIONS_ALLOW= 3
+
+    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]   
 
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
     changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
@@ -87,6 +92,19 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     # If the draft is loaded from a reversion version save the revision id here.
     revision_id = models.PositiveIntegerField(default=0, editable=False)
+
+    # X Frame Options for clickjacking protection
+    xframe_options = models.IntegerField(
+        choices=(
+            (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
+            (X_FRAME_OPTIONS_DENY, _('Deny')),
+            (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
+            (X_FRAME_OPTIONS_ALLOW, _('Allow'))
+        ),
+        default=X_FRAME_OPTIONS_INHERIT
+    )
+ 
+
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -250,6 +268,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         target.application_namespace = self.application_namespace
         target.template = self.template
         target.site_id = self.site_id
+        target.xframe_options = self.xframe_options
 
     def copy_page(self, target, site, position='first-child',
                   copy_permissions=True):
@@ -1141,7 +1160,22 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
         return found
+ 
+    def get_xframe_options(self):
+        """ Finds X_FRAME_OPTION from tree if inherited """
+        ancestors = self.get_ancestors(ascending=True, include_self=True)
 
+        # Ignore those pages which just inherit their value
+        ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
+        
+        # Now just give me the clickjacking setting (not anything else)
+        xframe_options = ancestors.values_list('xframe_options', flat=True)
+
+        if len(xframe_options) <= 0:
+            # No ancestors were found
+            return None
+
+        return xframe_options[0]
 
 def _reversion():
     exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
