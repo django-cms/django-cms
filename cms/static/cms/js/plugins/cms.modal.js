@@ -149,6 +149,7 @@ $(document).ready(function () {
 			}
 			// handle refresh option
 			if(this.options.onClose === 'REFRESH_PAGE') this.reloadBrowser();
+			if(this.options.redirectOnClose) this.reloadBrowser(this.options.redirectOnClose);
 		},
 
 		// private methods
