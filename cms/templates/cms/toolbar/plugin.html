@@ -22,7 +22,7 @@ $(document).ready(function () {
 		'plugin_breadcrumb': {{ instance.get_breadcrumb_json|default:"[]" }},
 		'plugin_restriction': [{% for cls in allowed_child_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],
 		'onClose': {% if refresh_page %}'REFRESH_PAGE'{% else %}false{% endif %},
-		{% if redirect_on_close %}'redirectOnClose': '{{ redirect_on_close }}'{% endif %},
+		'redirectOnClose': {% if redirect_on_close %}'{{ redirect_on_close }}'{% else %}false{% endif %},
 		'urls': {
 			'add_plugin': '{% if add_url %}{{ add_url }}{% else %}{% url "admin:cms_page_add_plugin" %}}{% endif %}',
 			'edit_plugin': '{% if edit_url %}{{ edit_url }}{% else %}{% url "admin:cms_page_edit_plugin" instance.pk %}{% endif %}',
