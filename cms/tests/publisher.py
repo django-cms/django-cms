@@ -202,6 +202,7 @@ class PublishingTests(TestCase):
             self.assertObjectExist(drafts, title_set__title=name)
             self.assertObjectDoesNotExist(public, title_set__title=name)
             self.assertObjectDoesNotExist(published, title_set__title=name)
+        print "$$$$$$$$$$$$$$$$$$$$"
         parent.publish("en")
 
         # Cascade publish for all pending descendants
@@ -314,19 +315,21 @@ class PublishingTests(TestCase):
         home.unpublish('en')
         self.assertEqual(Title.objects.count(), 4)
         child = child.reload()
-        self.assertFalse(child.is_published('en'))
+        self.assertFalse(child.publisher_public.is_published('en'))
         self.assertFalse(child.in_navigation)
         self.assertFalse(child.publisher_public.in_navigation)
 
         child.in_navigation = True
         child.save()
+        print '$$$$$$$$$$$$$$$$$$$$$$$$$'
         child.publish('en')
         child = self.reload(child)
         self.assertEqual(Title.objects.count(), 4)
 
-        self.assertFalse(child.is_published('en'))
+        self.assertTrue(child.is_published('en'))
+        self.assertFalse(child.publisher_public.is_published('en'))
         self.assertTrue(child.in_navigation)
-        #self.assertTrue(child.publisher_public.in_navigation)
+        self.assertTrue(child.publisher_public.in_navigation)
         self.assertEqual(child.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
 
         home.publish('en')
@@ -347,9 +350,11 @@ class PublishingTests(TestCase):
         home.unpublish('en')
         child = self.reload(child)
         gc = self.reload(gc)
-
-        self.assertFalse(child.is_published("en"))
-        self.assertFalse(gc.is_published('en'))
+        print child.title_set.get(language='en').published
+        self.assertTrue(child.is_published("en"))
+        self.assertTrue(gc.is_published("en"))
+        self.assertFalse(child.publisher_public.is_published("en"))
+        self.assertFalse(gc.publisher_public.is_published('en'))
         self.assertEqual(child.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
         self.assertEqual(gc.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
 
@@ -369,25 +374,27 @@ class PublishingTests(TestCase):
         dirty1 = self.create_page("Dirty1", published=True, parent=home)
         dirty2 = self.create_page("Dirty2", published=True, parent=home)
         home = self.reload(home)
-
+        dirty1 = self.reload(dirty1)
+        dirty2 = self.reload(dirty2)
         dirty1.save()
         home.unpublish('en')
         dirty2.save()
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
-        self.assertTrue(dirty1.publisher_public_id)
+        self.assertTrue(dirty1.is_published)
         self.assertTrue(dirty2.publisher_public_id)
         self.assertEqual(dirty1.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
         self.assertEqual(dirty2.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
         home = self.reload(home)
+        print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
         home.publish('en')
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
-        self.assertTrue(dirty1.publisher_public_id)
+        self.assertTrue(dirty1.is_published("en"))
         self.assertTrue(dirty2.is_published("en"))
         self.assertTrue(dirty1.publisher_public.is_published("en"))
-        self.assertTrue(dirty2.publisher_public_id)
+        self.assertTrue(dirty2.publisher_public.is_published("en"))
         self.assertEqual(dirty1.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
         self.assertEqual(dirty2.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
@@ -401,25 +408,28 @@ class PublishingTests(TestCase):
         unpub2 = self.create_page("Unpub2", published=True, parent=home)
         gc1 = self.create_page("GC1", published=True, parent=unpub1)
         gc2 = self.create_page("GC2", published=True, parent=unpub2)
-
+        self.assertFalse(gc1.publisher_public_id)
+        self.assertFalse(gc1.publisher_public_id)
+        self.assertTrue(gc1.is_published('en'))
+        self.assertTrue(gc2.is_published('en'))
         home.unpublish('en')
         unpub1 = self.reload(unpub1)
         unpub2.unpublish('en')  # Just marks this as not published
         for page in (unpub1, unpub2):
-            self.assertFalse(page.is_published('en'))
+            self.assertFalse(page.is_published('en'), page)
             self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
         self.assertIsNone(unpub1.publisher_public)
         self.assertIsNotNone(unpub2.publisher_public)
-        self.assertFalse(unpub2.is_published('en'))
+        self.assertFalse(unpub2.publisher_public.is_published('en'))
 
         gc1 = self.reload(gc1)
         gc2 = self.reload(gc2)
         for page in (gc1, gc2):
             self.assertTrue(page.is_published('en'))
-            self.assertEqual(page.publisher_state, PUBLISHER_STATE_PENDING)
+            self.assertEqual(page.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
         self.assertIsNone(gc1.publisher_public)
-        self.assertIsNone(gc2.publisher_public)
-        self.assertFalse(gc2.publisher_public.published)
+        self.assertIsNotNone(gc2.publisher_public)
+        self.assertFalse(gc2.publisher_public.is_published('en'))
 
 
     def test_unpublish_with_descendants(self):
@@ -445,10 +455,10 @@ class PublishingTests(TestCase):
             self.assertObjectExist(published, title_set__title=title)
             item = drafts.get(title_set__title=title)
             self.assertTrue(item.publisher_public_id)
-            self.assertEqual(item.publisher_state, PUBLISHER_STATE_DEFAULT)
+            self.assertEqual(item.get_publisher_state('en'), PUBLISHER_STATE_DEFAULT)
 
         self.assertTrue(page.unpublish('en'), 'Unpublish was not successful')
-        self.assertFalse(page.publisher_public_id)
+        self.assertFalse(page.is_published('en'))
         for url in (base, base + 'child/', base + 'child/grandchild/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
@@ -459,18 +469,20 @@ class PublishingTests(TestCase):
             self.assertObjectDoesNotExist(published, title_set__title=title)
             item = drafts.get(title_set__title=title)
             if title == 'Page':
-                self.assertFalse(item.publisher_public_id)
+                self.assertFalse(item.is_published("en"))
+                self.assertFalse(item.publisher_public.is_published("en"))
                 # Not sure what the proper state of these are after unpublish
                 #self.assertEqual(page.publisher_state, PUBLISHER_STATE_DEFAULT)
-                self.assertTrue(page.is_dirty())
+                self.assertTrue(page.is_dirty('en'))
             else:
                 # The changes to the published subpages are simply that the
                 # published flag of the PUBLIC instance goes to false, and the
                 # publisher state is set to mark waiting for parent
-                self.assertFalse(item.publisher_public_id, title)
-                self.assertEqual(item.publisher_state, PUBLISHER_STATE_PENDING,
+                self.assertTrue(item.is_published('en'), title)
+                self.assertFalse(item.publisher_public.is_published('en'), title)
+                self.assertEqual(item.get_publisher_state('en'), PUBLISHER_STATE_PENDING,
                                  title)
-                self.assertFalse(item.is_dirty(), title)
+                self.assertFalse(item.is_dirty('en'), title)
 
     def test_unpublish_with_dirty_descendants(self):
         page = self.create_page("Page", published=True)
@@ -483,8 +495,8 @@ class PublishingTests(TestCase):
 
         self.assertTrue(child.is_dirty("en"))
         self.assertFalse(gchild.is_dirty('en'))
-        self.assertTrue(child.publisher_public_id)
-        self.assertTrue(gchild.publisher_public_id)
+        self.assertTrue(child.publisher_public.is_published('en'))
+        self.assertTrue(gchild.publisher_public.is_published('en'))
 
         page.unpublish('en')
         child = self.reload(child)
@@ -493,8 +505,8 @@ class PublishingTests(TestCase):
         self.assertTrue(child.is_dirty('en'))
         self.assertFalse(gchild.is_dirty('en'))
         # However, their public version is still removed no matter what
-        self.assertFalse(child.is_published('en'))
-        self.assertFalse(gchild.is_published('en'))
+        self.assertFalse(child.publisher_public.is_published('en'))
+        self.assertFalse(gchild.publisher_public.is_published('en'))
 
     def test_republish_multiple_root(self):
         # TODO: The paths do not match expected behaviour

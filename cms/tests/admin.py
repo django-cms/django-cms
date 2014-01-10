@@ -351,11 +351,11 @@ class AdminTestCase(AdminTestsBase):
         request.method = "POST"
         pageadmin = site._registry[Page]
         with self.login_user_context(staff):
-            self.assertRaises(Http404, pageadmin.change_template, request, 1, 'en')
+            self.assertRaises(Http404, pageadmin.change_template, request, 1)
             page = create_page('test-page', 'nav_playground.html', 'en')
-            response = pageadmin.change_template(request, page.pk, 'en')
+            response = pageadmin.change_template(request, page.pk)
             self.assertEqual(response.status_code, 403)
-        url = reverse('admin:cms_page_change_template', args=(page.pk, 'en'))
+        url = reverse('admin:cms_page_change_template', args=(page.pk,))
         with self.login_user_context(admin):
             response = self.client.post(url, {'template': 'doesntexist'})
             self.assertEqual(response.status_code, 400)
@@ -489,15 +489,16 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             response = self.admin_class.publish_page(request, page.pk, "en")
-            self.assertEqual(response.status_code, 405)
+            print response
+            self.assertEqual(response.status_code, 403)
             page = self.reload(page)
-            self.assertFalse(page.publisher_public_id > 0)
+            self.assertFalse(page.is_published('en'))
 
             request = self.get_request(post_data={'no': 'data'})
             response = self.admin_class.publish_page(request, page.pk, "en")
             # Forbidden
             self.assertEqual(response.status_code, 403)
-            self.assertFalse(page.publisher_public_id > 0)
+            self.assertFalse(page.is_published('en'))
 
         admin = self.get_admin()
         with self.login_user_context(admin):
@@ -506,13 +507,13 @@ class AdminTests(AdminTestsBase):
             self.assertEqual(response.status_code, 302)
 
             page = self.reload(page)
-            self.assertTrue(page.publisher_public_id > 0)
+            self.assertTrue(page.is_published('en'))
 
             response = self.admin_class.unpublish(request, page.pk, "en")
             self.assertEqual(response.status_code, 200)
 
             page = self.reload(page)
-            self.assertFalse(page.title_set.filter(published=True).count() > 0)
+            self.assertFalse(page.is_published('en'))
 
     def test_change_status_adds_log_entry(self):
         page = self.get_page()
@@ -741,7 +742,7 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(admin):
             response = self.client.post(admin_url, post_data)
             draft_page = Page.objects.get(pk=page.pk).get_draft_object()
-            self.assertTrue(draft_page.is_dirty())
+            self.assertTrue(draft_page.is_dirty('en'))
 
     def test_edit_title_languages(self):
         language = "en"

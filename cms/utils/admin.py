@@ -66,11 +66,6 @@ def get_admin_menu_item_context(request, page, filtered=False):
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
             has_add_on_same_level_permission = True
 
-    if not page.publisher_public_id:
-        css_class = "publisher_draft"
-    else:
-        css_class = publisher_classes.get(page.publisher_state, "")
-
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site)
@@ -81,8 +76,6 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'lang': lang,
         'filtered': filtered,
         'metadata': metadata,
-        'css_class': css_class,
-
         'has_change_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
