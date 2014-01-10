@@ -162,17 +162,18 @@ $(document).ready(function () {
 		_show: function (width, animate) {
 			// add class
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
+			
+			// make sure the close / hide / maximize controls appear, regardless of hidden / maximized state
+			this.sideframe.show();
 
 			// check if sideframe should be hidden
 			if(this.settings.sideframe.hidden) this._hide();
+
 			// check if sideframe should be maximized
-			if(this.settings.sideframe.maximized) {
-				this.sideframe.show();
-				this._maximize();
-			}
+			if(this.settings.sideframe.maximized) this._maximize();
+
 			// otherwise do normal behaviour
 			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-				this.sideframe.show();
 				if(animate) {
 					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
 					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
