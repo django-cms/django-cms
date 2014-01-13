@@ -1206,5 +1206,30 @@ class ChangePageTemplateTests(TestCase):
         request_template = get_template_from_request(request, child_page)
         self.assertEqual(request_template, 'nav_playground.html')
 
+    def test_child_defaults_when_parent_templ_invalid(self):
+        from cms.utils import get_template_from_request
+
+        cms_templates = [t[0] for t in settings.CMS_TEMPLATES]
+        assert "col_two.html" in cms_templates
+        assert "nav_playground.html" in cms_templates
+
+        parent_page = create_page(title="parent",
+                                  template="nav_playground.html",
+                                  language=settings.LANGUAGES[0][0])
+
+        child_page = create_page(title="child",
+                                 template="col_two.html",
+                                 language=settings.LANGUAGES[0][0],
+                                 parent=parent_page)
+        settings.CMS_TEMPLATES = tuple([t for t in settings.CMS_TEMPLATES
+            if t[0] != "col_two.html" and t[0] != "nav_playground.html"])  
+        # simulates template deletion
+
+        request = RequestFactory().get('admin/cms/page/%d/?template=%s' %
+                (child_page.pk, settings.CMS_TEMPLATE_INHERITANCE_MAGIC))
+        request_template = get_template_from_request(request, child_page)
+        self.assertEqual(request_template, settings.CMS_TEMPLATES[0][0])
+
+
     def tearDown(self):
         settings.CMS_TEMPLATES = self.saved_cms_templates
