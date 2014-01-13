@@ -424,7 +424,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # This template does not render anything as content is saved in a
         # variable and never inserted in the page
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}
+{% load cms_tags %}{% load url from future %}
 
 {% block content %}
 {% render_model_block instance as rendered_model %}
@@ -444,7 +444,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # This template does not render anything as content is saved in a
         # variable and never inserted in the page
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}
+{% load cms_tags %}{% load url from future %}
 
 {% block content %}
 {% render_model_block instance as rendered_model %}
