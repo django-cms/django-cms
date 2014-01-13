@@ -51,8 +51,9 @@ unpublished changes. To see your extension live make sure to publish the page.
 
 You'll also want to make your model editable from the cms toolbar in order to
 associate each instance of the extension model with a page. (Page isn't an
-editable attribute in the default admin interface.) The following example adds a
-menu entry for the extension on each page::
+editable attribute in the default admin interface.) The following example,
+which should live in a file named ``cms_toolbar.py`` in one of your apps, adds
+a menu entry for the extension on each page::
 
     from cms.api import get_page_draft
     from cms.toolbar_pool import toolbar_pool
