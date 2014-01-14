@@ -93,6 +93,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     child_plugin_instances = None
+    translatable_content_excluded_fields = []
 
     class Meta:
         app_label = 'cms'
@@ -380,6 +381,42 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         if self.child_plugin_instances:
             return len(self.child_plugin_instances)
 
+    def get_translatable_content(self):
+        fields = []
+        instance = self.get_plugin_instance()[0]
+        if instance:
+            for field in instance._meta.fields:
+                if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices
+                    and field.editable and field not in self.excluded_translatable_fields and field
+                ):
+                    fields.append(field)
+
+            translatable_fields = dict()
+            for field in fields:
+                c = getattr(instance, field.name).encode('utf-8')
+                if c:
+                    translatable_fields[field.name] = c
+
+            return translatable_fields
+
+        return False
+
+    def set_translatable_content(self, fields):
+        instance = self.get_plugin_instance()[0]
+        if not instance:
+            return False
+
+        for field, value in fields.items():
+            setattr(instance, field, value)
+
+        instance.save()
+
+        # let's verify that they all changed
+        for field, value in fields.items():
+            if getattr(instance, field) != value:
+                return False
+
+        return True
 
 reversion_register(CMSPlugin)
 
