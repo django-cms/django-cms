@@ -11,10 +11,10 @@
 // #PLACEHOLDER
 .cms_placeholder { height:0px; overflow:hidden; }
 
-.cms_render_model_icon { display: inline-block; width:18px; height:18px; overflow: hidden; padding: 0; margin: 0;
-  img{ vertical-align: middle; max-width: none; position: relative; left: -22px; top:-169px; padding: 0; margin: 0; }
+.cms_render_model_icon { display: inline-block; width:18px; height:18px; padding: 0; margin: 0;
+  img{ max-width: none; position: relative; padding: 0!important; margin: 0!important; }
 }
 
-.cms_render_model_add { display: inline-block; width:18px; height:18px; overflow: hidden; padding: 0; margin: 0;
-  img{ vertical-align: middle; max-width: none; position: relative; left: -105px; top:-69px; padding: 0; margin: 0; }
+.cms_render_model_add { display: inline-block; width:18px; height:18px; padding: 0; margin: 0;
+  img{ max-width: none; position: relative; padding: 0!important; margin: 0!important; }
 }

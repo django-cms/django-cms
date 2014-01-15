@@ -395,7 +395,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/sprite_toolbar.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_icon.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
 
     def test_add_tag(self):
         user = self.get_staff()
@@ -412,7 +412,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/sprite_toolbar.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_add.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
 
     def test_block_tag(self):
         user = self.get_staff()
@@ -439,7 +439,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertNotContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/sprite_toolbar.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
+        self.assertNotContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_icon.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
 
         # This template does not render anything as content is saved in a
         # variable and never inserted in the page
