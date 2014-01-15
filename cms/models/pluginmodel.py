@@ -393,7 +393,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
             translatable_fields = {}
             for field in fields:
-                content = getattr(instance, field.name).encode('utf-8')
+                content = getattr(instance, field.name)
                 if content:
                     translatable_fields[field.name] = content
 
