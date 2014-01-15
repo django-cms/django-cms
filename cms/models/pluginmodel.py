@@ -386,7 +386,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
         for field in self._meta.fields:
             if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices
-                and field.editable and field not in self.translatable_content_excluded_fields and field
+                and field.editable and field.name not in self.translatable_content_excluded_fields and field
             ):
                 fields.append(field)
 
