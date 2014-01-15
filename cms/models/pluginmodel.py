@@ -411,7 +411,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
         instance.save()
 
-        # let's verify that they all changed
+        # verify that all fields have been set
         for field, value in fields.items():
             if getattr(instance, field) != value:
                 return False
