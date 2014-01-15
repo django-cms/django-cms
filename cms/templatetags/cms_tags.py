@@ -763,10 +763,10 @@ class CMSEditableObject(InclusionTag):
             language = get_language_from_request(context['request'])
         # This allow the requested item to be a method, a property or an
         # attribute
-        if not instance:
+        if not instance and editmode:
             return context
         # ugly-ish
-        if isinstance(instance, Page):
+        if instance and isinstance(instance, Page):
             if not edit_fields:
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
