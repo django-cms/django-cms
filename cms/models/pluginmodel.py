@@ -383,37 +383,30 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
     def get_translatable_content(self):
         fields = []
-        instance = self.get_plugin_instance()[0]
-        if instance:
-            for field in instance._meta.fields:
-                if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices
-                    and field.editable and field not in self.translatable_content_excluded_fields and field
-                ):
-                    fields.append(field)
 
-            translatable_fields = {}
-            for field in fields:
-                content = getattr(instance, field.name)
-                if content:
-                    translatable_fields[field.name] = content
+        for field in self._meta.fields:
+            if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices
+                and field.editable and field not in self.translatable_content_excluded_fields and field
+            ):
+                fields.append(field)
 
-            return translatable_fields
+        translatable_fields = {}
+        for field in fields:
+            content = getattr(self, field.name)
+            if content:
+                translatable_fields[field.name] = content
 
-        return False
+        return translatable_fields
 
     def set_translatable_content(self, fields):
-        instance = self.get_plugin_instance()[0]
-        if not instance:
-            return False
-
         for field, value in fields.items():
-            setattr(instance, field, value)
+            setattr(self, field, value)
 
-        instance.save()
+        self.save()
 
         # verify that all fields have been set
         for field, value in fields.items():
-            if getattr(instance, field) != value:
+            if getattr(self, field) != value:
                 return False
 
         return True
