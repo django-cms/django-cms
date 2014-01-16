@@ -785,12 +785,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         title.title = 'Main Test'
         title.save()
         page.publish()
+        page.reload()
         request = self.get_page_request(page, user, edit=True)
         response = details(request, '')
-        response.render()
-        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_page_title-1">%s</div>' % page.get_page_title(language))
-        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_menu_title-1">%s</div>' % page.get_menu_title(language))
-        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_title-1">%s</div>' % page.get_title(language))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_page_title-%s">%s</div>' % (page.pk, page.get_page_title(language)))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_menu_title-%s">%s</div>' % (page.pk, page.get_menu_title(language)))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_title-%s">%s</div>' % (page.pk, page.get_title(language)))
 
 
 class ToolbarAPITests(TestCase):
