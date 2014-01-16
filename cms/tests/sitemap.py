@@ -50,14 +50,14 @@ class SitemapTestCase(CMSTestCase):
             p10 = create_page('P10', published=False, in_navigation=True, parent=p9, **defaults)
             create_title(language='de', title="other title %s" % p10.get_title('en'), page=p10)
             p11 = create_page('P11', published=True, in_navigation=True, parent=p9, **defaults)
-            p8.publish()
-            p7.publish()
-            p5.publish()
-            p3.publish()
-            p2.publish()
-            p6.publish()
-            p4.publish()
-            p1.publish()
+            p8.publish('en')
+            p7.publish('en')
+            p5.publish('en')
+            p3.publish('en')
+            p2.publish('en')
+            p6.publish('en')
+            p4.publish('en')
+            p1.publish('en')
 
     def test_sitemap_count(self):
         """

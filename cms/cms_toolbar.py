@@ -176,7 +176,7 @@ class PageToolbar(CMSToolbar):
                     self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
                                         disabled=not dirty)
         if self.page:
-            if self.page.has_change_permission(self.request) and self.page.published:
+            if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
                 self.add_draft_live()
             elif statics:
                 for static_placeholder in statics:
@@ -256,7 +256,7 @@ class PageToolbar(CMSToolbar):
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             # add templates
             templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
-            action = reverse('admin:cms_page_change_template', args=(self.page.pk))
+            action = reverse('admin:cms_page_change_template', args=(self.page.pk,))
             for path, name in get_cms_setting('TEMPLATES'):
                 active = self.page.template == path
                 if path == TEMPLATE_INHERITANCE_MAGIC:
@@ -294,7 +294,7 @@ class PageToolbar(CMSToolbar):
             publish_url = reverse('admin:cms_page_unpublish', args=(self.page.pk, self.current_lang))
         else:
             publish_title = _('Publish page')
-            publish_url = reverse('admin:cms_page_publish', args=(self.page.pk, self.current_lang))
+            publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk, self.current_lang))
 
         current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
         current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)

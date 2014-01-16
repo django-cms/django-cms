@@ -762,7 +762,7 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(admin):
             response = self.client.post(admin_url, post_data)
             draft_page = Page.objects.get(pk=page.pk).get_draft_object()
-            self.assertTrue(draft_page.is_dirty())
+            self.assertTrue(draft_page.is_dirty('en'))
 
 class NoDBAdminTests(CMSTestCase):
     @property

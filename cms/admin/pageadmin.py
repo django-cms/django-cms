@@ -191,8 +191,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not obj.pk:
             new = True
         obj.save()
-        if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
-            obj.publish()
+
         if 'recover' in request.path or 'history' in request.path:
             obj.pagemoderatorstate_set.all().delete()
             moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
@@ -205,15 +204,16 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
-
+        language = form.cleaned_data['language']
         if not 'permission' in request.path:
-            language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
                 obj,
                 form,
                 language,
             )
+        if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
+            obj.publish(language)
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -950,6 +950,13 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                     all_published = False
         if all_published:
             messages.info(request, _('The content was successfully published.'))
+            LogEntry.objects.log_action(
+                user_id=request.user.id,
+                content_type_id=ContentType.objects.get_for_model(Page).pk,
+                object_id=page_id,
+                object_repr=page.get_title(),
+                action_flag=CHANGE,
+            )
         else:
             messages.warning(request, _("There was a problem publishing your content"))
         if "reversion" in settings.INSTALLED_APPS and page:
@@ -1163,40 +1170,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
             page.site.domain, url)
         return HttpResponseRedirect(url)
-
-    @require_POST
-    def change_status(self, request, page_id):
-        """
-        Switch the status of a page
-        """
-        page = get_object_or_404(Page, pk=page_id)
-        if not page.has_publish_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to publish this page"))
-
-        try:
-            if page.published or is_valid_url(page.get_absolute_url(), page, False):
-                published = page.published
-                method = page.publish if not published else page.unpublish
-                try:
-                    success = method()
-                    if published:
-                        messages.info(request, _('The page "%s" was successfully unpublished') % page)
-                    else:
-                        messages.info(request, _('The page "%s" was successfully published') % page)
-                    LogEntry.objects.log_action(
-                        user_id=request.user.id,
-                        content_type_id=ContentType.objects.get_for_model(Page).pk,
-                        object_id=page_id,
-                        object_repr=page.get_title(),
-                        action_flag=CHANGE,
-                    )
-                except RuntimeError:
-                    exc = sys.exc_info()[1]
-                    messages.error(request, exc.message)
-            return admin_utils.render_admin_menu_item(request, page)
-        except ValidationError:
-            exc = sys.exc_info()[1]
-            return HttpResponseBadRequest(exc.messages)
 
     @require_POST
     def change_innavigation(self, request, page_id):
