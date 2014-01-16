@@ -1,3 +1,5 @@
+.. _custom-plugins:
+
 ##############
 Custom Plugins
 ##############
@@ -658,3 +660,40 @@ require_parent
 Default: False
 
 Is it required that this plugin is a child of another plugin? Or can it be added to any placeholder, even one attached to a page.
+
+
+get_translatable_content
+------------------------
+
+Get a dictionary of all content fields (field name / field value pairs) from the plugin.
+
+.. note:: This method and the one below should not be used on the plugin but rather on the plugin's instance.
+
+Example::
+
+    from djangocms_text_ckeditor.models import Text
+
+    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+    plugin.get_translatable_content()
+    # returns {'body': u'<p>I am text!</p>\n'}
+
+set_translatable_content
+------------------------
+
+Takes a dictionary of plugin fields (field name / field value pairs) and overwrites the plugin's fields. Returns True if all fields
+have been written successfully, and False otherwise.
+
+Example::
+
+    from djangocms_text_ckeditor.models import Text
+
+    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+    plugin.set_translatable_content({'body': u'<p>This is a different text!</p>\n'})
+    # returns True
+
+translatable_content_excluded_fields
+------------------------------------
+
+Default: [ ]
+
+A list of plugin fields which will not be exported while using :meth:`get_translatable_content`

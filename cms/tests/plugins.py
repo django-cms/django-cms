@@ -1016,6 +1016,32 @@ class PluginsTestCase(PluginsTestBaseCase):
                                 plugin.get_parent_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ParentClassesPlugin)
 
+    def test_plugin_translatable_content_getter_setter(self):
+        """
+        Test that you can add a text plugin
+        """
+        # add a new text plugin
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        created_plugin_id = self._create_text_plugin_on_page(page)
+
+        # now edit the plugin
+        plugin = self._edit_text_plugin(created_plugin_id, "Hello World")
+        self.assertEquals("Hello World", plugin.body)
+
+        # see if the getter works
+        self.assertEquals({'body': "Hello World"}, plugin.get_translatable_content())
+
+        # change the content
+        self.assertEquals(True, plugin.set_translatable_content({'body': "It works!"}))
+
+        # check if it changed
+        self.assertEquals("It works!", plugin.body)
+
+        # double check through the getter
+        self.assertEquals({'body': "It works!"}, plugin.get_translatable_content())
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):
