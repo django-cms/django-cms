@@ -66,7 +66,7 @@ class SiteTestCase(CMSTestCase):
             with SettingsOverride(SITE_ID=self.site2.pk):
                 pages["2"][0] = create_page("page_2", "nav_playground.html", "de",
                                             site=self.site2)
-                pages["2"][0].publish()
+                pages["2"][0].publish('de')
                 pages["2"][1] = create_page("page_2_1", "nav_playground.html", "de",
                                             parent=pages["2"][0], site=self.site2)
                 pages["2"][2] = create_page("page_2_2", "nav_playground.html", "de",
@@ -77,7 +77,7 @@ class SiteTestCase(CMSTestCase):
                                             parent=pages["2"][1], site=self.site2)
 
                 for page in pages["2"]:
-                    page.publish()
+                    page.publish('de')
                 for page in pages["2"]:
                     if page.is_home:
                         page_url = "/de/"
@@ -89,7 +89,7 @@ class SiteTestCase(CMSTestCase):
             with SettingsOverride(SITE_ID=self.site3.pk):
                 pages["3"][0] = create_page("page_3", "nav_playground.html", "de",
                                             site=self.site3)
-                pages["3"][0].publish()
+                pages["3"][0].publish('de')
                 pages["3"][1] = create_page("page_3_1", "nav_playground.html", "de",
                                             parent=pages["3"][0], site=self.site3)
                 pages["3"][2] = create_page("page_3_2", "nav_playground.html", "de",
@@ -100,7 +100,7 @@ class SiteTestCase(CMSTestCase):
                                             parent=pages["3"][1], site=self.site3)
 
                 for page in pages["3"]:
-                    page.publish()
+                    page.publish('de')
                 for page in pages["3"]:
                     if page.is_home:
                         page_url = "/de/"

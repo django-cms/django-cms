@@ -100,7 +100,7 @@ class SitemapTestCase(CMSTestCase):
                 url = 'http://example.com/%s/%s/' % (title.language, title.path)
             else:
                 url = 'http://example.com/%s/%s' % (title.language, title.path)
-            if page.published and not page.publisher_is_draft:
+            if page.is_published('en') and not page.publisher_is_draft:
                 self.assertTrue(url in locations)
             else:
                 self.assertFalse(url in locations)

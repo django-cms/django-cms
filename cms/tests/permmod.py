@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.api import create_page, publish_page, add_plugin, create_page_user, assign_user_to_page
+from cms.constants import PUBLISHER_STATE_PENDING
 from cms.management.commands.subcommands.moderator import log
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
@@ -352,7 +353,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertFalse(page.publisher_public)
 
         # waiting for parents
-        self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_PENDING)
+        self.assertEqual(page.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
 
         # publish slave page
         self.slave_page = self.slave_page.reload()
@@ -390,7 +391,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
 
         # page should require approval
-        self.assertEqual(page.publisher_state, Page.PUBLISHER_STATE_PENDING)
+        self.assertEqual(page.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
 
         # master approves and publishes the page
         # first approve slave-home

@@ -296,8 +296,8 @@ class PagesTestCase(CMSTestCase):
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
             t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-d\TH:i:s' }}")
             req = HttpRequest()
-            page.published = True
             page.save()
+            page.publish('en')
             after_change = datetime.datetime.now()
             req.current_page = page
             req.REQUEST = {}
@@ -380,17 +380,17 @@ class PagesTestCase(CMSTestCase):
 
             # publish page 1 (becomes home)
             home.delete()
-            page1.publish()
+            page1.publish('en')
             public_page1 = page1.publisher_public
             self.assertEqual(page1.get_path(), '')
             self.assertEqual(public_page1.get_path(), '')
             # check that page2 and page3 url have changed
             page2 = Page.objects.get(pk=page2.pk)
-            page2.publish()
+            page2.publish('en')
             public_page2 = page2.publisher_public
             self.assertEqual(public_page2.get_absolute_url(), self.get_pages_root() + page_data2['slug'] + "/")
             page3 = Page.objects.get(pk=page3.pk)
-            page3.publish()
+            page3.publish('en')
             public_page3 = page3.publisher_public
             self.assertEqual(public_page3.get_absolute_url(),
                              self.get_pages_root() + page_data2['slug'] + "/" + page_data3['slug'] + "/")
@@ -413,6 +413,7 @@ class PagesTestCase(CMSTestCase):
                             "en", parent=parent)
         self.assertEqual(child.get_template(), parent.get_template())
         child.move_page(parent, 'left')
+        child = Page.objects.get(pk=child.pk)
         self.assertEqual(child.get_template(), parent.get_template())
 
     def test_add_placeholder(self):
@@ -421,7 +422,7 @@ class PagesTestCase(CMSTestCase):
                            position="last-child", published=True, in_navigation=True)
         page.template = 'add_placeholder.html'
         page.save()
-        page.publish()
+        page.publish('en')
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
@@ -454,6 +455,7 @@ class PagesTestCase(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=one_day_ago)
         page.creation_date = one_day_ago
         page.save()
+        page.publish('en')
         sitemap = CMSSitemap()
         self.assertEqual(sitemap.items().count(), 1)
         actual_last_modification_time = sitemap.lastmod(sitemap.items()[0])
@@ -591,7 +593,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_get_page_from_request_with_page_404(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
-        page.publish()
+        page.publish('en')
         request = self.get_request('/does-not-exist/')
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
@@ -601,9 +603,9 @@ class PagesTestCase(CMSTestCase):
                            published=True)
         page = create_page("page", "nav_playground.html", "en", slug="page",
                            published=True, parent=root)
-        root.publish()
+        root.publish('en')
         page = page.reload()
-        page.publish()
+        page.publish('en')
         request = self.get_request('/en/page')
         found_page = get_page_from_request(request)
         self.assertIsNotNone(found_page)
@@ -741,17 +743,16 @@ class PagesTestCase(CMSTestCase):
             title.has_url_overwrite = True
             title.path = '/bar/'
             title.save()
-            foo.publish()
+            foo.publish('en')
 
             try:
                 url = is_valid_url(bar.get_absolute_url('en'), bar)
             except ValidationError:
                 url = False
             if url:
-                bar.published = True
                 bar.save()
-                bar.publish()
-            self.assertFalse(bar.published)
+                bar.publish('en')
+            self.assertFalse(bar.is_published('en'))
 
     def test_valid_url_multisite(self):
         site1 = Site.objects.get_current()
@@ -777,17 +778,17 @@ class PagesTestCase(CMSTestCase):
         """Test that publishing changes to the home page doesn't move the public version"""
         home = create_page('home', 'nav_playground.html', 'en', published=True, slug='home')
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
-        home.publish()
+        home.publish('en')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
         other = create_page('other', 'nav_playground.html', 'en', published=True, slug='other')
-        other.publish()
+        other.publish('en')
         self.assertEqual(Page.objects.drafts().get_home(), home)
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
         home = Page.objects.get(pk=home.id)
         home.in_navigation = True
         home.save()
-        home.publish()
+        home.publish('en')
         self.assertEqual(Page.objects.drafts().get_home().get_slug(), 'home')
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
@@ -947,9 +948,9 @@ class NoAdminPageTests(CMSTestCase):
 class PreviousFilteredSiblingsTests(CMSTestCase):
     def test_with_publisher(self):
         home = create_page('home', 'nav_playground.html', 'en', published=True)
-        home.publish()
+        home.publish('en')
         other = create_page('other', 'nav_playground.html', 'en', published=True)
-        other.publish()
+        other.publish('en')
         other = Page.objects.get(pk=other.pk)
         home = Page.objects.get(pk=home.pk)
         self.assertEqual(other.get_previous_filtered_sibling(), home)
@@ -959,9 +960,9 @@ class PreviousFilteredSiblingsTests(CMSTestCase):
         firstsite = Site.objects.create(name='first', domain='first.com')
         secondsite = Site.objects.create(name='second', domain='second.com')
         home = create_page('home', 'nav_playground.html', 'de', site=firstsite)
-        home.publish()
+        home.publish('de')
         other = create_page('other', 'nav_playground.html', 'de', site=secondsite)
-        other.publish()
+        other.publish('de')
         other = Page.objects.get(pk=other.pk)
         home = Page.objects.get(pk=home.pk)
         self.assertEqual(other.get_previous_filtered_sibling(), None)
@@ -971,18 +972,18 @@ class PreviousFilteredSiblingsTests(CMSTestCase):
 class PageTreeTests(CMSTestCase):
     def test_rename_node(self):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
-        home.publish()
+        home.publish('en')
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent', published=True)
-        parent.publish()
+        parent.publish('en')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=parent)
-        child.publish()
+        child.publish('en')
 
         page_title = Title.objects.get(page=parent)
         page_title.slug = "father"
         page_title.save()
 
         parent = Page.objects.get(pk=parent.pk)
-        parent.publish()
+        parent.publish('en')
         child = Page.objects.get(pk=child.pk)
 
         self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
@@ -991,14 +992,14 @@ class PageTreeTests(CMSTestCase):
 
     def test_move_node(self):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
-        home.publish()
+        home.publish('en')
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent', published=True)
-        parent.publish()
+        parent.publish('en')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=home)
-        child.publish()
+        child.publish('en')
 
         child.move_page(parent)
-        child.publish()
+        child.publish('en')
         child.reload()
 
         self.assertEqual(child.get_absolute_url(language='en'), '/en/parent/child/')
