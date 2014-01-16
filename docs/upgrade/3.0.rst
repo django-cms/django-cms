@@ -224,3 +224,9 @@ template tags you can just do:
 .. code-block:: html+django
 
     {% load cms_tags %}
+
+Getter and setter for translatable plugin content
+=================================================
+
+A plugin's translatable content can now be read and set through :meth:`get_translatable_content`
+and :meth:`set_translatable_content`. See :ref:`Custom Plugins <custom-plugins>` for more info.
