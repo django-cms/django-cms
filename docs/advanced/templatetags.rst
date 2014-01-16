@@ -279,14 +279,14 @@ Plugin needs to be an instance of a plugin model.
 
 Example::
 
-	{% load cms_tags %}
-	<div class="multicolumn">
-	{% for plugin in instance.child_plugin_instances %}
-		<div style="width: {{ plugin.width }}00px;">
-     		{% render_plugin plugin %}
-		</div>
-	{% endfor %}
-	</div>
+    {% load cms_tags %}
+    <div class="multicolumn">
+    {% for plugin in instance.child_plugin_instances %}
+        <div style="width: {{ plugin.width }}00px;">
+            {% render_plugin plugin %}
+        </div>
+    {% endfor %}
+    </div>
 	
 Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
@@ -309,6 +309,19 @@ clickable.
 Using this templatetag you can show and edit page titles as well as fields in
 standard django models, see :ref:`frontend-editable-fields` for examples and
 further documentation.
+
+Example:
+
+.. code-block:: html+django
+
+    <h1>{% render_model_block my_model "title" "title,abstract" %}</h1>
+
+This will render to:
+
+.. code-block:: html+django
+
+    <!-- The content of the H1 is the active area that triggers the frontend editor -->
+    <h1><div class="cms_plugin cms_plugin-myapp-mymodel-title-1">{{ my_model.title }}</div></h1>
 
 **Arguments:**
 
@@ -354,6 +367,18 @@ render_model_block
         </div>
     {% endrender_model_block %}
 
+This will render to:
+
+.. code-block:: html+django
+
+    <!-- This whole block is the active area that triggers the frontend editor -->
+    <div class="cms_plugin cms_plugin-myapp-mymodel-1">
+        <h1>{{ my_model.title }}</h1>
+        <div class="body">
+            {{ my_model.date|date:"d F Y" }}
+            {{ my_model.text }}
+        </div>
+    </div>
 
 In the block the ``my_model`` is aliased as ``instance`` and every attribute and
 method is available; also templatetags and filters are available in the block.
@@ -390,6 +415,22 @@ the editing changeform for the provided fields.
 
     <h3><a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a> {% render_model_icon my_model %}</h3>
 
+It will render to something like:
+
+.. code-block:: html+django
+
+    <h3>
+        <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
+        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_icon">
+            <!-- The image below is the active area that triggers the frontend editor -->
+            <img src="/static/cms/img/toolbar/render_model_placeholder.png">
+        </div>
+    </h3>
+
+.. note::
+
+        Icon and position can be customized via CSS by setting a background
+        to the ``.cms_render_model_icon img`` selector.
 
 **Arguments:**
 
@@ -420,6 +461,23 @@ create instances of the given instance class; when in edit mode, it renders an
 .. code-block:: html+django
 
     <h3><a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a> {% render_model_add my_model %}</h3>
+
+It will render to something like:
+
+.. code-block:: html+django
+
+    <h3>
+        <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
+        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_add">
+            <!-- The image below is the active area that triggers the frontend editor -->
+            <img src="/static/cms/img/toolbar/render_model_placeholder.png">
+        </div>
+    </h3>
+
+.. note::
+
+        Icon and position can be customized via CSS by setting a background
+        to the ``.cms_render_model_add img`` selector.
 
 ..warning::
 
