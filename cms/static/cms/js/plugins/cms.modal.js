@@ -148,7 +148,11 @@ $(document).ready(function () {
 				this._hide(100);
 			}
 			// handle refresh option
-			if(this.options.onClose === 'REFRESH_PAGE') this.reloadBrowser();
+			if(this.options.onClose === 'REFRESH_PAGE') {
+				this.reloadBrowser();
+			} else if(this.options.redirectOnClose) {
+				this.reloadBrowser(this.options.redirectOnClose);
+			}
 		},
 
 		// private methods
@@ -440,6 +444,9 @@ $(document).ready(function () {
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
  							that.options.newPlugin = null;
 							that.enforceClose = true;
+							if(item.hasClass('deletelink')) {
+								that.options.onClose = null;
+							}
 						} else {
 							that.enforceClose = false;
 						}

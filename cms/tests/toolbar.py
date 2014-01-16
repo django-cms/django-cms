@@ -282,7 +282,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1.save()
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'char_1', ex1.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'char_1', ex1.pk))
 
     def test_invalid_item(self):
         user = self.get_staff()
@@ -316,7 +316,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">%s</div></h1>' % ('placeholderapp', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">%s</div></h1>' % ('placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
 
     def test_filters_date(self):
         user = self.get_staff()
@@ -334,7 +334,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
 
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">%s</div></h1>' % ('placeholderapp', 'date_field', ex1.pk, ex1.date_field.strftime("%Y-%m-%d")))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">%s</div></h1>' % ('placeholderapp', 'example1', 'date_field', ex1.pk, ex1.date_field.strftime("%Y-%m-%d")))
 
         template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
@@ -344,7 +344,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% endblock content %}
 '''
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">%s</div></h1>' % ('placeholderapp', 'date_field', ex1.pk, ex1.date_field.strftime("%Y %m %d")))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">%s</div></h1>' % ('placeholderapp', 'example1', 'date_field', ex1.pk, ex1.date_field.strftime("%Y %m %d")))
 
     def test_filters_notoolbar(self):
         user = self.get_staff()
@@ -378,7 +378,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s"></div>' % ('placeholderapp', 'fake_field', ex1.pk))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s-%s"></div>' % ('placeholderapp', 'example1', 'fake_field', ex1.pk))
 
     def test_callable_item(self):
         user = self.get_staff()
@@ -395,7 +395,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'callable_item', ex1.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_admin_url(self):
         user = self.get_staff()
@@ -412,7 +412,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'callable_item', ex1.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_admin_url_extra_field(self):
         user = self.get_staff()
@@ -429,7 +429,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'callable_item', ex1.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
         self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
         self.assertTrue(re.search(self.edit_fields_rx % "char_2", response.content.decode('utf8')))
 
@@ -448,7 +448,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'callable_item', ex1.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
         self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
         self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode('utf8')))
         self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
@@ -468,7 +468,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'callable_item', ex1.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_item_from_context(self):
         user = self.get_staff()
@@ -486,7 +486,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text,
                                item_name="callable_item")
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'callable_item', ex1.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_edit_field(self):
         from django.contrib.admin import site
@@ -537,7 +537,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         request = self.get_page_request(page, user, edit=True)
         response = detail_view_multi(request, exm.pk)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">one</div></h1>' % ('placeholderapp', 'char_1', exm.pk))
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">one</div></h1>' % ('placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
         self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/en/" % exm.pk)
         self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode('utf8')))
         self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
@@ -545,7 +545,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         with SettingsOverride(LANGUAGE_CODE="fr"):
             request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
             response = detail_view_multi(request, exm.pk)
-            self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s">un</div></h1>' % ('placeholderapp', 'char_1', exm.pk))
+            self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">un</div></h1>' % ('placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
             self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/" % exm.pk)
             self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
 

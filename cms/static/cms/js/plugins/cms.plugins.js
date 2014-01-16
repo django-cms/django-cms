@@ -244,8 +244,12 @@ $(document).ready(function () {
 
 		editPlugin: function (url, name, breadcrumb) {
 			// trigger modal window
-			var modal = new CMS.Modal({ 'newPlugin': this.newPlugin || false });
-				modal.open(url, name, breadcrumb);
+			var modal = new CMS.Modal({
+				'newPlugin': this.newPlugin || false,
+				'onClose': this.options.onClose || false,
+				'redirectOnClose': this.options.redirectOnClose || false,
+			});
+			modal.open(url, name, breadcrumb);
 		},
 
 		copyPlugin: function (options) {

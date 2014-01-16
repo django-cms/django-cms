@@ -706,6 +706,13 @@ class CMSEditableObject(InclusionTag):
                     url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+            context['refresh_page'] = True
+            # We may be outside the CMS (e.g.: an application which is not attached via Apphook
+            # in this case we may only go back to the home page
+            if hasattr(context['request'], 'current_page'):
+                context['redirect_on_close'] = context['request'].current_page.get_absolute_url(language)
+            else:
+                context['redirect_on_close'] = ''
         # content is for non-edit template content.html
         # rendered_content is for edit template plugin.html
         # in this templatetag both hold the same content

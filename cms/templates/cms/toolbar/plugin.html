@@ -2,14 +2,14 @@
 {% load i18n l10n sekizai_tags %}
 {% load url from future %}
 
-<div class="cms_plugin cms_plugin-{% if generic %}{{ generic.app_label }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk }}">{{ rendered_content }}</div>
+<div class="cms_plugin cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk }}">{{ rendered_content }}</div>
 
 {% endspaceless %}{% addtoblock "js" %}
 <script>
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.Plugin('cms_plugin-{% if generic %}{{ generic.app_label }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}', {
+	new CMS.Plugin('cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}', {
 		'type': {% if generic %}'generic'{% else %}'plugin'{% endif %},
 		'page_language': '{{ LANGUAGE_CODE }}',
 		'placeholder_id': '{{ instance.placeholder_id|unlocalize }}',
@@ -21,6 +21,8 @@ $(document).ready(function () {
 		'plugin_order': '{{ instance.plugin_order }}',
 		'plugin_breadcrumb': {{ instance.get_breadcrumb_json|default:"[]" }},
 		'plugin_restriction': [{% for cls in allowed_child_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+		'onClose': {% if refresh_page %}'REFRESH_PAGE'{% else %}false{% endif %},
+		'redirectOnClose': {% if redirect_on_close %}'{{ redirect_on_close }}'{% else %}false{% endif %},
 		'urls': {
 			'add_plugin': '{% if add_url %}{{ add_url }}{% else %}{% url "admin:cms_page_add_plugin" %}}{% endif %}',
 			'edit_plugin': '{% if edit_url %}{{ edit_url }}{% else %}{% url "admin:cms_page_edit_plugin" instance.pk %}{% endif %}',
