@@ -683,9 +683,9 @@ class CMSEditableObject(InclusionTag):
         else:
             extra_context['edit_url'] = "%s" % url_base
         extra_context['refresh_page'] = True
-        # We may be outside the CMS (e.g.: an application which is not attached via Apphook
+        # We may be outside the CMS (e.g.: an application which is not attached via Apphook)
         # in this case we may only go back to the home page
-        if hasattr(context['request'], 'current_page'):
+        if getattr(context['request'], 'current_page', None):
             extra_context['redirect_on_close'] = context['request'].current_page.get_absolute_url(language)
         else:
             extra_context['redirect_on_close'] = ''
@@ -734,7 +734,7 @@ class CMSEditableObject(InclusionTag):
                 if not edit_fields:
                     edit_fields = 'menu_title'
             elif attribute == 'titles':
-                attribute = 'get_page_title'
+                attribute = 'get_title'
                 if not edit_fields:
                     edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
