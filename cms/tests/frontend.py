@@ -124,7 +124,7 @@ class ToolbarBasicTests(CMSLiveTests):
         super(ToolbarBasicTests, self).setUp()
 
     def test_toolbar_login(self):
-        create_page('Home', 'simple.html', 'en', published=True).publish()
+        create_page('Home', 'simple.html', 'en', published=True)
         url = '%s/?edit' % self.live_server_url
         self.driver.get(url)
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')

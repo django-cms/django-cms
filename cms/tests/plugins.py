@@ -714,7 +714,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page.placeholders.get(slot='body')
         text = Text(body="hello", language="en", placeholder=placeholder, plugin_type="TextPlugin", position=1)
         text.save()
-        page.publish()
+        page.publish('en')
         pages = Page.objects.search("hi")
         self.assertEqual(pages.count(), 0)
         self.assertEqual(Page.objects.search("hello").count(),1)
@@ -1173,7 +1173,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 
         # check publish box
-        page = publish_page(page, self.super_user)
+        page = publish_page(page, self.super_user, 'en')
 
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(2, CMSPlugin.objects.all().count())

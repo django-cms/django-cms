@@ -695,7 +695,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
     @require_POST
-    def undo(self, request, object_id):
+    def undo(self, request, object_id, language):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
@@ -736,7 +736,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         return HttpResponse("ok")
 
     @require_POST
-    def redo(self, request, object_id):
+    def redo(self, request, object_id, language):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision

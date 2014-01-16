@@ -83,7 +83,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             p_data = self.page_data.copy()
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page.publish()
+            page.publish('en')
 
     def test_revert(self):
         """
@@ -135,13 +135,13 @@ class ReversionTestCase(TransactionCMSTestCase):
             version = Version.objects.get(content_type=ctype, revision=revision)
             page = Page.objects.all()[0]
 
-            undo_url = reverse("admin:cms_page_undo", args=[page.pk])
+            undo_url = reverse("admin:cms_page_undo", args=[page.pk, 'en'])
             response = self.client.post(undo_url)
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
             self.assertTrue(page.revision_id != 0)
             rev = page.revision_id
-            redo_url = reverse("admin:cms_page_redo", args=[page.pk])
+            redo_url = reverse("admin:cms_page_redo", args=[page.pk, 'en'])
             response = self.client.post(redo_url)
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
@@ -216,7 +216,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             page = Page.objects.all()[0]
             page_pk = page.pk
             self.assertEquals(Revision.objects.all().count(), 5)
-            publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
+            publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
             response = self.client.get(publish_url)
             self.assertEquals(response.status_code, 302)
             self.assertEquals(Revision.objects.all().count(), 2)
@@ -228,7 +228,7 @@ class ReversionTestCase(TransactionCMSTestCase):
                 page_pk = page.pk
                 self.assertEquals(Revision.objects.all().count(), 5)
                 for x in range(10):
-                    publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
+                    publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
                     response = self.client.get(publish_url)
                     self.assertEquals(response.status_code, 302)
                 self.assertEqual(Revision.objects.all().count(), 6)
