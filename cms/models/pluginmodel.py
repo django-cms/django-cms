@@ -383,11 +383,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
     def get_translatable_content(self):
         fields = []
-
         for field in self._meta.fields:
-            if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices
-                and field.editable and field.name not in self.translatable_content_excluded_fields and field
-            ):
+            if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices and
+                    field.editable and field.name not in self.translatable_content_excluded_fields and field):
                 fields.append(field)
 
         translatable_fields = {}
