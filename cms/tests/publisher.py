@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
 
-from cms.api import create_page, add_plugin
+from cms.api import create_page, add_plugin, create_title
 from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
@@ -141,7 +141,7 @@ class PublishingTests(TestCase):
     def test_publish_single(self):
         name = self._testMethodName
         page = self.create_page(name, published=False)
-        self.assertFalse(page.publisher_public_id)
+        self.assertFalse(page.is_published('en'))
 
         drafts = Page.objects.drafts()
         public = Page.objects.public()
@@ -152,7 +152,11 @@ class PublishingTests(TestCase):
 
         page.publish("en")
 
-        self.assertTrue(page.publisher_public_id)
+        drafts = Page.objects.drafts()
+        public = Page.objects.public()
+        published = Page.objects.public().published("en")
+
+        self.assertTrue(page.is_published('en'))
         self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
         self.assertIsNotNone(page.publisher_public)
         self.assertTrue(page.publisher_public_id)
@@ -179,8 +183,8 @@ class PublishingTests(TestCase):
         parent = self.create_page('parent', published=False)
         child = self.create_page('child', published=False, parent=parent)
         parent = parent.reload()
-        self.assertFalse(parent.publisher_public_id)
-        self.assertFalse(child.publisher_public_id)
+        self.assertFalse(parent.is_published('en'))
+        self.assertFalse(child.is_published('en'))
 
         drafts = Page.objects.drafts()
         public = Page.objects.public()
@@ -193,7 +197,7 @@ class PublishingTests(TestCase):
 
         child.publish("en")
         child = child.reload()
-        self.assertFalse(child.publisher_public_id)
+        self.assertTrue(child.is_published("en"))
         self.assertEqual(child.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
         self.assertIsNone(child.publisher_public)
 
@@ -204,15 +208,22 @@ class PublishingTests(TestCase):
             self.assertObjectDoesNotExist(published, title_set__title=name)
         print "$$$$$$$$$$$$$$$$$$$$"
         parent.publish("en")
-
+        for t in Title.objects.all():
+            print t.title
+            print t.publisher_is_draft
+            print t.published
+        print published
+        drafts = Page.objects.drafts()
+        public = Page.objects.public()
+        published = Page.objects.public().published('en')
         # Cascade publish for all pending descendants
         for name in ('parent', 'child'):
             self.assertObjectExist(drafts, title_set__title=name)
             page = drafts.get(title_set__title=name)
-            self.assertTrue(page.publisher_public_id, name)
+            self.assertTrue(page.is_published("en"), name)
             self.assertEqual(page.get_publisher_state('en'), PUBLISHER_STATE_DEFAULT, name)
             self.assertIsNotNone(page.publisher_public, name)
-            self.assertTrue(page.publisher_public_id, name)
+            self.assertTrue(page.publisher_public.is_published('en'), name)
 
             self.assertObjectExist(public, title_set__title=name)
             self.assertObjectExist(published, title_set__title=name)
@@ -247,6 +258,17 @@ class PublishingTests(TestCase):
         self.assertTrue(pageB.publisher_public_id)
         self.assertTrue(pageC.publisher_public_id)
         self.assertEqual(len(Page.objects.public().published("en")), 3)
+
+    def test_i18n_publishing(self):
+        page = self.create_page('parent', published=True)
+        self.assertEqual(Title.objects.all().count(), 2)
+        create_title("de", "vater", page)
+        self.assertEqual(Title.objects.all().count(), 3)
+        self.assertEqual(Title.objects.filter(published=True).count(), 2)
+        page.publish('de')
+        self.assertEqual(Title.objects.all().count(), 4)
+        self.assertEqual(Title.objects.filter(published=True).count(), 4)
+
 
     def test_publish_ordering(self):
         page = self.create_page('parent', published=True)

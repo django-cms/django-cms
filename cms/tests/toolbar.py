@@ -223,6 +223,7 @@ class ToolbarTests(ToolbarTestBase):
         user = self.get_staff()
         cms_page = create_page('test-en', 'nav_playground.html', 'en', published=True)
         create_title('de', 'test-de', cms_page)
+        cms_page.publish('de')
         en_request = self.get_page_request(cms_page, user, edit=True)
         en_toolbar = CMSToolbar(en_request)
         self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)

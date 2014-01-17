@@ -66,15 +66,15 @@ class ApphooksTestCase(CMSTestCase):
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser, published=True)
         create_title('de', page.get_title(), page)
+        page.publish('de')
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, published=True, parent=page)
         create_title('de', child_page.get_title(), child_page)
+        child_page.publish('de')
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
                                        apphook_namespace=namespace)
         create_title("de", child_child_page.get_title(), child_child_page)
-
-        child_child_page.publish('en')
         child_child_page.publish('de')
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)

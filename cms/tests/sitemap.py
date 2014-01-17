@@ -8,7 +8,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class SitemapTestCase(CMSTestCase):
-    def create_fixtures(self):
+    def setUp(self):
         """
         Tree from fixture:
 
@@ -28,36 +28,56 @@ class SitemapTestCase(CMSTestCase):
             'template': 'nav_playground.html',
             'language': 'en',
         }
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
             create_title(language='de', title="other title %s" % p1.get_title('en'), page=p1)
+
             p4 = create_page('P4', published=True, in_navigation=True, **defaults)
             create_title(language='de', title="other title %s" % p4.get_title('en'), page=p4)
+
             p6 = create_page('P6', published=True, in_navigation=False, **defaults)
             create_title(language='de', title="other title %s" % p6.get_title('en'), page=p6)
+
             p2 = create_page('P2', published=True, in_navigation=True, parent=p1, **defaults)
             create_title(language='de', title="other title %s" % p2.get_title('en'), page=p2)
+
             p3 = create_page('P3', published=True, in_navigation=True, parent=p2, **defaults)
             create_title(language='de', title="other title %s" % p3.get_title('en'), page=p3)
+
             p5 = create_page('P5', published=True, in_navigation=True, parent=p4, **defaults)
             create_title(language='de', title="other title %s" % p5.get_title('en'), page=p5)
+
             p7 = create_page('P7', published=True, in_navigation=True, parent=p6, **defaults)
             create_title(language='de', title="other title %s" % p7.get_title('en'), page=p7)
+
             p8 = create_page('P8', published=True, in_navigation=True, parent=p6, **defaults)
             create_title(language='de', title="other title %s" % p8.get_title('en'), page=p8)
+
             p9 = create_page('P9', published=True, in_navigation=True, parent=p1, **defaults)
             create_title(language='de', title="other title %s" % p9.get_title('en'), page=p9)
+
             p10 = create_page('P10', published=False, in_navigation=True, parent=p9, **defaults)
             create_title(language='de', title="other title %s" % p10.get_title('en'), page=p10)
+
             p11 = create_page('P11', published=True, in_navigation=True, parent=p9, **defaults)
-            p8.publish('en')
-            p7.publish('en')
-            p5.publish('en')
-            p3.publish('en')
-            p2.publish('en')
-            p6.publish('en')
-            p4.publish('en')
-            p1.publish('en')
+            p1 = p1.reload()
+            p2 = p2.reload()
+            p3 = p3.reload()
+            p4 = p4.reload()
+            p5 = p5.reload()
+            p6 = p6.reload()
+            p7 = p7.reload()
+            p8 = p8.reload()
+            p8.publish('de')
+            p7.publish('de')
+            p5.publish('de')
+            p3.publish('de')
+            p2.publish('de')
+            p6.publish('de')
+            p4.publish('de')
+            p1.publish('de')
+            self.assertEqual(Title.objects.filter(published=True, publisher_is_draft=False).count(), 18)
+
 
     def test_sitemap_count(self):
         """

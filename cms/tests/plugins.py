@@ -443,7 +443,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # publish page
         response = self.client.post(URL_CMS_PAGE + "%d/en/publish/" % page.pk, {1: 1})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEquals(Page.objects.count(), 3)
 
         # there should now be two plugins - 1 draft, 1 public

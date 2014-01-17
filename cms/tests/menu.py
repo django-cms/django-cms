@@ -419,8 +419,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_unpublished(self):
         page2 = self.get_page(2)
-        page2.published = False
-        page2.save()
+        page2.title_set.update(published=False)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)

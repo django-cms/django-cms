@@ -62,7 +62,7 @@ class PageQuerySet(PublisherQuerySet):
                 Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
                 title_set__published=True
             )
-        return pub.distinct()
+        return pub
 
     def expired(self):
         return self.on_site().filter(

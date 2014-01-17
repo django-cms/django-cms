@@ -24,7 +24,6 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
@@ -452,6 +451,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if not self.pk:
             self.save()
+        # be sure we have the newest data including mptt
+        p = Page.objects.get(pk=self.pk)
+        self.lft = p.lft
+        self.rght = p.rght
+        self.level = p.level
+        self.tree_id = p.tree_id
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -525,6 +530,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # Check if there are some children which are waiting for parents to
         # become published.
         publish_set = self.get_descendants().filter(title_set__published=True, title_set__language=language).select_related('publisher_public')
+        print 'publisher_set', publish_set, self.get_descendants(), self.get_descendants().filter(title_set__published=True)
         for page in publish_set:
             if page.publisher_public:
                 if page.publisher_public.parent.is_published(language):

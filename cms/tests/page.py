@@ -62,7 +62,10 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             self.assertEqual(Title.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
-
+            # crate home and auto publish
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -80,7 +83,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page.placeholders.all().count(), 2)
 
             # were public instances created?
-            self.assertEqual(Title.objects.all().count(), 2)
+            self.assertEqual(Title.objects.all().count(), 4)
             title = Title.objects.drafts().get(slug=page_data['slug'])
             title = Title.objects.public().get(slug=page_data['slug'])
 
@@ -207,7 +210,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.get(title_set__slug=page_data['slug'])
+            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             response = self.client.get('/en/admin/cms/page/%s/' % page.id)
             self.assertEqual(response.status_code, 200)
             page_data['title'] = 'changed title'
@@ -252,13 +255,13 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             page_data["meta_description"] = "I am a page"
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.get(title_set__slug=page_data['slug'])
+            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             response = self.client.get('/en/admin/cms/page/%s/' % page.id)
             self.assertEqual(response.status_code, 200)
             page_data['meta_description'] = 'I am a duck'
             response = self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page = Page.objects.get(title_set__slug=page_data["slug"])
+            page = Page.objects.get(title_set__slug=page_data["slug"], publisher_is_draft=True)
             self.assertEqual(page.get_meta_description(), 'I am a duck')
 
     def test_meta_description_from_template_tags(self):
@@ -270,7 +273,7 @@ class PagesTestCase(CMSTestCase):
             page_data["title"] = "Hello"
             page_data["meta_description"] = "I am a page"
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.get(title_set__slug=page_data['slug'])
+            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %}")
@@ -292,7 +295,7 @@ class PagesTestCase(CMSTestCase):
             #some databases don't store microseconds, so move the start flag back by 1 second
             before_change = datetime.datetime.now()+datetime.timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.get(title_set__slug=page_data['slug'])
+            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
             t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-d\TH:i:s' }}")
             req = HttpRequest()
@@ -492,7 +495,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page = Page.objects.get(title_set__slug=page_data['slug'])
+            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
 
