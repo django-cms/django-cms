@@ -129,8 +129,8 @@ class PagesTestCase(CMSTestCase):
                 # TODO: check for slug collisions after move
                 # TODO: check for slug collisions with different settings
 
-    def test_get_available_slug(self):
-        """ Checks cms.utils.get_available_slug
+    def test_get_available_slug_recursion(self):
+        """ Checks cms.utils.page.get_available_slug for infinite recursion
         """
         for x in range(0, 12):
             page1 = create_page('test copy', 'nav_playground.html', 'en',
