@@ -6,16 +6,25 @@ import re
 APPEND_TO_SLUG = "-copy"
 COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d)*)?$')
 
+
 def is_valid_page_slug(page, parent, lang, slug, site, path=None):
     """Validates given slug depending on settings.
     """
     from cms.models import Title
     # Exclude the page with the publisher_state == page.PUBLISHER_STATE_DELETE
-    qs = Title.objects.filter(page__site=site).exclude(
-        Q(page=page) |
-        Q(page=page.publisher_public) |
-        Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
-    )
+    # Since 3.0 this must take into account unpublished pages as it's necessary
+    # to be able to open every page to edit content.
+    # If page is newly created (i.e. page.pk is None) we skip filtering out
+    # titles attached to the same page
+    if page.pk:
+        qs = Title.objects.filter(page__site=site).exclude(
+            Q(page=page) |
+            Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
+        )
+    else:
+        qs = Title.objects.filter(page__site=site).exclude(
+            Q(page__publisher_state=page.PUBLISHER_STATE_DELETE)
+        )
 
     if settings.USE_I18N:
         qs = qs.filter(language=lang)
