@@ -293,6 +293,39 @@ $(document).ready(function () {
 			}
 		},
 
+		copyPluginFromLanguage: function (options, language) {
+			// Copy all plugins from one language to another in the same placeholder
+			var that = this;
+			// set correct options
+			options = options || this.options;
+
+			var data = {
+				'source_placeholder_id': options.placeholder_id,
+				'source_plugin_id': '',
+				'source_language': language,
+				'target_plugin_id': '',
+				'target_placeholder_id': options.placeholder_id,
+				'target_language': options.plugin_language,
+				'csrfmiddlewaretoken': this.csrf
+			};
+			var request = {
+				'type': 'POST',
+				'url': options.urls.copy_plugin,
+				'data': data,
+				'success': function () {
+					CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+					// reload
+					CMS.API.Helpers.reloadBrowser();
+				},
+				'error': function (jqXHR) {
+					var msg = CMS.config.lang.error;
+					// trigger error
+					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+				}
+			};
+			$.ajax(request);
+		},
+
 		cutPlugin: function () {
 			var that = this;
 			var data = {
@@ -413,6 +446,9 @@ $(document).ready(function () {
 						break;
 					case 'edit':
 						that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
+						break;
+					case 'copy-lang':
+						that.copyPluginFromLanguage(this.options, el.attr('data-language'));
 						break;
 					case 'copy':
 						that.copyPlugin();
