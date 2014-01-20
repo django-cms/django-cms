@@ -25,7 +25,8 @@ $(document).ready(function () {
 				'add_plugin': '',
 				'edit_plugin': '',
 				'move_plugin': '',
-				'copy_plugin': ''
+				'copy_plugin': '',
+				'delete_plugin': ''
 			}
 		},
 
@@ -386,6 +387,16 @@ $(document).ready(function () {
 			$('.cms_btn-publish').addClass('cms_btn-publish-active').parent().show();
 		},
 
+		deletePlugin: function (url, name, breadcrumb) {
+			// trigger modal window
+			var modal = new CMS.Modal({
+				'newPlugin': this.newPlugin || false,
+				'onClose': this.options.onClose || false,
+				'redirectOnClose': this.options.redirectOnClose || false
+			});
+			modal.open(url, name, breadcrumb);
+		},
+
 		// private methods
 		_setSubnav: function (nav) {
 			var that = this;
@@ -419,6 +430,9 @@ $(document).ready(function () {
 						break;
 					case 'cut':
 						that.cutPlugin();
+						break;
+					case 'delete':
+						that.deletePlugin(that.options.urls.delete_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
 						break;
 					default:
 						CMS.API.Toolbar._loader(false);
