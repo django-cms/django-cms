@@ -24,7 +24,7 @@ class StaticPlaceholder(models.Model):
     CREATION_BY_CODE = 'code'
     CREATION_METHODS = (
         (CREATION_BY_TEMPLATE, _('by template')),
-        (CREATION_BY_TEMPLATE, _('by code')),
+        (CREATION_BY_CODE, _('by code')),
     )
     name = models.CharField(
         verbose_name=_(u'static placeholder name'), max_length=255, blank=True, default='',
