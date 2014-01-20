@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import shutil
-from cms.admin import pageadmin
-from django.contrib import admin
 from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from djangocms_text_ckeditor.models import Text
@@ -18,6 +16,7 @@ from django.core.urlresolvers import reverse
 from os.path import join
 import reversion
 from reversion.models import Revision, Version
+
 if hasattr(reversion.models, 'VERSION_CHANGE'):
     from reversion.models import VERSION_CHANGE
 
@@ -135,13 +134,13 @@ class ReversionTestCase(TransactionCMSTestCase):
             version = Version.objects.get(content_type=ctype, revision=revision)
             page = Page.objects.all()[0]
 
-            undo_url = reverse("admin:cms_page_undo", args=[page.pk, 'en'])
+            undo_url = reverse("admin:cms_page_undo", args=[page.pk])
             response = self.client.post(undo_url)
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
             self.assertTrue(page.revision_id != 0)
             rev = page.revision_id
-            redo_url = reverse("admin:cms_page_redo", args=[page.pk, 'en'])
+            redo_url = reverse("admin:cms_page_redo", args=[page.pk])
             response = self.client.post(redo_url)
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
@@ -151,7 +150,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             response = self.client.post(edit_url, {"body": "Hello World2"})
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
-            self.assertTrue(page.revision_id == 0)
+            self.assertEqual(page.revision_id, 0)
             self.assertEqual(2, CMSPlugin.objects.all().count())
             placeholderpk = page.placeholders.filter(slot="body")[0].pk
             plugin_data = {
@@ -256,7 +255,7 @@ class ReversionFileFieldTests(CMSTestCase):
                 reversion.revision_context_manager.add_to_context(
                     reversion.default_revision_manager, file1,
                     adapter.get_version_data(file1))
-            # reload the instance from db
+                # reload the instance from db
         file2 = FileModel.objects.all()[0]
         # delete the instance.
         file2.delete()

@@ -325,15 +325,15 @@ class PageToolbar(CMSToolbar):
             from reversion.models import Revision
 
             versions = reversion.get_for_object(self.page)
-            if self.title.revision_id:
-                current_revision = Revision.objects.get(pk=self.title.revision_id)
+            if self.page.revision_id:
+                current_revision = Revision.objects.get(pk=self.page.revision_id)
                 has_undo = versions.filter(revision__pk__lt=current_revision.pk).count() > 0
                 has_redo = versions.filter(revision__pk__gt=current_revision.pk).count() > 0
             else:
                 has_redo = False
                 has_undo = versions.count() > 1
-            undo_action = reverse('admin:cms_page_undo', args=(self.page.pk, self.current_lang))
-            redo_action = reverse('admin:cms_page_redo', args=(self.page.pk, self.current_lang))
+            undo_action = reverse('admin:cms_page_undo', args=(self.page.pk,))
+            redo_action = reverse('admin:cms_page_redo', args=(self.page.pk,))
             history_menu.add_ajax_item(_('Undo'), action=undo_action, disabled=not has_undo)
             history_menu.add_ajax_item(_('Redo'), action=redo_action, disabled=not has_redo)
             history_menu.add_break(HISTORY_MENU_BREAK)

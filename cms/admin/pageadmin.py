@@ -123,12 +123,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
+            pat(r'^([0-9]+)/undo/$', self.undo),
+            pat(r'^([0-9]+)/redo/$', self.redo),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),  # publish page
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),  # unpublish page
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
-            pat(r'^([0-9]+)/([a-z\-]+)/undo/$', self.undo),
-            pat(r'^([0-9]+)/([a-z\-]+)/redo/$', self.redo),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),  # copy dialog
             pat(r'^([0-9]+)/change_template/$', self.change_template), # copy dialog
         )
@@ -695,7 +695,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
     @require_POST
-    def undo(self, request, object_id, language):
+    def undo(self, request, object_id):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
@@ -736,7 +736,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         return HttpResponse("ok")
 
     @require_POST
-    def redo(self, request, object_id, language):
+    def redo(self, request, object_id):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision

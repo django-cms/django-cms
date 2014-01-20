@@ -33,8 +33,6 @@ class Title(models.Model):
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
-    # If the draft is loaded from a reversion version save the revision id here.
-    revision_id = models.PositiveIntegerField(default=0, editable=False)
 
     objects = TitleManager()
 
@@ -85,7 +83,6 @@ class Title(models.Model):
             self.page.publication_date = timezone.now() - timedelta(seconds=5)
 
         if self.publisher_is_draft and not keep_state:
-            print "from title save"
             self.publisher_state = PUBLISHER_STATE_DIRTY
         if keep_state:
             delattr(self, '_publisher_keep_state')

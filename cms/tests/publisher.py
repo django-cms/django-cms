@@ -206,13 +206,7 @@ class PublishingTests(TestCase):
             self.assertObjectExist(drafts, title_set__title=name)
             self.assertObjectDoesNotExist(public, title_set__title=name)
             self.assertObjectDoesNotExist(published, title_set__title=name)
-        print "$$$$$$$$$$$$$$$$$$$$"
         parent.publish("en")
-        for t in Title.objects.all():
-            print t.title
-            print t.publisher_is_draft
-            print t.published
-        print published
         drafts = Page.objects.drafts()
         public = Page.objects.public()
         published = Page.objects.public().published('en')
@@ -343,7 +337,6 @@ class PublishingTests(TestCase):
 
         child.in_navigation = True
         child.save()
-        print '$$$$$$$$$$$$$$$$$$$$$$$$$'
         child.publish('en')
         child = self.reload(child)
         self.assertEqual(Title.objects.count(), 4)
@@ -355,7 +348,6 @@ class PublishingTests(TestCase):
         self.assertEqual(child.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
 
         home.publish('en')
-        print "after publish"
         child = self.reload(child)
         self.assertTrue(child.is_published('en'))
         self.assertTrue(child.publisher_public_id)
@@ -372,7 +364,6 @@ class PublishingTests(TestCase):
         home.unpublish('en')
         child = self.reload(child)
         gc = self.reload(gc)
-        print child.title_set.get(language='en').published
         self.assertTrue(child.is_published("en"))
         self.assertTrue(gc.is_published("en"))
         self.assertFalse(child.publisher_public.is_published("en"))
@@ -409,7 +400,6 @@ class PublishingTests(TestCase):
         self.assertEqual(dirty2.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
         home = self.reload(home)
-        print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
         home.publish('en')
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
@@ -570,17 +560,7 @@ class PublishingTests(TestCase):
         self.assertEqual(child.get_public_object().get_absolute_url(), root+'page/child/')
         self.assertEqual(child2.get_absolute_url(), root+'child/')
         self.assertEqual(child2.get_public_object().get_absolute_url(), root+'child/')
-        print '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
         home.publish('en')
-        for p in Page.objects.filter(is_home=True):
-            print p.pk
-            print p.publisher_public_id
-            print p.is_home
-        print home.pk
-        print other.pk
-
-        print home.tree_id
-        print other.tree_id
         home = self.reload(home)
         other = self.reload(other)
         child = self.reload(child)

@@ -86,6 +86,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     published_languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
+    # If the draft is loaded from a reversion version save the revision id here.
+    revision_id = models.PositiveIntegerField(default=0, editable=False)
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -411,7 +413,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         """
         keep_state = getattr(self, '_publisher_keep_state', None)
         if self.publisher_is_draft and not keep_state:
-            print "from page save"
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
@@ -473,7 +474,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             # Ensure that the page is in the right position and save it
             public_page = self._publisher_save_public(public_page)
             published = public_page.parent_id is None or public_page.parent.is_published(language)
-            print 'published: ', published
             if not public_page.pk:
                 public_page.save()
             # The target page now has a pk, so can be used as a target
@@ -497,8 +497,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         else:
             # Nothing left to do
             pass
-        print "set states"
-
         if published:
             if not self.published_languages or not "|%s|" % language in self.published_languages:
                 if self.published_languages:
@@ -507,10 +505,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     self.published_languages = "|%s|" % language
         else:
             self.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=True)
-        print "=================================before page save"
         self._publisher_keep_state = True
         self.save()
-        print "after page save"
         # If we are publishing, this page might have become a "home" which
         # would change the path
         if self.is_home:
@@ -523,14 +519,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         self.pagemoderatorstate_set.all().delete()
 
         if not published:
-            print "not published"
             # was not published, escape
             return
 
         # Check if there are some children which are waiting for parents to
         # become published.
         publish_set = self.get_descendants().filter(title_set__published=True, title_set__language=language).select_related('publisher_public')
-        print 'publisher_set', publish_set, self.get_descendants(), self.get_descendants().filter(title_set__published=True)
         for page in publish_set:
             if page.publisher_public:
                 if page.publisher_public.parent.is_published(language):
@@ -550,9 +544,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 page.publish(language)
         # fire signal after publishing is done
         import cms.signals as cms_signals
-
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
-        print "after publish signal"
+
         return published
 
     def unpublish(self, language):
@@ -584,14 +577,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         self.save()
         # Go through all children of our public instance
         descendants = public_page.get_descendants()
-        print descendants
         for child in descendants:
             child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
             draft = child.publisher_public
-            print draft.is_published(language)
-            print draft.get_publisher_state(language)
             if draft and draft.is_published(language) and draft.get_publisher_state(language) == PUBLISHER_STATE_DEFAULT:
-                print 'set pending'
                 draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
         from cms.signals import post_unpublish
         post_unpublish.send(sender=Page, instance=self, language=language)
@@ -609,9 +598,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         public._copy_titles(self, language, public.is_published(language))
         public._copy_contents(self, language)
         public._copy_attributes(self)
-        self.set_publisher_state(language, PUBLISHER_STATE_DEFAULT)
-        self._publisher_keep_state = True
+        self.title_set.filter(language=language).update(publisher_state=PUBLISHER_STATE_DEFAULT, published=True)
         self.revision_id = 0
+        self._publisher_keep_state = True
         self.save()
         # clean moderation log
         self.pagemoderatorstate_set.all().delete()

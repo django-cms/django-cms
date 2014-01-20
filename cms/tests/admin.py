@@ -489,7 +489,6 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             response = self.admin_class.publish_page(request, page.pk, "en")
-            print response
             self.assertEqual(response.status_code, 403)
             page = self.reload(page)
             self.assertFalse(page.is_published('en'))

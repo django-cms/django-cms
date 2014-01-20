@@ -1021,7 +1021,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 GlobalpagePermission count query
                 """
                 get_visible_pages(request, pages, site)
-                #print connection.queries
 
     def test_authed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):

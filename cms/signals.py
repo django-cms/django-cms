@@ -44,7 +44,6 @@ def update_home(instance, **kwargs):
     :param kwargs:
     :return:
     """
-    print "update home"
     if getattr(instance, '_home_checked', False):
         return
     if not instance.parent_id or (getattr(instance, 'old_page', False) and not instance.old_page.parent_id):
@@ -66,7 +65,6 @@ def update_home(instance, **kwargs):
             page._publisher_keep_state = True
             page._home_checked = True
             page.save()
-        print 'home pk:', home_pk
         try:
             page = qs.get(pk=home_pk, site=instance.site)
         except Page.DoesNotExist:
@@ -86,7 +84,6 @@ signals.post_delete.connect(update_home, sender=Page)
 def update_title_paths(instance, **kwargs):
     """Update child pages paths in case when page was moved.
     """
-    print "update title path"
     for title in instance.title_set.all():
         title.save()
 
@@ -95,7 +92,6 @@ page_moved.connect(update_title_paths, sender=Page, dispatch_uid="cms.title.upda
 
 
 def update_title(title):
-    print "update title"
     slug = u'%s' % title.slug
     if title.page.is_home:
         title.path = ''
