@@ -263,6 +263,9 @@ def update_placeholders(instance, **kwargs):
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
 
+def delete_placeholders(instance, **kwargs):
+    instance.placeholders.all().delete()
+
 # tell moderator, there is something happening with this page
 signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
 signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
@@ -270,6 +273,7 @@ signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
+signals.pre_delete.connect(delete_placeholders, sender=Page)
 signals.pre_delete.connect(pre_delete_title, sender=Title)
 
 

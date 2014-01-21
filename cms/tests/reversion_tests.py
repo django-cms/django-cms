@@ -181,12 +181,6 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEquals(Revision.objects.all().count(), 5)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
-
-            for rev in Revision.objects.all():
-                print rev
-            for v in Version.objects.filter(content_type=ctype, revision=revision):
-                print v
-                print dir(v)
             version = Version.objects.filter(content_type=ctype, revision=revision)[0]
 
             self.assertEquals(Page.objects.all().count(), 2)
@@ -195,7 +189,7 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             page = Page.objects.all()[0]
             page_pk = page.pk
-            page.delete_with_public()
+            page.delete()
 
             self.assertEquals(Page.objects.all().count(), 0)
             self.assertEquals(CMSPlugin.objects.all().count(), 0)

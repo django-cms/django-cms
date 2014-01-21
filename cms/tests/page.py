@@ -559,12 +559,13 @@ class PagesTestCase(CMSTestCase):
         plugin.save()
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self.assertEqual(Text.objects.count(), 1)
-        self.assertTrue(Placeholder.objects.count() > 0)
+        self.assertTrue(Placeholder.objects.count() > 2)
         page.delete()
         home.delete()
         self.assertEqual(CMSPlugin.objects.count(), 0)
         self.assertEqual(Text.objects.count(), 0)
         self.assertEqual(Placeholder.objects.count(), 0)
+        self.assertEqual(Page.objects.count(), 0)
 
     def test_get_page_from_request_on_non_cms_admin(self):
         request = self.get_request(
