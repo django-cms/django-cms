@@ -11,7 +11,10 @@ class Migration(DataMigration):
             titles = page.title_set.all()
             languages = []
             pub_page = page.publisher_public
-            pub_titles = pub_page.title_set.all()
+            if pub_page:
+                pub_titles = pub_page.title_set.all()
+            else:
+                pub_titles = []
             for title in titles:
                 title.published = page.published
                 title.publisher_is_draft = page.publisher_is_draft
@@ -30,6 +33,7 @@ class Migration(DataMigration):
             if page.published:
                 page.published_languages = ",".join(languages)
             page.languages = ",".join(languages)
+            page.save()
 
 
     def backwards(self, orm):

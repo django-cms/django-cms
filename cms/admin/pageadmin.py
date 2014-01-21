@@ -38,7 +38,7 @@ from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorStat
     titlemodels, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, copy_plugins
-from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
+from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
 from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
@@ -1154,21 +1154,20 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             "admin/delete_confirmation.html"
         ], context, context_instance=context_instance)
 
-    def preview_page(self, request, object_id):
+    def preview_page(self, request, object_id, language):
         """Redirecting preview function based on draft_id
         """
         page = get_object_or_404(Page, id=object_id)
         attrs = "?edit"
-        language = request.REQUEST.get('language', None)
-        if language:
-            attrs += "&language=" + language
-
-        url = page.get_absolute_url(language) + attrs
+        attrs += "&language=" + language
+        with force_language(language):
+            url = page.get_absolute_url(language) + attrs
         site = current_site(request)
 
         if not site == page.site:
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
             page.site.domain, url)
+        print url
         return HttpResponseRedirect(url)
 
     @require_POST

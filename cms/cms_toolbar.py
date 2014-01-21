@@ -169,7 +169,8 @@ class PageToolbar(CMSToolbar):
                 pk = 0
                 if self.page:
                     pk = self.page.pk
-                publish_url = reverse('admin:cms_page_publish_page', args=(pk, self.current_lang))
+                with force_language(self.current_lang):
+                    publish_url = reverse('admin:cms_page_publish_page', args=(pk, self.current_lang))
                 if dirty_statics:
                     publish_url += "?statics=%s" % ','.join(str(static.pk) for static in dirty_statics)
                 if publish_permission:

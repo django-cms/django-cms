@@ -657,7 +657,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.publisher_public
 
     def get_languages(self):
-        return sorted(self.languages.split(','))
+        if self.languages:
+            return sorted(self.languages.split(','))
+        else:
+            return []
 
     def get_cached_ancestors(self, ascending=True):
         if ascending:
