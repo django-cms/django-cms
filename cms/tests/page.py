@@ -28,7 +28,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_AD
 from cms.test_utils.util.context_managers import (LanguageOverride, SettingsOverride, UserLoginContext)
 from cms.utils import get_cms_setting
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
-from cms.utils.page import is_valid_page_slug
+from cms.utils.page import is_valid_page_slug, get_available_slug
 
 
 class PageMigrationTestCase(CMSTestCase):
@@ -128,6 +128,15 @@ class PagesTestCase(CMSTestCase):
                 self.assertEqual(response['Location'].endswith(URL_CMS_PAGE_ADD), True)
                 # TODO: check for slug collisions after move
                 # TODO: check for slug collisions with different settings
+
+    def test_get_available_slug_recursion(self):
+        """ Checks cms.utils.page.get_available_slug for infinite recursion
+        """
+        for x in range(0, 12):
+            page1 = create_page('test copy', 'nav_playground.html', 'en',
+                                published=True)
+        new_slug = get_available_slug(page1.get_title_obj('en'), 'test-copy')
+        self.assertTrue(new_slug, 'test-copy-11')
 
     def test_slug_collisions_api_1(self):
         """ Checks for slug collisions on sibling pages - uses API to create pages
