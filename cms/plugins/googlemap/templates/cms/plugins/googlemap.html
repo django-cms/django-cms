@@ -17,13 +17,13 @@
       var options = {
         zoom: {{ object.zoom }},
         mapTypeId: google.maps.MapTypeId.ROADMAP, /* ROADMAP, SATELLITE, HYBRID or TERRAIN */
-        scrollwheel: {{ object.scrollwheel | lower }},
+        scrollwheel: {{ object.scrollwheel|lower }},
         disableDoubleClickZoom: {% if object.double_click_zoom %}false{% else %}true{% endif %},
-        draggable: {{ object.draggable | lower}},
-        keyboardShortcuts: {{ object.keyboard_shortcuts | lower}},
-        panControl: {{ object.pan_control | lower}},
-        zoomControl: {{ object.zoom_control | lower}},
-        streetViewControl: {{ object.street_view_control | lower}},
+        draggable: {{ object.draggable|lower}},
+        keyboardShortcuts: {{ object.keyboard_shortcuts|lower}},
+        panControl: {{ object.pan_control|lower}},
+        zoomControl: {{ object.zoom_control|lower}},
+        streetViewControl: {{ object.street_view_control|lower}},
       };
 
       {% if object.get_lat_lng %}
