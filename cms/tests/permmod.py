@@ -763,6 +763,7 @@ class ModeratorSwitchCommandTest(CMSTestCase):
             page1 = create_page('page', 'nav_playground.html', 'en', published=True)
             path = page1.get_absolute_url()[len(pages_root):].strip('/')
             page2 = get_page_from_path(path)
+            self.assertIsNotNone(page2)
             self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
 
 

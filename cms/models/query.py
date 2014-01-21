@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import datetime, timedelta
 from cms.utils.conf import get_cms_setting
 from django.db.models import Q
 from django.contrib.sites.models import Site
@@ -52,14 +52,14 @@ class PageQuerySet(PublisherQuerySet):
 
         if language:
             pub = self.on_site(site).filter(
-                Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
-                Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
+                Q(publication_date__lte=timezone.now()) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gt=timezone.now()) | Q(publication_end_date__isnull=True),
                 title_set__published=True, title_set__language=language
             )
         else:
             pub = self.on_site(site).filter(
-                Q(publication_date__lt=timezone.now()) | Q(publication_date__isnull=True),
-                Q(publication_end_date__gte=timezone.now()) | Q(publication_end_date__isnull=True),
+                Q(publication_date__lte=timezone.now()) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gt=timezone.now()) | Q(publication_end_date__isnull=True),
                 title_set__published=True
             )
         return pub
