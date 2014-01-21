@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy, copy
 from itertools import chain
 from datetime import datetime
 from django.template.defaultfilters import safe
@@ -596,7 +597,7 @@ class CMSEditableObject(InclusionTag):
     """
     template = 'cms/toolbar/content.html'
     edit_template = 'cms/toolbar/plugin.html'
-    name = 'show_editable_model'
+    name = 'render_model'
     options = Options(
         Argument('instance'),
         Argument('attribute'),
@@ -605,11 +606,13 @@ class CMSEditableObject(InclusionTag):
         Argument('filters', default=None, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False),
     )
 
     def __init__(self, parser, tokens):
         self.parser = parser
-        return super(CMSEditableObject, self).__init__(parser, tokens)
+        super(CMSEditableObject, self).__init__(parser, tokens)
 
     def _is_editable(self, request):
         return (request and hasattr(request, 'toolbar') and
@@ -629,16 +632,90 @@ class CMSEditableObject(InclusionTag):
         data = self.get_context(context, **kwargs)
         output = render_to_string(template, data)
         context.pop()
-        return output
+        if kwargs.get('varname'):
+            context[kwargs['varname']] = output
+            return ''
+        else:
+            return output
 
-    def get_context(self, context, instance, attribute, edit_fields, language,
-                    filters, view_url, view_method):
-        if not language:
-            language = get_language_from_request(context['request'])
+    def _get_editable_context(self, context, instance, language, edit_fields,
+                              view_method, view_url, querystring, editmode=True):
+        """
+        Populate the contex with the requested attributes to trigger the changeform
+        """
+        extra_context = {}
+        if editmode:
+            instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+        else:
+            instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
+            extra_context['attribute_name'] = 'add'
+        extra_context['instance'] = instance
+        extra_context['generic'] = instance._meta
+        # view_method has the precedence and we retrieve the corresponding
+        # attribute in the instance class.
+        # If view_method refers to a method it will be called passing the
+        # request; if it's an attribute, it's stored for later use
+        if view_method:
+            method = getattr(instance, view_method)
+            if callable(method):
+                url_base = method(context['request'])
+            else:
+                url_base = method
+        else:
+            # The default view_url is the default admin changeform for the
+            # current instance
+            if not editmode:
+                view_url = 'admin:%s_%s_add' % (
+                    instance._meta.app_label, instance._meta.module_name)
+                url_base = reverse(view_url)
+            elif not edit_fields:
+                view_url = 'admin:%s_%s_change' % (
+                    instance._meta.app_label, instance._meta.module_name)
+                url_base = reverse(view_url, args=(instance.pk,))
+            else:
+                if not view_url:
+                    view_url = 'admin:%s_%s_edit_field' % (
+                        instance._meta.app_label, instance._meta.module_name)
+                url_base = reverse(view_url, args=(instance.pk, language))
+                querystring['edit_fields'] = ",".join(context['edit_fields'])
+        if editmode:
+            extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+        else:
+            extra_context['edit_url'] = "%s" % url_base
+        extra_context['refresh_page'] = True
+        # We may be outside the CMS (e.g.: an application which is not attached via Apphook)
+        # in this case we may only go back to the home page
+        if getattr(context['request'], 'current_page', None):
+            extra_context['redirect_on_close'] = context['request'].current_page.get_absolute_url(language)
+        else:
+            extra_context['redirect_on_close'] = ''
+        return extra_context
+
+    def _get_content(self, context, instance, attribute, language, filters):
+        """
+        Renders the requested attribute
+        """
+        extra_context = copy(context)
+        extra_context['content'] = getattr(instance, attribute, '')
         # This allow the requested item to be a method, a property or an
         # attribute
-        if not instance:
-            return context
+        if callable(extra_context['content']):
+            if isinstance(instance, Page):
+                extra_context['content'] = extra_context['content'](language)
+            else:
+                extra_context['content'] = extra_context['content'](context['request'])
+        if filters:
+            expression = self.parser.compile_filter("content|%s" % (filters))
+            extra_context['content'] = expression.resolve(extra_context)
+        return extra_context
+
+    def _get_data_context(self, context, instance, attribute, edit_fields,
+                          language, filters, view_url, view_method):
+        """
+        Renders the requested attribute and attach changeform trigger to it
+
+        Uses `_get_empty_context`
+        """
         if not attribute:
             return context
         attribute = attribute.strip()
@@ -657,67 +734,181 @@ class CMSEditableObject(InclusionTag):
                 if not edit_fields:
                     edit_fields = 'menu_title'
             elif attribute == 'titles':
-                attribute = 'get_page_title'
+                attribute = 'get_title'
                 if not edit_fields:
                     edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
-        context['attribute_name'] = attribute
-        querystring = {'language': language}
-        if edit_fields:
-            context['edit_fields'] = edit_fields.strip().split(",")
-        context['content'] = getattr(instance, attribute, '')
-        if callable(context['content']):
-            if isinstance(instance, Page):
-                context['content'] = context['content'](language)
-            else:
-                context['content'] = context['content'](context['request'])
-        if filters:
-            expression = self.parser.compile_filter("content|%s" % (filters))
-            context['content'] = expression.resolve(context)
-        # If the toolbar is not enabled the following part is just skipped: it
-        # would cause a perfomance hit for no reason
-        if self._is_editable(context.get('request', None)):
-            instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
-            context['instance'] = instance
-            context['generic'] = instance._meta
-            # view_method has the precedence and we retrieve the corresponding
-            # attribute in the instance class.
-            # If view_method refers to a method it will be called passing the
-            # request; if it's an attribute, it's stored for later use
-            if view_method:
-                method = getattr(instance, view_method)
-                if callable(method):
-                    url_base = method(context['request'])
-                else:
-                    url_base = method
-            else:
-                # The default view_url is the default admin changeform for the
-                # current instance
-                if not edit_fields:
-                    view_url = 'admin:%s_%s_change' % (
-                        instance._meta.app_label, instance._meta.module_name)
-                    url_base = reverse(view_url, args=(instance.pk,))
-                else:
-                    if not view_url:
-                        view_url = 'admin:%s_%s_edit_field' % (
-                            instance._meta.app_label, instance._meta.module_name)
-                    url_base = reverse(view_url, args=(instance.pk, language))
-                    querystring['edit_fields'] = ",".join(context['edit_fields'])
-            context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
-            context['refresh_page'] = True
-            # We may be outside the CMS (e.g.: an application which is not attached via Apphook
-            # in this case we may only go back to the home page
-            if hasattr(context['request'], 'current_page'):
-                context['redirect_on_close'] = context['request'].current_page.get_absolute_url(language)
-            else:
-                context['redirect_on_close'] = ''
+        extra_context = copy(context)
+        extra_context['attribute_name'] = attribute
+        extra_context = self._get_empty_context(extra_context, instance,
+                                                edit_fields, language, view_url,
+                                                view_method)
+        extra_context.update(self._get_content(extra_context, instance, attribute,
+                                         language, filters))
         # content is for non-edit template content.html
         # rendered_content is for edit template plugin.html
         # in this templatetag both hold the same content
-        context['content'] = mark_safe(context['content'])
-        context['rendered_content'] = context['content']
-        return context
+        extra_context['content'] = mark_safe(extra_context['content'])
+        extra_context['rendered_content'] = extra_context['content']
+        return extra_context
+
+    def _get_empty_context(self, context, instance, edit_fields, language,
+                           view_url, view_method, editmode=True):
+        """
+        Inject in a copy of the context the data requested to trigger the edit.
+
+        `content` and `rendered_content` is emptied.
+        """
+        if not language:
+            language = get_language_from_request(context['request'])
+        # This allow the requested item to be a method, a property or an
+        # attribute
+        if not instance and editmode:
+            return context
+        # ugly-ish
+        if instance and isinstance(instance, Page):
+            if not edit_fields:
+                edit_fields = 'title,page_title,menu_title'
+            view_url = 'admin:cms_page_edit_title_fields'
+        querystring = {'language': language}
+        extra_context = copy(context)
+        if edit_fields:
+            extra_context['edit_fields'] = edit_fields.strip().split(",")
+        # If the toolbar is not enabled the following part is just skipped: it
+        # would cause a perfomance hit for no reason
+        extra_context.update(context)
+        if self._is_editable(context.get('request', None)):
+            extra_context.update(self._get_editable_context(
+                extra_context, instance, language, edit_fields, view_method,
+                view_url, querystring, editmode))
+        # content is for non-edit template content.html
+        # rendered_content is for edit template plugin.html
+        # in this templatetag both hold the same content
+        extra_context['content'] = ''
+        extra_context['rendered_content'] = ''
+        return extra_context
+
+    def get_context(self, context, instance, attribute, edit_fields,
+                          language, filters, view_url, view_method, varname):
+        """
+        Uses _get_data_context to render the requested attributes
+        """
+        extra_context = self._get_data_context(context, instance, attribute,
+                                               edit_fields, language, filters,
+                                               view_url, view_method)
+        return extra_context
 register.tag(CMSEditableObject)
+
+
+class CMSEditableObjectIcon(CMSEditableObject):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+
+    The output of this templatetag is just an icon to trigger the changeform.
+    """
+    name = 'render_model_icon'
+    options = Options(
+        Argument('instance'),
+        Argument('edit_fields', default=None, required=False),
+        Argument('language', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False),
+    )
+
+    def get_context(self, context, instance, edit_fields, language,
+                    view_url, view_method, varname):
+        """
+        Uses _get_empty_context and adds the `render_model_icon` variable.
+        """
+        extra_context = self._get_empty_context(context, instance, edit_fields,
+                                                language, view_url, view_method)
+        extra_context['render_model_icon'] = True
+        return extra_context
+register.tag(CMSEditableObjectIcon)
+
+
+class CMSEditableObjectAdd(CMSEditableObject):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+
+    The output of this templatetag is just an icon to trigger the changeform.
+    """
+    name = 'render_model_add'
+    options = Options(
+        Argument('instance'),
+        Argument('language', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False),
+    )
+
+    def get_context(self, context, instance, language,
+                    view_url, view_method, varname):
+        """
+        Uses _get_empty_context and adds the `render_model_icon` variable.
+        """
+        extra_context = self._get_empty_context(context, instance, None,
+                                                language, view_url, view_method,
+                                                editmode=False)
+        extra_context['render_model_add'] = True
+        return extra_context
+register.tag(CMSEditableObjectAdd)
+
+
+class CMSEditableObjectBlock(CMSEditableObject):
+    """
+    Templatetag that links a content extracted from a generic django model
+    to the model admin changeform.
+
+    The rendered content is to be specified in the enclosed block.
+    """
+    name = 'render_model_block'
+    options = Options(
+        Argument('instance'),
+        Argument('edit_fields', default=None, required=False),
+        Argument('language', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False),
+        blocks=[('endrender_model_block', 'nodelist')],
+    )
+
+    def render_tag(self, context, **kwargs):
+        """
+        Renders the block and then inject the resulting HTML in the template
+        context
+        """
+        context.push()
+        template = self.get_template(context, **kwargs)
+        data = self.get_context(context, **kwargs)
+        data['content'] = mark_safe(kwargs['nodelist'].render(data))
+        data['rendered_content'] = data['content']
+        output = render_to_string(template, data)
+        context.pop()
+        if kwargs.get('varname'):
+            context[kwargs['varname']] = output
+            return ''
+        else:
+            return output
+
+    def get_context(self, context, instance, edit_fields, language,
+                    view_url, view_method, varname, nodelist):
+        """
+        Uses _get_empty_context and adds the `instance` object to the local
+        context. Context here is to be intended as the context of the nodelist
+        in the block.
+        """
+        extra_context = self._get_empty_context(context, instance, edit_fields,
+                                                language, view_url, view_method)
+        extra_context['instance'] = instance
+        return extra_context
+register.tag(CMSEditableObjectBlock)
 
 
 class StaticPlaceholderNode(Tag):

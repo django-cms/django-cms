@@ -9,16 +9,31 @@ Frontend editing for Page and Django models
 django CMS frontend editing can also be used to edit non-placeholder fields from
 the frontend, both for pages and your standard Django models.
 
-By enabling it, it's possible to double click on a value of a model instance in
+Using this interface, you can double click on a value of a model instance in
 the frontend and access the instance changeform in a popup window, like the page
 changeform.
 
 
 .. warning::
 
-    ``show_editable_model`` marks as safe the content of the rendered model
-    attribute. This may be a security risk if used on fields which may hold
-    non-trusted content. Be aware, and use the templatetag accordingly.
+    Templatetag used by this feature mark as safe the content of the rendered
+    model attribute. This may be a security risk if used on fields which may
+    hold non-trusted content. Be aware, and use the templatetags accordingly.
+
+************
+Templatetags
+************
+
+This feature relies on four templatetag sharing common code:
+
+* :ttag:`render_model`
+* :ttag:`render_model_icon`
+* :ttag:`render_model_add`
+* :ttag:`render_model_block`
+
+Look at the tag-specific page for a detailed reference; in the examples
+below ``render_model`` is assumed.
+
 
 ****************
 Page titles edit
@@ -29,26 +44,26 @@ attribute specified a overridable default field will be editable.
 
 Main title::
 
-    {% show_editable_model request.current_page "title" %}
+    {% render_model request.current_page "title" %}
 
 
 Page title::
 
-    {% show_editable_model request.current_page "page_title" %}
+    {% render_model request.current_page "page_title" %}
 
 Menu title::
 
-    {% show_editable_model request.current_page "menu_title" %}
+    {% render_model request.current_page "menu_title" %}
 
 All three titles::
 
-    {% show_editable_model request.current_page "titles" %}
+    {% render_model request.current_page "titles" %}
 
 
 You can always customize the editable fields by providing the
 `edit_field` parameter::
 
-    {% show_editable_model request.current_page "title" "page_title,menu_title" %}
+    {% render_model request.current_page "title" "page_title,menu_title" %}
 
 
 
@@ -74,15 +89,15 @@ on Django admin::
     class MyModelAdmin(FrontendEditableAdmin, admin.ModelAdmin):
         ...
 
-Then setup the templates adding ``show_editable_model`` templatetag::
+Then setup the templates adding ``render_model`` templatetag::
 
     {% load cms_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "some_attribute" %}</h1>
+    <h1>{% render_model instance "some_attribute" %}</h1>
     {% endblock content %}
 
-See :ttag:`templatetag reference <show_editable_model>` for arguments documentation.
+See :ttag:`templatetag reference <render_model>` for arguments documentation.
 
 
 Selected fields edit
@@ -113,7 +128,7 @@ the templatetag::
     {% load cms_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" %}</h1>
+    <h1>{% render_model instance "some_attribute" "some_field,other_field" %}</h1>
     {% endblock content %}
 
 
@@ -143,14 +158,14 @@ evaluated with ``request`` as parameter.
 The custom view does not need to obey any specific interface; it will get
 ``edit_fields`` value as a ``GET`` parameter.
 
-See :ttag:`templatetag reference <show_editable_model>` for arguments documentation.
+See :ttag:`templatetag reference <render_model>` for arguments documentation.
 
 Example ``view_url``::
 
     {% load cms_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "admin:exampleapp_example1_some_view" %}</h1>
+    <h1>{% render_model instance "some_attribute" "some_field,other_field" "" "admin:exampleapp_example1_some_view" %}</h1>
     {% endblock content %}
 
 
@@ -166,7 +181,7 @@ Example ``view_method``::
     {% load cms_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "some_attribute" "some_field,other_field" "" "" "some_method" %}</h1>
+    <h1>{% render_model instance "some_attribute" "some_field,other_field" "" "" "some_method" %}</h1>
     {% endblock content %}
 
 
@@ -177,11 +192,33 @@ Filters
 *******
 
 If you need to apply filters to the output value of the templatetag, add quoted
-sequence of filters as in Django :ttag:`django:filter` templatetag::
+sequence of filters as in Django :ttag:`django:filter` templatetag:
+
+.. code-block:: html+django
 
     {% load cms_tags %}
 
     {% block content %}
-    <h1>{% show_editable_model instance "attribute" "" "" "truncatechars:9" %}</h1>
+    <h1>{% render_model instance "attribute" "" "" "truncatechars:9" %}</h1>
+    {% endblock content %}
+
+
+
+****************
+Context variable
+****************
+
+The templatetag output can be saved in a context variable for later use, using
+the standard `as` syntax:
+
+.. code-block:: html+django
+
+    {% load cms_tags %}
+
+    {% block content %}
+    {% render_model instance "attribute" as variable %}
+
+    <h1>{{ variable }}</h1>
+
     {% endblock content %}
 

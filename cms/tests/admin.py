@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import json
 import datetime
+from cms.views import details
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
@@ -645,7 +646,6 @@ class AdminTests(AdminTestsBase):
         self.assertEquals(sub_col.language, "de")
         self.assertEquals(sub_col.parent_id, col2.pk)
 
-
     def test_preview_page(self):
         permless = self.get_permless()
         with self.login_user_context(permless):
@@ -762,6 +762,7 @@ class AdminTests(AdminTestsBase):
             response = self.client.post(admin_url, post_data)
             draft_page = Page.objects.get(pk=page.pk).get_draft_object()
             self.assertTrue(draft_page.is_dirty())
+
 
 class NoDBAdminTests(CMSTestCase):
     @property

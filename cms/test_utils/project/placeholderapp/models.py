@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from cms.utils import get_language_from_request
 from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from cms.models.fields import PlaceholderField
@@ -13,6 +14,7 @@ def dynamic_placeholder_2(instance):
     return instance.char_2
 
 
+@python_2_unicode_compatible
 class Example1(models.Model):
     char_1 = models.CharField(u'char_1', max_length=255)
     char_2 = models.CharField(u'char_2', max_length=255)
@@ -20,6 +22,11 @@ class Example1(models.Model):
     char_4 = models.CharField(u'char_4', max_length=255)
     date_field = models.DateField(null=True)
     placeholder = PlaceholderField('placeholder')
+
+    static_admin_url = ''
+
+    def __init__(self, *args, **kwargs):
+        super(Example1, self).__init__(*args, **kwargs)
 
     def callable_item(self, request):
         return self.char_1
@@ -29,6 +36,16 @@ class Example1(models.Model):
 
     def get_absolute_url(self):
         return reverse("detail", args=(self.pk,))
+
+    def set_static_url(self, request):
+        language = get_language_from_request(request)
+        if self.pk:
+            self.static_admin_url = reverse('admin:placeholderapp_example1_edit_field', args=(self.pk, language))
+        return self.pk
+
+    def dynamic_url(self, request):
+        language = get_language_from_request(request)
+        return reverse('admin:placeholderapp_example1_edit_field', args=(self.pk, language))
 
 
 class TwoPlaceholderExample(models.Model):

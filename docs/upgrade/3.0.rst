@@ -199,8 +199,8 @@ Please read :ref:`cms-copy-lang-command` before using.
 Frontedit editor for Django models
 ==================================
 
-You can now use the :ref:`show_editable_model <frontend-editable-fields>`
-template tag to edit any Django models in the frontend editor.
+Frontend editor is available for any Django model; see
+:ref:`documentation<frontend-editable-fields>` for details.
 
 New ``Page related_name`` to ``Site``
 =====================================

@@ -5,8 +5,12 @@ source =
 branch = True
 omit =
     cms/migrations/*
+    cms/plugins/*/migrations/*
+    cms/stacks/migrations/*
     cms/tests/*
     cms/test_utils/*
+    menus/migrations/*
+    docs
 
 [report]
 exclude_lines =
