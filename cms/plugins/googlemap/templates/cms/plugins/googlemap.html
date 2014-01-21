@@ -46,10 +46,12 @@
           'title': title
         });
         // prepare info window
+        var content = "";
+        if (title) content += "<strong>" + title + "</strong><br />";
+        content += address {% if object.content %} + "<br /> \
+                   <br /><em>{{ object.content }}</em>"{% endif %}
         var infowindow = new google.maps.InfoWindow({
-          content: "<strong>" + title + "</strong> \
-                    <br />" + address {% if object.content %} + "<br /> \
-                    <br /><em>{{ object.content }}</em>"{% endif %}
+          content: content
         });
         // show info window
         infowindow.open(map, marker);
