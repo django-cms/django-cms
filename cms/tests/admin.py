@@ -650,29 +650,28 @@ class AdminTests(AdminTestsBase):
         permless = self.get_permless()
         with self.login_user_context(permless):
             request = self.get_request()
-            self.assertRaises(Http404, self.admin_class.preview_page, request,
-                              404)
+            self.assertRaises(Http404, self.admin_class.preview_page, request, 404, "en")
         page = self.get_page()
         page.publish("en")
         base_url = page.get_absolute_url()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
-            response = self.admin_class.preview_page(request, page.pk)
+            response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?edit' % base_url)
+            self.assertEqual(response['Location'], '%s?edit&language=en' % base_url)
             request = self.get_request()
-            response = self.admin_class.preview_page(request, page.pk)
+            response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?edit' % base_url)
+            self.assertEqual(response['Location'], '%s?edit&language=en' % base_url)
             site = Site.objects.create(domain='django-cms.org', name='django-cms')
             page.site = site
             page.save()
             page.publish("en")
             self.assertTrue(page.is_home)
-            response = self.admin_class.preview_page(request, page.pk)
+            response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'],
-                             'http://django-cms.org%s?edit' % base_url)
+                             'http://django-cms.org%s?edit&language=en' % base_url)
 
     def test_too_many_plugins_global(self):
         conf = {

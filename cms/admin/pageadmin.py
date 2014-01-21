@@ -146,6 +146,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         """Returns all the instances to be used in the object's revision."""
         if isinstance(object, Title):
             object = object.page
+        if isinstance(object, Page) and not object.publisher_is_draft:
+            object = object.publisher_public
         placeholder_relation = find_placeholder_relation(object)
         data = [object]
         filters = {'placeholder__%s' % placeholder_relation: object}
@@ -154,6 +156,11 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             plugin_instance, admin = plugin.get_plugin_instance()
             if plugin_instance:
                 data.append(plugin_instance)
+        if isinstance(object, Page):
+            titles = object.title_set.all()
+            for title in titles:
+                title.publisher_public = None
+                data.append(title)
         return data
 
     def save_model(self, request, obj, form, change):
@@ -1167,7 +1174,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not site == page.site:
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
             page.site.domain, url)
-        print url
         return HttpResponseRedirect(url)
 
     @require_POST

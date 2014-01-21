@@ -181,7 +181,13 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEquals(Revision.objects.all().count(), 5)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
-            version = Version.objects.get(content_type=ctype, revision=revision)
+
+            for rev in Revision.objects.all():
+                print rev
+            for v in Version.objects.filter(content_type=ctype, revision=revision):
+                print v
+                print dir(v)
+            version = Version.objects.filter(content_type=ctype, revision=revision)[0]
 
             self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)

@@ -60,7 +60,7 @@ def revert_plugins(request, version_id, obj):
         try:
             title.save()
         except:
-            title.pk = Title.objects.get(page=page, language=title.language).pk
+            title.pk = Title.objects.get(page_id=page, language=title.language).pk
             title.save()
     for other in others:
         other.object.save()
