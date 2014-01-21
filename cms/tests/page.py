@@ -114,20 +114,11 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
-            #page1 = Title.objects.get(slug=page_data['slug']).page
-            # create page with the same page_data
-
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
 
-            if settings.USE_I18N:
-                self.assertEqual(response.status_code, 302)
-                # did we got right redirect?
-                self.assertEqual(response['Location'].endswith(URL_CMS_PAGE), True)
-            else:
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response['Location'].endswith(URL_CMS_PAGE_ADD), True)
-                # TODO: check for slug collisions after move
-                # TODO: check for slug collisions with different settings
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
+            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
 
     def test_get_available_slug_recursion(self):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
