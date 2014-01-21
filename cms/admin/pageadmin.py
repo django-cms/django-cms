@@ -39,7 +39,6 @@ from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorStat
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
-from cms.utils.page_resolver import is_valid_url
 from cms.utils.admin import jsonify_request
 
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
@@ -110,7 +109,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
         url_patterns = patterns(
             '',
-            pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
+
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
             pat(r'^([0-9]+)/dates/$', self.dates),
             pat(r'^([0-9]+)/permission-settings/$', self.permissions),
@@ -126,11 +125,13 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
             pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
-            pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),  # publish page
-            pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),  # unpublish page
+            pat(r'^([0-9]+)/change_template/$', self.change_template),
+            pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
+            pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
+            pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
-            pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),  # copy dialog
-            pat(r'^([0-9]+)/change_template/$', self.change_template), # copy dialog
+            pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
+
         )
 
         if plugin_pool.get_all_plugins():
