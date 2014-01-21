@@ -39,6 +39,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     )
     PUBLISHER_STATE_DEFAULT = 0
     PUBLISHER_STATE_DIRTY = 1
+    # PUBLISHER_STATE_DELETE is not used anymore
     PUBLISHER_STATE_DELETE = 2
     # Page was marked published, but some of page parents are not.
     PUBLISHER_STATE_PENDING = 4
@@ -567,10 +568,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             plugin.delete()
             ph.delete()
 
-        if self.publisher_public_id:
-            # mark the public instance for deletion
-            self.publisher_public.publisher_state = self.PUBLISHER_STATE_DELETE
-            self.publisher_public.save()
         super(Page, self).delete()
 
     def delete_with_public(self):
