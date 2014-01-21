@@ -113,7 +113,6 @@ class CMSLiveTests(LiveServerTestCase, TestCase):
 class ToolbarBasicTests(CMSLiveTests):
 
     def setUp(self):
-        print "setup"
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
         user = User()
@@ -141,6 +140,7 @@ class ToolbarBasicTests(CMSLiveTests):
     def test_basic_add_pages(self):
         with SettingsOverride(DEBUG=True):
             self.assertEqual(Page.objects.all().count(), 0)
+            self.assertTrue(User.objects.all().count(), 1)
             driver = self.driver
             driver.get(self.base_url + "/de/")
             driver.find_element_by_id("add-page").click()
