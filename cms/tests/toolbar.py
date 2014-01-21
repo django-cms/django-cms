@@ -785,7 +785,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         title.page_title = 'Page Test'
         title.title = 'Main Test'
         title.save()
-        page.publish()
+        page.publish('en')
         page.reload()
         request = self.get_page_request(page, user, edit=True)
         response = details(request, '')
