@@ -42,7 +42,8 @@ class GoogleMap(CMSPlugin):
 
     info_window = models.BooleanField(_('info window'), default=True,
                                       help_text=_('Show textbox over marker'))
-    scrollwheel = models.BooleanField(_('scrollsheel zooming'), default=True)
+    scrollwheel = models.BooleanField(_('scrollwheel'), default=True,
+                          help_text=_('Enable scrollwheel zooming on the map'))
     double_click_zoom = models.BooleanField(_('double click zoom'),
                                             default=True)
     draggable = models.BooleanField(_('draggable'), default=True)
