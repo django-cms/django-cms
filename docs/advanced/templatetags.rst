@@ -279,25 +279,25 @@ Plugin needs to be an instance of a plugin model.
 
 Example::
 
-	{% load cms_tags %}
-	<div class="multicolumn">
-	{% for plugin in instance.child_plugin_instances %}
-		<div style="width: {{ plugin.width }}00px;">
-     		{% render_plugin plugin %}
-		</div>
-	{% endfor %}
-	</div>
+    {% load cms_tags %}
+    <div class="multicolumn">
+    {% for plugin in instance.child_plugin_instances %}
+        <div style="width: {{ plugin.width }}00px;">
+            {% render_plugin plugin %}
+        </div>
+    {% endfor %}
+    </div>
 	
 Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
-.. templatetag:: show_editable_model
+.. templatetag:: render_model
 .. versionadded:: 3.0
 
-show_editable_model
-===================
+render_model
+============
 
-``show_editable_model`` works by showing the content of the given attribute in
+``render_model`` works by showing the content of the given attribute in
 the model instance and eventually makes it clickable to edit the related model.
 
 If the toolbar is not enabled, the value of the attribute is rendered in the
@@ -310,7 +310,20 @@ Using this templatetag you can show and edit page titles as well as fields in
 standard django models, see :ref:`frontend-editable-fields` for examples and
 further documentation.
 
-Arguments:
+Example:
+
+.. code-block:: html+django
+
+    <h1>{% render_model_block my_model "title" "title,abstract" %}</h1>
+
+This will render to:
+
+.. code-block:: html+django
+
+    <!-- The content of the H1 is the active area that triggers the frontend editor -->
+    <h1><div class="cms_plugin cms_plugin-myapp-mymodel-title-1">{{ my_model.title }}</div></h1>
+
+**Arguments:**
 
 * ``instance``: instance of your model in the template
 * ``attribute``: the name of the attribute you want to show in the template; it
@@ -326,13 +339,165 @@ Arguments:
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
 
 .. warning::
 
-    ``show_editable_model`` marks as safe the content of the rendered model
+    ``render_model`` marks as safe the content of the rendered model
     attribute. This may be a security risk if used on fields which may hold
     non-trusted content. Be aware, and use the templatetag accordingly.
+
+
+.. templatetag:: render_model_block
+.. versionadded:: 3.0
+
+render_model_block
+==================
+
+``render_model_block`` is the block-level equivalent of ``render_model``:
+
+.. code-block:: html+django
+
+    {% render_model_block my_model %}
+        <h1>{{ instance.title }}</h1>
+        <div class="body">
+            {{ instance.date|date:"d F Y" }}
+            {{ instance.text }}
+        </div>
+    {% endrender_model_block %}
+
+This will render to:
+
+.. code-block:: html+django
+
+    <!-- This whole block is the active area that triggers the frontend editor -->
+    <div class="cms_plugin cms_plugin-myapp-mymodel-1">
+        <h1>{{ my_model.title }}</h1>
+        <div class="body">
+            {{ my_model.date|date:"d F Y" }}
+            {{ my_model.text }}
+        </div>
+    </div>
+
+In the block the ``my_model`` is aliased as ``instance`` and every attribute and
+method is available; also templatetags and filters are available in the block.
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor;
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+
+.. templatetag:: render_model_icon
+.. versionadded:: 3.0
+
+render_model_icon
+=================
+
+``render_model_icon`` is intended for use where the relevant object attribute
+is not available for user interaction (for example, already has a link on it,
+think of a title in a list of items and the titles are linked to the object
+detail view); when in edit mode, it renders an **edit** icon, which will trigger
+the editing changeform for the provided fields.
+
+
+.. code-block:: html+django
+
+    <h3><a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a> {% render_model_icon my_model %}</h3>
+
+It will render to something like:
+
+.. code-block:: html+django
+
+    <h3>
+        <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
+        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_icon">
+            <!-- The image below is the active area that triggers the frontend editor -->
+            <img src="/static/cms/img/toolbar/render_model_placeholder.png">
+        </div>
+    </h3>
+
+.. note::
+
+        Icon and position can be customized via CSS by setting a background
+        to the ``.cms_render_model_icon img`` selector.
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor;
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+
+.. templatetag:: render_model_add
+.. versionadded:: 3.0
+
+render_model_add
+================
+
+``render_model_add`` is similar to ``render_model_icon`` but it will enable to
+create instances of the given instance class; when in edit mode, it renders an
+**add** icon, which will trigger the editing addform for the provided model.
+
+
+.. code-block:: html+django
+
+    <h3><a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a> {% render_model_add my_model %}</h3>
+
+It will render to something like:
+
+.. code-block:: html+django
+
+    <h3>
+        <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
+        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_add">
+            <!-- The image below is the active area that triggers the frontend editor -->
+            <img src="/static/cms/img/toolbar/render_model_placeholder.png">
+        </div>
+    </h3>
+
+.. note::
+
+        Icon and position can be customized via CSS by setting a background
+        to the ``.cms_render_model_add img`` selector.
+
+..warning::
+
+    You **must** pass an instance of your model as instance parameter.
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor;
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 

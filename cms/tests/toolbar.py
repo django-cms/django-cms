@@ -295,12 +295,29 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model fake "char_1" %}</h1>
+<h1>{% render_model fake "char_1" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response, '<div class="cms_plugin cms_plugin-%s"></div>' % ex1.pk)
+
+    def test_as_varname(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "char_1" as tempvar %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertNotContains(response, '<div class="cms_plugin cms_plugin-%s"></div>' % ex1.pk)
 
     def test_filters(self):
         user = self.get_staff()
@@ -312,7 +329,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "char_1" "" "" 'truncatewords:2' %}</h1>
+<h1>{% render_model instance "char_1" "" "" 'truncatewords:2' %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -329,7 +346,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "date_field" %}</h1>
+<h1>{% render_model instance "date_field" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -341,7 +358,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "date_field" "" "" 'date:"Y m d"' %}</h1>
+<h1>{% render_model instance "date_field" "" "" 'date:"Y m d"' %}</h1>
 {% endblock content %}
 '''
         response = detail_view(request, ex1.pk, template_string=template_text)
@@ -357,12 +374,138 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "char_1" "" "" 'truncatewords:2'  %}</h1>
+<h1>{% render_model instance "char_1" "" "" 'truncatewords:2'  %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=False)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response, '<h1>%s</h1>' % truncatewords(ex1.char_1, 2))
+
+    def test_no_cms(self):
+        user = self.get_staff()
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_icon instance %}
+{% endblock content %}
+'''
+        request = self.get_page_request('', user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
+        self.assertContains(response, '\'redirectOnClose\': false,')
+
+    def test_icon_tag(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_icon instance %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
+
+    def test_add_tag(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_add instance %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
+
+    def test_block_tag(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4", date_field=datetime.date(2012, 1, 1))
+        ex1.save()
+
+        # This template does not render anything as content is saved in a
+        # variable and never inserted in the page
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}{% load url from future %}
+
+{% block content %}
+{% render_model_block instance as rendered_model %}
+    {{ instance }}
+    <h1>{{ instance.char_1 }} - {{  instance.char_2 }}</h1>
+    {{ instance.date_field|date:"Y" }}
+    {% if instance.char_1 %}
+    <a href="{% url 'detail' instance.pk %}">successful if</a>
+    {% endif %}
+{% endrender_model_block %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertNotContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_icon.png"></div>' % ('placeholderapp', 'example1', ex1.pk))
+
+        # This template does not render anything as content is saved in a
+        # variable and inserted in the page afterwards
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}{% load url from future %}
+
+{% block content %}
+{% render_model_block instance as rendered_model %}
+    {{ instance }}
+    <h1>{{ instance.char_1 }} - {{  instance.char_2 }}</h1>
+    <span class="date">{{ instance.date_field|date:"Y" }}</span>
+    {% if instance.char_1 %}
+    <a href="{% url 'detail' instance.pk %}">successful if</a>
+    {% endif %}
+{% endrender_model_block %}
+{{ rendered_model }}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        # Assertions on the content of the block tag
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s">' % ('placeholderapp', 'example1', ex1.pk))
+        self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
+        self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
+        self.assertContains(response, '<a href="%s">successful if</a></div>' % (reverse('detail', args=(ex1.pk,))))
+
+        # This template is rendered directly
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}{% load url from future %}
+
+{% block content %}
+{% render_model_block instance %}
+    {{ instance }}
+    <h1>{{ instance.char_1 }} - {{  instance.char_2 }}</h1>
+    <span class="date">{{ instance.date_field|date:"Y" }}</span>
+    {% if instance.char_1 %}
+    <a href="{% url 'detail' instance.pk %}">successful if</a>
+    {% endif %}
+{% endrender_model_block %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        # Assertions on the content of the block tag
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s">' % ('placeholderapp', 'example1', ex1.pk))
+        self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
+        self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
+        self.assertContains(response, '<a href="%s">successful if</a></div>' % (reverse('detail', args=(ex1.pk,))))
 
     def test_invalid_attribute(self):
         user = self.get_staff()
@@ -374,12 +517,24 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "fake_field" %}</h1>
+<h1>{% render_model instance "fake_field" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-%s-%s"></div>' % ('placeholderapp', 'example1', 'fake_field', ex1.pk))
+
+        # no attribute
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}CIAOOOO
+<h1>{% render_model instance "" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s"></div>' % ex1.pk)
 
     def test_callable_item(self):
         user = self.get_staff()
@@ -391,10 +546,45 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" %}</h1>
+<h1>{% render_model instance "callable_item" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
+
+    def test_view_method(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "" "dynamic_url" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
+
+    def test_method_attribute(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "" "static_admin_url" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        ex1.set_static_url(request)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s">char_1</div></h1>' % ('placeholderapp', 'example1', 'callable_item', ex1.pk))
 
@@ -408,7 +598,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "char_1" %}</h1>
+<h1>{% render_model instance "callable_item" "char_1" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -425,7 +615,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "char_2" %}</h1>
+<h1>{% render_model instance "callable_item" "char_2" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -444,7 +634,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" "char_1,char_2" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
+<h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -464,7 +654,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance "callable_item" %}</h1>
+<h1>{% render_model instance "callable_item" %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -481,7 +671,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% show_editable_model instance item_name %}</h1>
+<h1>{% render_model instance item_name %}</h1>
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
@@ -585,6 +775,23 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = exadmin.edit_field(request, exm.pk, "fr")
             self.assertContains(response, 'id="id_char_2"')
             self.assertContains(response, 'value="deux"')
+
+    def test_edit_page(self):
+        language = "en"
+        user = self.get_superuser()
+        page = create_page('Test', 'col_two.html', language, published=True)
+        title = page.get_title_obj(language)
+        title.menu_title = 'Menu Test'
+        title.page_title = 'Page Test'
+        title.title = 'Main Test'
+        title.save()
+        page.publish()
+        page.reload()
+        request = self.get_page_request(page, user, edit=True)
+        response = details(request, '')
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_page_title-%s">%s</div>' % (page.pk, page.get_page_title(language)))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_menu_title-%s">%s</div>' % (page.pk, page.get_menu_title(language)))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_title-%s">%s</div>' % (page.pk, page.get_title(language)))
 
 
 class ToolbarAPITests(TestCase):
