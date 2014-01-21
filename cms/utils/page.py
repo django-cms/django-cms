@@ -4,7 +4,7 @@ from django.db.models import Q
 import re
 
 APPEND_TO_SLUG = "-copy"
-COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d)*)?$')
+COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d+)*)?$')
 
 def is_valid_page_slug(page, parent, lang, slug, site, path=None):
     """Validates given slug depending on settings.
@@ -63,9 +63,8 @@ def get_available_slug(title, new_slug=None):
             try:
                 next = int(match.groups()[0]) + 1
                 slug = "-".join(slug.split('-')[:-1]) + "-%d" % next
-            except TypeError:
+            except TypeError as e:
                 slug += "-2"
-
         else:
             slug += APPEND_TO_SLUG
         return get_available_slug(title, slug)
