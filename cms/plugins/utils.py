@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, permissions
 from cms.utils.i18n import get_redirect_on_fallback, get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.placeholder import get_placeholder_conf
@@ -65,6 +65,9 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
                     plugins = placeholder._plugins_cache
                     if plugins:
                         break
+    # If no plugin is present, create default plugins if enabled)
+    if not plugins:
+        plugins = create_default_plugins(request, placeholders, template, lang)
     plugin_list = downcast_plugins(plugins, placeholders)
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
@@ -74,6 +77,27 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
     for placeholder in placeholders:
         setattr(placeholder, '_plugins_cache', list(groups.get(placeholder.pk, [])))
 
+
+def create_default_plugins(request, placeholders, template, lang):
+    """
+    Create all default plugins for the given ``placeholders`` if they have 
+    a "default_plugins" configuration value in settings.
+    """
+    from cms.api import add_plugin
+    plugins = list()
+    for placeholder in placeholders:
+        default_plugins = get_placeholder_conf("default_plugins", placeholder.slot, template, None)
+        if not default_plugins:
+            continue
+        if not placeholder.has_add_permission(request):
+            continue
+        position=0
+        for conf in default_plugins:
+            if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
+                continue
+            plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['value'])
+            plugins.append(plugin)
+    return plugins
 
 
 def build_plugin_tree(plugin_list):
