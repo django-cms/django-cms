@@ -5,6 +5,7 @@ Edit Toolbar middleware
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.dj import force_unicode
+from menus.menu_pool import menu_pool
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from cms.utils.placeholder import get_toolbar_plugin_struct
@@ -46,10 +47,14 @@ class ToolbarMiddleware(object):
         request.toolbar. Then call the request_hook on the toolbar.
         """
         if 'edit' in request.GET and not request.session.get('cms_edit', False):
+            if not request.session.get('cms_edit', False):
+                menu_pool.clear()
             request.session['cms_edit'] = True
             if request.session.get('cms_build', False):
                 request.session['cms_build'] = False
         if 'edit_off' in request.GET and request.session.get('cms_edit', True):
+            if request.session.get('cms_edit', True):
+                menu_pool.clear()
             request.session['cms_edit'] = False
             if request.session.get('cms_build', False):
                 request.session['cms_build'] = False
