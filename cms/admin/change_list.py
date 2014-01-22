@@ -124,9 +124,6 @@ class CMSChangeList(ChangeList):
         for state in pm_qs:
             pm_states[state.page_id].append(state)
 
-        public_page_id_set = Page.objects.public().filter(
-            publisher_public_id__gt=0, publisher_public__in=pages).values_list('id', flat=True)
-
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'
         # and otherwise complaints about 'invalid item order'
@@ -150,7 +147,6 @@ class CMSChangeList(ChangeList):
                 page.permission_user_cache = request.user
 
             page._moderator_state_cache = pm_states[page.pk]
-            page._public_published_cache = page.publisher_public_id in public_page_id_set
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):
