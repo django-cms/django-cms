@@ -144,16 +144,21 @@ $color-background-blue-hover: #e6f6fd;
 	li .col-apphook span.icon {
 		width: 18px !important; height: 18px !important; margin:0 !important;
 		background: url('../../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
-    li .col-language span.dirty {
-		width: 18px !important; height: 19px !important; margin:0 !important; display: inline-block;
-		background: url('../../img/pagetree/sprite.png') -80px -40px no-repeat !important;color: transparent;}
-    li .col-language span.published {
-		width: 18px !important; height: 19px !important; margin:0 !important; display: inline-block;
-		background: url('../../img/pagetree/sprite.png') -80px -60px no-repeat !important;color: transparent;}
-    li .col-language span.unpublished {
-		width: 18px !important; height: 19px !important; margin:0 !important; display: inline-block;
-		background: url('../../img/pagetree/sprite.png') -80px -20px no-repeat !important;color: transparent;}
-    li .col-language span.empty {
-		width: 18px !important; height: 19px !important; margin:0 !important; display: inline-block;
-		background: url('../../img/pagetree/sprite.png') -80px -80px no-repeat !important;color: transparent;}
+    li .col-language span {
+		width: 14px !important; height: 14px !important; margin:0 !important; display: inline-block;
+        @include border-radius(7px);
+        color: transparent;
+        &.dirty {
+	       background-color: #6ba6ff;
+	      }
+        &.empty {
+             background-color: #e8e9e5;
+            }
+        &.unpublished {
+             background-color: #ff914f;
+            }
+        &.published {
+             background-color: #31da1b;
+            }
+     }
 }
