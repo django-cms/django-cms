@@ -253,16 +253,24 @@ $(document).ready(function () {
 			modal.open(url, name, breadcrumb);
 		},
 
-		copyPlugin: function (options) {
+		copyPlugin: function (options, source_language) {
 			var that = this;
-			var move = (options) ? true : false;
+			var move = (options || source_language) ? true : false;
 			// set correct options
 			options = options || this.options;
+			if(source_language) {
+				options.target = options.placeholder_id;
+				options.plugin_id = '';
+				options.parent = '';
+			}
+			else {
+				source_language = options.plugin_language
+			}
 
 			var data = {
 				'source_placeholder_id': options.placeholder_id,
 				'source_plugin_id': options.plugin_id || '',
-				'source_language': options.plugin_language,
+				'source_language': source_language,
 				'target_plugin_id': options.parent || '',
 				'target_placeholder_id': options.target || CMS.config.clipboard.id,
 				'target_language': options.plugin_language,
@@ -424,6 +432,9 @@ $(document).ready(function () {
 						break;
 					case 'edit':
 						that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
+						break;
+					case 'copy-lang':
+						that.copyPlugin(this.options, el.attr('data-language'));
 						break;
 					case 'copy':
 						that.copyPlugin();

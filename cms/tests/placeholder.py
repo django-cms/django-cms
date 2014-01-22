@@ -420,6 +420,54 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                         response.context['request'].toolbar.clipboard.pk, ".",
                         grouping=3, thousand_sep=","))
 
+    def test_placeholder_languages_model(self):
+        """
+        Checks the retrieval of filled languages for a placeholder in a django
+        model
+        """
+        avail_langs = set([u'en', u'de', u'fr'])
+        # Setup instance
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ###
+        # add the test plugin
+        ###
+        for lang in avail_langs:
+            test_plugin = add_plugin(ex.placeholder, u"EmptyPlugin", lang)
+        # reload instance from database
+        ex = Example1.objects.get(pk=ex.pk)
+        #get languages
+        langs = [lang['code'] for lang in ex.placeholder.get_filled_languages()]
+        self.assertEqual(avail_langs, set(langs))
+
+    def test_placeholder_languages_page(self):
+        """
+        Checks the retrieval of filled languages for a placeholder in a django
+        model
+        """
+        avail_langs = set([u'en', u'de', u'fr'])
+        # Setup instances
+        page = create_page('test page', 'col_two.html', u'en')
+        for lang in avail_langs:
+            if lang != u'en':
+                create_title(lang, 'test page %s' % lang, page)
+        placeholder = page.placeholders.get(slot='col_sidebar')
+        ###
+        # add the test plugin
+        ###
+        for lang in avail_langs:
+            test_plugin = add_plugin(placeholder, u"EmptyPlugin", lang)
+        # reload placeholder from database
+        placeholder = page.placeholders.get(slot='col_sidebar')
+        # get languages
+        langs = [lang['code'] for lang in placeholder.get_filled_languages()]
+        self.assertEqual(avail_langs, set(langs))
+
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     def test_placeholder_no_action(self):
