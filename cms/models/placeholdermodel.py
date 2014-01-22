@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
+from cms.utils.i18n import get_language_object
 from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -174,6 +175,15 @@ class Placeholder(models.Model):
 
     def get_plugins(self):
         return self.cmsplugin_set.all().order_by('tree_id', 'lft')
+
+    def get_filled_languages(self):
+        """
+        Returns language objects for every language for which the placeholder
+        has plugins.
+
+        This is not cached as it's meant to eb used in the frontend editor.
+        """
+        return [get_language_object(lang_code) for lang_code in set(self.get_plugins().values_list('language', flat=True))]
 
     def get_cached_plugins(self):
         return getattr(self, '_plugins_cache', [])
