@@ -3,8 +3,7 @@
 <div class="cont {{ css_class }}">
 	<div class="col1">
 		{% if has_change_permission %}
-			<a href="./{{ page.id }}/preview/" target="_parent" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>
-			<a href="{{ url }}{{ page.id }}/" class="changelink" title="{% trans "edit this page" %}">{% trans "edit" %}</a>
+			<a href="{{ page.id }}/{{ lang }}/preview/" target="_parent" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>
 		{% else %}
 			<span class="title">{{ page.get_slug }}</span>
 		{% endif %}
@@ -33,10 +32,11 @@
 		</div>
         {% endfor %}
 		<div class="col-actions">
-			{% if not filtered %}
-				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
-			{% endif %}
-			{% if has_change_permission %}<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
+
+			{% if has_change_permission %}
+           	<a href="{{ url }}{{ page.id }}/" class="edit" title="{% trans "Page settings" %}"><span>{% trans "page settings" %}</span></a>
+            <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a-->
+            <a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
 
 			{% if has_add_page_permission and has_add_on_same_level_permission %}
 				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
@@ -45,6 +45,9 @@
 					{# if he can add page under current page, go directly to thi url #}
 					<a href="./add/?target={{ page.id }}&amp;position=last-child" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
 				{% endif %}
+			{% endif %}
+            {% if not filtered %}
+				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
 			{% endif %}
 			{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}
 		</div>

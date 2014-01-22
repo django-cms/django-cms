@@ -34,29 +34,24 @@ $color-background-blue-hover: #e6f6fd;
 	li input.hidden { position: absolute; left: -9999em; }
 
 	// icons
-	li a.icon, li span.icon, li a.move, li a.copy {
+	li a.icon, li span.icon, li a.move, li a.copy, li a.edit, li a.advanced-settings {
 		display: inline-block; width: 18px; height: 18px; margin-top:5px;
 		background: url('../../img/pagetree/sprite.png') no-repeat 0 0; }
 	li a.move { background-position:-20px -20px; margin-top:0; }
 	li a.copy { background-position:-40px -60px;  margin-top:0; }
-	li a.publish, li span.state-icon { margin-top:0; }
+    li a.edit { background-position:-40px -20px;  margin-top:0; }
+    li a.advanced-settings { background-position:-60px -60px;  margin-top:0; }
+
 	li a.selector-add { background-position:-20px 0; margin-left:4px; margin-top:-1px; }
-	li a.publish { background-position: -60px -82px; margin-left:4px; }
+
 	li a.addlink,
 	li a.deletelink { display:inline-block; width:10px; height:10px; padding:0; margin:0 0 0 4px; background-position:0 0; }
 	li .col-softroot span.icon { background-position:-80px 0; margin-top:0; }
 	li .col-apphook span.icon { background-position:-40px -80px; margin-top:0; }
-	// icons last row
-	li .col-lastchange .state-icon.add { background-position:-40px 0; }
-	li .col-lastchange .state-icon.cha { background-position:-40px -20px; }
-	li .col-lastchange .state-icon.pub { background-position:-60px -20px; }
-	li .col-lastchange .state-icon.unp { background-position:-60px -40px; }
-	li .col-lastchange .state-icon.mov { background-position:-60px 0; }
-	li .col-lastchange .state-icon.del { background-position:-40px -40px; }
-	li .col-lastchange .state-icon.app { background-position:-600px -60px; }
+
 
 	li a.move span, li a.copy span, li a.selector-add span,
-	li a.addlink span, li a.deletelink span,
+	li a.addlink span, li a.deletelink span, li a.edit span, li a.advanced-settings span,
 	.col-navigation input, .col-published input { display:none; }
 
 	// header
@@ -97,19 +92,13 @@ $color-background-blue-hover: #e6f6fd;
 
 	// row hover states
 	li .cont:hover { background:$color-border-light; }
-	li .publisher_draft { background:$color-border-light; }
-	li .publisher_draft:hover { background:$color-background-light-hover; }
-	li .publisher_pending { background:$color-background-blue; }
-	li .publisher_pending:hover { background:$color-background-blue-hover; }
-	li .publisher_dirty { background:$color-background-blue; }
-	li .publisher_dirty:hover { background:$color-background-blue-hover; }
 
 	// custom col asignments
 	li.moveable .col1 .title { background:url('../../img/pagetree/tree-li-drag.gif') no-repeat 0 0; }
 	li .col-language a { text-transform:uppercase; }
 
 	// edit button
-	.cont:hover .col1 a.changelink { display:inline; }
+	.cont:hover .col1 a.changelink { display:block; }
 
 	// drag modus
 	li#dragged { min-width:500px; }

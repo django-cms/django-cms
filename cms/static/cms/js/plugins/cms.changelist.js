@@ -353,20 +353,52 @@ $(document).ready(function () {
 					$(this).css("width",max + 'px');
 				});
 			}
-			return this;
 		};
+        $.fn.syncHeight = function() {
+            $(this).each(function() {
+                var cont = $(this).children('div.cont')
+                var col1 = cont.children('.col1');
+                var col2 = cont.children('.col2');
+                var w = 0;
+                var col1_width = col1.width();
+                col2.children('div').each(function () {
+                    this.style.setProperty('display','block', 'important' );
+                });
+                var col2_width = col2.width();
+                var total_width = cont.width();
+                if (col1_width+col2_width < total_width){
+                    return
+                }
+                $(col2.children('div').get().reverse()).each(function(){
+                    w += $(this).outerWidth();
+                    if (w + col1_width> total_width){
+                        this.style.setProperty('display','none', 'important' );
+                    }else{
+                        this.style.setProperty('display','block', 'important' );
+                    }
+                })
+            });
+		};
+
 		$("div#sitemap").show();
 		function syncCols(){
+            $('#sitemap ul .col-info').syncWidth(0);
+            $('#sitemap ul .col-navigation').syncWidth(0);
 			$('#sitemap ul .col-actions').syncWidth(0);
 			$('#sitemap ul .col-language').syncWidth(0);
-			$('#sitemap ul .col-navigation').syncWidth(0);
 			$('#sitemap ul .col-softroot').syncWidth(0);
 			$('#sitemap ul .col-apphook').syncWidth(0);
-			$('#sitemap ul .col-info').syncWidth(0);
+
+            $('ul.tree-default li').syncHeight();
 		}	
 		syncCols();
 		$(window).bind('resize', syncCols);
-
+        $('#sitemap ul div.cont').mouseenter(function() {
+           $(this).parent().syncHeight();
+        });
+        $('#sitemap ul div.cont').mouseleave(function() {
+           $(this).parent().syncHeight();
+        });
 		/* Site Selector */
 		$('#site-select').change(function(){
 			var form = $(this).closest('form');
