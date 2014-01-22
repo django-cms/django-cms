@@ -252,16 +252,24 @@ $(document).ready(function () {
 			modal.open(url, name, breadcrumb);
 		},
 
-		copyPlugin: function (options) {
+		copyPlugin: function (options, source_language) {
 			var that = this;
-			var move = (options) ? true : false;
+			var move = (options || source_language) ? true : false;
 			// set correct options
 			options = options || this.options;
+			if(source_language) {
+				options.target = options.placeholder_id;
+				options.plugin_id = '';
+				options.parent = '';
+			}
+			else {
+				source_language = options.plugin_language
+			}
 
 			var data = {
 				'source_placeholder_id': options.placeholder_id,
 				'source_plugin_id': options.plugin_id || '',
-				'source_language': options.plugin_language,
+				'source_language': source_language,
 				'target_plugin_id': options.parent || '',
 				'target_placeholder_id': options.target || CMS.config.clipboard.id,
 				'target_language': options.plugin_language,
@@ -291,39 +299,6 @@ $(document).ready(function () {
 					$.ajax(request);
 				});
 			}
-		},
-
-		copyPluginFromLanguage: function (options, language) {
-			// Copy all plugins from one language to another in the same placeholder
-			var that = this;
-			// set correct options
-			options = options || this.options;
-
-			var data = {
-				'source_placeholder_id': options.placeholder_id,
-				'source_plugin_id': '',
-				'source_language': language,
-				'target_plugin_id': '',
-				'target_placeholder_id': options.placeholder_id,
-				'target_language': options.plugin_language,
-				'csrfmiddlewaretoken': this.csrf
-			};
-			var request = {
-				'type': 'POST',
-				'url': options.urls.copy_plugin,
-				'data': data,
-				'success': function () {
-					CMS.API.Toolbar.openMessage(CMS.config.lang.success);
-					// reload
-					CMS.API.Helpers.reloadBrowser();
-				},
-				'error': function (jqXHR) {
-					var msg = CMS.config.lang.error;
-					// trigger error
-					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
-				}
-			};
-			$.ajax(request);
 		},
 
 		cutPlugin: function () {
@@ -448,7 +423,7 @@ $(document).ready(function () {
 						that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
 						break;
 					case 'copy-lang':
-						that.copyPluginFromLanguage(this.options, el.attr('data-language'));
+						that.copyPlugin(this.options, el.attr('data-language'));
 						break;
 					case 'copy':
 						that.copyPlugin();
