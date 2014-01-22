@@ -9,6 +9,7 @@ from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
 from django import template
 from django.conf import settings
+from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 import django
@@ -80,7 +81,7 @@ class TreePublishRow(Tag):
             else:
                 cls = "empty"
                 text = _("no content")
-        return mark_safe('<span class="%s">%s</span>' % (cls, unicode(text)))
+        return mark_safe('<span class="%s">%s</span>' % (cls, force_unicode(text)))
 
 register.tag(TreePublishRow)
 
