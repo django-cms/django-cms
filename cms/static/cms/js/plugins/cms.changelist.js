@@ -358,15 +358,11 @@ $(document).ready(function () {
 		$("div#sitemap").show();
 		function syncCols(){
 			$('#sitemap ul .col-actions').syncWidth(0);
-			$('#sitemap ul .col-published').syncWidth(0);
+			$('#sitemap ul .col-language').syncWidth(0);
 			$('#sitemap ul .col-navigation').syncWidth(0);
 			$('#sitemap ul .col-softroot').syncWidth(0);
 			$('#sitemap ul .col-apphook').syncWidth(0);
-			$('#sitemap ul .col-template').syncWidth(0);
-			$('#sitemap ul .col-creator').syncWidth(0);
-            $('#sitemap ul .col-view-perms').syncWidth(0);
-			$('#sitemap ul .col-lastchange').syncWidth(0);
-			$('#sitemap ul .col-draft').syncWidth(0);
+			$('#sitemap ul .col-info').syncWidth(0);
 		}	
 		syncCols();
 		$(window).bind('resize', syncCols);

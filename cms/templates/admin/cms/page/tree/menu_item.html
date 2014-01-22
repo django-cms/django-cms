@@ -56,25 +56,16 @@
 			</label>
 		</div>
 
-			<div class="col-published">
-			<label>{{ page.is_public_published|boolean_icon }}
-				{% if has_publish_permission %}
-					{% if page.publisher_public_id %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" checked="checked" value="1" title="{% trans 'Unpublish' %}"/>
-					{% else %}<input type="checkbox" class="publish-checkbox" name="status-{{ page.id }}" value="0" title="{% trans 'Publish' %}"/>
-					{% endif %}
-				{% endif %}
-			</label>
 
-			{% if page.is_public_published %}<a href="./{{ page.id }}/preview/?public=1" target="_parent" title="{% trans "View on page" %}" class="icon selector-add viewpage" id="view-page-{{page.id}}"><span>{% trans "view" %}</span></a>{% endif %}
-		</div>
 
 		<div class="col-info">
             <span>{% trans "info" %}</span>
             <div class="info-details">
-                publication date: {{ page.publication_date|date:"Y-m-d" }}
+                {% comment %}publication date: {{ page.publication_date|date:"Y-m-d" }}
                 publication end date: {{ page.publication_end_date|date:"Y-m-d" }}
                 is restricted: {{ page|is_restricted:request }}
                 last change by: {{ page.changed_by }}
+                template: {{ page.get_template_display }}{% endcomment %}
             </div>
         </div>
 	</div>

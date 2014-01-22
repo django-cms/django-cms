@@ -81,7 +81,7 @@ class TreePublishRow(Tag):
             else:
                 cls = "empty"
                 text = _("no content")
-        return mark_safe('<span class="%s">%s</span>' % (cls, force_unicode(text)))
+        return mark_safe('<span class="%s" title="%s"></span>' % (cls, force_unicode(text)))
 
 register.tag(TreePublishRow)
 
