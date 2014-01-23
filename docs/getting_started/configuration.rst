@@ -143,6 +143,8 @@ plugins, as shown above with ``base.html content``.
     it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
     Defaults to ``False`` to maintain pre-3.0 behavior.
 
+.. _placeholder_default_plugins:
+
 ``default_plugins``
     You can specify the list of default plugins which will be automagically 
     added when the placeholder will be created (or rendered).

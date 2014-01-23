@@ -178,6 +178,13 @@ In addition to model level permissions, ``Placeholder`` now checks if a user
 has permissions on a specific object of that model. Details can be found here
 in :ref:`placeholder_object_permissions`.
 
+Placeholder are prefillable with default plugins
+================================================
+
+In CMS_PLACEHOLDER_CONF, for each placeholder configuration, you can specify
+via 'default_plugins' a list of plugins to automagically add to the 
+placeholder if empty. See :ref:`placeholder_default_plugins`.
+
 Custom modules and plugin labels in the toolbar UI
 ==================================================
 
