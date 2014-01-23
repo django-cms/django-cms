@@ -91,7 +91,6 @@ def create_default_plugins(request, placeholders, template, lang):
             continue
         if not placeholder.has_add_permission(request):
             continue
-        position=0
         for conf in default_plugins:
             if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
                 continue
