@@ -1,6 +1,102 @@
 /*##################################################|*/
 /* #CMS# */
+
+
 (function($) {
+    $.syncCols = function(){
+
+        $('#sitemap .col-softroot').syncWidth(0);
+        $('#sitemap .col-apphook').syncWidth(0);
+        $('#sitemap .col-language').syncWidth(0);
+        $('#sitemap .col-navigation').syncWidth(0);
+        $('#sitemap .col-actions').syncWidth(0);
+        $('#sitemap .col-info').syncWidth(0);
+    }
+
+    $.syncHeights = function(){
+        $('ul.tree-default li').syncHeight();
+    }
+
+
+	/* Colums width sync */
+    $.fn.syncWidth = function(max) {
+        var visible = false;
+        $(this).each(function() {
+            $(this).css('width', null)
+            if ($(this).is(':visible')) {
+
+                visible = true;
+                var val= $(this).width();
+                if(val > max){
+                    max = val;
+                }
+            }
+        });
+        if (visible && max > 0) {
+            $(this).each(function() {
+                $(this).css("width",max + 'px');
+            });
+        }
+    };
+    $.fn.syncHeight = function() {
+
+        $('div.col2').children('div').each(function(){
+           this.style.setProperty('display','block', 'important' );
+        });
+        var min_width = 100000;
+        var max_col2_width = 0;
+        var max_col2 = null;
+        $(this).each(function() {
+            var cont = $(this).children('div.cont')
+            if (!cont.is(':visible')) {
+                return;
+            }
+            var col1 = cont.children('div.col1');
+            var col2 = cont.children('div.col2');
+            var col1_width = col1.width();
+            var col2_width = col2.width();
+            var total_width = cont.outerWidth();
+
+            var dif = total_width - col1_width;
+            if(dif < min_width){
+               min_width = dif;
+            }
+            if(col2_width > max_col2_width){
+                max_col2_width = col2_width;
+                max_col2 = col2
+            }
+        });
+        var w = 0;
+        var hidden_count = 0;
+        var max_reached = false;
+        if(max_col2){
+            max_col2.children('div').each(function(){
+                if(!max_reached){
+                    w += $(this).outerWidth()
+                }
+
+                if(max_reached || w > min_width){
+                    hidden_count ++
+                    max_reached = true
+                }
+            });
+
+            var count = 0
+            if(hidden_count){
+                $(this).each(function() {
+                    $(this).children('div.cont').children('div.col2').children('div').slice(-hidden_count).each(function(){
+                        this.style.setProperty('display','none', 'important' );
+                    })
+                });
+                $('div#sitemap ul.header div.col2').children().slice(-hidden_count).each(function(){
+                    this.style.setProperty('display','none', 'important' );
+                })
+            }
+        }
+    };
+
+
+
 // CMS.$ will be passed for $
 $(document).ready(function () {
 
@@ -123,7 +219,15 @@ $(document).ready(function () {
 				onchange: function(node){
 					url = $(node).find('a.title').attr("href");
                     window.top.location = url;
-				}
+                    reCalc();
+				},
+                onopen: function(){
+                    reCalc();
+                },
+                onclose: function(){
+                    reCalc();
+                }
+
 			}
 		};
 
@@ -138,353 +242,271 @@ $(document).ready(function () {
 		tree.init($("div.tree"), options);
 	};
 	
-	$(document).ready(function() {
-		selected_page = false;
-		action = false;
 
-		var _oldAjax = $.ajax;
+    selected_page = false;
+    action = false;
 
-		$.ajax = function(s){
-			// just override ajax function, so the loader message gets displayed 
-			// always
-			$('#loader-message').show();
-			
-			callback = s.success || false;
-			s.success = function(data, status){
-				if (callback) {
-					callback(data, status);
-				}
-				$('#loader-message').hide();
-				syncCols();
-			};
-			
-			// just for debuging!! 
-			/*s.complete = function(xhr, status) {
-				if (status == "error" && cmsSettings.debug) {
-					$('body').before(xhr.responseText);
-				}
-			}*/
-			// end just for debuging
-			
-			// TODO: add error state!
-			return _oldAjax(s);
-		};
+    var _oldAjax = $.ajax;
 
-		function refresh(){
-			window.location = window.location.href;
-		}
+    $.ajax = function(s){
+        // just override ajax function, so the loader message gets displayed
+        // always
+        $('#loader-message').show();
 
-		function refreshIfChildren(pageId){
-			return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){ return true; };
-		}
-
-		/**
-		 * Loads remote dialog to dialogs div.
-		 * 
-		 * @param {String} url 
-		 * @param {Object} data Data to be send over post
-		 * @param {Function} noDialogCallback Gets called when response is empty.
-		 * @param {Function} callback Standard callback function.
-		 */
-		function loadDialog(url, data, noDialogCallback, callback){
-			if (data === undefined) data = {};
-			$.post(url, data, function(response) {
-				if (response == '' && noDialogCallback) noDialogCallback();
-				$('#dialogs').empty().append(response);
-				if (callback) callback(response);
-			});
-		}
-
-		// let's start event delegation
-		$('#changelist li').click(function(e) {
-			// I want a link to check the class
-			if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
-				target = e.target.parentNode;
-			} else {
-				target = e.target;
-			}
-			var jtarget = $(target);
-			if(jtarget.hasClass("move")) {
-				// prepare tree for move / cut paste
-				var id = e.target.id.split("move-link-")[1];
-				if(id==null){
-					id = e.target.parentNode.id.split("move-link-")[1];
-				}
-				var page_id = id;
-				selected_page = page_id;
-				action = "move";
-				$('span.move-target-container, span.line, a.move-target').show();
-				$('#page_'+page_id).addClass("selected");
-				$('#page_'+page_id+' span.move-target-container').hide();
-				e.stopPropagation();
-				return false;
-			}
-			
-			if(jtarget.hasClass("copy")) {
-				// prepare tree for copy
-				id = e.target.id.split("copy-link-")[1];
-				if(id==null){
-					id = e.target.parentNode.id.split("copy-link-")[1];
-				}
-				selected_page = id;
-				action = mark_copy_node(id);
-				e.stopPropagation();
-				return false;
-			}
-			
-			if(jtarget.hasClass("viewpage")) {
-				var view_page_url = $('#' + target.id + '-select').val();
-				if(view_page_url){
-					window.open(view_page_url);
-				}
-			}
-			
-			if(jtarget.hasClass("addlink")) {
-				if (!/#$/g.test(jtarget.attr('href'))) {
-					// if there is url instead of # inside href, follow this url
-					// used if user haves add_page 
-					return true;
-				}
-				
-				$("tr").removeClass("target");
-				$("#changelist table").removeClass("table-selected");
-				page_id = target.id.split("add-link-")[1];
-				selected_page = page_id;
-				action = "add";
-				$('tr').removeClass("selected");
-				$('#page-row-'+page_id).addClass("selected");
-				$('.move-target-container').hide();
-				$('a.move-target, span.line, #move-target-'+page_id).show();
-				e.stopPropagation();
-				return false;
-			}
-			
-			// don't assume admin site is root-level
-			// grab base url to construct full absolute URLs
-			admin_base_url = document.URL.split("/cms/page/")[0] + "/";
-
-			// published checkbox
-			if(jtarget.hasClass("publish-checkbox")) {
-				pageId = jtarget.attr("name").split("status-")[1];
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-status/", {1:1}, refreshIfChildren(pageId));
-				e.stopPropagation();
-				return false;
-			}
-
-			// in navigation
-			if(jtarget.hasClass("navigation-checkbox")) {
-				pageId = jtarget.attr("name").split("navigation-")[1];
-				// if I don't put data in the post, django doesn't get it
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-navigation/", { 1:1 });
-				e.stopPropagation();
-				return true;
-			}
-
-			// quick publish
-			if(jtarget.hasClass("publish")) {
-				pageId = jtarget.parents('li[id^=page_]').attr('id').split('_')[1];
-				reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/publish/?node=1", {}, refreshIfChildren(pageId));
-				e.stopPropagation();
-				return false;
-			}
-
-			// lazy load descendants on tree open
-			if(jtarget.hasClass("closed")) {
-				// only load them once
-				if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
-					// keeps this event from firing multiple times before
-					// the dom as changed. it still needs to propagate for 
-					// the other click event on this element to fire
-					jtarget.addClass("loading");
-					var pageId = $(jtarget).attr("id").split("page_")[1];
-					
-					$.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
-						jtarget.children('ul').append(r);    
-						// show move targets if needed
-						if($('span.move-target-container:visible').length > 0) {
-							jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
-						};
-					});
-				}
-			}
-			
-			if(jtarget.hasClass("move-target")) {
-				if(jtarget.hasClass("left")){
-					position = "left";
-				}
-				if(jtarget.hasClass("right")){
-					position = "right";
-				}
-				if(jtarget.hasClass("last-child")){
-					position = "last-child";
-				}
-				target_id = target.parentNode.id.split("move-target-")[1];
-				
-				if(action=="move") {
-					moveTreeItem(null, selected_page, target_id, position, tree);
-					$('.move-target-container').hide();
-				}else if(action=="copy") {
-					site = $('#site-select')[0].value;
-					copyTreeItem(selected_page, target_id, position, site);
-					$('.move-target-container').hide();
-				}else if(action=="add") {
-					site = $('#site-select')[0].value;
-					window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&amp;position="+position+"&amp;site="+site;
-				}
-				e.stopPropagation();
-				return false;
-			}
-			return true;
-		});
-		/* Colums width sync */
-		$.fn.syncWidth = function(max) {
-			var visible = false;
-			$(this).each(function() {
-				if ($(this).is(':visible')) {
-					visible = true;
-					var val= $(this).width();
-					if(val > max){
-						max = val;
-					}
-				}
-			});
-			if (visible) {
-				$(this).each(function() {
-					$(this).css("width",max + 'px');
-				});
-			}
-		};
-        $.fn.syncHeight = function() {
-            var max=0;
-            $('div.col2').children('div').each(function(){
-               this.style.setProperty('display','block', 'important' );
-            });
-            $(this).each(function() {
-                var cont = $(this).children('div.cont')
-                var col1 = cont.children('div.col1');
-                var col2 = cont.children('div.col2');
-                var col1_width = col1.width();
-                var col2_width = col2.width();
-                var total_width = cont.width();
-
-                var dif = total_width - col1_width - col2_width;
-                if(dif<max){
-                   max = dif;
-                }
-            });
-            console.log(max)
-            var count = 0
-            if(max<0){
-                $(this).each(function() {
-                    var w = 0;
-                    count = 0
-                    $($(this).children('div.cont').children('div.col2').children('div').get().reverse()).each(function(){
-                        var outer_w =  $(this).outerWidth()
-                        if(w > max){
-                            count ++
-                            this.style.setProperty('display','none', 'important' );
-                        }else{
-                            this.style.setProperty('display','block', 'important' );
-                        }
-                        w -= outer_w;
-                    })
-                });
+        callback = s.success || false;
+        s.success = function(data, status){
+            if (callback) {
+                callback(data, status);
             }
-            var hidden = 0;
-            console.log($('div#sitemap ul.header div.col2').children())
-            $($('div#sitemap ul.header div.col2').children().get().reverse()).each(function(){
-                if(hidden < count){
-                    this.style.setProperty('display','none', 'important' );
-                    hidden ++;
-                }else{
-                    this.style.setProperty('display','block', 'important' );
-                }
+            $('#loader-message').hide();
+        };
+
+        // just for debuging!!
+        /*s.complete = function(xhr, status) {
+            if (status == "error" && cmsSettings.debug) {
+                $('body').before(xhr.responseText);
+            }
+        }*/
+        // end just for debuging
+
+        // TODO: add error state!
+        return _oldAjax(s);
+    };
+
+    function refresh(){
+        window.location = window.location.href;
+    }
+
+    function refreshIfChildren(pageId){
+        return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){ return true; };
+    }
+
+    /**
+     * Loads remote dialog to dialogs div.
+     *
+     * @param {String} url
+     * @param {Object} data Data to be send over post
+     * @param {Function} noDialogCallback Gets called when response is empty.
+     * @param {Function} callback Standard callback function.
+     */
+    function loadDialog(url, data, noDialogCallback, callback){
+        if (data === undefined) data = {};
+        $.post(url, data, function(response) {
+            if (response == '' && noDialogCallback) noDialogCallback();
+            $('#dialogs').empty().append(response);
+            if (callback) callback(response);
+        });
+    }
+
+    // let's start event delegation
+    $('#changelist li').click(function(e) {
+        // I want a link to check the class
+        if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
+            target = e.target.parentNode;
+        } else {
+            target = e.target;
+        }
+        var jtarget = $(target);
+        if(jtarget.hasClass("move")) {
+            // prepare tree for move / cut paste
+            var id = e.target.id.split("move-link-")[1];
+            if(id==null){
+                id = e.target.parentNode.id.split("move-link-")[1];
+            }
+            var page_id = id;
+            selected_page = page_id;
+            action = "move";
+            $('span.move-target-container, span.line, a.move-target').show();
+            $('#page_'+page_id).addClass("selected");
+            $('#page_'+page_id+' span.move-target-container').hide();
+            e.stopPropagation();
+            return false;
+        }
+
+        if(jtarget.hasClass("copy")) {
+            // prepare tree for copy
+            id = e.target.id.split("copy-link-")[1];
+            if(id==null){
+                id = e.target.parentNode.id.split("copy-link-")[1];
+            }
+            selected_page = id;
+            action = mark_copy_node(id);
+            e.stopPropagation();
+            return false;
+        }
+
+        if(jtarget.hasClass("viewpage")) {
+            var view_page_url = $('#' + target.id + '-select').val();
+            if(view_page_url){
+                window.open(view_page_url);
+            }
+        }
+
+        if(jtarget.hasClass("addlink")) {
+            if (!/#$/g.test(jtarget.attr('href'))) {
+                // if there is url instead of # inside href, follow this url
+                // used if user haves add_page
+                return true;
+            }
+
+            $("tr").removeClass("target");
+            $("#changelist table").removeClass("table-selected");
+            page_id = target.id.split("add-link-")[1];
+            selected_page = page_id;
+            action = "add";
+            $('tr').removeClass("selected");
+            $('#page-row-'+page_id).addClass("selected");
+            $('.move-target-container').hide();
+            $('a.move-target, span.line, #move-target-'+page_id).show();
+            e.stopPropagation();
+            return false;
+        }
+
+        // don't assume admin site is root-level
+        // grab base url to construct full absolute URLs
+        admin_base_url = document.URL.split("/cms/page/")[0] + "/";
+
+        // in navigation
+        if(jtarget.hasClass("navigation-checkbox")) {
+            pageId = jtarget.attr("name").split("navigation-")[1];
+            // if I don't put data in the post, django doesn't get it
+            reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-navigation/", { 1:1 });
+            e.stopPropagation();
+            return true;
+        }
+
+         // lazy load descendants on tree open
+        if(jtarget.hasClass("closed")) {
+            // only load them once
+            if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
+                // keeps this event from firing multiple times before
+                // the dom as changed. it still needs to propagate for
+                // the other click event on this element to fire
+                jtarget.addClass("loading");
+                var pageId = $(jtarget).attr("id").split("page_")[1];
+
+                $.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
+                    jtarget.children('ul').append(r);
+                    // show move targets if needed
+                    if($('span.move-target-container:visible').length > 0) {
+                        jtarget.children('ul').find('a.move-target, span.move-target-container, span.line').show();
+                    };
+                    reCalc();
+                });
+            }else{
+                reCalc();
+            }
+        }
+
+        if(jtarget.hasClass("move-target")) {
+            if(jtarget.hasClass("left")){
+                position = "left";
+            }
+            if(jtarget.hasClass("right")){
+                position = "right";
+            }
+            if(jtarget.hasClass("last-child")){
+                position = "last-child";
+            }
+            target_id = target.parentNode.id.split("move-target-")[1];
+
+            if(action=="move") {
+                moveTreeItem(null, selected_page, target_id, position, tree);
+                $('.move-target-container').hide();
+            }else if(action=="copy") {
+                site = $('#site-select')[0].value;
+                copyTreeItem(selected_page, target_id, position, site);
+                $('.move-target-container').hide();
+            }else if(action=="add") {
+                site = $('#site-select')[0].value;
+                window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&amp;position="+position+"&amp;site="+site;
+            }
+            e.stopPropagation();
+            return false;
+        }
+        document.setTimeout(function(){reCalc();}, 1)
+        return true;
+    });
+    $("div#sitemap").show();
+    function resized(){
+        //$.syncCols();
+        $.syncHeights();
+
+    }
+
+    function reCalc(){
+        $.syncCols();
+        $.syncHeights();
+    }
+    window.setTimeout(function(){
+        $.syncCols();
+        $.syncHeights();
+    },1);
+    $(window).bind('resize', resized);
+    /* Site Selector */
+    $('#site-select').change(function(){
+        var form = $(this).closest('form');
+        // add correct value for copy
+        if(action === 'copy') $('#site-copy').val(selected_page);
+        // submit form
+        form.submit();
+    });
+
+    var copy_splits = window.location.href.split("copy=");
+    if(copy_splits.length > 1){
+        var id = copy_splits[1].split("&")[0];
+        var action = mark_copy_node(id);
+        selected_page = id;
+    }
+
+    // moderation checkboxes over livequery
+    // TODO jquery.livequery has been removed
+    //$('div.col-moderator input').livequery(function() {
+        // TODO jquery.checkbox.ui has been removed
+        // $(this).checkBox({addLabel:false});
+    //});
+
+    function copyTreeItem(item_id, target_id, position, site){
+        if (cmsSettings.cmsPermission || cmsSettings.cmsModerator) {
+            return loadDialog('./' + item_id + '/dialog/copy/', {
+                position:position,
+                target:target_id,
+                site:site,
+                callback: $.callbackRegister("_copyTreeItem", _copyTreeItem, item_id, target_id, position, site)
             });
-		};
+        }
+        return _copyTreeItem(item_id, target_id, position, site);
+    }
 
-		$("div#sitemap").show();
-		function syncCols(no_height){
-            $('ul.tree-default li').syncHeight();
-            $('#sitemap ul .col-info').syncWidth(0);
-            $('#sitemap ul .col-navigation').syncWidth(0);
-			$('#sitemap ul .col-actions').syncWidth(0);
-			$('#sitemap ul .col-language').syncWidth(0);
-			$('#sitemap ul .col-softroot').syncWidth(0);
-			$('#sitemap ul .col-apphook').syncWidth(0);
+    function _copyTreeItem(item_id, target_id, position, site, options) {
+        var data = {
+            position:position,
+            target:target_id,
+            site:site
+        };
+        data = $.extend(data, options);
 
-		}	
-		syncCols();
-		$(window).bind('resize', syncCols);
-        $('#sitemap ul div.cont').mouseenter(function() {
-           $(this).parent().syncHeight();
+        $.post("./" + item_id + "/copy-page/", data, function(decoded) {
+            response = decoded.content;
+            status = decoded.status;
+            if(status==200) {
+                // reload tree
+                window.location = window.location.href;
+            }else{
+                alert(response);
+                moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
+            }
         });
-        $('#sitemap ul div.cont').mouseleave(function() {
-           $(this).parent().syncHeight();
-        });
-		/* Site Selector */
-		$('#site-select').change(function(){
-			var form = $(this).closest('form');
-			// add correct value for copy
-			if(action === 'copy') $('#site-copy').val(selected_page);
-			// submit form
-			form.submit();
-		});
+    }
 
-		var copy_splits = window.location.href.split("copy=");
-		if(copy_splits.length > 1){
-			var id = copy_splits[1].split("&")[0];
-			var action = mark_copy_node(id);
-			selected_page = id;
-		}
+    function mark_copy_node(id){
+        $('a.move-target, span.move-target-container, span.line').show();
+        $('#page_'+id).addClass("selected");
+        $('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
+        $('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
+        return "copy";
+    }
 
-		// moderation checkboxes over livequery
-		// TODO jquery.livequery has been removed
-		//$('div.col-moderator input').livequery(function() {
-			// TODO jquery.checkbox.ui has been removed
-			// $(this).checkBox({addLabel:false});
-		//});
-		
-		function copyTreeItem(item_id, target_id, position, site){
-			if (cmsSettings.cmsPermission || cmsSettings.cmsModerator) {
-				return loadDialog('./' + item_id + '/dialog/copy/', {
-					position:position,
-					target:target_id,
-					site:site,
-					callback: $.callbackRegister("_copyTreeItem", _copyTreeItem, item_id, target_id, position, site)
-				});
-			}
-			return _copyTreeItem(item_id, target_id, position, site);
-		}
-		
-		function _copyTreeItem(item_id, target_id, position, site, options) {
-			var data = {
-				position:position,
-				target:target_id,
-				site:site
-			};
-			data = $.extend(data, options);
-			
-			$.post("./" + item_id + "/copy-page/", data, function(decoded) {
-				response = decoded.content;
-				status = decoded.status;
-				if(status==200) {
-					// reload tree
-					window.location = window.location.href;
-				}else{
-					alert(response);
-					moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
-				}
-			});
-		}
-		
-		function mark_copy_node(id){
-			$('a.move-target, span.move-target-container, span.line').show();
-			$('#page_'+id).addClass("selected");
-			$('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
-			$('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
-			return "copy";
-		}
-	});
 	
 	/**
 	 * Reloads tree item (one line). If some filtering is found, adds 

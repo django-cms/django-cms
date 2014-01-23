@@ -48,6 +48,8 @@ $(document).ready(function () {
 	{% endif %}
 
 	moveSuccess = function(node){
+        $.syncHeights();
+        $.syncCols();
 		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
 		node.append(msg);
 		msg.fadeOut(3000);
@@ -66,7 +68,6 @@ $(document).ready(function () {
 		cmsPermission: {{ CMS_PERMISSION|js }},
 		debug: {{ DEBUG|js }}
 	};
-
 });
 })(CMS.$);
 </script>
