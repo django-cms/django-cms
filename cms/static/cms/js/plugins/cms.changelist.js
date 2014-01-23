@@ -361,8 +361,8 @@ $(document).ready(function () {
             });
             $(this).each(function() {
                 var cont = $(this).children('div.cont')
-                var col1 = cont.children('.col1');
-                var col2 = cont.children('.col2');
+                var col1 = cont.children('div.col1');
+                var col2 = cont.children('div.col2');
                 var col1_width = col1.width();
                 var col2_width = col2.width();
                 var total_width = cont.width();
@@ -373,12 +373,15 @@ $(document).ready(function () {
                 }
             });
             console.log(max)
+            var count = 0
             if(max<0){
                 $(this).each(function() {
                     var w = 0;
+                    count = 0
                     $($(this).children('div.cont').children('div.col2').children('div').get().reverse()).each(function(){
                         var outer_w =  $(this).outerWidth()
                         if(w > max){
+                            count ++
                             this.style.setProperty('display','none', 'important' );
                         }else{
                             this.style.setProperty('display','block', 'important' );
@@ -387,21 +390,30 @@ $(document).ready(function () {
                     })
                 });
             }
+            var hidden = 0;
+            console.log($('div#sitemap ul.header div.col2').children())
+            $($('div#sitemap ul.header div.col2').children().get().reverse()).each(function(){
+                if(hidden < count){
+                    this.style.setProperty('display','none', 'important' );
+                    hidden ++;
+                }else{
+                    this.style.setProperty('display','block', 'important' );
+                }
+            });
 		};
 
 		$("div#sitemap").show();
 		function syncCols(no_height){
+            $('ul.tree-default li').syncHeight();
             $('#sitemap ul .col-info').syncWidth(0);
             $('#sitemap ul .col-navigation').syncWidth(0);
 			$('#sitemap ul .col-actions').syncWidth(0);
 			$('#sitemap ul .col-language').syncWidth(0);
 			$('#sitemap ul .col-softroot').syncWidth(0);
 			$('#sitemap ul .col-apphook').syncWidth(0);
-            if(no_height){
-                $('ul.tree-default li').syncHeight();
-            }
+
 		}	
-		syncCols(true);
+		syncCols();
 		$(window).bind('resize', syncCols);
         $('#sitemap ul div.cont').mouseenter(function() {
            $(this).parent().syncHeight();
