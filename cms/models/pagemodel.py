@@ -654,6 +654,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 language, fallback, version_id, force_reload), attrname)
             return attribute
         except AttributeError:
+            raise
             return None
 
     def get_path(self, language=None, fallback=True, version_id=None, force_reload=False):
@@ -738,10 +739,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             load = True
         if load:
             from cms.models.titlemodels import Title
-
             if version_id:
                 from reversion.models import Version
-
                 version = get_object_or_404(Version, pk=version_id)
                 revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                 for rev in revs:

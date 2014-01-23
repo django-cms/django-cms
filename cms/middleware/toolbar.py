@@ -20,6 +20,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(placeholder, page)]
         # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
         child_plugin_classes = get_toolbar_plugin_struct(childs, placeholder.slot, placeholder.page, parent=plugin_class)
+    instance.placeholder = placeholder
     data = {
         'instance': instance,
         'rendered_content': rendered_content,
@@ -29,6 +30,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         'delete_url': placeholder.get_delete_url(instance.pk),
         'move_url': placeholder.get_move_url(),
     }
+
     original_context.update(data)
     output = render_to_string(instance.get_plugin_class().frontend_edit_template, original_context)
     original_context.pop()

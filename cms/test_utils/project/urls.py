@@ -26,3 +26,9 @@ urlpatterns += i18n_patterns('',
                              url(r'^example/$', 'cms.test_utils.project.placeholderapp.views.example_view'),
                              url(r'^', include('cms.urls')),
 )
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += patterns('',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )
