@@ -94,7 +94,7 @@ def create_default_plugins(request, placeholders, template, lang):
         for conf in default_plugins:
             if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
                 continue
-            plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['value'])
+            plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
             plugins.append(plugin)
     return plugins
 

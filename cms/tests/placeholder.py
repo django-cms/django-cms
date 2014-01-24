@@ -403,11 +403,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'default_plugins' : [
                     {
                         'plugin_type':'TextPlugin', 
-                        'value':{'body':'<p>en default body 1</p>'}, 
+                        'values':{'body':'<p>en default body 1</p>'}, 
                     },
                     {
                         'plugin_type':'TextPlugin', 
-                        'value':{'body':'<p>en default body 2</p>'}, 
+                        'values':{'body':'<p>en default body 2</p>'}, 
                     },
                 ]
             },

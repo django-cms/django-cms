@@ -80,7 +80,7 @@ Example::
             'default_plugins':[
                 {
                     'plugin_type':'TextPlugin', 
-                    'value':{
+                    'values':{
                         'body':'<p>Lorem ipsum dolor sit amet...</p>'
                     }, 
                 },
@@ -149,8 +149,8 @@ plugins, as shown above with ``base.html content``.
     You can specify the list of default plugins which will be automagically 
     added when the placeholder will be created (or rendered).
     Each element of the list is a dictionary with the "plugin_type" to add 
-    and the "value" dictionnary to use for this plugin. 
-    The "value" depend on the "plugin_type". See the documentation of each 
+    and the "values" dictionnary to use for this plugin. 
+    The "values" depend on the "plugin_type". See the documentation of each 
     plugin type to see which parameters are required and available.
 
 ``plugin_modules``
