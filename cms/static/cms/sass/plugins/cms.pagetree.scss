@@ -114,7 +114,8 @@ $color-background-blue-hover: #e6f6fd;
 		position:absolute; right:-6px; top:-6px; z-index:100;
 		text-align:left; line-height:18px; padding:5px 10px;
 		background:white; border:1px solid #ccc; @include border-radius(3px 0 3px 3px);
-		mark { font-weight:bold; background:none; font-style:normal; min-width:100px; }
+		mark { font-weight:bold; background:none; font-style:normal;
+			@include inline-block(); min-width:100px; }
 		span { display:inline !important; }
 	}
 }
