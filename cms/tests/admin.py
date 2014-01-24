@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import json
 import datetime
+from unittest import skipUnless
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
@@ -32,6 +33,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from django.utils import timezone
 from cms.utils.compat.dj import force_unicode
+from django.conf import settings
 
 
 class AdminTestsBase(CMSTestCase):
