@@ -115,17 +115,18 @@ class ToolbarBasicTests(CMSLiveTests):
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
-        self.driver.implicitly_wait(2)
         user = User()
         user.username = 'admin'
         user.set_password('admin')
         user.is_superuser = user.is_staff = user.is_active = True
         user.save()
+        self.driver.implicitly_wait(2)
         super(ToolbarBasicTests, self).setUp()
 
     def test_toolbar_login(self):
-        create_page('Home', 'simple.html', 'en', published=True).publish()
+        create_page('Home', 'simple.html', 'en', published=True)
         url = '%s/?edit' % self.live_server_url
+        self.assertTrue(User.objects.all().count(), 1)
         self.driver.get(url)
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
@@ -139,6 +140,7 @@ class ToolbarBasicTests(CMSLiveTests):
     def test_basic_add_pages(self):
         with SettingsOverride(DEBUG=True):
             self.assertEqual(Page.objects.all().count(), 0)
+            self.assertTrue(User.objects.all().count(), 1)
             driver = self.driver
             driver.get(self.base_url + "/de/")
             driver.find_element_by_id("add-page").click()

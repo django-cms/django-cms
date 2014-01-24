@@ -56,27 +56,28 @@ class ExtensionPool(object):
 
         # instance from kwargs is the draft page
         draft_page = kwargs.get('instance')
+        language = kwargs.get('language')
         # get the new public page from the draft page
         public_page = draft_page.publisher_public
 
         if self.page_extensions:
-            self._copy_page_extensions(draft_page, public_page)
+            self._copy_page_extensions(draft_page, public_page, language)
             self._remove_orphaned_page_extensions()
         if self.title_extensions:
-            self._copy_title_extensions(draft_page, public_page)
+            self._copy_title_extensions(draft_page, public_page, language)
             self._remove_orphaned_title_extensions()
 
-    def _copy_page_extensions(self, draft_page, public_page):
+    def _copy_page_extensions(self, draft_page, public_page, language):
         for extension in self.page_extensions:
             for instance in extension.objects.filter(extended_object=draft_page):
-                instance.copy_to_public(public_page)
+                instance.copy_to_public(public_page, language)
 
-    def _copy_title_extensions(self, draft_page, public_page):
-        for draft_title in draft_page.title_set.all():
-            public_title = Title.objects.get(language=draft_title.language, page=public_page)
-            for extension in self.title_extensions:
-                for instance in extension.objects.filter(extended_object=draft_title):
-                    instance.copy_to_public(public_title)
+    def _copy_title_extensions(self, draft_page, public_page, language):
+        draft_title = draft_page.title_set.get(language=language)
+        public_title = draft_title.publisher_public
+        for extension in self.title_extensions:
+            for instance in extension.objects.filter(extended_object=draft_title):
+                instance.copy_to_public(public_title, language)
 
     def _remove_orphaned_page_extensions(self):
         for extension in self.page_extensions:

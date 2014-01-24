@@ -59,11 +59,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertNotEqual(title, None)
         
         # Publish and unpublish the page
-        page.published = True
-        page.save()
-        page.published = False
-        page.save()
+        page.publish(TESTLANG)
         
+        page.unpublish(TESTLANG)
+        page = page.reload()
+
         # Has correct title and slug after calling save()?
         self.assertEqual(page.get_title(), page_data['title'])
         self.assertEqual(page.get_slug(), page_data['slug'])
@@ -85,9 +85,9 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page_data['published'] = True
             response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
                                         page_data)
-            response = self.client.post(URL_CMS_PAGE_PUBLISH % page.pk)
+            response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, TESTLANG))
             page = page.reload()
-            self.assertTrue(page.published)
+            self.assertTrue(page.is_published(TESTLANG))
             
             # Create a different language using the edit admin page
             # This test case is bound in actual experience...
@@ -134,7 +134,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
         user = User.objects.create_superuser('super', 'super@django-cms.org', 'super')
-        page = publish_page(page, user)
+        page = publish_page(page, user, TESTLANG)
+        page = publish_page(page, user, TESTLANG2)
         public = page.publisher_public
         placeholder = public.placeholders.all()[0]
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
@@ -151,10 +152,13 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page3 = create_page("page2", "nav_playground.html", "en")
             create_title("de", page3.get_title(), page3, slug=page3.get_slug())
             page4 = create_page("page4", "nav_playground.html", "de")
-            page.publish()
-            page2.publish()
-            page3.publish()
-            page4.publish()
+            page.publish('en')
+            page.publish('de')
+            page2.publish('en')
+            page2.publish('de')
+            page3.publish('de')
+            page3.publish('en')
+            page4.publish('de')
             response = self.client.get("/en/")
             self.assertRedirects(response, "/de/")
             response = self.client.get("/en/page2/")
@@ -174,7 +178,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
     def test_detail_view_404_when_no_language_is_found(self):
         page = create_page("page1", "nav_playground.html", "en")
         create_title("de", page.get_title(), page, slug=page.get_slug())
-        page.publish()
+        page.publish('en')
+        page.publish('de')
 
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
@@ -210,7 +215,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                     ]},
             ):
             create_title("x-klingon", "futla ak", page, slug=page.get_slug())
-            page.publish()
+            page.publish("x-klingon")
             from cms.views import details
 
             request = AttributeObject(
