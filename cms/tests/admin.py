@@ -1154,6 +1154,7 @@ class AdminFormsTests(AdminTestsBase):
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
             self.assertContains(resp, '<div class="form-row errors reverse_id">')
 
+    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_render_edit_mode(self):
         from django.core.cache import cache
 
@@ -1165,7 +1166,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            with self.assertNumQueries(43):
+            with self.assertNumQueries(46):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 7)
@@ -1175,7 +1176,7 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(45):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(23):
+        with self.assertNumQueries(27):
             output = force_unicode(self.client.get('/en/?edit'))
         with self.assertNumQueries(15):
             output = force_unicode(self.client.get('/en/'))
