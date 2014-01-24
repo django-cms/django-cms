@@ -158,7 +158,7 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, 'href="LinkPlugin">Add a link')
+        self.assertContains(response, 'href="LinkPlugin">')
         self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
 
     def test_show_toolbar_to_staff(self):

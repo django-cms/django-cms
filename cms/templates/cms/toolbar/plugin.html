@@ -18,7 +18,7 @@ $(document).ready(function () {
 		'plugin_id': '{{ instance.pk|unlocalize }}',
 		'plugin_language': '{{ instance.language|default:"" }}',
 		'plugin_parent': '{{ instance.parent_id|unlocalize }}',
-		'plugin_order': '{{ instance.plugin_order }}',
+		'plugin_order': '{{ instance.plugin_order }}',{% language request.toolbar.toolbar_language %}
 		'plugin_breadcrumb': {{ instance.get_breadcrumb_json|default:"[]" }},
 		'plugin_restriction': [{% for cls in allowed_child_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],
 		'onClose': {% if refresh_page %}'REFRESH_PAGE'{% else %}false{% endif %},
@@ -29,7 +29,7 @@ $(document).ready(function () {
 			'move_plugin': '{% if move_url %}{{ move_url }}{% else %}{% url "admin:cms_page_move_plugin" %}{% endif %}',
 			'delete_plugin': '{% if delete_url %}{{ delete_url }}{% else %}{% url "admin:cms_page_delete_plugin" instance.pk %}{% endif %}',
 			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}'
-		}
+		} {% endlanguage %}
 	});
 });
 })(CMS.$);

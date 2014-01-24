@@ -19,6 +19,7 @@ var _$ = window.$ || undefined;
 <script src="{% static "cms/js/plugins/cms.plugins.js" %}"></script>
 <script src="{% static "cms/js/plugins/cms.structureboard.js" %}"></script>
 <script src="{% static "cms/js/plugins/cms.toolbar.js" %}"></script>
+{% language request.toolbar.toolbar_language %}
 <script>
 (function($) {
 // CMS.$ will be passed for $
@@ -66,6 +67,7 @@ $(document).ready(function () {
 });
 })(CMS.$);
 </script>
+{% endlanguage %}
 <script>
 window.jQuery = _jQuery;
 window.$ = _$;
