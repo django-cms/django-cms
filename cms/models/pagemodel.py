@@ -654,7 +654,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 language, fallback, version_id, force_reload), attrname)
             return attribute
         except AttributeError:
-            raise
             return None
 
     def get_path(self, language=None, fallback=True, version_id=None, force_reload=False):
