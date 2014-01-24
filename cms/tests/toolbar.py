@@ -242,6 +242,12 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEquals(response.status_code, 200)
             self.assertContains(response, 'PPPP')
 
+    def test_user_settings(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/admin/cms/user_settings/')
+            self.assertEqual(response.statu_code, 200)
+
 
 class EditModelTemplateTagTest(ToolbarTestBase):
     urls = 'cms.test_utils.project.placeholderapp_urls'
