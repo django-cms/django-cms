@@ -18,8 +18,8 @@ application_post_changed = Signal(providing_args=["instance"])
 
 # fired after page gets published - copied to public model - there may be more
 # than one instances published before this signal gets called
-post_publish = Signal(providing_args=["instance"])
-post_unpublish = Signal(providing_args=["instance"])
+post_publish = Signal(providing_args=["instance", "language"])
+post_unpublish = Signal(providing_args=["instance", "language"])
 
 
 def update_plugin_positions(**kwargs):
@@ -52,9 +52,9 @@ def update_home(instance, **kwargs):
         else:
             qs = Page.objects.public()
         try:
-            home_pk = qs.filter(published=True).get_home(instance.site).pk
+            home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site).pk
         except NoHomeFound:
-            if instance.publisher_is_draft and not instance.published:
+            if instance.publisher_is_draft and not instance.published_languages:
                 return
             home_pk = instance.pk
             instance.is_home = True
@@ -108,6 +108,15 @@ def update_title(title):
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
+    if instance.page.languages:
+        languages = instance.page.languages.split(',')
+    else:
+        languages = []
+    if not instance.language in languages:
+        languages.append(instance.language)
+        instance.page.languages = ",".join(languages)
+        instance.page._publisher_keep_state = True
+        instance.page.save(no_signals=True)
     if not instance.page.publisher_is_draft:
         menu_pool.clear(instance.page.site_id)
     if instance.id and not hasattr(instance, "tmp_path"):
@@ -123,6 +132,19 @@ def pre_save_title(instance, raw, **kwargs):
     else:
         update_title(instance)
 
+
+def pre_delete_title(instance, **kwargs):
+    """Save old state to instance and setup path
+    """
+    if instance.page.languages:
+        languages = instance.page.languages.split(',')
+    else:
+        languages = []
+    if instance.language in languages:
+        languages.remove(instance.language)
+        instance.page.languages = ",".join(languages)
+        instance.page._publisher_keep_state = True
+        instance.page.save(no_signals=True)
 
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
@@ -143,6 +165,7 @@ def post_save_title(instance, raw, created, **kwargs):
         for descendant_title in descendant_titles:
             descendant_title.path = ''  # just reset path
             descendant_title.tmp_prevent_descendant_update = True
+            descendant_title._publisher_keep_state = True
             descendant_title.save()
             # remove temporary attributes
     if hasattr(instance, 'tmp_path'):
@@ -226,6 +249,7 @@ def post_save_page(instance, **kwargs):
         for page in instance.get_descendants(include_self=True):
             for title in page.title_set.all().select_related('page'):
                 update_title(title)
+                title._publisher_keep_state = True
                 title.save()
     if instance.old_page is None or instance.old_page.application_urls != instance.application_urls:
         application_post_changed.send(sender=Page, instance=instance)
@@ -239,6 +263,9 @@ def update_placeholders(instance, **kwargs):
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
 
+def delete_placeholders(instance, **kwargs):
+    instance.placeholders.all().delete()
+
 # tell moderator, there is something happening with this page
 signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid="cms.page.presave")
 signals.post_save.connect(post_save_page_moderator, sender=Page, dispatch_uid="cms.page.postsave")
@@ -246,6 +273,8 @@ signals.post_save.connect(post_save_page, sender=Page)
 signals.post_save.connect(update_placeholders, sender=Page)
 signals.pre_save.connect(invalidate_menu_cache, sender=Page)
 signals.pre_delete.connect(invalidate_menu_cache, sender=Page)
+signals.pre_delete.connect(delete_placeholders, sender=Page)
+signals.pre_delete.connect(pre_delete_title, sender=Title)
 
 
 def clear_placeholder_ref(instance, **kwargs):

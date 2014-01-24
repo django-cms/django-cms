@@ -38,3 +38,6 @@ class ObjectPermissionBackend(object):
         return Permission.objects.filter(content_type=ctype)\
                                  .filter(**user_filters)\
                                  .values_list("codename", flat=True)
+
+    def authenticate(self):
+        return True

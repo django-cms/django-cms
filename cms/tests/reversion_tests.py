@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import shutil
-from cms.admin import pageadmin
-from django.contrib import admin
 from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from djangocms_text_ckeditor.models import Text
@@ -18,6 +16,7 @@ from django.core.urlresolvers import reverse
 from os.path import join
 import reversion
 from reversion.models import Revision, Version
+
 if hasattr(reversion.models, 'VERSION_CHANGE'):
     from reversion.models import VERSION_CHANGE
 
@@ -83,7 +82,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             p_data = self.page_data.copy()
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page.publish()
+            page.publish('en')
 
     def test_revert(self):
         """
@@ -151,7 +150,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             response = self.client.post(edit_url, {"body": "Hello World2"})
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
-            self.assertTrue(page.revision_id == 0)
+            self.assertEqual(page.revision_id, 0)
             self.assertEqual(2, CMSPlugin.objects.all().count())
             placeholderpk = page.placeholders.filter(slot="body")[0].pk
             plugin_data = {
@@ -182,7 +181,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEquals(Revision.objects.all().count(), 5)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
-            version = Version.objects.get(content_type=ctype, revision=revision)
+            version = Version.objects.filter(content_type=ctype, revision=revision)[0]
 
             self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)
@@ -190,7 +189,7 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             page = Page.objects.all()[0]
             page_pk = page.pk
-            page.delete_with_public()
+            page.delete()
 
             self.assertEquals(Page.objects.all().count(), 0)
             self.assertEquals(CMSPlugin.objects.all().count(), 0)
@@ -216,7 +215,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             page = Page.objects.all()[0]
             page_pk = page.pk
             self.assertEquals(Revision.objects.all().count(), 5)
-            publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
+            publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
             response = self.client.get(publish_url)
             self.assertEquals(response.status_code, 302)
             self.assertEquals(Revision.objects.all().count(), 2)
@@ -228,7 +227,7 @@ class ReversionTestCase(TransactionCMSTestCase):
                 page_pk = page.pk
                 self.assertEquals(Revision.objects.all().count(), 5)
                 for x in range(10):
-                    publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
+                    publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
                     response = self.client.get(publish_url)
                     self.assertEquals(response.status_code, 302)
                 self.assertEqual(Revision.objects.all().count(), 6)
@@ -256,7 +255,7 @@ class ReversionFileFieldTests(CMSTestCase):
                 reversion.revision_context_manager.add_to_context(
                     reversion.default_revision_manager, file1,
                     adapter.get_version_data(file1))
-            # reload the instance from db
+                # reload the instance from db
         file2 = FileModel.objects.all()[0]
         # delete the instance.
         file2.delete()

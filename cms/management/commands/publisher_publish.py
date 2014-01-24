@@ -24,14 +24,18 @@ class Command(NoArgsCommand):
         
         set_current_user(user) # set him as current user
 
-        qs = Page.objects.drafts().filter(published=True)
+        qs = Page.objects.drafts().filter(title_set__published=True)
         pages_total, pages_published = qs.count(), 0
         
         print(u"\nPublishing public drafts....\n")
         
         for i, page in enumerate(qs):
             m = " "
-            if page.publish():
+            add = True
+            for lang in page.title_set.filter(published=True).values_list("language", flat=True):
+                if not page.publish(lang):
+                    add = False
+            if add:
                 pages_published += 1
                 m = "*"
             print(u"%d.\t%s  %s [%d]" % (i + 1, m, force_unicode(page), page.id))
