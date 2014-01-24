@@ -77,6 +77,14 @@ Example::
             'extra_context': {"width":640},
             'name': gettext("Content"),
             'language_fallback': True,
+            'default_plugins':[
+                {
+                    'plugin_type':'TextPlugin', 
+                    'values':{
+                        'body':'<p>Lorem ipsum dolor sit amet...</p>'
+                    }, 
+                },
+            ]
             'child_classes': {
                 'TextPlugin': ['PicturePlugin', 'LinkPlugin'],
             },
@@ -134,6 +142,16 @@ plugins, as shown above with ``base.html content``.
     When ``True``, if the placeholder has no plugin for the current language
     it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
     Defaults to ``False`` to maintain pre-3.0 behavior.
+
+.. _placeholder_default_plugins:
+
+``default_plugins``
+    You can specify the list of default plugins which will be automagically 
+    added when the placeholder will be created (or rendered).
+    Each element of the list is a dictionary with the "plugin_type" to add 
+    and the "values" dictionnary to use for this plugin. 
+    The "values" depend on the "plugin_type". See the documentation of each 
+    plugin type to see which parameters are required and available.
 
 ``plugin_modules``
     A dictionary of plugins and custom module names to group plugin in the
