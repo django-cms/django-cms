@@ -245,8 +245,8 @@ class ToolbarTests(ToolbarTestBase):
     def test_user_settings(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/admin/cms/user_settings/')
-            self.assertEqual(response.statu_code, 200)
+            response = self.client.get('/en/admin/cms/usersettings/')
+            self.assertEqual(response.status_code, 200)
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):
