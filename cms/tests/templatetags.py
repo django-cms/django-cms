@@ -1,7 +1,6 @@
 from __future__ import with_statement
 import copy
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.models import StaticPlaceholder
 from cms.toolbar.toolbar import CMSToolbar
 from django.test import RequestFactory, TestCase
 import os
@@ -22,7 +21,6 @@ from django.template import RequestContext, Context
 from django.template.base import Template
 from django.utils.html import escape
 from django.contrib.auth.models import User, AnonymousUser
-from cms.utils.compat.dj import force_unicode
 
 
 class TemplatetagTests(TestCase):
@@ -227,6 +225,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         db_placeholder = page.placeholders.get(slot='col_right')
         self.assertEqual(placeholder.slot, 'col_right')
 
+
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
     def test_cached_show_placeholder_sekizai(self):
         from django.core.cache import cache
@@ -302,6 +301,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_plugin(self):
         from django.core.cache import cache
+
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
         placeholder = page.placeholders.all()[0]
@@ -315,37 +315,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.current_page = page
         request.session = {}
         request.toolbar = CMSToolbar(request)
-        context = RequestContext(request, {'plugin':plugin})
+        context = RequestContext(request, {'plugin': plugin})
         with self.assertNumQueries(0):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
-
-
-    def test_render_edit_mode(self):
-        from django.core.cache import cache
-        cache.clear()
-        page = create_page('Test', 'static.html', 'en', published=True)
-        for placeholder in Placeholder.objects.all():
-            plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-        request = RequestFactory().get('/?edit')
-        user = self.get_superuser()
-        request.user = user
-        request.current_page = page
-        request.session = {}
-        request.toolbar = CMSToolbar(request)
-        self.assertEqual(Placeholder.objects.all().count(), 5)
-        with self.login_user_context(user):
-            with self.assertNumQueries(42):
-                output = force_unicode(self.client.get('/en/?edit'))
-            self.assertIn('<b>Test</b>', output)
-            self.assertEqual(Placeholder.objects.all().count(), 7)
-            self.assertEqual(StaticPlaceholder.objects.count(), 1)
-            for placeholder in Placeholder.objects.all():
-                plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            with self.assertNumQueries(45):
-                output = force_unicode(self.client.get('/en/?edit'))
-            self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(23):
-            output = force_unicode(self.client.get('/en/?edit'))
-        with self.assertNumQueries(15):
-            output = force_unicode(self.client.get('/en/'))

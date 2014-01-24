@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import json
-from cms.api import add_plugin
+from cms.api import add_plugin, create_page
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.stacks.models import Stack
@@ -10,6 +10,7 @@ from cms.utils.compat.dj import force_unicode
 from django.contrib.auth.models import User
 from django.contrib.admin.sites import site
 from django.template.base import Template
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
@@ -131,3 +132,4 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             target = StaticPlaceholder.objects.get(pk=static_placeholder_target.pk)
             self.assertFalse(source.dirty)
             self.assertTrue(target.dirty)
+
