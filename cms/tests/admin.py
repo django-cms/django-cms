@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import json
 import datetime
-from django.utils.unittest.case import skipUnless
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
@@ -33,7 +33,6 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from django.utils import timezone
 from cms.utils.compat.dj import force_unicode
-from django.conf import settings
 
 
 class AdminTestsBase(CMSTestCase):
@@ -1156,7 +1155,6 @@ class AdminFormsTests(AdminTestsBase):
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
             self.assertContains(resp, '<div class="form-row errors reverse_id">')
 
-    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_render_edit_mode(self):
         from django.core.cache import cache
 
@@ -1168,17 +1166,17 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            with self.assertNumQueries(46):
+            with self.assertNumQueries(FuzzyInt(40, 48)):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 7)
             self.assertEqual(StaticPlaceholder.objects.count(), 1)
             for placeholder in Placeholder.objects.all():
                 plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            with self.assertNumQueries(45):
+            with self.assertNumQueries(FuzzyInt(40, 48)):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(27):
+        with self.assertNumQueries(FuzzyInt(20, 30)):
             output = force_unicode(self.client.get('/en/?edit'))
         with self.assertNumQueries(15):
             output = force_unicode(self.client.get('/en/'))
