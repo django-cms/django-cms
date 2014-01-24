@@ -9,7 +9,7 @@ from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.moderator import get_title_queryset
+from cms.utils.moderator import get_title_queryset, use_draft
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
@@ -231,7 +231,9 @@ class CMSMenu(Menu):
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
 
-        pages = page_queryset.published(lang).filter(**filters).order_by("tree_id", "lft")
+        if not use_draft(request):
+            page_queryset = page_queryset.published(lang)
+        pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
         ids = {}
         nodes = []
         first = True
