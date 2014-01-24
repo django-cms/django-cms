@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import json
 import datetime
-from unittest import skipUnless
+from django.utils.unittest.case import skipUnless
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
