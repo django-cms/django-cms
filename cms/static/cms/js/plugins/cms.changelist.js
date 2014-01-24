@@ -226,6 +226,11 @@ $(document).ready(function () {
                 },
                 onclose: function(){
                     reCalc();
+                },
+                onload: function () {
+					setTimeout(function () {
+						reCalc();
+					}, 250);
                 }
 
 			}
@@ -424,24 +429,19 @@ $(document).ready(function () {
             e.stopPropagation();
             return false;
         }
-        document.setTimeout(function(){reCalc();}, 1)
         return true;
     });
     $("div#sitemap").show();
     function resized(){
         //$.syncCols();
         $.syncHeights();
-
     }
 
     function reCalc(){
         $.syncCols();
         $.syncHeights();
     }
-    window.setTimeout(function(){
-        $.syncCols();
-        $.syncHeights();
-    },1);
+
     $(window).bind('resize', resized);
     /* Site Selector */
     $('#site-select').change(function(){
