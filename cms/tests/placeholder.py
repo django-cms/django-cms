@@ -390,6 +390,37 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             content_en = render_placeholder(placeholder_en, context_en)
             self.assertRegexpMatches(content_en, "^en body$")
 
+    def test_plugins_prepopulate(self):
+        """ Tests prepopulate placeholder configuration """
+
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+
+            pop = push
+        conf = {
+            'col_left': {
+                'default_plugins' : [
+                    {
+                        'plugin_type':'TextPlugin', 
+                        'values':{'body':'<p>en default body 1</p>'}, 
+                    },
+                    {
+                        'plugin_type':'TextPlugin', 
+                        'values':{'body':'<p>en default body 2</p>'}, 
+                    },
+                ]
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('page_en', 'col_two.html', 'en')
+            placeholder = page.placeholders.get(slot='col_left')
+            context = NoPushPopContext()
+            context['request'] = self.get_request(language="en", page=page)
+            # Our page should have "en default body 1" AND "en default body 2"
+            content = render_placeholder(placeholder, context)
+            self.assertRegexpMatches(content, "^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
         for placeholder in page.placeholders.all():
