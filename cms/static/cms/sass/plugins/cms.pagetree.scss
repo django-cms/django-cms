@@ -34,13 +34,14 @@ $color-background-blue-hover: #e6f6fd;
 	li input.hidden { position: absolute; left: -9999em; }
 
 	// icons
-	li a.icon, li span.icon, li a.move, li a.copy, li a.edit, li a.advanced-settings {
+	li a.icon, li span.icon, li a.move, li a.copy, li a.edit, li a.advanced-settings, li span.info {
 		display: inline-block; width: 18px; height: 18px; margin-top:5px;
 		background: url('../../img/pagetree/sprite.png') no-repeat 0 0; }
 	li a.move { background-position:-20px -20px; margin-top:0; }
 	li a.copy { background-position:-40px -60px;  margin-top:0; }
     li a.edit { background-position:-40px -20px;  margin-top:0; }
-    li a.advanced-settings { background-position:-60px -60px;  margin-top:0; }
+    li a.advanced-settings { background-position:-60px -60px; margin-top:0; }
+    li span.info { background-position:-81px -20px; margin-top:-1px; cursor:pointer; }
 
 	li a.selector-add { background-position:-20px 0; margin-left:4px; margin-top:-1px; }
 
@@ -51,7 +52,7 @@ $color-background-blue-hover: #e6f6fd;
 
 
 	li a.move span, li a.copy span, li a.selector-add span,
-	li a.addlink span, li a.deletelink span, li a.edit span, li a.advanced-settings span,
+	li a.addlink span, li a.deletelink span, li a.edit span, li a.advanced-settings span, li span.info span,
 	.col-navigation input, .col-published input { display:none; }
 
 	// header
@@ -103,6 +104,20 @@ $color-background-blue-hover: #e6f6fd;
 	// drag modus
 	li#dragged { min-width:500px; }
 	li#dragged .col2 { display:none; }
+
+	// info handling
+	.info-details { display:none; }
+	li .info:hover { position:relative;
+		.info-details { display:block; }
+	}
+	.info-details { cursor:default;
+		position:absolute; right:-6px; top:-6px; z-index:100;
+		text-align:left; line-height:18px; padding:5px 10px;
+		background:white; border:1px solid #ccc; @include border-radius(3px 0 3px 3px);
+		mark { font-weight:bold; background:none; font-style:normal;
+			@include inline-block(); min-width:100px; }
+		span { display:inline !important; }
+	}
 }
 
 // filter button on top right
@@ -133,21 +148,27 @@ $color-background-blue-hover: #e6f6fd;
 	li .col-apphook span.icon {
 		width: 18px !important; height: 18px !important; margin:0 !important;
 		background: url('../../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
-    li .col-language span {
-		width: 14px !important; height: 14px !important; margin:0 !important; display: inline-block;
-        @include border-radius(7px);
-        color: transparent;
-        &.dirty {
-	       background-color: #6ba6ff;
-	      }
-        &.empty {
-             background-color: #e8e9e5;
-            }
-        &.unpublished {
-             background-color: #ff914f;
-            }
-        &.published {
-             background-color: #31da1b;
-            }
-     }
+	li .col-language span {
+		width:14px !important; height:14px !important; margin:-3px 0 0 !important;
+		@include inline-block();
+		@include border-radius(7px);
+		color: transparent;
+		// colors used within the tree
+		&.dirty { background-color:#6ba6ff;
+			-webkit-animation:pulsate 2.5s ease-out infinite;
+			-moz-animation:pulsate 2.5s ease-out infinite;
+			animation:pulsate 2.5s ease-out infinite;
+		}
+		&.empty { background-color:#e8e9e5; }
+		&.unpublished { background-color:#435df1; }
+		&.published { background-color:#65b417; }
+	 }
+	 li .cont { overflow:visible !important; }
+}
+
+// animation for publishing
+@-webkit-keyframes pulsate {
+    0% { opacity:0.5; }
+    50% { opacity:1; }
+    100% { opacity:0.5; }
 }

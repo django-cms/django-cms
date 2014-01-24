@@ -58,19 +58,17 @@
 			{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}
 		</div>
 
-
-
-
-
 		<div class="col-info">
-            <span>{% trans "info" %}</span>
-            <div class="info-details">
-                {% comment %}publication date: {{ page.publication_date|date:"Y-m-d" }}
-                publication end date: {{ page.publication_end_date|date:"Y-m-d" }}
-                is restricted: {{ page|is_restricted:request }}
-                last change by: {{ page.changed_by }}
-                template: {{ page.get_template_display }}{% endcomment %}
-            </div>
-        </div>
+			<span class="info">
+				<span>{% trans "info" %}</span>
+				<div class="info-details">
+					{% if page.publication_date %}<mark>{% trans "publication date:" %}</mark> {{ page.publication_date|date:"Y-m-d" }}<br />{% endif %}
+					{% if page.publication_end_date %}<mark>{% trans "publication end date:" %}</mark> {{ page.publication_end_date|date:"Y-m-d" }}<br />{% endif %}
+					<mark>{% trans "is restricted:" %}</mark> {{ page|is_restricted:request }}<br />
+					{% if page.changed_by %}<mark>{% trans "last change by:" %}</mark> {{ page.changed_by }}<br />{% endif %}
+					{% if page.get_template_display %}<mark>{% trans "template:" %}</mark> {{ page.get_template_display }}{% endif %}
+				</div>
+			</span>
+		</div>
 	</div>
 </div>
