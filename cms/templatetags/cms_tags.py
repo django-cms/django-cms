@@ -169,7 +169,7 @@ def _get_placeholder(current_page, page, context, name):
     return placeholder
 
 
-def get_placeholder_content(context, request, current_page, name, inherit):
+def get_placeholder_content(context, request, current_page, name, inherit, default):
     edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
     pages = [current_page]
     # don't display inherited plugins in edit mode, so that the user doesn't
@@ -190,7 +190,7 @@ def get_placeholder_content(context, request, current_page, name, inherit):
             # call _get_placeholder again to get the placeholder properly rendered
             # in frontend editing
     placeholder = _get_placeholder(current_page, current_page, context, name)
-    return render_placeholder(placeholder, context, name)
+    return render_placeholder(placeholder, context, name, default=default)
 
 
 class PlaceholderParser(Parser):
@@ -265,9 +265,7 @@ class Placeholder(Tag):
 
             return ''
 
-        content = get_placeholder_content(context, request, page, name, inherit)
-        if not content and nodelist:
-            return nodelist.render(context)
+        content = get_placeholder_content(context, request, page, name, inherit, nodelist)
         return content
 
     def get_name(self):
@@ -915,22 +913,28 @@ register.tag(CMSEditableObjectBlock)
 
 class StaticPlaceholderNode(Tag):
     name = 'static_placeholder'
-    options = Options(
+    options = PlaceholderOptions(
         Argument('code', required=True),
-        'as',
-        Argument('varname', required=False, resolve=False)
+        MultiValueArgument('extra_bits', required=False, resolve=False),
+        blocks=[
+            ('endstatic_placeholder', 'nodelist'),
+        ]
     )
 
-    def render_tag(self, context, code, varname):
+    def render_tag(self, context, code, extra_bits, nodelist=None):
         # TODO: language override (the reason this is not implemented, is that language selection is buried way
         #       down somewhere in some method called in render_plugins. There it gets extracted from the request
         #       and a language in request.GET always overrides everything.)
         if not code:
             # an empty string was passed in or the variable is not available in the context
+            if nodelist:
+                return nodelist.render(context)
             return ''
             # TODO: caching?
         request = context.get('request', False)
         if not request:
+            if nodelist:
+                return nodelist.render(context)
             return ''
         if isinstance(code, StaticPlaceholder):
             static_placeholder = code
@@ -945,7 +949,8 @@ class StaticPlaceholderNode(Tag):
         else:
             placeholder = static_placeholder.public
         placeholder.is_static = True
-        return render_placeholder(placeholder, context, name_fallback=code)
+        content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
+        return content
 
 
 register.tag(StaticPlaceholderNode)

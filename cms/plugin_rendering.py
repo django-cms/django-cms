@@ -84,7 +84,7 @@ def render_plugins(plugins, context, placeholder, processors=None):
     return out
 
 
-def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None):
+def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None, default=None):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
@@ -148,7 +148,13 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
             request.toolbar.placeholders[placeholder.pk] = placeholder
     if edit:
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback, save_language))
-    content = mark_safe("".join(content))
+    if content:
+        content = mark_safe("".join(content))
+    elif default:
+        #should be nodelist from a template
+        content = mark_safe(default.render(context_to_copy))
+    else:
+        content = ''
     context['content'] = content
     context['placeholder'] = toolbar_content
     context['edit'] = edit

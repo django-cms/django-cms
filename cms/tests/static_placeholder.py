@@ -59,6 +59,17 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         self.assertObjectExist(StaticPlaceholder.objects.all(), code='foobar', creation_method=StaticPlaceholder.CREATION_BY_TEMPLATE)
         self.assertEqual(Placeholder.objects.filter(slot='foobar').count(), 2)
 
+    def test_empty(self):
+        self.assertObjectDoesNotExist(Stack.objects.all(), code='foobar')
+        self.assertObjectDoesNotExist(Placeholder.objects.all(), slot='foobar')
+        t = Template('{% load cms_tags %}{% static_placeholder "foobar" or %}No Content{% endstatic_placeholder %}')
+        rendered = t.render(self.get_context('/'))
+        self.assertIn("No Content", rendered)
+        for p in Placeholder.objects.all():
+            add_plugin(p, 'TextPlugin', 'en', body='test')
+        rendered = t.render(self.get_context('/'))
+        self.assertNotIn("No Content", rendered)
+
     def test_publish_stack(self):
         static_placeholder = StaticPlaceholder.objects.create(name='foo', code='bar')
         self.fill_placeholder(static_placeholder.draft)

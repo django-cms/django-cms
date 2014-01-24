@@ -6,7 +6,7 @@
 {% block content %}
 	<h1>{% render_model request.current_page "page_title" %}</h1>
 
-    {% static_placeholder "logo" %}
+    {% static_placeholder "logo" or %}Here comes a logo{% endstatic_placeholder %}
 
 	<div id="col1" class="grid_3">
 		{% include "sidebar_submenu.html" %}
@@ -24,4 +24,7 @@
 			{% endwith %}
 		{% endblock %}
     </div>
+    <div id="col3" class="grid_12">
+        {% static_placeholder "footer" %}
+     </div>
 {% endblock %}

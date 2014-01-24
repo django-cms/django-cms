@@ -85,6 +85,18 @@ Example::
     Static_placeholders are not included in the undo/redo and page history pages
 
 
+If you want additional content to be displayed in case the static placeholder is
+empty, use the ``or`` argument and an additional ``{% endstatic_placeholder %}``
+closing tag. Everything between ``{% static_placeholder "..." or %}`` and ``{%
+endstatic_placeholder %}`` is rendered in the event that the placeholder has no plugins or
+the plugins do not generate any output.
+
+Example::
+
+    {% static_placeholder "footer" or %}There is no content.{% endstatic_placeholder %}
+
+
+
 .. templatetag:: show_placeholder
 
 render_placeholder
