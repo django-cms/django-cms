@@ -148,10 +148,92 @@ plugins, as shown above with ``base.html content``.
 ``default_plugins``
     You can specify the list of default plugins which will be automagically 
     added when the placeholder will be created (or rendered).
-    Each element of the list is a dictionary with the "plugin_type" to add 
-    and the "values" dictionnary to use for this plugin. 
-    The "values" depend on the "plugin_type". See the documentation of each 
-    plugin type to see which parameters are required and available.
+    Each element of the list is a dictionary with following keys :
+
+    ``plugin_type`` 
+        It's the plugin type to add to the placeholder
+        Exemple : 'TextPlugin'
+
+    ``values``
+        Dictionnary to use for the plugin creation.
+        It depends on the ``plugin_type``. See the documentation of each 
+        plugin type to see which parameters are required and available.
+        Exemple for a Textplugin :
+        {'body':'<p>Lorem ipsum</p>'}
+        Exemple for a LinkPlugin :
+        {'name':'Django-CMS','url':'https://www.django-cms.org'}
+
+    ``children``
+        It is a list of dictionnaries to configure default plugins 
+        to add as children for the current plugin (it must accepts children). 
+        Each dictionnary accepts same args than dictionnaries of 
+        ``default_plugins`` : ``plugin_type``, ``values``, ``children`` 
+        (yes, it is recursive) and ``post_add_process``.
+
+    ``post_add_process``
+        Must be a callable object. You can use this to do some special process
+        when the default plugin is created. It's very usefull for exemple when
+        the parent plugin's content must be updated when we add a child 
+        (ex : when you add a child "LinkPlugin" to "TextPlugin", the 
+        "TextPlugin" must be updated to add the link reference.
+        Parameters of the callable object are :
+
+        ``plugin``
+            Plugin we just added to be able to access the placeholder or all
+            other usefull plugin attributes.
+        ``request``
+            The current request when the plugin is automagically added. Useful 
+            to have the current page or current user for exemple.
+        ``conf``
+            Current configuration dictionnary of the default plugin we just 
+            added. Usefull if you want to have some extra content configured in 
+            settings and not in the callable object.
+
+    Complete exemple of default_plugins usage::
+
+        def upd_textplugin_ctn_with_child_link(plugin, request, conf):
+            textplugin = plugin.parent
+            needle = '%%(_tag_%s_%d)s' % (plugin.plugin_type, plugin.position)
+            if needle in textplugin.body:
+                textplugin.body = textplugin.body.replace(needle, plugin_to_tag(plugin))
+                textplugin.save()
+        CMS_PLACEHOLDER_CONF = {
+            'content': {
+                'name' : _('Content'),
+                'plugins': ['TextPlugin', 'LinkPlugin'],
+                'default_plugins':[
+                    {
+                        'plugin_type':'TextPlugin', 
+                        'values':{
+                            'body':'<p>Great websites : %(_tag_LinkPlugin_2)s and %(_tag_LinkPlugin_3)s</p>'
+                        },
+                        'children':[
+                            {
+                                'plugin_type':'LinkPlugin',
+                                'values':{
+                                    'name':'django', 
+                                    'url':'https://www.djangoproject.com/'
+                                },
+                                'post_add_process':upd_textplugin_ctn_with_child_link,
+                            },
+                            {
+                                'plugin_type':'LinkPlugin',
+                                'values':{
+                                    'name':'django-cms', 
+                                    'url':'https://www.django-cms.org'
+                                },
+                                'post_add_process':upd_textplugin_ctn_with_child_link,
+                                # If using LinkPlugin from djangocms-link which
+                                # accepts children, you could add some grandchildren :
+                                # 'children' : [
+                                #     ...
+                                # ]
+                            },
+                        ]
+                    },
+                ]
+            }
+        }
 
 ``plugin_modules``
     A dictionary of plugins and custom module names to group plugin in the

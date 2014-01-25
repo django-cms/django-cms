@@ -95,8 +95,30 @@ def create_default_plugins(request, placeholders, template, lang):
             if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
                 continue
             plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
+            if 'post_add_process' in conf and callable(conf['post_add_process']):
+                conf['post_add_process'](plugin=plugin, request=request, conf=conf)
+            if 'children' in conf:
+                create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
             plugins.append(plugin)
     return plugins
+
+
+def create_default_children_plugins(request, placeholder, lang, parent_plugin, children_conf):
+    """
+    Create all default children plugins in the given ``placeholder``.
+    If a child have children, this function recurse.
+    """
+    from cms.api import add_plugin
+    for conf in children_conf:
+        if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
+            continue
+        plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
+        plugin.parent = parent_plugin
+        if 'post_add_process' in conf and callable(conf['post_add_process']):
+            conf['post_add_process'](plugin=plugin, request=request, conf=conf)
+        plugin.save()
+        if 'children' in conf:
+            create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
 
 
 def build_plugin_tree(plugin_list):
