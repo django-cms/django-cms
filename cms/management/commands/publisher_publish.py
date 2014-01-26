@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from django.core.management.base import NoArgsCommand, CommandError
+from django.utils.translation import activate
 from cms.utils.compat.dj import force_unicode
 
 class Command(NoArgsCommand):
@@ -28,13 +29,17 @@ class Command(NoArgsCommand):
         pages_total, pages_published = qs.count(), 0
         
         print(u"\nPublishing public drafts....\n")
-        
+        output_language = None
         for i, page in enumerate(qs):
             m = " "
             add = True
             for lang in page.title_set.filter(published=True).values_list("language", flat=True):
+                if not output_language:
+                    output_language = lang
                 if not page.publish(lang):
                     add = False
+            # we may need to activate the first (main) language for proper page title rendering
+            activate(output_language)
             if add:
                 pages_published += 1
                 m = "*"
