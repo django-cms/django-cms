@@ -1165,7 +1165,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(40, 48)):
+            with self.assertNumQueries(FuzzyInt(40, 56)):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 7)
