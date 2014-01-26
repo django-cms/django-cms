@@ -643,52 +643,54 @@ class CMSEditableObject(InclusionTag):
         """
         Populate the contex with the requested attributes to trigger the changeform
         """
-        extra_context = {}
-        if editmode:
-            instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
-        else:
-            instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
-            extra_context['attribute_name'] = 'add'
-        extra_context['instance'] = instance
-        extra_context['generic'] = instance._meta
-        # view_method has the precedence and we retrieve the corresponding
-        # attribute in the instance class.
-        # If view_method refers to a method it will be called passing the
-        # request; if it's an attribute, it's stored for later use
-        if view_method:
-            method = getattr(instance, view_method)
-            if callable(method):
-                url_base = method(context['request'])
+        request = context['request']
+        with force_language(request.toolbar.toolbar_language):
+            extra_context = {}
+            if editmode:
+                instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
             else:
-                url_base = method
-        else:
-            # The default view_url is the default admin changeform for the
-            # current instance
-            if not editmode:
-                view_url = 'admin:%s_%s_add' % (
-                    instance._meta.app_label, instance._meta.module_name)
-                url_base = reverse(view_url)
-            elif not edit_fields:
-                view_url = 'admin:%s_%s_change' % (
-                    instance._meta.app_label, instance._meta.module_name)
-                url_base = reverse(view_url, args=(instance.pk,))
+                instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
+                extra_context['attribute_name'] = 'add'
+            extra_context['instance'] = instance
+            extra_context['generic'] = instance._meta
+            # view_method has the precedence and we retrieve the corresponding
+            # attribute in the instance class.
+            # If view_method refers to a method it will be called passing the
+            # request; if it's an attribute, it's stored for later use
+            if view_method:
+                method = getattr(instance, view_method)
+                if callable(method):
+                    url_base = method(context['request'])
+                else:
+                    url_base = method
             else:
-                if not view_url:
-                    view_url = 'admin:%s_%s_edit_field' % (
+                # The default view_url is the default admin changeform for the
+                # current instance
+                if not editmode:
+                    view_url = 'admin:%s_%s_add' % (
                         instance._meta.app_label, instance._meta.module_name)
-                url_base = reverse(view_url, args=(instance.pk, language))
-                querystring['edit_fields'] = ",".join(context['edit_fields'])
-        if editmode:
-            extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
-        else:
-            extra_context['edit_url'] = "%s" % url_base
-        extra_context['refresh_page'] = True
-        # We may be outside the CMS (e.g.: an application which is not attached via Apphook)
-        # in this case we may only go back to the home page
-        if getattr(context['request'], 'current_page', None):
-            extra_context['redirect_on_close'] = context['request'].current_page.get_absolute_url(language)
-        else:
-            extra_context['redirect_on_close'] = ''
+                    url_base = reverse(view_url)
+                elif not edit_fields:
+                    view_url = 'admin:%s_%s_change' % (
+                        instance._meta.app_label, instance._meta.module_name)
+                    url_base = reverse(view_url, args=(instance.pk,))
+                else:
+                    if not view_url:
+                        view_url = 'admin:%s_%s_edit_field' % (
+                            instance._meta.app_label, instance._meta.module_name)
+                    url_base = reverse(view_url, args=(instance.pk, language))
+                    querystring['edit_fields'] = ",".join(context['edit_fields'])
+            if editmode:
+                extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+            else:
+                extra_context['edit_url'] = "%s" % url_base
+            extra_context['refresh_page'] = True
+            # We may be outside the CMS (e.g.: an application which is not attached via Apphook)
+            # in this case we may only go back to the home page
+            if getattr(context['request'], 'current_page', None):
+                extra_context['redirect_on_close'] = context['request'].current_page.get_absolute_url(language)
+            else:
+                extra_context['redirect_on_close'] = ''
         return extra_context
 
     def _get_content(self, context, instance, attribute, language, filters):
