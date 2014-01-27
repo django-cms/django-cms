@@ -475,8 +475,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             published = public_page.parent_id is None or public_page.parent.is_published(language)
             if not public_page.pk:
                 public_page.save()
-                if not self.parent_id:
-                    public_page.move_to(self, 'right')
                 # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
@@ -1036,11 +1034,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
-            if public_prev_sib:
-                obj.insert_at(public_prev_sib, position='right', save=False)
+            if not self.parent_id:
+                obj.insert_at(self, position='right', save=False)
             else:
-                if public_parent:
-                    obj.insert_at(public_parent, position='first-child', save=False)
+                if public_prev_sib:
+                    obj.insert_at(public_prev_sib, position='right', save=False)
+                else:
+                    if public_parent:
+                        obj.insert_at(public_parent, position='first-child', save=False)
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
