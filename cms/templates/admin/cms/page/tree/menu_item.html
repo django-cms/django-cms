@@ -21,7 +21,7 @@
 		</span>
 
 		{% if page.soft_root or page.is_home %}<div class="col-softroot"><span class="icon softroot-icon" title="{% if page.soft_root %}{% trans 'softroot' %}{% else %}{% trans 'home' %}{% endif %}"></span></div>{% endif %}
-		{% if page.application_urls %}<div class="col-apphook"><span class="icon apphook-icon" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}"></span></div>{% endif %}
+		{% if page.application_urls %}<div class="col-apphook"><a href="{{ page.id }}/advanced-settings/"><span class="icon apphook-icon" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}"></span></a></div>{% endif %}
         {% for lang in site_languages %}
 		<div class="col-language">
 		    {% if has_change_permission %}
