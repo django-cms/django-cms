@@ -13,7 +13,8 @@ argparse
 dj-database-url
 selenium
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
--e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
--e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
--e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
--e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
+djangocms-admin-style.git
+djangocms-text-ckeditor
+djangocms-column
+djangocms-style
+djangocms_link

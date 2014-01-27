@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db import DatabaseError
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.forms.fields import EMPTY_VALUES
@@ -32,7 +33,7 @@ class PageSelectFormField(forms.MultiValueField):
             forms.ChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
         super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
-    
+
     def compress(self, data_list):
         if data_list:
             page_id = data_list[1]
