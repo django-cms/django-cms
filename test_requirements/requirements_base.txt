@@ -13,7 +13,7 @@ argparse
 dj-database-url
 selenium
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
-djangocms-admin-style.git
+djangocms-admin-style
 djangocms-text-ckeditor
 djangocms-column
 djangocms-style
