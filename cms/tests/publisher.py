@@ -307,16 +307,16 @@ class PublishingTests(TestCase):
     def test_publish_ordering2(self):
         page = self.create_page('parent', published=False)
         pageA = self.create_page('pageA', published=False)
-        pageC = self.create_page('pageC', published=False)
-        pageB = self.create_page('pageB', published=False)
+        pageC = self.create_page('pageC', published=False, parent=pageA)
+        pageB = self.create_page('pageB', published=False, parent=pageA)
         page = page.reload()
-        pageC.publish('en')
-        pageB.publish('en')
         pageA.publish('en')
+        pageB.publish('en')
+        pageC.publish('en')
         page.publish('en')
 
-        drafts = Page.objects.filter(publisher_is_draft=True).order_by('tree_id')
-        publics = Page.objects.filter(publisher_is_draft=False).order_by('tree_id')
+        drafts = Page.objects.filter(publisher_is_draft=True).order_by('tree_id', 'lft')
+        publics = Page.objects.filter(publisher_is_draft=False).order_by('tree_id', 'lft')
 
         x = 0
         for draft in drafts:
