@@ -1172,7 +1172,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            with self.assertNumQueries(FuzzyInt(40, 57)):
+            with self.assertNumQueries(FuzzyInt(40, 58)):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(20, 30)):
