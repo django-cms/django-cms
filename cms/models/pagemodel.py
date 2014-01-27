@@ -475,6 +475,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             published = public_page.parent_id is None or public_page.parent.is_published(language)
             if not public_page.pk:
                 public_page.save()
+                public_page.move_to(self, 'right')
                 # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
