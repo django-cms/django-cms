@@ -255,7 +255,6 @@ def post_save_page(instance, **kwargs):
     if (instance.old_page is None and instance.application_urls) or (instance.old_page and (
             instance.old_page.application_urls != instance.application_urls or instance.old_page.application_namespace != instance.application_namespace)):
         if instance.publisher_public_id and instance.publisher_is_draft:
-            print 'changing apphook'
             public = instance.publisher_public
             public._publisher_keep_state = True
             public.application_urls = instance.application_urls
