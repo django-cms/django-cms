@@ -1,4 +1,6 @@
 from __future__ import with_statement
+import re
+from django.template.defaultfilters import truncatewords
 import datetime
 
 from django.template.defaultfilters import truncatewords
@@ -156,7 +158,7 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, 'href="LinkPlugin">Add a link')
+        self.assertContains(response, 'href="LinkPlugin">')
         self.assertContains(response,
                             '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
 
@@ -240,6 +242,12 @@ class ToolbarTests(ToolbarTestBase):
                 response = self.client.get('/en/?edit')
             self.assertEquals(response.status_code, 200)
             self.assertContains(response, 'PPPP')
+
+    def test_user_settings(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/admin/cms/usersettings/')
+            self.assertEqual(response.status_code, 200)
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):

@@ -243,7 +243,7 @@ In your ``menu.py`` write::
 At this point this menu alone doesn't do a whole lot. We have to attach it to the
 Apphook first.
 
-So open your ``cms_apps.py`` and write::
+So open your ``cms_app.py`` and write::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool

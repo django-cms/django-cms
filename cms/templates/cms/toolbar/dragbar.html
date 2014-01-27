@@ -2,7 +2,7 @@
 {% load url from future %}
 
 <div class="cms_dragbar cms_dragbar-{{ placeholder.pk|unlocalize }}">
-	{% language request.toolbar.language %}
+	{% language request.toolbar.toolbar_language %}
 	<div class="cms_submenu">
 		<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
 		<div class="cms_submenu-dropdown">

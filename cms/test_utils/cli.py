@@ -209,7 +209,7 @@ def configure(db_url, **extra):
                     'LinkPlugin': 'Different Grouper'
                 },
                 'plugin_labels': {
-                    'LinkPlugin': 'Add a link'
+                    'LinkPlugin': gettext('Add a link')
                 }
             },
 

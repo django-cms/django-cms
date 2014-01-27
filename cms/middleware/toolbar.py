@@ -5,6 +5,7 @@ Edit Toolbar middleware
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.dj import force_unicode
+from cms.utils.i18n import force_language
 from menus.menu_pool import menu_pool
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -22,16 +23,17 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
         child_plugin_classes = get_toolbar_plugin_struct(childs, placeholder.slot, placeholder.page, parent=plugin_class)
     instance.placeholder = placeholder
-    data = {
-        'instance': instance,
-        'rendered_content': rendered_content,
-        'child_plugin_classes': child_plugin_classes,
-        'edit_url': placeholder.get_edit_url(instance.pk),
-        'add_url': placeholder.get_add_url(),
-        'delete_url': placeholder.get_delete_url(instance.pk),
-        'move_url': placeholder.get_move_url(),
-    }
-
+    request = original_context['request']
+    with force_language(request.toolbar.toolbar_language):
+        data = {
+            'instance': instance,
+            'rendered_content': rendered_content,
+            'child_plugin_classes': child_plugin_classes,
+            'edit_url': placeholder.get_edit_url(instance.pk),
+            'add_url': placeholder.get_add_url(),
+            'delete_url': placeholder.get_delete_url(instance.pk),
+            'move_url': placeholder.get_move_url(),
+        }
     original_context.update(data)
     output = render_to_string(instance.get_plugin_class().frontend_edit_template, original_context)
     original_context.pop()
