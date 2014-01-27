@@ -146,6 +146,7 @@ def pre_delete_title(instance, **kwargs):
         instance.page._publisher_keep_state = True
         instance.page.save(no_signals=True)
 
+
 signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid="cms.title.presave")
 
 
@@ -251,7 +252,15 @@ def post_save_page(instance, **kwargs):
                 update_title(title)
                 title._publisher_keep_state = True
                 title.save()
-    if instance.old_page is None or instance.old_page.application_urls != instance.application_urls:
+    if (instance.old_page is None and instance.application_urls) or (instance.old_page and (
+            instance.old_page.application_urls != instance.application_urls or instance.old_page.application_namespace != instance.application_namespace)):
+        if instance.publisher_public_id and instance.publisher_is_draft:
+            print 'changing apphook'
+            public = instance.publisher_public
+            public._publisher_keep_state = True
+            public.application_urls = instance.application_urls
+            public.application_namespace = instance.application_namespace
+            public.save()
         application_post_changed.send(sender=Page, instance=instance)
 
 
@@ -262,6 +271,7 @@ def update_placeholders(instance, **kwargs):
 
 def invalidate_menu_cache(instance, **kwargs):
     menu_pool.clear(instance.site_id)
+
 
 def delete_placeholders(instance, **kwargs):
     instance.placeholders.all().delete()
@@ -280,11 +290,13 @@ signals.pre_delete.connect(pre_delete_title, sender=Title)
 def clear_placeholder_ref(instance, **kwargs):
     instance.placeholder_ref_id_later = instance.placeholder_ref_id
 
+
 signals.pre_delete.connect(clear_placeholder_ref, sender=PlaceholderReference)
 
 
 def clear_placeholder_ref_placeholder(instance, **kwargs):
     Placeholder.objects.filter(pk=instance.placeholder_ref_id_later).delete()
+
 
 signals.post_delete.connect(clear_placeholder_ref_placeholder, sender=PlaceholderReference)
 

@@ -425,7 +425,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.title_set.filter(language=language, published=True).count() == 1
 
     def get_publisher_state(self, language):
-        return self.title_set.get(language=language).publisher_state
+        from cms.models import Title
+        try:
+            return self.title_set.get(language=language).publisher_state
+        except Title.DoesNotExist:
+            return None
 
     def set_publisher_state(self, language, state, published=None):
         title = self.title_set.get(language=language)
