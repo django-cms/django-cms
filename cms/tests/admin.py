@@ -1168,16 +1168,16 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(FuzzyInt(40, 56)):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
-            self.assertEqual(Placeholder.objects.all().count(), 7)
-            self.assertEqual(StaticPlaceholder.objects.count(), 1)
+            self.assertEqual(Placeholder.objects.all().count(), 9)
+            self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            with self.assertNumQueries(FuzzyInt(40, 48)):
+            with self.assertNumQueries(FuzzyInt(40, 57)):
                 output = force_unicode(self.client.get('/en/?edit'))
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(20, 30)):
             output = force_unicode(self.client.get('/en/?edit'))
-        with self.assertNumQueries(15):
+        with self.assertNumQueries(19):
             output = force_unicode(self.client.get('/en/'))
 
 
