@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import bisect
 from collections import defaultdict
-from cms.models import Title, Page, PageModeratorState
+from cms.models import Title, Page, PageModeratorState, EmptyTitle
+from cms.utils import get_language_list
 from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset
@@ -187,6 +188,12 @@ class CMSChangeList(ChangeList):
             page.title_cache[title.language] = title
             if not title.language in page.all_languages:
                 insort(page.all_languages, title.language)
+        site_id = self.current_site()
+        languages = get_language_list(site_id)
+        for page in all_pages:
+            for lang in languages:
+                if not lang in page.title_cache:
+                    page.title_cache[lang] = EmptyTitle(lang)
         self.root_pages = root_pages
 
     def get_items(self):

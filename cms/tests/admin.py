@@ -1180,6 +1180,20 @@ class AdminFormsTests(AdminTestsBase):
         with self.assertNumQueries(19):
             output = force_unicode(self.client.get('/en/'))
 
+    def test_tree_view_queries(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        for i in xrange(10):
+            page = create_page('Test%s' % i, 'col_two.html', 'en', published=True)
+        for placeholder in Placeholder.objects.all():
+            plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+
+        user = self.get_superuser()
+        with self.login_user_context(user):
+            with self.assertNumQueries(FuzzyInt(20, 32)):
+                output = force_unicode(self.client.get('/en/admin/cms/page/'))
+
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
     """
