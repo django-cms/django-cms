@@ -201,3 +201,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Frontedit editor for Django models
 - Extending the page & title model API
 - Placeholders can be configured to have plugins automagically added.
+- Publishing is now language independent and the tree-view has been updated to reflect this
