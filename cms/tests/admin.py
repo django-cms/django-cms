@@ -1173,12 +1173,12 @@ class AdminFormsTests(AdminTestsBase):
             for placeholder in Placeholder.objects.all():
                 plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
             with self.assertNumQueries(FuzzyInt(40, 65)):
-                output = self.client.get('/en/?edit').content
+                output = force_unicode(self.client.get('/en/?edit').content)
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(20, 33)):
-            output = self.client.get('/en/?edit').content
+            output = force_unicode(self.client.get('/en/?edit').content)
         with self.assertNumQueries(19):
-            output = self.client.get('/en/').content
+            output = force_unicode(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):
         from django.core.cache import cache
