@@ -1038,11 +1038,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
-            if public_prev_sib:
-                obj.insert_at(public_prev_sib, position='right', save=False)
+            if not self.parent_id:
+                obj.insert_at(self, position='right', save=False)
             else:
-                if public_parent:
-                    obj.insert_at(public_parent, position='first-child', save=False)
+                if public_prev_sib:
+                    obj.insert_at(public_prev_sib, position='right', save=False)
+                else:
+                    if public_parent:
+                        obj.insert_at(public_parent, position='first-child', save=False)
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
