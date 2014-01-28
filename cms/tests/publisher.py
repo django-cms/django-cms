@@ -304,6 +304,27 @@ class PublishingTests(TestCase):
                               ('pageB', 4, 5),
                               ('pageC', 6, 7)], public_titles)
 
+    def test_publish_ordering2(self):
+        page = self.create_page('parent', published=False)
+        pageA = self.create_page('pageA', published=False)
+        pageC = self.create_page('pageC', published=False, parent=pageA)
+        pageB = self.create_page('pageB', published=False, parent=pageA)
+        page = page.reload()
+        pageA.publish('en')
+        pageB.publish('en')
+        pageC.publish('en')
+        page.publish('en')
+
+        drafts = Page.objects.filter(publisher_is_draft=True).order_by('tree_id', 'lft')
+        publics = Page.objects.filter(publisher_is_draft=False).order_by('tree_id', 'lft')
+
+        x = 0
+        for draft in drafts:
+            self.assertEqual(draft.publisher_public_id, publics[x].pk)
+            x += 1
+
+
+
 
     def test_unpublish_unpublish(self):
         name = self._testMethodName

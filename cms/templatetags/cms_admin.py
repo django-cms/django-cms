@@ -4,6 +4,7 @@ from distutils.version import LooseVersion
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
+from cms.constants import PUBLISHER_STATE_PENDING
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
@@ -67,7 +68,7 @@ class TreePublishRow(Tag):
     )
 
     def render_tag(self, context, page, language):
-        if page.is_published(language):
+        if page.is_published(language) and page.publisher_public_id and page.publisher_public.is_published(language):
             if page.is_dirty(language):
                 cls = "dirty"
                 text = _("unpublished changes")
@@ -75,16 +76,22 @@ class TreePublishRow(Tag):
                 cls = "published"
                 text = _("published")
         else:
+
             if language in page.languages:
-                cls = "unpublished"
-                text = _("unpublished")
+                if page.publisher_public_id and page.publisher_public.get_publisher_state(
+                    language) == PUBLISHER_STATE_PENDING:
+                    cls = "unpublishedparent"
+                    text = _("unpublished parent")
+                else:
+                    cls = "unpublished"
+                    text = _("unpublished")
             else:
                 cls = "empty"
                 text = _("no content")
         return mark_safe('<span class="%s" title="%s"></span>' % (cls, force_unicode(text)))
 
-register.tag(TreePublishRow)
 
+register.tag(TreePublishRow)
 
 
 class ShowLazyAdminMenu(InclusionTag):
