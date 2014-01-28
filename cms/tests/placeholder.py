@@ -476,7 +476,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(plugins[1].plugin_type, 'LinkPlugin')
             self.assertEqual(plugins[2].plugin_type, 'LinkPlugin')
             self.assertTrue(plugins[1].parent == plugins[2].parent and plugins[1].parent == plugins[0])
-            content = render_placeholder(page.placeholders.get(slot='col_left'), context)
+            content = render_placeholder(placeholder, context)
             #Activate the test above when ckeditor will implement notify_on_autoadd_children
             #self.assertRegexpMatches(content,"^<p>body .*https://www.djangoproject.com/.*https://www.django-cms.org.*</p>$")            
 

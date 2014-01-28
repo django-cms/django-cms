@@ -96,10 +96,6 @@ def create_default_plugins(request, placeholders, template, lang):
             if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
                 continue
             plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
-            if 'post_add_process' in conf and callable(conf['post_add_process']):
-                conf['post_add_process'](plugin=plugin, request=request, conf=conf)
-            if 'children' in conf:
-                create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
             plugins.append(plugin)
             if 'children' in conf:
                 children = create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
