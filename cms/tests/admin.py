@@ -1166,7 +1166,7 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
             with self.assertNumQueries(FuzzyInt(40, 65)):
-                output = force_unicode(self.client.get('/en/?edit'))
+                output = force_unicode(self.client.get('/en/?edit').read())
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
@@ -1184,7 +1184,7 @@ class AdminFormsTests(AdminTestsBase):
         from django.core.cache import cache
 
         cache.clear()
-        for i in xrange(10):
+        for i in range(10):
             page = create_page('Test%s' % i, 'col_two.html', 'en', published=True)
         for placeholder in Placeholder.objects.all():
             plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
