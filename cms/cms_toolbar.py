@@ -289,15 +289,16 @@ class PageToolbar(CMSToolbar):
             nav_title = _("Display in navigation")
         nav_action = reverse('admin:cms_page_change_innavigation', args=(self.page.pk,))
         current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
-        # publisher
-        if self.title.published:
-            publish_title = _('Unpublish page')
-            publish_url = reverse('admin:cms_page_unpublish', args=(self.page.pk, self.current_lang))
-        else:
-            publish_title = _('Publish page')
-            publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk, self.current_lang))
+        if self.title:
+            # publisher
+            if self.title.published:
+                publish_title = _('Unpublish page')
+                publish_url = reverse('admin:cms_page_unpublish', args=(self.page.pk, self.current_lang))
+            else:
+                publish_title = _('Publish page')
+                publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk, self.current_lang))
 
-        current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
+            current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
         current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
         # delete
         delete_url = reverse('admin:cms_page_delete', args=(self.page.pk,))
