@@ -436,10 +436,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def get_publisher_state(self, language):
         from cms.models import Title
         try:
-            title = self.get_title_obj(language, False)
+            return self.title_set.get(language=language).publisher_state
         except Title.DoesNotExist:
             return None
-        return title.publisher_state
 
     def set_publisher_state(self, language, state, published=None):
         title = self.title_set.get(language=language)
@@ -1051,11 +1050,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
-            if public_prev_sib:
-                obj.insert_at(public_prev_sib, position='right', save=False)
+            if not self.parent_id:
+                obj.insert_at(self, position='right', save=False)
             else:
-                if public_parent:
-                    obj.insert_at(public_parent, position='first-child', save=False)
+                if public_prev_sib:
+                    obj.insert_at(public_prev_sib, position='right', save=False)
+                else:
+                    if public_parent:
+                        obj.insert_at(public_parent, position='first-child', save=False)
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()

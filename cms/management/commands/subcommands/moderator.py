@@ -27,9 +27,10 @@ class ModeratorOnCommand(NoArgsCommand):
         """
         log.info('Reverting drafts to public versions')
         for page in Page.objects.public():
-            if CMSPlugin.objects.filter(placeholder__page=page).count():
-                log.debug('Reverting page pk=%d' % (page.pk,))
-                page.publisher_draft.revert()
+            for language in page.get_languages():
+                if CMSPlugin.objects.filter(placeholder__page=page, language=language).exists():
+                    log.debug('Reverting page pk=%d' % (page.pk,))
+                    page.publisher_draft.revert(language)
 
         log.info('Publishing all published drafts')
         for title in Title.objects.filter(publisher_is_draft=True, publisher_public_id__gt=0):
