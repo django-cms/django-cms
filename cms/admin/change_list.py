@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import bisect
 from collections import defaultdict
-from cms.models import Title, Page, PageModeratorState, EmptyTitle
+from cms.models import Title, Page, PageModeratorState, EmptyTitle, PagePermission
 from cms.utils import get_language_list
 from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
@@ -104,17 +104,19 @@ class CMSChangeList(ChangeList):
         # tree using a stack now)
         pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related('publisher_public')
 
-
         # Get lists of page IDs for which the current user has
         # "permission to..." on the current site.
-        perm_edit_ids = Page.permissions.get_change_id_list(request.user, site)
-        perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
-        perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user, site)
-        perm_change_list_ids = Page.permissions.get_change_id_list(request.user, site)
-        perm_view_list_ids = Page.permissions.get_view_id_list(request.user, site)
-
-        if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
-            pages = pages.filter(pk__in=perm_edit_ids)
+        if get_cms_setting('PERMISSION'):
+            perm_edit_ids = Page.permissions.get_change_id_list(request.user, site)
+            perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
+            perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user, site)
+            restricted_ids = Page.permissions.get_restricted_id_list(site)
+            # perm_change_list_ids = PagePermission.objects.for_page(page=page).filter(can_view=True)
+            #perm_view_list_ids = Page.permissions.get_view_id_list(request.user, site)
+            #PagePermission.objects.filter(can_view=True, page)
+            #print perm_view_list_ids
+            if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
+                pages = pages.filter(pk__in=perm_edit_ids)
 
         root_pages = []
         pages = list(pages)
@@ -141,7 +143,7 @@ class CMSChangeList(ChangeList):
                 page.permission_publish_cache = perm_publish_ids == Page.permissions.GRANT_ALL or page.pk in perm_publish_ids
                 page.permission_advanced_settings_cache = perm_advanced_settings_ids == Page.permissions.GRANT_ALL or page.pk in perm_advanced_settings_ids
                 page.permission_user_cache = request.user
-
+                page.permission_restricted = page.pk in restricted_ids
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):

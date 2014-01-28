@@ -212,8 +212,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
-        language = form.cleaned_data['language']
         if not 'permission' in request.path:
+            language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
                 obj,

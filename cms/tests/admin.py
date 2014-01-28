@@ -1009,8 +1009,7 @@ class PluginPermissionTests(AdminTestsBase):
         # => PagePermissionInline is no longer visible
         self.assertFalse(
             any(type(inline) is PagePermissionInlineAdmin
-                for inline in page_admin.get_inline_instances(request,
-                                                              page if not DJANGO_1_4 else None)))
+                for inline in page_admin.get_inline_instances(request, page if not DJANGO_1_4 else None)))
 
     def test_edit_title_is_allowed_for_staff_user(self):
         """
