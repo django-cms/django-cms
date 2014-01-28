@@ -102,7 +102,7 @@ class CMSChangeList(ChangeList):
         site = self.current_site()
         # Get all the pages, ordered by tree ID (it's convenient to build the
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related()
+        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related('publisher_public')
 
 
         # Get lists of page IDs for which the current user has
@@ -180,6 +180,10 @@ class CMSChangeList(ChangeList):
         for page in all_pages:
             page.title_cache = {}
             page.all_languages = []
+            if page.publisher_public_id:
+                page.publisher_public.title_cache = {}
+                page.publisher_public.all_languages = []
+                ids[page.publisher_public_id] = page.publisher_public
 
         titles = Title.objects.filter(page__in=ids)
         insort = bisect.insort # local copy to avoid globals lookup in the loop
