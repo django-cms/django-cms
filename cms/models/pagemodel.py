@@ -436,7 +436,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def get_publisher_state(self, language):
         from cms.models import Title
         try:
-            return self.title_set.get(language=language).publisher_state
+            return self.get_title_obj(language, False).publisher_state
         except Title.DoesNotExist:
             return None
 

@@ -111,6 +111,7 @@ class CMSChangeList(ChangeList):
         perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
         perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user, site)
         perm_change_list_ids = Page.permissions.get_change_id_list(request.user, site)
+        perm_view_list_ids = Page.permissions.get_view_id_list(request.user, site)
 
         if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
             pages = pages.filter(pk__in=perm_edit_ids)
@@ -118,12 +119,6 @@ class CMSChangeList(ChangeList):
         root_pages = []
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
-
-        # page moderator states
-        pm_qs = PageModeratorState.objects.filter(page__in=pages).order_by('page')
-        pm_states = defaultdict(list)
-        for state in pm_qs:
-            pm_states[state.page_id].append(state)
 
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'
@@ -147,7 +142,6 @@ class CMSChangeList(ChangeList):
                 page.permission_advanced_settings_cache = perm_advanced_settings_ids == Page.permissions.GRANT_ALL or page.pk in perm_advanced_settings_ids
                 page.permission_user_cache = request.user
 
-            page._moderator_state_cache = pm_states[page.pk]
             if page.root_node or self.is_filtered():
                 page.last = True
                 if len(children):
