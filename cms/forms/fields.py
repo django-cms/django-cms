@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.sites.models import Site
 from django.db import DatabaseError
 from django.utils.translation import ugettext_lazy as _
 from django import forms
@@ -26,11 +27,13 @@ class PageSelectFormField(forms.MultiValueField):
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
         site_choices = SuperLazyIterator(get_site_choices)
+        site_choices.model = Site
         page_choices = SuperLazyIterator(get_page_choices)
-        kwargs['required']=required
+        page_choices.model = Page
+        kwargs['required'] = required
         fields = (
-            forms.ChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
-            forms.ChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
+            forms.ModelChoiceField(queryset=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
+            forms.ModelChoiceField(queryset=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
         super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
 
