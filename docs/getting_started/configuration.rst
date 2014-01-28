@@ -168,26 +168,7 @@ plugins, as shown above with ``base.html content``.
         to add as children for the current plugin (it must accepts children). 
         Each dictionnary accepts same args than dictionnaries of 
         ``default_plugins`` : ``plugin_type``, ``values``, ``children`` 
-        (yes, it is recursive) and ``post_add_process``.
-
-    ``post_add_process``
-        Must be a callable object. You can use this to do some special process
-        when the default plugin is created. It's very usefull for exemple when
-        the parent plugin's content must be updated when we add a child 
-        (ex : when you add a child "LinkPlugin" to "TextPlugin", the 
-        "TextPlugin" must be updated to add the link reference.
-        Parameters of the callable object are :
-
-        ``plugin``
-            Plugin we just added to be able to access the placeholder or all
-            other usefull plugin attributes.
-        ``request``
-            The current request when the plugin is automagically added. Useful 
-            to have the current page or current user for exemple.
-        ``conf``
-            Current configuration dictionnary of the default plugin we just 
-            added. Usefull if you want to have some extra content configured in 
-            settings and not in the callable object.
+        (yes, it is recursive).
 
     Complete exemple of default_plugins usage::
 
@@ -214,7 +195,6 @@ plugins, as shown above with ``base.html content``.
                                     'name':'django', 
                                     'url':'https://www.djangoproject.com/'
                                 },
-                                'post_add_process':upd_textplugin_ctn_with_child_link,
                             },
                             {
                                 'plugin_type':'LinkPlugin',
@@ -222,7 +202,6 @@ plugins, as shown above with ``base.html content``.
                                     'name':'django-cms', 
                                     'url':'https://www.django-cms.org'
                                 },
-                                'post_add_process':upd_textplugin_ctn_with_child_link,
                                 # If using LinkPlugin from djangocms-link which
                                 # accepts children, you could add some grandchildren :
                                 # 'children' : [

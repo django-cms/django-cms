@@ -82,6 +82,7 @@ def create_default_plugins(request, placeholders, template, lang):
     """
     Create all default plugins for the given ``placeholders`` if they have 
     a "default_plugins" configuration value in settings.
+    return all plugins, children, grandchildren (etc.) created
     """
     from cms.api import add_plugin
     plugins = list()
@@ -100,6 +101,10 @@ def create_default_plugins(request, placeholders, template, lang):
             if 'children' in conf:
                 create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
             plugins.append(plugin)
+            if 'children' in conf:
+                children = create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
+                plugins+=children
+            plugin.notify_on_autoadd(request, conf)
     return plugins
 
 
@@ -107,18 +112,23 @@ def create_default_children_plugins(request, placeholder, lang, parent_plugin, c
     """
     Create all default children plugins in the given ``placeholder``.
     If a child have children, this function recurse.
+    Return all children and grandchildren (etc.) created
     """
     from cms.api import add_plugin
+    children = list()
+    grandchildren = list()
     for conf in children_conf:
         if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
             continue
         plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
         plugin.parent = parent_plugin
-        if 'post_add_process' in conf and callable(conf['post_add_process']):
-            conf['post_add_process'](plugin=plugin, request=request, conf=conf)
         plugin.save()
         if 'children' in conf:
-            create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
+            grandchildren+= create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
+        plugin.notify_on_autoadd(request, conf)
+        children.append(plugin)
+    parent_plugin.notify_on_autoadd_children(request, conf, children)
+    return children + grandchildren
 
 
 def build_plugin_tree(plugin_list):
