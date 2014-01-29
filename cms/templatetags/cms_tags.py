@@ -646,7 +646,10 @@ class CMSEditableObject(InclusionTag):
         request = context['request']
         with force_language(request.toolbar.toolbar_language):
             extra_context = {}
-            if editmode:
+            if edit_fields == 'changelist':
+                instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                extra_context['attribute_name'] = 'changelist'
+            elif editmode:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
             else:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
@@ -678,7 +681,10 @@ class CMSEditableObject(InclusionTag):
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (
                             instance._meta.app_label, instance._meta.module_name)
-                    url_base = reverse(view_url, args=(instance.pk, language))
+                    if view_url.endswith('_changelist'):
+                        url_base = reverse(view_url)
+                    else:
+                        url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             if editmode:
                 extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
@@ -767,13 +773,15 @@ class CMSEditableObject(InclusionTag):
         # attribute
         if not instance and editmode:
             return context
+        extra_context = copy(context)
         # ugly-ish
         if instance and isinstance(instance, Page):
             if not edit_fields:
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
+        if edit_fields == 'changelist':
+            view_url = 'admin:cms_page_changelist'
         querystring = {'language': language}
-        extra_context = copy(context)
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it
@@ -791,7 +799,7 @@ class CMSEditableObject(InclusionTag):
         return extra_context
 
     def get_context(self, context, instance, attribute, edit_fields,
-                          language, filters, view_url, view_method, varname):
+                    language, filters, view_url, view_method, varname):
         """
         Uses _get_data_context to render the requested attributes
         """

@@ -513,6 +513,21 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
         self.assertContains(response, '<a href="%s">successful if</a></div>' % (reverse('detail', args=(ex1.pk,))))
 
+        # Changelist check
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}{% load url from future %}
+
+{% block content %}
+{% render_model_block instance 'changelist' %}
+    {{ instance }}
+{% endrender_model_block %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        # Assertions on the content of the block tag
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-%s-%s-changelist-%s">' % ('placeholderapp', 'example1', ex1.pk))
+
     def test_invalid_attribute(self):
         user = self.get_staff()
         page = create_page('Test', 'col_two.html', 'en', published=True)
@@ -798,6 +813,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_page_title-%s">%s</div>' % (page.pk, page.get_page_title(language)))
         self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_menu_title-%s">%s</div>' % (page.pk, page.get_menu_title(language)))
         self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_title-%s">%s</div>' % (page.pk, page.get_title(language)))
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-changelist-%s"><h3>Menu</h3></div>' % page.pk)
 
 
 class ToolbarAPITests(TestCase):
