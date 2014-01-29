@@ -1174,7 +1174,7 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(FuzzyInt(40, 60)):
                 output = force_unicode(self.client.get('/en/?edit').content)
             self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(FuzzyInt(20, 30)):
+        with self.assertNumQueries(FuzzyInt(19, 30)):
             output = force_unicode(self.client.get('/en/?edit').content)
         with self.assertNumQueries(19):
             output = force_unicode(self.client.get('/en/').content)
