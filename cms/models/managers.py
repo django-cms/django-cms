@@ -469,19 +469,20 @@ class PagePermissionsPermissionManager(models.Manager):
             # for standard users without global permissions, get all pages for him or
         # his group/s
         qs = PagePermission.objects.with_user(user)
-        qs.filter(**{'page__site': site, attr: True}).order_by('page__tree_id', 'page__level',
+        qs.filter(**{'page__site': site}).order_by('page__tree_id', 'page__level',
                                                                'page__lft').select_related('page')
         # default is denny...
         page_id_allow_list = []
         for permission in qs:
-            # can add is special - we are actually adding page under current page
-            if permission.grant_on & MASK_PAGE or attr is "can_add":
-                page_id_allow_list.append(permission.page.id)
-            if permission.grant_on & MASK_CHILDREN and not attr is "can_add":
-                page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
-            elif permission.grant_on & MASK_DESCENDANTS:
-                page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
-                # store value in cache
+            if getattr(permission, attr):
+                # can add is special - we are actually adding page under current page
+                if permission.grant_on & MASK_PAGE or attr is "can_add":
+                    page_id_allow_list.append(permission.page.id)
+                if permission.grant_on & MASK_CHILDREN and not attr is "can_add":
+                    page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
+                elif permission.grant_on & MASK_DESCENDANTS:
+                    page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))
+                    # store value in cache
         set_permission_cache(user, attr, page_id_allow_list)
         return page_id_allow_list
 

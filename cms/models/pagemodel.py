@@ -428,10 +428,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def is_published(self, language):
         from cms.models import Title
         try:
-            title = self.get_title_obj(language, False)
+            return self.get_title_obj(language, False).published
         except Title.DoesNotExist:
             return False
-        return title.published == True
 
     def get_publisher_state(self, language):
         from cms.models import Title
@@ -552,7 +551,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                         public_title.published = True
                         public_title.publisher_state = PUBLISHER_STATE_DEFAULT
                         public_title.save()
-
                     if draft_title.publisher_state == PUBLISHER_STATE_PENDING:
                         draft_title.publisher_state = PUBLISHER_STATE_DEFAULT
                         draft_title._publisher_keep_state = True
