@@ -70,8 +70,6 @@ class PluginModelBase(MPTTModelBase):
                     splitted = att.rel.through._meta.db_table.split(splitter, 1)
                     table_name = 'cmsplugin_%s' % splitted[1]
                     att.rel.through._meta.db_table = table_name
-                else:
-                    print att.rel.through._meta.db_table
         return new_class
 
 
