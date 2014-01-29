@@ -172,12 +172,6 @@ plugins, as shown above with ``base.html content``.
 
     Complete exemple of default_plugins usage::
 
-        def upd_textplugin_ctn_with_child_link(plugin, request, conf):
-            textplugin = plugin.parent
-            needle = '%%(_tag_%s_%d)s' % (plugin.plugin_type, plugin.position)
-            if needle in textplugin.body:
-                textplugin.body = textplugin.body.replace(needle, plugin_to_tag(plugin))
-                textplugin.save()
         CMS_PLACEHOLDER_CONF = {
             'content': {
                 'name' : _('Content'),
@@ -186,7 +180,7 @@ plugins, as shown above with ``base.html content``.
                     {
                         'plugin_type':'TextPlugin', 
                         'values':{
-                            'body':'<p>Great websites : %(_tag_LinkPlugin_2)s and %(_tag_LinkPlugin_3)s</p>'
+                            'body':'<p>Great websites : %(_tag_child_1)s and %(_tag_child_2)s</p>'
                         },
                         'children':[
                             {
