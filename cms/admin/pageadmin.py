@@ -1321,7 +1321,10 @@ class PageAdmin(ModelAdmin):
         if request.method == "POST":
             # set the continue flag, otherwise will plugin_admin make redirect to list
             # view, which actually doesn't exists
-            request.POST['_continue'] = True
+    
+            post_request = request.POST.copy()                                  
+            post_request['_continue'] = True                                    
+            request.POST = post_request
 
         if 'reversion' in settings.INSTALLED_APPS and ('history' in request.path or 'recover' in request.path):
             # in case of looking to history just render the plugin content
