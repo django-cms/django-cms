@@ -111,10 +111,6 @@ class CMSChangeList(ChangeList):
             perm_publish_ids = Page.permissions.get_publish_id_list(request.user, site)
             perm_advanced_settings_ids = Page.permissions.get_advanced_settings_id_list(request.user, site)
             restricted_ids = Page.permissions.get_restricted_id_list(site)
-            # perm_change_list_ids = PagePermission.objects.for_page(page=page).filter(can_view=True)
-            #perm_view_list_ids = Page.permissions.get_view_id_list(request.user, site)
-            #PagePermission.objects.filter(can_view=True, page)
-            #print perm_view_list_ids
             if perm_edit_ids and perm_edit_ids != Page.permissions.GRANT_ALL:
                 pages = pages.filter(pk__in=perm_edit_ids)
 
