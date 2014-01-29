@@ -1164,14 +1164,14 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(40, 55)):
+            with self.assertNumQueries(FuzzyInt(40, 60)):
                 output = force_unicode(self.client.get('/en/?edit').content)
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            with self.assertNumQueries(FuzzyInt(40, 55)):
+            with self.assertNumQueries(FuzzyInt(40, 60)):
                 output = force_unicode(self.client.get('/en/?edit').content)
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(20, 30)):
