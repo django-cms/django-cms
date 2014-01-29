@@ -94,6 +94,14 @@ Will render to:
             <li><a href="/another">another</a></li>
             [...]
     </div>
+    
+.. warning:
+    
+    Be aware that depending on the layout of your menu templates, clickable
+    area of the menu may completely overlap with the active area of the
+    frontend editor thus preventing editing. In this case you may use
+    ``{% render_model_icon %}``.
+    The same conflict exists when menu template is managed by a plugin.
 
 ******************
 Django models edit
