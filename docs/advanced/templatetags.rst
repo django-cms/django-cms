@@ -309,16 +309,16 @@ Plugins need the ``allow_children`` attribute to set to `True` for this to be en
 render_model
 ============
 
-``render_model`` works by showing the content of the given attribute in
-the model instance and eventually makes it clickable to edit the related model.
+``render_model`` is the way to add frontend editing to any Django model.
+It both render the content of the given attribute of the model instance and
+makes it clickable to edit the related model.
 
 If the toolbar is not enabled, the value of the attribute is rendered in the
 template without further action.
 
-If the toolbar is enabled, frontend code is added to make the attribute value
-clickable.
+If the toolbar is enabled, click to call frontend editing code is added.
 
-Using this templatetag you can show and edit page titles as well as fields in
+By using this templatetag you can show and edit page titles as well as fields in
 standard django models, see :ref:`frontend-editable-fields` for examples and
 further documentation.
 
@@ -342,7 +342,8 @@ This will render to:
   can be a context variable name; it's possible to target field, property or
   callable for the specified model;
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
-  popup editor;
+  popup editor; the special keyword ``changelist`` can be used to call for the
+  model **changelist** (items list);
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
 * ``filters`` (optional): a string containing chained filters to apply to the
@@ -399,7 +400,8 @@ method is available; also templatetags and filters are available in the block.
 
 * ``instance``: instance of your model in the template
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
-  popup editor;
+  popup editor; the special keyword ``changelist`` can be used to call for the
+  model **changelist** (items list);
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
 * ``view_url`` (optional): the name of a url that will be reversed using the
@@ -448,7 +450,8 @@ It will render to something like:
 
 * ``instance``: instance of your model in the template
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
-  popup editor;
+  popup editor; the special keyword ``changelist`` can be used to call for the
+  model **changelist** (items list);
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
 * ``view_url`` (optional): the name of a url that will be reversed using the
