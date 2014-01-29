@@ -109,7 +109,8 @@ Example::
             }.
         },
         'base.html content': {
-            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin']
+            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin'],
+            'inherit': 'content',
         },
     }
 
@@ -168,7 +169,12 @@ plugins, as shown above with ``base.html content``.
     A dictionary of plugin names with lists describing which plugins may contain
     each plugin. If not supplied, all plugins can be selected.
 
-
+``inherit``
+    Placeholder name or template name + placeholder name which inherit. In the
+    exemple, the configuration for "base.html content" inherits from "content"
+    and just overwrite the "plugins" setting to allow TeaserPlugin, thus you
+    have not to duplicate your "content"'s configuration.
+    
 .. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
 CMS_PLUGIN_CONTEXT_PROCESSORS
