@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
+from django.db.models import ManyToManyField
 import os
 import warnings
 import json
@@ -55,16 +56,22 @@ class PluginModelBase(MPTTModelBase):
 
         # turn 'myapp_mymodel' into 'cmsplugin_mymodel' by removing the
         # 'myapp_' bit from the db_table name.
+        splitter = '%s_' % new_class._meta.app_label
         if [base for base in bases if isinstance(base, PluginModelBase)]:
-            splitter = '%s_' % new_class._meta.app_label
-
             if splitter in new_class._meta.db_table:
                 splitted = new_class._meta.db_table.split(splitter, 1)
                 table_name = 'cmsplugin_%s' % splitted[1]
             else:
                 table_name = new_class._meta.db_table
             new_class._meta.db_table = table_name
-
+        for att in attrs.values():
+            if isinstance(att, ManyToManyField):
+                if splitter in att.rel.through._meta.db_table:
+                    splitted = att.rel.through._meta.db_table.split(splitter, 1)
+                    table_name = 'cmsplugin_%s' % splitted[1]
+                    att.rel.through._meta.db_table = table_name
+                else:
+                    print att.rel.through._meta.db_table
         return new_class
 
 
