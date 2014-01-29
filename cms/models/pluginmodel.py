@@ -381,6 +381,25 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         if self.child_plugin_instances:
             return len(self.child_plugin_instances)
 
+    def notify_on_autoadd(self, request, conf):
+        """
+        Method called when we auto add this plugin via default_plugins in 
+        CMS_PLACEHOLDER_CONF.
+        Some specific plugins may have some special stuff to do when they are
+        auto added.
+        """
+        pass
+
+    def notify_on_autoadd_children(self, request, conf, children):
+        """
+        Method called when we auto add children to this plugin via 
+        default_plugins/<plugin>/children in CMS_PLACEHOLDER_CONF.
+        Some specific plugins may have some special stuff to do when we add
+        children to them. ie : TextPlugin must update its content to add HTML 
+        tags to be able to see his children in WYSIWYG.
+        """
+        pass
+
     def get_translatable_content(self):
         fields = []
         for field in self._meta.fields:

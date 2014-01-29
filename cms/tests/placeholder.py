@@ -13,6 +13,7 @@ from cms.plugins.link.cms_plugins import LinkPlugin
 from cms.utils.compat.tests import UnittestCompatMixin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
+from djangocms_text_ckeditor.utils import plugin_to_tag
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
 from cms.test_utils.project.placeholderapp.models import (
@@ -438,6 +439,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 pass
 
             pop = push
+
         conf = {
             'col_left': {
                 'default_plugins' : [
@@ -460,6 +462,64 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             # Our page should have "en default body 1" AND "en default body 2"
             content = render_placeholder(placeholder, context)
             self.assertRegexpMatches(content, "^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+
+
+    def test_plugins_children_prepopulate(self):
+        """
+        Validate a default textplugin with a nested default link plugin
+        """
+        
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+
+            pop = push
+
+        conf = {
+            'col_left': {
+                'default_plugins' : [
+                    {
+                        'plugin_type':'TextPlugin', 
+                        'values':{
+                            'body':'<p>body %(_tag_child_1)s and %(_tag_child_2)s</p>'
+                        },
+                        'children':[
+                            {
+                                'plugin_type':'LinkPlugin',
+                                'values':{
+                                    'name':'django', 
+                                    'url':'https://www.djangoproject.com/'
+                                },
+                            },
+                            {
+                                'plugin_type':'LinkPlugin',
+                                'values':{
+                                    'name':'django-cms', 
+                                    'url':'https://www.django-cms.org'
+                                },
+                            },
+                        ]
+                    },
+                ]
+            },
+        }
+
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('page_en', 'col_two.html', 'en')
+            placeholder = page.placeholders.get(slot='col_left')
+            context = NoPushPopContext()
+            context['request'] = self.get_request(language="en", page=page)
+            render_placeholder(placeholder, context)
+            plugins = placeholder.get_plugins_list()
+            self.assertEqual(len(plugins), 3)
+            self.assertEqual(plugins[0].plugin_type, 'TextPlugin')
+            self.assertEqual(plugins[1].plugin_type, 'LinkPlugin')
+            self.assertEqual(plugins[2].plugin_type, 'LinkPlugin')
+            self.assertTrue(plugins[1].parent == plugins[2].parent and plugins[1].parent == plugins[0])
+            content = render_placeholder(placeholder, context)
+            #Activate the test above when ckeditor will implement notify_on_autoadd_children
+            #self.assertRegexpMatches(content,"^<p>body .*https://www.djangoproject.com/.*https://www.django-cms.org.*</p>$")            
+
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
