@@ -66,6 +66,42 @@ You can always customize the editable fields by providing the
     {% render_model request.current_page "title" "page_title,menu_title" %}
 
 
+**************
+Page menu edit
+**************
+
+By using the special keyword ``changelist`` as edit field the frontend
+editing will show the page tree; a common pattern for this is to enable
+changes in the menu by wrapping the menu templatetags:
+
+.. code-block:: html+django
+
+    {% render_model_block request.current_page "changelist" %}
+        <h3>Menu</h3>
+        <ul>
+            {% show_menu 1 100 0 1 "sidebar_submenu_root.html" %}
+        </ul>
+    {% endrender_model_block %}
+
+Will render to:
+
+.. code-block:: html+django
+
+    <div class="cms_plugin cms_plugin-cms-page-changelist-1">
+        <h3>Menu</h3>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/another">another</a></li>
+            [...]
+    </div>
+    
+.. warning:
+    
+    Be aware that depending on the layout of your menu templates, clickable
+    area of the menu may completely overlap with the active area of the
+    frontend editor thus preventing editing. In this case you may use
+    ``{% render_model_icon %}``.
+    The same conflict exists when menu template is managed by a plugin.
 
 ******************
 Django models edit
@@ -183,6 +219,25 @@ Example ``view_method``::
     {% block content %}
     <h1>{% render_model instance "some_attribute" "some_field,other_field" "" "" "some_method" %}</h1>
     {% endblock content %}
+
+
+Model changelist
+================
+
+By using the special keyword ``changelist`` as edit field the frontend
+editing will show the model changelist:
+
+.. code-block:: html+django
+
+    {% render_model instance "name" "changelist" %}
+
+Will render to:
+
+.. code-block:: html+django
+
+    <div class="cms_plugin cms_plugin-myapp-mymodel-changelist-1">
+        My Model Instance Name
+    </div>
 
 
 .. filters:
