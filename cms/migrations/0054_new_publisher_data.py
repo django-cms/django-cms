@@ -36,8 +36,9 @@ class Migration(DataMigration):
                 page.published_languages = ",".join(languages)
             page.languages = ",".join(languages)
             page.save()
-            pub_page.languages = ",".join(pub_languages)
-            pub_page.save()
+            if pub_page and pub_languages:
+                pub_page.languages = ",".join(pub_languages)
+                pub_page.save()
 
 
     def backwards(self, orm):
