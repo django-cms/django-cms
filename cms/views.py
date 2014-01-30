@@ -104,7 +104,10 @@ def details(request, slug):
             app_urls = page.get_application_urls(current_language, False)
         except Title.DoesNotExist:
             app_urls = []
-        if app_urls:
+        skip_app = False
+        if not page.is_published(current_language) and request.toolbar.edit_mode:
+            skip_app = True
+        if app_urls and not skip_app:
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []
             for urlpatterns in get_app_urls(app.urls):
