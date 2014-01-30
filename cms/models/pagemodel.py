@@ -83,7 +83,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
-    published_languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
     # If the draft is loaded from a reversion version save the revision id here.
@@ -425,10 +424,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
-    def is_published(self, language):
+    def is_published(self, language, force_reload=False):
         from cms.models import Title
         try:
-            return self.get_title_obj(language, False).published
+            return self.get_title_obj(language, False, force_reload=force_reload).published
         except Title.DoesNotExist:
             return False
 
@@ -510,13 +509,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         else:
             # Nothing left to do
             pass
-        if published:
-            if not self.published_languages or not "|%s|" % language in self.published_languages:
-                if self.published_languages:
-                    self.published_languages += "%s|" % language
-                else:
-                    self.published_languages = "|%s|" % language
-        else:
+        if not published:
             self.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=True)
         self._publisher_keep_state = True
         self.save()
@@ -584,12 +577,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         public_title.save()
         public_page = self.publisher_public
         public_placeholders = public_page.placeholders.all()
-        published_languages = self.published_languages.split("|")
-        published_languages.remove(language)
-        self.published_languages = "|".join(published_languages)
         for pl in public_placeholders:
             pl.cmsplugin_set.filter(language=language).delete()
-        public_page.published_languages = self.published_languages
         public_page.save()
         # trigger update home
         self.save()
