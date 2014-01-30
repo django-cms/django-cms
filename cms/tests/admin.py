@@ -249,6 +249,50 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(page.reverse_id, REVERSE_ID)
             self.assertEqual(page.application_urls, '')
 
+    def test_2apphooks_with_same_namespace(self):
+        PAGE1 = 'Test Page'
+        PAGE2 = 'Test page 2'
+        REVERSE_ID = 'Test'
+        APPLICATION_URLS = 'project.sampleapp.urls'
+
+        admin, normal_guy = self._get_guys()
+
+        site = Site.objects.get(pk=1)
+
+        # The admin creates the page
+        page = create_page(PAGE1, "nav_playground.html", "en",
+                           site=site, created_by=admin)
+        page2 = create_page(PAGE2, "nav_playground.html", "en",
+                           site=site, created_by=admin)
+
+        page.application_urls = APPLICATION_URLS
+        page.application_namespace = "space1"
+        page.save()
+        page2.application_urls = APPLICATION_URLS
+        page2.save()
+
+
+        # The admin edits the page (change the page name for ex.)
+        page_data = {
+            'title': PAGE2,
+            'slug': page2.get_slug(),
+            'language': 'en',
+            'site': page.site.pk,
+            'template': page2.template,
+            'application_urls':'SampleApp',
+            'application_namespace':'space1',
+        }
+
+        with self.login_user_context(admin):
+            resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page.pk, page_data)
+            self.assertEqual(resp.status_code, 302)
+            self.assertEqual(Page.objects.filter(application_namespace="space1").count(), 1)
+            resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page_data)
+            self.assertEqual(resp.status_code, 200)
+            page_data['application_namespace'] = 'space2'
+            resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page_data)
+            self.assertEqual(resp.status_code, 302)
+
     def test_delete(self):
         admin = self.get_superuser()
         page = create_page("delete-page", "nav_playground.html", "en",
@@ -1190,7 +1234,7 @@ class AdminFormsTests(AdminTestsBase):
 
         user = self.get_superuser()
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(19, 25)):
+            with self.assertNumQueries(FuzzyInt(18, 25)):
                 output = force_unicode(self.client.get('/en/admin/cms/page/'))
 
 
