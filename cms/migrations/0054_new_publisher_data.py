@@ -26,9 +26,9 @@ class Migration(DataMigration):
                 languages.append(title.language)
                 title.save()
             for title in pub_titles:
-                title.published = page.published
-                title.publisher_is_draft = page.publisher_is_draft
-                title.publisher_state = page.publisher_state
+                title.published = pub_page.published
+                title.publisher_is_draft = pub_page.publisher_is_draft
+                title.publisher_state = pub_page.publisher_state
                 title.save()
             if page.published:
                 page.published_languages = ",".join(languages)
