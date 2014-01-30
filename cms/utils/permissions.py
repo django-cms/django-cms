@@ -294,8 +294,8 @@ def get_user_sites_queryset(user):
             # so he haves access to all sites
             return qs
     # add some pages if he has permission to add / change them
-    query |= Q(Q(page__pagepermission__user=user) | Q(page__pagepermission__group__user=user)) & \
-        (Q(Q(page__pagepermission__can_add=True) | Q(page__pagepermission__can_change=True)))
+    query |= Q(Q(djangocms_pages__pagepermission__user=user) | Q(djangocms_pages__pagepermission__group__user=user)) & \
+        (Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True)))
     return qs.filter(query).distinct()
 
 

@@ -97,7 +97,6 @@ Concepts
     concepts/menu_system
     concepts/publishing
     concepts/multiple_languages
-    concepts/stacks
 
 
 **************************

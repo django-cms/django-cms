@@ -26,7 +26,8 @@ from cms.tests.reversion_tests import *
 from cms.tests.security import *
 from cms.tests.settings import *
 from cms.tests.site import *
-from cms.tests.stacks import *
+from cms.tests.sitemap import *
+from cms.tests.static_placeholder import *
 from cms.tests.staticfiles import *
 from cms.tests.templatetags import *
 from cms.tests.toolbar import *

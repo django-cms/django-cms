@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from cms import constants
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_default_language, get_language_list, get_language_code
 from django.conf import settings
 from django.core.files.storage import get_storage_class
@@ -65,16 +65,6 @@ def get_language_from_request(request, current_page=None):
 
     return language
 
-
-def get_page_from_request(request):
-    from warnings import warn
-    from cms.utils.page_resolver import get_page_from_request as new
-    warn("'cms.utils.get_page_from_request' is deprecated in favor of "
-         "'cms.utils.page_resolver.get_page_from_request' and will be removed "
-         "in Django-CMS 2.2.", DeprecationWarning)
-    return new(request)
-
-
 default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 
@@ -83,11 +73,3 @@ class ConfiguredStorage(LazyObject):
         self._wrapped = get_storage_class(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
 
 configured_storage = ConfiguredStorage()
-
-def cms_static_url(path):
-    '''
-    Helper that prefixes a URL with STATIC_URL and cms
-    '''
-    if not path:
-        return ''
-    return configured_storage.url(os.path.join('cms', path))

@@ -10,7 +10,7 @@ from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.moderator import get_title_queryset
+from cms.utils.moderator import get_title_queryset, use_draft
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
@@ -181,10 +181,7 @@ def page_to_node(page, home, cut):
     else:
         attr['visible_for_authenticated'] = page.limit_visibility_in_menu == 1
         attr['visible_for_anonymous'] = page.limit_visibility_in_menu == 2
-
-    if page.pk == home.pk:
-        attr['is_home'] = True
-
+    attr['is_home'] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
@@ -235,7 +232,9 @@ class CMSMenu(Menu):
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
 
-        pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
+        if not use_draft(request):
+            page_queryset = page_queryset.published(lang)
+        pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
         ids = {}
         nodes = []
         first = True
@@ -254,7 +253,6 @@ class CMSMenu(Menu):
                 continue
             if not home:
                 home = page
-            page.home_pk_cache = home.pk
             if first and page.pk != home.pk:
                 home_cut = True
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:

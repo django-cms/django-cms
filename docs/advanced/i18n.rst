@@ -14,7 +14,7 @@ official django `documentation`_.
 Main `urls.py` example::
 
     from django.conf import settings
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls import patterns, include, url
     from django.contrib import admin
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -85,10 +85,10 @@ Example:
 
 
 ******************
-hide_unstranslated
+hide_untranslated
 ******************
 
-If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_unstranslated` to ``False``
+If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_untranslated` to ``False``
 all pages will be displayed in all languages even if they are
 not translated yet.
 

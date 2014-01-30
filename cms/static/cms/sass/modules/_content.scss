@@ -1,0 +1,20 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//######################################################################################################################
+// #PLUGIN
+.cms_plugin { display:inline; }
+.cms_plugin-active { outline:rgba(adjust-hue($color-blue, 15deg), 1) auto 4px; }
+
+// #PLACEHOLDER
+.cms_placeholder { height:0px; overflow:hidden; }
+
+.cms_render_model_icon { display: inline-block; width:18px; height:18px; padding: 0; margin: 0; cursor: pointer;
+  img{ max-width: none; position: relative; padding: 0!important; margin: 0!important; background: url('../img/toolbar/render_model_icon.png') no-repeat; }
+}
+
+.cms_render_model_add { display: inline-block; width:18px; height:18px; padding: 0; margin: 0; cursor: pointer;
+  img{ max-width: none; position: relative; padding: 0!important; margin: 0!important; background: url('../img/toolbar/render_model_add.png') no-repeat; }
+}

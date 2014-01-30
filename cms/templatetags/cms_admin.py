@@ -4,14 +4,17 @@ from distutils.version import LooseVersion
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
+from cms.constants import PUBLISHER_STATE_PENDING
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
 from django import template
 from django.conf import settings
+from cms.utils.compat.dj import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 import django
+from django.utils.translation import ugettext_lazy as _
 
 
 register = template.Library()
@@ -55,6 +58,40 @@ class ShowAdminMenu(InclusionTag):
 
 
 register.tag(ShowAdminMenu)
+
+
+class TreePublishRow(Tag):
+    name = "tree_publish_row"
+    options = Options(
+        Argument('page'),
+        Argument('language')
+    )
+
+    def render_tag(self, context, page, language):
+        if page.is_published(language) and page.publisher_public_id and page.publisher_public.is_published(language):
+            if page.is_dirty(language):
+                cls = "dirty"
+                text = _("unpublished changes")
+            else:
+                cls = "published"
+                text = _("published")
+        else:
+
+            if language in page.languages:
+                if page.publisher_public_id and page.publisher_public.get_publisher_state(
+                    language) == PUBLISHER_STATE_PENDING:
+                    cls = "unpublishedparent"
+                    text = _("unpublished parent")
+                else:
+                    cls = "unpublished"
+                    text = _("unpublished")
+            else:
+                cls = "empty"
+                text = _("no content")
+        return mark_safe('<span class="%s" title="%s"></span>' % (cls, force_unicode(text)))
+
+
+register.tag(TreePublishRow)
 
 
 class ShowLazyAdminMenu(InclusionTag):
@@ -188,7 +225,8 @@ class PageSubmitRow(InclusionTag):
         advanced_settings = context.get('basic_info', False)
         language = context['language']
         return {
-            'onclick_attrib': (opts.get_ordered_objects() and change
+            # TODO check this (old code: opts.get_ordered_objects() )
+            'onclick_attrib': (opts and change
                                and 'onclick="submitOrderForm();"' or ''),
             'show_delete_link': False,
             'show_save_as_new': not is_popup and change and save_as,

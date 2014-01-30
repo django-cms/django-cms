@@ -14,6 +14,7 @@ from cms.test_utils.util.context_managers import (SettingsOverride,
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_5
 from cms.utils.i18n import force_language
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
@@ -181,14 +182,16 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(5 if DJANGO_1_5 else 7):
             """
             The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
                 get the menu cache key
+                create a savepoint (in django>=1.6)
                 set the menu cache key
+                release the savepoint (in django>=1.6)
             """
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
@@ -417,8 +420,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_unpublished(self):
         page2 = self.get_page(2)
-        page2.published = False
-        page2.save()
+        page2.title_set.update(published=False)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
@@ -798,15 +800,18 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
     def test_show_submenu_num_queries(self):
         page = self.get_page(6)
         context = self.get_context(page.get_absolute_url())
+
         # test standard show_menu
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(5 if DJANGO_1_5 else 7):
             """
             The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
                 get the menu cache key
+                create a savepoint (in django>=1.6)
                 set the menu cache key
+                release the savepoint (in django>=1.6)
             """
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
@@ -866,14 +871,16 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(5 if DJANGO_1_5 else 7):
                 """
                 The queries should be:
                     get all pages
                     get all page permissions
                     get all titles
                     get the menu cache key
+                    create a savepoint (in django>=1.6)
                     set the menu cache key
+                    release the savepoint (in django>=1.6)
                 """
                 # Actually seems to run:
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
@@ -1015,7 +1022,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 GlobalpagePermission count query
                 """
                 get_visible_pages(request, pages, site)
-                #print connection.queries
 
     def test_authed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):

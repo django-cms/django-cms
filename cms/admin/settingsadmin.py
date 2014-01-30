@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.contrib.auth.admin import csrf_protect_m
 from django.contrib.admin import ModelAdmin
 
@@ -9,6 +9,7 @@ from django.contrib import admin
 from cms.models import UserSettings
 from django.core.urlresolvers import reverse
 from django.db import transaction
+import json
 
 
 class SettingsAdmin(ModelAdmin):
@@ -25,6 +26,9 @@ class SettingsAdmin(ModelAdmin):
 
         urlpatterns = patterns(
             '',
+            url(r'^session_store/$',
+                self.session_store,
+                name='%s_%s_session_store' % info),
             url(r'^$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
@@ -43,6 +47,18 @@ class SettingsAdmin(ModelAdmin):
         except model.DoesNotExist:
             return self.add_view(request)
         return super(SettingsAdmin, self).change_view(request, str(obj.pk))
+
+    def session_store(self, request):
+        """
+        either POST or GET
+        POST should have a settings parameter
+        """
+        if not request.user.is_staff:
+            return HttpResponse(json.dumps(""), mimetype="application/json")
+        if request.method == "POST":
+            request.session['cms_settings'] = request.POST['settings']
+            request.session.save()
+        return HttpResponse(json.dumps(request.session.get('cms_settings', '')), mimetype="application/json")
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user

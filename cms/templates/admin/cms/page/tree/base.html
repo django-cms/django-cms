@@ -17,25 +17,25 @@
 {% block coltype %}flex{% endblock %}
 {% block extrastyle %}
 {{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static "cms/css/cms.base.css" %}" />
-<link rel="stylesheet" type="text/css" href="{% static "cms/css/plugins/cms.pagetree.css" %}" />
-<link rel="stylesheet" type="text/css" href="{% static "cms/js/jstree/tree_component.css" %}" />
+<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />
+<link rel="stylesheet" href="{% static "cms/css/plugins/cms.pagetree.css" %}" />
+<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" />
 {% if cl.is_filtered %}
-<link rel="stylesheet" type="text/css" href="{% static "cms/js/jstree/themes/default/style.css" %}" />
+<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" />
 {% endif %}
 {% endblock extrastyle %}
 
 {% block extrahead %}
 {{ block.super }}
-{% block jquery %}<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>{% endblock jquery %}
+{% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}"></script>{% endblock jquery %}
 <!-- load jstree -->
-<script type="text/javascript" src="{% static "cms/js/jstree/_lib/_all.js" %}"></script>
-<script type="text/javascript" src="{% static "cms/js/jstree/tree_component.js" %}"></script>
+<script src="{% static "cms/js/jstree/_lib/_all.js" %}"></script>
+<script src="{% static "cms/js/jstree/tree_component.js" %}"></script>
 <!-- load changelist -->
-<script type="text/javascript" src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>
-<script type="text/javascript" src="{% static "cms/js/plugins/cms.base.js" %}"></script>
-<script type="text/javascript" src="{% static "cms/js/plugins/cms.changelist.js" %}"></script>
-<script type="text/javascript">
+<script src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.base.js" %}"></script>
+<script src="{% static "cms/js/plugins/cms.changelist.js" %}"></script>
+<script>
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
@@ -48,6 +48,8 @@ $(document).ready(function () {
 	{% endif %}
 
 	moveSuccess = function(node){
+        $.syncHeights();
+        $.syncCols();
 		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
 		node.append(msg);
 		msg.fadeOut(3000);
@@ -66,7 +68,6 @@ $(document).ready(function () {
 		cmsPermission: {{ CMS_PERMISSION|js }},
 		debug: {{ DEBUG|js }}
 	};
-
 });
 })(CMS.$);
 </script>

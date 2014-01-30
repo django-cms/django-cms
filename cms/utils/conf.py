@@ -224,3 +224,14 @@ def get_cms_setting(name):
         return COMPLEX[name]()
     else:
         return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
+
+
+def get_site_id(site):
+    from django.contrib.sites.models import Site
+    if isinstance(site, Site):
+        return site.id
+    try:
+        return int(site)
+    except (TypeError, ValueError):
+        pass
+    return settings.SITE_ID

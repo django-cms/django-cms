@@ -58,6 +58,11 @@ placeholder (configuration is the same as for placeholders in the CMS) or you ca
     ``'+'`` to allow the cms to check permissions properly. Attempting to do
     so will raise a :exc:`ValueError`.
 
+.. note::
+
+    If you add a PlaceholderField to an existing model, you'll be able to see
+    the placeholder on the frontend editor only after saving each instance.
+
 
 Admin Integration
 =================
@@ -122,11 +127,11 @@ Templates
 
 Now to render the placeholder in a template you use the
 :ttag:`render_placeholder` tag from the
-:mod:`~cms.templatetags.placeholder_tags` template tag library:
+:mod:`~cms.templatetags.cms_tags` template tag library:
 
 .. code-block:: html+django
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% render_placeholder mymodel_instance.my_placeholder "640" %}
 
@@ -157,7 +162,7 @@ like this:
 
 .. code-block:: html+django
 
-    {% load placeholder_tags %}
+    {% load cms_tags %}
 
     {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 

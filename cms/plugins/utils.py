@@ -6,20 +6,19 @@ from django.utils.translation import ugettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request
+from cms.utils import get_language_from_request, permissions
 from cms.utils.i18n import get_redirect_on_fallback, get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode
 
 
-def get_plugins(request, placeholder, lang=None):
+def get_plugins(request, placeholder, template, lang=None):
     if not placeholder:
         return []
-    lang = lang or get_language_from_request(request)
-    if not hasattr(placeholder, '_%s_plugins_cache' % lang):
-        assign_plugins(request, [placeholder], lang)
-    return getattr(placeholder, '_%s_plugins_cache' % lang)
+    if not hasattr(placeholder, '_plugins_cache'):
+        assign_plugins(request, [placeholder], template, lang)
+    return getattr(placeholder, '_plugins_cache')
 
 
 def requires_reload(action, plugins):
@@ -33,7 +32,7 @@ def requires_reload(action, plugins):
     return False
 
 
-def assign_plugins(request, placeholders, lang=None):
+def assign_plugins(request, placeholders, template, lang=None, no_fallback=False):
     """
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
@@ -44,26 +43,60 @@ def assign_plugins(request, placeholders, lang=None):
         return
     lang = lang or get_language_from_request(request)
     request_lang = lang
-    if hasattr(request, "current_page") and request.current_page is not None:
-        languages = request.current_page.get_languages()
-        if not lang in languages and not get_redirect_on_fallback(lang):
-            fallbacks = get_fallback_languages(lang)
-            for fallback in fallbacks:
-                if fallback in languages:
-                    request_lang = fallback
-                    break
-                    # get all plugins for the given placeholders
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
         'placeholder', 'tree_id', 'level', 'position')
-    plugin_list = downcast_plugins(qs)
+    plugins = list(qs)
+    # If no plugin is present in the current placeholder we loop in the fallback languages
+    # and get the first available set of plugins
 
+    if not no_fallback:
+        for placeholder in placeholders:
+            found = False
+            for plugin in plugins:
+                if plugin.placeholder_id == placeholder.pk:
+                    found = True
+                    break
+            if found:
+                continue
+            elif placeholder and get_placeholder_conf("language_fallback", placeholder.slot, template, False):
+                fallbacks = get_fallback_languages(lang)
+                for fallback_language in fallbacks:
+                    assign_plugins(request, [placeholder], template, fallback_language, no_fallback=True)
+                    plugins = placeholder._plugins_cache
+                    if plugins:
+                        break
+    # If no plugin is present, create default plugins if enabled)
+    if not plugins:
+        plugins = create_default_plugins(request, placeholders, template, lang)
+    plugin_list = downcast_plugins(plugins, placeholders)
     # split the plugins up by placeholder
     groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
 
     for group in groups:
         groups[group] = build_plugin_tree(groups[group])
     for placeholder in placeholders:
-        setattr(placeholder, '_%s_plugins_cache' % lang, list(groups.get(placeholder.pk, [])))
+        setattr(placeholder, '_plugins_cache', list(groups.get(placeholder.pk, [])))
+
+
+def create_default_plugins(request, placeholders, template, lang):
+    """
+    Create all default plugins for the given ``placeholders`` if they have 
+    a "default_plugins" configuration value in settings.
+    """
+    from cms.api import add_plugin
+    plugins = list()
+    for placeholder in placeholders:
+        default_plugins = get_placeholder_conf("default_plugins", placeholder.slot, template, None)
+        if not default_plugins:
+            continue
+        if not placeholder.has_add_permission(request):
+            continue
+        for conf in default_plugins:
+            if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
+                continue
+            plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
+            plugins.append(plugin)
+    return plugins
 
 
 def build_plugin_tree(plugin_list):
@@ -84,7 +117,7 @@ def build_plugin_tree(plugin_list):
     return root
 
 
-def downcast_plugins(queryset, select_placeholder=False):
+def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
 
@@ -102,8 +135,18 @@ def downcast_plugins(queryset, select_placeholder=False):
         # downcasted versions
         for instance in plugin_qs:
             plugin_lookup[instance.pk] = instance
+            # cache the placeholder
+            if placeholders:
+                for pl in placeholders:
+                    if instance.placeholder_id == pl.pk:
+                        instance.placeholder = pl
             # make the equivalent list of qs, but with downcasted instances
-    plugin_list = [plugin_lookup[p.pk] for p in queryset if p.pk in plugin_lookup]
+    plugin_list = []
+    for p in queryset:
+        if p.pk in plugin_lookup:
+            plugin_list.append(plugin_lookup[p.pk])
+        else:
+            plugin_list.append(p)
     return plugin_list
 
 

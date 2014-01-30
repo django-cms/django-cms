@@ -38,6 +38,9 @@ class PlaceholderField(models.ForeignKey):
         else:
             slot = self._get_placeholder_slot(model_instance)
             placeholder = getattr(model_instance, self.name)
+            if not placeholder:
+                setattr(model_instance, self.name, self._get_new_placeholder(model_instance))
+                placeholder = getattr(model_instance, self.name)
             if placeholder.slot != slot:
                 placeholder.slot = slot
                 placeholder.save()
@@ -46,7 +49,7 @@ class PlaceholderField(models.ForeignKey):
     def save_form_data(self, instance, data):
         data = getattr(instance, self.name, '')
         if not isinstance(data, Placeholder):
-            data = self._get_new_placeholder(model_instance)
+            data = self._get_new_placeholder(instance)
         super(PlaceholderField, self).save_form_data(instance, data)
 
     def south_field_triple(self):

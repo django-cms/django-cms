@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+#### TO BE DELETED BEFORE PULLED ####
+
 from cms.test_utils.cli import configure
 from cms.test_utils.tmpdir import temp_dir
 import argparse

@@ -58,7 +58,7 @@ def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
     elif preview:
         pages = Page.objects.public().filter(site=site)
     else:
-        pages = Page.objects.public().published(site)
+        pages = Page.objects.public().published(site=site)
 
     # Check if there are any pages
     if not pages.all_root().exists():
@@ -66,8 +66,8 @@ def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
 
     # get the home page (needed to get the page)
     try:
-        home = pages.get_home(site=site)
-    except NoHomeFound:
+        home = pages.filter(is_home=True, site=site)[0]
+    except IndexError:
         home = None
         # if there is no path (slashes stripped) and we found a home, this is the
     # home page.

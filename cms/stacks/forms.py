@@ -20,4 +20,4 @@ class StackInsertionForm(forms.Form):
 class StackCreationForm(forms.ModelForm):
     class Meta:
         model = Stack
-        exclude = 'content'
+        exclude = ('content',)

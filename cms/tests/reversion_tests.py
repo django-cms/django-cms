@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import shutil
+
 from cms.compat import get_user_model
 from cms.admin import pageadmin
 from django.contrib import admin
+
 from cms.models import Page, Title
 from cms.models.pluginmodel import CMSPlugin
 from djangocms_text_ckeditor.models import Text
 from cms.test_utils.project.fileapp.models import FileModel
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
+from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
@@ -17,7 +19,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from os.path import join
 import reversion
-from reversion.models import Revision, Version, VERSION_CHANGE
+from reversion.models import Revision, Version
+
+if hasattr(reversion.models, 'VERSION_CHANGE'):
+    from reversion.models import VERSION_CHANGE
 
 
 class BasicReversionTestCase(CMSTestCase):
@@ -36,11 +41,11 @@ class BasicReversionTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
 
             self.assertRedirects(response, URL_CMS_PAGE)
-            self.assertEquals(Page.objects.all().count(), 1)
+            self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(Revision.objects.all().count(), 1)
 
 
-class ReversionTestCase(CMSTestCase):
+class ReversionTestCase(TransactionCMSTestCase):
     def setUp(self):
         u = User(username="test", is_staff=True, is_active=True,
                  is_superuser=True)
@@ -81,7 +86,7 @@ class ReversionTestCase(CMSTestCase):
             p_data = self.page_data.copy()
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page.publish()
+            page.publish('en')
 
     def test_revert(self):
         """
@@ -149,7 +154,7 @@ class ReversionTestCase(CMSTestCase):
             response = self.client.post(edit_url, {"body": "Hello World2"})
             self.assertEquals(response.status_code, 200)
             page = Page.objects.all()[0]
-            self.assertTrue(page.revision_id == 0)
+            self.assertEqual(page.revision_id, 0)
             self.assertEqual(2, CMSPlugin.objects.all().count())
             placeholderpk = page.placeholders.filter(slot="body")[0].pk
             plugin_data = {
@@ -180,7 +185,7 @@ class ReversionTestCase(CMSTestCase):
             self.assertEquals(Revision.objects.all().count(), 5)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
-            version = Version.objects.get(content_type=ctype, revision=revision)
+            version = Version.objects.filter(content_type=ctype, revision=revision)[0]
 
             self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)
@@ -188,7 +193,7 @@ class ReversionTestCase(CMSTestCase):
 
             page = Page.objects.all()[0]
             page_pk = page.pk
-            page.delete_with_public()
+            page.delete()
 
             self.assertEquals(Page.objects.all().count(), 0)
             self.assertEquals(CMSPlugin.objects.all().count(), 0)
@@ -214,7 +219,7 @@ class ReversionTestCase(CMSTestCase):
             page = Page.objects.all()[0]
             page_pk = page.pk
             self.assertEquals(Revision.objects.all().count(), 5)
-            publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
+            publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
             response = self.client.get(publish_url)
             self.assertEquals(response.status_code, 302)
             self.assertEquals(Revision.objects.all().count(), 2)
@@ -226,7 +231,7 @@ class ReversionTestCase(CMSTestCase):
                 page_pk = page.pk
                 self.assertEquals(Revision.objects.all().count(), 5)
                 for x in range(10):
-                    publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
+                    publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
                     response = self.client.get(publish_url)
                     self.assertEquals(response.status_code, 302)
                 self.assertEqual(Revision.objects.all().count(), 6)
@@ -246,10 +251,15 @@ class ReversionFileFieldTests(CMSTestCase):
             # manually add a revision because we use the explicit way
             # django-cms uses too.
             adapter = reversion.get_adapter(FileModel)
-            reversion.revision_context_manager.add_to_context(
-                reversion.default_revision_manager, file1,
-                adapter.get_version_data(file1, VERSION_CHANGE))
-            # reload the instance from db
+            if hasattr(reversion.models, 'VERSION_CHANGE'):
+                reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1, VERSION_CHANGE))
+            else:
+                reversion.revision_context_manager.add_to_context(
+                    reversion.default_revision_manager, file1,
+                    adapter.get_version_data(file1))
+                # reload the instance from db
         file2 = FileModel.objects.all()[0]
         # delete the instance.
         file2.delete()

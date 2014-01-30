@@ -49,7 +49,7 @@ class NavigationNode(object):
         return self.url
     
     def get_attribute(self, name):
-        return self.attr[name]
+        return self.attr.get(name, None)
     
     def get_descendants(self):
         nodes = []

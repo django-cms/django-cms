@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import os
 import dj_database_url
+from cms.utils.compat import DJANGO_1_5
 
 gettext = lambda s: s
 
@@ -63,7 +64,6 @@ def configure(db_url, **extra):
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
-            'django.middleware.transaction.TransactionMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
@@ -83,7 +83,6 @@ def configure(db_url, **extra):
             'cms.stacks',
             'menus',
             'mptt',
-            #'cms.plugins.text',
             'djangocms_text_ckeditor',
             'djangocms_column',
             'djangocms_style',
@@ -190,7 +189,7 @@ def configure(db_url, **extra):
             ('col_three.html', gettext('three columns')),
             ('nav_playground.html', gettext('navigation examples')),
             ('simple.html', 'simple'),
-            ('stacks.html', 'stacks'),
+            ('static.html', 'static placeholders'),
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
@@ -206,8 +205,8 @@ def configure(db_url, **extra):
                 'plugin_modules': {
                     'LinkPlugin': 'Different Grouper'
                 },
-                'plugin_labes': {
-                    'LinkPlugin': 'Add a link'
+                'plugin_labels': {
+                    'LinkPlugin': gettext('Add a link')
                 }
             },
 
@@ -290,6 +289,11 @@ def configure(db_url, **extra):
                     'level': 'ERROR',
                     'propagate': False,
                 },
+                'django.db': {
+                    'handlers': ['console'],
+                    'level': 'ERROR',
+                    'propagate': False,
+                },
                 'cms': {
                     'handlers': ['console'],
                     'level': 'INFO',
@@ -299,12 +303,14 @@ def configure(db_url, **extra):
     )
     from django.utils.functional import empty
 
+    if DJANGO_1_5:
+        defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
     settings._wrapped = empty
     defaults.update(extra)
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
     if extra_settings:
-        from django.utils.simplejson import load, loads
+        from json import load, loads
 
         if os.path.exists(extra_settings):
             with open(extra_settings) as fobj:

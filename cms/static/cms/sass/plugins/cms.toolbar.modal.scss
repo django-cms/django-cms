@@ -5,7 +5,7 @@
 
 //##################################################
 // #IMPORT SETTINGS#
-@import "partials/settings";
+@import "settings";
 
 //##################################################
 // #MODAL#
@@ -24,11 +24,4 @@
 		@include box-shadow(none !important); }
 }
 
-.errornote { margin:4px 0 0 !important; }
-
-#page_form_lang_tabs {
-	.language_button { background:#ccc !important; }
-	.language_button.selected { color:black !important; background:white !important; text-shadow:none !important; }
-	.language_button.notfilled { color:#bbb !important; }
-}
-#content-main #lang_tab_content .header { display:block !important; background:white !important; margin-top:-1px; }
+.errornote { margin:0 !important; }

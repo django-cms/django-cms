@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from optparse import make_option
-
 from django.conf import settings
 
 from django.core.management.base import BaseCommand, CommandError
 
 from cms.api import copy_plugins_to_language
-from cms.models import Title, Page
+from cms.models import Title, Page, StaticPlaceholder
+from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import get_language_list
 
 
@@ -50,6 +49,8 @@ class CopyLangCommand(BaseCommand):
                     if verbose:
                         self.stdout.write('copying title %s from language %s\n' % (title.title, from_lang))
                     title.id = None
+                    title.publisher_public_id = None
+                    title.publisher_state = 0
                     title.language = to_lang
                     title.save()
                 # copy plugins using API
@@ -59,5 +60,17 @@ class CopyLangCommand(BaseCommand):
             else:
                 if verbose:
                     self.stdout.write('Skipping page %s, language %s not defined\n' % (page, from_lang))
+
+        for static_placeholder in StaticPlaceholder.objects.all():
+            plugin_list = []
+            for plugin in static_placeholder.draft.get_plugins():
+                if plugin.language == from_lang:
+                    plugin_list.append(plugin)
+
+            if plugin_list:
+                if verbose:
+                    self.stdout.write("copying plugins from static_placeholder '%s' in '%s' to '%s'\n" % (static_placeholder.name, from_lang,
+                                                                                             to_lang))
+                copy_plugins_to(plugin_list, static_placeholder.draft, to_lang)
 
         self.stdout.write(u"all done")

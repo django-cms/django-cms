@@ -9,7 +9,6 @@ from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.views import _handle_no_page, details
-from django.conf import settings
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
 

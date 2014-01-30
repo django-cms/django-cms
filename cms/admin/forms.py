@@ -117,7 +117,7 @@ class PageForm(forms.ModelForm):
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
-        if self.instance and self.instance.published and page.title_set.count():
+        if self.instance and page.title_set.count():
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
@@ -153,10 +153,26 @@ class PageForm(forms.ModelForm):
         return language
 
 
-class PublicationForm(forms.ModelForm):
+class PublicationDatesForm(forms.ModelForm):
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
+                                 help_text=_('The current language of the content fields.'))
+
+    def __init__(self, *args, **kwargs):
+        # Dates are not language dependent, so let's just fake the language to
+        # make the ModelAdmin happy
+        super(PublicationDatesForm, self).__init__(*args, **kwargs)
+        self.fields['language'].widget = HiddenInput()
+        self.fields['site'].widget = HiddenInput()
+        site_id = self.fields['site'].initial
+
+        languages = get_language_tuple(site_id)
+        self.fields['language'].choices = languages
+        if not self.fields['language'].initial:
+            self.fields['language'].initial = get_language()
+
     class Meta:
         model = Page
-        fields = ["publication_date", "publication_end_date"]
+        fields = ['site', 'publication_date', 'publication_end_date']
 
 
 class AdvancedSettingsForm(forms.ModelForm):
@@ -484,9 +500,3 @@ class PageUserGroupForm(GenericCmsPermissionForm):
         save_permissions(self.cleaned_data, group)
 
         return group
-
-
-class PageTitleForm(forms.ModelForm):
-    class Meta:
-        model = Title
-        fields = ('title', )

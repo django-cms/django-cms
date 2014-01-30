@@ -11,6 +11,7 @@ from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
 from django.template import Template, RequestContext
 from sekizai.context import SekizaiContext
+from cms.toolbar.toolbar import CMSToolbar
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -84,13 +85,13 @@ class RenderingTestCase(SettingsOverrideTestCase):
                    body=self.test_data['text_main'])
         add_plugin(self.test_placeholders['sub'], 'TextPlugin', 'en',
                    body=self.test_data['text_sub'])
-        p.publish()
+        p.publish('en')
 
         # Insert another page that is not the home page
         p2 = create_page(self.test_data2['title'], TEMPLATE_NAME, 'en',
                          parent=p, slug=self.test_data2['slug'], published=True,
                          reverse_id=self.test_data2['reverse_id'])
-        p2.publish()
+        p2.publish('en')
 
         # Insert another page that is not the home page
         p3 = create_page(self.test_data3['title'], TEMPLATE_NAME, 'en',
@@ -103,7 +104,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
                    body=self.test_data3['text_sub'])
-        p3.publish()
+        p3.publish('en')
 
         # Insert another page that is not the home
         p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
@@ -113,7 +114,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
             self.test_placeholders4[placeholder.slot] = placeholder
             # Insert some test plugins
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')
-        p4.publish()
+        p4.publish('en')
 
         # Reload test pages
         self.test_page = self.reload(p.publisher_public)
@@ -323,36 +324,9 @@ class RenderingTestCase(SettingsOverrideTestCase):
             method='GET',
         )
         classes = [
-            "cms_placeholder-bar-%s" % placeholder.pk,
-            '"cms_placeholder-bar"',
+            "cms_placeholder-%s" % placeholder.pk,
+            'cms_placeholder',
         ]
-        output = render_placeholder_toolbar(placeholder, context, '', 'test')
+        output = render_placeholder_toolbar(placeholder, context, 'test', 'en')
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
-
-    def test_placeholder_name_toolbar(self):
-        placeholder_conf_name = 'test_placeholder'
-        placeholder_conf_tag = '<div class="cms_placeholder-title">%s</div>' % placeholder_conf_name
-        with SettingsOverride(CMS_PLACEHOLDER_CONF={
-            'test': {'name': placeholder_conf_name}
-        }):
-            placeholder = Placeholder()
-            placeholder.slot = 'test'
-            placeholder.pk = placeholder.id = 99
-            context = SekizaiContext()
-            context['request'] = AttributeObject(
-                REQUEST={'language': 'en'},
-                GET=[],
-                session={},
-                path='/',
-                user=self.test_user,
-                current_page=None,
-                method='GET',
-            )
-            classes = [
-                "cms_placeholder-bar-%s" % placeholder.pk,
-                "cms_placeholder_slot::test",
-            ]
-            output = render_placeholder_toolbar(placeholder, context, '', 'test')
-            self.assertTrue(placeholder_conf_tag in output,
-                            'placeholder name %r is not in %r' % (placeholder_conf_name, output))

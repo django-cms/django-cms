@@ -10,7 +10,7 @@ Also, make sure the poll app is in your :setting:`django:INSTALLED_APPS`.
 
 We assume your main ``urls.py`` looks something like this::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import *
 
     from django.contrib import admin
     admin.autodiscover()
@@ -165,7 +165,7 @@ In this file, write::
 Now remove the inclusion of the polls urls in your main ``urls.py`` so it looks
 like this::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import *
 
     from django.contrib import admin
     admin.autodiscover()
@@ -243,7 +243,7 @@ In your ``menu.py`` write::
 At this point this menu alone doesn't do a whole lot. We have to attach it to the
 Apphook first.
 
-So open your ``cms_apps.py`` and write::
+So open your ``cms_app.py`` and write::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool

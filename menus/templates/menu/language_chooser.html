@@ -2,6 +2,6 @@
 {% get_available_languages as languages %}
 {% for language in languages %}
     {% language language.0 %}
-        <a href="{% page_language_url language.0 %}"{% ifequal current_language language.0 %} class="current"{% endifequal %}>{{ language.1 }}</a>
+        <a href="{% page_language_url language.0 %}"{% ifequal current_language language.0 %} class="current"{% endifequal %} lang="{{ language.0 }}">{{ language.1 }}</a>
     {% endlanguage %}
 {% endfor %}
