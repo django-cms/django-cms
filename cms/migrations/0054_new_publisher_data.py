@@ -26,9 +26,9 @@ class Migration(DataMigration):
                 languages.append(title.language)
                 title.save()
             for title in pub_titles:
-                title.published = page.published
-                title.publisher_is_draft = page.publisher_is_draft
-                title.publisher_state = page.publisher_state
+                title.published = pub_page.published
+                title.publisher_is_draft = pub_page.publisher_is_draft
+                title.publisher_state = pub_page.publisher_state
                 title.save()
             if page.published:
                 page.published_languages = ",".join(languages)
@@ -37,7 +37,23 @@ class Migration(DataMigration):
 
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        for page in orm['cms.Page'].objects.filter(publisher_is_draft=True):
+            titles = page.title_set.all()
+            pub_page = page.publisher_public
+            if pub_page:
+                pub_titles = pub_page.title_set.all()
+            else:
+                pub_titles = []
+            for title in titles:
+                page.published = title.published
+                page.publisher_state = title.publisher_state
+                page.save()
+                break
+            for title in pub_titles:
+                pub_page.published = title.published
+                pub_page.publisher_state = title.publisher_state
+                pub_page.save()
+                break
 
     models = {
         u'auth.group': {
