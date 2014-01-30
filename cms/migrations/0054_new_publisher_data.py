@@ -25,15 +25,19 @@ class Migration(DataMigration):
                 title.publisher_state = page.publisher_state
                 languages.append(title.language)
                 title.save()
+            pub_languages = []
             for title in pub_titles:
                 title.published = pub_page.published
                 title.publisher_is_draft = pub_page.publisher_is_draft
                 title.publisher_state = pub_page.publisher_state
                 title.save()
+                pub_languages.append(title.language)
             if page.published:
                 page.published_languages = ",".join(languages)
             page.languages = ",".join(languages)
             page.save()
+            pub_page.languages = ",".join(pub_languages)
+            pub_page.save()
 
 
     def backwards(self, orm):
