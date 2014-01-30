@@ -2,19 +2,20 @@
 from __future__ import with_statement
 import json
 import datetime
-from cms.views import details
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
 from cms.constants import PLUGIN_MOVE_ACTION
-from cms.models import UserSettings
+from cms.models import UserSettings, StaticPlaceholder
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
@@ -31,6 +32,7 @@ from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden,
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from django.utils import timezone
+from cms.utils.compat.dj import force_unicode
 
 
 class AdminTestsBase(CMSTestCase):
@@ -66,7 +68,6 @@ class AdminTestsBase(CMSTestCase):
 
 
 class AdminTestCase(AdminTestsBase):
-
     def test_permissioned_page_list(self):
         """
         Makes sure that a user with restricted page permissions can view
@@ -955,11 +956,10 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(CMSPlugin.objects.count(), 7)
         self.assertEqual(Placeholder.objects.count(), 4)
         url = reverse('admin:cms_page_clear_placeholder', args=[clipboard.pk])
-        response = self.client.post(url, {'test':0})
+        response = self.client.post(url, {'test': 0})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CMSPlugin.objects.count(), 4)
         self.assertEqual(Placeholder.objects.count(), 3)
-
 
 
     def test_plugins_copy_language(self):
@@ -1009,8 +1009,7 @@ class PluginPermissionTests(AdminTestsBase):
         # => PagePermissionInline is no longer visible
         self.assertFalse(
             any(type(inline) is PagePermissionInlineAdmin
-                for inline in page_admin.get_inline_instances(request,
-                                                              page if not DJANGO_1_4 else None)))
+                for inline in page_admin.get_inline_instances(request, page if not DJANGO_1_4 else None)))
 
     def test_edit_title_is_allowed_for_staff_user(self):
         """
@@ -1153,6 +1152,46 @@ class AdminFormsTests(AdminTestsBase):
             # collapsing these, so that the error is visible.
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
             self.assertContains(resp, '<div class="form-row errors reverse_id">')
+
+    def test_render_edit_mode(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        page = create_page('Test', 'static.html', 'en', published=True)
+        for placeholder in Placeholder.objects.all():
+            plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+
+        user = self.get_superuser()
+        self.assertEqual(Placeholder.objects.all().count(), 4)
+        with self.login_user_context(user):
+            with self.assertNumQueries(FuzzyInt(40, 60)):
+                output = force_unicode(self.client.get('/en/?edit').content)
+            self.assertIn('<b>Test</b>', output)
+            self.assertEqual(Placeholder.objects.all().count(), 9)
+            self.assertEqual(StaticPlaceholder.objects.count(), 2)
+            for placeholder in Placeholder.objects.all():
+                plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+            with self.assertNumQueries(FuzzyInt(40, 60)):
+                output = force_unicode(self.client.get('/en/?edit').content)
+            self.assertIn('<b>Test</b>', output)
+        with self.assertNumQueries(FuzzyInt(18, 33)):
+            output = force_unicode(self.client.get('/en/?edit').content)
+        with self.assertNumQueries(FuzzyInt(18, 19)):
+            output = force_unicode(self.client.get('/en/').content)
+
+    def test_tree_view_queries(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        for i in range(10):
+            page = create_page('Test%s' % i, 'col_two.html', 'en', published=True)
+        for placeholder in Placeholder.objects.all():
+            plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+
+        user = self.get_superuser()
+        with self.login_user_context(user):
+            with self.assertNumQueries(FuzzyInt(19, 25)):
+                output = force_unicode(self.client.get('/en/admin/cms/page/'))
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):

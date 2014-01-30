@@ -212,8 +212,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
-        language = form.cleaned_data['language']
         if not 'permission' in request.path:
+            language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
                 obj,
@@ -252,7 +252,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
                                               force_reload=True)
             except titlemodels.Title.DoesNotExist:
-                title_obj = EmptyTitle()
+                title_obj = EmptyTitle(language)
             if 'site' in form.base_fields and form.base_fields['site'].initial is None:
                 form.base_fields['site'].initial = obj.site
             for name in [
