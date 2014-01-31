@@ -1,4 +1,5 @@
 {% load i18n menu_tags %}
+{% if not native_language_name %}{% get_available_languages as languages %}{% endif %}
 {% for language in languages %}
     {% language language.0 %}
         <a href="{% page_language_url language.0 %}"{% ifequal current_language language.0 %} class="current"{% endifequal %} lang="{{ language.0 }}">{{ language.1 }}</a>
