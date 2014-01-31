@@ -94,6 +94,14 @@ class ToolbarAPIMixin(object):
         except IndexError:
             return None
 
+    def get_alphabetical_insert_position(self, new_menu_name, item_type, default=0):
+        results = sorted(self.find_items(item_type), key=lambda x: x.item.name)
+        for result in results:
+            if result.item.name > new_menu_name:
+                return result.index
+        else:
+            return default
+
     def remove_item(self, item):
         self._remove_item(item)
         self._unmemoize(item)
