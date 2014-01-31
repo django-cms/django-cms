@@ -183,10 +183,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
 
         instance, plugin = self.get_plugin_instance()
-
+        if not placeholder or not isinstance(placeholder, Placeholder):
+            placeholder = instance.placeholder
         if instance and not (admin and not plugin.admin_preview):
-            if not isinstance(placeholder, Placeholder):
-                placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
             current_app = context.current_app if context else None
             context = PluginContext(context, instance, placeholder, current_app=current_app)
