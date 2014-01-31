@@ -134,7 +134,6 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
         user = get_user_model().objects.create_superuser('super', 'super@django-cms.org', 'super')
-        page = publish_page(page, user)
         page = publish_page(page, user, TESTLANG)
         page = publish_page(page, user, TESTLANG2)
         public = page.publisher_public

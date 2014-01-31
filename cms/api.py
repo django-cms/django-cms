@@ -140,7 +140,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # ugly permissions hack
     if created_by and isinstance(created_by, get_user_model()):
         _thread_locals.user = created_by
-        created_by = created_by.username
+
+        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
     else:
         _thread_locals.user = None
 

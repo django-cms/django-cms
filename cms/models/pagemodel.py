@@ -28,6 +28,7 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 
+from cms.compat import get_user_model
 
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
@@ -390,7 +391,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         user = getattr(_thread_locals, "user", None)
         if user:
-            self.changed_by = getattr(user, user.USERNAME_FIELD)
+            self.changed_by = getattr(user, get_user_model().USERNAME_FIELD)
         else:
             self.changed_by = "script"
         if created:

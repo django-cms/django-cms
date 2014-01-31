@@ -26,6 +26,8 @@ from menus.menu_pool import menu_pool
 
 
 def get_permission_acessor(obj):
+    User = get_user_model()
+    
     if isinstance(obj, (PageUser, User,)):
         rel_name = 'user_permissions'
     else:

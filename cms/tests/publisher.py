@@ -12,7 +12,6 @@ from cms.models.pagemodel import Page
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
 
-
 class PublisherCommandTests(TestCase):
     """
     Tests for the publish command

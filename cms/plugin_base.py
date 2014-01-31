@@ -202,13 +202,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         New version will be created in admin.views.edit_plugin
         """
         self.object_successfully_changed = True
-        #if DJANGO_1_3:
-        #    post_url_continue = reverse('admin:cms_page_edit_plugin',
-        #            args=(obj._get_pk_val(),),
-        #            current_app=self.admin_site.name)
-        #    kwargs.setdefault('post_url_continue', post_url_continue)
-        #else:
-        #    kwargs.setdefault('continue_editing_url', 'admin:cms_page_edit_plugin')
         return super(CMSPluginBase, self).response_change(request, obj, **kwargs)
 
     def response_add(self, request, obj, **kwargs):
@@ -218,13 +211,12 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         New version will be created in admin.views.edit_plugin
         """
         self.object_successfully_changed = True
-        #if DJANGO_1_3:
-        #    post_url_continue = reverse('admin:cms_page_edit_plugin',
-        #            args=(obj._get_pk_val(),),
-        #            current_app=self.admin_site.name)
-        #    kwargs.setdefault('post_url_continue', post_url_continue)
-        #else:
-        #    kwargs.setdefault('continue_editing_url', 'admin:cms_page_edit_plugin')
+
+        if not DJANGO_1_4:
+            post_url_continue = reverse('admin:cms_page_edit_plugin',
+                    args=(obj._get_pk_val(),),
+                    current_app=self.admin_site.name)
+            kwargs.setdefault('post_url_continue', post_url_continue)
         return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
 
     def log_addition(self, request, object):

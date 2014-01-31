@@ -73,17 +73,27 @@ class PluginsTestBaseCase(CMSTestCase):
         User = get_user_model()
         
         self.super_user = User(is_staff=True, is_active=True, is_superuser=True)
-        setattr(self.super_user, User.USERNAME_FIELD, "test") 
+
+        if User.USERNAME_FIELD != 'email':
+            setattr(self.super_user, User.USERNAME_FIELD, "test")
+
+        self.super_user.email = "test@example.com"
         self.super_user.set_password("test")
         self.super_user.save()
 
         self.slave = User(is_staff=True, is_active=True, is_superuser=False)
-        setattr(self.super_user, User.USERNAME_FIELD, "slave")
+        
+        if User.USERNAME_FIELD != 'email':
+            setattr(self.slave, User.USERNAME_FIELD, "slave")
+
+        self.slave.email = "slave@example.com"
         self.slave.set_password("slave")
         self.slave.save()
 
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
+
+        #import pdb; pdb.set_trace()
 
         self._login_context = self.login_user_context(self.super_user)
         self._login_context.__enter__()

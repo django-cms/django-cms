@@ -50,10 +50,15 @@ def server(bind='127.0.0.1', port=8000, migrate=False):
         else:
             syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
             migrate.Command().handle(interactive=False, verbosity=1, fake=True)
-        from django.contrib.auth.models import User
+        
+        from cms.compat import get_user_model
+        User = get_user_model()        
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
-            usr.username = 'admin'
+
+            if(User.USERNAME_FIELD != 'email'):
+                setattr(usr, User.USERNAME_FIELD, 'admin')
+
             usr.email = 'admin@admin.com'
             usr.set_password('admin')
             usr.is_superuser = True

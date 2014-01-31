@@ -17,6 +17,8 @@ class SiteTestCase(CMSTestCase):
     All stuff which is changing settings.SITE_ID for tests should come here.
     """
     def setUp(self):
+        User = get_user_model()
+
         self.assertEqual(Site.objects.all().count(), 1)
         with SettingsOverride(SITE_ID=1):
 
