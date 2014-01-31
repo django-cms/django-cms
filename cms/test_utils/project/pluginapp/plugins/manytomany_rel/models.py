@@ -19,16 +19,26 @@ class Section(models.Model):
         return self.name
 
 
-
-
-
 @python_2_unicode_compatible
 class ArticlePluginModel(CMSPlugin):
     title = models.CharField(max_length=50)
     sections = models.ManyToManyField('Section')
+    name_scheme = '2'
     
     def __str__(self):
         return self.title
     
+    def copy_relations(self, oldinstance):
+        self.sections = oldinstance.sections.all()
+
+
+@python_2_unicode_compatible
+class ArticlePluginModelOldScheme(CMSPlugin):
+    title = models.CharField(max_length=50)
+    sections = models.ManyToManyField('Section')
+
+    def __str__(self):
+        return self.title
+
     def copy_relations(self, oldinstance):
         self.sections = oldinstance.sections.all()

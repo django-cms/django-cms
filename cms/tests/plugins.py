@@ -22,9 +22,12 @@ from cms.plugins.picture.models import Picture
 from cms.toolbar.toolbar import CMSToolbar
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, Section, ArticlePluginModel
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
+    Article, Section, ArticlePluginModel, ArticlePluginModelOldScheme)
+from cms.test_utils.testcases import (
+    CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD,
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE,
+    URL_CMS_PLUGIN_REMOVE)
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -1147,8 +1150,21 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(self.section_count, plugin.sections.count())
         response = self.client.get('/en/?edit')
         self.assertEquals(response.status_code, 200)
+        ### New naming scheme for plugin models with the flag attribute
         self.assertEquals(plugin.sections.through._meta.db_table, 'cmsplugin_articlepluginmodel_sections')
 
+    def test_add_plugin_with_m2m_old_naming(self):
+        self.assertEqual(ArticlePluginModel.objects.count(), 0)
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+        page.publish('en')
+
+        placeholder = page.placeholders.get(slot="body")
+        add_plugin(placeholder=placeholder, plugin_type='ArticlePluginOldScheme', language='en')
+        plugin = ArticlePluginModelOldScheme.objects.all()[0]
+        ### Old naming scheme for plugin models without the flag attribute
+        self.assertEquals(plugin.sections.through._meta.db_table, 'manytomany_rel_articlepluginmodeloldscheme_sections')
 
     def test_add_plugin_with_m2m_and_publisher(self):
         self.assertEqual(ArticlePluginModel.objects.count(), 0)
