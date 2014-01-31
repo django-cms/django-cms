@@ -181,11 +181,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
-
         instance, plugin = self.get_plugin_instance()
-
         if instance and not (admin and not plugin.admin_preview):
-            if not isinstance(placeholder, Placeholder):
+            if not placeholder or not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
             current_app = context.current_app if context else None
@@ -206,6 +204,8 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         else:
             from cms.middleware.toolbar import toolbar_plugin_processor
             if processors and toolbar_plugin_processor in processors:
+                if not placeholder:
+                    placeholder = self.placeholder
                 current_app = context.current_app if context else None
                 context = PluginContext(context, self, placeholder, current_app=current_app)
                 template = None
