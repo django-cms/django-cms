@@ -64,12 +64,13 @@ class PluginModelBase(MPTTModelBase):
             else:
                 table_name = new_class._meta.db_table
             new_class._meta.db_table = table_name
-        for att in attrs.values():
-            if isinstance(att, ManyToManyField):
-                if splitter in att.rel.through._meta.db_table:
-                    splitted = att.rel.through._meta.db_table.split(splitter, 1)
-                    table_name = 'cmsplugin_%s' % splitted[1]
-                    att.rel.through._meta.db_table = table_name
+        if getattr(new_class, 'name_scheme', False) == '2':
+            for att in attrs.values():
+                if isinstance(att, ManyToManyField):
+                    if splitter in att.rel.through._meta.db_table:
+                        splitted = att.rel.through._meta.db_table.split(splitter, 1)
+                        table_name = 'cmsplugin_%s' % splitted[1]
+                        att.rel.through._meta.db_table = table_name
         return new_class
 
 
