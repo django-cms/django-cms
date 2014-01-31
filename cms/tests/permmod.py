@@ -996,5 +996,3 @@ class PagePermissionTests(PermissionTestsBase):
         # the permission_user_cache attribute set
         page = Page.objects.get(pk=page.pk)
         self.assertFalse(page.has_change_permissions_permission(request))
-        
-        

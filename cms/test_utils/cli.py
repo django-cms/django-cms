@@ -57,6 +57,7 @@ def configure(db_url, **extra):
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
+           # 'debug_toolbar.middleware.DebugToolbarMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
@@ -97,7 +98,6 @@ def configure(db_url, **extra):
             'cms.plugins.inherit',
             'cms.test_utils.project.sampleapp',
             'cms.test_utils.project.placeholderapp',
-            'cms.test_utils.project.pluginapp',
             'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.fakemlng',
@@ -109,7 +109,10 @@ def configure(db_url, **extra):
             'reversion',
             'sekizai',
             'hvad',
+          #  'debug_toolbar',
         ],
+        DEBUG_TOOLBAR_PATCH_SETTINGS = False,
+        INTERNAL_IPS = ['127.0.0.1'],
         AUTHENTICATION_BACKENDS=(
             'django.contrib.auth.backends.ModelBackend',
             'cms.test_utils.project.objectpermissionsapp.backends.ObjectPermissionBackend',

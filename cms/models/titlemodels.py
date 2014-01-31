@@ -91,6 +91,10 @@ class Title(models.Model):
 
 
 class EmptyTitle(object):
+
+    def __init__(self, language):
+        self.language = language
+
     """Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
     """
@@ -103,6 +107,7 @@ class EmptyTitle(object):
     application_urls = ""
     menu_title = ""
     page_title = ""
+    published = False
 
     @property
     def overwrite_url(self):

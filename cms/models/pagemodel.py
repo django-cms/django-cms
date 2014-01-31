@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 from django.utils.timezone import now
 
 from os.path import join
@@ -69,7 +70,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                                                         help_text=_("limit when this page is visible in the menu"))
     is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
-    application_namespace = models.CharField(_('application namespace'), max_length=200, blank=True, null=True)
+    application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
     level = models.PositiveIntegerField(db_index=True, editable=False)
     lft = models.PositiveIntegerField(db_index=True, editable=False)
     rght = models.PositiveIntegerField(db_index=True, editable=False)
@@ -82,7 +83,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
     publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
-    published_languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
     # If the draft is loaded from a reversion version save the revision id here.
@@ -192,12 +192,15 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             title.published = published
             title._publisher_keep_state = True
             title.save()
+
             old_title = Title.objects.get(pk=old_pk)
             old_title.publisher_public = title
             old_title.publisher_state = title.publisher_state
             old_title.published = True
             old_title._publisher_keep_state = True
             old_title.save()
+            if hasattr(self, 'title_cache'):
+                self.title_cache[language] = old_title
         if old_titles:
             Title.objects.filter(id__in=old_titles.values()).delete()
 
@@ -421,13 +424,17 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
-    def is_published(self, language):
-        return self.title_set.filter(language=language, published=True).count() == 1
+    def is_published(self, language, force_reload=False):
+        from cms.models import Title
+        try:
+            return self.get_title_obj(language, False, force_reload=force_reload).published
+        except Title.DoesNotExist:
+            return False
 
     def get_publisher_state(self, language):
         from cms.models import Title
         try:
-            return self.title_set.get(language=language).publisher_state
+            return self.get_title_obj(language, False).publisher_state
         except Title.DoesNotExist:
             return None
 
@@ -438,6 +445,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             title.published = published
         title._publisher_keep_state = True
         title.save()
+        if hasattr(self, 'title_cache') and language in self.title_cache:
+            self.title_cache[language].publisher_state = state
         return title
 
     def publish(self, language):
@@ -500,13 +509,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         else:
             # Nothing left to do
             pass
-        if published:
-            if not self.published_languages or not "|%s|" % language in self.published_languages:
-                if self.published_languages:
-                    self.published_languages += "%s|" % language
-                else:
-                    self.published_languages = "|%s|" % language
-        else:
+        if not published:
             self.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=True)
         self._publisher_keep_state = True
         self.save()
@@ -568,16 +571,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         public_title = title.publisher_public
         title.published = False
         title.save()
+        if hasattr(self, 'title_cache'):
+            self.title_cache[language] = title
         public_title.published = False
         public_title.save()
         public_page = self.publisher_public
         public_placeholders = public_page.placeholders.all()
-        published_languages = self.published_languages.split("|")
-        published_languages.remove(language)
-        self.published_languages = "|".join(published_languages)
         for pl in public_placeholders:
             pl.cmsplugin_set.filter(language=language).delete()
-        public_page.published_languages = self.published_languages
         public_page.save()
         # trigger update home
         self.save()
@@ -652,7 +653,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             return self.title_cache[language]
         from cms.models.titlemodels import EmptyTitle
 
-        return EmptyTitle()
+        return EmptyTitle(language)
 
     def get_title_obj_attribute(self, attrname, language=None, fallback=True, version_id=None, force_reload=False):
         """Helper function for getting attribute or None from wanted/current title.
@@ -746,10 +747,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             load = True
         if load:
             from cms.models.titlemodels import Title
-
             if version_id:
                 from reversion.models import Version
-
                 version = get_object_or_404(Version, pk=version_id)
                 revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                 for rev in revs:

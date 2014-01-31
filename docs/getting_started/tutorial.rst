@@ -493,7 +493,8 @@ The admin interfaces shows you theses placeholders as sub menus:
 
 Scroll down the "Available plugins" drop-down list. This displays the plugins you
 added to your :setting:`django:INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
-then press the "Add" button.
+then press the "Add" button. If the "text" plugin is not listed, you need to add 
+'djangocms_text_ckeditor' to your :setting:`django:INSTALLED_APPS` settings.
 
 The right part of the plugin area displays a rich text editor (`TinyMCE`_).
 
