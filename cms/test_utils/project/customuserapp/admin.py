@@ -9,4 +9,4 @@ if getattr(OriginalUser._meta, 'swapped', False):
     class CustomUserAdmin(UserAdmin):
         pass
 
-    admin.site.register(User, CustomUserAdmin)
+    admin.site.register(get_user_model(), CustomUserAdmin)

@@ -116,6 +116,7 @@ class TestNoI18N(SettingsOverrideTestCase):
             'site': 1,
         }
         # required only if user haves can_change_permission
+        User = get_user_model()
         self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
         self.super_user.set_password("test")
         self.super_user.save()

@@ -2,7 +2,6 @@
 from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db import connections
 from django.utils import unittest
@@ -10,6 +9,8 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 from django.test import LiveServerTestCase, TestCase
 import os
+
+from cms.compat import get_user_model
 
 
 class CMSLiveTests(LiveServerTestCase, TestCase):
@@ -113,6 +114,7 @@ class CMSLiveTests(LiveServerTestCase, TestCase):
 class ToolbarBasicTests(CMSLiveTests):
 
     def setUp(self):
+        User = get_user_model()
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
         user = User()
@@ -124,6 +126,7 @@ class ToolbarBasicTests(CMSLiveTests):
         super(ToolbarBasicTests, self).setUp()
 
     def test_toolbar_login(self):
+        User = get_user_model()
         create_page('Home', 'simple.html', 'en', published=True)
         url = '%s/?edit' % self.live_server_url
         self.assertTrue(User.objects.all().count(), 1)
@@ -139,6 +142,7 @@ class ToolbarBasicTests(CMSLiveTests):
 
     def test_basic_add_pages(self):
         with SettingsOverride(DEBUG=True):
+            User = get_user_model()
             self.assertEqual(Page.objects.all().count(), 0)
             self.assertTrue(User.objects.all().count(), 1)
             driver = self.driver

@@ -140,7 +140,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             ('user_5_nostaff', False, self.GROUPNAME_5),
             ('user_staff', True, None),
         ]
-        default_users_count = User.objects.all().count()
+        default_users_count = get_user_model().objects.all().count()
         for username, is_staff, groupname in userdata:
             user = get_user_model().objects.create(username=username,
                                        email=username + '@domain.com',

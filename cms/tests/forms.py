@@ -40,6 +40,8 @@ class FormsTestCase(CMSTestCase):
 
     def test_get_site_choices_without_moderator_with_superuser(self):
         # boilerplate (creating a page)
+        User = get_user_model()
+
         user_super = User(username="super", is_staff=True, is_active=True,
                           is_superuser=True)
         user_super.set_password("super")
@@ -75,6 +77,8 @@ class FormsTestCase(CMSTestCase):
 
     def test_compress_function_gets_a_page_when_one_exists(self):
         # boilerplate (creating a page)
+        User = get_user_model()
+        
         user_super = User(username="super", is_staff=True, is_active=True,
                           is_superuser=True)
         user_super.set_password("super")

@@ -27,6 +27,8 @@ if hasattr(reversion.models, 'VERSION_CHANGE'):
 
 class BasicReversionTestCase(CMSTestCase):
     def setUp(self):
+        User = get_user_model()
+
         u = User(username="test", is_staff=True, is_active=True,
                  is_superuser=True)
         u.set_password("test")
@@ -47,6 +49,8 @@ class BasicReversionTestCase(CMSTestCase):
 
 class ReversionTestCase(TransactionCMSTestCase):
     def setUp(self):
+        User = get_user_model()
+        
         u = User(username="test", is_staff=True, is_active=True,
                  is_superuser=True)
         u.set_password("test")

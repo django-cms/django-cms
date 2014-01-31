@@ -13,7 +13,7 @@ from cms.models.managers import BasicPagePermissionManager, PagePermissionManage
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
-from peak.util.proxies import LazyWrapper
+#from peak.util.proxies import LazyWrapper
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
@@ -35,6 +35,11 @@ ACCESS_CHOICES = (
     (ACCESS_DESCENDANTS, _('Page descendants')),
     (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
     )
+
+#if settings.AUTH_USER_MODEL:
+#    User = settings.AUTH_USER_MODEL
+#else:
+from django.contrib.auth.models import User
 
 
 class AbstractPagePermission(models.Model):
@@ -108,8 +113,8 @@ class PagePermission(AbstractPagePermission):
         page = self.page_id and force_unicode(self.page) or "None"
         return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
 
-
-class PageUser(LazyWrapper(get_user_model())):
+#class PageUser(LazyWrapper(get_user_model())):
+class PageUser(get_user_model()):
     """Cms specific user data, required for permission system
     """
     created_by = models.ForeignKey(user_model_label, related_name="created_users")

@@ -189,6 +189,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                     {'code':'x-elvish', 'name':'Elvish', 'public':True, 'fallbacks':[]},
                ]}):
             from cms.views import details
+
+            User = get_user_model()
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],
@@ -219,6 +221,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page.publish("x-klingon")
             from cms.views import details
 
+            User = get_user_model()
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],

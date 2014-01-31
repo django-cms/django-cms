@@ -81,6 +81,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         self.assertEqual(page, control)
 
     def test_get_page_by_pk_arg_edit_mode(self):
+        User = get_user_model()
+
         control = self._getfirst()
         request = self.get_request('/')
         request.GET = {"edit": ''}
@@ -144,6 +146,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         Verify ``show_placeholder`` correctly handles being given an
         invalid identifier.
         """
+        User = get_user_model()
+
         with SettingsOverride(DEBUG=True):
             request = HttpRequest()
             request.REQUEST = {}
@@ -235,6 +239,8 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         cache.clear()
         from cms.test_utils import project
 
+        User = get_user_model()
+
         template_dir = os.path.join(os.path.dirname(project.__file__), 'templates', 'alt_plugin_templates',
                                     'show_placeholder')
         page = create_page('Test', 'col_two.html', 'en')
@@ -276,6 +282,7 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
 
     def test_cached_show_placeholder_preview(self):
         from django.core.cache import cache
+        User = get_user_model()
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
@@ -303,6 +310,8 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
 
     def test_render_plugin(self):
         from django.core.cache import cache
+        User = get_user_model()
+
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
         placeholder = page.placeholders.all()[0]

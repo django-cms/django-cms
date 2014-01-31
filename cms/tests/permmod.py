@@ -74,6 +74,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
     }
 
     def setUp(self):
+        User = get_user_model()
         # create super user
         self.user_super = self._create_user("super", is_staff=True,
                                             is_superuser=True)
@@ -486,6 +487,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
     def test_user_globalpermission(self):
         # Global user
+        User = get_user_model()
         user_global = User(username="global", is_active=True)
         user_global.set_password("global")
         user_global.save()
@@ -583,6 +585,7 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
     def setUp(self):
         # create super user
+        User = get_user_model()
         self.user_super = User(username="super", is_staff=True, is_active=True,
                                is_superuser=True)
         self.user_super.set_password("super")
@@ -975,6 +978,7 @@ class PagePermissionTests(PermissionTestsBase):
         This is to assert that the permissions cache is properly
         invalidated.
         """
+        User = get_user_model()
         user = User(username='user', email='user@domain.com', password='user',
                     is_staff=True)
         user.save()

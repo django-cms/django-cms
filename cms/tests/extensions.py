@@ -5,9 +5,10 @@ from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 
 from cms.extensions import *
 from cms.tests import AdminTestsBase
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from cms.compat import get_user_model
 
 
 class ExtensionsTestCase(TestCase):
@@ -127,6 +128,8 @@ class ExtensionsTestCase(TestCase):
 
 class ExtensionAdminTestCase(AdminTestsBase):
     def setUp(self):
+        User = get_user_model()
+        
         self.admin, self.normal_guy = self._get_guys()
         self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'no_page_permission')
         self.no_page_permission_user.is_staff = True

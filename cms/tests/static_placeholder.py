@@ -7,7 +7,7 @@ from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.stacks.models import Stack
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.utils.compat.dj import force_unicode
-from django.contrib.auth.models import User
+from cms.compat import get_user_model
 from django.contrib.admin.sites import site
 from django.template.base import Template
 
@@ -46,6 +46,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         return placeholder
 
     def get_admin(self):
+        User = get_user_model()
         usr = User(username="admin", email="admin@django-cms.org", is_staff=True, is_superuser=True)
         usr.set_password("admin")
         usr.save()

@@ -459,12 +459,16 @@ class AdminTests(AdminTestsBase):
         self.page = create_page("testpage", "nav_playground.html", "en")
 
     def get_admin(self):
+        User = get_user_model()
+
         usr = User(username="admin", email="admin@django-cms.org", is_staff=True, is_superuser=True)
         usr.set_password("admin")
         usr.save()
         return usr
 
     def get_permless(self):
+        User = get_user_model()
+
         usr = User(username="permless", email="permless@django-cms.org", is_staff=True)
         usr.set_password("permless")
         usr.save()
@@ -783,6 +787,8 @@ class PluginPermissionTests(AdminTestsBase):
         self._placeholder = self._page.placeholders.all()[0]
 
     def _get_admin(self):
+        User = get_user_model()
+
         admin = User(
             username='admin',
             email='admin@admin.com',
@@ -984,6 +990,8 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(2, CMSPlugin.objects.all().count())
 
     def test_page_permission_inline_visibility(self):
+        User = get_user_model()
+
         user = User(username='user', email='user@domain.com', password='user',
                     is_staff=True)
         user.save()

@@ -22,6 +22,7 @@ from django.utils.functional import lazy
 from django.core.urlresolvers import reverse
 from cms.test_utils.project.placeholderapp.models import (Example1, TwoPlaceholderExample, MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
+from cms.compat import get_user_model
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
@@ -46,6 +47,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         return AnonymousUser()
 
     def get_staff(self):
+        User = get_user_model()
         staff = User(
             username='staff',
             email='staff@staff.org',
@@ -58,6 +60,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         return staff
 
     def get_nonstaff(self):
+        User = get_user_model()
         nonstaff = User(
             username='nonstaff',
             email='nonstaff@staff.org',
@@ -70,6 +73,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         return nonstaff
 
     def get_superuser(self):
+        User = get_user_model()
         superuser = User(
             username='superuser',
             email='superuser@superuser.org',
@@ -112,9 +116,9 @@ class ToolbarTests(ToolbarTestBase):
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
 
         if is_user_swapped:
-            self.assertEqual(len(admin_items), 6, admin_items)
-        else:
             self.assertEqual(len(admin_items), 7, admin_items)
+        else:
+            self.assertEqual(len(admin_items), 8, admin_items)
 #        self.assertEqual(len(admin_items), 8, admin_items)
 
     def test_anon(self):

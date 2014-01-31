@@ -17,6 +17,7 @@ class NonRootCase(CMSTestCase):
     urls = 'cms.test_utils.project.nonroot_urls'
 
     def setUp(self):
+        User = get_user_model()
         u = User(username="test", is_staff = True, is_active = True, is_superuser = True)
         u.set_password("test")
         u.save()

@@ -110,6 +110,7 @@ class BaseCMSTestCase(object):
         Set `permissions` parameter to an iterable of permission codes to add
         custom permissios.
         """
+        User = get_user_model()
         user = User(username=username, email=username+'@django-cms.org',
                     is_staff=is_staff, is_active=is_active, is_superuser=is_superuser)
         user.set_password(username)

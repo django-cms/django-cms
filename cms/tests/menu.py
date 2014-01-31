@@ -986,6 +986,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_authed_basic_perm(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            User = get_user_model()
             user = User()
             user.username = "test"
             user.is_staff = True
@@ -1004,6 +1005,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            User = get_user_model()
             user = User()
             user.username = "test"
             user.is_staff = True
