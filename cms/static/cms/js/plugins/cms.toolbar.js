@@ -168,6 +168,9 @@ $(document).ready(function () {
 					} else {
 						lists.find('ul ul').hide();
 					}
+
+					// Remove stale submenus
+					el.siblings().find('> ul').hide();
 				});
 
 				// fix leave event
