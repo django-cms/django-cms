@@ -1308,14 +1308,14 @@ class PluginsMetaOptionsTests(TestCase):
         ''' make sure custom database table names are OK. '''
 
         plugin = TestPlugin4.model
-        self.assertEqual(plugin._meta.db_table, 'or_another')
+        self.assertEqual(plugin._meta.db_table, 'or_another_4')
         self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_custom_both(self):
         ''' We should be able to customise app_label and db_table together '''
 
         plugin = TestPlugin5.model
-        self.assertEqual(plugin._meta.db_table, 'or_another')
+        self.assertEqual(plugin._meta.db_table, 'or_another_5')
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
 
