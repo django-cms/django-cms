@@ -312,19 +312,13 @@ running.
 Twitter
 *******
 
-Display's a number of a twitter user's latest posts.
+Twitter disabled V1 of their API, thus we've removed the twitter plugin
+(``cms.plugins.twitter``).
 
-For installation be sure you have the following in your project's
-:setting:`django:INSTALLED_APPS` setting::
+For alternatives have a look at these plugins:
 
-    INSTALLED_APPS = (
-        # ...
-        'cms.plugins.twitter',
-        # ...
-    )
-
-.. note:: Since avatars are not guaranteed to be available over SSL (HTTPS), by
-          default the Twitter plugin does not use avatars on secure sites.
+* https://github.com/nephila/djangocms_twitter
+* https://github.com/changer/cmsplugin-twitter
 
 .. :module:: cms.plugins.inherit
 
