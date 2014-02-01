@@ -57,6 +57,9 @@ class PluginPool(object):
                 pass
 
         model = plugin.model
+        from cms.models import CMSPlugin
+        if model is CMSPlugin:
+            return
         splitter = '%s_' % model._meta.app_label
         try:
             model.objects.count()
@@ -66,10 +69,15 @@ class PluginPool(object):
                 splitted = model._meta.db_table.split(splitter, 1)
                 table_name = 'cmsplugin_%s' % splitted[1]
             else:
-                table_name = new_class._meta.db_table
+                table_name = model._meta.db_table
             model._meta.db_table = table_name
+
+            try:
+                model.objects.count()
+            except DatabaseError:
+                model._meta.db_table = old_db_name
+                return
             warnings.warn('please rename the table "%s" to "%s" in %s' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
-            model.objects.count()
         for att_name in model.__dict__.keys():
             att = model.__dict__[att_name]
             if isinstance(att, ManyToManyField):
