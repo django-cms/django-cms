@@ -2,7 +2,8 @@
 import warnings
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
-from cms.utils.django_load import load
+from cms.models import CMSPlugin
+from cms.utils.django_load import load, get_subclasses
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode
@@ -14,6 +15,7 @@ from django.db import DatabaseError
 from django.db.models.fields.related import ManyToManyField
 from django.template.defaultfilters import slugify
 from django.utils.translation import get_language, deactivate_all, activate
+
 
 class PluginPool(object):
     def __init__(self):
@@ -43,6 +45,7 @@ class PluginPool(object):
                 "Cannot register %r, a plugin with this name (%r) is already "
                 "registered." % (plugin, plugin_name)
             )
+
         plugin.value = plugin_name
         self.plugins[plugin_name] = plugin
 
@@ -55,42 +58,6 @@ class PluginPool(object):
                 reversion_register(plugin.model)
             except RegistrationError:
                 pass
-
-        model = plugin.model
-        from cms.models import CMSPlugin
-        if model is CMSPlugin:
-            return
-        splitter = '%s_' % model._meta.app_label
-        try:
-            model.objects.count()
-        except DatabaseError:
-            old_db_name = model._meta.db_table
-            if splitter in model._meta.db_table:
-                splitted = model._meta.db_table.split(splitter, 1)
-                table_name = 'cmsplugin_%s' % splitted[1]
-            else:
-                table_name = model._meta.db_table
-            model._meta.db_table = table_name
-
-            try:
-                model.objects.count()
-            except DatabaseError:
-                model._meta.db_table = old_db_name
-                return
-            warnings.warn('please rename the table "%s" to "%s" in %s' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
-        for att_name in model.__dict__.keys():
-            att = model.__dict__[att_name]
-            if isinstance(att, ManyToManyField):
-                try:
-                    inst = model.objects.filter(**{"%s__pk" % att_name:1}).count()
-                except DatabaseError:
-                    if splitter in att.rel.through._meta.db_table:
-                        old_db_name = att.rel.through._meta.db_table
-                        splitted = att.rel.through._meta.db_table.split(splitter, 1)
-                        table_name = 'cmsplugin_%s' % splitted[1]
-                        att.rel.through._meta.db_table = table_name
-                        warnings.warn('please rename the table "%s" to "%s" in %s' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
-
 
     def unregister_plugin(self, plugin):
         """
@@ -105,8 +72,40 @@ class PluginPool(object):
             )
         del self.plugins[plugin_name]
 
+    def set_plugin_meta(self, model):
+        if not model._meta.abstract and not hasattr(model, 'patched'):
+            splitter = '%s_' % model._meta.app_label
+            try:
+                model.objects.exists()
+            except DatabaseError as e:
+                old_db_name = model._meta.db_table
+                if splitter in model._meta.db_table:
+                    splitted = model._meta.db_table.split(splitter, 1)
+                    table_name = 'cmsplugin_%s' % splitted[1]
+                else:
+                    table_name = model._meta.db_table
+                model._meta.db_table = table_name
+                warnings.warn('please rename the table "%s" to "%s" in %s' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+                model.objects.exists()
+            for att_name in model.__dict__.keys():
+                att = model.__dict__[att_name]
+                if isinstance(att, ManyToManyField):
+                    try:
+                        inst = model.objects.filter(**{"%s__pk" % att_name:1}).count()
+                    except DatabaseError:
+                        if splitter in att.rel.through._meta.db_table:
+                            old_db_name = att.rel.through._meta.db_table
+                            splitted = att.rel.through._meta.db_table.split(splitter, 1)
+                            table_name = 'cmsplugin_%s' % splitted[1]
+                            att.rel.through._meta.db_table = table_name
+                            warnings.warn('please rename the table "%s" to "%s" in %s' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+            model.patched = True
+
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         self.discover_plugins()
+        subs = get_subclasses(CMSPlugin)
+        for model in subs:
+            self.set_plugin_meta(model)
         plugins = list(self.plugins.values())
         plugins.sort(key=lambda obj: force_unicode(obj.name))
         final_plugins = []
@@ -156,6 +155,7 @@ class PluginPool(object):
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
+        self.set_plugin_meta(self.plugins[name].model)
         return self.plugins[name]
     
     def get_patterns(self):
