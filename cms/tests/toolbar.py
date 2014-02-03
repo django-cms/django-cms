@@ -848,7 +848,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         page.reload()
         request = self.get_page_request(page, user, edit=True)
         response = details(request, '')
-        self.assertContains(response, 'cms_plugin-cms-page-get_page_title-%s">%s</div>' % (
+        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_page_title-%s">%s</div>' % (
         page.pk, page.get_page_title(language)))
         self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_menu_title-%s">%s</div>' % (
         page.pk, page.get_menu_title(language)))

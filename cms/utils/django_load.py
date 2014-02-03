@@ -88,3 +88,12 @@ def iterload_objects(import_paths):
     """
     for import_path in import_paths:
         yield load_object(import_path)
+
+def get_subclasses(c):
+    """
+    Get all subclasses of a given class
+    """
+    subclasses = c.__subclasses__()
+    for d in list(subclasses):
+        subclasses.extend(get_subclasses(d))
+    return subclasses

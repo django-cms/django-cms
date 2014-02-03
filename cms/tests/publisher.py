@@ -9,8 +9,10 @@ from cms.api import create_page, add_plugin, create_title
 from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
+from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
+from djangocms_text_ckeditor.models import Text
 
 class PublisherCommandTests(TestCase):
     """
@@ -74,6 +76,36 @@ class PublisherCommandTests(TestCase):
 
         self.assertEqual(Page.objects.public().count(), 0)
 
+    def test_table_name_patching(self):
+        """
+        This tests the plugin models patching when publishing from the command line
+        """
+        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        published = create_page("The page!", "nav_playground.html", "en", published=True)
+        draft = Page.objects.drafts()[0]
+        draft.reverse_id = 'a_test' # we have to change *something*
+        draft.save()
+        add_plugin(draft.placeholders.get(slot=u"body"),
+                   u"TextPlugin", u"en", body="Test content")
+        draft.publish('en')
+        add_plugin(draft.placeholders.get(slot=u"body"),
+                   u"TextPlugin", u"en", body="Test content")
+
+        # Manually undoing table name patching
+        Text._meta.db_table = 'djangocms_text_ckeditor_text'
+        plugin_pool.patched = False
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            com = publisher_publish.Command()
+            com.handle_noargs()
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+        # Sanity check the database (we should have one draft and one public)
+        not_drafts = len(Page.objects.filter(publisher_is_draft=False))
+        drafts = len(Page.objects.filter(publisher_is_draft=True))
+        self.assertEquals(not_drafts, 1)
+        self.assertEquals(drafts, 1)
+
     def test_command_line_publishes_one_page(self):
         """
         Publisher always creates two Page objects for every CMS page,
@@ -120,6 +152,9 @@ class PublisherCommandTests(TestCase):
         non_draft = Page.objects.public()[0]
         self.assertEquals(non_draft.reverse_id, 'a_test')
 
+    def tearDown(self):
+        plugin_pool.patched = False
+        plugin_pool.set_plugin_meta()
 
 class PublishingTests(TestCase):
     def create_page(self, title=None, **kwargs):
