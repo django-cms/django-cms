@@ -15,25 +15,32 @@ class SuperLazyIterator(object):
     def __iter__(self):
         return iter(self.func())
 
+class LazyChoiceField(forms.ChoiceField):
+
+    def _set_choices(self, value):
+        # we overwrite this function so no list(value) is called
+        self._choices = self.widget.choices = value
+
+    choices = property(forms.ChoiceField._get_choices, _set_choices)
+
 class PageSelectFormField(forms.MultiValueField):
     widget = PageSelectWidget
     default_error_messages = {
         'invalid_site': _(u'Select a valid site'),
         'invalid_page': _(u'Select a valid page'),
     }
-    def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
+
+    def __init__(self, queryset=None, empty_label=u"---------", cache_choices=False,
                  required=True, widget=None, to_field_name=None, *args, **kwargs):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
         site_choices = SuperLazyIterator(get_site_choices)
-        site_choices.model = Site
         page_choices = SuperLazyIterator(get_page_choices)
-        page_choices.model = Page
         kwargs['required'] = required
         fields = (
-            forms.ModelChoiceField(queryset=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
-            forms.ModelChoiceField(queryset=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
+            LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
+            LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
         super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
 
