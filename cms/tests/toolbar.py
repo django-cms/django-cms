@@ -249,27 +249,35 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('/en/admin/cms/usersettings/')
             self.assertEqual(response.status_code, 200)
 
-
     def test_get_alphabetical_insert_position(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
-        request = self.get_page_request(page, self.get_superuser(), edit=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
+        toolbar.get_left_items()
+        toolbar.get_right_items()
 
-        menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test')
+        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test')
 
         # Insert alpha
-        alpha_position = menu.get_alphabetical_insert_position('test-submenu-alpha', SubMenu)
+        alpha_position = admin_menu.get_alphabetical_insert_position('menu-alpha', SubMenu)
+        # As this *may* be the first one, we'll probably need to provide the
+        # location after the break.
         if not alpha_position:
-            alpha_position = menu.find_first(Break, identifier=ADMINISTRATION_BREAK) + 1
-        menu.get_or_create_menu('alpha-menu', 'test-submenu-alpha', position=alpha_position)
+            alpha_position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK) + 1
+
+        menu = admin_menu.get_or_create_menu('menu-alpha', 'menu-alpha', position=alpha_position)
+        self.assertGreater(int(alpha_position), 0)
 
         # Insert gamma
-        gamma_position = menu.get_alphabetical_insert_position('test-submenu-gamma', SubMenu)
-        menu.get_or_create_menu('gamma-menu', 'test-submenu-gamma', position=gamma_position)
+        gamma_position = admin_menu.get_alphabetical_insert_position('menu-gamma', SubMenu)
+        self.assertGreater(int(gamma_position), int(alpha_position))
+        admin_menu.get_or_create_menu('menu-gamma', 'menu-gamma', position=gamma_position)
 
-        # Where should beta go?
-        beta_position = menu.get_alphabetical_insert_position('test-submenu-beta', SubMenu)
+        # Where should beta go? It should go right where gamma is now...
+        beta_position = admin_menu.get_alphabetical_insert_position('menu-beta', SubMenu)
         self.assertEqual(beta_position, gamma_position)
+
 
 class EditModelTemplateTagTest(ToolbarTestBase):
     urls = 'cms.test_utils.project.placeholderapp_urls'
