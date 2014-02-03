@@ -36,12 +36,6 @@ ACCESS_CHOICES = (
     (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
     )
 
-#if settings.AUTH_USER_MODEL:
-#    User = settings.AUTH_USER_MODEL
-#else:
-from django.contrib.auth.models import User
-
-
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
     """

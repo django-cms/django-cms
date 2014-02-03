@@ -21,9 +21,6 @@ from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 
-#DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
-#DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
-
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
     """
     Ensure the CMSPlugin subclasses have sane values and set some defaults if 
@@ -195,14 +192,14 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
 
-    def response_change(self, request, obj, **kwargs):
+    def response_change(self, request, obj):
         """
         Just set a flag, so we know something was changed, and can make
         new version if reversion installed.
         New version will be created in admin.views.edit_plugin
         """
         self.object_successfully_changed = True
-        return super(CMSPluginBase, self).response_change(request, obj, **kwargs)
+        return super(CMSPluginBase, self).response_change(request, obj)
 
     def response_add(self, request, obj, **kwargs):
         """

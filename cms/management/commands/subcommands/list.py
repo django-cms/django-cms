@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models.pagemodel import Page
+from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugin_pool import plugin_pool

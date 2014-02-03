@@ -13,7 +13,6 @@ from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied, ValidationError
 from cms.utils.i18n import get_language_list
 
-# from django.contrib.auth.models import User
 from cms.compat import get_user_model
 from django.contrib.sites.models import Site
 from django.db.models import Max

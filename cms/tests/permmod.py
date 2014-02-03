@@ -776,6 +776,7 @@ class ModeratorSwitchCommandTest(CMSTestCase):
         """
         This tests the plugin models patching when publishing from the command line
         """
+        User = get_user_model()
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         published = create_page("The page!", "nav_playground.html", "en", published=True)
         draft = Page.objects.drafts()[0]
