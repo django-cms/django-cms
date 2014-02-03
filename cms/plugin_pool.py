@@ -21,7 +21,7 @@ class PluginPool(object):
     def __init__(self):
         self.plugins = {}
         self.discovered = False
-        self.table_names = ()
+        self.patched = False
 
     def discover_plugins(self):
         if self.discovered:
@@ -73,7 +73,7 @@ class PluginPool(object):
             )
         del self.plugins[plugin_name]
 
-    def set_plugin_meta(self, model):
+    def set_plugin_meta(self):
         """
         Patches a plugin model by forcing a specifc db_table whether the
         'new style' table name exists or not. The same goes for all the
@@ -84,36 +84,38 @@ class PluginPool(object):
         The model is modified in place; a 'patched' attribute is added
         to the model to check whether it's already been modified.
         """
-        if not model._meta.abstract and not getattr(model, 'patched', False):
-            if not self.table_names:
-                self.table_names = connection.introspection.table_names()
-            splitter = '%s_' % model._meta.app_label
-            table_name = model._meta.db_table
-            if (table_name not in self.table_names
-                and splitter in table_name):
-                    old_db_name = table_name
-                    splitted = table_name.split(splitter, 1)
-                    table_name = 'cmsplugin_%s' % splitted[1]
-                    model._meta.db_table = table_name
-                    warnings.warn('please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.2' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
-            for att_name in model.__dict__.keys():
-                att = model.__dict__[att_name]
-                if isinstance(att, ManyToManyField):
-                    table_name = att.rel.through._meta.db_table
-                    if (table_name not in self.table_names
-                        and splitter in table_name):
+        if self.patched:
+            return
+        table_names = connection.introspection.table_names()
+        subs = get_subclasses(CMSPlugin)
+        for model in subs:
+            if not model._meta.abstract:
+
+                splitter = '%s_' % model._meta.app_label
+                table_name = model._meta.db_table
+                if (table_name not in table_names
+                    and splitter in table_name):
                         old_db_name = table_name
-                        table_name.split(splitter, 1)
+                        splitted = table_name.split(splitter, 1)
                         table_name = 'cmsplugin_%s' % splitted[1]
-                        att.rel.through._meta.db_table = table_name
+                        model._meta.db_table = table_name
                         warnings.warn('please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.2' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
-            model.patched = True
+                for att_name in model.__dict__.keys():
+                    att = model.__dict__[att_name]
+                    if isinstance(att, ManyToManyField):
+                        table_name = att.rel.through._meta.db_table
+                        if (table_name not in table_names
+                            and splitter in table_name):
+                            old_db_name = table_name
+                            table_name.split(splitter, 1)
+                            table_name = 'cmsplugin_%s' % splitted[1]
+                            att.rel.through._meta.db_table = table_name
+                            warnings.warn('please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.2' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+        self.patched = True
 
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         self.discover_plugins()
-        subs = get_subclasses(CMSPlugin)
-        for model in subs:
-            self.set_plugin_meta(model)
+        self.set_plugin_meta()
         plugins = list(self.plugins.values())
         plugins.sort(key=lambda obj: force_unicode(obj.name))
         final_plugins = []
@@ -163,7 +165,7 @@ class PluginPool(object):
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
-        self.set_plugin_meta(self.plugins[name].model)
+        self.set_plugin_meta()
         return self.plugins[name]
     
     def get_patterns(self):

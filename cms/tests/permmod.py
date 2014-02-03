@@ -778,7 +778,7 @@ class ModeratorSwitchCommandTest(CMSTestCase):
 
         # Manually undoing table name patching
         Text._meta.db_table = 'djangocms_text_ckeditor_text'
-        delattr(Text, 'patched')
+        plugin_pool.patched = False
 
         with disable_logger(log):
             call_command('cms', 'moderator', 'on')
@@ -798,7 +798,8 @@ class ModeratorSwitchCommandTest(CMSTestCase):
             self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
 
     def tearDown(self):
-        plugin_pool.set_plugin_meta(Text)
+        plugin_pool.patched = False
+        plugin_pool.set_plugin_meta()
 
 
 class PermissionTestsBase(SettingsOverrideTestCase):

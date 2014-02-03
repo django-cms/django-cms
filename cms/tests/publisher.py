@@ -95,7 +95,7 @@ class PublisherCommandTests(TestCase):
 
         # Manually undoing table name patching
         Text._meta.db_table = 'djangocms_text_ckeditor_text'
-        Text.patched = False
+        plugin_pool.patched = False
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
@@ -155,7 +155,8 @@ class PublisherCommandTests(TestCase):
         self.assertEquals(non_draft.reverse_id, 'a_test')
 
     def tearDown(self):
-        plugin_pool.set_plugin_meta(Text)
+        plugin_pool.patched = False
+        plugin_pool.set_plugin_meta()
 
 class PublishingTests(TestCase):
     def create_page(self, title=None, **kwargs):
