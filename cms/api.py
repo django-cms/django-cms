@@ -90,6 +90,7 @@ def _verify_plugin_type(plugin_type):
     """
     if (hasattr(plugin_type, '__module__') and
         issubclass(plugin_type, CMSPluginBase)):
+        plugin_pool.set_plugin_meta()
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__

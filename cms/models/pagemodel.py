@@ -211,6 +211,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         """
         # TODO: Make this into a "graceful" copy instead of deleting and overwriting
         # copy the placeholders (and plugins on those placeholders!)
+        from cms.plugin_pool import plugin_pool
+        plugin_pool.set_plugin_meta()
         CMSPlugin.objects.filter(placeholder__page=target, language=language).delete()
         for ph in self.placeholders.all():
             plugins = ph.get_plugins_list(language)
