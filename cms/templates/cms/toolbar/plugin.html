@@ -4,8 +4,8 @@
 
 <div class="cms_plugin cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk }}{% if render_model_icon %} cms_render_model_icon{% elif render_model_add %} cms_render_model_add{% endif %}">{% if render_model_icon %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% elif render_model_add %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% else %}{{ rendered_content }}{% endif %}</div>
 
-{% endspaceless %}{% addtoblock "js" %}
-<script type="text/javascript">
+{% addtoblock "js" %}
+<script>
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
@@ -35,3 +35,4 @@ $(document).ready(function () {
 })(CMS.$);
 </script>
 {% endaddtoblock %}
+{% endspaceless %}
