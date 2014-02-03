@@ -7,8 +7,8 @@ from django.template.defaultfilters import truncatewords
 from cms.views import details
 import re
 from cms.api import create_page, create_title
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
-from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -249,6 +249,27 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('/en/admin/cms/usersettings/')
             self.assertEqual(response.status_code, 200)
 
+
+    def test_get_alphabetical_insert_position(self):
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        request = self.get_page_request(page, self.get_superuser(), edit=True)
+        toolbar = CMSToolbar(request)
+
+        menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test')
+
+        # Insert alpha
+        alpha_position = menu.get_alphabetical_insert_position('test-submenu-alpha', SubMenu)
+        if not alpha_position:
+            alpha_position = menu.find_first(Break, identifier=ADMINISTRATION_BREAK) + 1
+        menu.get_or_create_menu('alpha-menu', 'test-submenu-alpha', position=alpha_position)
+
+        # Insert gamma
+        gamma_position = menu.get_alphabetical_insert_position('test-submenu-gamma', SubMenu)
+        menu.get_or_create_menu('gamma-menu', 'test-submenu-gamma', position=gamma_position)
+
+        # Where should beta go?
+        beta_position = menu.get_alphabetical_insert_position('test-submenu-beta', SubMenu)
+        self.assertEqual(beta_position, gamma_position)
 
 class EditModelTemplateTagTest(ToolbarTestBase):
     urls = 'cms.test_utils.project.placeholderapp_urls'
