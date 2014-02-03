@@ -9,6 +9,7 @@ from django.forms.widgets import Media
 from django.template.defaultfilters import title
 from django.utils.translation import ugettext_lazy as _, get_language
 import operator
+from django.contrib import admin
 
 
 @python_2_unicode_compatible
@@ -112,23 +113,36 @@ class Placeholder(models.Model):
         Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
         """
         from cms.models import CMSPlugin
-        for rel in self._meta.get_all_related_objects():
-            if issubclass(rel.model, CMSPlugin):
-                continue
-            field = getattr(self, rel.get_accessor_name())
-            if field.count():
-                yield rel.field
-
-    def _get_attached_field(self):
-        from cms.models import CMSPlugin
-        if not hasattr(self, '_attached_field_cache'):
-            self._attached_field_cache = None
+        if not hasattr(self, '_attached_fields_cache'):
+            self._attached_fields_cache = []
             for rel in self._meta.get_all_related_objects():
                 if issubclass(rel.model, CMSPlugin):
                     continue
-                field = getattr(self, rel.get_accessor_name())
-                if field.count():
-                    self._attached_field_cache = rel.field
+                from cms.admin.placeholderadmin import PlaceholderAdmin
+                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdmin):
+                    field = getattr(self, rel.get_accessor_name())
+                    if field.count():
+                        self._attached_fields_cache.append(rel.field)
+        return self._attached_fields_cache
+
+    def _get_attached_field(self):
+        from cms.models import CMSPlugin, StaticPlaceholder, Page
+        if not hasattr(self, '_attached_field_cache'):
+            self._attached_field_cache = None
+            relations = self._meta.get_all_related_objects()
+
+            for rel in relations:
+                if rel.model == Page or rel.model == StaticPlaceholder:
+                    relations.insert(0, relations.pop(relations.index(rel)))
+            for rel in relations:
+                if issubclass(rel.model, CMSPlugin):
+                    continue
+                from cms.admin.placeholderadmin import PlaceholderAdmin
+                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdmin):
+                    field = getattr(self, rel.get_accessor_name())
+                    if field.count():
+                        self._attached_field_cache = rel.field
+                        break
         return self._attached_field_cache
 
     def _get_attached_field_name(self):
@@ -138,16 +152,27 @@ class Placeholder(models.Model):
         return None
 
     def _get_attached_model(self):
+        if hasattr(self, '_attached_model_cache'):
+            return self._attached_model_cache
+        if self.page or self.page_set.all().count():
+            from cms.models import Page
+            self._attached_model_cache = Page
+            return Page
         field = self._get_attached_field()
         if field:
+            self._attached_model_cache = field.model
             return field.model
+        self._attached_model_cache = None
         return None
 
     def _get_attached_models(self):
         """
         Returns a list of models of attached to this placeholder.
         """
-        return [field.model for field in self._get_attached_fields()]
+        if hasattr(self, '_attached_models_cache'):
+            return self._attached_models_cache
+        self._attached_models_cache = [field.model for field in self._get_attached_fields()]
+        return self._attached_models_cache
 
     def _get_attached_objects(self):
         """

@@ -166,18 +166,19 @@ def boolean_icon(value):
 @register.filter
 def is_restricted(page, request):
     if get_cms_setting('PERMISSION'):
-        all_perms = list(get_any_page_view_permissions(request, page))
-        icon = boolean_icon(bool(all_perms))
+        if hasattr(page, 'permission_restricted'):
+            icon = boolean_icon(bool(page.permission_restricted))
+        else:
+            all_perms = list(get_any_page_view_permissions(request, page))
+            icon = boolean_icon(bool(all_perms))
         return mark_safe(
-            ugettext('<span title="Restrictions: %(title)s">%(icon)s</span>') % {
-                'title': u', '.join((perm.get_grant_on_display() for perm in all_perms)) or None,
+            ugettext('<span>%(icon)s</span>') % {
                 'icon': icon,
             })
     else:
         icon = boolean_icon(None)
         return mark_safe(
-            ugettext('<span title="Restrictions: %(title)s">%(icon)s</span>') % {
-                'title': None,
+            ugettext('<span>%(icon)s</span>') % {
                 'icon': icon,
             })
 

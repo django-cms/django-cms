@@ -5,19 +5,20 @@ Installation
 This document assumes you are familiar with Python and Django. It should
 outline the steps necessary for you to follow the :doc:`tutorial`.
 
+.. _requirements:
+
 ************
 Requirements
 ************
 
-* `Python`_ 2.5 (or a higher release of 2.x), or 3.3.
-* `Django`_ 1.4.5, 1.5 or higher
+* `Python`_ 2.6, 2.7 or 3.3.
+* `Django`_ 1.4.5, 1.5.x or 1.6.x
 * `South`_ 0.7.2 or higher
 * `django-classy-tags`_ 0.3.4.1 or higher
-* `django-mptt`_ 0.5.2 (strict due to API compatibility issues)
+* `django-mptt`_ 0.6 (strict due to API compatibility issues)
 * `django-sekizai`_ 0.7 or higher
-* `html5lib`_ 0.90 or higher
+* `html5lib`_ 0.99 or higher
 * `djangocms-admin-style`_
-* `django-i18nurls`_ (if using django 1.3.X)
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
 
@@ -63,10 +64,10 @@ Revision management
 -------------------
 
 * `django-reversion`_ 1.6.6 (with Django 1.4.5), 1.7 (with Django 1.5)
-  to support versions of your content (If using a different Django version
-  it is a good idea to check the page `Compatible-Django-Versions`_ in the
-  django-reversion wiki in order to make sure that the package versions are
-  compatible.)
+  or 1.8 (with Django 1.6)  to support versions of your content (If using
+  a different Django version it is a good idea to check the page
+  `Compatible-Django-Versions`_ in the django-reversion wiki in order
+  to make sure that the package versions are compatible.)
 
   .. note::
 
@@ -95,8 +96,9 @@ Installing in a virtualenv using pip
         
     to target the development branch.
 
-Installing inside a `virtualenv`_ is the preferred way to install any Django installation. This should work on
-any platform where python in installed. The first step is to create the virtualenv:
+Installing inside a `virtualenv`_ is the preferred way to install any Django
+installation. This should work on any platform where python in installed.
+The first step is to create the virtualenv:
 
 .. code-block:: bash
 
@@ -110,30 +112,39 @@ You can switch to your virtualenv at the command line by typing:
 
   source env/bin/activate
   
-Next, you can install packages one at a time using `pip`_, but we recommend using a `requirements.txt`_ file. The
-following is an example requirements.txt file that can be used with pip to install django CMS and its dependencies:
+Next, you can install packages one at a time using `pip`_, but we recommend
+using a `requirements.txt`_ file. The following is an example
+requirements.txt file that can be used with pip to install django CMS and
+its dependencies:
 
 ::
 
     # Bare minimum
     django-cms==3.0
     
-    #These dependencies are brought in by django CMS, but if you want to lock-in their version, specify them
-    Django==1.5.1
+    #These dependencies are brought in by django CMS, but if you want to
+    # lock-in their version, specify them
+    Django==1.6.1
     django-classy-tags==0.4
-    South==0.8.1
+    South==0.8.4
     html5lib==1.0b1
-    django-mptt==0.5.2
+    django-mptt==0.6
     django-sekizai==0.7
     six==1.3.0
     djangocms-admin-style==0.1.2
     
-    #Optional, recommended packages                
+    #Optional, recommended packages
     Pillow==2.0.0
-    django-filer==0.9.4      
-    cmsplugin-filer==0.9.5   
+    django-filer==0.9.5
+    cmsplugin-filer==0.9.5
     django-reversion==1.7
-    
+
+.. note::
+
+    In the above list, packages are pinned to specific version as an example;
+    those are not mandatory versions; refer to `requirements`_
+    for any version-specific restriction
+
 for Postgresql you would also add:
 
 ::

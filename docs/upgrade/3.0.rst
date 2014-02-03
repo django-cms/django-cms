@@ -238,3 +238,11 @@ Getter and setter for translatable plugin content
 
 A plugin's translatable content can now be read and set through :meth:`get_translatable_content`
 and :meth:`set_translatable_content`. See :ref:`Custom Plugins <custom-plugins>` for more info.
+
+No more DB tablename magic for plugins
+======================================
+
+Since django CMS 2.0 plugins had their table names start with `cmsplugin_`. We removed this behavior
+in 3.0 and will display a deprecation warning with the old and new table name. If your plugin uses
+south for migrations create a new empty schemamigration and rename the table by hand.
+

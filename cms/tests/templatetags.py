@@ -9,7 +9,7 @@ from cms.models.pagemodel import Page, Placeholder
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from cms.templatetags.cms_tags import _get_page_by_untyped_arg, _show_placeholder_for_page, _get_placeholder
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.testcases import SettingsOverrideTestCase, CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import get_cms_setting, get_site_id
 from cms.utils.plugins import get_placeholders
@@ -227,7 +227,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         db_placeholder = page.placeholders.get(slot='col_right')
         self.assertEqual(placeholder.slot, 'col_right')
 
-class NoFixtureDatabaseTemplateTagTests(TestCase):
+
+class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
     def test_cached_show_placeholder_sekizai(self):
         from django.core.cache import cache
 
@@ -302,6 +303,7 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
 
     def test_render_plugin(self):
         from django.core.cache import cache
+
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
         placeholder = page.placeholders.all()[0]
@@ -315,7 +317,7 @@ class NoFixtureDatabaseTemplateTagTests(TestCase):
         request.current_page = page
         request.session = {}
         request.toolbar = CMSToolbar(request)
-        context = RequestContext(request, {'plugin':plugin})
+        context = RequestContext(request, {'plugin': plugin})
         with self.assertNumQueries(0):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)

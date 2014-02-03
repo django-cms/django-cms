@@ -22,9 +22,8 @@ from cms.plugins.picture.models import Picture
 from cms.toolbar.toolbar import CMSToolbar
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
-from cms.test_utils.project.pluginapp.models import Article, Section
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    ArticlePluginModel)
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, Section, ArticlePluginModel
+from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
 from cms.sitemaps.cms_sitemap import CMSSitemap
@@ -1112,6 +1111,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
+        page.publish('en')
         placeholder = page.placeholders.get(slot="body")
         plugin_data = {
             'plugin_type': "ArticlePlugin",
@@ -1146,6 +1146,10 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEquals(self.section_count, plugin.sections.count())
+        response = self.client.get('/en/?edit')
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(plugin.sections.through._meta.db_table, 'manytomany_rel_articlepluginmodel_sections')
+
 
     def test_add_plugin_with_m2m_and_publisher(self):
         self.assertEqual(ArticlePluginModel.objects.count(), 0)
@@ -1278,59 +1282,40 @@ class PluginsMetaOptionsTests(TestCase):
         ''' handling when a CMSPlugin meta options are computed defaults '''
         # this plugin relies on the base CMSPlugin and Model classes to
         # decide what the app_label and db_table should be
-        class TestPlugin(CMSPlugin):
-            pass
 
-        plugin = TestPlugin()
-        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin')
-        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+        plugin = TestPlugin.model
+        self.assertEqual(plugin._meta.db_table, 'meta_testpluginmodel')
+        self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_as_declared_defaults(self):
         ''' handling when a CMSPlugin meta options are declared as per defaults '''
         # here, we declare the db_table and app_label explicitly, but to the same
         # values as would be computed, thus making sure it's not a problem to
         # supply options.
-        class TestPlugin2(CMSPlugin):
-            class Meta:
-                db_table = 'cmsplugin_testplugin2'
-                app_label = 'tests'
 
-        plugin = TestPlugin2()
-        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin2')
-        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+        plugin = TestPlugin2.model
+        self.assertEqual(plugin._meta.db_table, 'meta_testpluginmodel2')
+        self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_custom_app_label(self):
         ''' make sure customised meta options on CMSPlugins don't break things '''
 
-        class TestPlugin3(CMSPlugin):
-            class Meta:
-                app_label = 'one_thing'
-
-        plugin = TestPlugin3()
-        self.assertEqual(plugin._meta.db_table, 'cmsplugin_testplugin3') # because it's inlined
+        plugin = TestPlugin3.model
+        self.assertEqual(plugin._meta.db_table, 'one_thing_testpluginmodel3')
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
     def test_meta_options_custom_db_table(self):
         ''' make sure custom database table names are OK. '''
 
-        class TestPlugin4(CMSPlugin):
-            class Meta:
-                db_table = 'or_another'
-
-        plugin = TestPlugin4()
-        self.assertEqual(plugin._meta.db_table, 'or_another')
-        self.assertEqual(plugin._meta.app_label, 'tests') # because it's inlined
+        plugin = TestPlugin4.model
+        self.assertEqual(plugin._meta.db_table, 'or_another_4')
+        self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_custom_both(self):
         ''' We should be able to customise app_label and db_table together '''
 
-        class TestPlugin5(CMSPlugin):
-            class Meta:
-                app_label = 'one_thing'
-                db_table = 'or_another'
-
-        plugin = TestPlugin5()
-        self.assertEqual(plugin._meta.db_table, 'or_another')
+        plugin = TestPlugin5.model
+        self.assertEqual(plugin._meta.db_table, 'or_another_5')
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
 
@@ -1398,7 +1383,7 @@ class NoDatabasePluginTests(TestCase):
         # TODO: Django tests seem to leak models from test methods, somehow
         # we should clear django.db.models.loading.app_cache in tearDown.
         plugin_class = PluginModelBase('TestPlugin', (CMSPlugin,), {'__module__': 'cms.tests.plugins'})
-        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin')
+        self.assertEqual(plugin_class._meta.db_table, 'tests_testplugin')
 
     def test_db_table_hack_with_mixin(self):
         class LeftMixin: pass
@@ -1407,7 +1392,7 @@ class NoDatabasePluginTests(TestCase):
 
         plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin),
                                        {'__module__': 'cms.tests.plugins'})
-        self.assertEqual(plugin_class._meta.db_table, 'cmsplugin_testplugin2')
+        self.assertEqual(plugin_class._meta.db_table, 'tests_testplugin2')
 
     def test_pickle(self):
         text = Text()

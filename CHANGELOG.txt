@@ -200,5 +200,6 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - django 1.6 support added
 - Frontedit editor for Django models
 - Extending the page & title model API
-- Placeholders can be configured to have plugins automagically added.
+- Placeholders can be configured to have plugins automatically added.
 - Publishing is now language independent and the tree-view has been updated to reflect this
+- Removed the plugin DB-name magic and added a compatibility layer

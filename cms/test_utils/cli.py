@@ -57,6 +57,7 @@ def configure(db_url, **extra):
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
+           # 'debug_toolbar.middleware.DebugToolbarMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
@@ -96,9 +97,10 @@ def configure(db_url, **extra):
             'cms.plugins.inherit',
             'cms.test_utils.project.sampleapp',
             'cms.test_utils.project.placeholderapp',
-            'cms.test_utils.project.pluginapp',
             'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
             'cms.test_utils.project.pluginapp.plugins.extra_context',
+            'cms.test_utils.project.pluginapp.plugins.meta',
+            'cms.test_utils.project.pluginapp.plugins.one_thing',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
             'cms.test_utils.project.objectpermissionsapp',
@@ -107,7 +109,10 @@ def configure(db_url, **extra):
             'reversion',
             'sekizai',
             'hvad',
+          #  'debug_toolbar',
         ],
+        DEBUG_TOOLBAR_PATCH_SETTINGS = False,
+        INTERNAL_IPS = ['127.0.0.1'],
         AUTHENTICATION_BACKENDS=(
             'django.contrib.auth.backends.ModelBackend',
             'cms.test_utils.project.objectpermissionsapp.backends.ObjectPermissionBackend',
@@ -243,60 +248,60 @@ def configure(db_url, **extra):
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ),
         ALLOWED_HOSTS=['localhost'],
-        LOGGING={
-            'version': 1,
-            'disable_existing_loggers': True,
-            'formatters': {
-                'verbose': {
-                    'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-                },
-                'simple': {
-                    'format': '%(levelname)s %(message)s'
-                },
-            },
-            'handlers': {
-                'null': {
-                    'level': 'DEBUG',
-                    'class': 'django.utils.log.NullHandler',
-                },
-                'console': {
-                    'level': 'DEBUG',
-                    'class': 'logging.StreamHandler',
-                    'formatter': 'simple'
-                },
-                'mail_admins': {
-                    'level': 'ERROR',
-                     'filters': ['require_debug_false'],
-                    'class': 'django.utils.log.AdminEmailHandler',
-                }
-            },
-            'filters': {
-                'require_debug_false': {
-                    '()': 'django.utils.log.RequireDebugFalse'
-                }
-            },
-            'loggers': {
-                'django': {
-                    'handlers': ['console'],
-                    'propagate': True,
-                    'level': 'INFO',
-                },
-                'django.request': {
-                    'handlers': ['console'],
-                    'level': 'ERROR',
-                    'propagate': False,
-                },
-                'django.db': {
-                    'handlers': ['console'],
-                    'level': 'ERROR',
-                    'propagate': False,
-                },
-                'cms': {
-                    'handlers': ['console'],
-                    'level': 'INFO',
-                }
-            }
-        }
+        # LOGGING={
+        #     'version': 1,
+        #     'disable_existing_loggers': True,
+        #     'formatters': {
+        #         'verbose': {
+        #             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        #         },
+        #         'simple': {
+        #             'format': '%(levelname)s %(message)s'
+        #         },
+        #     },
+        #     'handlers': {
+        #         'null': {
+        #             'level': 'DEBUG',
+        #             'class': 'django.utils.log.NullHandler',
+        #         },
+        #         'console': {
+        #             'level': 'DEBUG',
+        #             'class': 'logging.StreamHandler',
+        #             'formatter': 'simple'
+        #         },
+        #         'mail_admins': {
+        #             'level': 'ERROR',
+        #              'filters': ['require_debug_false'],
+        #             'class': 'django.utils.log.AdminEmailHandler',
+        #         }
+        #     },
+        #     'filters': {
+        #         'require_debug_false': {
+        #             '()': 'django.utils.log.RequireDebugFalse'
+        #         }
+        #     },
+        #     'loggers': {
+        #         'django': {
+        #             'handlers': ['console'],
+        #             'propagate': True,
+        #             'level': 'INFO',
+        #         },
+        #         'django.request': {
+        #             'handlers': ['console'],
+        #             'level': 'ERROR',
+        #             'propagate': False,
+        #         },
+        #         'django.db': {
+        #             'handlers': ['console'],
+        #             'level': 'ERROR',
+        #             'propagate': False,
+        #         },
+        #         'cms': {
+        #             'handlers': ['console'],
+        #             'level': 'INFO',
+        #         }
+        #     }
+        # }
     )
     from django.utils.functional import empty
 

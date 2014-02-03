@@ -6,8 +6,10 @@ from cms.management.commands.subcommands.moderator import log
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-from cms.test_utils.testcases import URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, SettingsOverrideTestCase, \
-    URL_CMS_PLUGIN_ADD, CMSTestCase
+from cms.plugin_pool import plugin_pool
+from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
+                                      SettingsOverrideTestCase,
+                                      URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride, disable_logger
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
@@ -19,6 +21,8 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+
+from djangocms_text_ckeditor.models import Text
 
 
 def fake_mptt_attrs(page):
@@ -757,6 +761,33 @@ class ModeratorSwitchCommandTest(CMSTestCase):
             page2 = get_page_from_path(path)
         self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
 
+    def test_table_name_patching(self):
+        """
+        This tests the plugin models patching when publishing from the command line
+        """
+        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        published = create_page("The page!", "nav_playground.html", "en", published=True)
+        draft = Page.objects.drafts()[0]
+        draft.reverse_id = 'a_test' # we have to change *something*
+        draft.save()
+        add_plugin(draft.placeholders.get(slot=u"body"),
+                   u"TextPlugin", u"en", body="Test content")
+        draft.publish('en')
+        add_plugin(draft.placeholders.get(slot=u"body"),
+                   u"TextPlugin", u"en", body="Test content")
+
+        # Manually undoing table name patching
+        Text._meta.db_table = 'djangocms_text_ckeditor_text'
+        plugin_pool.patched = False
+
+        with disable_logger(log):
+            call_command('cms', 'moderator', 'on')
+        # Sanity check the database (we should have one draft and one public)
+        not_drafts = len(Page.objects.filter(publisher_is_draft=False))
+        drafts = len(Page.objects.filter(publisher_is_draft=True))
+        self.assertEquals(not_drafts, 1)
+        self.assertEquals(drafts, 1)
+
     def test_switch_moderator_off(self):
         with force_language("en"):
             pages_root = unquote(reverse("pages-root"))
@@ -765,6 +796,10 @@ class ModeratorSwitchCommandTest(CMSTestCase):
             page2 = get_page_from_path(path)
             self.assertIsNotNone(page2)
             self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
+
+    def tearDown(self):
+        plugin_pool.patched = False
+        plugin_pool.set_plugin_meta()
 
 
 class PermissionTestsBase(SettingsOverrideTestCase):
@@ -984,5 +1019,3 @@ class PagePermissionTests(PermissionTestsBase):
         # the permission_user_cache attribute set
         page = Page.objects.get(pk=page.pk)
         self.assertFalse(page.has_change_permissions_permission(request))
-        
-        

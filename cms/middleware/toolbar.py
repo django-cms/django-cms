@@ -22,6 +22,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(placeholder, page)]
         # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
         child_plugin_classes = get_toolbar_plugin_struct(childs, placeholder.slot, placeholder.page, parent=plugin_class)
+    instance.placeholder = placeholder
     request = original_context['request']
     with force_language(request.toolbar.toolbar_language):
         data = {

@@ -212,17 +212,23 @@ class AdvancedSettingsForm(forms.ModelForm):
                         pk=self.instance.pk).count():
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
-        apphook = cleaned_data['application_urls']
-        namespace = cleaned_data['application_namespace']
+        apphook = cleaned_data.get('application_urls', None)
+        namespace = cleaned_data.get('application_namespace', None)
         if apphook:
             apphook_pool.discover_apps()
             if apphook_pool.apps[apphook].app_name and not namespace:
                 self._errors['application_urls'] = ErrorList(
-                    [_('You selected an apphook with an "app_name". You must enter a namespace.')])
+                    [_('You selected an apphook with an "app_name". You must enter a instance name.')])
         if namespace and not apphook:
             self._errors['application_namespace'] = ErrorList(
-                [_("If you enter a namespace you need an application url as well.")])
+                [_("If you enter an instance name you need an application url as well.")])
         return cleaned_data
+
+    def clean_application_namespace(self):
+        namespace = self.cleaned_data['application_namespace']
+        if namespace and Page.objects.filter(publisher_is_draft=True, application_namespace=namespace).exclude(pk=self.instance.pk).count():
+            raise ValidationError(_('A instance name with this name already exists.'))
+        return namespace
 
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:

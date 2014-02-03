@@ -256,7 +256,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             return []  # if plugin has inlines but no own fields return empty fieldsets to remove empty white fieldset
 
         try:  # if all fieldsets are empty (assuming there is only one fieldset then) add description
-            fieldsets[0][1]['description'] = _('There are no further settings for this plugin. Please hit OK to save.')
+            fieldsets[0][1]['description'] = _('There are no further settings for this plugin. Please press save.')
         except KeyError:
             pass
 

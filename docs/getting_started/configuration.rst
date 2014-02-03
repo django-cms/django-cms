@@ -109,7 +109,8 @@ Example::
             }.
         },
         'base.html content': {
-            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin']
+            "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin'],
+            'inherit': 'content',
         },
     }
 
@@ -148,10 +149,65 @@ plugins, as shown above with ``base.html content``.
 ``default_plugins``
     You can specify the list of default plugins which will be automagically 
     added when the placeholder will be created (or rendered).
-    Each element of the list is a dictionary with the "plugin_type" to add 
-    and the "values" dictionnary to use for this plugin. 
-    The "values" depend on the "plugin_type". See the documentation of each 
-    plugin type to see which parameters are required and available.
+    Each element of the list is a dictionary with following keys :
+
+    ``plugin_type`` 
+        It's the plugin type to add to the placeholder
+        Exemple : 'TextPlugin'
+
+    ``values``
+        Dictionnary to use for the plugin creation.
+        It depends on the ``plugin_type``. See the documentation of each 
+        plugin type to see which parameters are required and available.
+        Exemple for a Textplugin :
+        {'body':'<p>Lorem ipsum</p>'}
+        Exemple for a LinkPlugin :
+        {'name':'Django-CMS','url':'https://www.django-cms.org'}
+
+    ``children``
+        It is a list of dictionnaries to configure default plugins 
+        to add as children for the current plugin (it must accepts children). 
+        Each dictionnary accepts same args than dictionnaries of 
+        ``default_plugins`` : ``plugin_type``, ``values``, ``children`` 
+        (yes, it is recursive).
+
+    Complete exemple of default_plugins usage::
+
+        CMS_PLACEHOLDER_CONF = {
+            'content': {
+                'name' : _('Content'),
+                'plugins': ['TextPlugin', 'LinkPlugin'],
+                'default_plugins':[
+                    {
+                        'plugin_type':'TextPlugin', 
+                        'values':{
+                            'body':'<p>Great websites : %(_tag_child_1)s and %(_tag_child_2)s</p>'
+                        },
+                        'children':[
+                            {
+                                'plugin_type':'LinkPlugin',
+                                'values':{
+                                    'name':'django', 
+                                    'url':'https://www.djangoproject.com/'
+                                },
+                            },
+                            {
+                                'plugin_type':'LinkPlugin',
+                                'values':{
+                                    'name':'django-cms', 
+                                    'url':'https://www.django-cms.org'
+                                },
+                                # If using LinkPlugin from djangocms-link which
+                                # accepts children, you could add some grandchildren :
+                                # 'children' : [
+                                #     ...
+                                # ]
+                            },
+                        ]
+                    },
+                ]
+            }
+        }
 
 ``plugin_modules``
     A dictionary of plugins and custom module names to group plugin in the
@@ -168,7 +224,12 @@ plugins, as shown above with ``base.html content``.
     A dictionary of plugin names with lists describing which plugins may contain
     each plugin. If not supplied, all plugins can be selected.
 
-
+``inherit``
+    Placeholder name or template name + placeholder name which inherit. In the
+    exemple, the configuration for "base.html content" inherits from "content"
+    and just overwrite the "plugins" setting to allow TeaserPlugin, thus you
+    have not to duplicate your "content"'s configuration.
+    
 .. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
 CMS_PLUGIN_CONTEXT_PROCESSORS
