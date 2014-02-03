@@ -14,7 +14,6 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -22,8 +21,6 @@ from django.utils.functional import lazy
 from django.core.urlresolvers import reverse
 from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
-from cms.compat import get_user_model
-
 
 class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
@@ -119,7 +116,6 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(len(admin_items), 7, admin_items)
         else:
             self.assertEqual(len(admin_items), 8, admin_items)
-#        self.assertEqual(len(admin_items), 8, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -852,7 +848,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         page.reload()
         request = self.get_page_request(page, user, edit=True)
         response = details(request, '')
-        self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_page_title-%s">%s</div>' % (
+        self.assertContains(response, 'cms_plugin-cms-page-get_page_title-%s">%s</div>' % (
         page.pk, page.get_page_title(language)))
         self.assertContains(response, '<div class="cms_plugin cms_plugin-cms-page-get_menu_title-%s">%s</div>' % (
         page.pk, page.get_menu_title(language)))
