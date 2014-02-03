@@ -257,21 +257,19 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.get_left_items()
         toolbar.get_right_items()
 
-        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test')
+        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'TestAppMenu')
 
         # Insert alpha
-        alpha_position = admin_menu.get_alphabetical_insert_position('menu-alpha', SubMenu)
-        # As this *may* be the first one, we'll probably need to provide the
-        # location after the break.
+        alpha_position = admin_menu.get_alphabetical_insert_position('menu-alpha', SubMenu, None)
+
+        # As this will be the first item added to this, this use should return the default, or namely None
         if not alpha_position:
             alpha_position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK) + 1
-
         menu = admin_menu.get_or_create_menu('menu-alpha', 'menu-alpha', position=alpha_position)
-        self.assertGreater(int(alpha_position), 0)
 
-        # Insert gamma
+        # Insert gamma (should return alpha_position + 1)
         gamma_position = admin_menu.get_alphabetical_insert_position('menu-gamma', SubMenu)
-        self.assertGreater(int(gamma_position), int(alpha_position))
+        self.assertEquals(int(gamma_position), int(alpha_position) + 1)
         admin_menu.get_or_create_menu('menu-gamma', 'menu-gamma', position=gamma_position)
 
         # Where should beta go? It should go right where gamma is now...

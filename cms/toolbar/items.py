@@ -114,7 +114,7 @@ class ToolbarAPIMixin(object):
             if result.index > last_position:
                 last_position = result.index
         else:
-            return last_position
+            return last_position + 1
 
     def remove_item(self, item):
         self._remove_item(item)
