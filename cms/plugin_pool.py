@@ -84,7 +84,7 @@ class PluginPool(object):
         The model is modified in place; a 'patched' attribute is added
         to the model to check whether it's already been modified.
         """
-        if not model._meta.abstract and not hasattr(model, 'patched'):
+        if not model._meta.abstract and not getattr(model, 'patched', False):
             if not self.table_names:
                 self.table_names = connection.introspection.table_names()
             splitter = '%s_' % model._meta.app_label

@@ -6,8 +6,10 @@ from cms.management.commands.subcommands.moderator import log
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-from cms.test_utils.testcases import URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE, SettingsOverrideTestCase, \
-    URL_CMS_PLUGIN_ADD, CMSTestCase
+from cms.plugin_pool import plugin_pool
+from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
+                                      SettingsOverrideTestCase,
+                                      URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride, disable_logger
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
@@ -19,6 +21,8 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+
+from djangocms_text_ckeditor.models import Text
 
 
 def fake_mptt_attrs(page):
@@ -761,7 +765,6 @@ class ModeratorSwitchCommandTest(CMSTestCase):
         """
         This tests the plugin models patching when publishing from the command line
         """
-        from djangocms_text_ckeditor.models import Text
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         published = create_page("The page!", "nav_playground.html", "en", published=True)
         draft = Page.objects.drafts()[0]
@@ -793,6 +796,9 @@ class ModeratorSwitchCommandTest(CMSTestCase):
             page2 = get_page_from_path(path)
             self.assertIsNotNone(page2)
             self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
+
+    def tearDown(self):
+        plugin_pool.set_plugin_meta(Text)
 
 
 class PermissionTestsBase(SettingsOverrideTestCase):

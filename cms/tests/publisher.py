@@ -9,8 +9,11 @@ from cms.api import create_page, add_plugin, create_title
 from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
+from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
+
+from djangocms_text_ckeditor.models import Text
 
 
 class PublisherCommandTests(TestCase):
@@ -79,7 +82,6 @@ class PublisherCommandTests(TestCase):
         """
         This tests the plugin models patching when publishing from the command line
         """
-        from djangocms_text_ckeditor.models import Text
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         published = create_page("The page!", "nav_playground.html", "en", published=True)
         draft = Page.objects.drafts()[0]
@@ -93,7 +95,7 @@ class PublisherCommandTests(TestCase):
 
         # Manually undoing table name patching
         Text._meta.db_table = 'djangocms_text_ckeditor_text'
-        delattr(Text, 'patched')
+        Text.patched = False
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
@@ -152,6 +154,8 @@ class PublisherCommandTests(TestCase):
         non_draft = Page.objects.public()[0]
         self.assertEquals(non_draft.reverse_id, 'a_test')
 
+    def tearDown(self):
+        plugin_pool.set_plugin_meta(Text)
 
 class PublishingTests(TestCase):
     def create_page(self, title=None, **kwargs):
