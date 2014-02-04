@@ -384,6 +384,9 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% language_chooser 'short' 'menu/test_language_chooser.html' %}")
             tpl.render(context)
             self.assertEqual(context['template'], 'menu/test_language_chooser.html')
+            tpl = Template("{% load menu_tags %}{% language_chooser 'short' 'menu/test_language_chooser.html' False %}")
+            tpl.render(context)
+            self.assertEqual(context['template'], 'menu/test_language_chooser.html')
             for lang in context['languages']:
                 self.assertEqual(*lang)
 

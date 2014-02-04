@@ -70,6 +70,19 @@ Example:
     {% load menu_tags %}
     {% language_chooser "myapp/language_chooser.html" %}
 
+By default, the language chooser will not translate languages names from their
+native spelling (e.g. "Swedish" will be displayed as "Svenska"). Setting
+``native_language_name`` to ``False`` will change this behaviour, and language
+names will be translated to the currently active language (e.g. "Swedish" will
+be displayed as "Swedish" if English is the currently selected language).
+
+Example:
+
+.. code-block:: html+django
+
+    {% load menu_tags %}
+    {% language_chooser "myapp/language_chooser.html" 'raw' False %}
+
 
 *****************
 page_language_url
