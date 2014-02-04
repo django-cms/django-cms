@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
 from cms.utils.compat.dj import python_2_unicode_compatible
 
 from django.db import models

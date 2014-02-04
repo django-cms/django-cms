@@ -19,7 +19,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.decorators.http import require_POST
 import warnings

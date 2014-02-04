@@ -1,6 +1,6 @@
 import abc
 import json
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from cms.utils.compat.dj import force_unicode
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 from django.template.loader import render_to_string

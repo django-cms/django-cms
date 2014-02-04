@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
-from cms.utils.conf import get_cms_setting
 from django.db.models import Q
 from django.contrib.sites.models import Site
 from cms.publisher.query import PublisherQuerySet
-from django.conf import settings
 from cms.exceptions import NoHomeFound
 from django.utils import timezone
 

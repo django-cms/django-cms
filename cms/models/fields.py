@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from cms.forms.fields import PageSelectFormField, PlaceholderFormField
+from cms.forms.fields import PageSelectFormField
 from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 from django.db import models
-from django.utils.text import capfirst
 
 
 class PlaceholderField(models.ForeignKey):

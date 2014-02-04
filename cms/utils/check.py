@@ -10,7 +10,6 @@ from cms.management.commands.subcommands.list import plugin_report
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
-from django.utils.translation.trans_real import accept_language_re
 from sekizai.helpers import validate_template
 
 SUCCESS = 1
