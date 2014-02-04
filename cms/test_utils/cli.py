@@ -3,6 +3,7 @@ from __future__ import with_statement
 import os
 import dj_database_url
 from cms.utils.compat import DJANGO_1_5
+import django
 
 gettext = lambda s: s
 
@@ -249,7 +250,6 @@ def configure(db_url, **extra):
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ),
-        AUTH_USER_MODEL='customuserapp.User',
         ALLOWED_HOSTS=['localhost'],
         # LOGGING={
         #     'version': 1,
@@ -310,10 +310,15 @@ def configure(db_url, **extra):
 
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
+
+    if django.VERSION >= (1, 5):
+        defaults['AUTH_USER_MODEL'] = 'customuserapp.User'
+
     settings._wrapped = empty
     defaults.update(extra)
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
+    
     if extra_settings:
         from json import load, loads
 
@@ -322,6 +327,7 @@ def configure(db_url, **extra):
                 defaults.update(load(fobj))
         else:
             defaults.update(loads(extra_settings))
+    
     settings.configure(**defaults)
     from south.management.commands import patch_for_test_db_setup
 

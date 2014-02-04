@@ -11,6 +11,7 @@ if django.VERSION >= (1, 5):
     is_user_swapped = bool(OriginalUser._meta.swapped)
 else:
     from django.contrib.auth.models import User
+    User.USERNAME_FIELD = 'username'
     get_user_model = lambda: User
     is_user_swapped = False
     
