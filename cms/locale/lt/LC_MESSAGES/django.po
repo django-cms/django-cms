@@ -34,15 +34,15 @@ msgstr ""
 
 #: cms_toolbar.py:91
 msgid "Users"
-msgstr ""
+msgstr "Vartotojai"
 
 #: cms_toolbar.py:98
 msgid "Sites"
-msgstr ""
+msgstr "Puslapiai"
 
 #: cms_toolbar.py:99
 msgid "Admin Sites"
-msgstr ""
+msgstr "Administravimo Puslapiai"
 
 #: cms_toolbar.py:105
 msgid "Stacks"
@@ -50,20 +50,20 @@ msgstr ""
 
 #: cms_toolbar.py:107
 msgid "Administration"
-msgstr ""
+msgstr "Administravimas"
 
 #: cms_toolbar.py:110
 msgid "User settings"
-msgstr ""
+msgstr "Vartotojo nustatymai"
 
 #: cms_toolbar.py:113
 msgid "Logout"
-msgstr ""
+msgstr "Atsijungti"
 
 #: cms_toolbar.py:120 admin/forms.py:72 admin/forms.py:170
 #: models/settingmodels.py:12
 msgid "Language"
-msgstr ""
+msgstr "Kalba"
 
 #: cms_toolbar.py:168
 msgid "Publish changes"
@@ -95,23 +95,23 @@ msgstr ""
 
 #: cms_toolbar.py:251
 msgid "Pages"
-msgstr ""
+msgstr "Puslapiai"
 
 #: cms_toolbar.py:256 templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr ""
+msgstr "Puslapis"
 
 #: cms_toolbar.py:257
 msgid "Edit this Page"
-msgstr ""
+msgstr "Redaguoti šį puslapį"
 
 #: cms_toolbar.py:259
 msgid "Page settings"
-msgstr ""
+msgstr "Puslapio nustatymai"
 
 #: cms_toolbar.py:268
 msgid "Templates"
-msgstr ""
+msgstr "Šablonai"
 
 #: cms_toolbar.py:279
 msgid "Advanced settings"
@@ -119,7 +119,7 @@ msgstr ""
 
 #: cms_toolbar.py:286
 msgid "Permissions"
-msgstr ""
+msgstr "Leidimai"
 
 #: cms_toolbar.py:292
 msgid "Hide in navigation"
@@ -139,11 +139,11 @@ msgstr ""
 
 #: cms_toolbar.py:321
 msgid "Delete page"
-msgstr ""
+msgstr "Ištrinti puslapį"
 
 #: cms_toolbar.py:326 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
-msgstr ""
+msgstr "Istorija"
 
 #: cms_toolbar.py:341
 msgid "Undo"
@@ -163,7 +163,7 @@ msgstr ""
 
 #: cms_toolbar.py:348
 msgid "View history"
-msgstr ""
+msgstr "Peržiūrėti istoriją"
 
 #: plugin_base.py:77
 msgid "Advanced options"
@@ -179,7 +179,7 @@ msgstr ""
 
 #: admin/forms.py:59
 msgid "Title"
-msgstr ""
+msgstr "Pavadinimas"
 
 #: admin/forms.py:60
 msgid "The default title"
@@ -224,7 +224,7 @@ msgstr ""
 
 #: admin/forms.py:162
 msgid "Application"
-msgstr ""
+msgstr "Aplikacija"
 
 #: admin/forms.py:164
 msgid "Hook application to this page."
@@ -232,7 +232,7 @@ msgstr ""
 
 #: admin/forms.py:165
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Perrašyti URL"
 
 #: admin/forms.py:166
 msgid "Keep this field empty if standard path should be used."
@@ -240,11 +240,11 @@ msgstr ""
 
 #: admin/forms.py:168
 msgid "Redirect"
-msgstr ""
+msgstr "Nukreipti"
 
 #: admin/forms.py:169
 msgid "Redirects to this URL."
-msgstr ""
+msgstr "Nukreipti į šį puslapį"
 
 #: admin/forms.py:198
 msgid "A page with this reverse URL id exists already."
@@ -260,7 +260,7 @@ msgstr ""
 
 #: admin/forms.py:238 models/permissionmodels.py:40
 msgid "user"
-msgstr ""
+msgstr "vartotojas"
 
 #: admin/forms.py:302
 msgid ""
@@ -283,7 +283,7 @@ msgstr ""
 #: admin/forms.py:352 admin/forms.py:359 admin/forms.py:363
 #: templates/admin/cms/usersettings/change_form.html:8
 msgid "Add"
-msgstr ""
+msgstr "Pridėti"
 
 #: admin/forms.py:353 admin/forms.py:360 admin/forms.py:364
 #: templates/cms/toolbar/toolbar.html:36
