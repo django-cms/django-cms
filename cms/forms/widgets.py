@@ -20,9 +20,9 @@ class PageSelectWidget(MultiWidget):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
-
+        self.choices = []
         super(PageSelectWidget, self).__init__((Select, Select, Select), attrs)
-    
+
     def decompress(self, value):
         """
         receives a page_id in value and returns the site_id and page_id
