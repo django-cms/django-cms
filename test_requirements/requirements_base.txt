@@ -13,9 +13,9 @@ argparse
 dj-database-url
 selenium
 django-debug-toolbar
-https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
-djangocms-admin-style
-djangocms-text-ckeditor
-djangocms-column
-djangocms-style
-djangocms_link
+https://github.com/KristianOellegaard/django-hvad/archive/master.zip
+-e git+git://github.com/divio/djangocms-admin-style.git
+-e git+git://github.com/divio/djangocms-text-ckeditor.git
+-e git+git://github.com/divio/djangocms-column.git
+-e git+git://github.com/divio/djangocms-style.git
+-e git+git://github.com/divio/djangocms-link.git

@@ -171,6 +171,15 @@ For alternatives have a look at these plugins:
 * https://github.com/nephila/djangocms_twitter
 * https://github.com/changer/cmsplugin-twitter
 
+Link Plugin removed
+===================
+
+We removed the link plugin (``cms.plugins.link``). As an alternative use:
+
+* https://github.com/divio/djangocms-link
+
+
+
 Placeholder object permissions
 ==============================
 
