@@ -99,7 +99,7 @@ Also add any (or all) of the following plugins, depending on your needs::
 The plugins are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
 There are even more plugins available on the django CMS `extensions page`_.
 
-.. _snippet_plugin snippet-plugin: https://github.com/divio/djangocms-snippet
+.. _snippet_plugin: https://github.com/divio/djangocms-snippet
 .. _extensions page: http://www.django-cms.org/en/extensions/
 
 In addition, make sure you uncomment (enable) ``'django.contrib.admin'``
