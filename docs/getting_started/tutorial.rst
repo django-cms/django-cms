@@ -80,17 +80,17 @@ Also add any (or all) of the following plugins, depending on your needs::
     'cms.plugins.file',
     'cms.plugins.flash',
     'cms.plugins.googlemap',
-    'cms.plugins.link',
     'cms.plugins.picture',
-    'cms.plugins.snippet',
     'cms.plugins.teaser',
+    'djangocms_link',
+    'djangocms_snippet',
     'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
     'cms.plugins.video',
 
 .. warning::
 
-    Adding the ``'cms.plugins.snippet'`` plugin is a potential security hazard.
-    For more information, refer to :ref:`snippets-plugin`.
+    Adding the ``'djangocms_snippet'`` plugin is a potential security hazard.
+    For more information, refer to `snippet_plugin`_.
 
     In addition, ``'cms.plugins.text'`` and ``'cms.plugins.twitter'`` have
     been removed from the Django-CMS bundle. Read :ref:`upgrade-to-3.0` for
@@ -99,6 +99,7 @@ Also add any (or all) of the following plugins, depending on your needs::
 The plugins are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
 There are even more plugins available on the django CMS `extensions page`_.
 
+.. _snippet_plugin snippet-plugin: https://github.com/divio/djangocms-snippet
 .. _extensions page: http://www.django-cms.org/en/extensions/
 
 In addition, make sure you uncomment (enable) ``'django.contrib.admin'``

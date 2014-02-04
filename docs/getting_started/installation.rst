@@ -49,6 +49,18 @@ Text Editors
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
+Other Plugins
+-------------
+
+* djangocms-link
+* djangocms-snippet
+* djangocms-style
+* djangocms-column
+* djangocms-grid
+* djangocms-oembed
+* djangocms-table
+
+
 File and image handling
 -----------------------
 
