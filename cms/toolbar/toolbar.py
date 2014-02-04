@@ -33,8 +33,10 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def __init__(self, request):
         super(CMSToolbar, self).__init__()
-        self.left_items = None
-        self.right_items = None
+        self.right_items = []
+        self.left_items = []
+        self.populated = False
+        self.post_template_populated = False
         self.menus = {}
         self.request = request
         self.login_form = CMSToolbarLoginForm(request=request)
@@ -62,6 +64,17 @@ class CMSToolbar(ToolbarAPIMixin):
                 user_settings.save()
             self.toolbar_language = user_settings.language
             self.clipboard = user_settings.clipboard
+        with force_language(self.language):
+            try:
+                self.view_name = resolve(self.request.path).func.__module__
+            except Resolver404:
+                self.view_name = ""
+        self.toolbars = toolbar_pool.get_toolbars()
+        app_key = ""
+        for key in self.toolbars:
+            app_name = ".".join(key.split(".")[:-2])
+            if app_name in self.view_name and len(key) > len(app_key):
+                app_key = key
 
     @property
     def csrf_token(self):
@@ -132,18 +145,13 @@ class CMSToolbar(ToolbarAPIMixin):
         """
         Get the CMS items on the toolbar
         """
-        if self.right_items is not None or self.left_items is not None:
+        if self.populated:
             return
-        self.right_items = []
-        self.left_items = []
+        self.populated = True
         # never populate the toolbar on is_staff=False
         if not self.is_staff:
             return
-        with force_language(self.language):
-            try:
-                self.view_name = resolve(self.request.path).func.__module__
-            except Resolver404:
-                self.view_name = ""
+
         with force_language(self.toolbar_language):
             toolbars = toolbar_pool.get_toolbars()
             app_key = ""
@@ -162,11 +170,34 @@ class CMSToolbar(ToolbarAPIMixin):
                 toolbar = toolbars[key](self.request, self, key == app_key, app_key)
                 toolbar.populate()
 
+    def post_template_populate(self):
+        if not self.is_staff:
+            return
+        self._call_toolbar('post_template_populate')
+
     def request_hook(self):
         if self.request.method != 'POST':
             return self._request_hook_get()
         else:
             return self._request_hook_post()
+
+    def _call_toolbar(self, func_name, args, kwargs=None):
+        toolbars = toolbar_pool.get_toolbars()
+        with force_language(self.language):
+            first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
+            app_key = ""
+            for key in toolbars:
+                app_name = ".".join(key.split(".")[:-2])
+                if app_name in self.view_name and len(key) > len(app_key):
+                    app_key = key
+            for key in first:
+                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
+                getattr(toolbar, func_name)(*args, **kwargs)
+            for key in toolbars:
+                if key in first:
+                    continue
+                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
+                getattr(toolbar, func_name)(*args, **kwargs)
 
     def _request_hook_get(self):
         if 'cms-toolbar-logout' in self.request.GET:

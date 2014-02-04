@@ -18,4 +18,7 @@ class CMSToolbar(object):
             self.current_lang = None
 
     def populate(self):
-        raise NotImplemented('populate() is not implemented')
+        pass
+
+    def post_template_populate(self):
+        pass
