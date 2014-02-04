@@ -113,6 +113,102 @@ menus::
             admin_menu.add_break('poll-break', position=menu)
 
 
+===========================
+Adding Items Alphabetically
+===========================
+
+Sometimes it is desireable to add sub-menus from different applications
+alphabetically. This can be challenging due to the non-obvious manner in which
+your apps will be loaded into Django and is further complicated when you add new
+applications over time.
+
+To aide developers, django-cms exposes a :meth:`cms.toolbar.items.ToolbarMixin.get_alphabetical_insert_position`
+method, which, if used consistently can produce alphabetized sub-menus, even
+when they come from multiple applications.
+
+An example is shown here for an 'Offices' app, which allows handy access to
+certain admin functions for managing office locations in a project::
+
+    from django.core.urlresolvers import reverse
+    from django.utils.translation import ugettext_lazy as _
+    from cms.toolbar_base import CMSToolbar
+    from cms.toolbar_pool import toolbar_pool
+    from cms.toolbar.items import Break, SubMenu
+    from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+
+    @toolbar_pool.register
+    class OfficesToolbar(CMSToolbar):
+
+        def populate(self):
+            #
+            # 'Apps' is the spot on the existing djang-cms toolbar admin_menu
+            # 'where we'll insert all of our applications' menus.
+            #
+            admin_menu = self.toolbar.get_or_create_menu(
+                ADMIN_MENU_IDENTIFIER, _('Apps')
+            )
+
+            #
+            # Let's check to see where we would insert an 'Offices' menu in the
+            # admin_menu.
+            #
+            position = admin_menu.get_alphabetical_insert_position(
+                _('Offices'),
+                SubMenu
+            )
+
+            #
+            # If zero was returned, then we know we're the first of our
+            # applications' menus to be inserted into the admin_menu, so, here
+            # we'll compute that we need to go after the first
+            # ADMINISTRATION_BREAK and, we'll insert our own break after our
+            # section.
+            #
+            if not position:
+                # OK, use the ADMINISTRATION_BREAK location + 1
+                position = admin_menu.find_first(
+                    Break,
+                    identifier=ADMINISTRATION_BREAK
+                ) + 1
+                # Insert our own menu-break, at this new position. We'll insert
+                # all subsequent menus before this, so it will ultimately come
+                # after all of our applications' menus.
+                admin_menu.add_break('custom-break', position=position)
+
+            # OK, create our office menu here.
+            office_menu = admin_menu.get_or_create_menu(
+                'offices-menu',
+                _('Offices ...'),
+                position=position
+            )
+
+            # Let's add some sub-menus to our office menu that help our users
+            # manage office-related things.
+
+            # Take the user to the admin-listing for offices...
+            url = reverse('admin:offices_office_changelist')
+            office_menu.add_sideframe_item(_('Offices List'), url=url)
+
+            # Display a modal dialogue for creating a new office...
+            url = reverse('admin:offices_office_add')
+            office_menu.add_modal_item(_('Add New Office'), url=url)
+
+            # Add a break in the submenus
+            office_menu.add_break()
+
+            # More submenus...
+            url = reverse('admin:offices_state_changelist')
+            office_menu.add_sideframe_item(_('States List'), url=url)
+
+            url = reverse('admin:offices_state_add')
+            office_menu.add_modal_item(_('Add New State'), url=url)
+
+Here is the resulting toolbar (with a few other menus sorted alphabetically
+beside it)
+
+|alphabetized-toolbar-app-menus|
+
+.. |alphabetized-toolbar-app-menus| image:: ../images/alphabetized-toolbar-app-menus.png
 
 ==========================
 Adding items through views
