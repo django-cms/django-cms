@@ -178,6 +178,15 @@ We removed the link plugin (``cms.plugins.link``). As an alternative use:
 
 * https://github.com/divio/djangocms-link
 
+Snippet Plugin removed
+======================
+
+We removed the snippet plugin (``cms.plugins.snippet``). As an alternative use:
+
+* https://github.com/divio/djangocms-link
+* https://github.com/pbs/django-cms-smartsnippets
+
+
 
 
 Placeholder object permissions
