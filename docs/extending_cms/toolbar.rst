@@ -34,8 +34,13 @@ These have four attributes:
 * is_current_app (a flag indicating whether the current request is handled by the same app as the function is in)
 * app_path (the name of the app used for the current request)
 
-This classes must implement a ``populate`` function.
-The populate function will only be called if the current user is a staff user.
+This classes must implement a ``populate`` or ``post_template_populate`` function. An optional ``request_hook`` function
+is available for overwrite as well.
+The populate functions will only be called if the current user is a staff user.
+The ``populate`` function will be called before the template and plugins are rendered.
+The ``post_template_populate`` function will be called after the template is rendered.
+The ``request_hook`` function is called before the view and may return a response. This way you would be able to issue
+redirects from a toolbar.
 
 A simple example, registering a class that does nothing::
 

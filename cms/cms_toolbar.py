@@ -10,7 +10,7 @@ from cms.toolbar_base import CMSToolbar
 from cms.utils.i18n import get_language_objects, get_language_object, force_language
 from django.contrib.auth import logout
 from django.contrib.sites.models import Site
-from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils import get_cms_setting
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings
@@ -46,7 +46,7 @@ class PlaceholderToolbar(CMSToolbar):
 
     """
 
-    def populate(self):
+    def post_template_populate(self):
         self.page = get_page_draft(self.request.current_page)
         statics = getattr(self.request, 'static_placeholders', [])
         placeholders = getattr(self.request, 'placeholders', [])
@@ -160,15 +160,17 @@ class PageToolbar(CMSToolbar):
             self.change_admin_menu()
             if self.page:
                 self.add_page_menu()
+        # history menu
+        if self.page and self.toolbar.edit_mode:
+            self.add_history_menu()
+            self.change_language_menu()
+
+    def post_template_populate(self):
         statics = getattr(self.request, 'static_placeholders', [])
         dirty_statics = [stpl for stpl in statics if stpl.dirty]
         placeholders = getattr(self.request, 'placeholders', [])
         if self.page or statics:
             if self.toolbar.edit_mode:
-                # history menu
-                if self.page:
-                    self.add_history_menu()
-                    self.change_language_menu()
                 # publish button
                 publish_permission = True
                 if self.page and not self.page.has_publish_permission(self.request):
