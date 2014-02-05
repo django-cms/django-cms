@@ -7,8 +7,8 @@ from django.template.defaultfilters import truncatewords
 from cms.views import details
 import re
 from cms.api import create_page, create_title
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
-from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -248,6 +248,33 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/admin/cms/usersettings/')
             self.assertEqual(response.status_code, 200)
+
+    def test_get_alphabetical_insert_position(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), '/')
+        toolbar = CMSToolbar(request)
+        toolbar.get_left_items()
+        toolbar.get_right_items()
+
+        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'TestAppMenu')
+
+        # Insert alpha
+        alpha_position = admin_menu.get_alphabetical_insert_position('menu-alpha', SubMenu, None)
+
+        # As this will be the first item added to this, this use should return the default, or namely None
+        if not alpha_position:
+            alpha_position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK) + 1
+        menu = admin_menu.get_or_create_menu('menu-alpha', 'menu-alpha', position=alpha_position)
+
+        # Insert gamma (should return alpha_position + 1)
+        gamma_position = admin_menu.get_alphabetical_insert_position('menu-gamma', SubMenu)
+        self.assertEquals(int(gamma_position), int(alpha_position) + 1)
+        admin_menu.get_or_create_menu('menu-gamma', 'menu-gamma', position=gamma_position)
+
+        # Where should beta go? It should go right where gamma is now...
+        beta_position = admin_menu.get_alphabetical_insert_position('menu-beta', SubMenu)
+        self.assertEqual(beta_position, gamma_position)
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):

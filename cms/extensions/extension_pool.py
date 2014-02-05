@@ -1,5 +1,4 @@
 from cms.exceptions import SubClassNeededError
-from cms.models import Title
 
 from .models import PageExtension, TitleExtension
 
