@@ -3,12 +3,12 @@ from __future__ import with_statement
 import inspect
 from contextlib import contextmanager
 import os
-from django.db.models import get_app_paths
 from django.template import Lexer, TOKEN_BLOCK
 from cms import constants
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
+from cms.utils.compat.dj import get_app_paths
 from cms.management.commands.subcommands.list import plugin_report
 from django.conf import settings
 from django.utils.decorators import method_decorator
