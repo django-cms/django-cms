@@ -1,20 +1,14 @@
 # -*- coding: utf-8 -*-
-from classytags.arguments import Argument
-from classytags.core import Tag, Options
+import warnings
+
 from django import template
+
+from cms.templatetags.cms_tags import RenderPlaceholder
+
+warnings.warn('render_placeholder is now located in cms_tags. Please do not '
+              'load placeholder_tags anymore.', DeprecationWarning)
 
 register = template.Library()
 
-
-class RenderPlaceholder(Tag):
-    name = 'render_placeholder'
-    options = Options(
-        Argument('placeholder'),
-        Argument('width', default=None, required=False),
-        'language',
-        Argument('language', default=None, required=False),
-    )
-
-    def render_tag(self, context, placeholder, width, language=None):
-        raise DeprecationWarning('render_placeholder is now located in cms_tags. Please do not load placeholder_tags anymore')
 register.tag(RenderPlaceholder)
+
