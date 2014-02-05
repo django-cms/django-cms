@@ -78,7 +78,7 @@ class CMSToolbar(ToolbarAPIMixin):
             if app_name in self.view_name and len(key) > len(app_key):
                 app_key = key
         for key in toolbars:
-            toolbars[key] = toolbars[key](self.request, self, key == app_key, app_key)
+            self.toolbars[key] = toolbars[key](self.request, self, key == app_key, app_key)
 
     @property
     def csrf_token(self):
@@ -169,6 +169,24 @@ class CMSToolbar(ToolbarAPIMixin):
         response = self._call_toolbar('request_hook')
         if isinstance(response, HttpResponse):
             return response
+
+        if self.request.method != 'POST':
+            return self._request_hook_get()
+        else:
+            return self._request_hook_post()
+
+    def _request_hook_get(self):
+        if 'cms-toolbar-logout' in self.request.GET:
+            logout(self.request)
+            return HttpResponseRedirect(self.request.path)
+
+    def _request_hook_post(self):
+        # login hook
+        if 'cms-toolbar-login' in self.request.GET:
+            self.login_form = CMSToolbarLoginForm(request=self.request, data=self.request.POST)
+            if self.login_form.is_valid():
+                login(self.request, self.login_form.user_cache)
+                return HttpResponseRedirect(self.request.path)
 
     def _call_toolbar(self, func_name):
         with force_language(self.language):
