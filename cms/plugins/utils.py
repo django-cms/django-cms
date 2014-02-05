@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from cms.exceptions import PluginLimitReached
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request, permissions
-from cms.utils.i18n import get_redirect_on_fallback, get_fallback_languages
+from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode

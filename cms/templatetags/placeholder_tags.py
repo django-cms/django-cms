@@ -2,7 +2,6 @@
 from classytags.arguments import Argument
 from classytags.core import Tag, Options
 from django import template
-from django.template.defaultfilters import safe
 
 register = template.Library()
 

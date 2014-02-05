@@ -2,10 +2,6 @@ from classytags.arguments import Argument
 from classytags.core import Tag, Options
 from django import template
 
-from cms.plugin_rendering import render_placeholder
-
-from cms.stacks.models import Stack
-
 register = template.Library()
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.admin import csrf_protect_m
 from django.contrib.admin import ModelAdmin
 

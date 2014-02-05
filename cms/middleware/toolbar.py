@@ -4,7 +4,6 @@ Edit Toolbar middleware
 """
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import force_language
 from menus.menu_pool import menu_pool
 from django.http import HttpResponse
