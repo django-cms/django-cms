@@ -1,6 +1,6 @@
 import abc
 import json
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from cms.utils.compat.dj import force_unicode
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 from django.template.loader import render_to_string
@@ -93,6 +93,28 @@ class ToolbarAPIMixin(object):
             return self.find_items(item_type, **attributes)[0]
         except IndexError:
             return None
+
+    #
+    # This will only work if it is used to determine the insert position for
+    # all items in the same menu.
+    #
+    def get_alphabetical_insert_position(self, new_menu_name, item_type, default=0):
+        results = self.find_items(item_type)
+
+        # No items yet? Use the default value provided
+        if not len(results):
+            return default
+
+        last_position = 0
+
+        for result in sorted(results, key=lambda x: x.item.name):
+            if result.item.name > new_menu_name:
+                return result.index
+
+            if result.index > last_position:
+                last_position = result.index
+        else:
+            return last_position + 1
 
     def remove_item(self, item):
         self._remove_item(item)

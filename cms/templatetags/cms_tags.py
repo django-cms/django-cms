@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy, copy
+from copy import copy
 from itertools import chain
 from datetime import datetime
 from django.template.defaultfilters import safe

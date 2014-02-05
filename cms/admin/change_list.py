@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import bisect
-from collections import defaultdict
-from cms.models import Title, Page, PageModeratorState, EmptyTitle, PagePermission
+from cms.models import Title, Page, EmptyTitle
 from cms.utils import get_language_list
 from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting

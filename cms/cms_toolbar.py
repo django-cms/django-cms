@@ -7,7 +7,7 @@ from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.utils.i18n import get_language_objects, get_language_object, force_language
 from django.contrib.sites.models import Site
-from cms.utils import get_language_from_request, get_cms_setting
+from cms.utils import get_cms_setting
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings

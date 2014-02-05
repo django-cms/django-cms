@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.template.defaultfilters import title
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext_lazy as _
 import operator
 from django.contrib import admin
 

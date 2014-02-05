@@ -9,7 +9,7 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.contrib.sites.models import Site
 
-from cms.models import Page, Title
+from cms.models import Page
 from cms.utils import permissions, get_language_from_request, get_language_list, get_cms_setting
 from cms.utils.permissions import has_global_page_permission
 from django.utils.encoding import smart_str
