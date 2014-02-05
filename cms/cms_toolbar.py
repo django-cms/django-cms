@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.views import login
 from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.models import Title
 from cms.toolbar.items import TemplateItem
+from cms.toolbar.toolbar import CMSToolbarLoginForm
 from cms.toolbar_base import CMSToolbar
 from cms.utils.i18n import get_language_objects, get_language_object, force_language
+from django.contrib.auth import logout
 from django.contrib.sites.models import Site
 from cms.utils import get_language_from_request, get_cms_setting
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -84,6 +88,25 @@ class BasicToolbar(CMSToolbar):
         self.add_admin_menu()
         self.add_language_menu()
 
+    def request_hook(self):
+        if self.request.method != 'POST':
+            return self._request_hook_get()
+        else:
+            return self._request_hook_post()
+
+    def _request_hook_get(self):
+        if 'cms-toolbar-logout' in self.request.GET:
+            logout(self.request)
+            return HttpResponseRedirect(self.request.path)
+
+    def _request_hook_post(self):
+        # login hook
+        if 'cms-toolbar-login' in self.request.GET:
+            self.toolbar.login_form = CMSToolbarLoginForm(request=self.request, data=self.request.POST)
+            if self.login_form.is_valid():
+                login(self.request, self.login_form.user_cache)
+                return HttpResponseRedirect(self.request.path)
+
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
@@ -100,8 +123,6 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-        # static placeholders
-        admin_menu.add_sideframe_item(_('Static Placeholders'), url=reverse('admin:cms_staticplaceholder_changelist'))
         # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)

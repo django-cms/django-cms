@@ -10,7 +10,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django import forms
 from django.contrib.auth import login, logout
 from django.core.urlresolvers import resolve, Resolver404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -69,12 +69,16 @@ class CMSToolbar(ToolbarAPIMixin):
                 self.view_name = resolve(self.request.path).func.__module__
             except Resolver404:
                 self.view_name = ""
-        self.toolbars = toolbar_pool.get_toolbars()
-        app_key = ""
-        for key in self.toolbars:
+        toolbars = toolbar_pool.get_toolbars()
+
+        self.toolbars = {}
+        app_key = ''
+        for key in toolbars:
             app_name = ".".join(key.split(".")[:-2])
             if app_name in self.view_name and len(key) > len(app_key):
                 app_key = key
+        for key in toolbars:
+            toolbars[key] = toolbars[key](self.request, self, key == app_key, app_key)
 
     @property
     def csrf_token(self):
@@ -151,63 +155,34 @@ class CMSToolbar(ToolbarAPIMixin):
         # never populate the toolbar on is_staff=False
         if not self.is_staff:
             return
-
-        with force_language(self.toolbar_language):
-            toolbars = toolbar_pool.get_toolbars()
-            app_key = ""
-            for key in toolbars:
-                app_name = ".".join(key.split(".")[:-2])
-                if app_name in self.view_name and len(key) > len(app_key):
-                    app_key = key
-                # if the cms_toolbar is in use, ensure it's first
-            first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
-            for key in first:
-                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
-                toolbar.populate()
-            for key in toolbars:
-                if key in first:
-                    continue
-                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
-                toolbar.populate()
+        self._call_toolbar('populate')
 
     def post_template_populate(self):
+        if self.post_template_populated:
+            return
+        self.post_template_populated = True
         if not self.is_staff:
             return
         self._call_toolbar('post_template_populate')
 
     def request_hook(self):
-        if self.request.method != 'POST':
-            return self._request_hook_get()
-        else:
-            return self._request_hook_post()
+        response = self._call_toolbar('request_hook')
+        if isinstance(response, HttpResponse):
+            return response
 
-    def _call_toolbar(self, func_name, args, kwargs=None):
-        toolbars = toolbar_pool.get_toolbars()
+    def _call_toolbar(self, func_name):
         with force_language(self.language):
             first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
-            app_key = ""
-            for key in toolbars:
-                app_name = ".".join(key.split(".")[:-2])
-                if app_name in self.view_name and len(key) > len(app_key):
-                    app_key = key
             for key in first:
-                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
-                getattr(toolbar, func_name)(*args, **kwargs)
-            for key in toolbars:
+                toolbar = self.toolbars[key]
+                result = getattr(toolbar, func_name)()
+                if isinstance(result, HttpResponse):
+                    return result
+            for key in self.toolbars:
                 if key in first:
                     continue
-                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
-                getattr(toolbar, func_name)(*args, **kwargs)
+                toolbar = self.toolbars[key]
+                result = getattr(toolbar, func_name)()
+                if isinstance(result, HttpResponse):
+                    return result
 
-    def _request_hook_get(self):
-        if 'cms-toolbar-logout' in self.request.GET:
-            logout(self.request)
-            return HttpResponseRedirect(self.request.path)
-
-    def _request_hook_post(self):
-        # login hook
-        if 'cms-toolbar-login' in self.request.GET:
-            self.login_form = CMSToolbarLoginForm(request=self.request, data=self.request.POST)
-            if self.login_form.is_valid():
-                login(self.request, self.login_form.user_cache)
-                return HttpResponseRedirect(self.request.path)

@@ -22,3 +22,6 @@ class CMSToolbar(object):
 
     def post_template_populate(self):
         pass
+
+    def request_hook(self):
+        pass
