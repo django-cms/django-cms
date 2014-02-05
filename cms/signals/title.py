@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from cms.models import Title
+from cms.signals.apphook import apphook_pre_checker, apphook_post_checker, apphook_post_delete_checker
 from menus.menu_pool import menu_pool
 
 
@@ -45,12 +46,7 @@ def pre_save_title(instance, raw, **kwargs):
             instance.tmp_path = Title.objects.filter(pk=instance.id).values_list('path')[0][0]
         except IndexError:
             pass  # no Titles exist for this page yet
-
-    # Build path from parent page's path and slug
-    if instance.has_url_overwrite and instance.path:
-        instance.path = instance.path.strip(" /")
-    else:
-        update_title(instance)
+    apphook_pre_checker(instance, **kwargs)
 
 
 def post_save_title(instance, raw, created, **kwargs):
@@ -75,6 +71,7 @@ def post_save_title(instance, raw, created, **kwargs):
         del instance.tmp_path
     if prevent_descendants:
         del instance.tmp_prevent_descendant_update
+    apphook_post_checker(instance, **kwargs)
 
 
 def pre_delete_title(instance, **kwargs):
@@ -89,3 +86,7 @@ def pre_delete_title(instance, **kwargs):
         instance.page.languages = ",".join(languages)
         instance.page._publisher_keep_state = True
         instance.page.save(no_signals=True)
+
+
+def post_delete_title(instance, **kwargs):
+    apphook_post_delete_checker(instance, **kwargs)

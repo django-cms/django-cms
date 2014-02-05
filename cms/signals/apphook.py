@@ -7,9 +7,9 @@ def apphook_pre_checker(instance, **kwargs):
     Store the old application_urls and path on the instance
     """
     try:
-        instance._old_data = Title.objects.filter(pk=instance.pk).values_list('application_urls', 'path')[0]
+        instance._old_data = Title.objects.filter(pk=instance.pk).values_list('page__application_urls', 'path', 'published')[0]
     except IndexError:
-        instance._old_data = (None, None)
+        instance._old_data = (None, None, False)
 
 
 def apphook_post_checker(instance, **kwargs):
@@ -29,5 +29,5 @@ def apphook_post_delete_checker(instance, **kwargs):
     Check if this was an apphook
     """
     from cms.signals import urls_need_reloading
-    if instance.application_urls:
+    if instance.page.application_urls:
         urls_need_reloading.send(sender=instance)

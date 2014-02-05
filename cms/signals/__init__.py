@@ -3,8 +3,8 @@ from cms.signals.page import pre_save_page, post_save_page, pre_delete_page, pos
 from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
 from cms.signals.placeholder import pre_delete_placeholder_ref, post_delete_placeholder_ref
 from cms.signals.plugins import update_plugin_positions
-from cms.signals.reversion import post_revision
-from cms.signals.title import pre_save_title, post_save_title, pre_delete_title
+from cms.signals.reversion_signals import post_revision
+from cms.signals.title import pre_save_title, post_save_title, pre_delete_title, post_delete_title
 from cms.utils.conf import get_cms_setting
 from django.db.models import signals
 from django.dispatch import Signal
@@ -43,6 +43,7 @@ page_moved.connect(post_moved_page, sender=Page)
 signals.pre_save.connect(pre_save_title, sender=Title)
 signals.post_save.connect(post_save_title, sender=Title)
 signals.pre_delete.connect(pre_delete_title, sender=Title)
+signals.post_delete.connect(post_delete_title, sender=Title)
 
 ###################### placeholder #######################
 
@@ -75,10 +76,6 @@ if get_cms_setting('PERMISSION'):
 
     signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission)
     signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission)
-
-signals.pre_save.connect(apphook_pre_checker, sender=Title)
-signals.post_save.connect(apphook_post_checker, sender=Title)
-signals.post_delete.connect(apphook_post_delete_checker, sender=Title)
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.models import post_revision_commit
