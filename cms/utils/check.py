@@ -282,9 +282,10 @@ def _load_all_templates(directory):
             if os.path.isdir(path):
                 for template in _load_all_templates(path):
                     yield template
-            else:
-                with open(path) as fobj:
-                    lexer = Lexer(fobj.read(), fobj)
+            elif path.endswith('.html'):
+                with open(path, 'rb') as fobj:
+                    source = fobj.read().decode(settings.FILE_CHARSET)
+                    lexer = Lexer(source, path)
                     yield lexer.tokenize(), path
 
 @define_check
