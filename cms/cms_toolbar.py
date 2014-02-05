@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import login
 from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.models import Title
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
-from cms.utils.i18n import get_language_objects, get_language_object, force_language
-from django.contrib.auth import logout
 from django.contrib.sites.models import Site
 from cms.utils import get_cms_setting
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django import forms
-from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -38,18 +32,6 @@ USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
-
-
-class CMSToolbarLoginForm(AuthenticationForm):
-    username = forms.CharField(label=_("Username"), max_length=100)
-
-    def __init__(self, *args, **kwargs):
-        kwargs['prefix'] = kwargs.get('prefix', 'cms')
-        super(CMSToolbarLoginForm, self).__init__(*args, **kwargs)
-
-    def check_for_test_cookie(self): pass  # for some reason this test fails in our case. but login works.
-
-
 
 
 @toolbar_pool.register

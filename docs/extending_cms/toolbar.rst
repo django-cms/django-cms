@@ -36,11 +36,12 @@ These have four attributes:
 
 This classes must implement a ``populate`` or ``post_template_populate`` function. An optional ``request_hook`` function
 is available for overwrite as well.
-The populate functions will only be called if the current user is a staff user.
-The ``populate`` function will be called before the template and plugins are rendered.
-The ``post_template_populate`` function will be called after the template is rendered.
-The ``request_hook`` function is called before the view and may return a response. This way you would be able to issue
-redirects from a toolbar.
+
+* The populate functions will only be called if the current user is a staff user.
+* The ``populate`` function will be called before the template and plugins are rendered.
+* The ``post_template_populate`` function will be called after the template is rendered.
+* The ``request_hook`` function is called before the view and may return a response. This way you would be able to issue
+  redirects from a toolbar if needed
 
 A simple example, registering a class that does nothing::
 
@@ -53,7 +54,21 @@ A simple example, registering a class that does nothing::
         def populate(self):
             pass
 
+        def post_template_populate(self):
+            pass
 
+        def request_hook(self):
+            pass
+
+
+.. warning::
+
+    ``post_template_populate`` maybe finds different nodes in the toolbar than propagate.
+
+.. tip::
+
+    You can change the toolbar or add items inside a plugin render method (context['request'].toolbar) or inside a view
+    (request.toolbar)
 
 ************
 Adding items
@@ -135,8 +150,6 @@ selected poll and its sub-methods::
 
     def detail(request, poll_id):
         poll = get_object_or_404(Poll, pk=poll_id)
-
-        request.toolbar.populate()
         menu = request.toolbar.get_or_create_menu('polls-app', _('Polls'))
         menu.add_modal_item(_('Change this Poll'), url=reverse('admin:polls_poll_change', args=[poll_id]))
         menu.add_sideframe_item(_('Show History of this Poll'), url=reverse('admin:polls_poll_history', args=[poll_id]))
