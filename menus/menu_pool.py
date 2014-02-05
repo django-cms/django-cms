@@ -126,7 +126,8 @@ class MenuPool(object):
         if request.user.is_authenticated():
             key += "_%s_user" % request.user.pk
         cached_nodes = cache.get(key, None)
-        if cached_nodes:
+        if cached_nodes and CacheKey.objects.filter(
+                key=key, language=lang, site=site_id).exists():
             return cached_nodes
         
         final_nodes = []
