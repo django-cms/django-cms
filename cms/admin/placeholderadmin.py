@@ -13,7 +13,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
-from cms.plugins.utils import has_reached_plugin_limit, requires_reload
+from cms.utils.plugins import requires_reload, has_reached_plugin_limit
 from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404

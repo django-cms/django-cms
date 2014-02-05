@@ -13,7 +13,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.plugins.googlemap.models import GoogleMap
 from cms.plugins.inherit.cms_plugins import InheritPagePlaceholderPlugin
-from cms.plugins.utils import get_plugins_for_page
+from cms.utils.plugins import get_plugins_for_page
 from cms.plugins.file.models import File
 from cms.plugins.inherit.models import InheritPagePlaceholder
 from cms.plugins.link.forms import LinkForm
@@ -773,7 +773,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(URL_CMS_PLUGIN_MOVE, post)
         self.assertEquals(response.status_code, 200)
 
-        from cms.plugins.utils import build_plugin_tree
+        from cms.utils.plugins import build_plugin_tree
 
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
         plugin_pool.unregister_plugin(DumbFixturePlugin)
