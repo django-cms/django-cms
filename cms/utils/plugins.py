@@ -2,7 +2,6 @@
 from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
-from cms.templatetags.cms_tags import Placeholder
 from cms.utils import get_language_from_request, permissions
 from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_fallback_languages
@@ -80,6 +79,8 @@ def _extend_nodelist(extend_node):
 
 
 def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
+    from cms.templatetags.cms_tags import Placeholder
+    
     placeholders = []
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
