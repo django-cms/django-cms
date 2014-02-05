@@ -19,7 +19,10 @@ try:
     from django.db.models.loading import get_app_paths
 except ImportError:
     from django.db.models.loading import get_apps
-    from django.utils._os import upath
+    try:
+        from django.utils._os import upath
+    except ImportError:
+        upath = lambda path: path
 
     def get_app_paths():
         """
