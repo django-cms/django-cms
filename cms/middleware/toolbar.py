@@ -16,7 +16,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     child_plugin_classes = []
     plugin_class = instance.get_plugin_class()
     if plugin_class.allow_children:
-        instance, plugin = instance.get_plugin_instance()
+        inst, plugin = instance.get_plugin_instance()
         page = original_context['request'].current_page
         childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(placeholder, page)]
         # Builds the list of dictionaries containing module, name and value for the plugin dropdowns

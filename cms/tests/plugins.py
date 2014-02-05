@@ -16,8 +16,8 @@ from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.utils.plugins import get_plugins_for_page
 from djangocms_file.models import File
 from djangocms_inherit.models import InheritPagePlaceholder
-from cms.plugins.link.forms import LinkForm
-from cms.plugins.link.models import Link
+from djangocms_link.forms import LinkForm
+from djangocms_link.models import Link
 from djangocms_picture.models import Picture
 from cms.toolbar.toolbar import CMSToolbar
 from djangocms_text_ckeditor.models import Text

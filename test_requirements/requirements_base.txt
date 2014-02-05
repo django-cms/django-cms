@@ -25,3 +25,4 @@ https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
 -e git+git://github.com/divio/djangocms-picture.git#egg=djangocms-picture
 -e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
 -e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
+-e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
