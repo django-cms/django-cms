@@ -5,13 +5,16 @@ from cms.tests.menu_page_viewperm import ViewPermissionTests
 
 from django.contrib.auth.models import  User
 
+__all__ = [
+    'ViewPermissionComplexMenuStaffNodeTests',
+]
+
 
 class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
     """
     Test CMS_PUBLIC_FOR=staff group access and menu nodes rendering
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'staff',
     }
@@ -50,6 +53,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_c',
                    'page_b_d',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -111,6 +116,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_b_b',
                    'page_b_b_c',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -177,6 +184,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_d_b',
                    'page_b_d_c',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -256,6 +265,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_b_b',
                    'page_b_b_c',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d_a',
                    'page_d_b',
                    'page_d_c',
@@ -327,6 +338,8 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self._setup_view_restrictions()
         granted = ['page_a',
                    'page_c',
+                   'page_c_a',
+                   'page_c_b',
                    'page_d',
                    'page_d_a',
                    'page_d_b',

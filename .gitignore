@@ -2,6 +2,7 @@
 !.travis.yml
 *.swp
 *.lock
+*.log
 *.pid
 cms/django
 *.DS_Store
@@ -37,3 +38,5 @@ include/
 lib/
 man/
 share/
+.editorconfig
+cms/static/cms/compass_app_log.txt

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
+from cms.utils.conf import get_cms_setting
 from django.utils.translation import ugettext as _
 
 from django.contrib import admin
@@ -58,6 +58,6 @@ class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     def get_fieldsets(self, request, obj=None):
         return self.update_permission_fieldsets(request, obj)
 
-if settings.CMS_PERMISSION:    
+if get_cms_setting('PERMISSION'):
     admin.site.register(PageUser, PageUserAdmin)
     admin.site.register(PageUserGroup, PageUserGroupAdmin)

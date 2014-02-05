@@ -1,8 +1,10 @@
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin
 
 
+@python_2_unicode_compatible
 class GoogleMap(CMSPlugin):
     """
     A google maps integration
@@ -38,7 +40,21 @@ class GoogleMap(CMSPlugin):
     height = models.CharField(_('height'), max_length=6, default='400px',
                               help_text=_('Plugin height (in pixels).'))
 
-    def __unicode__(self):
+    info_window = models.BooleanField(_('info window'), default=True,
+                                      help_text=_('Show textbox over marker'))
+    scrollwheel = models.BooleanField(_('scrollwheel'), default=True,
+                          help_text=_('Enable scrollwheel zooming on the map'))
+    double_click_zoom = models.BooleanField(_('double click zoom'),
+                                            default=True)
+    draggable = models.BooleanField(_('draggable'), default=True)
+    keyboard_shortcuts = models.BooleanField(_('keyboard shortcuts'),
+                                             default=True)
+    pan_control = models.BooleanField(_('Pan control'), default=True)
+    zoom_control = models.BooleanField(_('zoom control'), default=True)
+    street_view_control = models.BooleanField(_('Street View control'),
+                                              default=True)
+
+    def __str__(self):
         return u"%s (%s, %s %s)" % (self.get_title(), self.address,
                                     self.zipcode, self.city,)
 

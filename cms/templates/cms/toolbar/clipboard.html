@@ -1,0 +1,28 @@
+{% load i18n %}
+{% load url from future %}
+
+{% if request.toolbar.edit_mode or request.toolbar.build_mode %}
+{% if request.toolbar.get_clipboard_plugins %}
+{% with slot="clipboard" %}
+<div class="cms_clipboard">
+	<div class="cms_clipboard-triggers">
+		{# maximum of 5, delete link #}
+		{% for plugin in request.toolbar.get_clipboard_plugins %}
+			{% if not plugin.parent_id %}
+			<div class="cms_clipboard-numbers"><a href="#">{{ forloop.index }}</a></div>
+			{% endif %}
+		{% endfor %}
+	</div>
+	{% for plugin in request.toolbar.get_clipboard_plugins %}
+	<div class="cms_plugins">{% include "cms/toolbar/plugin.html" with instance=plugin %}</div>
+	{% endfor %}
+	<div class="cms_clipboard-containers cms_dragarea cms_draggables">
+		{% for plugin in request.toolbar.get_clipboard_plugins %}
+			{% with show_language="true" %}{% include "cms/toolbar/dragitem.html" with plugin=plugin %}{% endwith %}
+		{% endfor %}
+	</div>
+	<p class="cms_clipboard-empty"><a href="#">{% trans "Empty Clipboard" %}</a></p>
+</div>
+{% endwith %}
+{% endif %}
+{% endif %}

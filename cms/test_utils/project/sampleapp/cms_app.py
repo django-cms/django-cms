@@ -11,6 +11,13 @@ class SampleApp(CMSApp):
 apphook_pool.register(SampleApp)
 
 
+class SampleApp2(CMSApp):
+    name = _("Sample App 2")
+    urls = ["cms.test_utils.project.sampleapp.urls2"]
+
+apphook_pool.register(SampleApp2)
+
+
 class NamespacedApp(CMSApp):
     name = _("Namespaced App")
     urls = [

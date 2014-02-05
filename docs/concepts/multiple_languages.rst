@@ -17,10 +17,15 @@ How django CMS determines the user's preferred language
 django CMS determines the user's language the same way Django does it.
 
 * the language code prefix in the URL
-* the last language the user chose in the language chooser (cookie).
+* the language set in the session
+* the language in the `django_language` cookie
 * the language that the browser says its user prefers
 
 It uses the django built in capabilities for this.
+
+By default no session and cookie are set. If you want to enable this use the
+`cms.middleware.language.LanguageCookieMiddleware` to set the cookie on every request.
+
 
 How django CMS determines what language to serve
 ================================================

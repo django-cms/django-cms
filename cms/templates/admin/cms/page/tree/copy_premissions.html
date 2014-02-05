@@ -1,0 +1,50 @@
+{% load i18n %}
+
+<div id="{{ dialog_id }}" class="cms_dialog">
+{% block content %}
+	{% block title %}<h1>{% trans "Copy options" %}</h1>{% endblock %}
+	{% block header %}<p>{% blocktrans %}Choose copy options{% endblocktrans %}</p>{% endblock %}
+
+	{% block form %}
+	{% if form %}
+	<form action="." method="post">
+		{% csrf_token %}
+		{{ form.as_p }}
+	</form>
+	{% endif %}
+	{% endblock %}
+
+	{% block submit_row %}
+	<div class="submit-row">
+		<input type="submit" value="{% trans 'Save' %}" class="default submit" />
+		<input type="submit" value="{% trans 'Close' %}" class="cancel" />
+	</div>
+	{% endblock %}
+{% endblock %}
+</div>
+
+{% block script %}
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+
+	// get the modals id
+	var dialog = $('#{{ dialog_id }}');
+
+	// function when closing the modal
+	dialog.find('.cancel').bind('click', function (e) {
+		e.preventDefault();
+		dialog.remove();
+	});
+
+	// function when submitting the modal
+	dialog.find('.submit').bind('click', function (e) {
+		e.preventDefault();
+		$.callbackCall('{{ callback }}', dialog.find('form').serialize());
+	});
+
+});
+})(CMS.$);
+</script>
+{% endblock %}

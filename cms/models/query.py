@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.db.models import Q
 from django.contrib.sites.models import Site
 from cms.publisher.query import PublisherQuerySet
-from django.conf import settings
 from cms.exceptions import NoHomeFound
-
-#from cms.utils.urlutils import levelize_path
+from django.utils import timezone
 
 
 class PageQuerySet(PublisherQuerySet):
@@ -48,41 +45,25 @@ class PageQuerySet(PublisherQuerySet):
         else:
             return self.exclude(id__in=exclude_list)
 
-    def published(self, site=None):
-        pub = self.on_site(site).filter(published=True)
+    def published(self, language=None, site=None):
 
-        if settings.CMS_SHOW_START_DATE:
-            pub = pub.filter(
-                Q(publication_date__lt=datetime.now()) |
-                Q(publication_date__isnull=True)
+        if language:
+            pub = self.on_site(site).filter(
+                Q(publication_date__lte=timezone.now()) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gt=timezone.now()) | Q(publication_end_date__isnull=True),
+                title_set__published=True, title_set__language=language
             )
-
-        if settings.CMS_SHOW_END_DATE:
-            pub = pub.filter(
-                Q(publication_end_date__gte=datetime.now()) |
-                Q(publication_end_date__isnull=True)
+        else:
+            pub = self.on_site(site).filter(
+                Q(publication_date__lte=timezone.now()) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gt=timezone.now()) | Q(publication_end_date__isnull=True),
+                title_set__published=True
             )
-
         return pub
 
     def expired(self):
         return self.on_site().filter(
-            publication_end_date__lte=datetime.now())
-
-#    - seems this is not used anymore...
-#    def get_pages_with_application(self, path, language):
-#        """Returns all pages containing application for current path, or
-#        any parrent. Returned list is sorted by path length, longer path first.
-#        """
-#        paths = levelize_path(path)
-#        q = Q()
-#        for path in paths:
-#            # build q for all the paths
-#            q |= Q(title_set__path=path, title_set__language=language)
-#        app_pages = self.published().filter(q & Q(title_set__application_urls__gt='')).distinct()
-#        # add proper ordering
-#        app_pages.query.order_by.extend(('LENGTH(`cms_title`.`path`) DESC',))
-#        return app_pages
+            publication_end_date__lte=timezone.now())
 
     def get_all_pages_with_application(self):
         """Returns all pages containing applications for all sites.
@@ -93,7 +74,7 @@ class PageQuerySet(PublisherQuerySet):
 
     def get_home(self, site=None):
         try:
-            home = self.published(site).all_root().order_by("tree_id")[0]
+            home = self.published(site=site).all_root().order_by("tree_id")[0]
         except IndexError:
             raise NoHomeFound('No Root page found. Publish at least one page!')
         return home

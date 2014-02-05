@@ -20,7 +20,7 @@ class NavextendersFixture(object):
             'template': 'nav_playground.html',
             'language': 'en',            
         }
-        with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('page1', published=True, in_navigation=True, **defaults)
             p4 = create_page('page4', published=True, in_navigation=True, **defaults)
             p1 = Page.objects.get(pk=p1.pk)

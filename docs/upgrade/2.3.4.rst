@@ -1,0 +1,53 @@
+###################
+2.3.4 release notes
+###################
+
+*******************
+What's new in 2.3.4
+*******************
+
+WymEditor fixed
+===============
+
+2.3.4 fixes a critical issue with WymEditor that prevented it from load it's
+JavaScript assets correctly.
+
+Moved Norwegian translations
+============================
+
+The Norwegian translations are now available as ``nb``, which is the new
+(since 2003) official language code for Norwegian, replacing the older and
+deprecated ``no`` code.
+
+If your site runs in Norwegian, you need to change your ``LANGUAGES`` settings!
+
+Added support for timezones
+===========================
+
+On Django 1.4, and with ``USE_TZ=True`` the django CMS now uses timezone aware
+date and time objects.
+
+Fixed slug clashing
+===================
+
+In earlier versions, publishing a page that has the same slug (URL) as another
+(published) page could lead to errors. Now, when a page which would have the
+same URL as another (published) page is published, the user is shown an error
+and they're prompted to change the slug for the page.
+
+Prevent unnamed related names for PlaceholderField
+==================================================
+
+:class:`cms.models.fields.PlaceholderField` no longer allows the related name
+to be suppressed. Trying to do so will lead to a :exc:`ValueError`. This change
+was done to allow the django CMS to properly check permissions on Placeholder
+Fields.
+
+Two fixes to page change form
+=============================
+
+The change form for pages would throw errors if the user editing the page does
+not have the permission to publish this page. This issue was resolved.
+
+Further the page change form would not correctly pre-popluate the slug field if
+``DEBUG`` was set to ``False``. Again, this issue is now resolved.

@@ -14,17 +14,18 @@ Install
 *******
 
 .. warning::
-    In version 2.4 migrations have been completely rewritten to fix issues
-    with newer south releases.
-    If upgrading from prior 2.3.2 releases, please refer to
-    :ref:`migrations-upgrade`
+    Version 3.0 introduces some significant changes that **require** action if
+    you are upgrading from a previous version. Please refer to
+    :ref:`Upgrading from previous versions <upgrade-to-3.0>`
 
 
 .. toctree::
     :maxdepth: 1
 
     getting_started/installation
+    upgrade/3.0
     upgrade/2.4
+    upgrade/2.3.4
     upgrade/2.3.3
     upgrade/2.3.2
     upgrade/2.3
@@ -72,12 +73,16 @@ Extending the CMS
     :numbered:
 
     extending_cms/extending_examples
+    extending_cms/extending_page_title
     extending_cms/custom_plugins
     extending_cms/app_integration
     extending_cms/api_references
     extending_cms/placeholders
+    extending_cms/toolbar
+    extending_cms/frontend_models
     extending_cms/searchdocs
     extending_cms/fields
+    extending_cms/testing
 
 
 ********
@@ -90,6 +95,7 @@ Concepts
 
     concepts/introduction
     concepts/menu_system
+    concepts/publishing
     concepts/multiple_languages
 
 
@@ -101,7 +107,8 @@ Contributing to django CMS
     :maxdepth: 2
     :numbered:
 
-    contribution
+    contributing/contributing
+    contributing/testing
 
 
 

@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
+from logging import getLogger
+from cms.utils import get_cms_setting
 from cms.utils.django_load import load
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import get_language
 from menus.exceptions import NamespaceAllreadyRegistered
 from menus.models import CacheKey
+from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 import copy
+
+logger = getLogger('menus')
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
     '''
@@ -131,10 +139,19 @@ class MenuPool(object):
         
         final_nodes = []
         for menu_class_name in self.menus:
-            nodes = self.menus[menu_class_name].get_nodes(request)
+            try:
+                nodes = self.menus[menu_class_name].get_nodes(request)
+            except NoReverseMatch:
+                # Apps might raise NoReverseMatch if an apphook does not yet
+                # exist, skip them instead of crashing
+                nodes = []
+                toolbar = getattr(request, 'toolbar', None)
+                if toolbar and toolbar.is_staff:
+                    messages.error(request, _('Menu %s cannot be loaded. Please, make sure all its urls exist and can be resolved.') % menu_class_name)
+                    logger.error("Menu %s could not be loaded." % menu_class_name, exc_info=True)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
-        cache.set(key, final_nodes, settings.CMS_CACHE_DURATIONS['menus'])
+        cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
         # We need to have a list of the cache keys for languages and sites that
         # span several processes - so we follow the Django way and share through 
         # the database. It's still cheaper than recomputing every time!

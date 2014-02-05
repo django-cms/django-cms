@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
 import warnings
@@ -34,8 +35,8 @@ def find_selected(nodes):
             result = find_selected(node.children)
             if result:
                 return result
-            
-            
+
+
 def set_language_changer(request, func):
     """
     
@@ -74,20 +75,23 @@ class DefaultLanguageChanger(object):
     def __init__(self, request):
         self.request = request
         self._app_path = None
-        
+
     @property
     def app_path(self):
         if self._app_path is None:
-            page_path = self.get_page_path(self.request.LANGUAGE_CODE)
+            if settings.USE_I18N:
+                page_path = self.get_page_path(get_language_from_request(self.request))
+            else:
+                page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
                 self._app_path = self.request.path[len(page_path):]
             else:
                 self._app_path = self.request.path
         return self._app_path
-        
+
     def __call__(self, lang):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
-    
+
     def get_page_path(self, lang):
         page = getattr(self.request, 'current_page', None)
         if page:
@@ -95,12 +99,15 @@ class DefaultLanguageChanger(object):
                 try:
                     return page.get_absolute_url(language=lang, fallback=False)
                 except Title.DoesNotExist:
-                    if hide_untranslated(lang):
+                    if hide_untranslated(lang) and settings.USE_I18N:
                         return '/%s/' % lang
                     else:
                         return page.get_absolute_url(language=lang, fallback=True)
         else:
-            return '/%s/' % lang
+            if settings.USE_I18N:
+                return '/%s/' % lang
+            else:
+                return "/"
 
 def simple_language_changer(func):
     warnings.warn("simple_language_changer is deprecated and will be removed in "

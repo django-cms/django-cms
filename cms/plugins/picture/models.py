@@ -1,10 +1,12 @@
-
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from cms.models import CMSPlugin, Page
 from os.path import basename
 
+
+@python_2_unicode_compatible
 class Picture(CMSPlugin):
     """
     A Picture with or without a link.
@@ -21,6 +23,7 @@ class Picture(CMSPlugin):
     url = models.CharField(_("link"), max_length=255, blank=True, null=True,
         help_text=_("If present, clicking on image will take user to link."))
     page_link = models.ForeignKey(Page, verbose_name=_("page"), null=True,
+        limit_choices_to={'publisher_is_draft': True},
         blank=True, help_text=_("If present, clicking on image will take user \
         to specified page."))
     alt = models.CharField(_("alternate text"), max_length=255, blank=True,
@@ -33,7 +36,7 @@ class Picture(CMSPlugin):
     float = models.CharField(_("side"), max_length=10, blank=True, null=True,
         choices=FLOAT_CHOICES, help_text=_("Move image left, right or center."))
 
-    def __unicode__(self):
+    def __str__(self):
         if self.alt:
             return self.alt[:40]
         elif self.image:

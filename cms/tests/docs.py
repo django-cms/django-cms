@@ -7,21 +7,20 @@ from sphinx.application import Sphinx
 import cms
 import os
 import socket
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from cms.utils.compat.string_io import StringIO
+
 
 ROOT_DIR = os.path.dirname(cms.__file__)
-DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, '..', 'docs'))
+DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, u'..', u'docs'))
 
 
 def has_no_internet():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('4.4.4.2', 80))
+        s.send(b"hello")
     except socket.error: # no internet
-        return  True
+        return True
     return False
 
 
@@ -45,5 +44,5 @@ class DocsTestCase(CMSTestCase):
             try:
                 app.build()
             except:
-                print nullout.getvalue()
+                print(nullout.getvalue())
                 raise

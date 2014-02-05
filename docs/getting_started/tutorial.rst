@@ -23,7 +23,7 @@ Configuration and setup
 Preparing the environment
 =========================
 
-Gathering the requirements is a good start, but we now need to give the CMS a 
+Gathering the requirements is a good start, but we now need to give the CMS a
 Django project to live in, and configure it.
 
 
@@ -52,43 +52,49 @@ nice "It Worked" message from Django.
 Installing and configuring django CMS in your Django project
 ------------------------------------------------------------
 
-Open the file ``~/workspace/myproject/settings.py``.
+Open the file ``~/workspace/myproject/myproject/settings.py``.
 
 To make your life easier, add the following at the top of the file::
 
     # -*- coding: utf-8 -*-
     import os
     gettext = lambda s: s
-    PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+    PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
 
 Add the following apps to your :setting:`django:INSTALLED_APPS`.
 This includes django CMS itself as well as its dependenices and
-other highly recommended applications/libraries:
+other highly recommended applications/libraries::
 
-* ``'cms'``, django CMS itself
-* ``'mptt'``, utilities for implementing a modified pre-order traversal tree
-* ``'menus'``, helper for model independent hierarchical website navigation
-* ``'south'``, intelligent schema and data migrations
-* ``'sekizai'``, for javascript and css management
+    'cms',  # django CMS itself
+    'mptt',  # utilities for implementing a modified pre-order traversal tree
+    'menus',  # helper for model independent hierarchical website navigation
+    'south',  # intelligent schema and data migrations
+    'sekizai',  # for javascript and css management
+    'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list before 'django.contrib.admin'.
+    'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
 
-Also add any (or all) of the following plugins, depending on your needs:
 
-* ``'cms.plugins.file'``
-* ``'cms.plugins.flash'``
-* ``'cms.plugins.googlemap'``
-* ``'cms.plugins.link'``
-* ``'cms.plugins.picture'``
-* ``'cms.plugins.snippet'``
-* ``'cms.plugins.teaser'``
-* ``'cms.plugins.text'``
-* ``'cms.plugins.video'``
-* ``'cms.plugins.twitter'``
+Also add any (or all) of the following plugins, depending on your needs::
+
+    'cms.plugins.file',
+    'cms.plugins.flash',
+    'cms.plugins.googlemap',
+    'cms.plugins.link',
+    'cms.plugins.picture',
+    'cms.plugins.snippet',
+    'cms.plugins.teaser',
+    'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
+    'cms.plugins.video',
 
 .. warning::
 
     Adding the ``'cms.plugins.snippet'`` plugin is a potential security hazard.
     For more information, refer to :ref:`snippets-plugin`.
+
+    In addition, ``'cms.plugins.text'`` and ``'cms.plugins.twitter'`` have
+    been removed from the Django-CMS bundle. Read :ref:`upgrade-to-3.0` for
+    detailed information.
 
 The plugins are described in more detail in chapter :doc:`Plugins reference <plugin_reference>`.
 There are even more plugins available on the django CMS `extensions page`_.
@@ -97,21 +103,16 @@ There are even more plugins available on the django CMS `extensions page`_.
 
 In addition, make sure you uncomment (enable) ``'django.contrib.admin'``
 
-you may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
+You may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
 instead of the :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
-:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins. In this
-case you should not add them to :setting:`django:INSTALLED_APPS` but add the following
-instead:
-
-* ``'filer'``
-* ``'cmsplugin_filer_file'``
-* ``'cmsplugin_filer_folder'``
-* ``'cmsplugin_filer_image'``
-* ``'cmsplugin_filer_teaser'``
-* ``'cmsplugin_filer_video'``
+:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins.
+In this case you should check the `django-filer documentation <django-filer:installation_and_configuration>`_
+and `django CMS plugin documentation`_ for detailed installation information, and
+then return to this tutorial.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django CMS plugin documentation: https://github.com/stefanfoulis/cmsplugin-filer#installation
 
 If you opt for the core plugins you should take care that directory to which
 the :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
@@ -140,12 +141,14 @@ at the right position::
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
     )
 
 You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
     TEMPLATE_CONTEXT_PROCESSORS = (
         'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
         'django.core.context_processors.i18n',
         'django.core.context_processors.request',
         'django.core.context_processors.media',
@@ -155,9 +158,32 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
     )
 
 .. note::
-    
+
     This setting will be missing from automatically generated Django settings
     files, so you will have to add it.
+
+.. warning::
+
+    Be sure to have ``'django.contrib.sites'`` in INSTALLED_APPS and set
+    ``SITE_ID`` parameter in your ``settings``: they may be missing from the
+    settings file generated by ``django-admin`` depending on your Django version
+    and project template.
+
+.. _enable-messages:
+
+.. versionchanged:: 3.0.0
+
+.. warning::
+
+    Django ``messages`` framework is now required for the toolbar to work
+    properly.
+
+    To enable it you must be check the following settings:
+
+        * ``INSTALLED_APPS``: must contain ``'django.contrib.messages'``
+        * ``MIDDLEWARE_CLASSES``: must contain ``'django.contrib.messages.middleware.MessageMiddleware'``
+        * ``TEMPLATE_CONTEXT_PROCESSORS``: must contain ``'django.contrib.messages.context_processors.messages'``
+
 
 Point your :setting:`django:STATIC_ROOT` to where the static files should live
 (that is, your images, CSS files, Javascript files, etc.)::
@@ -191,7 +217,7 @@ Add at least one template to :setting:`CMS_TEMPLATES`; for example::
         ('template_2.html', 'Template Two'),
     )
 
-We will create the actual template files at a later step, don't worry about it for 
+We will create the actual template files at a later step, don't worry about it for
 now. Simply paste this code into your settings file.
 
 .. note::
@@ -199,7 +225,7 @@ now. Simply paste this code into your settings file.
     The templates you define in :setting:`CMS_TEMPLATES` have to exist at runtime and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
     for django CMS. For more details see `Creating templates`_
-    
+
 The django CMS allows you to edit all languages for which Django has built in
 translations. Since these are numerous, we'll limit it to English for now::
 
@@ -225,9 +251,10 @@ URL configuration
 =================
 
 You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
-urlpatterns. We suggest starting with the following ``urls.py``::
+urlpatterns. We suggest starting with the following
+``~/workspace/myproject/myproject/urls.py``::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import include, patterns, url
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib import admin
     from django.conf import settings
@@ -288,7 +315,7 @@ Here is a simple example for a base template called ``base.html``:
     </body>
   </html>
 
-Now, create a file called ``template_1.html`` in the same directory. This will use 
+Now, create a file called ``template_1.html`` in the same directory. This will use
 your base template, and add extra content to it:
 
 .. code-block:: html+django
@@ -328,18 +355,19 @@ as the last thing before the closing ``</head>`` HTML tag and the
 HTML tag.
 
 
-.. _django-sekizai: https://github.com/ojii/django-sekizai 
+.. _django-sekizai: https://github.com/ojii/django-sekizai
 
+**********************
 Initial database setup
-======================
+**********************
 
 This command depends on whether you **upgrade** your installation or do a
-**fresh install**. We recommend that you get familiar with the way `South`_ works, 
+**fresh install**. We recommend that you get familiar with the way `South`_ works,
 as it is a very powerful, easy and convenient tool. django CMS uses it extensively.
 
 
 Fresh install
--------------
+=============
 
 Run::
 
@@ -349,9 +377,8 @@ Run::
 The first command will prompt you to create a super user. Choose 'yes' and enter
 appropriate values.
 
-
 Upgrade
--------
+=======
 
 Run::
 
@@ -359,11 +386,21 @@ Run::
     python manage.py migrate
 
 
-Up and running!
-===============
+******************************
+Check you did everything right
+******************************
 
-That should be it. Restart your development server using ``python manage.py runserver`` 
-and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ :you should get 
+Now, use the following command to check if you did everything correctly::
+
+    python manage.py cms check
+
+
+***************
+Up and running!
+***************
+
+That should be it. Restart your development server using ``python manage.py runserver``
+and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ : you should get
 the django CMS "It Worked" screen.
 
 |it-works-cms|
@@ -382,13 +419,13 @@ Creating your first CMS Page!
 *****************************
 
 That's it. Now the best part: you can start using the CMS!
-Run your server with ``python manage.py runserver``, then point a web browser to 
-`127.0.0.1:8000/admin/ <http://127.0.0.1:8000/admin/>`_ , and log in using the super 
+Run your server with ``python manage.py runserver``, then point a web browser to
+`127.0.0.1:8000/admin/ <http://127.0.0.1:8000/admin/>`_ , and log in using the super
 user credentials you defined when you ran ``syncdb`` earlier.
 
 Once in the admin part of your site, you should see something like the following:
 
-|first-admin| 
+|first-admin|
 
 .. |first-admin| image:: ../images/first-admin.png
 
@@ -440,13 +477,13 @@ Adding content to a page
 So far, our page doesn't do much. Make sure it's marked as "published", then
 click on the page's "edit" button.
 
-Ignore most of the interface for now and click the "view on site" button at the 
+Ignore most of the interface for now and click the "view on site" button at the
 top right-hand corner of the screen. As expected, your page is blank for the
 time being, since our template is a really minimal one.
 
 Let's get to it now then!
 
-Press your browser's back button, so as to see the page's admin interface. If you followed 
+Press your browser's back button, so as to see the page's admin interface. If you followed
 the tutorial so far, your template (``template_1.html``) defines two placeholders.
 The admin interfaces shows you theses placeholders as sub menus:
 
@@ -456,12 +493,18 @@ The admin interfaces shows you theses placeholders as sub menus:
 
 Scroll down the "Available plugins" drop-down list. This displays the plugins you
 added to your :setting:`django:INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
-then press the "Add" button.
+then press the "Add" button. If the "text" plugin is not listed, you need to add 
+'djangocms_text_ckeditor' to your :setting:`django:INSTALLED_APPS` settings.
 
 The right part of the plugin area displays a rich text editor (`TinyMCE`_).
 
 In the editor, type in some text and then press the "Save" button.
 
+The new text is only visible on the draft copy so far, but you can see it by using the
+top button "Preview draft". If you use the "View on site" button instead, you can see that the
+page is still blank to the normal users.
+
+To publish the changes you have made, click on the "Publish draft" button.
 Go back to your website using the top right-hand "View on site" button. That's it!
 
 |hello-cms-world|
@@ -472,11 +515,11 @@ Go back to your website using the top right-hand "View on site" button. That's i
 Where to go from here
 =====================
 
-Congratulations, you now have a fully functional CMS! Feel free to play around 
+Congratulations, you now have a fully functional CMS! Feel free to play around
 with the different plugins provided out of the box and to build great websites!
 
 
 .. _South: http://south.aeracode.org/
 .. _TinyMCE: http://tinymce.moxiecode.com/
-.. _official documentation: http://docs.djangoproject.com/en/1.2/topics/templates/
+.. _official documentation: http://docs.djangoproject.com/en/1.5/topics/templates/
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms

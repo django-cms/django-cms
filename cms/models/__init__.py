@@ -4,12 +4,16 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import get_resolver, get_script_prefix, \
     NoReverseMatch
 from django.utils.encoding import iri_to_uri
-from moderatormodels import *
-from pagemodel import *
-from permissionmodels import *
-from placeholdermodel import *
-from pluginmodel import *
-from titlemodels import *
+from .settingmodels import *
+from .moderatormodels import *
+from .pagemodel import *
+from .permissionmodels import *
+from .placeholdermodel import *
+from .pluginmodel import *
+from .titlemodels import *
+from .placeholderpluginmodel import *
+from .static_placeholder import *
+
 import django.core.urlresolvers
 # must be last
 from cms import signals as s_import

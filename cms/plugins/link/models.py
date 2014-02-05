@@ -1,7 +1,10 @@
+from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from cms.models import CMSPlugin, Page
 
+
+@python_2_unicode_compatible
 class Link(CMSPlugin):
     """
     A link to an other page or to an external website
@@ -18,7 +21,20 @@ class Link(CMSPlugin):
         ("_top", _("topmost frame")),
     )))
 
-    def __unicode__(self):
+    def link(self):
+        """
+        Returns the link with highest priority among the model fields
+        """
+        if self.mailto:
+            return u"mailto:%s" % self.mailto
+        elif self.url:
+            return self.url
+        elif self.page_link:
+            return self.page_link.get_absolute_url()
+        else:
+            return ""
+
+    def __str__(self):
         return self.name
 
     search_fields = ('name',)

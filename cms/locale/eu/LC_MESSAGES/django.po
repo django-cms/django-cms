@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ales Zabala Alava <shagi@gisa-elkartea.org>, 2012.
+# Ales Zabala Alava <shagi@gisa-elkartea.org>, 2012-2013
+# iune <iunetrecet@gisa-elkartea.org>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2012-09-19 14:44+0200\n"
-"PO-Revision-Date: 2012-09-19 14:44+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-12-11 14:31+0100\n"
+"PO-Revision-Date: 2013-12-12 09:10+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: divio.ch <developers@divio.ch>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django-cms/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,70 +22,162 @@ msgstr ""
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: cms_toolbar.py:70
-msgid "Edit mode"
-msgstr "Edizio modua"
+#: cms_plugins.py:9
+msgid "Placeholder"
+msgstr ""
 
-#: cms_toolbar.py:79
-msgid "django CMS"
-msgstr "django CMS"
+#: cms_toolbar.py:71
+msgid "Content"
+msgstr ""
 
-#: cms_toolbar.py:110 templates/admin/cms/page/menu_item.html:69
-msgid "Publish"
-msgstr "Argitaratu"
+#: cms_toolbar.py:73
+msgid "Structure"
+msgstr ""
 
-#: cms_toolbar.py:114
-msgid "Request Approval"
-msgstr "Onespena eskatu"
+#: cms_toolbar.py:91
+msgid "Users"
+msgstr ""
 
-#: cms_toolbar.py:135 cms_toolbar.py:144
+#: cms_toolbar.py:98
+msgid "Sites"
+msgstr ""
+
+#: cms_toolbar.py:99
+msgid "Admin Sites"
+msgstr ""
+
+#: cms_toolbar.py:105
+msgid "Stacks"
+msgstr ""
+
+#: cms_toolbar.py:107
+msgid "Administration"
+msgstr ""
+
+#: cms_toolbar.py:110
+msgid "User settings"
+msgstr ""
+
+#: cms_toolbar.py:113
 msgid "Logout"
 msgstr "Irten"
 
-#: cms_toolbar.py:160
-msgid "Template"
-msgstr "Txantiloia"
+#: cms_toolbar.py:120 admin/forms.py:72 admin/forms.py:170
+#: models/settingmodels.py:12
+msgid "Language"
+msgstr "Hizkuntza"
 
 #: cms_toolbar.py:168
-msgid "Move/add Pages"
-msgstr "Orriak mugitu/gehitu"
-
-#: cms_toolbar.py:173
-msgid "Add child page"
-msgstr "Orri semea gehitu"
-
-#: cms_toolbar.py:179
-msgid "Add sibling page"
+msgid "Publish changes"
 msgstr ""
 
-#: cms_toolbar.py:185
-msgid "Delete Page"
-msgstr "Orria ezabatu"
+#: cms_toolbar.py:170
+msgid "Publish page now"
+msgstr ""
 
-#: cms_toolbar.py:188 models/moderatormodels.py:45
-#: templates/admin/cms/page/permissions.html:5
+#: cms_toolbar.py:217
+#, python-format
+msgid "Add %(language)s Translation"
+msgstr ""
+
+#: cms_toolbar.py:231
+#, python-format
+msgid "Delete %(language)s Translation"
+msgstr ""
+
+#: cms_toolbar.py:243
+#, python-format
+msgid "Are you sure you want copy all plugins from %s?"
+msgstr ""
+
+#: cms_toolbar.py:244
+#, python-format
+msgid "Copy all plugins from %s"
+msgstr ""
+
+#: cms_toolbar.py:251
+msgid "Pages"
+msgstr ""
+
+#: cms_toolbar.py:256 templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "Orria"
 
-#: cms_toolbar.py:197
-msgid "Site Administration"
-msgstr "Gune kudeaketa"
-
-#: cms_toolbar.py:203
-msgid "Page Settings"
-msgstr "Orriaren ezarpenak"
-
-#: cms_toolbar.py:209
-msgid "View History"
-msgstr "Historia ikusi"
-
-#: cms_toolbar.py:213
-msgid "Admin"
+#: cms_toolbar.py:257
+msgid "Edit this Page"
 msgstr ""
 
-#: plugin_base.py:65
+#: cms_toolbar.py:259
+msgid "Page settings"
+msgstr ""
+
+#: cms_toolbar.py:268
+msgid "Templates"
+msgstr ""
+
+#: cms_toolbar.py:279
+msgid "Advanced settings"
+msgstr ""
+
+#: cms_toolbar.py:286
+msgid "Permissions"
+msgstr ""
+
+#: cms_toolbar.py:292
+msgid "Hide in navigation"
+msgstr ""
+
+#: cms_toolbar.py:294
+msgid "Display in navigation"
+msgstr ""
+
+#: cms_toolbar.py:299
+msgid "Unpublish page"
+msgstr "ez-argitaratze esk."
+
+#: cms_toolbar.py:301
+msgid "Publish page"
+msgstr "argitaratzeko esk."
+
+#: cms_toolbar.py:321
+msgid "Delete page"
+msgstr "ezabatzeko esk."
+
+#: cms_toolbar.py:326 templates/admin/cms/page/history/revision_header.html:10
+msgid "History"
+msgstr "Historia"
+
+#: cms_toolbar.py:341
+msgid "Undo"
+msgstr ""
+
+#: cms_toolbar.py:342
+msgid "Redo"
+msgstr ""
+
+#: cms_toolbar.py:345
+msgid "Are you sure you want to revert to live?"
+msgstr ""
+
+#: cms_toolbar.py:346
+msgid "Revert to live"
+msgstr ""
+
+#: cms_toolbar.py:348
+msgid "View history"
+msgstr ""
+
+#: plugin_base.py:77
 msgid "Advanced options"
 msgstr "Aukera aurreratuak"
+
+#: plugin_base.py:94
+msgid "Generic"
+msgstr "Generikoa"
+
+#: plugin_base.py:259
+msgid "There are no further settings for this plugin. Please hit OK to save."
+msgstr ""
 
 #: admin/forms.py:59
 msgid "Title"
@@ -103,10 +196,27 @@ msgid "The part of the title that is used in the URL"
 msgstr "URLetan erabiltzen den izenburuaren zatia"
 
 #: admin/forms.py:63
-msgid "Language"
-msgstr "Hizkuntza"
+msgid "Menu Title"
+msgstr "Menuko izenburua"
 
 #: admin/forms.py:64
+msgid "Overwrite what is displayed in the menu"
+msgstr "Menuan ikusiko dena gainidatzi"
+
+#: admin/forms.py:65
+msgid "Page Title"
+msgstr "Orriaren izenburua"
+
+#: admin/forms.py:66
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Nabigatzailearen goikaldean edo bookmarketan ikusiko dena gainidatzi"
+
+#: admin/forms.py:70
+msgid "A description of the page used by search engines."
+msgstr "Bilaketa motoreak batzutan erabiltzen dituzten gako-hitzak, komaz bereiztuta"
+
+#: admin/forms.py:73 admin/forms.py:171
 msgid "The current language of the content fields."
 msgstr "Edukiaren uneko hizkuntza."
 
@@ -114,324 +224,357 @@ msgstr "Edukiaren uneko hizkuntza."
 msgid "Another page with this slug already exists"
 msgstr "Badago slug hau duen beste orri bat"
 
-#: admin/forms.py:151
-msgid "Menu Title"
-msgstr "Menuko izenburua"
-
-#: admin/forms.py:152
-msgid "Overwrite what is displayed in the menu"
-msgstr "Menuan ikusiko dena gainidatzi"
-
-#: admin/forms.py:153
-msgid "Page Title"
-msgstr "Orriaren izenburua"
-
-#: admin/forms.py:154
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Nabigatzailearen goikaldean edo bookmarketan ikusiko dena gainidatzi"
-
-#: admin/forms.py:155
+#: admin/forms.py:162
 msgid "Application"
 msgstr "Aplikazioa"
 
-#: admin/forms.py:157
+#: admin/forms.py:164
 msgid "Hook application to this page."
 msgstr "Orri honetan aplikazioa estekatu."
 
-#: admin/forms.py:158
+#: admin/forms.py:165
 msgid "Overwrite URL"
 msgstr "URLa gainidatzi"
 
-#: admin/forms.py:159
+#: admin/forms.py:166
 msgid "Keep this field empty if standard path should be used."
 msgstr "Mantendu eremu hau hutsik bide arruntak erabiltzeko."
 
-#: admin/forms.py:165
+#: admin/forms.py:168
 msgid "Redirect"
 msgstr "Berbideratu"
 
-#: admin/forms.py:166
+#: admin/forms.py:169
 msgid "Redirects to this URL."
 msgstr "URL honetara berbideratu."
 
-#: admin/forms.py:168
-msgid "A description of the page sometimes used by search engines."
-msgstr "Orriaren deskribapena, bilaketa motorrentzako erabilgarria."
-
-#: admin/forms.py:170
-msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "Bilaketa motoreak batzutan erabiltzen dituzten gako-hitzak, komaz bereiztuta"
-
-#: admin/forms.py:186
+#: admin/forms.py:198
 msgid "A page with this reverse URL id exists already."
+msgstr "ID berdina duen alderantzizko URL bat badago dagoeneko."
+
+#: admin/forms.py:205
+msgid "You selected an apphook with an \"app_name\". You must enter a namespace."
 msgstr ""
 
-#: admin/forms.py:203 admin/forms.py:204 migrations/0001_initial.py:41
-#: models/permissionmodels.py:17
+#: admin/forms.py:208
+msgid "If you enter a namespace you need an application url as well."
+msgstr ""
+
+#: admin/forms.py:238 models/permissionmodels.py:40
 msgid "user"
 msgstr "erabiltzailea"
 
-#: admin/forms.py:228
+#: admin/forms.py:302
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr "Orriaren  baimena gehitzeko haurrentzako sarrera gehitzea beharrezkoa da, bestela sortzaileak ezingo du gehitutako orria aldatu."
 
-#: admin/forms.py:233
+#: admin/forms.py:307
 msgid "Add page permission also requires edit page permission."
 msgstr "Orria gehitzeko baimenak orria editatzeko baimea ere behar du."
 
-#: admin/forms.py:260
+#: admin/forms.py:334
 msgid "can_view"
 msgstr "Ikusi dezake"
 
-#: admin/forms.py:272
+#: admin/forms.py:345
 msgid "Please select user or group first."
 msgstr "Erabiltzaile edo taldeea hautatu mesedez."
 
-#: admin/forms.py:279 admin/forms.py:286 admin/forms.py:290
-#: templates/admin/cms/page/change_form.html:68
-#: templates/admin/cms/page/plugin_change_form.html:76
-#: templates/cms/toolbar/placeholder.html:26
+#: admin/forms.py:352 admin/forms.py:359 admin/forms.py:363
+#: templates/admin/cms/usersettings/change_form.html:8
 msgid "Add"
 msgstr "Gehitu"
 
-#: admin/forms.py:280 admin/forms.py:287 admin/forms.py:291
+#: admin/forms.py:353 admin/forms.py:360 admin/forms.py:364
+#: templates/cms/toolbar/toolbar.html:36
+#: templates/cms/toolbar/items/live_draft.html:7
 msgid "Change"
 msgstr "Aldatu"
 
-#: admin/forms.py:281 admin/forms.py:288 admin/forms.py:292
-#: templates/admin/page_submit_line.html:5
-#: templates/admin/cms/page/menu_item.html:44
+#: admin/forms.py:354 admin/forms.py:361 admin/forms.py:365
+#: templates/admin/cms/page/submit_row.html:8
+#: templates/admin/cms/page/plugin/delete_confirmation.html:9
+#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/cms/toolbar/dragitem_item.html:15
 msgid "Delete"
 msgstr "Ezabatu"
 
-#: admin/forms.py:282
+#: admin/forms.py:355
 msgid "Recover (any) pages"
 msgstr "orriak berreskuratu (edozein)"
 
-#: admin/forms.py:309
+#: admin/forms.py:383
 msgid "Notify user"
 msgstr "Erabiltzailea ohartarazi"
 
-#: admin/forms.py:310
+#: admin/forms.py:385
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr "Erabiltzaileari eposta bat bidali erabiltzaile izena edo pasahitza aldatzean. Erabiltzaileak eposta eduki behar du"
 
-#: admin/forms.py:330
+#: admin/forms.py:405
 msgid "New password"
 msgstr "Pasahitz berria"
 
-#: admin/forms.py:332
+#: admin/forms.py:407
 msgid "New password confirmation"
 msgstr "Pasahitz berria baieztatu"
 
-#: admin/forms.py:351
+#: admin/forms.py:426
 msgid "Email notification requires valid email address."
 msgstr "Eposta ohartarazpenak baliozko eposta helbidea behar du."
 
-#: admin/forms.py:353
+#: admin/forms.py:428
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "Orri berriak gehitzeko baimenak orriak aldatzeko baimena behar du!"
 
-#: admin/forms.py:355
+#: admin/forms.py:430
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "Erabiltzaileak gehitzeko baimenak erabiltzeileak aldatzeko baimena behar du!"
 
-#: admin/forms.py:357
+#: admin/forms.py:432
 msgid "To add permissions you also need to edit them!"
 msgstr "Baimenak gehitzeko baimenak editatu behar dituzu baita ere!"
 
-#: admin/pageadmin.py:108
-msgid "Basic Settings"
-msgstr "Oinarrizko ezarpenak"
-
-#: admin/pageadmin.py:111
-msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr "Oharra: Orria birkargatzen da aukeraketa aldatzen baduzu. Gorde lehendabizi."
-
-#: admin/pageadmin.py:113 admin/pageadmin.py:165
-msgid "Hidden"
-msgstr "Ezkutatua"
-
-#: admin/pageadmin.py:117
+#: admin/pageadmin.py:269 templates/admin/cms/page/submit_row.html:10
 msgid "Advanced Settings"
 msgstr "Ezarpen aurreratuak"
 
-#: admin/pageadmin.py:124
-msgid "SEO Settings"
+#: admin/pageadmin.py:275
+msgid "Change Permissions"
 msgstr ""
 
-#: admin/pageadmin.py:311
-msgid "You have no permission to change the template"
-msgstr "Ez duzu txantiloia aldatzeko baimenik"
-
-#: admin/pageadmin.py:498
-msgid "higher"
-msgstr "altuagoa"
-
-#: admin/pageadmin.py:668
-msgid "Database error"
-msgstr "Datu baseko akatsa"
-
-#: admin/pageadmin.py:779
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
-
-#: admin/pageadmin.py:880
-msgid "Page was successfully approved."
-msgstr "Orria onartu da."
-
-#: admin/pageadmin.py:952
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Ez da existitzen %(key)r gakodun %(name)s objecturik."
-
-#: admin/pageadmin.py:958
-msgid "There only exists one translation for this page"
-msgstr "Orri honen itzulpen bakarra dago"
-
-#: admin/pageadmin.py:987
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr "%(language)s hizkuntzako izenburu eta pluginak ezabatu dira"
-
-#: admin/pageadmin.py:1009
-msgid "Are you sure?"
-msgstr "Ziur al zaude?"
-
-#: admin/pageadmin.py:1074
-msgid "You do not have permission to publish this page"
-msgstr "Ez duzu orri hau argitaratzeko baimenik"
-
-#: admin/pageadmin.py:1088
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Ez duzu orri honen nabigazio egoera aldatzeko baimenik"
-
-#: admin/pageadmin.py:1113
-msgid "You have no permission to add a plugin"
-msgstr "Ez duzu pluginik gehitzeko baimenik"
-
-#: admin/pageadmin.py:1160 admin/pageadmin.py:1192
-msgid "Language must be set to a supported language!"
-msgstr "Hizkuntza hori ez dago onartuta!"
-
-#: admin/pageadmin.py:1172
+#: admin/pageadmin.py:518
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plugina %(placeholder)s-(e)ra gehituta"
 
-#: admin/pageadmin.py:1190
-msgid "You do not have permission to change this page"
-msgstr "Ez duzu orri hau aldatzeko baimenik"
-
-#: admin/pageadmin.py:1194
-msgid "Language must be different than the copied language!"
-msgstr "Helburuko hizkuntza jatorrizkoaren ezberdina izan behar du!"
-
-#: admin/pageadmin.py:1200
-msgid "You do not have permission to add plugins"
-msgstr "Ez duzu pluginak gehitzeko baimenik"
-
-#: admin/pageadmin.py:1207
+#: admin/pageadmin.py:525
 #, python-format
-msgid "Copied %(language)s plugins to %(placeholder)s"
-msgstr "%(language)s hizkuntzako pluginak %(placeholder)s-(e)ra kopiatuta"
+msgid "Copied plugins to %(placeholder)s"
+msgstr ""
 
-#: admin/pageadmin.py:1221 admin/pageadmin.py:1349 admin/pageadmin.py:1375
-msgid "You have no permission to change this page"
-msgstr "Ez duzu orri hau aldatzeko baimenik."
-
-#: admin/pageadmin.py:1255
-msgid "You have no permission to edit a plugin"
-msgstr "Ez duzu plugina editatzeko baimenik"
-
-#: admin/pageadmin.py:1311
+#: admin/pageadmin.py:537
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s plugina %(position)s kokapenean editatuta %(placeholder)s-(e)n"
 
-#: admin/pageadmin.py:1370
-msgid "You have no permission to move a plugin"
-msgstr "Ez duzu pluginak mugitzeko baimenik"
-
-#: admin/pageadmin.py:1388
-msgid "Plugins where moved"
+#: admin/pageadmin.py:548
+msgid "Plugins were moved"
 msgstr "Pluginak mugitu dira"
 
-#: admin/pageadmin.py:1402
-msgid "You have no permission to remove a plugin"
-msgstr "Ez duzu pluginak ezabatzeko baimenik"
-
-#: admin/pageadmin.py:1420 admin/placeholderadmin.py:293
+#: admin/pageadmin.py:555
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
+msgstr "%(plugin_name)s plugina %(position)s kokapenean dagoen %(placeholder)s-(e)a ezabatua izan da"
+
+#: admin/pageadmin.py:568
+#, python-format
+msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 msgstr ""
 
-#: admin/permissionadmin.py:94
+#: admin/pageadmin.py:587
+msgid "You do not have permission to change pages."
+msgstr "Ez duzu orriak aldatzeko baimenik"
+
+#: admin/pageadmin.py:599
+msgid "Database error"
+msgstr "Datu baseko akatsa"
+
+#: admin/pageadmin.py:695 admin/pageadmin.py:736 admin/pageadmin.py:991
+#: admin/pageadmin.py:1027
+msgid "You do not have permission to change this page"
+msgstr "Ez duzu orri hau aldatzeko baimenik"
+
+#: admin/pageadmin.py:771
+msgid "You do not have permission to change the template"
+msgstr "Ez duzu txantiloia aldatzeko baimenik"
+
+#: admin/pageadmin.py:775
+msgid "Template not valid"
+msgstr "Txantiloia ez da egokia"
+
+#: admin/pageadmin.py:780
+#, python-format
+msgid "Template changed to %s"
+msgstr "Txantiloia %s-ra aldatua"
+
+#: admin/pageadmin.py:782
+msgid "The template was successfully changed"
+msgstr "Txantiloia ondo aldatu da"
+
+#: admin/pageadmin.py:804
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr "Errorea! Ez duzu orri hau mugitzeko baimenik. Mesedez birkargatu orria"
+
+#: admin/pageadmin.py:808
+msgid "Page moved"
+msgstr "Orria mugitu da"
+
+#: admin/pageadmin.py:854 admin/placeholderadmin.py:257
+#: admin/placeholderadmin.py:303
+msgid "Language must be set to a supported language!"
+msgstr "Hizkuntza hori ez dago onartuta!"
+
+#: admin/pageadmin.py:859 admin/placeholderadmin.py:322
+msgid "You do not have permission to copy these plugins."
+msgstr ""
+
+#: admin/pageadmin.py:862
+#, python-format
+msgid "Copied plugins from %(source_language)s to %(target_language)s"
+msgstr ""
+
+#: admin/pageadmin.py:924 admin/pageadmin.py:1129
+msgid "You do not have permission to publish this page"
+msgstr "Ez duzu orri hau argitaratzeko baimenik"
+
+#: admin/pageadmin.py:939
+msgid "The content was successfully published."
+msgstr ""
+
+#: admin/pageadmin.py:941
+msgid "There was a problem publishing your content"
+msgstr ""
+
+#: admin/pageadmin.py:995
+#, python-format
+msgid "The page \"%s\" was successfully reverted."
+msgstr "\"%s\" orria ondo leheneratu da."
+
+#: admin/pageadmin.py:1031
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Ez da existitzen %(key)r gakodun %(name)s objecturik."
+
+#: admin/pageadmin.py:1037
+msgid "There only exists one translation for this page"
+msgstr "Orri honen itzulpen bakarra dago"
+
+#: admin/pageadmin.py:1066
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "%(language)s hizkuntzako izenburu eta pluginak ezabatu dira"
+
+#: admin/pageadmin.py:1088 admin/placeholderadmin.py:498
+#: admin/placeholderadmin.py:537
+msgid "Are you sure?"
+msgstr "Ziur al zaude?"
+
+#: admin/pageadmin.py:1138
+#, python-format
+msgid "The page \"%s\" was successfully unpublished"
+msgstr "\"%s\" orria argitarapena deuseztatu da"
+
+#: admin/pageadmin.py:1140
+#, python-format
+msgid "The page \"%s\" was successfully published"
+msgstr "\"%s\" orria ondo argitaratu da"
+
+#: admin/pageadmin.py:1167
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Ez duzu orri honen nabigazio egoera aldatzeko baimenik"
+
+#: admin/pageadmin.py:1200
+msgid "You do not have permission to edit this page"
+msgstr ""
+
+#: admin/permissionadmin.py:84
 msgid "View restriction"
 msgstr "Murriztapena ikusi"
 
-#: admin/permissionadmin.py:95
+#: admin/permissionadmin.py:85
 msgid "View restrictions"
 msgstr "Murriztapenak ikusi"
 
-#: admin/permissionadmin.py:155 models/permissionmodels.py:76
+#: admin/permissionadmin.py:140 models/permissionmodels.py:100
 msgid "Page permissions"
 msgstr "Orri baimenak"
 
-#: admin/permissionadmin.py:156
+#: admin/permissionadmin.py:141
 msgid "User & Group permissions"
 msgstr "Erabiltzaile eta talde baimenak"
 
-#: admin/permissionadmin.py:157
+#: admin/permissionadmin.py:142
 msgid "Page permissions management"
 msgstr "Orriaren baimenen kudeaketa"
 
-#: admin/placeholderadmin.py:151 admin/placeholderadmin.py:192
-msgid "You don't have permission to add content here."
-msgstr "Ez duzu hemen edukia gehitzeko baimenik."
+#: admin/placeholderadmin.py:72
+#, python-format
+msgid "Fields %s not editabled in the frontend"
+msgstr ""
 
-#: admin/placeholderadmin.py:188
-msgid "You don't have permission to add plugins"
+#: admin/placeholderadmin.py:74
+msgid "You do not have permission to edit this item"
+msgstr ""
+
+#: admin/placeholderadmin.py:233
+msgid "You do not have permission to add a plugin"
 msgstr "Ez duzu pluginak gehitzeko baimenik"
 
-#: admin/placeholderadmin.py:289
-msgid "You don't have permission to delete a plugin"
-msgstr "Ez duzu plugina ezabatzeko baimenik"
+#: admin/placeholderadmin.py:259
+msgid "Parent plugin language must be same as language!"
+msgstr ""
 
-#: admin/useradmin.py:25
+#: admin/placeholderadmin.py:357
+msgid "You do not have permission to edit this plugin"
+msgstr ""
+
+#: admin/placeholderadmin.py:437
+msgid "You have no permission to move this plugin"
+msgstr ""
+
+#: admin/placeholderadmin.py:475 admin/placeholderadmin.py:486
+msgid "You do not have permission to delete this plugin"
+msgstr ""
+
+#: admin/placeholderadmin.py:490
+#, python-format
+msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#: admin/placeholderadmin.py:496 admin/placeholderadmin.py:535
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: admin/placeholderadmin.py:516 admin/placeholderadmin.py:526
+msgid "You do not have permission to clear this placeholder"
+msgstr ""
+
+#: admin/placeholderadmin.py:530
+#, python-format
+msgid "The placeholder \"%(obj)s\" was cleared successfully."
+msgstr ""
+
+#: admin/placeholderadmin.py:540
+msgid "placeholder"
+msgstr ""
+
+#: admin/useradmin.py:26
 msgid "User details"
 msgstr "Erabiltzailearen xehetasunak"
 
-#: admin/useradmin.py:26
+#: admin/useradmin.py:27
 msgid "Groups"
 msgstr "Taldeak"
 
-#: admin/useradmin.py:36 templates/cms/toolbar/items/login.html:7
+#: admin/useradmin.py:37 templates/cms/toolbar/items/login.html:5
 msgid "Password"
 msgstr "Pasahitza"
 
 #: admin/dialog/forms.py:9
 msgid "Copy permissions"
-msgstr ""
-
-#: admin/dialog/forms.py:16
-msgid "Copy moderation"
-msgstr ""
-
-#: conf/patch.py:28
-msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Kopiatzeko baimenak"
 
 #: forms/fields.py:19
 msgid "Select a valid site"
@@ -441,299 +584,95 @@ msgstr "Hautatu baliozko gunea"
 msgid "Select a valid page"
 msgstr "Hautatu baliozko orria"
 
-#: forms/widgets.py:174
+#: forms/widgets.py:143
 msgid "Add Another"
 msgstr "Beste bat gehitu"
 
-#: migrations/0001_initial.py:12 migrations/0001_initial.py:24
-#: migrations/0001_initial.py:75 migrations/0003_remove_placeholder.py:18
-#: migrations/0010_5char_language.py:12 migrations/0010_5char_language.py:15
-#: migrations/0010_5char_language.py:22 migrations/0010_5char_language.py:25
-#: models/pluginmodel.py:82 models/titlemodels.py:11
-#: plugins/inherit/models.py:11
-msgid "language"
-msgstr "hizkuntza"
-
-#: migrations/0001_initial.py:13 migrations/0001_initial.py:26
-#: migrations/0001_initial.py:40 migrations/0001_initial.py:78
-#: migrations/0003_remove_placeholder.py:21 models/pagemodel.py:99
-#: models/permissionmodels.py:70 models/titlemodels.py:22
-#: plugins/inherit/forms.py:9 plugins/link/forms.py:9
-#: plugins/link/models.py:12 plugins/link/migrations/0001_initial.py:19
-#: plugins/picture/models.py:22 plugins/teaser/models.py:13
-msgid "page"
-msgstr "orria"
-
-#: migrations/0001_initial.py:14 migrations/0004_textobjects.py:12
-#: migrations/0004_textobjects.py:22 models/pluginmodel.py:81
-msgid "position"
-msgstr "kokapena"
-
-#: migrations/0001_initial.py:15 migrations/0001_initial.py:29
-#: models/pluginmodel.py:84 models/titlemodels.py:23
-msgid "creation date"
-msgstr "sorrera data"
-
-#: migrations/0001_initial.py:16 migrations/0001_initial.py:77
-#: migrations/0003_remove_placeholder.py:20 models/placeholdermodel.py:12
-msgid "slot"
-msgstr ""
-
-#: migrations/0001_initial.py:18 models/pluginmodel.py:83
-msgid "plugin_name"
-msgstr "Pluginaren izena"
-
-#: migrations/0001_initial.py:25 migrations/0011_title_overwrites.py:12
-#: migrations/0011_title_overwrites.py:15 models/titlemodels.py:12
-#: models/titlemodels.py:13 models/titlemodels.py:21 plugins/file/models.py:25
-#: plugins/file/migrations/0001_initial.py:18 plugins/teaser/models.py:9
-#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
-#: templates/admin/cms/page/change_list_tree.html:6
-msgid "title"
-msgstr "izenburua"
-
-#: migrations/0001_initial.py:28
-msgid "path"
-msgstr "bidea"
-
-#: migrations/0001_initial.py:30 models/titlemodels.py:14
-msgid "slug"
-msgstr ""
-
-#: migrations/0001_initial.py:36
-msgid "everybody"
-msgstr "edonork"
-
-#: migrations/0001_initial.py:37 models/permissionmodels.py:21
-msgid "can edit"
-msgstr "editatu dezake"
-
-#: migrations/0001_initial.py:38 models/permissionmodels.py:18
-msgid "group"
-msgstr "taldea"
-
-#: migrations/0001_initial.py:39 models/permissionmodels.py:25
-msgid "can publish"
-msgstr "Argitaratu dezake"
-
-#: migrations/0001_initial.py:42
-msgid "type"
-msgstr "mota"
-
-#: migrations/0001_initial.py:44
-msgid "can change soft-root"
-msgstr ""
-
-#: migrations/0001_initial.py:50 migrations/0006_apphook.py:34
-#: migrations/0006_apphook.py:62
-msgid "status"
-msgstr "egoera"
-
-#: migrations/0001_initial.py:53
-msgid "navigation extenders"
-msgstr ""
-
-#: migrations/0001_initial.py:54 migrations/0006_apphook.py:12
-#: migrations/0006_apphook.py:46 models/titlemodels.py:16
-msgid "has url overwrite"
-msgstr ""
-
-#: migrations/0001_initial.py:55 migrations/0006_apphook.py:49
-msgid "url overwrite"
-msgstr ""
-
-#: migrations/0001_initial.py:57
-msgid "author"
-msgstr "egilea"
-
-#: migrations/0001_initial.py:58 migrations/0006_apphook.py:37
-msgid "reverse url id"
-msgstr ""
-
-#: migrations/0001_initial.py:59 models/pagemodel.py:79
-msgid "login required"
-msgstr "Saio-hasiera beharrezkoa"
-
-#: migrations/0001_initial.py:60 models/pagemodel.py:64
-msgid "soft root"
-msgstr ""
-
-#: migrations/0001_initial.py:63 models/pagemodel.py:62
-msgid "publication end date"
-msgstr "argitalpen bukaera data"
-
-#: migrations/0001_initial.py:64 models/pagemodel.py:69
-#: plugins/snippet/models.py:14
-msgid "template"
-msgstr "txantiloia"
-
-#: migrations/0001_initial.py:66 models/pagemodel.py:61
-msgid "publication date"
-msgstr "argitalpen data"
-
-#: migrations/0001_initial.py:67 models/pagemodel.py:63
-#: templates/admin/cms/page/change_list_tree.html:9
-msgid "in navigation"
-msgstr "nabigazioan"
-
-#: migrations/0006_apphook.py:15 migrations/0007_apphook_longer.py:11
-#: migrations/0007_apphook_longer.py:17 models/titlemodels.py:17
-msgid "application"
-msgstr "aplikazioa"
-
-#: migrations/0006_apphook.py:65 models/pagemodel.py:65
-msgid "id"
-msgstr "id"
-
-#: migrations/0008_redirects.py:11 models/titlemodels.py:18
-msgid "redirect"
-msgstr "berbideratu"
-
-#: migrations/0009_added_meta_fields.py:12 models/titlemodels.py:20
-msgid "keywords"
-msgstr ""
-
-#: migrations/0009_added_meta_fields.py:15 models/titlemodels.py:19
-#: plugins/teaser/models.py:20
-msgid "description"
-msgstr "deskribapena"
-
-#: models/moderatormodels.py:25
-msgid "Current page"
-msgstr "Uneko orria"
-
 #: models/moderatormodels.py:26
-msgid "Page children (immediate)"
-msgstr "Orri semeak (semeak bakarrik)"
-
-#: models/moderatormodels.py:27
-msgid "Page and children (immediate)"
-msgstr "Orria eta semeak (semeak bakarrik)"
-
-#: models/moderatormodels.py:28
-msgid "Page descendants"
-msgstr "Orriaren oinordekoak"
-
-#: models/moderatormodels.py:29
-msgid "Page and descendants"
-msgstr "Orria eta oinordekoak"
-
-#: models/moderatormodels.py:46
-#: templates/admin/cms/page/moderation_messages.html:6
-#: templates/admin/cms/page/permissions.html:6
-msgid "User"
-msgstr "Erabiltzailea"
-
-#: models/moderatormodels.py:50 templatetags/cms_admin.py:147
-msgid "Moderate page"
-msgstr ""
-
-#: models/moderatormodels.py:51 templatetags/cms_admin.py:148
-msgid "Moderate children"
-msgstr ""
-
-#: models/moderatormodels.py:52 templatetags/cms_admin.py:149
-msgid "Moderate descendants"
-msgstr ""
-
-#: models/moderatormodels.py:55 models/moderatormodels.py:56
-msgid "PageModerator"
-msgstr ""
-
-#: models/moderatormodels.py:99
 msgid "created"
 msgstr "sortuta"
 
-#: models/moderatormodels.py:100 models/pagemodel.py:39
+#: models/moderatormodels.py:27
 msgid "changed"
 msgstr "aldatuta"
 
-#: models/moderatormodels.py:101
-msgid "delete req."
-msgstr "ezabatzeko esk."
-
-#: models/moderatormodels.py:102
-msgid "move req."
-msgstr "mugitzeko esk."
-
-#: models/moderatormodels.py:103
-msgid "publish req."
-msgstr "argitaratzeko esk."
-
-#: models/moderatormodels.py:104
-msgid "unpublish req."
-msgstr "ez-argitaratze esk."
-
-#: models/moderatormodels.py:105 models/pagemodel.py:42
-msgid "approved"
-msgstr "onartua"
-
-#: models/moderatormodels.py:117
+#: models/moderatormodels.py:39
 msgid "Page moderator state"
-msgstr ""
+msgstr "Orri moderatzailearen egoera"
 
-#: models/moderatormodels.py:118
+#: models/moderatormodels.py:40
 msgid "Page moderator states"
-msgstr ""
+msgstr "Orri moderatzailearen egoerak"
 
-#: models/pagemodel.py:40
-msgid "req. app."
-msgstr ""
-
-#: models/pagemodel.py:41 templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:66 utils/moderator.py:90
-msgid "delete"
-msgstr "ezabatu"
-
-#: models/pagemodel.py:43
-msgid "app. par."
-msgstr ""
-
-#: models/pagemodel.py:47
+#: models/pagemodel.py:37
 msgid "for logged in users only"
-msgstr ""
+msgstr "saioa hasi duten erabiltzaileentzat bakarrik"
+
+#: models/pagemodel.py:38
+msgid "for anonymous users only"
+msgstr "erabiltzaile anonimoentzat bakarrik"
 
 #: models/pagemodel.py:48
-msgid "for anonymous users only"
-msgstr ""
-
-#: models/pagemodel.py:56
 msgid "created by"
-msgstr ""
+msgstr "-k sortua"
 
-#: models/pagemodel.py:57 templates/admin/cms/page/change_list_tree.html:20
+#: models/pagemodel.py:49 templates/admin/cms/page/tree/base_header.html:16
 msgid "changed by"
 msgstr "nork aldatua"
 
-#: models/pagemodel.py:61
+#: models/pagemodel.py:54
+msgid "publication date"
+msgstr "argitalpen data"
+
+#: models/pagemodel.py:55
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "Orria noiz agertuko den. Egoera \"Argitaratuta\" izan behar du orria webgunean agertzeko."
 
-#: models/pagemodel.py:62
+#: models/pagemodel.py:56
+msgid "publication end date"
+msgstr "argitalpen bukaera data"
+
+#: models/pagemodel.py:57
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Orria noiz desagertuko den. Hutsik utzi inoiz ez desagertzeko."
 
-#: models/pagemodel.py:64
-msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
+#: models/pagemodel.py:59 templates/admin/cms/page/tree/base_header.html:10
+msgid "in navigation"
+msgstr "nabigazioan"
 
-#: models/pagemodel.py:65
+#: models/pagemodel.py:60
+msgid "soft root"
+msgstr "erro leuna"
+
+#: models/pagemodel.py:61
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "Arbaso guztiak ez dira nabigazioan bistaratuko"
+
+#: models/pagemodel.py:62
+msgid "id"
+msgstr "id"
+
+#: models/pagemodel.py:63
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
+msgstr "page_url templatetagak orri honetara estekatzeko erabiltzen duen identifikadorea."
 
-#: models/pagemodel.py:66
+#: models/pagemodel.py:64
 msgid "attached menu"
-msgstr ""
+msgstr "erantsitako menua"
 
-#: models/pagemodel.py:67
+#: models/pagemodel.py:65
 msgid "is published"
 msgstr "argitaratuta dago"
 
-#: models/pagemodel.py:69
+#: models/pagemodel.py:67 plugins/snippet/models.py:16
+msgid "template"
+msgstr "txantiloia"
+
+#: models/pagemodel.py:68
 msgid "The template used to render the content."
 msgstr "edukia ikusteko erabiliko den txantiloia"
 
@@ -746,160 +685,268 @@ msgid "site"
 msgstr "gunea"
 
 #: models/pagemodel.py:72
-msgid "moderator state"
-msgstr ""
+msgid "login required"
+msgstr "Saio-hasiera beharrezkoa"
 
-#: models/pagemodel.py:80
+#: models/pagemodel.py:73
 msgid "menu visibility"
 msgstr "menu ikusgarritasuna"
 
-#: models/pagemodel.py:80
+#: models/pagemodel.py:75
 msgid "limit when this page is visible in the menu"
 msgstr "orri hau menuan noiz ikusi ahalko den mugatzen du"
 
-#: models/pagemodel.py:100
+#: models/pagemodel.py:77
+msgid "application"
+msgstr "aplikazioa"
+
+#: models/pagemodel.py:78
+msgid "application namespace"
+msgstr ""
+
+#: models/pagemodel.py:104 models/permissionmodels.py:94
+#: models/titlemodels.py:25 plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: plugins/link/models.py:15 plugins/picture/models.py:25
+#: plugins/teaser/models.py:16
+msgid "page"
+msgstr "orria"
+
+#: models/pagemodel.py:105
 msgid "pages"
 msgstr "orriak"
 
-#: models/pagemodel.py:268
-msgid "Page was copied."
-msgstr "Orria kopiatu da."
-
-#: models/pagemodel.py:690
+#: models/pagemodel.py:793
 msgid "default"
 msgstr "lehenetsia"
 
-#: models/permissionmodels.py:22
+#: models/permissionmodels.py:28
+msgid "Current page"
+msgstr "Uneko orria"
+
+#: models/permissionmodels.py:29
+msgid "Page children (immediate)"
+msgstr "Orri semeak (semeak bakarrik)"
+
+#: models/permissionmodels.py:30
+msgid "Page and children (immediate)"
+msgstr "Orria eta semeak (semeak bakarrik)"
+
+#: models/permissionmodels.py:31
+msgid "Page descendants"
+msgstr "Orriaren oinordekoak"
+
+#: models/permissionmodels.py:32
+msgid "Page and descendants"
+msgstr "Orria eta oinordekoak"
+
+#: models/permissionmodels.py:41
+msgid "group"
+msgstr "taldea"
+
+#: models/permissionmodels.py:44
+msgid "can edit"
+msgstr "editatu dezake"
+
+#: models/permissionmodels.py:45
 msgid "can add"
 msgstr "gehi dezake"
 
-#: models/permissionmodels.py:23
+#: models/permissionmodels.py:46
 msgid "can delete"
 msgstr "ezaba dezake"
 
-#: models/permissionmodels.py:24
+#: models/permissionmodels.py:47
 msgid "can change advanced settings"
 msgstr "ezarpen aurreratuak aldatu ditzake"
 
-#: models/permissionmodels.py:26
+#: models/permissionmodels.py:48
+msgid "can publish"
+msgstr "Argitaratu dezake"
+
+#: models/permissionmodels.py:49
 msgid "can change permissions"
 msgstr "baimenak alda ditzake"
 
-#: models/permissionmodels.py:26
+#: models/permissionmodels.py:49
 msgid "on page level"
 msgstr "orri mailan"
 
-#: models/permissionmodels.py:27
+#: models/permissionmodels.py:50
 msgid "can move"
 msgstr "mugitu dezake"
 
-#: models/permissionmodels.py:28
-msgid "can moderate"
-msgstr ""
-
-#: models/permissionmodels.py:29
+#: models/permissionmodels.py:51
 msgid "view restricted"
 msgstr "Ikusgarritasun mugatua"
 
-#: models/permissionmodels.py:29
+#: models/permissionmodels.py:51
 msgid "frontend view restriction"
-msgstr ""
+msgstr "frontend-aren ikuspegiaren murrizketa"
 
-#: models/permissionmodels.py:52
+#: models/permissionmodels.py:75
 msgid "can recover pages"
 msgstr "orriak berreskuratu ditzake"
 
-#: models/permissionmodels.py:52
+#: models/permissionmodels.py:75
 msgid "can recover any deleted page"
 msgstr "ezabatutako edozein orri berrezkuratu dezake"
 
-#: models/permissionmodels.py:53
+#: models/permissionmodels.py:76
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "Aukeratzen ez bada, erabiltzaileak baimen guztiak bermatuak izango ditu orri guztietan sartzeko"
 
-#: models/permissionmodels.py:53
+#: models/permissionmodels.py:76
 msgid "sites"
 msgstr "guneak"
 
-#: models/permissionmodels.py:58
+#: models/permissionmodels.py:81
 msgid "Page global permission"
 msgstr "Orrien baimen globala"
 
-#: models/permissionmodels.py:59
+#: models/permissionmodels.py:82
 msgid "Pages global permissions"
 msgstr "Orrien baimen globalak"
 
-#: models/permissionmodels.py:69 templates/admin/cms/page/permissions.html:15
+#: models/permissionmodels.py:93 templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
-msgstr ""
+msgstr "Baimendu"
 
-#: models/permissionmodels.py:75
+#: models/permissionmodels.py:99
 msgid "Page permission"
 msgstr "Orri baimena"
 
-#: models/permissionmodels.py:90
+#: models/permissionmodels.py:114
 msgid "User (page)"
 msgstr "Erabiltzailea (orria)"
 
-#: models/permissionmodels.py:91
+#: models/permissionmodels.py:115
 msgid "Users (page)"
 msgstr "Erabiltzaileak (orria)"
 
-#: models/permissionmodels.py:101
+#: models/permissionmodels.py:125
 msgid "User group (page)"
 msgstr "Erabiltzaile taldea (orria)"
 
-#: models/permissionmodels.py:102
+#: models/permissionmodels.py:126
 msgid "User groups (page)"
 msgstr "Erabiltzaile taldeak (orria)"
 
-#: models/placeholdermodel.py:13 plugins/flash/models.py:9
-#: plugins/flash/migrations/0001_initial.py:16 plugins/googlemap/models.py:36
-#: plugins/video/models.py:13
+#: models/placeholdermodel.py:15
+msgid "slot"
+msgstr "tartea"
+
+#: models/placeholdermodel.py:16 plugins/flash/models.py:12
+#: plugins/googlemap/models.py:38 plugins/video/models.py:16
 msgid "width"
 msgstr "zabalera"
 
-#: models/pluginmodel.py:142
+#: models/pluginmodel.py:86
+msgid "position"
+msgstr "kokapena"
+
+#: models/pluginmodel.py:87 models/titlemodels.py:13
+#: plugins/inherit/models.py:11
+msgid "language"
+msgstr "hizkuntza"
+
+#: models/pluginmodel.py:88
+msgid "plugin_name"
+msgstr "Pluginaren izena"
+
+#: models/pluginmodel.py:89 models/titlemodels.py:26
+msgid "creation date"
+msgstr "sorrera data"
+
+#: models/pluginmodel.py:149
 msgid "<Empty>"
 msgstr "<Hutsik>"
 
-#: models/titlemodels.py:13
+#: models/settingmodels.py:13
+msgid "The language for the admin interface and toolbar"
+msgstr ""
+
+#: models/settingmodels.py:17
+msgid "user setting"
+msgstr ""
+
+#: models/settingmodels.py:18
+msgid "user settings"
+msgstr ""
+
+#: models/titlemodels.py:14 models/titlemodels.py:15 models/titlemodels.py:17
+#: plugins/file/models.py:29 plugins/teaser/models.py:12
+#: templates/admin/cms/page/tree/base_header.html:7
+msgid "title"
+msgstr "izenburua"
+
+#: models/titlemodels.py:16
+msgid "overwrite the title (html title tag)"
+msgstr "izenburua gainidatzi (html title etiketa)"
+
+#: models/titlemodels.py:18
 msgid "overwrite the title in the menu"
 msgstr "menuan izenburua gainidatzi"
 
-#: models/titlemodels.py:15
+#: models/titlemodels.py:19 plugins/teaser/models.py:23
+msgid "description"
+msgstr "deskribapena"
+
+#: models/titlemodels.py:20
+msgid "The text displayed in search engines."
+msgstr ""
+
+#: models/titlemodels.py:21
+msgid "slug"
+msgstr "slug"
+
+#: models/titlemodels.py:22
 msgid "Path"
 msgstr "Bidea"
 
-#: models/titlemodels.py:21
-msgid "overwrite the title (html title tag)"
-msgstr "izenburua gainidatzi (html title etiketa)"
+#: models/titlemodels.py:23
+msgid "has url overwrite"
+msgstr "gainidatzitako URL-a dauka"
+
+#: models/titlemodels.py:24
+msgid "redirect"
+msgstr "berbideratu"
+
+#: plugins/utils.py:146
+#, python-format
+msgid "This placeholder already has the maximum number of plugins (%s)."
+msgstr "Biltegi honek gehienezko plugin kopurua dauka iada (%s)."
+
+#: plugins/utils.py:156
+#, python-format
+msgid ""
+"This placeholder already has the maximum number (%(limit)s) of allowed "
+"%(plugin_name)s plugins."
+msgstr "Biltegi honek iada gehienezko %(plugin_name)s plugin kopurua dauka iada (%(limit)s)."
 
 #: plugins/file/cms_plugins.py:9
 msgid "File"
 msgstr "Fitxategia"
 
-#: plugins/file/models.py:24 plugins/file/migrations/0001_initial.py:17
-#: plugins/flash/models.py:8 plugins/flash/migrations/0001_initial.py:18
+#: plugins/file/models.py:28 plugins/flash/models.py:11
 msgid "file"
 msgstr "fitxategia"
 
 #: plugins/file/templates/cms/plugins/file.html:6
 msgid "file missing!"
-msgstr ""
+msgstr "fitxategia falta da!"
 
 #: plugins/flash/cms_plugins.py:9
 msgid "Flash"
-msgstr ""
+msgstr "Flasha"
 
-#: plugins/flash/models.py:8
+#: plugins/flash/models.py:11
 msgid "use swf file"
-msgstr ""
+msgstr "Erabili swf fitxategia"
 
-#: plugins/flash/models.py:10 plugins/flash/migrations/0001_initial.py:19
-#: plugins/googlemap/models.py:38 plugins/video/models.py:14
+#: plugins/flash/models.py:13 plugins/googlemap/models.py:40
+#: plugins/video/models.py:17
 msgid "height"
-msgstr ""
+msgstr "altuera"
 
 #: plugins/flash/templates/cms/plugins/flash.html:40
 #: plugins/video/templates/cms/plugins/video.html:60
@@ -913,81 +960,81 @@ msgstr "Adobe Flash Player eskuratu"
 
 #: plugins/googlemap/cms_plugins.py:10
 msgid "Google Map"
-msgstr ""
+msgstr "Google Map"
 
 #: plugins/googlemap/cms_plugins.py:19
 msgid "Advanced"
-msgstr ""
+msgstr "Aurreratua"
 
 #: plugins/googlemap/forms.py:23
 msgid "Must be a positive integer followed by “px” or “%”."
-msgstr ""
+msgstr "Zenbaki positibo bat izan behar du pixeletan edo portzentailetan."
 
 #: plugins/googlemap/forms.py:26
 msgid "Must be a positive integer followed by “px”."
-msgstr ""
+msgstr "Zenbaki positibo bat izan behar du pixeletan."
 
-#: plugins/googlemap/models.py:10
+#: plugins/googlemap/models.py:12
 msgid "map title"
 msgstr "maparen izenburua"
 
-#: plugins/googlemap/models.py:13
+#: plugins/googlemap/models.py:15
 msgid "address"
 msgstr "helbidea"
 
-#: plugins/googlemap/models.py:14
+#: plugins/googlemap/models.py:16
 msgid "zip code"
 msgstr "posta-kodea"
 
-#: plugins/googlemap/models.py:15
+#: plugins/googlemap/models.py:17
 msgid "city"
 msgstr "hiria"
 
-#: plugins/googlemap/models.py:17
-msgid "additional content"
-msgstr ""
-
 #: plugins/googlemap/models.py:19
-msgid "Displayed under address in the bubble."
-msgstr ""
+msgid "additional content"
+msgstr "eduki gehigarria"
 
 #: plugins/googlemap/models.py:21
+msgid "Displayed under address in the bubble."
+msgstr "Burbuilan helbidearen azpian agertzen da."
+
+#: plugins/googlemap/models.py:23
 msgid "zoom level"
 msgstr "zoom maila"
 
-#: plugins/googlemap/models.py:24
+#: plugins/googlemap/models.py:26
 msgid "latitude"
 msgstr "latitudea"
 
-#: plugins/googlemap/models.py:26
+#: plugins/googlemap/models.py:28
 msgid "Use latitude & longitude to fine tune the map position."
 msgstr "Latitude eta longitudea erabili mapan kokapen fintzeko."
 
-#: plugins/googlemap/models.py:28
+#: plugins/googlemap/models.py:30
 msgid "longitude"
 msgstr "longitudea"
 
-#: plugins/googlemap/models.py:31
-msgid "route planer title"
-msgstr ""
-
 #: plugins/googlemap/models.py:33
+msgid "route planer title"
+msgstr "ibilbide planifikatzailearen izenburua"
+
+#: plugins/googlemap/models.py:35
 msgid "Calculate your fastest way to here"
 msgstr "Hona heltzeko bide azkarrena kalkulatu"
 
-#: plugins/googlemap/models.py:34
+#: plugins/googlemap/models.py:36
 msgid "route planer"
-msgstr ""
-
-#: plugins/googlemap/models.py:37
-msgid "Plugin width (in pixels or percent)."
-msgstr ""
+msgstr "ibilbide planifikatzailea"
 
 #: plugins/googlemap/models.py:39
-msgid "Plugin height (in pixels)."
-msgstr ""
+msgid "Plugin width (in pixels or percent)."
+msgstr "Pluginaren zabalera (pixeletan edo portzentailetan)."
 
-#: plugins/googlemap/models.py:47
+#: plugins/googlemap/models.py:41
+msgid "Plugin height (in pixels)."
+msgstr "Pluginaren altuera (pixeletan)."
+
+#: plugins/googlemap/models.py:49
 msgid "Map"
 msgstr "Mapa"
 
@@ -1001,7 +1048,7 @@ msgstr "Ibilbidea kalkulatu"
 
 #: plugins/inherit/cms_plugins.py:17
 msgid "Inherit Plugins from Page"
-msgstr ""
+msgstr "Heredatu Pluginak Orritik"
 
 #: plugins/inherit/forms.py:23
 msgid "Language or Page must be filled out"
@@ -1011,7 +1058,7 @@ msgstr "Orriaren hizkuntza zehaztu behar da"
 msgid ""
 "Choose a page to include its plugins into this placeholder, empty will "
 "choose current page"
-msgstr ""
+msgstr "Aukeratu orri bat bere pluginak biltegi honetan eransteko, hutsa gelditzen bada uneko orria aukeratuko da"
 
 #: plugins/inherit/models.py:11
 msgid "Optional: the language of the plugins you want"
@@ -1021,253 +1068,147 @@ msgstr "Aukerazkoa: nahi dituzun pluginen hizkuntza"
 msgid "Link"
 msgstr "Esteka"
 
-#: plugins/link/models.py:10 plugins/link/migrations/0001_initial.py:18
-#: plugins/link/migrations/0004_larger_link_names.py:11
-#: plugins/link/migrations/0004_larger_link_names.py:17
-#: plugins/snippet/models.py:12 plugins/snippet/migrations/0001_initial.py:17
+#: plugins/link/models.py:13 plugins/snippet/models.py:14
 msgid "name"
 msgstr "izena"
 
-#: plugins/link/models.py:11 plugins/link/migrations/0001_initial.py:16
-#: plugins/picture/models.py:21 plugins/picture/migrations/0001_initial.py:16
-#: plugins/teaser/models.py:19
+#: plugins/link/models.py:14 plugins/picture/models.py:23
+#: plugins/teaser/models.py:22 stacks/forms.py:13
 msgid "link"
 msgstr "esteka"
 
-#: plugins/link/models.py:12
-msgid "A link to a page has priority over a text link."
-msgstr ""
-
-#: plugins/link/models.py:13
-msgid "mailto"
-msgstr ""
-
-#: plugins/link/models.py:13
-msgid "An email adress has priority over a text link."
-msgstr ""
-
-#: plugins/link/models.py:14
-msgid "target"
-msgstr ""
-
 #: plugins/link/models.py:15
-msgid "same window"
-msgstr ""
+msgid "A link to a page has priority over a text link."
+msgstr "Orrira estekak lehentasuna du testu esteka baten aurrean."
 
 #: plugins/link/models.py:16
-msgid "new window"
-msgstr ""
+msgid "mailto"
+msgstr "eposta helbidea"
+
+#: plugins/link/models.py:16
+msgid "An email adress has priority over a text link."
+msgstr "Eposta helbideak lehentasuna du testu esteka baten aurrean."
 
 #: plugins/link/models.py:17
-msgid "parent window"
-msgstr ""
+msgid "target"
+msgstr "helburua"
 
 #: plugins/link/models.py:18
+msgid "same window"
+msgstr "lehio berdina"
+
+#: plugins/link/models.py:19
+msgid "new window"
+msgstr "lehio berria"
+
+#: plugins/link/models.py:20
+msgid "parent window"
+msgstr "lehio senidea"
+
+#: plugins/link/models.py:21
 msgid "topmost frame"
-msgstr ""
+msgstr "goreneko markoa"
 
 #: plugins/picture/cms_plugins.py:9
 msgid "Picture"
 msgstr "Irudia"
 
-#: plugins/picture/models.py:14
-msgid "center"
-msgstr "zentratuta"
-
-#: plugins/picture/models.py:15
+#: plugins/picture/models.py:17
 msgid "left"
 msgstr "ezkerrean"
 
-#: plugins/picture/models.py:16
+#: plugins/picture/models.py:18
 msgid "right"
 msgstr "eskuinean"
 
-#: plugins/picture/models.py:20 plugins/picture/migrations/0001_initial.py:17
-#: plugins/teaser/models.py:10 plugins/video/models.py:11
+#: plugins/picture/models.py:19
+msgid "center"
+msgstr "zentratuta"
+
+#: plugins/picture/models.py:22 plugins/teaser/models.py:13
+#: plugins/video/models.py:14
 msgid "image"
 msgstr "irudia"
 
-#: plugins/picture/models.py:21 plugins/picture/models.py:22
-msgid "if present image will be clickable"
-msgstr "zehazten bada irudia klikagarria izango da"
-
-#: plugins/picture/models.py:23 plugins/picture/migrations/0001_initial.py:19
-msgid "alternate text"
-msgstr ""
-
-#: plugins/picture/models.py:23
-msgid "textual description of the image"
-msgstr ""
-
 #: plugins/picture/models.py:24
+msgid "If present, clicking on image will take user to link."
+msgstr "Irudia egon ezkero,  haren gainean klik egitean erabiltzailea estekara eramango du."
+
+#: plugins/picture/models.py:27
+msgid ""
+"If present, clicking on image will take user         to specified page."
+msgstr "Irudia egon ezkero,  haren gainean klik egitean erabiltzailea zehaztutako orrira eramango du."
+
+#: plugins/picture/models.py:29
+msgid "alternate text"
+msgstr "ordezko testua"
+
+#: plugins/picture/models.py:30
+msgid ""
+"Specifies an alternate text for an image, if         the image cannot be "
+"displayed.<br />Is also used by search engines to         classify the "
+"image."
+msgstr "Irudiari ordezko testua ezarri, irudia ezin bada erakutsi hau agertuko da. <br />Bilatzaile motorrek ere hau erabiltzen dute irudia sailkatzeko."
+
+#: plugins/picture/models.py:33
 msgid "long description"
 msgstr "deskribapen luzea"
 
-#: plugins/picture/models.py:24
-msgid "additional description of the image"
-msgstr "irudiaren deskribapen osagarria"
+#: plugins/picture/models.py:34
+msgid ""
+"When user hovers above picture,        this text will appear in a popup."
+msgstr "Erabiltzaileak sagua irudiaren gainetik pasatzean, testu hau agertuko da."
 
-#: plugins/picture/models.py:25
+#: plugins/picture/models.py:36
 msgid "side"
 msgstr "aldea"
 
-#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
-#: plugins/snippet/models.py:32
+#: plugins/picture/models.py:37
+msgid "Move image left, right or center."
+msgstr "Mugitu irudia ezkerrera, eskubira edo erdira."
+
+#: plugins/picture/models.py:54
+msgid "You can enter a Link or a Page, but not both."
+msgstr "Esteka bat edo orri bat sartu dezakezu, baina ez biak."
+
+#: plugins/snippet/cms_plugins.py:13 plugins/snippet/models.py:26
+#: plugins/snippet/models.py:35
 msgid "Snippet"
 msgstr "Ebakina"
 
-#: plugins/snippet/cms_plugins.py:30
+#: plugins/snippet/cms_plugins.py:31
 #, python-format
 msgid "Template %(template)s does not exist."
 msgstr "%(template)s txantiloia ez da existitzen."
 
-#: plugins/snippet/models.py:13 plugins/snippet/migrations/0001_initial.py:18
+#: plugins/snippet/models.py:15
 msgid "HTML"
 msgstr "HTML"
 
-#: plugins/snippet/models.py:15
+#: plugins/snippet/models.py:17
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
+msgstr "Bistaratuko den txantiloia aukeratu (adib. \"snippets/plugin_xy.html\")."
 
-#: plugins/snippet/models.py:25
+#: plugins/snippet/models.py:27
 msgid "Snippets"
 msgstr "Ebakinak"
 
 #: plugins/teaser/cms_plugins.py:8
 msgid "Teaser"
-msgstr ""
+msgstr "Iragarkia"
 
-#: plugins/teaser/models.py:14
+#: plugins/teaser/models.py:17
 msgid "If present image will be clickable"
 msgstr "Zehazten bada irudia klikagarria izango da"
 
-#: plugins/teaser/models.py:19
+#: plugins/teaser/models.py:22
 msgid "If present image will be clickable."
 msgstr "Zehazten bada irudia klikagarria izango da."
 
 #: plugins/teaser/templates/cms/plugins/teaser.html:11
-#: templates/cms/toolbar/toolbar.html:68
 msgid "more"
 msgstr "gehiago"
-
-#: plugins/text/cms_plugins.py:15
-msgid "Text"
-msgstr "Testua"
-
-#: plugins/text/models.py:14 plugins/text/migrations/0001_initial.py:16
-msgid "body"
-msgstr "gorputza"
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
-msgid "Plugins"
-msgstr "Pluginak"
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
-msgid "Please select a plugin type."
-msgstr "Plugin mota hautatu mesedez."
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:112
-msgid "Edit selected plugin"
-msgstr "Hautatutako plugina editatu"
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
-msgid "Text editor does not support editing objects."
-msgstr "Testu editoreak ez du objeturik editatzeko gaitasuna."
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
-msgid "No object selected."
-msgstr "Ez da objekturik hautatu."
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
-msgid "Text editor does not support inserting objects."
-msgstr "Testu editoreak ez du objetuak txertatzeko gaitasuna."
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
-msgid "Not a plugin object"
-msgstr "Ez da plugin objetua"
-
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:108
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
-msgid "Available Plugins"
-msgstr "Plugin eskuragarriak"
-
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:111
-msgid "Insert plugin"
-msgstr "Plugina txertatu"
-
-#: plugins/twitter/cms_plugins.py:10
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:30
-msgid "Twitter"
-msgstr "Twitter"
-
-#: plugins/twitter/cms_plugins.py:23
-msgid "Twitter Search"
-msgstr "Twitter bilaketa"
-
-#: plugins/twitter/models.py:7
-msgid "twitter user"
-msgstr "twitter erabiltzailea"
-
-#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
-msgid "count"
-msgstr "kopurua"
-
-#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
-msgid "Number of entries to display"
-msgstr "Bistaratuko diren sarrera kopurua"
-
-#: plugins/twitter/models.py:9
-msgid "link hint"
-msgstr ""
-
-#: plugins/twitter/models.py:9
-msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-
-#: plugins/twitter/models.py:16
-msgid "query"
-msgstr "kontsulta"
-
-#: plugins/twitter/models.py:16
-msgid ""
-"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
-"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
-"\"brains\" and \"zombies\""
-msgstr "Adibidea: \"burmuinak AND zombiak AND from:umbrella AND to:nemesis\": \"umbrella\" erabiltzaileak \"nemesis\" erabiltzaileari bidalitako eta \"burmuinak\" eta \"zombiak\" hitzak dituzten tweetak"
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
-msgid "we said,"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:15
-msgid "we"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
-msgid "we were"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
-msgid "we replied to"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:18
-msgid "we were checking out"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
-msgid "loading tweets..."
-msgstr "twettak kargatzen..."
 
 #: plugins/video/cms_plugins.py:10
 msgid "Video"
@@ -1277,128 +1218,152 @@ msgstr "Bideoa"
 msgid "Color Settings"
 msgstr "Kolore ezarpenak"
 
-#: plugins/video/models.py:9
+#: plugins/video/models.py:12
 msgid "movie file"
 msgstr "bideo fitxategia"
 
-#: plugins/video/models.py:9
+#: plugins/video/models.py:12
 msgid "use .flv file or h264 encoded video file"
 msgstr "erabili .flv edo h264 kodeketa duen bideo fitxategia"
 
-#: plugins/video/models.py:10
+#: plugins/video/models.py:13
 msgid "movie url"
 msgstr "bideo url-a"
 
-#: plugins/video/models.py:10
+#: plugins/video/models.py:13
 msgid ""
 "vimeo or youtube video url. Example: "
 "http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 msgstr "vimeo edo youtubeko bideo url-a. Adibidea: http://www.youtube.com/watch?v=-iJ7bs4mTUY"
 
-#: plugins/video/models.py:11
+#: plugins/video/models.py:14
 msgid "preview image file"
 msgstr "irudi fitxategia aurreikusi"
 
-#: plugins/video/models.py:16
+#: plugins/video/models.py:19
 msgid "auto play"
 msgstr "erreprodukzio automatikoa"
 
-#: plugins/video/models.py:17
+#: plugins/video/models.py:20
 msgid "auto hide"
 msgstr "automatikoki ezkutatu"
 
-#: plugins/video/models.py:18
+#: plugins/video/models.py:21
 msgid "fullscreen"
 msgstr "pantaila osoa"
 
-#: plugins/video/models.py:19
-msgid "loop"
-msgstr ""
-
 #: plugins/video/models.py:22
+msgid "loop"
+msgstr "begizta"
+
+#: plugins/video/models.py:25
 msgid "background color"
 msgstr "atzeko planoaren kolorea"
 
-#: plugins/video/models.py:22 plugins/video/models.py:23
-#: plugins/video/models.py:24 plugins/video/models.py:25
-#: plugins/video/models.py:26 plugins/video/models.py:27
-#: plugins/video/models.py:28 plugins/video/models.py:29
+#: plugins/video/models.py:25 plugins/video/models.py:26
+#: plugins/video/models.py:27 plugins/video/models.py:28
+#: plugins/video/models.py:29 plugins/video/models.py:30
+#: plugins/video/models.py:31 plugins/video/models.py:32
 msgid "Hexadecimal, eg ff00cc"
 msgstr "Hamaseitarra, adib. ff00cc"
 
-#: plugins/video/models.py:23
+#: plugins/video/models.py:26
 msgid "text color"
 msgstr "testuaren kolorea"
 
-#: plugins/video/models.py:24
-msgid "seekbar color"
-msgstr ""
-
-#: plugins/video/models.py:25
-msgid "seekbar bg color"
-msgstr ""
-
-#: plugins/video/models.py:26
-msgid "loadingbar color"
-msgstr ""
-
 #: plugins/video/models.py:27
-msgid "button out color"
-msgstr ""
+msgid "seekbar color"
+msgstr "bilatze barraren kolorea"
 
 #: plugins/video/models.py:28
-msgid "button over color"
-msgstr ""
+msgid "seekbar bg color"
+msgstr "bilatze barraren atzeko kolorea"
 
 #: plugins/video/models.py:29
+msgid "loadingbar color"
+msgstr "kargatzeko barraren kolorea"
+
+#: plugins/video/models.py:30
+msgid "button out color"
+msgstr "botoiaren kolorea"
+
+#: plugins/video/models.py:31
+msgid "button over color"
+msgstr "gaineko botoiaren kolorea"
+
+#: plugins/video/models.py:32
 msgid "button highlight color"
+msgstr "nabarmendutako botoiaren kolorea"
+
+#: stacks/admin.py:34
+msgid "linked plugins"
 msgstr ""
 
-#: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:277
-#: templates/admin/cms/page/plugin_change_form.html:119
-msgid "Save"
-msgstr "Gorde"
-
-#: templates/admin/page_submit_line.html:7
-#, python-format
-msgid "Delete %(language)s translation"
-msgstr "Ezabatu %(language)s itzulpena"
-
-#: templates/admin/page_submit_line.html:11
-msgid "Save as new"
-msgstr "Gorde berri gisa"
-
-#: templates/admin/page_submit_line.html:12
-msgid "Save and add another"
-msgstr "Gorde eta berria gehitu"
-
-#: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:278
-msgid "Save and continue editing"
-msgstr "Gorde eta aldatzen jarraitu"
-
-#: templates/admin/cms/mail/approvement_required.html:5
-#: templates/admin/cms/mail/approvement_required.txt:5
-#, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+#: stacks/cms_plugins.py:12
+msgid "Stack"
 msgstr ""
 
-#: templates/admin/cms/mail/approvement_required.html:8
-#: templates/admin/cms/mail/approvement_required.txt:7
-msgid "Last changes"
-msgstr "Azken aldaketak"
+#: stacks/forms.py:12 templates/admin/cms/page/tree/menu_item.html:42
+msgid "copy"
+msgstr "kopiatu"
+
+#: stacks/forms.py:15 stacks/models.py:44 stacks/models.py:81
+msgid "stack"
+msgstr ""
+
+#: stacks/forms.py:16
+msgid "insertion type"
+msgstr ""
+
+#: stacks/forms.py:17
+msgid "language code"
+msgstr ""
+
+#: stacks/models.py:26
+msgid "by template"
+msgstr ""
+
+#: stacks/models.py:27
+msgid "by code"
+msgstr ""
+
+#: stacks/models.py:30
+msgid "stack name"
+msgstr ""
+
+#: stacks/models.py:31
+msgid "Descriptive name to identify this stack. Not displayed to users."
+msgstr ""
+
+#: stacks/models.py:33
+msgid "stack code"
+msgstr ""
+
+#: stacks/models.py:34
+msgid "To render the stack in templates."
+msgstr ""
+
+#: stacks/models.py:35
+msgid "stack content"
+msgstr ""
+
+#: stacks/models.py:39
+msgid "creation_method"
+msgstr ""
+
+#: stacks/models.py:45
+msgid "stacks"
+msgstr ""
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Kudeaketa gunean saioa hasi <a href=\"%(login_url)s\">hemen</a>."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "Saioa hasteko esteka: %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1410,260 +1375,68 @@ msgstr "Erabiltzaile-izena:"
 msgid "Password:"
 msgstr "Pasahitza:"
 
-#: templates/admin/cms/page/change_form.html:4
-#: templates/admin/cms/page/plugin_forms_history.html:3
-#: templates/admin/cms/page/plugin_forms_ok.html:4
+#: templates/admin/cms/page/change_form.html:5
+#: templates/admin/cms/page/close_frame.html:4
 msgid "Change a page"
 msgstr "Orria aldatu"
 
-#: templates/admin/cms/page/change_form.html:65
-#: templates/admin/cms/page/change_list.html:8
-#: templates/admin/cms/page/plugin_change_form.html:73
-#: templates/admin/cms/page/recover_form.html:14
-#: templates/admin/cms/page/revision_form.html:6
-msgid "Home"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:74
-msgid "Approve page deletion"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:80
-#, python-format
-msgid "(requires approvement at %(moderation_level)s level)"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:81
-msgid "(you can perform actions on this page directly)"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:94
-msgid "Remove delete request"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:96
-msgid "Approve delete"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:96
-msgid "Approve"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:96
-#: templates/admin/cms/page/change_form.html:97
-#: templates/admin/cms/page/change_list_tree.html:12
-msgid "draft"
-msgstr "zirriborroa"
-
-#: templates/admin/cms/page/change_form.html:97
-msgid "Preview"
-msgstr "Aurrebista"
-
-#: templates/admin/cms/page/change_form.html:100
-#: templates/admin/cms/page/revision_form.html:10
-msgid "History"
-msgstr "Historia"
-
-#: templates/admin/cms/page/change_form.html:101
-msgid "View on site"
-msgstr "Gunean ikusi"
-
-#: templates/admin/cms/page/change_form.html:131
-#: templates/admin/cms/page/plugin_change_form.html:90
+#: templates/admin/cms/page/change_form.html:48
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Arren beheko errorea."
 msgstr[1] "Arren beheko erroreak."
 
-#: templates/admin/cms/page/change_form.html:151
+#: templates/admin/cms/page/change_form.html:66
 msgid "All permissions"
 msgstr "Baimen guztiak"
 
-#: templates/admin/cms/page/change_form.html:152
-#: templates/admin/cms/page/change_form.html:164
-#: templates/admin/cms/page/loading.html:2
+#: templates/admin/cms/page/change_form.html:67
+#: templates/admin/cms/page/change_form.html:76
+#: templates/admin/cms/page/tree/base.html:90
 msgid "Loading..."
 msgstr "Kargatzen..."
 
-#: templates/admin/cms/page/change_form.html:163
+#: templates/admin/cms/page/change_form.html:75
 msgid "Page states"
-msgstr ""
+msgstr "Orriaren egoerak"
 
-#: templates/admin/cms/page/change_form.html:188
-#, python-format
-msgid ""
-"This page must be moderated at level %(moderation_level)s, post a message "
-"for moderator."
-msgstr ""
+#: templates/admin/cms/page/change_form.html:86
+#: templates/admin/cms/page/submit_row.html:5
+#: templates/admin/cms/page/tree/copy_premissions.html:19
+#: templates/admin/cms/usersettings/change_form.html:16
+#: templates/admin/stacks/insert_stack.html:46
+msgid "Save"
+msgstr "Gorde"
 
-#: templates/admin/cms/page/change_form.html:190
-msgid "Request approvemet"
-msgstr "Onespena eskatu"
+#: templates/admin/cms/page/change_form.html:87
+#: templates/admin/cms/page/submit_row.html:15
+msgid "Save and continue editing"
+msgstr "Gorde eta aldatzen jarraitu"
 
-#: templates/admin/cms/page/change_list.html:3
-msgid "List of pages"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:59
-msgid "Successfully moved"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:68
-msgid "An error occured. Please reload the page"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:90
-#, python-format
-msgid "Recover deleted %(name)s"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:93
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s gehitu"
-
-#: templates/admin/cms/page/change_list.html:105
-msgid "Pages on:"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:122
-msgid "Filter:"
-msgstr "Iragazkia:"
-
-#: templates/admin/cms/page/change_list.html:122
-msgid "on"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:122
-msgid "off"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:124
-msgid "Filter"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:8
-msgid "actions"
-msgstr "ekintzak"
-
-#: templates/admin/cms/page/change_list_tree.html:10
-msgid "moderate"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:13
-msgid "published"
-msgstr "argitaratuta"
-
-#: templates/admin/cms/page/change_list_tree.html:15
-msgid "start"
-msgstr "hasiera"
-
-#: templates/admin/cms/page/change_list_tree.html:16
-msgid "end"
-msgstr "amaiera"
-
-#: templates/admin/cms/page/change_list_tree.html:17
-msgid "restricted"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:19
-msgid "last changes"
-msgstr "azken aldaketak"
-
-#: templates/admin/cms/page/menu_item.html:5
-msgid "select this page"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:5
-#: templates/admin/cms/page/menu_item.html:6
-msgid "edit this page"
-msgstr "orri hau editatu"
-
-#: templates/admin/cms/page/menu_item.html:6
-#: templates/cms/toolbar/toolbar.html:63
-msgid "edit"
-msgstr "editatu"
-
-#: templates/admin/cms/page/menu_item.html:16
-msgid "insert above"
-msgstr "Goian txertatu"
-
-#: templates/admin/cms/page/menu_item.html:17
-msgid "insert below"
-msgstr "Behean txertatu"
-
-#: templates/admin/cms/page/menu_item.html:19
-msgid "insert inside"
-msgstr "Barnean txertatu"
-
-#: templates/admin/cms/page/menu_item.html:23
-msgid "softroot"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:23
-msgid "home"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:26
-#, python-format
-msgid "Edit this page in %(language)s "
-msgstr "Orri hau %(language)s hizkuntzan editatu"
-
-#: templates/admin/cms/page/menu_item.html:33
-msgid "Cut"
-msgstr "Ebaki"
-
-#: templates/admin/cms/page/menu_item.html:33
-msgid "cut"
-msgstr "ebaki"
-
-#: templates/admin/cms/page/menu_item.html:34
-msgid "Copy"
-msgstr "Kopiatu"
-
-#: templates/admin/cms/page/menu_item.html:34
-msgid "copy"
-msgstr "kopiatu"
-
-#: templates/admin/cms/page/menu_item.html:37
-#: templates/admin/cms/page/menu_item.html:41
-msgid "Add Child"
-msgstr "Semea gehitu"
-
-#: templates/admin/cms/page/menu_item.html:37
-#: templates/admin/cms/page/menu_item.html:41
-msgid "add"
-msgstr "gehitu"
-
-#: templates/admin/cms/page/menu_item.html:61
-msgid "Approve directly"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:63
-#: templates/admin/cms/page/menu_item.html:75
-#: templates/admin/cms/page/menu_item.html:77
-msgid "view"
-msgstr "ikusi"
-
-#: templates/admin/cms/page/menu_item.html:68
-msgid "Unpublish"
-msgstr "Ez-argitaratu"
-
-#: templates/admin/cms/page/menu_item.html:75
-msgid "View on page"
-msgstr "Orrian ikusi"
-
-#: templates/admin/cms/page/moderation_messages.html:4
+#: templates/admin/cms/page/moderation_messages.html:5
+#: templates/admin/cms/page/moderation_states.html:7
 msgid "Action"
 msgstr "Ekintza"
 
-#: templates/admin/cms/page/moderation_messages.html:5
+#: templates/admin/cms/page/moderation_messages.html:6
+#: templates/admin/cms/page/moderation_states.html:8
 msgid "Created"
-msgstr ""
+msgstr "Sortua"
 
 #: templates/admin/cms/page/moderation_messages.html:7
+#: templates/admin/cms/page/moderation_states.html:9
+#: templates/admin/cms/page/permissions.html:6
+msgid "User"
+msgstr "Erabiltzailea"
+
+#: templates/admin/cms/page/moderation_messages.html:8
+#: templates/admin/cms/page/moderation_states.html:10
 msgid "Message"
 msgstr "Mezua"
+
+#: templates/admin/cms/page/moderation_states.html:25
+msgid "Page doesn't have any states."
+msgstr ""
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
@@ -1697,282 +1470,546 @@ msgstr "Mugi dezake"
 msgid "Can view"
 msgstr "Ikus dezake"
 
-#: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
+#: templates/admin/cms/page/permissions.html:23
 msgid "(global)"
 msgstr "(globala)"
 
-#: templates/admin/cms/page/permissions.html:26
+#: templates/admin/cms/page/permissions.html:27
 msgid "(current)"
 msgstr "(unekoa)"
 
-#: templates/admin/cms/page/permissions.html:43
+#: templates/admin/cms/page/permissions.html:44
 msgid "All"
 msgstr "Guztiak"
 
-#: templates/admin/cms/page/permissions.html:51
+#: templates/admin/cms/page/permissions.html:52
 msgid "Page doesn't inherit any permissions."
+msgstr "Orriak ez dauka heredatutako baimenik."
+
+#: templates/admin/cms/page/submit_row.html:9
+msgid "Basic Infos"
 msgstr ""
 
-#: templates/admin/cms/page/plugin_change_form.html:120
-#: templates/cms/toolbar/toolbar.html:29
-msgid "Cancel"
-msgstr "Utzi"
+#: templates/admin/cms/page/submit_row.html:13
+msgid "Save as new"
+msgstr "Gorde berri gisa"
 
-#: templates/admin/cms/page/plugin_forms_history.html:9
-msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+#: templates/admin/cms/page/submit_row.html:14
+msgid "Save and add another"
+msgstr "Gorde eta berria gehitu"
 
-#: templates/admin/cms/page/plugin_forms_ok.html:26
-msgid "Your changes to this plugin have not been saved."
-msgstr ""
+#: templates/admin/cms/page/history/recover_header.html:13
+#: templates/admin/cms/page/history/revision_header.html:6
+#: templates/admin/cms/page/plugin/delete_confirmation.html:7
+#: templates/admin/cms/page/tree/base.html:9
+#: templates/admin/cms/usersettings/change_form.html:5
+msgid "Home"
+msgstr "Hasiera orria"
 
-#: templates/admin/cms/page/plugin_forms_ok.html:26
-msgid "Plugin saved successfully."
-msgstr ""
-
-#: templates/admin/cms/page/recover_form.html:17
+#: templates/admin/cms/page/history/recover_header.html:16
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "Ezabatutako  %(verbose_name)s-a berreskuratu"
 
-#: templates/admin/cms/page/recover_form.html:24
+#: templates/admin/cms/page/history/recover_header.html:22
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "Azpian dagoen gorde botoia sakatu objektuaren bertsio hau berreskuratzeko."
 
-#: templates/admin/cms/page/revision_form.html:11
+#: templates/admin/cms/page/history/revision_header.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "Leheneratu %(verbose_name)s-a"
 
-#: templates/admin/cms/page/revision_form.html:24
+#: templates/admin/cms/page/history/revision_header.html:20
 msgid "Press the save button below to revert to this version of the object."
+msgstr "Azpian dagoen gorde botoia sakatu objektuaren bertsio hau leheneratzeko."
+
+#: templates/admin/cms/page/tree/base.html:4
+msgid "List of pages"
+msgstr "Orri zerrenda"
+
+#: templates/admin/cms/page/tree/base.html:12
+msgid "Search"
 msgstr ""
 
-#: templates/admin/cms/page/dialog/copy.html:4
+#: templates/admin/cms/page/tree/base.html:51
+msgid "Successfully moved"
+msgstr "Lekuz ongi aldatu da."
+
+#: templates/admin/cms/page/tree/base.html:60
+msgid "An error occured. Please reload the page"
+msgstr "Akatsa gertatu da. Mesedez birkargatu orria"
+
+#: templates/admin/cms/page/tree/base.html:83
+#, python-format
+msgid "Recover deleted %(name)s"
+msgstr "Berreskuratu ezabatutako %(name)s-a"
+
+#: templates/admin/cms/page/tree/base.html:86
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s gehitu"
+
+#: templates/admin/cms/page/tree/base.html:98
+msgid "Pages on:"
+msgstr "Orriak:"
+
+#: templates/admin/cms/page/tree/base.html:119
+msgid "Filter:"
+msgstr "Iragazkia:"
+
+#: templates/admin/cms/page/tree/base.html:119
+msgid "on"
+msgstr "aktibatuta"
+
+#: templates/admin/cms/page/tree/base.html:119
+msgid "off"
+msgstr "desaktibatuta"
+
+#: templates/admin/cms/page/tree/base.html:121
+msgid "Filter"
+msgstr "Iragazkia"
+
+#: templates/admin/cms/page/tree/base_header.html:9
+msgid "actions"
+msgstr "ekintzak"
+
+#: templates/admin/cms/page/tree/base_header.html:11
+msgid "published"
+msgstr "argitaratuta"
+
+#: templates/admin/cms/page/tree/base_header.html:12
+msgid "start"
+msgstr "hasiera"
+
+#: templates/admin/cms/page/tree/base_header.html:13
+msgid "end"
+msgstr "amaiera"
+
+#: templates/admin/cms/page/tree/base_header.html:14
+msgid "restricted"
+msgstr "mugatuta"
+
+#: templates/admin/cms/page/tree/base_header.html:15
+msgid "last changes"
+msgstr "azken aldaketak"
+
+#: templates/admin/cms/page/tree/base_header.html:30
+msgid ""
+"<em>There is no page around yet.</em><br /><a href=\"add/\" "
+"class=\"addlink\">Add page</a> now."
+msgstr ""
+
+#: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Copy options"
-msgstr ""
+msgstr "Kopiatzeko aukerak"
 
-#: templates/admin/cms/page/dialog/copy.html:6
+#: templates/admin/cms/page/tree/copy_premissions.html:6
 msgid "Choose copy options"
+msgstr "Aukeratu kopiatzeko aukerak"
+
+#: templates/admin/cms/page/tree/copy_premissions.html:20
+msgid "Close"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
-msgid "Generic"
+#: templates/admin/cms/page/tree/menu_item.html:6
+msgid "select this page"
+msgstr "orri hau aukeratu"
+
+#: templates/admin/cms/page/tree/menu_item.html:6
+#: templates/admin/cms/page/tree/menu_item.html:7
+msgid "edit this page"
+msgstr "orri hau editatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:7
+msgid "edit"
+msgstr "editatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:17
+msgid "insert above"
+msgstr "Goian txertatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:18
+msgid "insert below"
+msgstr "Behean txertatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:20
+msgid "insert inside"
+msgstr "Barnean txertatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:24
+msgid "softroot"
+msgstr "erro biguna"
+
+#: templates/admin/cms/page/tree/menu_item.html:24
+msgid "home"
+msgstr "hasiera orria"
+
+#: templates/admin/cms/page/tree/menu_item.html:25
+#, python-format
+msgid "Application: %(apphook)s"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
-msgid "Add Plugin"
+#: templates/admin/cms/page/tree/menu_item.html:30
+#, python-format
+msgid "Edit this page in %(language)s "
+msgstr "Orri hau %(language)s hizkuntzan editatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:40
+#: templates/cms/toolbar/dragitem_item.html:13
+msgid "Cut"
+msgstr "Ebaki"
+
+#: templates/admin/cms/page/tree/menu_item.html:40
+msgid "cut"
+msgstr "ebaki"
+
+#: templates/admin/cms/page/tree/menu_item.html:42
+#: templates/cms/toolbar/dragitem_item.html:12
+msgid "Copy"
+msgstr "Kopiatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:45
+#: templates/admin/cms/page/tree/menu_item.html:49
+msgid "Add Child"
+msgstr "Semea gehitu"
+
+#: templates/admin/cms/page/tree/menu_item.html:45
+#: templates/admin/cms/page/tree/menu_item.html:49
+msgid "add"
+msgstr "gehitu"
+
+#: templates/admin/cms/page/tree/menu_item.html:52
+msgid "delete"
+msgstr "ezabatu"
+
+#: templates/admin/cms/page/tree/menu_item.html:65
+msgid "Unpublish"
+msgstr "Ez-argitaratu"
+
+#: templates/admin/cms/page/tree/menu_item.html:66
+#: templates/admin/cms/page/tree/menu_item.html:80
+msgid "Publish"
+msgstr "Argitaratu"
+
+#: templates/admin/cms/page/tree/menu_item.html:71
+msgid "View on page"
+msgstr "Orrian ikusi"
+
+#: templates/admin/cms/page/tree/menu_item.html:71
+msgid "view"
+msgstr "ikusi"
+
+#: templates/admin/stacks/insert_stack.html:4
+#: templates/admin/stacks/insert_stack.html:24
+msgid "Insert Stack"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:18
-msgid "From Language"
+#: templates/cms/toolbar/clipboard.html:24
+msgid "Empty Clipboard"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:25
-msgid "Copy Plugins"
-msgstr "Pluginak kopiatu"
-
-#: templates/admin/cms/page/widgets/plugin_editor.html:12
-msgid "You must save the page first to add plugins."
+#: templates/cms/toolbar/dragbar.html:7
+#: templates/cms/toolbar/dragitem_item.html:9
+msgid "Quicksearch"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:15
-msgid "No Plugin selected. Selected one on the left side"
+#: templates/cms/toolbar/dragbar.html:9
+#: templates/cms/toolbar/dragitem_item.html:11
+msgid "Settings"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:17
-msgid "No Plugins present. Add a plugin to this placeholder-slot."
+#: templates/cms/toolbar/dragbar.html:10
+msgid "Copy all"
 msgstr ""
 
-#: templates/cms/toolbar/placeholder.html:33
+#: templates/cms/toolbar/dragbar.html:11
+msgid "Empty all"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:12
+#: templates/cms/toolbar/dragitem_item.html:16
+msgid "Create stack"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:13
+msgid "Insert stack"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:23
+msgid "Drop a plugin here"
+msgstr ""
+
+#: templates/cms/toolbar/dragitem_item.html:14 templatetags/cms_tags.py:679
+msgid "Edit"
+msgstr ""
+
+#: templates/cms/toolbar/dragitem_menu.html:5
 msgid "Available plugins"
 msgstr "Plugin eskuragarriak"
 
-#: templates/cms/toolbar/toolbar.html:27
-msgid "The selected element can not be moved to the desired location."
+#: templates/cms/toolbar/toolbar.html:8
+msgid "Double-click to edit"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:28
+#: templates/cms/toolbar/toolbar.html:33
+#: templates/cms/toolbar/items/live_draft.html:4
+msgid "Live"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:34
+#: templates/cms/toolbar/items/live_draft.html:5
+msgid "Draft"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:41
+msgid "Toggle toolbar"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:83
+msgid "Start"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:33
+#, python-format
+msgid "Development version using django CMS %(cms_version)s"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:34
+msgid "Cancel"
+msgstr "Utzi"
+
+#: templates/cms/toolbar/toolbar_javascript.html:35
+msgid "<strong>The following error occured:</stron> "
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:36
+msgid "Action successfull... reloading."
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:37
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Ziur plugin hau ezabatu nahi duzula?"
 
-#: templates/cms/toolbar/toolbar.html:64
-msgid "up"
-msgstr "gora"
-
-#: templates/cms/toolbar/toolbar.html:65
-msgid "down"
-msgstr "behera"
-
-#: templates/cms/toolbar/toolbar.html:70
-msgid "Move to placeholder"
+#: templates/cms/toolbar/toolbar_javascript.html:55
+msgid "This page has unpublished changes."
 msgstr ""
 
-#: templates/cms/toolbar/items/login.html:5
+#: templates/cms/toolbar/items/login.html:4 toolbar/toolbar.py:20
 msgid "Username"
 msgstr "Erabiltzaile-izena"
 
-#: templates/cms/toolbar/items/login.html:10
-#: templates/cms/toolbar/items/login.html:12
-msgid "Login"
-msgstr "Saio-hasiera"
-
-#: templates/cms/toolbar/items/status.html:2
-msgid "Status"
-msgstr "Egoera"
-
-#: templates/cms/toolbar/items/switcher.html:4
-msgid "Switch on/off"
+#: templates/cms/toolbar/items/login.html:15
+msgid ""
+"<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
 
-#: templatetags/cms_admin.py:127 templatetags/cms_admin.py:134
+#: templates/cms/toolbar/items/logo.html:2
+msgid "django CMS"
+msgstr "django CMS"
+
+#: templatetags/cms_admin.py:135 templatetags/cms_admin.py:142
 #, python-format
 msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
 msgstr "<span title=\"Murriztapenak: %(title)s\">%(icon)s</span>"
 
-#: templatetags/cms_admin.py:147
-msgid "Unbind page moderation"
-msgstr ""
-
-#: templatetags/cms_admin.py:148
-msgid "Unbind children moderation"
-msgstr ""
-
-#: templatetags/cms_admin.py:149
-msgid "Unbind descendants moderation"
-msgstr ""
-
-#: templatetags/cms_tags.py:79
+#: templatetags/cms_tags.py:99
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr "Orria ez da %(domain)s-en topatu"
 
-#: templatetags/cms_tags.py:80
+#: templatetags/cms_tags.py:100
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
+msgstr "Template tag batek ezin du `%(page_lookup)s` parametroak dituen orririk aurkitu. \nEskaeraren URLa hau zen: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:100 test_utils/cli.py:107
+#: test_utils/cli.py:119 test_utils/cli.py:130
 msgid "English"
-msgstr ""
+msgstr "Ingelesa"
 
-#: test_utils/cli.py:101 test_utils/cli.py:108
+#: test_utils/cli.py:120 test_utils/cli.py:142 test_utils/cli.py:165
 msgid "French"
-msgstr ""
+msgstr "Frantsesa"
 
-#: test_utils/cli.py:102 test_utils/cli.py:109
+#: test_utils/cli.py:121 test_utils/cli.py:136 test_utils/cli.py:159
+#: test_utils/cli.py:178
 msgid "German"
-msgstr ""
+msgstr "Alemaniera"
 
-#: test_utils/cli.py:103 test_utils/cli.py:110
-msgid "Brazil"
-msgstr ""
+#: test_utils/cli.py:122 test_utils/cli.py:147
+msgid "Brazilian Portuguese"
+msgstr "Brazildar Portugaldarra"
 
-#: test_utils/cli.py:104 test_utils/cli.py:111
+#: test_utils/cli.py:123 test_utils/cli.py:172
 msgid "Dutch"
-msgstr ""
+msgstr "Alemaniera"
 
-#: test_utils/cli.py:128
+#: test_utils/cli.py:188
 msgid "two columns"
-msgstr ""
+msgstr "bi zutabe"
 
-#: test_utils/cli.py:129
+#: test_utils/cli.py:189
 msgid "three columns"
-msgstr ""
+msgstr "hiru zutabe"
 
-#: test_utils/cli.py:130
+#: test_utils/cli.py:190
 msgid "navigation examples"
-msgstr ""
+msgstr "nabigazio ereduak"
 
-#: test_utils/cli.py:136
+#: test_utils/cli.py:198
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:142
+#: test_utils/cli.py:204
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:148
+#: test_utils/cli.py:216
 msgid "right column"
 msgstr "background color"
 
+#: test_utils/project/extensionapp/cms_toolbar.py:46
+msgid "Page Extension"
+msgstr ""
+
+#: test_utils/project/extensionapp/cms_toolbar.py:82
+msgid "Title Extension"
+msgstr ""
+
+#: test_utils/project/objectpermissionsapp/models.py:47
+msgid "object ID"
+msgstr ""
+
+#: test_utils/project/placeholderapp/cms_app.py:7
+msgid "Example1 App"
+msgstr ""
+
+#: test_utils/project/placeholderapp/cms_app.py:13
+msgid "MultilingualExample1 App"
+msgstr ""
+
 #: test_utils/project/placeholderapp/cms_plugins.py:7
 msgid "Test Plugin"
-msgstr ""
+msgstr "Pluginaren testa"
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
-msgstr ""
+msgstr "Aparteko testuingurua"
 
 #: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
 msgid "Articles"
-msgstr ""
+msgstr "Artikuluak"
 
 #: test_utils/project/sampleapp/cms_app.py:7
 msgid "Sample App"
+msgstr "Ereduzko aplikazioa"
+
+#: test_utils/project/sampleapp/cms_app.py:15
+msgid "Sample App 2"
+msgstr "Ereduzko aplikazioa 2"
+
+#: test_utils/project/sampleapp/cms_app.py:22
+msgid "Namespaced App"
+msgstr "Izen-eremu propioa \"namespace\" duen aplikazioa"
+
+#: test_utils/project/sampleapp/cms_toolbar.py:17
+#: test_utils/project/sampleapp/views.py:21
+msgid "Category"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_toolbar.py:18
+msgid "Categories"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_toolbar.py:19
+msgid "Add Category"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
 msgid "sample root page"
-msgstr ""
+msgstr "ereduzko orri erroa"
 
 #: test_utils/project/sampleapp/menu.py:17
 msgid "sample settings page"
-msgstr ""
+msgstr "ereduzko ezarpenen orria"
 
 #: test_utils/project/sampleapp/menu.py:18
 msgid "sample account page"
-msgstr ""
+msgstr "ereduzko kontu orria"
 
 #: test_utils/project/sampleapp/menu.py:19
 msgid "sample my profile page"
-msgstr ""
+msgstr "ereduzko profil orria"
 
 #: test_utils/project/sampleapp/menu.py:31
 msgid "Static Menu"
-msgstr ""
+msgstr "Menu estatikoa"
 
 #: test_utils/project/sampleapp/menu.py:47
 msgid "Static Menu2"
+msgstr "Menu estatikoa2"
+
+#: test_utils/project/sampleapp/urls.py:12
+msgid "^account/$"
+msgstr "^account/$"
+
+#: test_utils/project/sampleapp/views.py:23
+msgid "Change Category"
 msgstr ""
+
+#: utils/conf.py:78
+msgid "Inherit the template of the nearest ancestor"
+msgstr "Heredatu senide orritik"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - zure erabiltzaile kontua sortu da."
 
 #: utils/mail.py:39
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - zure erabiltzaile kontua aldatu da."
 
-#: utils/moderator.py:83
-msgid "parent first"
-msgstr ""
-
-#: utils/moderator.py:90
-msgid "approve"
-msgstr "onartu"
-
-#: utils/moderator.py:251
-#, python-format
-msgid "CMS - Page %s requires approvement."
-msgstr ""
-
-#: utils/page_resolver.py:146
+#: utils/page_resolver.py:155
 msgid "Invalid URL, use /my/url format."
 msgstr "URL ezegokia, erabili /nire/url formatua"
 
-#: utils/page_resolver.py:176
+#: utils/page_resolver.py:187
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
 "Pages %(pages)s have the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(pages)s orriak, \"%(instance)s\" uneko orriaren url '%(url)s' berdina du."
+msgstr[1] "%(pages)s orriek, \"%(instance)s\" uneko orrien url '%(url)s' berdina dute."
+
+#~ msgid ""
+#~ "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+#~ msgstr "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approval by you."
+
+#~ msgid "No Plugin selected. Selected one on the left side"
+#~ msgstr "No Plugin selected. Select one on the left side"
+
+#~ msgid "move req."
+#~ msgstr "move request"
+
+#~ msgid "url overwrite"
+#~ msgstr "URL overwrite"
+
+#~ msgid "req. app."
+#~ msgstr "approval required"
+
+#~ msgid "(requires approvement at %(moderation_level)s level)"
+#~ msgstr "(requires approval at %(moderation_level)s level)"
+
+#~ msgid "Request approvemet"
+#~ msgstr "Request approval"
+
+#~ msgid "CMS - Page %s requires approvement."
+#~ msgstr "CMS - Page %s requires approval."
 
 #~ msgid "move"
 #~ msgstr "move request"

@@ -2,7 +2,6 @@
 from classytags.arguments import Argument
 from classytags.core import Tag, Options
 from django import template
-from django.template.defaultfilters import safe
 
 register = template.Library()
 
@@ -12,13 +11,10 @@ class RenderPlaceholder(Tag):
     options = Options(
         Argument('placeholder'),
         Argument('width', default=None, required=False),
+        'language',
+        Argument('language', default=None, required=False),
     )
 
-    def render_tag(self, context, placeholder, width):
-        request = context.get('request', None)
-        if not request:
-            return ''
-        if not placeholder:
-            return ''
-        return safe(placeholder.render(context, width))
+    def render_tag(self, context, placeholder, width, language=None):
+        raise DeprecationWarning('render_placeholder is now located in cms_tags. Please do not load placeholder_tags anymore')
 register.tag(RenderPlaceholder)

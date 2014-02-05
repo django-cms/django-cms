@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from django.conf import settings
 from django.core.management.base import NoArgsCommand, CommandError
+from django.utils.translation import activate
+from cms.utils.compat.dj import force_unicode
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
-        """Create published public version of all published drafts. Useful, 
-        when CMS_MODERATOR gets turned on after some time. 
+        """Create published public version of all published drafts.
         """
-        if not getattr(settings, 'CMS_MODERATOR', False):
-            raise CommandError("This command may be used only with settings.CMS_MODERATOR") 
-        
         self.publish_pages()
         
     def publish_pages(self):
@@ -27,21 +24,29 @@ class Command(NoArgsCommand):
             raise CommandError("No super user found, create one using `manage.py createsuperuser`.")
         
         set_current_user(user) # set him as current user
-        
-        qs = Page.objects.drafts().filter(published=True)
+
+        qs = Page.objects.drafts().filter(title_set__published=True)
         pages_total, pages_published = qs.count(), 0
         
-        print "\nPublishing public drafts....\n"
-        
+        print(u"\nPublishing public drafts....\n")
+        output_language = None
         for i, page in enumerate(qs):
             m = " "
-            if page.publish():
+            add = True
+            for lang in page.title_set.filter(published=True).values_list("language", flat=True):
+                if not output_language:
+                    output_language = lang
+                if not page.publish(lang):
+                    add = False
+            # we may need to activate the first (main) language for proper page title rendering
+            activate(output_language)
+            if add:
                 pages_published += 1
                 m = "*"
-            print "%d.\t%s  %s [%d]" % (i + 1, m, unicode(page), page.id) 
+            print(u"%d.\t%s  %s [%d]" % (i + 1, m, force_unicode(page), page.id))
         
-        print "\n"
-        print "=" * 40
-        print "Total:    ", pages_total
-        print "Published:", pages_published
+        print(u"\n")
+        print(u"=" * 40)
+        print(u"Total:     %s" % pages_total)
+        print(u"Published: %s" % pages_published)
         

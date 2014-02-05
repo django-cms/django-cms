@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
+from cms.test_utils.util.fuzzy_int import FuzzyInt
+from django.db import connection
 from cms.api import create_page
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
-    SoftrootFixture)
+    SoftrootFixture, ExtendedMenusFixture)
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride, 
+from cms.test_utils.util.context_managers import (SettingsOverride,
     LanguageOverride)
 from cms.test_utils.util.mock import AttributeObject
+from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User, Permission, Group
@@ -23,12 +26,8 @@ from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 
 
-
 class BaseMenuTest(SettingsOverrideTestCase):
-    settings_overrides = {
-        'CMS_MODERATOR': False,
-    }
-    
+
     def _get_nodes(self, path='/'):
         node1 = NavigationNode('1', '/1/', 1)
         node2 = NavigationNode('2', '/2/', 2, 1)
@@ -49,10 +48,72 @@ class BaseMenuTest(SettingsOverrideTestCase):
         menu_pool.menus = {'CMSMenu': self.old_menu['CMSMenu']}
         menu_pool.clear(settings.SITE_ID)
         activate("en")
-        
+
     def tearDown(self):
         menu_pool.menus = self.old_menu
         super(BaseMenuTest, self).tearDown()
+
+    def get_page(self, num):
+        return Page.objects.public().get(title_set__title='P%s' % num)
+
+class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
+    """
+    Tree from fixture:
+        
+        + P1
+        | + P2
+        |   + P3
+        | + P9
+        |   + P10
+        |      + P11
+        + P4
+        | + P5
+        + P6 (not in menu)
+          + P7
+          + P8
+    """
+    def get_page(self, num):
+        return Page.objects.public().get(title_set__title='P%s' % num)
+    
+    def get_level(self, num):
+        return Page.objects.public().filter(level=num)
+
+    def get_all_pages(self):
+        return Page.objects.public()
+    
+    def test_menu_failfast_on_invalid_usage(self):
+        context = self.get_context()
+        context['child'] = self.get_page(1)
+        # test standard show_menu
+        with SettingsOverride(DEBUG=True, TEMPLATE_DEBUG=True):
+            tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
+            self.assertRaises(TemplateSyntaxError, tpl.render, context)
+
+    def test_show_submenu_nephews(self):
+        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P2 is the selected node
+        self.assertTrue(nodes[0].selected) 
+        # Should include P10 but not P11 
+        self.assertEqual(len(nodes[1].children), 1)
+        self.assertFalse(nodes[1].children[0].children)
+
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # should now include both P10 and P11
+        self.assertEqual(len(nodes[1].children), 1)
+        self.assertEqual(len(nodes[1].children[0].children), 1)
+
+    def test_show_submenu_template_root_level_none_no_nephew_limit(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # default nephew limit, P2 and P9 in the nodes list
+        self.assertEqual(len(nodes), 2)
 
 
 class FixturesMenuTests(MenusFixture, BaseMenuTest):
@@ -69,13 +130,13 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
           + P8
     """
     def get_page(self, num):
-        return Page.objects.get(title_set__title='P%s' % num)
+        return Page.objects.public().get(title_set__title='P%s' % num)
     
     def get_level(self, num):
-        return Page.objects.filter(level=num)
+        return Page.objects.public().filter(level=num)
     
     def get_all_pages(self):
-        return Page.objects.all()
+        return Page.objects.public()
     
     def test_menu_failfast_on_invalid_usage(self):
         context = self.get_context()
@@ -84,22 +145,22 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         with SettingsOverride(DEBUG=True, TEMPLATE_DEBUG=True):
             tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
             self.assertRaises(TemplateSyntaxError, tpl.render, context)
-    
+
     def test_basic_cms_menu(self):
         self.assertEqual(len(menu_pool.menus), 1)
         with force_language("en"):
-            response = self.client.get(self.get_pages_root()) # path = '/'
+            response = self.client.get(self.get_pages_root())  # path = '/'
         self.assertEquals(response.status_code, 200)
         request = self.get_request()
-        
+
         # test the cms menu class
         menu = CMSMenu()
         nodes = menu.get_nodes(request)
         self.assertEqual(len(nodes), len(self.get_all_pages()))
-        
+
     def test_show_menu(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
         nodes = context['children']
@@ -113,18 +174,20 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[1].get_absolute_url(), self.get_page(4).get_absolute_url())
         self.assertEqual(nodes[1].sibling, True)
         self.assertEqual(nodes[1].selected, False)
-        
+
     def test_show_menu_num_queries(self):
         context = self.get_context()
-        # test standard show_menu 
-        with self.assertNumQueries(5):
+        # test standard show_menu
+        with self.assertNumQueries(FuzzyInt(5, 7)):
             """
             The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
                 get the menu cache key
+                create a savepoint (in django>=1.6)
                 set the menu cache key
+                release the savepoint (in django>=1.6)
             """
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
@@ -155,121 +218,156 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         context = self.get_context()
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes[1].children), 0)
         self.assertEqual(len(nodes[0].children), 1)
         self.assertEqual(len(nodes[0].children[0].children), 1)
         context = self.get_context(path=self.get_page(4).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes[1].children), 1)
         self.assertEqual(len(nodes[0].children), 0)
-        
+
     def test_only_one_active_level(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 1 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes[1].children), 0)
         self.assertEqual(len(nodes[0].children), 1)
         self.assertEqual(len(nodes[0].children[0].children), 0)
-        
+
     def test_only_level_zero(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         for node in nodes:
             self.assertEqual(len(node.children), 0)
-        
-    
+
+
     def test_only_level_one(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), len(self.get_level(1)))
         for node in nodes:
             self.assertEqual(len(node.children), 0)
-        
-    
+
+
     def test_only_level_one_active(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 0 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].descendant, True)
         self.assertEqual(len(nodes[0].children), 0)
-        
+
     def test_level_zero_and_one(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 1 100 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         for node in nodes:
             self.assertEqual(len(node.children), 1)
-            
+
     def test_show_submenu(self):
         context = self.get_context()
-        # test standard show_menu 
+        # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(nodes[0].descendant, True)
         self.assertEqual(len(nodes), 1)
         self.assertEqual(len(nodes[0].children), 1)
-        
+
         tpl = Template("{% load menu_tags %}{% show_sub_menu 1  %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(len(nodes[0].children), 0)
-        
+
+        context = self.get_context(path=self.get_page(3).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P3 is the selected node
+        self.assertFalse(nodes[0].selected)
+        self.assertTrue(nodes[0].children[0].selected)
+        # top level node should be P2
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
+        # should include P3 as well
+        self.assertEqual(len(nodes[0].children), 1)
+        # but not P1 as it's at the root_level
+        self.assertEqual(nodes[0].parent, None)
+
+        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # P1 should be in the nav
+        self.assertEqual(nodes[0].get_absolute_url(), self.get_page(1).get_absolute_url())
+        # P2 is selected
+        self.assertTrue(nodes[0].children[0].selected)
+
+    def test_show_submenu_template_root_level_none(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # First node is P2 (P1 children) thus not selected
+        self.assertFalse(nodes[0].selected)
+        # nephew limit of 1, so only P2 is the nodes list
+        self.assertEqual(len(nodes), 1)
+        # P3 is a child of P2, but not in nodes list
+        self.assertTrue(nodes[0].children)
+
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 3)
         tpl = Template("{% load menu_tags %}{% show_breadcrumb 1 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 2)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 1)
         tpl = Template("{% load menu_tags %}{% show_breadcrumb 1 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 0)
-        
-        page1 = Page.objects.get(pk=self.get_page(1).pk)
+
+        page1 = self.get_page(1)
         page1.in_navigation = False
         page1.save()
         page2 = self.get_page(2)
         context = self.get_context(path=page2.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(nodes[0].get_absolute_url(), self.get_pages_root())
         self.assertEqual(isinstance(nodes[0], NavigationNode), True)
         self.assertEqual(nodes[1].get_absolute_url(), page2.get_absolute_url())
-        
+
     def test_language_chooser(self):
         # test simple language chooser with default args
-        lang_settings = copy.deepcopy(settings.CMS_LANGUAGES)
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['public'] = False
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             context = self.get_context(path=self.get_page(3).get_absolute_url())
@@ -292,9 +390,9 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
         url = tpl.render(context)
         self.assertEqual(url, "%s" % path)
-            
+
     def test_show_menu_below_id(self):
-        page2 = Page.objects.get(pk=self.get_page(2).pk)
+        page2 = self.get_page(2)
         page2.reverse_id = "hello"
         page2.save()
         page2 = self.reload(page2)
@@ -302,7 +400,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page5 = self.get_page(5)
         context = self.get_context(path=page5.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'hello' %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         page3_url = self.get_page(3).get_absolute_url()
@@ -311,46 +409,45 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page2.save()
         context = self.get_context(path=page5.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'hello' %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), page3_url)
-                    
+
     def test_unpublished(self):
-        page2 = Page.objects.get(pk=self.get_page(2).pk)
-        page2.published = False
-        page2.save()
+        page2 = self.get_page(2)
+        page2.title_set.update(published=False)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 0)
-        
+
     def test_home_not_in_menu(self):
-        page1 = Page.objects.get(pk=self.get_page(1).pk)
+        page1 = self.get_page(1)
         page1.in_navigation = False
         page1.save()
-        page4 = Page.objects.get(pk=self.get_page(4).pk)
+        page4 = self.get_page(4)
         page4.in_navigation = False
         page4.save()
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
         self.assertEqual(nodes[0].children[0].get_absolute_url(), self.get_page(3).get_absolute_url())
-        page4 = Page.objects.get(pk=self.get_page(4).pk)
+        page4 = self.get_page(4)
         page4.in_navigation = True
         page4.save()
         menu_pool.clear(settings.SITE_ID)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
-        
+
     def test_show_submenu_from_non_menu_page(self):
         """
         Here's the structure bit we're interested in:
@@ -362,41 +459,43 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         When we render P6, there should be a menu entry for P7 and P8 if the
         tag parameters are "1 XXX XXX XXX"
         """
-        page6 = Page.objects.get(pk=self.get_page(6).pk)
+        page6 = self.get_page(6)
         context = self.get_context(page6.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         number_of_p6_children = len(page6.children.filter(in_navigation=True))
         self.assertEqual(len(nodes), number_of_p6_children)
-        
-        page7 = Page.objects.get(pk=self.get_page(7).pk)
+
+        page7 = self.get_page(7)
         context = self.get_context(page7.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), number_of_p6_children)
-        
+
         tpl = Template("{% load menu_tags %}{% show_menu 2 100 0 1 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         number_of_p7_children = len(page7.children.filter(in_navigation=True))
         self.assertEqual(len(nodes), number_of_p7_children)
-        
+
     def test_show_breadcrumb_invisible(self):
+        # Must use the drafts to find the parent when calling create_page
+        parent = Page.objects.drafts().get(title_set__title='P3')
         invisible_page = create_page("invisible", "nav_playground.html", "en",
-            parent=self.get_page(3), published=True, in_navigation=False)
+            parent=parent, published=True, in_navigation=False)
         context = self.get_context(path=invisible_page.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 3)
-        tpl = Template("{% load menu_tags %}{% show_breadcrumb 'menu/breadcrumb.html' 1 %}")
-        tpl.render(context) 
+        tpl = Template("{% load menu_tags %}{% show_breadcrumb 0 'menu/breadcrumb.html' 1 %}")
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 3)
-        tpl = Template("{% load menu_tags %}{% show_breadcrumb 'menu/breadcrumb.html' 0 %}")
-        tpl.render(context) 
+        tpl = Template("{% load menu_tags %}{% show_breadcrumb 0 'menu/breadcrumb.html' 0 %}")
+        tpl.render(context)
         nodes = context['ancestors']
         self.assertEqual(len(nodes), 4)
 
@@ -417,20 +516,20 @@ class MenuTests(BaseMenuTest):
         node3 = NavigationNode('Test3', '/test3/', 3, 4)
         node4 = NavigationNode('Test4', '/test4/', 4, 5)
         node5 = NavigationNode('Test5', '/test5/', 5, None)
-        
+
         menu_class_name = 'Test'
-        nodes = [node1,node2,node3,node4,node5,]
+        nodes = [node1, node2, node3, node4, node5, ]
         len_nodes = len(nodes)
-        
+
         final_list = _build_nodes_inner_for_one_menu(nodes, menu_class_name)
         self.assertEqual(len(final_list), len_nodes)
-        
+
         self.assertEqual(node1.parent, node2)
         self.assertEqual(node2.parent, node3)
         self.assertEqual(node3.parent, node4)
         self.assertEqual(node4.parent, node5)
         self.assertEqual(node5.parent, None)
-        
+
         self.assertEqual(node1.children, [])
         self.assertEqual(node2.children, [node1])
         self.assertEqual(node3.children, [node2])
@@ -445,7 +544,7 @@ class MenuTests(BaseMenuTest):
             Go nuts implementing it :)
         '''
         pass
-    
+
     def test_build_nodes_inner_for_broken_menu(self):
         '''
             Tests a broken menu tree (non-existing parent)
@@ -463,21 +562,21 @@ class MenuTests(BaseMenuTest):
         node3 = NavigationNode('Test3', '/test3/', 3, 4)
         node4 = NavigationNode('Test4', '/test4/', 4, 5)
         node5 = NavigationNode('Test5', '/test5/', 5, None)
-        
+
         menu_class_name = 'Test'
-        nodes = [node1,node2,node3,node4,node5,]
-        
+        nodes = [node1, node2, node3, node4, node5, ]
+
         final_list = _build_nodes_inner_for_one_menu(nodes, menu_class_name)
-        self.assertEqual(len(final_list), 3) 
+        self.assertEqual(len(final_list), 3)
         self.assertFalse(node1 in final_list)
         self.assertFalse(node2 in final_list)
-        
+
         self.assertEqual(node1.parent, None)
         self.assertEqual(node2.parent, None)
         self.assertEqual(node3.parent, node4)
         self.assertEqual(node4.parent, node5)
         self.assertEqual(node5.parent, None)
-        
+
         self.assertEqual(node1.children, [])
         self.assertEqual(node2.children, [])
         self.assertEqual(node3.children, [])
@@ -489,7 +588,7 @@ class MenuTests(BaseMenuTest):
         mark_descendants(tree_nodes)
         for node in flat_nodes:
             self.assertTrue(node.descendant, node)
-            
+
     def test_utils_find_selected(self):
         tree_nodes, flat_nodes = self._get_nodes()
         node = flat_nodes[0]
@@ -497,15 +596,15 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(selected, node)
         selected = find_selected([])
         self.assertEqual(selected, None)
-        
+
     def test_utils_cut_levels(self):
         tree_nodes, flat_nodes = self._get_nodes()
         self.assertEqual(cut_levels(tree_nodes, 1), [flat_nodes[1]])
-        
+
     def test_empty_menu(self):
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 0)
 
@@ -536,16 +635,15 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
         If we are above that page, the children of this page are not shown.
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': False
     }
-        
+
     def tearDown(self):
         Page.objects.all().delete()
-    
+
     def get_page(self, name):
-        return Page.objects.get(title_set__slug=name)
-    
+        return Page.objects.public().get(title_set__slug=name)
+
     def assertTreeQuality(self, a, b, *attrs):
         """
         Checks that the node-lists a and b are the same for attrs.
@@ -554,14 +652,14 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
         """
         msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
         self.assertEqual(len(a), len(b), msg)
-        for n1, n2 in zip(a,b):
+        for n1, n2 in zip(a, b):
             for attr in attrs:
                 a1 = getattr(n1, attr)
                 a2 = getattr(n2, attr)
                 msg = '%r != %r with %r, %r (%s)' % (a1, a2, n1, n2, attr)
                 self.assertEqual(a1, a2, msg)
             self.assertTreeQuality(n1.children, n2.children)
-            
+
     def test_top_not_in_nav(self):
         """
         top: not in navigation
@@ -581,7 +679,7 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
         # root is NOT a soft root
         context = self.get_context(aaa.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         hard_root = context['children']
         # root IS a soft root
         root = self.get_page('root')
@@ -590,11 +688,11 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
         aaa = self.get_page('aaa')
         context = self.get_context(aaa.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         soft_root = context['children']
         # assert the two trees are equal in terms of 'level' and 'title'
         self.assertTreeQuality(hard_root, soft_root, 'level', 'title')
-            
+
     def test_top_in_nav(self):
         """
         top: in navigation
@@ -627,7 +725,7 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
         # root is NOT a soft root
         context = self.get_context(aaa.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         hard_root = context['children']
         mock_tree = [
             AttributeObject(title='top', level=0, children=[
@@ -652,7 +750,7 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
         aaa = self.get_page('aaa')
         context = self.get_context(aaa.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
-        tpl.render(context) 
+        tpl.render(context)
         soft_root = context['children']
         mock_tree = [
             AttributeObject(title='root', level=0, children=[
@@ -684,27 +782,31 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
           + P8
     """
     def test_show_submenu(self):
-        page = Page.objects.get(title_set__title='P6')
+        page = self.get_page(6)
+        subpage = self.get_page(8)
         context = self.get_context(page.get_absolute_url())
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
         tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes[0].id, 8)
-        
+        self.assertEqual(nodes[0].id, subpage.pk)
+
     def test_show_submenu_num_queries(self):
-        page = Page.objects.get(title_set__title='P6')
+        page = self.get_page(6)
         context = self.get_context(page.get_absolute_url())
+
         # test standard show_menu
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(FuzzyInt(5, 7)):
             """
             The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
                 get the menu cache key
+                create a savepoint (in django>=1.6)
                 set the menu cache key
+                release the savepoint (in django>=1.6)
             """
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
@@ -735,12 +837,12 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         nodes = context['children']
         self.assertEqual(len(nodes), 1, nodes)
         node = nodes[0]
-        self.assertEqual(node.id, b.id)
+        self.assertEqual(node.id, b.publisher_public.id)
         children = node.children
         self.assertEqual(len(children), 1, repr(children))
         child = children[0]
-        self.assertEqual(child.id, c.id)
-        
+        self.assertEqual(child.id, c.publisher_public.id)
+
     def test_not_in_navigation_num_queries(self):
         """
         Test for issue 521
@@ -754,22 +856,25 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         """
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
-        b =create_page('B', 'nav_playground.html', 'en', parent=a,
+        b = create_page('B', 'nav_playground.html', 'en', parent=a,
                        published=True, in_navigation=True)
         create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
+
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(FuzzyInt(5, 7)):
                 """
                 The queries should be:
                     get all pages
                     get all page permissions
                     get all titles
                     get the menu cache key
+                    create a savepoint (in django>=1.6)
                     set the menu cache key
+                    release the savepoint (in django>=1.6)
                 """
                 # Actually seems to run:
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
@@ -778,11 +883,10 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
 class ViewPermissionMenuTests(SettingsOverrideTestCase):
     settings_overrides = {
-        'CMS_MODERATOR': False,
         'CMS_PERMISSION': True,
         'CMS_PUBLIC_FOR': 'all',
     }
-    
+
     def get_request(self, user=None):
         attrs = {
             'user': user or AnonymousUser(),
@@ -790,7 +894,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             'session': {},
         }
         return type('Request', (object,), attrs)
-    
+
     def test_public_for_all_staff(self):
         request = self.get_request()
         request.user.is_staff = True
@@ -801,7 +905,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
-        
+
     def test_public_for_all_staff_assert_num_queries(self):
         request = self.get_request()
         request.user.is_staff = True
@@ -814,9 +918,9 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             """
                 The queries are:
                 PagePermission count query
-            """    
+            """
             get_visible_pages(request, pages)
-    
+
     def test_public_for_all(self):
         user = User.objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
@@ -827,7 +931,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
-        
+
     def test_public_for_all_num_queries(self):
         user = User.objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
@@ -845,7 +949,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             GlobalpagePermission query for user
             """
             get_visible_pages(request, pages, site)
-    
+
     def test_unauthed(self):
         request = self.get_request()
         page = Page()
@@ -855,7 +959,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
-        
+
     def test_unauthed_num_queries(self):
         request = self.get_request()
         site = Site()
@@ -873,11 +977,11 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             global is not executed because it's lazy
             """
             get_visible_pages(request, pages, site)
-    
+
     def test_authed_basic_perm(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User()
-            user.username="test"
+            user.username = "test"
             user.is_staff = True
             user.save()
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
@@ -889,13 +993,13 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [1])
-    
+
     def test_authed_basic_perm_num_queries(self):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User()
-            user.username="test"
+            user.username = "test"
             user.is_staff = True
             user.save()
             user.user_permissions.add(Permission.objects.get(codename='view_page'))
@@ -912,7 +1016,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 GlobalpagePermission count query
                 """
                 get_visible_pages(request, pages, site)
-    
+
     def test_authed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -924,7 +1028,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [])
-    
+
     def test_authed_no_access_num_queries(self):
         site = Site()
         site.pk = 1
@@ -943,7 +1047,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 globalpagepermissino calculation
                 """
                 get_visible_pages(request, pages, site)
-    
+
     def test_unauthed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             request = self.get_request()
@@ -954,7 +1058,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [])
-        
+
     def test_unauthed_no_access_num_queries(self):
         site = Site()
         site.pk = 1
@@ -966,7 +1070,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         pages = [page]
         with self.assertNumQueries(1):
             get_visible_pages(request, pages, site)
-    
+
     def test_page_permissions(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -975,8 +1079,8 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             PagePermission.objects.create(can_view=True, user=user, page=page)
             pages = [page]
             result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
-    
+            self.assertEqual(result, [page.pk])
+
     def test_page_permissions_num_queries(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -991,7 +1095,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 GlobalpagePermission query for user
                 """
                 get_visible_pages(request, pages)
-    
+
     def test_page_permissions_view_groups(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -1002,8 +1106,8 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             PagePermission.objects.create(can_view=True, group=group, page=page)
             pages = [page]
             result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
-    
+            self.assertEqual(result, [page.pk])
+
     def test_page_permissions_view_groups_num_queries(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -1021,7 +1125,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 Group query via PagePermission
                 """
                 get_visible_pages(request, pages)
-            
+
     def test_global_permission(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = User.objects.create_user('user', 'user@domain.com', 'user')
@@ -1034,7 +1138,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [1])
-        
+
     def test_global_permission_num_queries(self):
         site = Site()
         site.pk = 1
@@ -1124,11 +1228,9 @@ class SoftrootTests(SettingsOverrideTestCase):
                 Instruments
     """
     settings_overrides = {
-        'CMS_MODERATOR': False,
-        'CMS_SOFTROOT': True,
         'CMS_PERMISSION': False
     }
-    
+
     def test_basic_home(self):
         """
         Given the tree:
@@ -1154,10 +1256,10 @@ class SoftrootTests(SettingsOverrideTestCase):
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)
-        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
-        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=projects, **stdkwargs)
+        djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
+        people = create_page("People", parent=home, **stdkwargs)
         # On Home
         context = self.get_context(home.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1166,19 +1268,19 @@ class SoftrootTests(SettingsOverrideTestCase):
         # check everything
         self.assertEqual(len(nodes), 1)
         homenode = nodes[0]
-        self.assertEqual(homenode.id, home.pk)
+        self.assertEqual(homenode.id, home.publisher_public.pk)
         self.assertEqual(len(homenode.children), 2)
         projectsnode, peoplenode = homenode.children
-        self.assertEqual(projectsnode.id, projects.pk)
-        self.assertEqual(peoplenode.id, people.pk)
+        self.assertEqual(projectsnode.id, projects.publisher_public.pk)
+        self.assertEqual(peoplenode.id, people.publisher_public.pk)
         self.assertEqual(len(projectsnode.children), 2)
         cmsnode, shopnode = projectsnode.children
-        self.assertEqual(cmsnode.id, djangocms.pk)
-        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(cmsnode.id, djangocms.publisher_public.pk)
+        self.assertEqual(shopnode.id, djangoshop.publisher_public.pk)
         self.assertEqual(len(cmsnode.children), 0)
         self.assertEqual(len(shopnode.children), 0)
         self.assertEqual(len(peoplenode.children), 0)
-        
+
     def test_basic_projects(self):
         """
         Given the tree:
@@ -1202,10 +1304,10 @@ class SoftrootTests(SettingsOverrideTestCase):
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)
-        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
-        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=projects, **stdkwargs)
+        djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
+        people = create_page("People", parent=home, **stdkwargs)
         # On Projects
         context = self.get_context(projects.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1214,14 +1316,14 @@ class SoftrootTests(SettingsOverrideTestCase):
         # check everything
         self.assertEqual(len(nodes), 1)
         projectsnode = nodes[0]
-        self.assertEqual(projectsnode.id, projects.pk)
+        self.assertEqual(projectsnode.id, projects.publisher_public.pk)
         self.assertEqual(len(projectsnode.children), 2)
         cmsnode, shopnode = projectsnode.children
-        self.assertEqual(cmsnode.id, djangocms.pk)
-        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(cmsnode.id, djangocms.publisher_public.pk)
+        self.assertEqual(shopnode.id, djangoshop.publisher_public.pk)
         self.assertEqual(len(cmsnode.children), 0)
         self.assertEqual(len(shopnode.children), 0)
-        
+
     def test_basic_djangocms(self):
         """
         Given the tree:
@@ -1245,10 +1347,10 @@ class SoftrootTests(SettingsOverrideTestCase):
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)
-        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
-        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=projects, **stdkwargs)
+        djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
+        people = create_page("People", parent=home, **stdkwargs)
         # On django CMS
         context = self.get_context(djangocms.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1257,14 +1359,14 @@ class SoftrootTests(SettingsOverrideTestCase):
         # check everything
         self.assertEqual(len(nodes), 1)
         projectsnode = nodes[0]
-        self.assertEqual(projectsnode.id, projects.pk)
+        self.assertEqual(projectsnode.id, projects.publisher_public.pk)
         self.assertEqual(len(projectsnode.children), 2)
         cmsnode, shopnode = projectsnode.children
-        self.assertEqual(cmsnode.id, djangocms.pk)
-        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(cmsnode.id, djangocms.publisher_public.pk)
+        self.assertEqual(shopnode.id, djangoshop.publisher_public.pk)
         self.assertEqual(len(cmsnode.children), 0)
         self.assertEqual(len(shopnode.children), 0)
-        
+
     def test_basic_people(self):
         """
         Given the tree:
@@ -1290,10 +1392,10 @@ class SoftrootTests(SettingsOverrideTestCase):
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)
-        projects = create_page("Projects", parent=Page.objects.get(pk=home.pk), soft_root=True, **stdkwargs)
-        djangocms = create_page("django CMS", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        djangoshop = create_page("django Shop", parent=Page.objects.get(pk=projects.pk), **stdkwargs)
-        people = create_page("People", parent=Page.objects.get(pk=home.pk), **stdkwargs)
+        projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
+        djangocms = create_page("django CMS", parent=projects, **stdkwargs)
+        djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
+        people = create_page("People", parent=home, **stdkwargs)
         # On People
         context = self.get_context(home.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1302,15 +1404,15 @@ class SoftrootTests(SettingsOverrideTestCase):
         # check everything
         self.assertEqual(len(nodes), 1)
         homenode = nodes[0]
-        self.assertEqual(homenode.id, home.pk)
+        self.assertEqual(homenode.id, home.publisher_public.pk)
         self.assertEqual(len(homenode.children), 2)
         projectsnode, peoplenode = homenode.children
-        self.assertEqual(projectsnode.id, projects.pk)
-        self.assertEqual(peoplenode.id, people.pk)
+        self.assertEqual(projectsnode.id, projects.publisher_public.pk)
+        self.assertEqual(peoplenode.id, people.publisher_public.pk)
         self.assertEqual(len(projectsnode.children), 2)
         cmsnode, shopnode = projectsnode.children
-        self.assertEqual(cmsnode.id, djangocms.pk)
-        self.assertEqual(shopnode.id, djangoshop.pk)
+        self.assertEqual(cmsnode.id, djangocms.publisher_public.pk)
+        self.assertEqual(shopnode.id, djangoshop.publisher_public.pk)
         self.assertEqual(len(cmsnode.children), 0)
         self.assertEqual(len(shopnode.children), 0)
         self.assertEqual(len(peoplenode.children), 0)
