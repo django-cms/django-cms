@@ -28,8 +28,6 @@ except ImportError:
         Useful for discovering files at conventional locations inside apps
         (static files, templates, etc.)
         """
-        self._populate()
-
         app_paths = []
         for app in get_apps():
             if hasattr(app, '__path__'):        # models/__init__.py package
