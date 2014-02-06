@@ -5,6 +5,7 @@ from cms.exceptions import LanguageError
 from cms.models import Title
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
+from cms.utils.i18n import get_language_objects, force_language, get_language_object
 from django.contrib.sites.models import Site
 from cms.utils import get_cms_setting
 from cms.toolbar_pool import toolbar_pool
