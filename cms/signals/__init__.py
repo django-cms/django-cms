@@ -28,57 +28,55 @@ urls_need_reloading = Signal(providing_args=[])
 
 ######################### plugins #######################
 
-signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin)
+signals.post_delete.connect(update_plugin_positions, sender=CMSPlugin, dispatch_uid='cms_post_delete_plugin')
 
 ########################## page #########################
 
-signals.pre_save.connect(pre_save_page, sender=Page)
-signals.post_save.connect(post_save_page, sender=Page)
-signals.pre_delete.connect(pre_delete_page, sender=Page)
-signals.post_delete.connect(post_delete_page, sender=Page)
-page_moved.connect(post_moved_page, sender=Page)
+signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid='cms_pre_save_page')
+signals.post_save.connect(post_save_page, sender=Page, dispatch_uid='cms_post_save_page')
+signals.pre_delete.connect(pre_delete_page, sender=Page, dispatch_uid='cms_pre_delete_page')
+signals.post_delete.connect(post_delete_page, sender=Page, dispatch_uid='cms_post_delete_page')
+page_moved.connect(post_moved_page, sender=Page, dispatch_uid='cms_post_move_page')
 
 ######################### title #########################
 
-signals.pre_save.connect(pre_save_title, sender=Title)
-signals.post_save.connect(post_save_title, sender=Title)
-signals.pre_delete.connect(pre_delete_title, sender=Title)
-signals.post_delete.connect(post_delete_title, sender=Title)
+signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid='cms_pre_save_page')
+signals.post_save.connect(post_save_title, sender=Title, dispatch_uid='cms_post_save_page')
+signals.pre_delete.connect(pre_delete_title, sender=Title, dispatch_uid='cms_pre_delete_page')
+signals.post_delete.connect(post_delete_title, sender=Title, dispatch_uid='cms_post_delete_page')
 
 ###################### placeholder #######################
 
-signals.pre_delete.connect(pre_delete_placeholder_ref, sender=PlaceholderReference)
-signals.post_delete.connect(post_delete_placeholder_ref, sender=PlaceholderReference)
+signals.pre_delete.connect(pre_delete_placeholder_ref, sender=PlaceholderReference, dispatch_uid='cms_pre_delete_placeholder_ref')
+signals.post_delete.connect(post_delete_placeholder_ref, sender=PlaceholderReference, dispatch_uid='cms_post_delete_placeholder_ref')
 
 ###################### permissions #######################
 
 if get_cms_setting('PERMISSION'):
     # only if permissions are in use
+    signals.pre_save.connect(pre_save_user, sender=User, dispatch_uid='cms_pre_save_user')
+    signals.post_save.connect(post_save_user, sender=User, dispatch_uid='cms_post_save_user')
+    signals.pre_delete.connect(pre_delete_user, sender=User, dispatch_uid='cms_pre_delete_user')
 
-    # register signals to user related models
-    signals.post_save.connect(post_save_user, User)
-    signals.post_save.connect(post_save_user_group, Group)
+    signals.pre_save.connect(pre_save_user, sender=PageUser, dispatch_uid='cms_pre_save_pageuser')
+    signals.pre_delete.connect(pre_delete_user, sender=PageUser, dispatch_uid='cms_pre_delete_pageuser')
 
-    signals.pre_save.connect(pre_save_user, sender=User)
-    signals.pre_delete.connect(pre_delete_user, sender=User)
+    signals.pre_save.connect(pre_save_group, sender=Group, dispatch_uid='cms_pre_save_group')
+    signals.post_save.connect(post_save_user_group, sender=Group, dispatch_uid='cms_post_save_group')
+    signals.pre_delete.connect(pre_delete_group, sender=Group, dispatch_uid='cms_post_save_group')
 
-    signals.pre_save.connect(pre_save_user, sender=PageUser)
-    signals.pre_delete.connect(pre_delete_user, sender=PageUser)
+    signals.pre_save.connect(pre_save_group, sender=PageUserGroup, dispatch_uid='cms_pre_save_pageusergroup')
+    signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup, dispatch_uid='cms_pre_delete_pageusergroup')
 
-    signals.pre_save.connect(pre_save_group, sender=Group)
-    signals.pre_delete.connect(pre_delete_group, sender=Group)
+    signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_save_pagepermission')
+    signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_delete_pagepermission')
 
-    signals.pre_save.connect(pre_save_group, sender=PageUserGroup)
-    signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup)
+    signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission, dispatch_uid='cms_pre_save_globalpagepermission')
+    signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission, dispatch_uid='cms_pre_delete_globalpagepermission')
 
-    signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission)
-    signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission)
-
-    signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission)
-    signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission)
+###################### reversion #########################
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.models import post_revision_commit
-
-    post_revision_commit.connect(post_revision)
+    post_revision_commit.connect(post_revision, dispatch_uid='cms_post_revision')
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.cache.permissions import clear_permission_cache
 from cms.exceptions import NoHomeFound
+from cms.signals.apphook import apphook_post_delete_page_checker, apphook_post_page_checker
 from cms.signals.title import update_title, update_title_paths
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -21,9 +22,6 @@ def pre_save_page(instance, **kwargs):
 def post_save_page(instance, **kwargs):
     if not kwargs.get('raw'):
         instance.rescan_placeholders()
-
-    from cms.signals import urls_need_reloading
-
     update_home(instance)
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
         for page in instance.get_descendants(include_self=True):
@@ -39,7 +37,9 @@ def post_save_page(instance, **kwargs):
             public.application_urls = instance.application_urls
             public.application_namespace = instance.application_namespace
             public.save()
-        urls_need_reloading.send(sender=Page, instance=instance)
+        elif not instance.publisher_is_draft:
+            apphook_post_page_checker(instance)
+
 
 
 def pre_delete_page(instance, **kwargs):
@@ -50,6 +50,7 @@ def pre_delete_page(instance, **kwargs):
 
 def post_delete_page(instance, **kwargs):
     update_home(instance, **kwargs)
+    apphook_post_delete_page_checker(instance)
 
 
 def post_moved_page(instance, **kwargs):
