@@ -23,6 +23,7 @@ def clear_app_resolvers():
     APP_RESOLVERS = []
 
 
+
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application.
     Applications have higher priority than other cms pages.

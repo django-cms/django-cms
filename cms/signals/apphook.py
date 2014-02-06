@@ -5,7 +5,7 @@ from django.core.management import color_style
 from django.core.urlresolvers import clear_url_caches
 from django.core.signals import request_finished
 from cms.models import Title
-from django.conf import settings
+
 
 DISPATCH_UID = 'cms-restart'
 
@@ -73,6 +73,10 @@ def trigger_restart(**kwargs):
 def debug_server_restart(**kwargs):
     clear_app_resolvers()
     clear_url_caches()
+
+    import cms.urls
+    reload(cms.urls)
+
     msg = 'Application url changed and urls_need_reloading signal fired. Please reload the urls.py or restart the server\n'
     styles = color_style()
     msg = styles.NOTICE(msg)
