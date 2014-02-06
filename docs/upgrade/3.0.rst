@@ -117,7 +117,7 @@ seperate repositories.
     In order to update from the old ``cms.plugins.X`` to the new
     ``djangocms_X`` plugins, simply install the new plugin, remove the old
     ``cms.plugins.X`` from ``settings.INSTALLED_APPS`` and add the new one
-     to it. Then run the migrations (``python manage.py migrate djangocms_X``).
+    to it. Then run the migrations (``python manage.py migrate djangocms_X``).
     
 
 File Plugin
