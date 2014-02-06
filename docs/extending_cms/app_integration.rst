@@ -219,7 +219,7 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
 
 
 Apphook Menus
-=============
+-------------
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
@@ -392,7 +392,7 @@ Or, if you are rendering a plugin, of the context instance::
 
 
 Automatically restart server on apphook changes
-===============================================
+-----------------------------------------------
 
 As mentioned above, whenever you add or remove an apphook, change the slug of a
 page containing an apphook or the slug if a page which has a descendant with an
@@ -427,7 +427,7 @@ menus.
 
 
 An example use-case
-===================
+-------------------
 
 A simple example: you have a news application that publishes pages
 independently of django CMS. However, you would like to integrate the
@@ -438,7 +438,7 @@ In such a case, a Navigation Modifier is the solution.
 
 
 How it works
-============
+------------
 
 Normally, you'd want to place modifiers in your application's 
 ``menu.py``.

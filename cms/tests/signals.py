@@ -34,6 +34,7 @@ class SignalTests(TestCase):
         with signal_tester(urls_need_reloading) as env:
             create_page("apphooked-page", "nav_playground.html", "en",
                 created_by=superuser, published=True, apphook="SampleApp")
+            self.client.get('/')
             self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_delete(self):
@@ -42,4 +43,5 @@ class SignalTests(TestCase):
             created_by=superuser, published=True, apphook="SampleApp")
         with signal_tester(urls_need_reloading) as env:
             page.delete()
+            self.client.get('/')
             self.assertEqual(env.call_count, 1)

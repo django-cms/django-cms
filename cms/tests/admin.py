@@ -516,19 +516,6 @@ class AdminTests(AdminTestsBase):
     def get_page(self):
         return self.page
 
-    def test_get_moderation_state(self):
-        page = self.get_page()
-        permless = self.get_permless()
-        admin = self.get_admin()
-        with self.login_user_context(permless):
-            request = self.get_request()
-            response = self.admin_class.get_moderation_states(request, page.pk)
-            self.assertEqual(response.status_code, 200)
-        with self.login_user_context(admin):
-            request = self.get_request()
-            response = self.admin_class.get_moderation_states(request, page.pk)
-            self.assertEqual(response.status_code, 200)
-
     def test_change_publish_unpublish(self):
         page = self.get_page()
         permless = self.get_permless()

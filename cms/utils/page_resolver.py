@@ -118,7 +118,6 @@ def get_page_from_request(request, use_path=None):
 
     draft = use_draft(request)
     preview = 'preview' in request.GET
-    print draft
     # If use_path is given, someone already did the path cleaning
     if use_path is not None:
         path = use_path
