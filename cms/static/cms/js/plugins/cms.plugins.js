@@ -204,6 +204,7 @@ $(document).ready(function () {
 			// adds double click to edit
 			this.container.bind('dblclick', function (e) {
 				e.preventDefault();
+				e.stopPropagation();
 				that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
 			});
 
