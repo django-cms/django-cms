@@ -117,6 +117,11 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
         with SettingsOverride(TEMPLATE_DIRS=[alt_dir], CMS_TEMPLATES=[]):
             self.assertCheck(True, warnings=1, errors=0)
 
+    def test_non_numeric_site_id(self):
+        self.assertCheck(True, warnings=0, errors=0)
+        with SettingsOverride(SITE_ID='broken'):
+            self.assertCheck(False, warnings=0, errors=1)
+
 
 class CheckWithDatabaseTests(TestCase, CheckAssertMixin):
 
