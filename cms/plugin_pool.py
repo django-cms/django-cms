@@ -98,8 +98,9 @@ class PluginPool(object):
                         old_db_name = table_name
                         splitted = table_name.split(splitter, 1)
                         table_name = 'cmsplugin_%s' % splitted[1]
-                        model._meta.db_table = table_name
-                        warnings.warn('please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+                        if table_name in table_names:
+                            model._meta.db_table = table_name
+                            warnings.warn('please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
                 for att_name in model.__dict__.keys():
                     att = model.__dict__[att_name]
                     if isinstance(att, ManyToManyField):
@@ -109,8 +110,9 @@ class PluginPool(object):
                             old_db_name = table_name
                             table_name.split(splitter, 1)
                             table_name = 'cmsplugin_%s' % splitted[1]
-                            att.rel.through._meta.db_table = table_name
-                            warnings.warn('please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+                            if table_name in table_names:
+                                att.rel.through._meta.db_table = table_name
+                                warnings.warn('please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (table_name, old_db_name, model._meta.app_label), DeprecationWarning)
         self.patched = True
 
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
