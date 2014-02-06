@@ -203,3 +203,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Placeholders can be configured to have plugins automatically added.
 - Publishing is now language independent and the tree-view has been updated to reflect this
 - Removed the plugin DB-name magic and added a compatibility layer
+- urls_need_reloading signal added when an apphook change is detected.
