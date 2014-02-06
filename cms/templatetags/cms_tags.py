@@ -583,7 +583,7 @@ class CMSToolbar(RenderBlock):
         # render the toolbar content
 
         with force_language(language):
-            request.toolbar.populate()
+            request.toolbar.post_template_populate()
             context['clipboard'] = clipboard
             content = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below

@@ -64,6 +64,7 @@ class ToolbarMiddleware(object):
         if 'build' in request.GET and not request.session.get('cms_build', False):
             request.session['cms_build'] = True
         request.toolbar = CMSToolbar(request)
+        request.toolbar.populate()
 
     def process_view(self, request, view_func, view_args, view_kwarg):
         response = request.toolbar.request_hook()

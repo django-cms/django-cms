@@ -86,29 +86,32 @@ class ToolbarTests(ToolbarTestBase):
     def test_no_page_anon(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         toolbar = CMSToolbar(request)
-
+        toolbar.populate()
+        toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 0)
 
     def test_no_page_staff(self):
         request = self.get_page_request(None, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
-
+        toolbar.populate()
+        toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + admin-menu + logout
         self.assertEqual(len(items), 2, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 6, admin_items)
 
     def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
         toolbar = CMSToolbar(request)
-
+        toolbar.populate()
+        toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 8, admin_items)
+        self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -187,6 +190,8 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_superuser(), edit=True)
         toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 7)
@@ -195,6 +200,8 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_staff(), edit=True)
         toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
         self.assertTrue(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
         self.assertTrue(toolbar.edit_mode)
@@ -208,6 +215,8 @@ class ToolbarTests(ToolbarTestBase):
         user.user_permissions.all().delete()
         request = self.get_page_request(page, user, edit=True)
         toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
         self.assertFalse(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
 
@@ -215,7 +224,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 6, admin_items)
 
     def test_button_consistency_staff(self):
         """
@@ -227,9 +236,13 @@ class ToolbarTests(ToolbarTestBase):
         cms_page.publish('de')
         en_request = self.get_page_request(cms_page, user, edit=True)
         en_toolbar = CMSToolbar(en_request)
+        en_toolbar.populate()
+        en_toolbar.post_template_populate()
         self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
+        de_toolbar.populate()
+        de_toolbar.post_template_populate()
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
 
     def test_placeholder_name(self):

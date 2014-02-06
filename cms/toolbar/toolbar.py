@@ -10,7 +10,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django import forms
 from django.contrib.auth import login, logout
 from django.core.urlresolvers import resolve, Resolver404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -33,8 +33,10 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def __init__(self, request):
         super(CMSToolbar, self).__init__()
-        self.left_items = None
-        self.right_items = None
+        self.right_items = []
+        self.left_items = []
+        self.populated = False
+        self.post_template_populated = False
         self.menus = {}
         self.request = request
         self.login_form = CMSToolbarLoginForm(request=request)
@@ -62,6 +64,21 @@ class CMSToolbar(ToolbarAPIMixin):
                 user_settings.save()
             self.toolbar_language = user_settings.language
             self.clipboard = user_settings.clipboard
+        with force_language(self.language):
+            try:
+                self.view_name = resolve(self.request.path).func.__module__
+            except Resolver404:
+                self.view_name = ""
+        toolbars = toolbar_pool.get_toolbars()
+
+        self.toolbars = {}
+        app_key = ''
+        for key in toolbars:
+            app_name = ".".join(key.split(".")[:-2])
+            if app_name in self.view_name and len(key) > len(app_key):
+                app_key = key
+        for key in toolbars:
+            self.toolbars[key] = toolbars[key](self.request, self, key == app_key, app_key)
 
     @property
     def csrf_token(self):
@@ -132,37 +149,27 @@ class CMSToolbar(ToolbarAPIMixin):
         """
         Get the CMS items on the toolbar
         """
-        if self.right_items is not None or self.left_items is not None:
+        if self.populated:
             return
-        self.right_items = []
-        self.left_items = []
+        self.populated = True
         # never populate the toolbar on is_staff=False
         if not self.is_staff:
             return
-        with force_language(self.language):
-            try:
-                self.view_name = resolve(self.request.path).func.__module__
-            except Resolver404:
-                self.view_name = ""
-        with force_language(self.toolbar_language):
-            toolbars = toolbar_pool.get_toolbars()
-            app_key = ""
-            for key in toolbars:
-                app_name = ".".join(key.split(".")[:-2])
-                if app_name in self.view_name and len(key) > len(app_key):
-                    app_key = key
-                # if the cms_toolbar is in use, ensure it's first
-            first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
-            for key in first:
-                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
-                toolbar.populate()
-            for key in toolbars:
-                if key in first:
-                    continue
-                toolbar = toolbars[key](self.request, self, key == app_key, app_key)
-                toolbar.populate()
+        self._call_toolbar('populate')
+
+    def post_template_populate(self):
+        if self.post_template_populated:
+            return
+        self.post_template_populated = True
+        if not self.is_staff:
+            return
+        self._call_toolbar('post_template_populate')
 
     def request_hook(self):
+        response = self._call_toolbar('request_hook')
+        if isinstance(response, HttpResponse):
+            return response
+
         if self.request.method != 'POST':
             return self._request_hook_get()
         else:
@@ -180,3 +187,20 @@ class CMSToolbar(ToolbarAPIMixin):
             if self.login_form.is_valid():
                 login(self.request, self.login_form.user_cache)
                 return HttpResponseRedirect(self.request.path)
+
+    def _call_toolbar(self, func_name):
+        with force_language(self.language):
+            first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
+            for key in first:
+                toolbar = self.toolbars[key]
+                result = getattr(toolbar, func_name)()
+                if isinstance(result, HttpResponse):
+                    return result
+            for key in self.toolbars:
+                if key in first:
+                    continue
+                toolbar = self.toolbars[key]
+                result = getattr(toolbar, func_name)()
+                if isinstance(result, HttpResponse):
+                    return result
+
