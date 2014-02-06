@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
+from cms.appresolver import clear_app_resolvers
 from django.core.management import color_style
-import warnings
+from django.core.urlresolvers import clear_url_caches
 from django.core.signals import request_finished
 from cms.models import Title
 from django.conf import settings
@@ -68,8 +69,12 @@ def trigger_restart(**kwargs):
     from cms.signals import urls_need_reloading
     request_finished.disconnect(trigger_restart, dispatch_uid=DISPATCH_UID)
     urls_need_reloading.send(sender=None)
-    if settings.DEBUG:
-        msg = 'Application url changed. Please reload the urls.py or restart the server\n'
-        styles = color_style()
-        msg = styles.NOTICE(msg)
-        sys.stderr.write(msg)
+
+def debug_server_restart(**kwargs):
+    clear_app_resolvers()
+    clear_url_caches()
+    msg = 'Application url changed and urls_need_reloading signal fired. Please reload the urls.py or restart the server\n'
+    styles = color_style()
+    msg = styles.NOTICE(msg)
+    sys.stderr.write(msg)
+

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.signals.apphook import debug_server_restart
 from cms.signals.page import pre_save_page, post_save_page, pre_delete_page, post_delete_page, post_moved_page
 from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
 from cms.signals.placeholder import pre_delete_placeholder_ref, post_delete_placeholder_ref
@@ -25,6 +26,9 @@ post_unpublish = Signal(providing_args=["instance", "language"])
 
 # fired if a public page with an apphook is added or changed
 urls_need_reloading = Signal(providing_args=[])
+
+if settings.DEBUG:
+    urls_need_reloading.connect(debug_server_restart)
 
 ######################### plugins #######################
 
