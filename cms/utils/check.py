@@ -195,11 +195,14 @@ def check_i18n(output):
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
                 section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
-        for site, items in get_cms_setting('LANGUAGES').items():
-            if type(site) == int:
-                for lang in items:
-                    if lang['code'].find('_') > -1:
-                        section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
+        if isinstance(settings.SITE_ID, int):
+            for site, items in get_cms_setting('LANGUAGES').items():
+                if type(site) == int:
+                    for lang in items:
+                        if lang['code'].find('_') > -1:
+                            section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
+        else:
+            section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
                 section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
