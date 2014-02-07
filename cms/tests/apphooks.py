@@ -181,7 +181,6 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
             attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash and language prefix
-            print attached_to_page, de_title.page
             self.assertEquals(attached_to_page.pk, de_title.page.pk)
 
             response = self.client.get(path)
