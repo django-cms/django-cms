@@ -274,7 +274,7 @@ $(document).ready(function () {
 				'source_language': source_language,
 				'target_plugin_id': options.parent || '',
 				'target_placeholder_id': options.target || CMS.config.clipboard.id,
-				'target_language': options.plugin_language,
+				'target_language': options.page_language || source_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
 			var request = {

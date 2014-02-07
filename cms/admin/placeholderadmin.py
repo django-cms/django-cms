@@ -317,7 +317,7 @@ class PlaceholderAdmin(ModelAdmin):
             ref.language = target_language
             ref.placeholder = target_placeholder
             ref.save()
-            ref.copy_from(source_placeholder)
+            ref.copy_from(source_placeholder, source_language)
         else:
             copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
