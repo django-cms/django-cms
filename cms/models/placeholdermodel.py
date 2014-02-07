@@ -102,7 +102,7 @@ class Placeholder(models.Model):
         return render_placeholder(self, context, lang=lang)
 
     def get_media(self, request, context):
-        from cms.plugins.utils import get_plugin_media
+        from cms.utils.plugins import get_plugin_media
         media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
         if media_classes:
             return reduce(operator.add, media_classes)

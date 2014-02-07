@@ -92,30 +92,6 @@ setting in your project's ``settings.py`` file::
     )
 
 
-.. :module:: cms.plugins.link
-
-.. :class:: cms.plugins.link.cms_plugins.LinkPlugin
-
-****
-Link
-****
-
-Displays a link to an arbitrary URL or to a page. If a page is moved the URL
-will still be correct.
-
-For installation be sure to have the following in the :setting:`django:INSTALLED_APPS`
-setting in your project's ``settings.py`` file::
-
-    INSTALLED_APPS = (
-        # ...
-        'cms.plugins.link',
-        # ...
-    )
-
-.. note:: As of version 2.2, the link plugin no longer verifies the existence of
-          link targets.
-
-
 .. :module:: cms.plugins.picture
 
 .. :class:: cms.plugins.picture.cms_plugins.PicturePlugin
@@ -176,43 +152,6 @@ running.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
-
-.. :module:: cms.plugins.snippet
-
-.. :class:: cms.plugins.snippet.cms_plugins.SnippetPlugin
-
-.. _snippets-plugin:
-
-*******
-Snippet
-*******
-
-Renders an HTML snippet from an HTML file in your templates directories or a
-snippet given via direct input.
-
-For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
-setting in your project's ``settings.py`` file::
-
-    INSTALLED_APPS = (
-        # ...
-        'cms.plugins.snippet',
-        # ...
-    )
-
-.. note:: This plugin should mainly be used during development to quickly test
-          HTML snippets.
-
-.. warning::
-
-    This plugin is a potential security hazard, since it allows admins to place
-    custom JavaScript on pages. This may allow administrators with the right to
-    add snippets to elevate their privileges to superusers. This plugin should
-    only be used during the initial development phase for rapid prototyping and
-    should be disabled on production sites.
-
-.. :module:: cms.plugins.teaser
-
-.. :class:: cms.plugins.teaser.cms_plugins.TeaserPlugin
 
 ******
 Teaser

@@ -110,6 +110,115 @@ We provide ``djangocms-text-ckeditor``, a CKEditor-based Text Plugin. It's
 available from https://github.com/divio/djangocms-text-ckeditor. You may of
 course use your preferred editor; others are available.
 
+Furthermore, we removed the following plugins from the core and moved them into
+seperate repositories.
+
+.. note::
+    In order to update from the old ``cms.plugins.X`` to the new
+    ``djangocms_X`` plugins, simply install the new plugin, remove the old
+    ``cms.plugins.X`` from ``settings.INSTALLED_APPS`` and add the new one
+    to it. Then run the migrations (``python manage.py migrate djangocms_X``).
+    
+
+File Plugin
+-----------
+
+We removed the file plugin (``cms.plugins.file``). Its new location is at:
+
+* https://github.com/divio/djangocms-file
+
+As an alternative, you could also use the following (yet you will not be able 
+to keep your existing files from the old ``cms.plugins.file``!)
+
+* https://github.com/stefanfoulis/django-filer
+
+
+Flash Plugin
+------------
+
+We removed the flash plugin (``cms.plugins.flash``). Its new location is at:
+
+* https://github.com/divio/djangocms-flash
+
+
+Googlemap Plugin
+----------------
+
+We removed the googlemap plugin (``cms.plugins.googlemap``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-googlemap
+
+
+Inherit Plugin
+--------------
+
+We removed the inherit plugin (``cms.plugins.inherit``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-inherit
+
+
+Picture Plugin
+--------------
+
+We removed the picture plugin (``cms.plugins.picture``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-picture
+
+
+Teaser Plugin
+-------------
+
+We removed the teaser plugin (``cms.plugins.teaser``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-teaser
+
+
+Video Plugin
+------------
+
+We removed the video plugin (``cms.plugins.video``). Its new location is at:
+
+* https://github.com/divio/djangocms-video
+
+
+Link Plugin
+-----------
+
+We removed the link plugin (``cms.plugins.link``). Its new location is at:
+
+* https://github.com/divio/djangocms-link
+
+
+Snippet Plugin
+--------------
+
+We removed the snippet plugin (``cms.plugins.snippet``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-link
+
+As an alternative, you could also use the following (yet you will not be able
+to keep your existing files from the old ``cms.plugins.snippet``!)
+
+* https://github.com/pbs/django-cms-smartsnippets
+
+
+Twitter Plugin
+--------------
+
+Twitter disabled V1 of their API, thus we've removed the twitter plugin
+(``cms.plugins.twitter``) completely.
+
+For alternatives have a look at these plugins:
+
+* https://github.com/nephila/djangocms_twitter
+* https://github.com/changer/cmsplugin-twitter
+
+
 Plugin Context Processors take a new argument
 =============================================
 
@@ -160,16 +269,6 @@ The workflow in the future should look like this:
 2. Go to the view that represents the model instance and add content via
    frontend editing.
 
-Twitter Plugin removed
-======================
-
-Twitter disabled V1 of their API, thus we've removed the twitter plugin
-(``cms.plugins.twitter``).
-
-For alternatives have a look at these plugins:
-
-* https://github.com/nephila/djangocms_twitter
-* https://github.com/changer/cmsplugin-twitter
 
 Placeholder object permissions
 ==============================

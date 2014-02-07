@@ -12,7 +12,7 @@ from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
-from cms.plugins.utils import get_plugins, assign_plugins
+from cms.utils.plugins import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting, get_site_id
 from cms.utils.compat.type_checks import string_types, int_types
 from cms.utils.i18n import force_language
