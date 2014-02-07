@@ -71,4 +71,5 @@ class ToolbarMiddleware(object):
         if isinstance(response, HttpResponse):
             return response
         request.toolbar.populate()
+        return None
 

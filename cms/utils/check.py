@@ -294,7 +294,7 @@ def _load_all_templates(directory):
 @define_check
 def deprecations(output):
     # deprecated placeholder_tags scan (1 in 3.1)
-    templates_dirs = getattr(settings, 'TEMPLATE_DIRS', [])
+    templates_dirs = list(getattr(settings, 'TEMPLATE_DIRS', []))
     templates_dirs.extend(
         [os.path.join(path, 'templates') for path in get_app_paths()]
     )

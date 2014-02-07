@@ -38,6 +38,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         request.current_page = page
         mid = ToolbarMiddleware()
         mid.process_request(request)
+        request.toolbar.populate()
         return request
 
     def get_anon(self):
