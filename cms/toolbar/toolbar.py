@@ -82,7 +82,8 @@ class CMSToolbar(ToolbarAPIMixin):
 
     @property
     def csrf_token(self):
-        return get_token(self.request)
+        token = get_token(self.request)
+        return token
 
     # Public API
 
