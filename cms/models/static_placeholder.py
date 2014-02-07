@@ -56,7 +56,7 @@ class StaticPlaceholder(models.Model):
     def publish(self, request, force=False):
         if force or self.has_publish_permission(request):
             CMSPlugin.objects.filter(placeholder=self.public).delete()
-            plugins = self.draft.get_plugins_list()
+            plugins = self.draft.cmsplugin_set.order_by('tree_id', 'level', 'position')
             copy_plugins_to(plugins, self.public)
             self.dirty = False
             self.save()

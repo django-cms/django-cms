@@ -356,7 +356,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
-                plugins = ph.get_plugins_list()
+                plugins = list(ph.cmsplugin_set.order_by('tree_id', 'level', 'position'))
                 try:
                     ph = page.placeholders.get(slot=ph.slot)
                 except Placeholder.DoesNotExist:

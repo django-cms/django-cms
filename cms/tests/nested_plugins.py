@@ -31,12 +31,12 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         for original_placeholder in placeholders:
 
             # get the plugins
-            original_plugins = original_placeholder.get_plugins()
+            original_plugins = original_placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position', 'pk')
 
             # copy them to a new placeholder
             copied_placeholder = Placeholder.objects.create(slot=original_placeholder.slot)
             copy_plugins_to(
-                original_placeholder.get_plugins(),
+                original_placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position', 'pk'),
                 copied_placeholder
             )
 

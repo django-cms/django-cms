@@ -17,10 +17,10 @@ class PlaceholderReference(CMSPlugin):
         return self.name
 
     def copy_to(self, placeholder, language):
-        copy_plugins_to(self.placeholder_ref.get_plugins(), placeholder, to_language=language)
+        copy_plugins_to(self.placeholder_ref.cmsplugin_set.order_by('tree_id', 'level', 'position'), placeholder, to_language=language)
 
     def copy_from(self, placeholder, language):
-        copy_plugins_to(placeholder.get_plugins(language), self.placeholder_ref, to_language=self.language)
+        copy_plugins_to(placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position'), self.placeholder_ref, to_language=self.language)
 
     def move_to(self, placeholder, language):
         for plugin in self.placeholder_ref.get_plugins():
