@@ -651,7 +651,6 @@ class PublishingTests(TestCase):
         # Now let's revert and restore
         page.revert('en')
         self.assertEquals(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
-        self.assertEquals(page.pagemoderatorstate_set.count(), 0)
 
         self.assertEquals(CMSPlugin.objects.count(), 4)
         plugins = CMSPlugin.objects.filter(placeholder__page=page)
