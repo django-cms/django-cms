@@ -503,7 +503,8 @@ class PlaceholderAdmin(ModelAdmin):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
         if not self.has_clear_placeholder_permission(request, placeholder):
             return HttpResponseForbidden(_("You do not have permission to clear this placeholder"))
-        plugins = placeholder.get_plugins()
+        language = request.GET.get('language', None)
+        plugins = placeholder.get_plugins(language)
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         app_label = opts.app_label
