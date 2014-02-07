@@ -83,8 +83,11 @@ def debug_server_restart(**kwargs):
         clear_app_resolvers()
         clear_url_caches()
         import cms.urls
-
-        reload(cms.urls)
+        try:
+            reload(cms.urls)
+        except NameError: #python3
+            from imp import reload
+            reload(cms.urls)
     if not 'test' in sys.argv:
         msg = 'Application url changed and urls_need_reloading signal fired. Please reload the urls.py or restart the server\n'
         styles = color_style()
