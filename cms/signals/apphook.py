@@ -79,7 +79,7 @@ def trigger_restart(**kwargs):
 
 
 def debug_server_restart(**kwargs):
-    if 'runserver' in sys.argv or 'server' in sys.argv or 'test' in sys.argv:
+    if 'runserver' in sys.argv or 'server' in sys.argv:
         clear_app_resolvers()
         clear_url_caches()
         import cms.urls
