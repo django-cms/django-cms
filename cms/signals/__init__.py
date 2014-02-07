@@ -51,8 +51,10 @@ signals.post_delete.connect(post_delete_title, sender=Title, dispatch_uid='cms_p
 
 ###################### placeholder #######################
 
-signals.pre_delete.connect(pre_delete_placeholder_ref, sender=PlaceholderReference, dispatch_uid='cms_pre_delete_placeholder_ref')
-signals.post_delete.connect(post_delete_placeholder_ref, sender=PlaceholderReference, dispatch_uid='cms_post_delete_placeholder_ref')
+signals.pre_delete.connect(pre_delete_placeholder_ref, sender=PlaceholderReference,
+                           dispatch_uid='cms_pre_delete_placeholder_ref')
+signals.post_delete.connect(post_delete_placeholder_ref, sender=PlaceholderReference,
+                            dispatch_uid='cms_post_delete_placeholder_ref')
 
 ###################### permissions #######################
 
@@ -73,14 +75,18 @@ if get_cms_setting('PERMISSION'):
     signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup, dispatch_uid='cms_pre_delete_pageusergroup')
 
     signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_save_pagepermission')
-    signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_delete_pagepermission')
+    signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission,
+                               dispatch_uid='cms_pre_delete_pagepermission')
 
-    signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission, dispatch_uid='cms_pre_save_globalpagepermission')
-    signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission, dispatch_uid='cms_pre_delete_globalpagepermission')
+    signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission,
+                             dispatch_uid='cms_pre_save_globalpagepermission')
+    signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission,
+                               dispatch_uid='cms_pre_delete_globalpagepermission')
 
 ###################### reversion #########################
 
 if 'reversion' in settings.INSTALLED_APPS:
     from reversion.models import post_revision_commit
+
     post_revision_commit.connect(post_revision, dispatch_uid='cms_post_revision')
 

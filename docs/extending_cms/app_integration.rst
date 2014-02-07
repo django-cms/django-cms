@@ -399,7 +399,8 @@ page containing an apphook or the slug if a page which has a descendant with an
 apphook, you have to restart your server to re-load the URL caches. To allow
 you to automate this process, the django CMS provides a signal
 :obj:`cms.signals.urls_need_reloading` which you can listen on to detect when
-your server needs restarting.
+your server needs restarting. When you run ``manage.py runserver`` a restart
+should not be needed.
 
 .. warning::
 
@@ -411,9 +412,8 @@ your server needs restarting.
 
 .. warning::
 
-    The signal is fired **during** the request, that caused this change. If
-    you restart the server, you should delay the restart to not interrupt the
-    request currently being handled.
+    The signal is fired **after** a request. If you change something via API
+    you need a request for the signal to fire.
 
 
 ********************
