@@ -20,10 +20,10 @@ def get_module(app, modname, verbose, failfast):
     Internal function to load a module from a single app.
     """
     module_name = '%s.%s' % (app, modname)
+    # the module *should* exist - raise an error if it doesn't
+    app_mod = import_module(app)
     try:
-        module_info = imp.find_module(modname)
-        module = imp.load_module(modname, module_info)
-        imp.find_module(app, module.__path__)
+        imp.find_module(modname, app_mod.__path__)
     except ImportError:
         # this ImportError will be due to the module not existing
         # so here we can silently ignore it.  But an ImportError
