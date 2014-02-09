@@ -20,6 +20,15 @@ changeform.
     model attribute. This may be a security risk if used on fields which may
     hold non-trusted content. Be aware, and use the templatetags accordingly.
 
+
+.. warning::
+
+    This feature is only partially compatible with django-hvad: using
+    ``render_model`` with hvad-translated fields (say
+    {% render_model object 'translated_field' %} return error if the
+    hvad-enabled object does not exists in the current language.
+    As a workaround ``render_model_icon`` can be used instead.
+
 ************
 Templatetags
 ************
