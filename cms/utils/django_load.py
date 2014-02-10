@@ -9,7 +9,6 @@ documentet clearly within this file with comments.
 For documentation on how to use the functions described in this file, please
 refer to http://django-load.readthedocs.org/en/latest/index.html.
 """
-import imp
 import traceback # changed
 
 from django.conf import settings
@@ -23,7 +22,7 @@ def get_module(app, modname, verbose, failfast):
     # the module *should* exist - raise an error if it doesn't
     app_mod = import_module(app)
     try:
-        imp.find_module(modname, app_mod.__path__)
+        module = import_module(module_name)
     except ImportError:
         # this ImportError will be due to the module not existing
         # so here we can silently ignore it.  But an ImportError
@@ -34,8 +33,6 @@ def get_module(app, modname, verbose, failfast):
             print(u"Could not find %r from %r" % (modname, app)) # changed
             traceback.print_exc() # changed
         return None
-
-    module = import_module(module_name)
 
     if verbose:
         print(u"Loaded %r from %r" % (modname, app))
