@@ -47,7 +47,7 @@ setup(
         'Pygments==1.5',
         'dj-database-url==0.2.1',
         'django-hvad',
-        'djangocms-text-ckeditor',
+        'djangocms-text-ckeditor>=2.1.1',
         'djangocms-column',
         'djangocms-style',
     ],
