@@ -152,7 +152,10 @@ def get_fallback_languages(language, site_id=None):
     """
     returns a list of fallback languages for the given language
     """
-    language = get_language_object(language, site_id)
+    try:
+        language = get_language_object(language, site_id)
+    except LanguageError:
+        language = get_languages(site_id)[0]
     return language.get('fallbacks', [])
 
 
