@@ -9,7 +9,7 @@ from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
-from cms.plugins.link.cms_plugins import LinkPlugin
+from djangocms_link.cms_plugins import LinkPlugin
 from cms.utils.compat.tests import UnittestCompatMixin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text

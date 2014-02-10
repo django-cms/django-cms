@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import os
 import unittest
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
@@ -103,6 +104,23 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
         del ArticlePluginModel.copy_relations
         self.assertCheck(True, warnings=1, errors=0)
         ArticlePluginModel.copy_relations = copy_rel
+
+    def test_placeholder_tag_deprecation(self):
+        self.assertCheck(True, warnings=0, errors=0)
+        alt_dir = os.path.join(
+            os.path.dirname(__file__),
+            '..',
+            'test_utils',
+            'project',
+            'alt_templates'
+        )
+        with SettingsOverride(TEMPLATE_DIRS=[alt_dir], CMS_TEMPLATES=[]):
+            self.assertCheck(True, warnings=1, errors=0)
+
+    def test_non_numeric_site_id(self):
+        self.assertCheck(True, warnings=0, errors=0)
+        with SettingsOverride(SITE_ID='broken'):
+            self.assertCheck(False, warnings=0, errors=1)
 
 
 class CheckWithDatabaseTests(TestCase, CheckAssertMixin):

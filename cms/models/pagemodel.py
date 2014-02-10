@@ -104,8 +104,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     class PublisherMeta:
         exclude_fields_append = ['id', 'publisher_is_draft', 'publisher_public',
-            'publisher_state', 'moderator_state',
-            'placeholders', 'lft', 'rght', 'tree_id',
+            'publisher_state', 'placeholders', 'lft', 'rght', 'tree_id',
             'parent']
 
     def __str__(self):
@@ -522,10 +521,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 if title.path != '':
                     title._publisher_keep_state = True
                     title.save()
-
-        # clean moderation log
-        self.pagemoderatorstate_set.all().delete()
-
         if not published:
             # was not published, escape
             return
@@ -613,8 +608,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         self.revision_id = 0
         self._publisher_keep_state = True
         self.save()
-        # clean moderation log
-        self.pagemoderatorstate_set.all().delete()
 
     def get_draft_object(self):
         if not self.publisher_is_draft:
@@ -919,16 +912,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         This location can be customised using the CMS_PAGE_MEDIA_PATH setting
         """
         return join(get_cms_setting('PAGE_MEDIA_PATH'), "%d" % self.id, filename)
-
-    def last_page_states(self):
-        """Returns last five page states, if they exist, optimized, calls sql
-        query only if some states available
-        """
-        result = getattr(self, '_moderator_state_cache', None)
-        if result is None:
-            result = list(self.pagemoderatorstate_set.all().order_by('created'))
-            self._moderator_state_cache = result
-        return result[:5]
 
     def reload(self):
         """

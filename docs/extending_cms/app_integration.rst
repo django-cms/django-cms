@@ -60,34 +60,34 @@ The get_nodes function should return a list of
 :class:`NavigationNode <menus.base.NavigationNode>` instances. A
 :class:`NavigationNode` takes the following arguments:
 
-- title
+- ``title``
 
   What the menu entry should read as
 
-- url,
+- ``url``,
 
   Link if menu entry is clicked.
 
-- id
+- ``id``
 
   A unique id for this menu.
 
-- parent_id=None
+- ``parent_id=None``
 
   If this is a child of another node supply the the id of the parent here.
 
-- parent_namespace=None
+- ``parent_namespace=None``
 
   If the parent node is not from this menu you can give it the parent
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-- attr=None
+- ``attr=None``
 
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
-- visible=True
+- ``visible=True``
 
   Whether or not this menu item should be visible.
 
@@ -185,10 +185,9 @@ under "Application". Save the page.
 
 .. warning::
 
-    If you are on a multi-threaded server (mostly all webservers,
-    except the dev-server): Restart the server because the URLs are cached by
-    Django and in a multi-threaded environment we don't know which caches are
-    cleared yet.
+    Whenever you add or remove an apphook, change the slug of a page containing
+    an apphook or the slug if a page which has a descendant with an apphook,
+    you have to restart your server to re-load the URL caches.
     
 .. note::
 
@@ -354,7 +353,7 @@ You can reverse namespaced apps similarly and it "knows" in which app instance i
     {% url myapp_namespace:app_main %}
 
 If you want to access the same url but in a different language use the language
-templatetag:
+template tag:
 
 .. code-block:: html+django
 
@@ -385,11 +384,36 @@ Or, if you are rendering a plugin, of the context instance::
 
     class MyPlugin(CMSPluginBase):
         def render(self, context, instance, placeholder):
-            ...
+            # ...
             current_app = resolve(request.path).namespace
             reversed_url = reverse('myapp_namespace:app_main',
                     current_app=current_app)
-            ...
+            # ...
+
+
+Automatically restart server on apphook changes
+-----------------------------------------------
+
+As mentioned above, whenever you add or remove an apphook, change the slug of a
+page containing an apphook or the slug if a page which has a descendant with an
+apphook, you have to restart your server to re-load the URL caches. To allow
+you to automate this process, the django CMS provides a signal
+:obj:`cms.signals.urls_need_reloading` which you can listen on to detect when
+your server needs restarting. When you run ``manage.py runserver`` a restart
+should not be needed.
+
+.. warning::
+
+    This signal does not actually do anything. To get automated server
+    restarting you need to implement logic in your project that gets
+    executed whenever this signal is fired. Because there are many ways of
+    deploying Django applications, there is no way we can provide a generic
+    solution for this problem that will always work.
+
+.. warning::
+
+    The signal is fired **after** a request. If you change something via API
+    you need a request for the signal to fire.
 
 
 ********************
@@ -509,6 +533,8 @@ Here is an example of a built-in modifier that marks all node levels::
                 self.mark_levels(child, post_cut)
     
     menu_pool.register_modifier(Level)
+
+
 
 **************
 Custom Plugins

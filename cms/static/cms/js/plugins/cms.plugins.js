@@ -204,6 +204,7 @@ $(document).ready(function () {
 			// adds double click to edit
 			this.container.bind('dblclick', function (e) {
 				e.preventDefault();
+				e.stopPropagation();
 				that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
 			});
 
@@ -273,7 +274,7 @@ $(document).ready(function () {
 				'source_language': source_language,
 				'target_plugin_id': options.parent || '',
 				'target_placeholder_id': options.target || CMS.config.clipboard.id,
-				'target_language': options.plugin_language,
+				'target_language': options.page_language || source_language,
 				'csrfmiddlewaretoken': this.csrf
 			};
 			var request = {

@@ -115,8 +115,8 @@ $(document).ready(function () {
 			// lets set the modal width and height to the size of the browser
 			var widthOffset = 300;
 			var heightOffset = 350;
-			var width = ($(window).width() >= this.options.minWidth + widthOffset) ? $(window).width() - widthOffset : this.options.minWidth;
-			var height = ($(window).height() >= this.options.minHeight + heightOffset) ? $(window).height() - heightOffset : this.options.minHeight;
+			var width = (screen.width >= this.options.minWidth + widthOffset) ? screen.width - widthOffset : this.options.minWidth;
+			var height = (screen.height >= this.options.minHeight + heightOffset) ? screen.height - heightOffset : this.options.minHeight;
 			this.modal.find('.cms_modal-body').css({
 				'width': width,
 				'height': height

@@ -362,6 +362,15 @@ This will render to:
     non-trusted content. Be aware, and use the templatetag accordingly.
 
 
+.. warning::
+
+    ``render_model`` is only partially compatible with django-hvad: using
+    it with hvad-translated fields
+    (say {% render_model object 'translated_field' %} return error if the
+    hvad-enabled object does not exists in the current language.
+    As a workaround ``render_model_icon`` can be used instead.
+
+
 .. templatetag:: render_model_block
 .. versionadded:: 3.0
 

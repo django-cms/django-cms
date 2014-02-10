@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-from django.db.models import ManyToManyField
 import os
 import warnings
 import json

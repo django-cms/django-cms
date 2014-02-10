@@ -34,7 +34,7 @@ from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
                              PublicationDatesForm)
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
-from cms.models import Page, Title, CMSPlugin, PagePermission, PageModeratorState, EmptyTitle, GlobalPagePermission, \
+from cms.models import Page, Title, CMSPlugin, PagePermission, EmptyTitle, GlobalPagePermission, \
     titlemodels, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, copy_plugins
@@ -124,7 +124,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
-            pat(r'^([0-9]+)/moderation-states/$', self.get_moderation_states),
             pat(r'^([0-9]+)/change_template/$', self.change_template),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
@@ -201,8 +200,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         obj.save()
 
         if 'recover' in request.path or 'history' in request.path:
-            obj.pagemoderatorstate_set.all().delete()
-            moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
@@ -549,8 +546,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     def post_edit_plugin(self, request, plugin):
         page = plugin.placeholder.page
         if page:
-            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
-
             # if reversion is installed, save version of the page plugins
             if 'reversion' in settings.INSTALLED_APPS and page:
                 plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
@@ -565,7 +560,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
         page = target_placeholder.page
         if page and 'reversion' in settings.INSTALLED_APPS:
-            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
 
     def post_delete_plugin(self, request, plugin):
@@ -578,7 +572,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 'position': plugin.position,
                 'placeholder': plugin.placeholder,
             }
-            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             if 'reversion' in settings.INSTALLED_APPS:
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
@@ -589,7 +582,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             comment = _('All plugins in the placeholder "%(name)s" were deleted.') % {
                 'name': force_unicode(placeholder)
             }
-            moderator.page_changed(page, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             if 'reversion' in settings.INSTALLED_APPS:
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
@@ -919,16 +911,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
-    def get_moderation_states(self, request, page_id):
-        """Returns moderation messages. Is loaded over ajax to inline-group
-        element in change form view.
-        """
-        page = get_object_or_404(Page, id=page_id)
-        context = {
-            'page': page,
-        }
-        return render_to_response('admin/cms/page/moderation_messages.html', context)
-
     #TODO: Make the change form buttons use POST
     #@require_POST
     @transaction.commit_on_success
@@ -956,7 +938,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 published = static_placeholder.publish(request)
                 if not published:
                     all_published = False
-        if all_published:
+        if page and all_published:
             messages.info(request, _('The content was successfully published.'))
             LogEntry.objects.log_action(
                 user_id=request.user.id,
@@ -1235,8 +1217,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             form = PageTitleForm(instance=title, data=request.POST)
             if form.is_valid():
                 form.save()
-                moderator.page_changed(title.page,
-                                       force_moderation_action=PageModeratorState.ACTION_CHANGED)
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=title)

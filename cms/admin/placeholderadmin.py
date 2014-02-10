@@ -13,13 +13,13 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
-from cms.plugins.utils import has_reached_plugin_limit, requires_reload
+from cms.utils.plugins import requires_reload, has_reached_plugin_limit
 from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.decorators.http import require_POST
 import warnings
@@ -317,7 +317,7 @@ class PlaceholderAdmin(ModelAdmin):
             ref.language = target_language
             ref.placeholder = target_placeholder
             ref.save()
-            ref.copy_from(source_placeholder)
+            ref.copy_from(source_placeholder, source_language)
         else:
             copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
@@ -503,7 +503,8 @@ class PlaceholderAdmin(ModelAdmin):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
         if not self.has_clear_placeholder_permission(request, placeholder):
             return HttpResponseForbidden(_("You do not have permission to clear this placeholder"))
-        plugins = placeholder.get_plugins()
+        language = request.GET.get('language', None)
+        plugins = placeholder.get_plugins(language)
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         app_label = opts.app_label
