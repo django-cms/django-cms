@@ -31,16 +31,16 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         for original_placeholder in placeholders:
 
             # get the plugins
-            original_plugins = original_placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position', 'pk')
+            original_plugins = original_placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position')
 
             # copy them to a new placeholder
             copied_placeholder = Placeholder.objects.create(slot=original_placeholder.slot)
             copy_plugins_to(
-                original_placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position', 'pk'),
+                original_placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position'),
                 copied_placeholder
             )
 
-            copied_plugins = copied_placeholder.get_plugins()
+            copied_plugins = copied_placeholder.cmsplugin_set.order_by('tree_id', 'level', 'position')
 
             # we should find the same number of plugins in both placeholders
             self.assertEquals(
@@ -69,18 +69,20 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 for plugin in roots:
                     plugin_list.append(plugin)
                     # recurse over the set of nodes
-                    plugin_list_from_tree(plugin.get_children(), plugin_list)
+                    plugin_list_from_tree(plugin.get_children().order_by('position'), plugin_list)
 
             # build the tree for each set of plugins
             plugin_list_from_tree(original_plugins.filter(level=0), original_plugins_list)
             plugin_list_from_tree(copied_plugins.filter(level=0), copied_plugins_list)
 
+            self.assertEqual(len(original_plugins_list), original_plugins.count())
+            self.assertEqual(len(copied_plugins_list), copied_plugins.count())
             # Check that each pair of items in the two lists match, in lots of 
             # different ways
             for original, copy in zip(original_plugins_list, copied_plugins_list):
+
                 original_text_plugin = Text.objects.get(id=original.id)
                 copied_text_plugin = Text.objects.get(id=copy.id)
-
                 # This first one is a sanity test, just to prove that we aren't 
                 # simply comparing *exactly the same items* in all these tests. 
                 # It could happen...
@@ -96,14 +98,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 self.assertEquals(
                     original_text_plugin.position,
                     copied_text_plugin.position
-                )
-                self.assertEquals(
-                    original_text_plugin.rght,
-                    copied_text_plugin.rght
-                )
-                self.assertEquals(
-                    original_text_plugin.lft,
-                    copied_text_plugin.lft
                 )
                 self.assertEquals(
                     original_text_plugin.get_descendant_count(),
@@ -771,6 +765,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     'plugin_id': text_plugin_two.id,
                     'plugin_language':'en',
                     'plugin_parent':'',
+
                 }
                 plugin_class = text_plugin_two.get_plugin_class_instance()
                 expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}

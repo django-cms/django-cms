@@ -265,10 +265,14 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     if target:
         if position == 'last-child':
             new_pos = CMSPlugin.objects.filter(language=language, parent=target, tree_id=target.tree_id).count()
+        elif position == 'first-child':
+            new_pos = 0
         elif position == 'left':
             new_pos = target.position
         elif position == 'right':
             new_pos = target.position + 1
+        else:
+            raise Exception('position not supported: %s' % position)
         for pl in CMSPlugin.objects.filter(language=language, parent=target.parent_id, tree_id=target.tree_id, position__gte=new_pos):
             pl.position += 1
             pl.save()
