@@ -38,6 +38,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
     )
+    TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
     template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
@@ -60,7 +61,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_INHERITANCE_MAGIC)
+                                default=TEMPLATE_DEFAULT)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"),
                              related_name='djangocms_pages')
 
