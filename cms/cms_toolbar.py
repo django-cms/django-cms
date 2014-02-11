@@ -146,6 +146,7 @@ class PageToolbar(CMSToolbar):
         statics = getattr(self.request, 'static_placeholders', [])
         dirty_statics = [stpl for stpl in statics if stpl.dirty]
         placeholders = getattr(self.request, 'placeholders', [])
+        self.page = getattr(self, 'page', None)
         if self.page or statics:
             if self.toolbar.edit_mode:
                 # publish button
