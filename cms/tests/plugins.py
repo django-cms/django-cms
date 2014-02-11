@@ -25,7 +25,7 @@ from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, Section, ArticlePluginModel
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -151,6 +151,25 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
+
+    def test_plugin_edit_marks_page_dirty(self):
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertEqual(response.status_code, 302)
+        page = Page.objects.all()[0]
+        response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
+        self.assertEqual(response.status_code, 302)
+        created_plugin_id = self._create_text_plugin_on_page(page)
+        page = Page.objects.all()[0]
+        self.assertEqual(page.is_dirty('en'), True)
+        response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
+        self.assertEqual(response.status_code, 302)
+        page = Page.objects.all()[0]
+        self.assertEqual(page.is_dirty('en'), False)
+        txt = self._edit_text_plugin(created_plugin_id, "Hello World")
+        page = Page.objects.all()[0]
+        self.assertEqual(page.is_dirty('en'), True)
+
 
     def test_plugin_order(self):
         """
