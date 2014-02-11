@@ -22,7 +22,7 @@ Install
 .. toctree::
     :maxdepth: 1
 
-    getting_started/installation
+    getting_started/installation/overview
     upgrade/3.0
     upgrade/2.4
     upgrade/2.3.4
@@ -41,12 +41,13 @@ Getting Started
     :maxdepth: 2
     :numbered:
 
-    getting_started/tutorial
-    getting_started/using_south
-    getting_started/configuration
-    getting_started/navigation
-    getting_started/plugin_reference
-    faq/common_issues
+    getting_started/installation/overview
+    getting_started/templates
+    getting_started/plugins
+    getting_started/apps
+    getting_started/blog
+    getting_started/toolbar
+    getting_started/page_model
     
 
 ********
