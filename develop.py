@@ -38,7 +38,7 @@ Options:
     --failfast                  Stop tests on first failure (only if not --parallel).
     --port=<port>               Port to listen on [default: 8000].
     --bind=<bind>               Interface to bind to [default: 127.0.0.1].
-    --user=<user>               Specify which user model to run tests with [default: auth.User].
+    --user=<user>               Specify which user model to run tests with (if other than auth.User).
 '''
 
 
