@@ -444,14 +444,24 @@ class PlaceholderAdmin(ModelAdmin):
             child.placeholder = placeholder
             child.language = language
             child.save()
-        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder)
+        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder).order_by('position')
+        x = 0
         for level_plugin in plugins:
-            x = 0
-            for pk in order:
-                if level_plugin.pk == int(pk):
-                    level_plugin.position = x
-                    level_plugin.save()
-                    break
+            if order:
+                x = 0
+                found = False
+                for pk in order:
+                    if level_plugin.pk == int(pk):
+                        level_plugin.position = x
+                        level_plugin.save()
+                        found = True
+                        break
+                    x += 1
+                if not found:
+                    return HttpResponseBadRequest('order parameter did not have all plugins of the same level in it')
+            else:
+                level_plugin.position = x
+                level_plugin.save()
                 x += 1
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
