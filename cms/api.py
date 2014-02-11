@@ -15,7 +15,6 @@ from cms.utils.i18n import get_language_list
 
 from cms.compat import get_user_model
 from django.contrib.sites.models import Site
-from django.db.models import Max
 from django.template.defaultfilters import slugify
 from menus.menu_pool import menu_pool
 
@@ -279,14 +278,27 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
 
     # validate and normalize plugin type
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
-
-    max_pos = CMSPlugin.objects.filter(language=language,
-                                       placeholder=placeholder).aggregate(Max('position'))['position__max'] or 0
+    if target:
+        if position == 'last-child':
+            new_pos = CMSPlugin.objects.filter(language=language, parent=target, tree_id=target.tree_id).count()
+        elif position == 'first-child':
+            new_pos = 0
+        elif position == 'left':
+            new_pos = target.position
+        elif position == 'right':
+            new_pos = target.position + 1
+        else:
+            raise Exception('position not supported: %s' % position)
+        for pl in CMSPlugin.objects.filter(language=language, parent=target.parent_id, tree_id=target.tree_id, position__gte=new_pos):
+            pl.position += 1
+            pl.save()
+    else:
+        new_pos = CMSPlugin.objects.filter(language=language, parent__isnull=True, placeholder=placeholder).count()
 
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
         placeholder=placeholder,
-        position=max_pos + 1,
+        position=new_pos,
         language=language
     )
     plugin_base.insert_at(target, position=position, save=False)

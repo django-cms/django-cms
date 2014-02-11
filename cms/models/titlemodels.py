@@ -82,12 +82,29 @@ class Title(models.Model):
         if self.page.publication_date is None and self.published:
             self.page.publication_date = timezone.now() - timedelta(seconds=5)
 
-        if self.publisher_is_draft and not keep_state:
+        if self.publisher_is_draft and not keep_state and self.is_new_dirty():
             self.publisher_state = PUBLISHER_STATE_DIRTY
         if keep_state:
             delattr(self, '_publisher_keep_state')
         ret = super(Title, self).save_base(*args, **kwargs)
         return ret
+
+    def is_new_dirty(self):
+        if self.pk:
+            fields = [
+                'title', 'page_title', 'menu_title', 'meta_description', 'slug', 'has_url_overwrite', 'redirect'
+            ]
+            try:
+                old_title = Title.objects.get(pk=self.pk)
+            except Title.DoesNotExist:
+                return True
+            for field in fields:
+                old_val = getattr(old_title, field)
+                new_val = getattr(self, field)
+                if not old_val == new_val:
+                    return True
+            return False
+        return True
 
 
 class EmptyTitle(object):

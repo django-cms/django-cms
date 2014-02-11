@@ -265,7 +265,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         # we assign a parent to our new plugin
         parent_cache[self.pk] = new_plugin
         if self.parent:
-            new_plugin.parent = parent_cache[self.parent_id]
+            parent = parent_cache[self.parent_id]
+            parent = CMSPlugin.objects.get(pk=parent.pk)
+            new_plugin.parent = parent
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
