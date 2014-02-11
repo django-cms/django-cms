@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy, copy
+from copy import copy
 from itertools import chain
 from datetime import datetime
 from django.template.defaultfilters import safe
@@ -12,7 +12,7 @@ from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
-from cms.plugins.utils import get_plugins, assign_plugins
+from cms.utils.plugins import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting, get_site_id
 from cms.utils.compat.type_checks import string_types, int_types
 from cms.utils.i18n import force_language
@@ -583,7 +583,7 @@ class CMSToolbar(RenderBlock):
         # render the toolbar content
 
         with force_language(language):
-            request.toolbar.populate()
+            request.toolbar.post_template_populate()
             context['clipboard'] = clipboard
             content = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below

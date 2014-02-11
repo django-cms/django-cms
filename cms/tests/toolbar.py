@@ -7,9 +7,9 @@ from django.template.defaultfilters import truncatewords
 from cms.views import details
 import re
 from cms.api import create_page, create_title
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.compat import get_user_model, is_user_swapped
-from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -38,6 +38,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         request.current_page = page
         mid = ToolbarMiddleware()
         mid.process_request(request)
+        request.toolbar.populate()
         return request
 
     def get_anon(self):
@@ -64,33 +65,36 @@ class ToolbarTests(ToolbarTestBase):
     def test_no_page_anon(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         toolbar = CMSToolbar(request)
-
+        toolbar.populate()
+        toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 0)
 
     def test_no_page_staff(self):
         request = self.get_page_request(None, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
-
+        toolbar.populate()
+        toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + admin-menu + logout
         self.assertEqual(len(items), 2, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 6, admin_items)
 
     def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
         toolbar = CMSToolbar(request)
-
+        toolbar.populate()
+        toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
 
         if is_user_swapped:
-            self.assertEqual(len(admin_items), 7, admin_items)
+            self.assertEqual(len(admin_items), 6, admin_items)
         else:
-            self.assertEqual(len(admin_items), 8, admin_items)
+            self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -169,6 +173,8 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_superuser(), edit=True)
         toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 7)
@@ -177,6 +183,8 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_staff(), edit=True)
         toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
         self.assertTrue(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
         self.assertTrue(toolbar.edit_mode)
@@ -190,6 +198,8 @@ class ToolbarTests(ToolbarTestBase):
         user.user_permissions.all().delete()
         request = self.get_page_request(page, user, edit=True)
         toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
         self.assertFalse(page.has_change_permission(request))
         self.assertFalse(page.has_publish_permission(request))
 
@@ -197,7 +207,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 6, admin_items)
 
     def test_button_consistency_staff(self):
         """
@@ -209,9 +219,13 @@ class ToolbarTests(ToolbarTestBase):
         cms_page.publish('de')
         en_request = self.get_page_request(cms_page, user, edit=True)
         en_toolbar = CMSToolbar(en_request)
+        en_toolbar.populate()
+        en_toolbar.post_template_populate()
         self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
+        de_toolbar.populate()
+        de_toolbar.post_template_populate()
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
 
     def test_placeholder_name(self):
@@ -230,6 +244,33 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/admin/cms/usersettings/')
             self.assertEqual(response.status_code, 200)
+
+    def test_get_alphabetical_insert_position(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), '/')
+        toolbar = CMSToolbar(request)
+        toolbar.get_left_items()
+        toolbar.get_right_items()
+
+        admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'TestAppMenu')
+
+        # Insert alpha
+        alpha_position = admin_menu.get_alphabetical_insert_position('menu-alpha', SubMenu, None)
+
+        # As this will be the first item added to this, this use should return the default, or namely None
+        if not alpha_position:
+            alpha_position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK) + 1
+        menu = admin_menu.get_or_create_menu('menu-alpha', 'menu-alpha', position=alpha_position)
+
+        # Insert gamma (should return alpha_position + 1)
+        gamma_position = admin_menu.get_alphabetical_insert_position('menu-gamma', SubMenu)
+        self.assertEquals(int(gamma_position), int(alpha_position) + 1)
+        admin_menu.get_or_create_menu('menu-gamma', 'menu-gamma', position=gamma_position)
+
+        # Where should beta go? It should go right where gamma is now...
+        beta_position = admin_menu.get_alphabetical_insert_position('menu-beta', SubMenu)
+        self.assertEqual(beta_position, gamma_position)
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):

@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.template.defaultfilters import title
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext_lazy as _
 import operator
 from django.contrib import admin
 
@@ -102,7 +102,7 @@ class Placeholder(models.Model):
         return render_placeholder(self, context, lang=lang)
 
     def get_media(self, request, context):
-        from cms.plugins.utils import get_plugin_media
+        from cms.utils.plugins import get_plugin_media
         media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
         if media_classes:
             return reduce(operator.add, media_classes)

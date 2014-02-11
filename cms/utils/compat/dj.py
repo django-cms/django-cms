@@ -14,3 +14,27 @@ try:
 except ImportError:
     force_unicode = lambda s: str(s)
     from django.utils.encoding import python_2_unicode_compatible
+
+try:
+    from django.db.models.loading import get_app_paths
+except ImportError:
+    from django.db.models.loading import get_apps
+    try:
+        from django.utils._os import upath
+    except ImportError:
+        upath = lambda path: path
+
+    def get_app_paths():
+        """
+        Returns a list of paths to all installed apps.
+
+        Useful for discovering files at conventional locations inside apps
+        (static files, templates, etc.)
+        """
+        app_paths = []
+        for app in get_apps():
+            if hasattr(app, '__path__'):        # models/__init__.py package
+                app_paths.extend([upath(path) for path in app.__path__])
+            else:                               # models.py module
+                app_paths.append(upath(app.__file__))
+        return app_paths

@@ -12,14 +12,14 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.plugins.googlemap.models import GoogleMap
-from cms.plugins.inherit.cms_plugins import InheritPagePlaceholderPlugin
-from cms.plugins.utils import get_plugins_for_page
-from cms.plugins.file.models import File
-from cms.plugins.inherit.models import InheritPagePlaceholder
-from cms.plugins.link.forms import LinkForm
-from cms.plugins.link.models import Link
-from cms.plugins.picture.models import Picture
+from djangocms_googlemap.models import GoogleMap
+from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
+from cms.utils.plugins import get_plugins_for_page
+from djangocms_file.models import File
+from djangocms_inherit.models import InheritPagePlaceholder
+from djangocms_link.forms import LinkForm
+from djangocms_link.models import Link
+from djangocms_picture.models import Picture
 from cms.toolbar.toolbar import CMSToolbar
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
@@ -770,7 +770,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(URL_CMS_PLUGIN_MOVE, post)
         self.assertEquals(response.status_code, 200)
 
-        from cms.plugins.utils import build_plugin_tree
+        from cms.utils.plugins import build_plugin_tree
 
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
         plugin_pool.unregister_plugin(DumbFixturePlugin)
@@ -1430,3 +1430,17 @@ class SimplePluginTests(TestCase):
         self.assertEqual(out_context['instance'], 1)
         self.assertEqual(out_context['placeholder'], 2)
         self.assertIs(out_context, context)
+
+
+class BrokenPluginTests(TestCase):
+    def test_import_broken_plugin(self):
+        """
+        If there is an import error in the actual cms_plugin file it should
+        raise the ImportError rather than silently swallowing it -
+        in opposition to the ImportError if the file 'cms_plugins.py' doesn't
+        exist.
+        """
+        apps = ['cms.test_utils.project.brokenpluginapp']
+        with SettingsOverride(INSTALLED_APPS=apps):
+            plugin_pool.discovered = False
+            self.assertRaises(ImportError, plugin_pool.discover_plugins)

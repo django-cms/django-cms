@@ -1,6 +1,7 @@
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.utils import i18n
 
+
 class TestLanguages(SettingsOverrideTestCase):
 
     settings_overrides = {

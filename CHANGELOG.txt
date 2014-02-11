@@ -192,6 +192,15 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - PageAdmin uses the same Plugin API as PlaceholderAdmin
 - Toolbar API for your own apps added
 - twitter plugin removed
+- file plugin removed
+- flash plugin removed
+- googlemap plugin removed
+- inherit plugin removed
+- picture plugin removed
+- teaser plugin removed
+- video plugin removed
+- link plugin removed
+- snippet plugin removed
 - Object level permission support for Placeholder
 - Configuration for plugin custom modules and labels in the toolbar UI
 - Added copy-lang subcommand to copy content between languages
@@ -203,3 +212,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Placeholders can be configured to have plugins automatically added.
 - Publishing is now language independent and the tree-view has been updated to reflect this
 - Removed the plugin DB-name magic and added a compatibility layer
+- urls_need_reloading signal added when an apphook change is detected.

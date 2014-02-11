@@ -11,7 +11,6 @@ from cms.utils.compat.urls import unquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
-from cms.exceptions import NoHomeFound
 from cms.models.pagemodel import Page
 from cms.utils.urlutils import any_path_re
 
@@ -119,7 +118,6 @@ def get_page_from_request(request, use_path=None):
 
     draft = use_draft(request)
     preview = 'preview' in request.GET
-
     # If use_path is given, someone already did the path cleaning
     if use_path is not None:
         path = use_path

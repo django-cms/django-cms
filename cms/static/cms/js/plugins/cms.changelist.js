@@ -150,6 +150,8 @@ $(document).ready(function () {
 		return this.after(o).remove().end(); 
 	};
 
+
+
 	var tree;
 	// global initTree function
 	initTree = function(){
@@ -173,6 +175,7 @@ $(document).ready(function () {
 				rtl: false,
 				animation: 0,
 				hover_mode: true,
+                //theme_path: script_url_path() + "/../jstree/themes/",
 				a_class: "title"
 			},
 			cookies : {

@@ -57,7 +57,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
                                     help_text=_("All ancestors will not be displayed in the navigation"))
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
-        "An unique identifier that is used with the page_url templatetag for linking to this page"))
+        "A unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
@@ -105,8 +105,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     class PublisherMeta:
         exclude_fields_append = ['id', 'publisher_is_draft', 'publisher_public',
-            'publisher_state', 'moderator_state',
-            'placeholders', 'lft', 'rght', 'tree_id',
+            'publisher_state', 'placeholders', 'lft', 'rght', 'tree_id',
             'parent']
 
     def __str__(self):
@@ -527,10 +526,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 if title.path != '':
                     title._publisher_keep_state = True
                     title.save()
-
-        # clean moderation log
-        self.pagemoderatorstate_set.all().delete()
-
         if not published:
             # was not published, escape
             return
@@ -618,8 +613,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         self.revision_id = 0
         self._publisher_keep_state = True
         self.save()
-        # clean moderation log
-        self.pagemoderatorstate_set.all().delete()
 
     def get_draft_object(self):
         if not self.publisher_is_draft:
@@ -924,16 +917,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         This location can be customised using the CMS_PAGE_MEDIA_PATH setting
         """
         return join(get_cms_setting('PAGE_MEDIA_PATH'), "%d" % self.id, filename)
-
-    def last_page_states(self):
-        """Returns last five page states, if they exist, optimized, calls sql
-        query only if some states available
-        """
-        result = getattr(self, '_moderator_state_cache', None)
-        if result is None:
-            result = list(self.pagemoderatorstate_set.all().order_by('created'))
-            self._moderator_state_cache = result
-        return result[:5]
 
     def reload(self):
         """

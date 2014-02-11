@@ -6,7 +6,6 @@ from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.i18n import get_fallback_languages
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -89,7 +88,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
     """
-    from cms.plugins.utils import get_plugins
+    from cms.utils.plugins import get_plugins
     context = context_to_copy
     context.push()
     request = context['request']

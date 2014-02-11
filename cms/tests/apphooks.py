@@ -47,6 +47,7 @@ class ApphooksTestCase(CMSTestCase):
             #       directly in the root urlconf.
             # '...',
             'cms.test_utils.project.second_cms_urls_for_apphook_tests',
+            'cms.test_utils.project.urls_for_apphook_tests',
             settings.ROOT_URLCONF,
         ]
 
@@ -175,11 +176,9 @@ class ApphooksTestCase(CMSTestCase):
             self.assertContains(response, en_title.title)
             with force_language("de"):
                 path = reverse('sample-settings')
-
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
-            attached_to_page = applications_page_check(request,
-                                                       path=path[1:])  # strip leading slash and language prefix
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash and language prefix
             self.assertEquals(attached_to_page.pk, de_title.page.pk)
 
             response = self.client.get(path)

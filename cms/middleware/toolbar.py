@@ -4,7 +4,6 @@ Edit Toolbar middleware
 """
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import force_language
 from menus.menu_pool import menu_pool
 from django.http import HttpResponse
@@ -17,7 +16,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     child_plugin_classes = []
     plugin_class = instance.get_plugin_class()
     if plugin_class.allow_children:
-        instance, plugin = instance.get_plugin_instance()
+        inst, plugin = instance.get_plugin_instance()
         page = original_context['request'].current_page
         childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(placeholder, page)]
         # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
@@ -66,8 +65,11 @@ class ToolbarMiddleware(object):
             request.session['cms_build'] = True
         request.toolbar = CMSToolbar(request)
 
+
     def process_view(self, request, view_func, view_args, view_kwarg):
         response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
+        request.toolbar.populate()
+        return None
 

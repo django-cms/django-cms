@@ -3,7 +3,7 @@ import sys
 from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
 from cms.forms.widgets import UserSelectAdminWidget
-from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels, Title
+from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change

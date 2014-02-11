@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from cms.utils.conf import get_cms_setting
-from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from django.contrib import admin

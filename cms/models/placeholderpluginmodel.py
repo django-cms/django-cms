@@ -16,18 +16,20 @@ class PlaceholderReference(CMSPlugin):
     def __str__(self):
         return self.name
 
-    def copy_to(self, placeholder):
-        copy_plugins_to(self.placeholder_ref.get_plugins(), placeholder, to_language=self.language)
+    def copy_to(self, placeholder, language):
+        copy_plugins_to(self.placeholder_ref.get_plugins(), placeholder, to_language=language)
 
-    def copy_from(self, placeholder):
-        copy_plugins_to(placeholder.get_plugins(), self.placeholder_ref, to_language=self.language)
+    def copy_from(self, placeholder, language):
+        copy_plugins_to(placeholder.get_plugins(language), self.placeholder_ref, to_language=self.language)
 
-    def move_to(self, placeholder):
+    def move_to(self, placeholder, language):
         for plugin in self.placeholder_ref.get_plugins():
             plugin.placeholder = placeholder
+            plugin.language = language
             plugin.save()
 
-    def move_from(self, placeholder):
+    def move_from(self, placeholder, language):
         for plugin in placeholder.get_plugins():
             plugin.placeholder = self.placeholder_ref
+            plugin.language = language
             plugin.save()
