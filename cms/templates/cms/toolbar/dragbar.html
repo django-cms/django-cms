@@ -11,7 +11,7 @@
 			{% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
 				<div class="cms_submenu-item"><a data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
 			{% endif %}{% endfor %}
-			<div class="cms_submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
+			<div class="cms_submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
 			{% plugin_child_classes placeholder %}
 		</div>
 	</div>

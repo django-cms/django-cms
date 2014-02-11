@@ -938,7 +938,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 published = static_placeholder.publish(request)
                 if not published:
                     all_published = False
-        if all_published:
+        if page and all_published:
             messages.info(request, _('The content was successfully published.'))
             LogEntry.objects.log_action(
                 user_id=request.user.id,

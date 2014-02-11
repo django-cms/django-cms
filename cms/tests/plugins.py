@@ -1456,3 +1456,17 @@ class SimplePluginTests(TestCase):
         self.assertEqual(out_context['instance'], 1)
         self.assertEqual(out_context['placeholder'], 2)
         self.assertIs(out_context, context)
+
+
+class BrokenPluginTests(TestCase):
+    def test_import_broken_plugin(self):
+        """
+        If there is an import error in the actual cms_plugin file it should
+        raise the ImportError rather than silently swallowing it -
+        in opposition to the ImportError if the file 'cms_plugins.py' doesn't
+        exist.
+        """
+        apps = ['cms.test_utils.project.brokenpluginapp']
+        with SettingsOverride(INSTALLED_APPS=apps):
+            plugin_pool.discovered = False
+            self.assertRaises(ImportError, plugin_pool.discover_plugins)
