@@ -17,14 +17,10 @@ class SiteTestCase(CMSTestCase):
     All stuff which is changing settings.SITE_ID for tests should come here.
     """
     def setUp(self):
-        User = get_user_model()
-
         self.assertEqual(Site.objects.all().count(), 1)
         with SettingsOverride(SITE_ID=1):
 
-            u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-            u.set_password("test")
-            u.save()
+            u = self._create_user("test", True, True)
 
             # setup sites
             self.site2 = Site.objects.create(domain="sample2.com", name="sample2.com", pk=2)

@@ -44,42 +44,17 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         return AnonymousUser()
 
     def get_staff(self):
-        User = get_user_model()
-        staff = User(
-            username='staff',
-            email='staff@staff.org',
-            is_active=True,
-            is_staff=True,
-        )
-        staff.set_password('staff')
-        staff.save()
+        staff = self._create_user('staff', True, False)
         staff.user_permissions.add(Permission.objects.get(codename='change_page'))
         return staff
 
     def get_nonstaff(self):
-        User = get_user_model()
-        nonstaff = User(
-            username='nonstaff',
-            email='nonstaff@staff.org',
-            is_active=True,
-            is_staff=False,
-        )
-        nonstaff.set_password('nonstaff')
-        nonstaff.save()
+        nonstaff = self._create_user('nonstaff')
         nonstaff.user_permissions.add(Permission.objects.get(codename='change_page'))
         return nonstaff
 
     def get_superuser(self):
-        User = get_user_model()
-        superuser = User(
-            username='superuser',
-            email='superuser@superuser.org',
-            is_active=True,
-            is_staff=True,
-            is_superuser=True,
-        )
-        superuser.set_password('superuser')
-        superuser.save()
+        superuser = self._create_user('superuser', True, True)
         return superuser
 
 

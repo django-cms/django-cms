@@ -22,10 +22,10 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    develop.py test [--parallel | --failfast] [--migrate] [<test-label>...]
+    develop.py test [--parallel | --failfast] [--migrate] [--user=<user>] [<test-label>...]
     develop.py timed test [test-label...]
     develop.py isolated test [<test-label>...] [--parallel] [--migrate]
-    develop.py server [--port=<port>] [--bind=<bind>] [--migrate]
+    develop.py server [--port=<port>] [--bind=<bind>] [--migrate] [--user=<user>]
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
@@ -171,13 +171,25 @@ if __name__ == '__main__':
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
             use_tz = VERSION[:2] >= (1, 4)
-            configure(db_url=db_url,
+
+            test_settings = dict(
+                db_url=db_url,
                 ROOT_URLCONF='cms.test_utils.project.urls',
                 STATIC_ROOT=STATIC_ROOT,
                 MEDIA_ROOT=MEDIA_ROOT,
                 USE_TZ=use_tz,
                 SOUTH_TESTS_MIGRATE=migrate
             )
+
+            if args['--user']:
+                if VERSION[:2] < (1, 5):
+                    print()
+                    print("Custom user models are not supported before Django 1.5")
+                    print()
+                else:
+                    test_settings['AUTH_USER_MODEL'] = args['--user']
+
+            configure(**test_settings)
 
             # run
             if args['test']:

@@ -101,9 +101,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             self.master_page = create_page("master", "nav_playground.html", "en")
 
             # create non global, non staff user
-            self.user_non_global = User(username="nonglobal", is_active=True)
-            self.user_non_global.set_password("nonglobal")
-            self.user_non_global.save()
+            self.user_non_global = self._create_user("nonglobal")
 
             # assign master user under home page
             assign_user_to_page(self.home_page, self.user_master,
@@ -452,12 +450,14 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
                 if perm.user == self.user_staff:
                     has_perm = True
         self.assertEqual(has_perm, False)
-        login_ok = self.client.login(username=self.user_staff.username, password=self.user_staff.username)
+        login_ok = self.client.login(username=getattr(self.user_staff, get_user_model().USERNAME_FIELD),
+                                     password=getattr(self.user_staff, get_user_model().USERNAME_FIELD))
         self.assertTrue(login_ok)
+
         # really logged in
         self.assertTrue('_auth_user_id' in self.client.session)
         login_user_id = self.client.session.get('_auth_user_id')
-        user = get_user_model().objects.get(username=self.user_staff.username)
+        user = get_user_model().objects.get(pk=self.user_staff.pk)
         self.assertEquals(login_user_id, user.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -491,10 +491,8 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
     def test_user_globalpermission(self):
         # Global user
-        User = get_user_model()
-        user_global = User(username="global", is_active=True)
-        user_global.set_password("global")
-        user_global.save()
+        user_global = self._create_user("global")
+
         with self.login_user_context(self.user_super):
             user_global = create_page_user(user_global, user_global)
             user_global.is_staff = False
@@ -589,11 +587,8 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
     def setUp(self):
         # create super user
-        User = get_user_model()
-        self.user_super = User(username="super", is_staff=True, is_active=True,
-                               is_superuser=True)
-        self.user_super.set_password("super")
-        self.user_super.save()
+        self.user_super = self._create_user("super", True, True)
+
         with self.login_user_context(self.user_super):
             self.home_page = create_page("home", "nav_playground.html", "en",
                                          created_by=self.user_super)
@@ -603,8 +598,7 @@ class PatricksMoveTest(SettingsOverrideTestCase):
             self.master_page = create_page("master", "nav_playground.html", "en")
 
             # create master user
-            self.user_master = get_user_model().objects.create(username="master", email="master@django-cms.org", password="master",
-                                                   is_staff=True)
+            self.user_master = self._create_user("master", True)
             self.user_master.user_permissions.add(Permission.objects.get(codename='publish_page'))
             #self.user_master = create_page_user(self.user_super, master, grant_all=True)
 
@@ -619,9 +613,7 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
             self.slave_page = create_page("slave-home", "nav_playground.html", "en",
                                           parent=self.master_page, created_by=self.user_super)
-            slave = User(username='slave', email='slave@django-cms.org', is_staff=True, is_active=True)
-            slave.set_password('slave')
-            slave.save()
+            slave = self._create_user("slave", True)
             self.user_slave = create_page_user(self.user_super, slave, can_add_page=True,
                                                can_change_page=True, can_delete_page=True)
 
@@ -1014,10 +1006,7 @@ class PagePermissionTests(PermissionTestsBase):
         This is to assert that the permissions cache is properly
         invalidated.
         """
-        User = get_user_model()
-        user = User(username='user', email='user@domain.com', password='user',
-                    is_staff=True)
-        user.save()
+        user = self._create_user("user", is_staff=True)
         group = Group.objects.create(name='testgroup')
         group.user_set.add(user)
         page = create_page('A', 'nav_playground.html', 'en')

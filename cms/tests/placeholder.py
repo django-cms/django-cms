@@ -47,13 +47,7 @@ import itertools
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def setUp(self):
-        User = get_user_model()
-        
-        u = User(is_staff=True, is_active=True, is_superuser=True)
-        setattr(u, u.USERNAME_FIELD, "test")
-        
-        u.set_password("test")
-        u.save()
+        u = self._create_user("test", True, True)
 
         self._login_context = self.login_user_context(u)
         self._login_context.__enter__()
@@ -541,7 +535,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
             user = self.get_superuser()
-            self.client.login(username=user.username, password=user.username)
+            self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
+                              password=getattr(user, get_user_model().USERNAME_FIELD))
             response = self.client.get("/en/?edit")
             for placeholder in page.placeholders.all():
                 self.assertContains(

@@ -9,6 +9,8 @@ from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.views import _handle_no_page, details
+from cms.compat import get_user_model
+
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
 
@@ -136,7 +138,8 @@ class ViewTests(SettingsOverrideTestCase):
 
         # Superuser
         user = self.get_superuser()
-        self.client.login(username=user.username, password=user.username)
+        self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
+                          password=getattr(user, get_user_model().USERNAME_FIELD))
         response = self.client.get("/en/?edit")
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
@@ -144,7 +147,9 @@ class ViewTests(SettingsOverrideTestCase):
         user = self.get_staff_user_with_no_permissions()
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
-        self.client.login(username=user.username, password=user.username)
+        self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
+                          password=getattr(user, get_user_model().USERNAME_FIELD))
+
         response = self.client.get("/en/?edit")
         self.assertNotContains(response, "cms_toolbar-item_switch", 200)
 

@@ -26,14 +26,8 @@ if hasattr(reversion.models, 'VERSION_CHANGE'):
 
 
 class BasicReversionTestCase(CMSTestCase):
-    def setUp(self):
-        User = get_user_model()
-
-        u = User(username="test", is_staff=True, is_active=True,
-                 is_superuser=True)
-        u.set_password("test")
-        u.save()
-        self.user = u
+    def setUp(self):        
+        self.user = self._create_user("test", True, True)
 
     def test_number_revisions(self):
         with self.login_user_context(self.user):
@@ -49,12 +43,7 @@ class BasicReversionTestCase(CMSTestCase):
 
 class ReversionTestCase(TransactionCMSTestCase):
     def setUp(self):
-        User = get_user_model()
-        
-        u = User(username="test", is_staff=True, is_active=True,
-                 is_superuser=True)
-        u.set_password("test")
-        u.save()
+        u = self._create_user("test", True, True)
 
         with self.login_user_context(u):
             # add a new text plugin
@@ -92,11 +81,13 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertRedirects(response, URL_CMS_PAGE)
             page.publish('en')
 
+        self.user = u
+
     def test_revert(self):
         """
         Test that you can revert a plugin
         """
-        with self.login_user_context(get_user_model().objects.get(username="test")):
+        with self.login_user_context(self.user):
             self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(Title.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)
@@ -131,7 +122,7 @@ class ReversionTestCase(TransactionCMSTestCase):
         """
         Test that you can revert a plugin
         """
-        with self.login_user_context(get_user_model().objects.get(username="test")):
+        with self.login_user_context(self.user):
             self.assertEquals(Page.objects.all().count(), 2)
             self.assertEquals(Title.objects.all().count(), 2)
             self.assertEquals(CMSPlugin.objects.all().count(), 2)
@@ -185,7 +176,7 @@ class ReversionTestCase(TransactionCMSTestCase):
         """
         Test that you can recover a page
         """
-        with self.login_user_context(get_user_model().objects.get(username="test")):
+        with self.login_user_context(self.user):
             self.assertEquals(Revision.objects.all().count(), 5)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
@@ -219,7 +210,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEquals(Text.objects.all().count(), 1)
 
     def test_publish(self):
-        with self.login_user_context(get_user_model().objects.get(username="test")):
+        with self.login_user_context(self.user):
             page = Page.objects.all()[0]
             page_pk = page.pk
             self.assertEquals(Revision.objects.all().count(), 5)
@@ -229,7 +220,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEquals(Revision.objects.all().count(), 2)
 
     def test_publish_limit(self):
-        with self.login_user_context(get_user_model().objects.get(username="test")):
+        with self.login_user_context(self.user):
             with SettingsOverride(CMS_MAX_PAGE_PUBLISH_REVERSIONS=5):
                 page = Page.objects.all()[0]
                 page_pk = page.pk

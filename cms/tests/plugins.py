@@ -73,28 +73,11 @@ class PluginsTestBaseCase(CMSTestCase):
     def setUp(self):
         User = get_user_model()
         
-        self.super_user = User(is_staff=True, is_active=True, is_superuser=True)
-
-        if User.USERNAME_FIELD != 'email':
-            setattr(self.super_user, User.USERNAME_FIELD, "test")
-
-        self.super_user.email = "test@example.com"
-        self.super_user.set_password("test")
-        self.super_user.save()
-
-        self.slave = User(is_staff=True, is_active=True, is_superuser=False)
-        
-        if User.USERNAME_FIELD != 'email':
-            setattr(self.slave, User.USERNAME_FIELD, "slave")
-
-        self.slave.email = "slave@example.com"
-        self.slave.set_password("slave")
-        self.slave.save()
+        self.super_user = self._create_user("test", True, True)
+        self.slave = self._create_user("slave", True)
 
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
-
-        #import pdb; pdb.set_trace()
 
         self._login_context = self.login_user_context(self.super_user)
         self._login_context.__enter__()
@@ -1090,15 +1073,8 @@ class FileSystemPluginTests(PluginsTestBaseCase):
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):
-        User = get_user_model()
-        
-        self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-        self.super_user.set_password("test")
-        self.super_user.save()
-
-        self.slave = User(username="slave", is_staff=True, is_active=True, is_superuser=False)
-        self.slave.set_password("slave")
-        self.slave.save()
+        self.super_user = self._create_user("test", True, True)
+        self.slave = self._create_user("slave", True)
 
         self._login_context = self.login_user_context(self.super_user)
         self._login_context.__enter__()

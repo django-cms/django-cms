@@ -111,9 +111,18 @@ class BaseCMSTestCase(object):
         custom permissios.
         """
         User = get_user_model()
-        user = User(username=username, email=username+'@django-cms.org',
-                    is_staff=is_staff, is_active=is_active, is_superuser=is_superuser)
-        user.set_password(username)
+
+        fields = dict(email=username+'@django-cms.org',
+            is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
+        )
+
+        # Check for special case where email is used as username
+        if(get_user_model().USERNAME_FIELD != 'email'):
+            fields[get_user_model().USERNAME_FIELD] = username
+
+        user = User(**fields)
+        
+        user.set_password(getattr(user, get_user_model().USERNAME_FIELD))
         user.save()
         if is_staff and not is_superuser and add_default_permissions:
             user.user_permissions.add(Permission.objects.get(codename='add_text'))
@@ -131,7 +140,9 @@ class BaseCMSTestCase(object):
 
     def get_superuser(self):
         try:
-            admin = get_user_model().objects.get(username="admin")
+            query = dict()
+            query[get_user_model().USERNAME_FIELD]="admin"
+            admin = get_user_model().objects.get(**query)
         except get_user_model().DoesNotExist:
             admin = self._create_user("admin", is_staff=True, is_superuser=True)
         return admin

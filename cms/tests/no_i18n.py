@@ -116,11 +116,10 @@ class TestNoI18N(SettingsOverrideTestCase):
             'site': 1,
         }
         # required only if user haves can_change_permission
-        User = get_user_model()
-        self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-        self.super_user.set_password("test")
-        self.super_user.save()
-        self.client.login(username="test", password="test")
+        self.super_user = self._create_user("test", True, True)
+        self.client.login(username=getattr(self.super_user, get_user_model().USERNAME_FIELD),
+                          password=getattr(self.super_user, get_user_model().USERNAME_FIELD))
+
         response = self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
         page = Page.objects.all()[0]
         response = self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)

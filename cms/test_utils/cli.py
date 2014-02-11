@@ -105,7 +105,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.one_thing',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
-            'cms.test_utils.project.customuserapp',
+            #'cms.test_utils.project.customuserapp',
             'cms.test_utils.project.objectpermissionsapp',
             'cms.test_utils.project.extensionapp',
             'south',
@@ -311,8 +311,9 @@ def configure(db_url, **extra):
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
 
-    if django.VERSION >= (1, 5):
-        defaults['AUTH_USER_MODEL'] = 'customuserapp.User'
+    if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in extra:
+        custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
+        defaults['INSTALLED_APPS'].append(custom_user_app)
 
     settings._wrapped = empty
     defaults.update(extra)

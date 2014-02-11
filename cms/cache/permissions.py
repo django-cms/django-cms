@@ -13,8 +13,9 @@ PERMISSION_KEYS = [
 
 
 def get_cache_key(user, key):
+    username = getattr(user, get_user_model().USERNAME_FIELD)
     return "%s:permission:%s:%s" % (
-        get_cms_setting('CACHE_PREFIX'), user.username, key)
+        get_cms_setting('CACHE_PREFIX'), username, key)
 
 def get_cache_version_key():
     return "%s:permission:version" % (get_cms_setting('CACHE_PREFIX'),)

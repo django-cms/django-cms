@@ -42,9 +42,8 @@ class RenderingTestCase(SettingsOverrideTestCase):
     def setUp(self):
         User = get_user_model()
         super(RenderingTestCase, self).setUp()
-        self.test_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-        self.test_user.set_password("test")
-        self.test_user.save()
+        self.test_user = self._create_user("test", True, True)
+        
         with self.login_user_context(self.test_user):
             self.test_data = {
                 'title': u'RenderingTestCase-title',

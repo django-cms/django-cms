@@ -169,7 +169,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             self.assertEqual(response.status_code, 200)
             # check if the admin can see non-public langs
             admin = self.get_superuser()
-            if self.client.login(username=admin.username, password="admin"):
+            if self.client.login(username=getattr(admin, get_user_model().USERNAME_FIELD),
+                                 password=getattr(admin, get_user_model().USERNAME_FIELD)):
                 response = self.client.get("/en/page2/")
                 self.assertEqual(response.status_code, 200)
                 response = self.client.get("/en/page4/")

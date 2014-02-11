@@ -393,7 +393,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         user = getattr(_thread_locals, "user", None)
         if user:
-            self.changed_by = getattr(user, get_user_model().USERNAME_FIELD)
+            try:
+                self.changed_by = getattr(user, get_user_model().USERNAME_FIELD)
+            except AttributeError:
+                # AnonymousUser may not have USERNAME_FIELD
+                self.changed_by = "anonymous"
         else:
             self.changed_by = "script"
         if created:

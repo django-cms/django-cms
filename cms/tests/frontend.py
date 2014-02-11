@@ -2,6 +2,7 @@
 from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
 from django.contrib.sites.models import Site
 from django.db import connections
 from django.utils import unittest
@@ -13,7 +14,7 @@ import os
 from cms.compat import get_user_model
 
 
-class CMSLiveTests(LiveServerTestCase, TestCase):
+class CMSLiveTests(LiveServerTestCase, CMSTestCase):
     @classmethod
     def setUpClass(cls):
         super(CMSLiveTests, cls).setUpClass()
@@ -114,14 +115,16 @@ class CMSLiveTests(LiveServerTestCase, TestCase):
 class ToolbarBasicTests(CMSLiveTests):
 
     def setUp(self):
-        User = get_user_model()
+        self.user = self._create_user('admin', True, True, True)
+
+        #User = get_user_model()
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
-        user = User()
-        user.username = 'admin'
-        user.set_password('admin')
-        user.is_superuser = user.is_staff = user.is_active = True
-        user.save()
+        #user = User()
+        #user.username = 'admin'
+        #user.set_password('admin')
+        #user.is_superuser = user.is_staff = user.is_active = True
+        #user.save()
         self.driver.implicitly_wait(2)
         super(ToolbarBasicTests, self).setUp()
 
@@ -133,9 +136,9 @@ class ToolbarBasicTests(CMSLiveTests):
         self.driver.get(url)
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys('admin')
+        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys('admin')
+        password_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input.submit()
         self.wait_page_loaded()
         self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
@@ -149,9 +152,9 @@ class ToolbarBasicTests(CMSLiveTests):
             driver.get(self.base_url + "/de/")
             driver.find_element_by_id("add-page").click()
             driver.find_element_by_id("id_username").clear()
-            driver.find_element_by_id("id_username").send_keys("admin")
+            driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
             driver.find_element_by_id("id_password").clear()
-            driver.find_element_by_id("id_password").send_keys("admin")
+            driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
             driver.find_element_by_css_selector("input[type=\"submit\"]").click()
             driver.find_element_by_name("_save").click()
             driver.find_element_by_link_text(u"Seite hinzufügen").click()

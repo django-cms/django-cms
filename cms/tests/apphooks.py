@@ -14,11 +14,9 @@ from cms.utils.compat.type_checks import string_types
 from cms.utils.i18n import force_language
 from django.core.urlresolvers import clear_url_caches, reverse
 
-
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
-
 
 class ApphooksTestCase(CMSTestCase):
     def setUp(self):
@@ -192,7 +190,12 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
 
     def test_get_page_for_apphook_on_preview_or_edit(self):
-        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+
+        if get_user_model().USERNAME_FIELD == 'email':
+            superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin@admin.com')
+        else:    
+            superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser, published=True, apphook=APP_NAME)
         create_title('de', page.get_title(), page)
