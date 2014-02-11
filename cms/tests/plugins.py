@@ -25,7 +25,7 @@ from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, Section, ArticlePluginModel
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -152,6 +152,25 @@ class PluginsTestCase(PluginsTestBaseCase):
         txt = Text.objects.all()[0]
         self.assertEquals("Hello World", txt.body)
 
+    def test_plugin_edit_marks_page_dirty(self):
+        page_data = self.get_new_page_data()
+        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.assertEqual(response.status_code, 302)
+        page = Page.objects.all()[0]
+        response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
+        self.assertEqual(response.status_code, 302)
+        created_plugin_id = self._create_text_plugin_on_page(page)
+        page = Page.objects.all()[0]
+        self.assertEqual(page.is_dirty('en'), True)
+        response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
+        self.assertEqual(response.status_code, 302)
+        page = Page.objects.all()[0]
+        self.assertEqual(page.is_dirty('en'), False)
+        txt = self._edit_text_plugin(created_plugin_id, "Hello World")
+        page = Page.objects.all()[0]
+        self.assertEqual(page.is_dirty('en'), True)
+
+
     def test_plugin_order(self):
         """
         Test that plugin position is saved after creation
@@ -168,10 +187,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_plugin_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk)
 
         with SettingsOverride(CMS_PERMISSION=False):
-            self.assertEqual(text_plugin_1.position, 1)
-            self.assertEqual(db_plugin_1.position, 1)
-            self.assertEqual(text_plugin_2.position, 2)
-            self.assertEqual(db_plugin_2.position, 2)
+            self.assertEqual(text_plugin_1.position, 0)
+            self.assertEqual(db_plugin_1.position, 0)
+            self.assertEqual(text_plugin_2.position, 1)
+            self.assertEqual(db_plugin_2.position, 1)
             ## Finally we render the placeholder to test the actual content
             rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url(), page=page_en), None)
             self.assertEquals(rendered_placeholder, "I'm the firstI'm the second")
@@ -368,17 +387,35 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add the text plugin
         mcol1 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
         mcol2 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+        mcol1 = self.reload(mcol1)
         col1 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        mcol1 = self.reload(mcol1)
         col2 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+
+        mcol2 = self.reload(mcol2)
         col3 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
+        mcol2 = self.reload(mcol2)
         col4 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
         mcol1 = add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")
         # add a *nested* link plugin
+        mcol1 = self.reload(mcol1)
+        mcol2 = self.reload(mcol2)
+        col3 = self.reload(col3)
+        col2 = self.reload(col2)
+        col1 = self.reload(col1)
         link_plugin_en = add_plugin(ph_en, "LinkPlugin", "en", target=col2,
                                     name="A Link", url="https://www.django-cms.org")
+        mcol1 = self.reload(mcol1)
+        mcol2 = self.reload(mcol2)
+        col3 = self.reload(col3)
         col2 = self.reload(col2)
+        col1 = self.reload(col1)
         copy_plugins_to([col2, link_plugin_en], ph_de, 'de', mcol1.pk)
+        mcol1 = self.reload(mcol1)
+        mcol2 = self.reload(mcol2)
+        col3 = self.reload(col3)
         col2 = self.reload(col2)
+        col1 = self.reload(col1)
         link_plugin_en = self.reload(link_plugin_en)
         mcol1 = self.reload(mcol1)
         self.assertEquals(mcol1.get_descendants().count(), 2)
