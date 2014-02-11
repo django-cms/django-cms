@@ -63,7 +63,7 @@ class CopyLangCommand(BaseCommand):
 
         for static_placeholder in StaticPlaceholder.objects.all():
             plugin_list = []
-            for plugin in static_placeholder.draft.cmsplugin_set.order_by('tree_id', 'level', 'position'):
+            for plugin in static_placeholder.draft.get_plugins():
                 if plugin.language == from_lang:
                     plugin_list.append(plugin)
 
