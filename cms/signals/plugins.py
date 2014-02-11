@@ -19,7 +19,10 @@ def pre_save_plugins(**kwargs):
         if attached_model == StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=placeholder).update(dirty=True)
     if plugin.pk:
-        old_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+        try:
+            old_plugin = CMSPlugin.objects.get(pk=plugin.pk)
+        except CMSPlugin.DoesNotExist:
+            return
         if old_plugin.placeholder_id != plugin.placeholder_id:
             attached_model = old_plugin.placeholder._get_attached_model()
             if attached_model == Page:
