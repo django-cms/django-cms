@@ -415,7 +415,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         PUBLISHER_STATE_DEFAULT (in publish method).
         """
         keep_state = getattr(self, '_publisher_keep_state', None)
-        if self.publisher_is_draft and not keep_state:
+        if self.publisher_is_draft and not keep_state and self.is_new_dirty():
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
@@ -424,6 +424,24 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             del (kwargs['cls'])
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
+
+    def is_new_dirty(self):
+        if self.pk:
+            fields = [
+                'publication_date', 'publication_end_date', 'in_navigation', 'soft_root', 'reverse_id',
+                'navigation_extenders', 'template', 'login_required', 'limit_visibility_in_menu'
+            ]
+            try:
+                old_page = Page.objects.get(pk=self.pk)
+            except Page.DoesNotExist:
+                return True
+            for field in fields:
+                old_val = getattr(old_page, field)
+                new_val = getattr(self, field)
+                if not old_val == new_val:
+                    return True
+            return False
+        return True
 
     def is_published(self, language, force_reload=False):
         from cms.models import Title
@@ -567,10 +585,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         title = self.title_set.get(language=language)
         public_title = title.publisher_public
         title.published = False
+        title.publisher_state = PUBLISHER_STATE_DIRTY
         title.save()
         if hasattr(self, 'title_cache'):
             self.title_cache[language] = title
         public_title.published = False
+
         public_title.save()
         public_page = self.publisher_public
         public_placeholders = public_page.placeholders.all()

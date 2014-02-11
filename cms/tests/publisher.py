@@ -446,8 +446,10 @@ class PublishingTests(TestCase):
         home = self.reload(home)
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
+        dirty1.in_navigation = True
         dirty1.save()
         home.unpublish('en')
+        dirty2.in_navigation = True
         dirty2.save()
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
@@ -560,6 +562,7 @@ class PublishingTests(TestCase):
         drafts = Page.objects.drafts()
         public = Page.objects.public()
         published = Page.objects.public().published("en")
+        child.in_navigation = True
         child.save()
 
         self.assertTrue(child.is_dirty("en"))

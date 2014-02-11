@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import json
-from cms.api import add_plugin, create_page
+from cms.api import add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
@@ -9,7 +9,6 @@ from cms.utils.compat.dj import force_unicode
 from django.contrib.auth.models import User
 from django.contrib.admin.sites import site
 from django.template.base import Template
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
@@ -56,7 +55,8 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         self.assertObjectDoesNotExist(Placeholder.objects.all(), slot='foobar')
         t = Template('{% load cms_tags %}{% static_placeholder "foobar" %}')
         t.render(self.get_context('/'))
-        self.assertObjectExist(StaticPlaceholder.objects.all(), code='foobar', creation_method=StaticPlaceholder.CREATION_BY_TEMPLATE)
+        self.assertObjectExist(StaticPlaceholder.objects.all(), code='foobar',
+                               creation_method=StaticPlaceholder.CREATION_BY_TEMPLATE)
         self.assertEqual(Placeholder.objects.filter(slot='foobar').count(), 2)
 
     def test_empty(self):
@@ -105,7 +105,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo')
         sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test source')
         targetplugin = add_plugin(static_placeholder_target.draft, 'TextPlugin', 'en', body='test dest')
-
+        StaticPlaceholder.objects.filter(pk=static_placeholder_source.pk).update(dirty=False)
         plugin_class = sourceplugin.get_plugin_class_instance()
         admin = self.get_admin()
 
@@ -133,7 +133,8 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
                         'language': plugin.language, 'placeholder_id': static_placeholder_target.draft.pk
                     }
                 )
-            expected = json.loads(json.dumps({'plugin_list': reduced_list, 'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}))
+            expected = json.loads(
+                json.dumps({'plugin_list': reduced_list, 'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}))
             self.assertEqual(response.status_code, 200)
             self.assertEquals(json.loads(response.content.decode('utf8')), expected)
 
