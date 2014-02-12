@@ -423,7 +423,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(mcol1.get_descendants().count(), 2)
 
     def test_plugin_validation(self):
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoSubPluginRender)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NonExisitngRenderTemplate)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRender)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRenderButChildren)
