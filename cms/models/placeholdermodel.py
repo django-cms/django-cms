@@ -28,12 +28,15 @@ class Placeholder(models.Model):
         return self._get_url('remove_plugin')
 
     def get_changelist_url(self):
-        return self._get_url('changelist')
+        return self._get_url('change')
 
     def _get_url(self, key):
         model = self._get_attached_model()
-        if not model:
-            return reverse('admin:cms_page_%s' % key)
+        if not model or self.page:
+            url_args = (self.page.id, ) if self.page else ()
+            if key == 'change' and not self.page:
+                key = 'changelist'
+            return reverse('admin:cms_page_%s' % key, args=url_args)
         else:
             app_label = model._meta.app_label
             model_name = model.__name__.lower()

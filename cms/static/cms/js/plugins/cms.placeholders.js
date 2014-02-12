@@ -82,7 +82,7 @@ CMS.$(document).ready(function ($) {
 				'data': values,
 				'success': function (response) {
 					// we get the id back
-					that.editPlugin.call(that, values.placeholder_id, response, editUrl);
+					that.editPlugin.call(that, response, editUrl);
 				},
 				'error': function () {
 					throw new Error('CMS.Placeholders was unable to perform this ajax request. Try again or contact the developers.');
@@ -90,7 +90,7 @@ CMS.$(document).ready(function ($) {
 			});
 		},
 		
-		editPlugin: function (placeholder_id, plugin_id, url) {
+		editPlugin: function (plugin_id, url) {
 			var that = this;
 			var frame = this.frame.find('.cms_placeholder-content_inner');
 			var needs_collapsing = false;
@@ -110,7 +110,7 @@ CMS.$(document).ready(function ($) {
 			// for that we create an iframe with the specific url
 			var iframe = $('<iframe />', {
 				'id': 'cms_placeholder-iframe',
-				'src': url + placeholder_id + '/edit-plugin/' + plugin_id + '?popup=true&no_preview',
+				'src': url + 'edit-plugin/' + plugin_id + '?popup=true&no_preview',
 				'style': 'width:100%; height:0; border:none; overflow:auto;',
 				'allowtransparency': true,
 				'scrollbars': 'no',
@@ -567,7 +567,7 @@ CMS.$(document).ready(function ($) {
 				// attach edit event
 				buttons.find('a[rel^=edit]').bind('click', function (e) {
 					e.preventDefault();
-					CMS.API.Placeholders.editPlugin(values.placeholder, values.plugin_id, that.options.urls.change_list);
+					CMS.API.Placeholders.editPlugin(values.plugin_id, that.options.urls.change_list);
 				});
 
 				// attach move event
