@@ -18,6 +18,7 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin
         else:
             plugin_language = old_plugin.language
             # do the simple copying
+
         new_plugin = old_plugin.copy_plugin(to_placeholder, plugin_language, old_parent_cache)
         if first:
             first = False

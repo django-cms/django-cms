@@ -11,6 +11,7 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.test_utils.project.placeholderapp.cms_plugins import EmptyPlugin
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoSubPluginRender, NoRender, NoRenderButChildren
 from djangocms_googlemap.models import GoogleMap
 from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
@@ -423,7 +424,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(mcol1.get_descendants().count(), 2)
 
     def test_plugin_validation(self):
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoSubPluginRender)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NonExisitngRenderTemplate)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRender)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRenderButChildren)
@@ -689,15 +689,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin.save()
 
         plugin_ref_1_base = CMSPlugin(
-            plugin_type='TextPlugin',
+            plugin_type='EmptyPlugin',
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
         plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)
-
-        plugin_ref_1 = Text(body='')
-        plugin_ref_1_base.set_base_attr(plugin_ref_1)
-        plugin_ref_1.save()
+        plugin_ref_1_base.save()
 
         plugin_ref_2_base = CMSPlugin(
             plugin_type='TextPlugin',
@@ -712,7 +709,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_ref_2.save()
 
         plugin.body = ' <img id="plugin_obj_%s" src=""/><img id="plugin_obj_%s" src=""/>' % (
-            str(plugin_ref_1.pk), str(plugin_ref_2.pk))
+            str(plugin_ref_1_base.pk), str(plugin_ref_2.pk))
         plugin.save()
 
         page_data = self.get_new_page_data()
@@ -743,8 +740,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.count(), 6)
-        plugins = list(Text.objects.all())
-        new_plugin = plugins[3]
+        plugins = list(CMSPlugin.objects.all())
+        new_plugin = plugins[3].get_plugin_instance()[0]
         idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
         expected = sorted([plugins[4].pk, plugins[5].pk])
         self.assertEquals(idlist, expected)
