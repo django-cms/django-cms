@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-11 14:31+0100\n"
-"PO-Revision-Date: 2013-12-12 09:10+0000\n"
+"POT-Creation-Date: 2014-02-04 11:15+0100\n"
+"PO-Revision-Date: 2014-02-06 13:41+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/projects/p/django-cms/language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
@@ -33,136 +33,140 @@ msgstr ""
 msgid "Structure"
 msgstr ""
 
-#: cms_toolbar.py:91
+#: cms_toolbar.py:90
 msgid "Users"
 msgstr ""
 
-#: cms_toolbar.py:98
+#: cms_toolbar.py:97
 msgid "Sites"
 msgstr ""
 
-#: cms_toolbar.py:99
+#: cms_toolbar.py:98
 msgid "Admin Sites"
 msgstr ""
 
-#: cms_toolbar.py:105
-msgid "Stacks"
+#: cms_toolbar.py:104
+msgid "Static Placeholders"
 msgstr ""
 
-#: cms_toolbar.py:107
+#: cms_toolbar.py:106
 msgid "Administration"
 msgstr ""
 
-#: cms_toolbar.py:110
+#: cms_toolbar.py:109
 msgid "User settings"
 msgstr ""
 
-#: cms_toolbar.py:113
+#: cms_toolbar.py:112
 msgid "Logout"
 msgstr "Odjavi se"
 
-#: cms_toolbar.py:120 admin/forms.py:72 admin/forms.py:170
+#: cms_toolbar.py:115 admin/forms.py:72 admin/forms.py:156 admin/forms.py:186
 #: models/settingmodels.py:12
 msgid "Language"
 msgstr "Jezik"
 
-#: cms_toolbar.py:168
+#: cms_toolbar.py:166
 msgid "Publish changes"
 msgstr ""
 
-#: cms_toolbar.py:170
+#: cms_toolbar.py:168
 msgid "Publish page now"
 msgstr ""
 
-#: cms_toolbar.py:217
+#: cms_toolbar.py:216
 #, python-format
 msgid "Add %(language)s Translation"
 msgstr ""
 
-#: cms_toolbar.py:231
+#: cms_toolbar.py:230
 #, python-format
 msgid "Delete %(language)s Translation"
 msgstr ""
 
-#: cms_toolbar.py:243
+#: cms_toolbar.py:239
 #, python-format
 msgid "Are you sure you want copy all plugins from %s?"
 msgstr ""
 
-#: cms_toolbar.py:244
+#: cms_toolbar.py:240
 #, python-format
 msgid "Copy all plugins from %s"
 msgstr ""
 
-#: cms_toolbar.py:251
+#: cms_toolbar.py:247
 msgid "Pages"
 msgstr ""
 
-#: cms_toolbar.py:256 templates/admin/cms/page/permissions.html:5
+#: cms_toolbar.py:252 templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "Strana"
 
-#: cms_toolbar.py:257
+#: cms_toolbar.py:253
 msgid "Edit this Page"
 msgstr ""
 
-#: cms_toolbar.py:259
+#: cms_toolbar.py:255 templates/admin/cms/page/tree/menu_item.html:43
 msgid "Page settings"
 msgstr ""
 
-#: cms_toolbar.py:268
+#: cms_toolbar.py:259
 msgid "Templates"
 msgstr ""
 
-#: cms_toolbar.py:279
+#: cms_toolbar.py:269 admin/pageadmin.py:288
+msgid "Publishing dates"
+msgstr ""
+
+#: cms_toolbar.py:274 templates/admin/cms/page/tree/menu_item.html:44
 msgid "Advanced settings"
 msgstr ""
 
-#: cms_toolbar.py:286
+#: cms_toolbar.py:281
 msgid "Permissions"
 msgstr ""
 
-#: cms_toolbar.py:292
+#: cms_toolbar.py:287
 msgid "Hide in navigation"
 msgstr ""
 
-#: cms_toolbar.py:294
+#: cms_toolbar.py:289
 msgid "Display in navigation"
 msgstr ""
 
-#: cms_toolbar.py:299
+#: cms_toolbar.py:295
 msgid "Unpublish page"
 msgstr "obustavljanje objave"
 
-#: cms_toolbar.py:301
+#: cms_toolbar.py:298
 msgid "Publish page"
 msgstr "objavljivanje"
 
-#: cms_toolbar.py:321
+#: cms_toolbar.py:319
 msgid "Delete page"
 msgstr "brisanje"
 
-#: cms_toolbar.py:326 templates/admin/cms/page/history/revision_header.html:10
+#: cms_toolbar.py:324 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
 msgstr "Istorija"
 
-#: cms_toolbar.py:341
+#: cms_toolbar.py:339
 msgid "Undo"
 msgstr ""
 
-#: cms_toolbar.py:342
+#: cms_toolbar.py:340
 msgid "Redo"
 msgstr ""
 
-#: cms_toolbar.py:345
+#: cms_toolbar.py:343
 msgid "Are you sure you want to revert to live?"
 msgstr ""
 
-#: cms_toolbar.py:346
+#: cms_toolbar.py:344
 msgid "Revert to live"
 msgstr ""
 
-#: cms_toolbar.py:348
+#: cms_toolbar.py:346
 msgid "View history"
 msgstr ""
 
@@ -175,7 +179,7 @@ msgid "Generic"
 msgstr "Opšte"
 
 #: plugin_base.py:259
-msgid "There are no further settings for this plugin. Please hit OK to save."
+msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
 #: admin/forms.py:59
@@ -215,7 +219,7 @@ msgstr "Pregaziće ono što je prikazano u vrhu pregledača i markerima."
 msgid "A description of the page used by search engines."
 msgstr "Spisak ključnih reči, zadvojenih zapetama, koji koriste pretraživači."
 
-#: admin/forms.py:73 admin/forms.py:171
+#: admin/forms.py:73 admin/forms.py:157 admin/forms.py:187
 msgid "The current language of the content fields."
 msgstr "Trenutni jezik polja sa sadržajem."
 
@@ -223,267 +227,277 @@ msgstr "Trenutni jezik polja sa sadržajem."
 msgid "Another page with this slug already exists"
 msgstr "Stranica sa zadatim slagom već postoji."
 
-#: admin/forms.py:162
+#: admin/forms.py:178
 msgid "Application"
 msgstr "Applikacija"
 
-#: admin/forms.py:164
+#: admin/forms.py:180
 msgid "Hook application to this page."
 msgstr "Veži aplikaciju za ovu stranu."
 
-#: admin/forms.py:165
+#: admin/forms.py:181
 msgid "Overwrite URL"
 msgstr "Pregazi URL"
 
-#: admin/forms.py:166
+#: admin/forms.py:182
 msgid "Keep this field empty if standard path should be used."
 msgstr "Ostavite ovo polje prazno ako treba koristiti standardnu putanju."
 
-#: admin/forms.py:168
+#: admin/forms.py:184
 msgid "Redirect"
 msgstr "Redirekcija"
 
-#: admin/forms.py:169
+#: admin/forms.py:185
 msgid "Redirects to this URL."
 msgstr "Vrši redirekciju na ovaj URL."
 
-#: admin/forms.py:198
+#: admin/forms.py:214
 msgid "A page with this reverse URL id exists already."
 msgstr "Stranica sa zadatim inverznim URL-om već postoji."
 
-#: admin/forms.py:205
-msgid "You selected an apphook with an \"app_name\". You must enter a namespace."
+#: admin/forms.py:221
+msgid ""
+"You selected an apphook with an \"app_name\". You must enter a instance "
+"name."
 msgstr ""
 
-#: admin/forms.py:208
-msgid "If you enter a namespace you need an application url as well."
+#: admin/forms.py:224
+msgid "If you enter an instance name you need an application url as well."
 msgstr ""
 
-#: admin/forms.py:238 models/permissionmodels.py:40
+#: admin/forms.py:230
+msgid "A instance name with this name already exists."
+msgstr ""
+
+#: admin/forms.py:260 models/permissionmodels.py:40
 msgid "user"
 msgstr "korisnik"
 
-#: admin/forms.py:302
+#: admin/forms.py:324
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "Privilegije za dodavanje strane takođe zahteva pravo pristupa deci ili potomcima. U suprotnom, strana se neće moći menjati od strane njenog tvorca."
 
-#: admin/forms.py:307
+#: admin/forms.py:329
 msgid "Add page permission also requires edit page permission."
 msgstr "Privilegije za dodavanje strane zahtevaju i privilegije za izmenu strane."
 
-#: admin/forms.py:334
+#: admin/forms.py:356
 msgid "can_view"
 msgstr "can_view"
 
-#: admin/forms.py:345
+#: admin/forms.py:367
 msgid "Please select user or group first."
 msgstr "Molimo prvo izaberite korisnika ili grupu."
 
-#: admin/forms.py:352 admin/forms.py:359 admin/forms.py:363
+#: admin/forms.py:374 admin/forms.py:381 admin/forms.py:385
 #: templates/admin/cms/usersettings/change_form.html:8
+#: templatetags/cms_tags.py:657
 msgid "Add"
 msgstr "Dodaj"
 
-#: admin/forms.py:353 admin/forms.py:360 admin/forms.py:364
+#: admin/forms.py:375 admin/forms.py:382 admin/forms.py:386
 #: templates/cms/toolbar/toolbar.html:36
 #: templates/cms/toolbar/items/live_draft.html:7
 msgid "Change"
 msgstr "Izmeni"
 
-#: admin/forms.py:354 admin/forms.py:361 admin/forms.py:365
+#: admin/forms.py:376 admin/forms.py:383 admin/forms.py:387
 #: templates/admin/cms/page/submit_row.html:8
 #: templates/admin/cms/page/plugin/delete_confirmation.html:9
-#: templates/admin/cms/page/tree/menu_item.html:52
-#: templates/cms/toolbar/dragitem_item.html:15
+#: templates/admin/cms/page/tree/menu_item.html:58
+#: templates/cms/toolbar/dragitem.html:15
 msgid "Delete"
 msgstr "Izbriši"
 
-#: admin/forms.py:355
+#: admin/forms.py:377
 msgid "Recover (any) pages"
 msgstr "Povrati (bilo koju) stranu"
 
-#: admin/forms.py:383
+#: admin/forms.py:405
 msgid "Notify user"
 msgstr "Obavesti korisnika"
 
-#: admin/forms.py:385
+#: admin/forms.py:407
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr "Šalji imejl obaveštenja korisnicima pri promeni korisničkog imena ili lozinke. Zahteva imejl adresu korisnika."
 
-#: admin/forms.py:405
+#: admin/forms.py:427
 msgid "New password"
 msgstr "Nova lozinka"
 
-#: admin/forms.py:407
+#: admin/forms.py:429
 msgid "New password confirmation"
 msgstr "Potvrda nove lozinke"
 
-#: admin/forms.py:426
+#: admin/forms.py:448
 msgid "Email notification requires valid email address."
 msgstr "Obaveštenje putem imejla zahteva važeću imejl adresu."
 
-#: admin/forms.py:428
+#: admin/forms.py:450
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "Pravo na kreiranje nove strane zahteva pravo za izmenu strane!"
 
-#: admin/forms.py:430
+#: admin/forms.py:452
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "Pravo na dodavanje novog korisnika zahteva pravo za izmenu kornisika!"
 
-#: admin/forms.py:432
+#: admin/forms.py:454
 msgid "To add permissions you also need to edit them!"
 msgstr "Da biste dodali dozvolu morate je izmeniti!"
 
-#: admin/pageadmin.py:269 templates/admin/cms/page/submit_row.html:10
+#: admin/pageadmin.py:285 templates/admin/cms/page/submit_row.html:10
 msgid "Advanced Settings"
 msgstr "Napredna podešavanja"
 
-#: admin/pageadmin.py:275
+#: admin/pageadmin.py:294
 msgid "Change Permissions"
 msgstr ""
 
-#: admin/pageadmin.py:518
+#: admin/pageadmin.py:539
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plagin dodat u %(placeholder)s"
 
-#: admin/pageadmin.py:525
+#: admin/pageadmin.py:546
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:537
+#: admin/pageadmin.py:558
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s plagin, izmenjen na poziciji %(position)s u %(placeholder)s"
 
-#: admin/pageadmin.py:548
+#: admin/pageadmin.py:569
 msgid "Plugins were moved"
 msgstr ""
 
-#: admin/pageadmin.py:555
+#: admin/pageadmin.py:576
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr "%(plugin_name)s plagin na poziciji %(position)s u %(placeholder)s je uklonjen."
 
-#: admin/pageadmin.py:568
+#: admin/pageadmin.py:589
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 msgstr ""
 
-#: admin/pageadmin.py:587
+#: admin/pageadmin.py:608
 msgid "You do not have permission to change pages."
 msgstr ""
 
-#: admin/pageadmin.py:599
+#: admin/pageadmin.py:620
 msgid "Database error"
 msgstr "Greška baze podataka"
 
-#: admin/pageadmin.py:695 admin/pageadmin.py:736 admin/pageadmin.py:991
-#: admin/pageadmin.py:1027
+#: admin/pageadmin.py:716 admin/pageadmin.py:757 admin/pageadmin.py:1051
+#: admin/pageadmin.py:1087
 msgid "You do not have permission to change this page"
 msgstr "Nemate privilegije da izmenite ovu stranu"
 
-#: admin/pageadmin.py:771
+#: admin/pageadmin.py:792
 msgid "You do not have permission to change the template"
 msgstr ""
 
-#: admin/pageadmin.py:775
+#: admin/pageadmin.py:796
 msgid "Template not valid"
 msgstr ""
 
-#: admin/pageadmin.py:780
+#: admin/pageadmin.py:801
 #, python-format
 msgid "Template changed to %s"
 msgstr ""
 
-#: admin/pageadmin.py:782
+#: admin/pageadmin.py:803
 msgid "The template was successfully changed"
 msgstr ""
 
-#: admin/pageadmin.py:804
+#: admin/pageadmin.py:825
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:808
+#: admin/pageadmin.py:829
 msgid "Page moved"
 msgstr ""
 
-#: admin/pageadmin.py:854 admin/placeholderadmin.py:257
-#: admin/placeholderadmin.py:303
+#: admin/pageadmin.py:875 admin/placeholderadmin.py:245
+#: admin/placeholderadmin.py:291
 msgid "Language must be set to a supported language!"
 msgstr "Jezik mora biti postaljen na jedan od podržanih!"
 
-#: admin/pageadmin.py:859 admin/placeholderadmin.py:322
+#: admin/pageadmin.py:880 admin/placeholderadmin.py:310
 msgid "You do not have permission to copy these plugins."
 msgstr ""
 
-#: admin/pageadmin.py:862
+#: admin/pageadmin.py:883
 #, python-format
 msgid "Copied plugins from %(source_language)s to %(target_language)s"
 msgstr ""
 
-#: admin/pageadmin.py:924 admin/pageadmin.py:1129
+#: admin/pageadmin.py:945
 msgid "You do not have permission to publish this page"
 msgstr "Nemate privilegije da izbrišete ovu stranu"
 
-#: admin/pageadmin.py:939
+#: admin/pageadmin.py:960
 msgid "The content was successfully published."
 msgstr ""
 
-#: admin/pageadmin.py:941
+#: admin/pageadmin.py:969
 msgid "There was a problem publishing your content"
 msgstr ""
 
-#: admin/pageadmin.py:995
+#: admin/pageadmin.py:1020
+msgid "You do not have permission to unpublish this page"
+msgstr ""
+
+#: admin/pageadmin.py:1022
+msgid "This page was never published"
+msgstr ""
+
+#: admin/pageadmin.py:1025
+#, python-format
+msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+msgstr ""
+
+#: admin/pageadmin.py:1055
 #, python-format
 msgid "The page \"%s\" was successfully reverted."
 msgstr ""
 
-#: admin/pageadmin.py:1031
+#: admin/pageadmin.py:1091
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "objekat %(name)s sa primarnim ključem %(key)r ne postoji."
 
-#: admin/pageadmin.py:1037
+#: admin/pageadmin.py:1097
 msgid "There only exists one translation for this page"
 msgstr "Postoji samo jedan prevod ove stranice"
 
-#: admin/pageadmin.py:1066
+#: admin/pageadmin.py:1126
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Naslov i plagin na jeziku %(language)s je obrisan"
 
-#: admin/pageadmin.py:1088 admin/placeholderadmin.py:498
-#: admin/placeholderadmin.py:537
+#: admin/pageadmin.py:1148 admin/placeholderadmin.py:487
+#: admin/placeholderadmin.py:526
 msgid "Are you sure?"
 msgstr "Da li ste sigurni?"
 
-#: admin/pageadmin.py:1138
-#, python-format
-msgid "The page \"%s\" was successfully unpublished"
-msgstr ""
-
-#: admin/pageadmin.py:1140
-#, python-format
-msgid "The page \"%s\" was successfully published"
-msgstr ""
-
-#: admin/pageadmin.py:1167
+#: admin/pageadmin.py:1191
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Nemate privilegije da izmenite status ove strane \"u navigaciji\""
 
-#: admin/pageadmin.py:1200
+#: admin/pageadmin.py:1224
 msgid "You do not have permission to edit this page"
 msgstr ""
 
@@ -516,46 +530,46 @@ msgstr ""
 msgid "You do not have permission to edit this item"
 msgstr ""
 
-#: admin/placeholderadmin.py:233
+#: admin/placeholderadmin.py:221
 msgid "You do not have permission to add a plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:259
+#: admin/placeholderadmin.py:247
 msgid "Parent plugin language must be same as language!"
 msgstr ""
 
-#: admin/placeholderadmin.py:357
+#: admin/placeholderadmin.py:345
 msgid "You do not have permission to edit this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:437
+#: admin/placeholderadmin.py:426
 msgid "You have no permission to move this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:475 admin/placeholderadmin.py:486
+#: admin/placeholderadmin.py:464 admin/placeholderadmin.py:475
 msgid "You do not have permission to delete this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:490
+#: admin/placeholderadmin.py:479
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:496 admin/placeholderadmin.py:535
+#: admin/placeholderadmin.py:485 admin/placeholderadmin.py:524
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: admin/placeholderadmin.py:516 admin/placeholderadmin.py:526
+#: admin/placeholderadmin.py:505 admin/placeholderadmin.py:515
 msgid "You do not have permission to clear this placeholder"
 msgstr ""
 
-#: admin/placeholderadmin.py:530
+#: admin/placeholderadmin.py:519
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:540
+#: admin/placeholderadmin.py:529
 msgid "placeholder"
 msgstr ""
 
@@ -583,7 +597,7 @@ msgstr "Izaberite važeći sajt"
 msgid "Select a valid page"
 msgstr "Izaberite važeću stranicu"
 
-#: forms/widgets.py:143
+#: forms/widgets.py:137
 msgid "Add Another"
 msgstr "Dodaj još"
 
@@ -603,118 +617,115 @@ msgstr "Status moderatora strane"
 msgid "Page moderator states"
 msgstr "Statusi moderatora strane"
 
-#: models/pagemodel.py:37
+#: models/pagemodel.py:38
 msgid "for logged in users only"
 msgstr "samo za prijavljene korisnike"
 
-#: models/pagemodel.py:38
+#: models/pagemodel.py:39
 msgid "for anonymous users only"
 msgstr "samo za anonimne korisnike"
 
-#: models/pagemodel.py:48
+#: models/pagemodel.py:44
 msgid "created by"
 msgstr "kreirao"
 
-#: models/pagemodel.py:49 templates/admin/cms/page/tree/base_header.html:16
+#: models/pagemodel.py:45
 msgid "changed by"
 msgstr "izmenio"
 
-#: models/pagemodel.py:54
+#: models/pagemodel.py:50 templates/admin/cms/page/tree/menu_item.html:65
 msgid "publication date"
 msgstr "datum objavljivanja"
 
-#: models/pagemodel.py:55
+#: models/pagemodel.py:51
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "Da bi se strana objavila, nepophodno je da joj status bude \"Objavljeno\"."
 
-#: models/pagemodel.py:56
+#: models/pagemodel.py:52 templates/admin/cms/page/tree/menu_item.html:66
 msgid "publication end date"
 msgstr "datum okončanja objave"
 
-#: models/pagemodel.py:57
+#: models/pagemodel.py:53
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Kada ističe objava strane. Ostavite prazno ako nikad ne ističe."
 
-#: models/pagemodel.py:59 templates/admin/cms/page/tree/base_header.html:10
+#: models/pagemodel.py:55
 msgid "in navigation"
 msgstr "u navigaciji"
 
-#: models/pagemodel.py:60
+#: models/pagemodel.py:56
 msgid "soft root"
 msgstr "soft root"
 
-#: models/pagemodel.py:61
+#: models/pagemodel.py:57
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Neće svi pretci biti prikazani u navigaciji"
 
-#: models/pagemodel.py:62
+#: models/pagemodel.py:58
 msgid "id"
 msgstr "id"
 
-#: models/pagemodel.py:63
+#: models/pagemodel.py:59
 msgid ""
 "An unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Jedinstveni identifikator koji se koristi sa page_url tagom za linkovanje sa ovom stranicom"
 
-#: models/pagemodel.py:64
+#: models/pagemodel.py:60
 msgid "attached menu"
 msgstr "povezani meni"
 
-#: models/pagemodel.py:65
-msgid "is published"
-msgstr "objavljen"
-
-#: models/pagemodel.py:67 plugins/snippet/models.py:16
+#: models/pagemodel.py:61 plugins/snippet/models.py:16
+#: templates/admin/cms/page/tree/menu_item.html:69
 msgid "template"
 msgstr "šablon"
 
-#: models/pagemodel.py:68
+#: models/pagemodel.py:62
 msgid "The template used to render the content."
 msgstr "Šablon koji se koristi za prikaz sadržaja."
 
-#: models/pagemodel.py:70
+#: models/pagemodel.py:64
 msgid "The site the page is accessible at."
 msgstr "The site the page is accessible at."
 
-#: models/pagemodel.py:70
+#: models/pagemodel.py:64
 msgid "site"
 msgstr "sajt"
 
-#: models/pagemodel.py:72
+#: models/pagemodel.py:67
 msgid "login required"
 msgstr "potrebno prijavljivanje"
 
-#: models/pagemodel.py:73
+#: models/pagemodel.py:68
 msgid "menu visibility"
 msgstr "vidljivost u meniju"
 
-#: models/pagemodel.py:75
+#: models/pagemodel.py:70
 msgid "limit when this page is visible in the menu"
 msgstr "ograniči kada je ova strana vidljiva u meniju"
 
-#: models/pagemodel.py:77
+#: models/pagemodel.py:72
 msgid "application"
 msgstr "aplikacija"
 
-#: models/pagemodel.py:78
-msgid "application namespace"
+#: models/pagemodel.py:73
+msgid "application instance name"
 msgstr ""
 
-#: models/pagemodel.py:104 models/permissionmodels.py:94
-#: models/titlemodels.py:25 plugins/inherit/forms.py:9 plugins/link/forms.py:9
+#: models/pagemodel.py:100 models/permissionmodels.py:94
+#: models/titlemodels.py:27 plugins/inherit/forms.py:9 plugins/link/forms.py:9
 #: plugins/link/models.py:15 plugins/picture/models.py:25
 #: plugins/teaser/models.py:16
 msgid "page"
 msgstr "strana"
 
-#: models/pagemodel.py:105
+#: models/pagemodel.py:101
 msgid "pages"
 msgstr "strane"
 
-#: models/pagemodel.py:793
+#: models/pagemodel.py:799
 msgid "default"
 msgstr "podrazumevano"
 
@@ -830,33 +841,33 @@ msgstr "Grupa korisnika (strana)"
 msgid "User groups (page)"
 msgstr "Grupe korisnika (strana)"
 
-#: models/placeholdermodel.py:15
+#: models/placeholdermodel.py:17
 msgid "slot"
 msgstr "slot"
 
-#: models/placeholdermodel.py:16 plugins/flash/models.py:12
+#: models/placeholdermodel.py:18 plugins/flash/models.py:12
 #: plugins/googlemap/models.py:38 plugins/video/models.py:16
 msgid "width"
 msgstr "širina"
 
-#: models/pluginmodel.py:86
+#: models/pluginmodel.py:75
 msgid "position"
 msgstr "pozicija"
 
-#: models/pluginmodel.py:87 models/titlemodels.py:13
+#: models/pluginmodel.py:76 models/titlemodels.py:15
 #: plugins/inherit/models.py:11
 msgid "language"
 msgstr "jezik"
 
-#: models/pluginmodel.py:88
+#: models/pluginmodel.py:77
 msgid "plugin_name"
 msgstr "plugin_name"
 
-#: models/pluginmodel.py:89 models/titlemodels.py:26
+#: models/pluginmodel.py:78 models/titlemodels.py:28
 msgid "creation date"
 msgstr "datum kreiranja"
 
-#: models/pluginmodel.py:149
+#: models/pluginmodel.py:139
 msgid "<Empty>"
 msgstr "<Prazno>"
 
@@ -872,50 +883,95 @@ msgstr ""
 msgid "user settings"
 msgstr ""
 
-#: models/titlemodels.py:14 models/titlemodels.py:15 models/titlemodels.py:17
+#: models/static_placeholder.py:26 stacks/models.py:26
+msgid "by template"
+msgstr ""
+
+#: models/static_placeholder.py:27 stacks/models.py:27
+msgid "by code"
+msgstr ""
+
+#: models/static_placeholder.py:30
+msgid "static placeholder name"
+msgstr ""
+
+#: models/static_placeholder.py:31
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+#: models/static_placeholder.py:33
+msgid "placeholder code"
+msgstr ""
+
+#: models/static_placeholder.py:34
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+#: models/static_placeholder.py:35
+msgid "placeholder content"
+msgstr ""
+
+#: models/static_placeholder.py:39 stacks/models.py:39
+msgid "creation_method"
+msgstr ""
+
+#: models/static_placeholder.py:44
+msgid "static placeholder"
+msgstr ""
+
+#: models/static_placeholder.py:45
+msgid "static placeholders"
+msgstr ""
+
+#: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
 #: plugins/file/models.py:29 plugins/teaser/models.py:12
-#: templates/admin/cms/page/tree/base_header.html:7
 msgid "title"
 msgstr "naslov"
 
-#: models/titlemodels.py:16
+#: models/titlemodels.py:18
 msgid "overwrite the title (html title tag)"
 msgstr "pregazi naslov (html tag title)"
 
-#: models/titlemodels.py:18
+#: models/titlemodels.py:20
 msgid "overwrite the title in the menu"
 msgstr "pregazi naslov u meniju"
 
-#: models/titlemodels.py:19 plugins/teaser/models.py:23
+#: models/titlemodels.py:21 plugins/teaser/models.py:23
 msgid "description"
 msgstr "opis"
 
-#: models/titlemodels.py:20
+#: models/titlemodels.py:22
 msgid "The text displayed in search engines."
 msgstr ""
 
-#: models/titlemodels.py:21
+#: models/titlemodels.py:23
 msgid "slug"
 msgstr "slag"
 
-#: models/titlemodels.py:22
+#: models/titlemodels.py:24
 msgid "Path"
 msgstr "Putanja"
 
-#: models/titlemodels.py:23
+#: models/titlemodels.py:25
 msgid "has url overwrite"
 msgstr "izabrano prepisivanje url-a"
 
-#: models/titlemodels.py:24
+#: models/titlemodels.py:26
 msgid "redirect"
 msgstr "redirekcija"
 
-#: plugins/utils.py:146
+#: models/titlemodels.py:31
+msgid "is published"
+msgstr "objavljen"
+
+#: plugins/utils.py:207
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr ""
 
-#: plugins/utils.py:156
+#: plugins/utils.py:217
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
@@ -1033,15 +1089,55 @@ msgstr ""
 msgid "Plugin height (in pixels)."
 msgstr ""
 
+#: plugins/googlemap/models.py:43
+msgid "info window"
+msgstr ""
+
+#: plugins/googlemap/models.py:44
+msgid "Show textbox over marker"
+msgstr ""
+
+#: plugins/googlemap/models.py:45
+msgid "scrollwheel"
+msgstr ""
+
+#: plugins/googlemap/models.py:46
+msgid "Enable scrollwheel zooming on the map"
+msgstr ""
+
+#: plugins/googlemap/models.py:47
+msgid "double click zoom"
+msgstr ""
+
 #: plugins/googlemap/models.py:49
+msgid "draggable"
+msgstr ""
+
+#: plugins/googlemap/models.py:50
+msgid "keyboard shortcuts"
+msgstr ""
+
+#: plugins/googlemap/models.py:52
+msgid "Pan control"
+msgstr ""
+
+#: plugins/googlemap/models.py:53
+msgid "zoom control"
+msgstr ""
+
+#: plugins/googlemap/models.py:54
+msgid "Street View control"
+msgstr ""
+
+#: plugins/googlemap/models.py:63
 msgid "Map"
 msgstr "Karta"
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:72
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:83
 msgid "Your address: "
 msgstr "Vaša adresa: "
 
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:74
+#: plugins/googlemap/templates/cms/plugins/googlemap.html:85
 msgid "Calculate route"
 msgstr "Sračunaj rutu"
 
@@ -1187,7 +1283,10 @@ msgstr "HTML"
 #: plugins/snippet/models.py:17
 msgid ""
 "Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr "Unesite ime šablona (na primer \"snippets/plugin_xy.html\") koji treba da se prikazuje. "
+"If \"template\" is given, the contents of field \"HTML\" will be passed as "
+"template variable {{ html }} to the template. Else, the content of \"HTML\" "
+"is rendered."
+msgstr ""
 
 #: plugins/snippet/models.py:27
 msgid "Snippets"
@@ -1302,7 +1401,7 @@ msgstr ""
 msgid "Stack"
 msgstr ""
 
-#: stacks/forms.py:12 templates/admin/cms/page/tree/menu_item.html:42
+#: stacks/forms.py:12 templates/admin/cms/page/tree/menu_item.html:45
 msgid "copy"
 msgstr "kopiraj"
 
@@ -1316,14 +1415,6 @@ msgstr ""
 
 #: stacks/forms.py:17
 msgid "language code"
-msgstr ""
-
-#: stacks/models.py:26
-msgid "by template"
-msgstr ""
-
-#: stacks/models.py:27
-msgid "by code"
 msgstr ""
 
 #: stacks/models.py:30
@@ -1344,10 +1435,6 @@ msgstr ""
 
 #: stacks/models.py:35
 msgid "stack content"
-msgstr ""
-
-#: stacks/models.py:39
-msgid "creation_method"
 msgstr ""
 
 #: stacks/models.py:45
@@ -1379,28 +1466,28 @@ msgstr "Lozinka:"
 msgid "Change a page"
 msgstr "Izmeni stranu"
 
-#: templates/admin/cms/page/change_form.html:48
+#: templates/admin/cms/page/change_form.html:49
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Molimo ispravite navedene greške."
 msgstr[1] "Molimo ispravite navedene greške."
 msgstr[2] "Molimo ispravite navedene greške."
 
-#: templates/admin/cms/page/change_form.html:66
+#: templates/admin/cms/page/change_form.html:67
 msgid "All permissions"
 msgstr "Sva prava"
 
-#: templates/admin/cms/page/change_form.html:67
-#: templates/admin/cms/page/change_form.html:76
-#: templates/admin/cms/page/tree/base.html:90
+#: templates/admin/cms/page/change_form.html:68
+#: templates/admin/cms/page/change_form.html:77
+#: templates/admin/cms/page/tree/base.html:91
 msgid "Loading..."
 msgstr "Učitavanje..."
 
-#: templates/admin/cms/page/change_form.html:75
+#: templates/admin/cms/page/change_form.html:76
 msgid "Page states"
 msgstr "Statusi strane"
 
-#: templates/admin/cms/page/change_form.html:86
+#: templates/admin/cms/page/change_form.html:87
 #: templates/admin/cms/page/submit_row.html:5
 #: templates/admin/cms/page/tree/copy_premissions.html:19
 #: templates/admin/cms/usersettings/change_form.html:16
@@ -1408,7 +1495,7 @@ msgstr "Statusi strane"
 msgid "Save"
 msgstr "Sačuvaj"
 
-#: templates/admin/cms/page/change_form.html:87
+#: templates/admin/cms/page/change_form.html:88
 #: templates/admin/cms/page/submit_row.html:15
 msgid "Save and continue editing"
 msgstr "Sačuvaj i nastavi izmenjivanje"
@@ -1533,69 +1620,58 @@ msgstr "Spisak strana"
 msgid "Search"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:51
+#: templates/admin/cms/page/tree/base.html:53
 msgid "Successfully moved"
 msgstr "Uspešno premešteno"
 
-#: templates/admin/cms/page/tree/base.html:60
+#: templates/admin/cms/page/tree/base.html:62
 msgid "An error occured. Please reload the page"
 msgstr "Došlo je do greške. Molimo osvežite stranu"
 
-#: templates/admin/cms/page/tree/base.html:83
+#: templates/admin/cms/page/tree/base.html:84
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "Povrati obrisano (%(name)s)"
 
-#: templates/admin/cms/page/tree/base.html:86
+#: templates/admin/cms/page/tree/base.html:87
 #, python-format
 msgid "Add %(name)s"
 msgstr "Dodaj %(name)s"
 
-#: templates/admin/cms/page/tree/base.html:98
+#: templates/admin/cms/page/tree/base.html:99
 msgid "Pages on:"
 msgstr "Strana na:"
 
-#: templates/admin/cms/page/tree/base.html:119
+#: templates/admin/cms/page/tree/base.html:120
 msgid "Filter:"
 msgstr "Filter:"
 
-#: templates/admin/cms/page/tree/base.html:119
+#: templates/admin/cms/page/tree/base.html:120
 msgid "on"
 msgstr "ukjlučeno"
 
-#: templates/admin/cms/page/tree/base.html:119
+#: templates/admin/cms/page/tree/base.html:120
 msgid "off"
 msgstr "isključen"
 
-#: templates/admin/cms/page/tree/base.html:121
+#: templates/admin/cms/page/tree/base.html:122
 msgid "Filter"
 msgstr "Filter"
 
-#: templates/admin/cms/page/tree/base_header.html:9
+#: templates/admin/cms/page/tree/base_header.html:10
+msgid "in menu"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base_header.html:11
 msgid "actions"
 msgstr "akcije"
 
-#: templates/admin/cms/page/tree/base_header.html:11
-msgid "published"
-msgstr "objavljeno"
-
 #: templates/admin/cms/page/tree/base_header.html:12
-msgid "start"
-msgstr "početak"
+#: templates/admin/cms/page/tree/menu_item.html:63
+msgid "info"
+msgstr ""
 
-#: templates/admin/cms/page/tree/base_header.html:13
-msgid "end"
-msgstr "kraj"
-
-#: templates/admin/cms/page/tree/base_header.html:14
-msgid "restricted"
-msgstr "ograničеnja"
-
-#: templates/admin/cms/page/tree/base_header.html:15
-msgid "last changes"
-msgstr "poslednje izmene"
-
-#: templates/admin/cms/page/tree/base_header.html:30
+#: templates/admin/cms/page/tree/base_header.html:26
 msgid ""
 "<em>There is no page around yet.</em><br /><a href=\"add/\" "
 "class=\"addlink\">Add page</a> now."
@@ -1618,88 +1694,78 @@ msgid "select this page"
 msgstr "izaberi ovu stranu"
 
 #: templates/admin/cms/page/tree/menu_item.html:6
-#: templates/admin/cms/page/tree/menu_item.html:7
 msgid "edit this page"
 msgstr "izmeni ovu stranu"
 
-#: templates/admin/cms/page/tree/menu_item.html:7
-msgid "edit"
-msgstr "izmeni"
-
-#: templates/admin/cms/page/tree/menu_item.html:17
+#: templates/admin/cms/page/tree/menu_item.html:16
 msgid "insert above"
 msgstr "ubaci iznad"
 
-#: templates/admin/cms/page/tree/menu_item.html:18
+#: templates/admin/cms/page/tree/menu_item.html:17
 msgid "insert below"
 msgstr "ubaci ispod"
 
-#: templates/admin/cms/page/tree/menu_item.html:20
+#: templates/admin/cms/page/tree/menu_item.html:19
 msgid "insert inside"
 msgstr "ubaci unutra"
 
-#: templates/admin/cms/page/tree/menu_item.html:24
+#: templates/admin/cms/page/tree/menu_item.html:23
 msgid "softroot"
 msgstr "softroot"
 
-#: templates/admin/cms/page/tree/menu_item.html:24
+#: templates/admin/cms/page/tree/menu_item.html:23
 msgid "home"
 msgstr "početna"
 
-#: templates/admin/cms/page/tree/menu_item.html:25
+#: templates/admin/cms/page/tree/menu_item.html:24
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:30
+#: templates/admin/cms/page/tree/menu_item.html:28
 #, python-format
 msgid "Edit this page in %(language)s "
 msgstr "Izmeni stranu na jeziku %(language)s"
 
-#: templates/admin/cms/page/tree/menu_item.html:40
-#: templates/cms/toolbar/dragitem_item.html:13
-msgid "Cut"
-msgstr "Iseci"
+#: templates/admin/cms/page/tree/menu_item.html:43
+msgid "page settings"
+msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:40
-msgid "cut"
-msgstr "iseci"
-
-#: templates/admin/cms/page/tree/menu_item.html:42
-#: templates/cms/toolbar/dragitem_item.html:12
+#: templates/admin/cms/page/tree/menu_item.html:45
+#: templates/cms/toolbar/dragitem.html:12
 msgid "Copy"
 msgstr "Kopiraj"
 
-#: templates/admin/cms/page/tree/menu_item.html:45
-#: templates/admin/cms/page/tree/menu_item.html:49
+#: templates/admin/cms/page/tree/menu_item.html:48
+#: templates/admin/cms/page/tree/menu_item.html:52
 msgid "Add Child"
 msgstr "Dodaj dete"
 
-#: templates/admin/cms/page/tree/menu_item.html:45
-#: templates/admin/cms/page/tree/menu_item.html:49
+#: templates/admin/cms/page/tree/menu_item.html:48
+#: templates/admin/cms/page/tree/menu_item.html:52
 msgid "add"
 msgstr "dodaj"
 
-#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/admin/cms/page/tree/menu_item.html:56
+#: templates/cms/toolbar/dragitem.html:13
+msgid "Cut"
+msgstr "Iseci"
+
+#: templates/admin/cms/page/tree/menu_item.html:56
+msgid "cut"
+msgstr "iseci"
+
+#: templates/admin/cms/page/tree/menu_item.html:58
 msgid "delete"
 msgstr "izbriši"
 
-#: templates/admin/cms/page/tree/menu_item.html:65
-msgid "Unpublish"
-msgstr "Povuci objavu"
+#: templates/admin/cms/page/tree/menu_item.html:67
+msgid "is restricted"
+msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:66
-#: templates/admin/cms/page/tree/menu_item.html:80
-msgid "Publish"
-msgstr "Objavi"
-
-#: templates/admin/cms/page/tree/menu_item.html:71
-msgid "View on page"
-msgstr "Prikaži na strani"
-
-#: templates/admin/cms/page/tree/menu_item.html:71
-msgid "view"
-msgstr "prikaži"
+#: templates/admin/cms/page/tree/menu_item.html:68
+msgid "last change by"
+msgstr ""
 
 #: templates/admin/stacks/insert_stack.html:4
 #: templates/admin/stacks/insert_stack.html:24
@@ -1710,13 +1776,11 @@ msgstr ""
 msgid "Empty Clipboard"
 msgstr ""
 
-#: templates/cms/toolbar/dragbar.html:7
-#: templates/cms/toolbar/dragitem_item.html:9
+#: templates/cms/toolbar/dragbar.html:7 templates/cms/toolbar/dragitem.html:9
 msgid "Quicksearch"
 msgstr ""
 
-#: templates/cms/toolbar/dragbar.html:9
-#: templates/cms/toolbar/dragitem_item.html:11
+#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:11
 msgid "Settings"
 msgstr ""
 
@@ -1724,24 +1788,20 @@ msgstr ""
 msgid "Copy all"
 msgstr ""
 
-#: templates/cms/toolbar/dragbar.html:11
+#: templates/cms/toolbar/dragbar.html:12
+msgid "Copy from"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:14
 msgid "Empty all"
 msgstr ""
 
-#: templates/cms/toolbar/dragbar.html:12
-#: templates/cms/toolbar/dragitem_item.html:16
-msgid "Create stack"
-msgstr ""
-
-#: templates/cms/toolbar/dragbar.html:13
-msgid "Insert stack"
-msgstr ""
-
-#: templates/cms/toolbar/dragbar.html:23
+#: templates/cms/toolbar/dragbar.html:30
 msgid "Drop a plugin here"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem_item.html:14 templatetags/cms_tags.py:679
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:652
+#: templatetags/cms_tags.py:655
 msgid "Edit"
 msgstr ""
 
@@ -1771,28 +1831,33 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:33
+#: templates/cms/toolbar/toolbar_javascript.html:34
 #, python-format
 msgid "Development version using django CMS %(cms_version)s"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:34
+#: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Cancel"
 msgstr "Odustani"
 
-#: templates/cms/toolbar/toolbar_javascript.html:35
-msgid "<strong>The following error occured:</stron> "
-msgstr ""
-
 #: templates/cms/toolbar/toolbar_javascript.html:36
-msgid "Action successfull... reloading."
+msgid "The following error occured:"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:37
+msgid "Action successfull... reloading."
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:38
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Da li ste sigurni da želite da izbrišete ovaj plagin?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:55
+#: templates/cms/toolbar/toolbar_javascript.html:56
+msgid ""
+"<strong>Login failed.</strong> Please check your credentials and try again."
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:57
 msgid "This page has unpublished changes."
 msgstr ""
 
@@ -1800,74 +1865,93 @@ msgstr ""
 msgid "Username"
 msgstr "Korisničko ime"
 
-#: templates/cms/toolbar/items/login.html:15
-msgid ""
-"<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr ""
-
 #: templates/cms/toolbar/items/logo.html:2
 msgid "django CMS"
 msgstr "django CMS"
 
-#: templatetags/cms_admin.py:135 templatetags/cms_admin.py:142
-#, python-format
-msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
-msgstr "<span title=\"Ograničenja: %(title)s\">%(icon)s</span>"
+#: templatetags/cms_admin.py:74
+msgid "unpublished changes"
+msgstr ""
 
-#: templatetags/cms_tags.py:99
+#: templatetags/cms_admin.py:77
+msgid "published"
+msgstr "objavljeno"
+
+#: templatetags/cms_admin.py:84
+msgid "unpublished parent"
+msgstr ""
+
+#: templatetags/cms_admin.py:87
+msgid "unpublished"
+msgstr ""
+
+#: templatetags/cms_admin.py:90
+msgid "no content"
+msgstr ""
+
+#: templatetags/cms_admin.py:175 templatetags/cms_admin.py:181
+#, python-format
+msgid "<span>%(icon)s</span>"
+msgstr ""
+
+#: templatetags/cms_tags.py:103
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr "Strana nije pronađena na %(domain)s"
 
-#: templatetags/cms_tags.py:100
+#: templatetags/cms_tags.py:104
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr "Template tag ne može pronaći stranu sa parametrima `%(page_lookup)s\n`. URL je bio: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:119 test_utils/cli.py:130
+#: test_utils/cli.py:123 test_utils/cli.py:134
 msgid "English"
 msgstr ""
 
-#: test_utils/cli.py:120 test_utils/cli.py:142 test_utils/cli.py:165
+#: test_utils/cli.py:124 test_utils/cli.py:146 test_utils/cli.py:169
 msgid "French"
 msgstr ""
 
-#: test_utils/cli.py:121 test_utils/cli.py:136 test_utils/cli.py:159
-#: test_utils/cli.py:178
+#: test_utils/cli.py:125 test_utils/cli.py:140 test_utils/cli.py:163
+#: test_utils/cli.py:182
 msgid "German"
 msgstr ""
 
-#: test_utils/cli.py:122 test_utils/cli.py:147
+#: test_utils/cli.py:126 test_utils/cli.py:151
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:123 test_utils/cli.py:172
+#: test_utils/cli.py:127 test_utils/cli.py:176
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:188
+#: test_utils/cli.py:192
 msgid "two columns"
 msgstr ""
 
-#: test_utils/cli.py:189
+#: test_utils/cli.py:193
 msgid "three columns"
 msgstr ""
 
-#: test_utils/cli.py:190
+#: test_utils/cli.py:194
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:198
+#: test_utils/cli.py:202
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:204
+#: test_utils/cli.py:208
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:216
+#: test_utils/cli.py:213
+msgid "Add a link"
+msgstr ""
+
+#: test_utils/cli.py:220
 msgid "right column"
 msgstr "background color"
 
@@ -1899,7 +1983,7 @@ msgstr ""
 msgid "Extra Context"
 msgstr ""
 
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
+#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:11
 msgid "Articles"
 msgstr ""
 
