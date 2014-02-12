@@ -65,7 +65,7 @@ class PageForm(forms.ModelForm):
     page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
                                  help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
                                  required=False)
-    meta_description = forms.CharField(label='Description meta tag', required=False,
+    meta_description = forms.CharField(label=_('Description meta tag'), required=False,
                                        widget=forms.Textarea(attrs={'maxlength': '155', 'rows': '4'}),
                                        help_text=_('A description of the page used by search engines.'),
                                        max_length=155)
@@ -142,7 +142,7 @@ class PageForm(forms.ModelForm):
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
         if not slug:
-            raise ValidationError("Slug must not be empty.")
+            raise ValidationError(_("Slug must not be empty."))
         return slug
 
     def clean_language(self):

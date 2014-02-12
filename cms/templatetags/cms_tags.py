@@ -563,7 +563,7 @@ class CMSToolbar(RenderBlock):
         toolbar = getattr(request, 'toolbar', None)
         context['cms_version'] = __version__
         if toolbar and toolbar.show_toolbar:
-            language = toolbar.language
+            language = toolbar.toolbar_language
             with force_language(language):
                 js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
                 clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
@@ -581,9 +581,8 @@ class CMSToolbar(RenderBlock):
         if not toolbar.show_toolbar:
             return rendered_contents
         # render the toolbar content
-
+        request.toolbar.post_template_populate()
         with force_language(language):
-            request.toolbar.post_template_populate()
             context['clipboard'] = clipboard
             content = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below

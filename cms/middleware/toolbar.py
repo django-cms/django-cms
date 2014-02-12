@@ -18,9 +18,10 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     if plugin_class.allow_children:
         inst, plugin = instance.get_plugin_instance()
         page = original_context['request'].current_page
-        childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(placeholder, page)]
+        children = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(placeholder, page)]
         # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-        child_plugin_classes = get_toolbar_plugin_struct(childs, placeholder.slot, placeholder.page, parent=plugin_class)
+        child_plugin_classes = get_toolbar_plugin_struct(children, placeholder.slot, placeholder.page,
+                                                         parent=plugin_class)
     instance.placeholder = placeholder
     request = original_context['request']
     with force_language(request.toolbar.toolbar_language):
@@ -65,11 +66,9 @@ class ToolbarMiddleware(object):
             request.session['cms_build'] = True
         request.toolbar = CMSToolbar(request)
 
-
     def process_view(self, request, view_func, view_args, view_kwarg):
         response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
-        request.toolbar.populate()
         return None
 
