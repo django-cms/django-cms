@@ -597,7 +597,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
         if not self.has_change_permission(request, None):
-            return HttpResponseForbidden(_("You do not have permission to change pages."))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to change pages.")))
         try:
             cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
                                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page,
@@ -705,7 +705,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to change this page"))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page")))
         versions = reversion.get_for_object(page)
         if page.revision_id:
             current_revision = Revision.objects.get(pk=page.revision_id)
@@ -746,7 +746,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to change this page"))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page")))
         versions = reversion.get_for_object(page)
         if page.revision_id:
             current_revision = Revision.objects.get(pk=page.revision_id)
@@ -781,18 +781,18 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
     def change_template(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
         if not page.has_change_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to change the template"))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to change the template")))
 
         to_template = request.POST.get("template", None)
         if to_template not in dict(get_cms_setting('TEMPLATES')):
-            return HttpResponseBadRequest(_("Template not valid"))
+            return HttpResponseBadRequest(force_unicode(_("Template not valid")))
 
         page.template = to_template
         page.save()
         if "reversion" in settings.INSTALLED_APPS:
             message = _("Template changed to %s") % dict(get_cms_setting('TEMPLATES'))[to_template]
             helpers.make_revision_with_plugins(page, request.user, message)
-        return HttpResponse(_("The template was successfully changed"))
+        return HttpResponse(force_unicode(_("The template was successfully changed")))
 
     @transaction.commit_on_success
     def move_page(self, request, page_id, extra_context=None):
@@ -814,7 +814,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         if not page.has_move_page_permission(request) or \
                 not target.has_add_permission(request):
             return jsonify_request(
-                HttpResponseForbidden(_("Error! You don't have permissions to move this page. Please reload the page")))
+                HttpResponseForbidden(force_unicode(_("Error! You don't have permissions to move this page. Please reload the page"))))
             # move page
         page.move_page(target, position)
         if "reversion" in settings.INSTALLED_APPS:
@@ -864,12 +864,12 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             placeholders = page.placeholders.all()
 
             if not target_language or not target_language in get_language_list():
-                return HttpResponseBadRequest(_("Language must be set to a supported language!"))
+                return HttpResponseBadRequest(force_unicode(_("Language must be set to a supported language!")))
             for placeholder in placeholders:
                 plugins = list(
                     placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
                 if not self.has_copy_plugin_permission(request, placeholder, placeholder, plugins):
-                    return HttpResponseForbidden(_('You do not have permission to copy these plugins.'))
+                    return HttpResponseForbidden(force_unicode(_('You do not have permission to copy these plugins.')))
                 copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             if page and "reversion" in settings.INSTALLED_APPS:
                 message = _(u"Copied plugins from %(source_language)s to %(target_language)s") % {
@@ -924,7 +924,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         all_published = True
         if page:
             if not page.has_publish_permission(request):
-                return HttpResponseForbidden(_("You do not have permission to publish this page"))
+                return HttpResponseForbidden(force_unicode(_("You do not have permission to publish this page")))
             published = page.publish(language)
             if not published:
                 all_published = False
@@ -999,9 +999,9 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         site = Site.objects.get_current()
         page = get_object_or_404(Page, pk=page_id)
         if not page.has_publish_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to unpublish this page"))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to unpublish this page")))
         if not page.publisher_public_id:
-            return HttpResponseForbidden(_("This page was never published"))
+            return HttpResponseForbidden(force_unicode(_("This page was never published")))
         try:
             page.unpublish(language)
             message = _('The %(language)s page "%(page)s" was successfully unpublished') % {
@@ -1030,7 +1030,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         page = get_object_or_404(Page, id=page_id)
         # ensure user has permissions to publish this page
         if not page.has_change_permission(request):
-            return HttpResponseForbidden(_("You do not have permission to change this page"))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page")))
 
         page.revert(language)
 
@@ -1066,7 +1066,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             obj = None
 
         if not self.has_delete_permission(request, obj):
-            return HttpResponseForbidden(_("You do not have permission to change this page"))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page")))
 
         if obj is None:
             raise Http404(
@@ -1170,7 +1170,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             page.in_navigation = not page.in_navigation
             page.save()
             return admin_utils.render_admin_menu_item(request, page)
-        return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
+        return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page's in_navigation status")))
 
     def descendants(self, request, page_id):
         """
@@ -1203,7 +1203,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
         if not has_generic_permission(title.page.pk, request.user, "change",
                                       title.page.site.pk):
-            return HttpResponseForbidden(_("You do not have permission to edit this page"))
+            return HttpResponseForbidden(force_unicode(_("You do not have permission to edit this page")))
 
         class PageTitleForm(django.forms.ModelForm):
             """
