@@ -44,7 +44,7 @@ def pre_delete_plugins(**kwargs):
             Title.objects.filter(page=plugin.placeholder.page, language=plugin.language).update(
                 publisher_state=PUBLISHER_STATE_DIRTY)
         if attached_model == StaticPlaceholder:
-            StaticPlaceholder.filter(draft=plugin.placeholder_id).update(dirty=True)
+            StaticPlaceholder.objects.filter(draft=plugin.placeholder_id).update(dirty=True)
 
 
 def post_delete_plugins(**kwargs):
