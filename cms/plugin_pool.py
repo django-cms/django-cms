@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 from django.db.models import signals
+from django.template import TemplateDoesNotExist
 import warnings
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
@@ -42,6 +42,41 @@ class PluginPool(object):
                 "CMS Plugins must be subclasses of CMSPluginBase, %r is not."
                 % plugin
             )
+        if plugin.render_plugin:
+            if not plugin.render_template and not hasattr(plugin.model, 'render_template'):
+                raise ImproperlyConfigured(
+                    "CMS Plugins must define a render template or set render_plugin=False: %s"
+                    % plugin
+                )
+            else:
+                from django.template import loader
+
+                template = hasattr(plugin.model,
+                                   'render_template') and plugin.model.render_template or plugin.render_template
+                try:
+                    t = loader.get_template(plugin.render_template)
+                except TemplateDoesNotExist:
+                    raise ImproperlyConfigured(
+                        "CMS Plugins must define a render template (%s) that exist: %s"
+                        % (plugin, template)
+                    )
+                if plugin.allow_children:
+                    found = False
+                    from cms.templatetags.cms_tags import RenderPlugin
+                    for node in t:
+                        if isinstance(node, RenderPlugin):
+                            found = True
+                    if not found:
+                        raise ImproperlyConfigured(
+                            "CMS Plugins that define allow_children=True must render the children correctly with {%% render_plugin %%}: %s"
+                            % (plugin)
+                        )
+        else:
+            if plugin.allow_children:
+                raise ImproperlyConfigured(
+                    "CMS Plugins can not define render_plugin=False and allow_children=True: %s"
+                    % plugin
+                )
         plugin_name = plugin.__name__
         if plugin_name in self.plugins:
             raise PluginAlreadyRegistered(

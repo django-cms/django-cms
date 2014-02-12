@@ -6,6 +6,7 @@ from django.conf import settings
 class EmptyPlugin(CMSPluginBase):
     name = _("Test Plugin")
     text_enabled = True
+    render_template = 'cms/content.html'
 
     def render(self, context, instance, placeholder):
         return context
