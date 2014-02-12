@@ -120,4 +120,4 @@ mode, add plugins, move them around and delete them again. Go mess with
 it and see how awesome it is!
 
 You can now start with an easy introduction into django CMS here:
-:doc:`../templates`.
+:doc:`../tutorial/index`.

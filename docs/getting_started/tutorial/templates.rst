@@ -104,6 +104,6 @@ Here's a basic example:
         {% show_menu 0 100 100 100 %}
     </ul>
 
-You should definitely check out the CMS' documentation on :doc:`navigation`.
+You should definitely check out the CMS' documentation on :doc:`../resources/navigation`.
 
 In the next step we're going to talk about :doc:`plugins`.
