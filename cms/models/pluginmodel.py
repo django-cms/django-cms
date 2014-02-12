@@ -254,7 +254,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         try:
             plugin_instance, cls = self.get_plugin_instance()
         except KeyError:  # plugin type not found anymore
-            raise
             return
 
         # set up some basic attributes on the new_plugin
