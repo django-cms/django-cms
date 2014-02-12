@@ -637,6 +637,21 @@ allow_children
 Default: False
 
 Can this plugin have child plugins? Or can other plugins be placed inside this plugin?
+If set to True you are responsible to render the children in your plugin template.
+
+Please use something like this or something similar::
+
+    {% load cms_tags %}
+    <div class="myplugin">
+    {{ instance.my_content }}
+    {% for plugin in instance.child_plugin_instances %}
+         {% render_plugin plugin %}
+    {% endfor %}
+    </div>
+
+
+Be sure to access ``instance.child_plugin_instances`` to get all children. They are pre-filled
+and ready to use. To finally render your child plugins use the ``{% render_plugin %}`` templatetag.
 
 
 child_classes

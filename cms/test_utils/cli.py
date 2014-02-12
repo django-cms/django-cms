@@ -101,6 +101,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.pluginapp.plugins.meta',
             'cms.test_utils.project.pluginapp.plugins.one_thing',
+
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
             'cms.test_utils.project.objectpermissionsapp',
