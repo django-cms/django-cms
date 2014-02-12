@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.compat.type_checks import string_types
 from django.db.models import signals
 from django.template import TemplateDoesNotExist
 from django.template.loader import find_template
@@ -54,13 +55,14 @@ class PluginPool(object):
 
                 template = hasattr(plugin.model,
                                    'render_template') and plugin.model.render_template or plugin.render_template
-                try:
-                    loader.get_template(template)
-                except TemplateDoesNotExist:
-                    raise ImproperlyConfigured(
-                        "CMS Plugins must define a render template (%s) that exist: %s"
-                        % (plugin, template)
-                    )
+                if isinstance(template, string_types) and template:
+                    try:
+                        loader.get_template(template)
+                    except TemplateDoesNotExist:
+                        raise ImproperlyConfigured(
+                            "CMS Plugins must define a render template (%s) that exist: %s"
+                            % (plugin, template)
+                        )
         else:
             if plugin.allow_children:
                 raise ImproperlyConfigured(
