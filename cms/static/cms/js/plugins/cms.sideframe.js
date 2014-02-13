@@ -185,6 +185,11 @@ $(document).ready(function () {
 				} else {
 					this.sideframe.animate({ 'width': width }, 0);
 					this.body.animate({ 'margin-left': width }, 0);
+					// reset width if larger than available space
+					if(width >= $(window).width()) {
+						this.sideframe.animate({ 'width': $(window).width() - 20 }, 0);
+						this.body.animate({ 'margin-left': $(window).width() - 20 }, 0);
+					}
 				}
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
