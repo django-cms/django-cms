@@ -308,8 +308,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
         # should include P3 as well
         self.assertEqual(len(nodes[0].children), 1)
-        # but not P1 as it's at the root_level
-        self.assertEqual(nodes[0].parent, None)
 
         context = self.get_context(path=self.get_page(2).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
