@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.utils.compat.type_checks import string_types
 from django.db.models import signals
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.loader import find_template
 import warnings
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
@@ -63,6 +63,8 @@ class PluginPool(object):
                             "CMS Plugins must define a render template (%s) that exist: %s"
                             % (plugin, template)
                         )
+                    except TemplateSyntaxError:
+                        pass
         else:
             if plugin.allow_children:
                 raise ImproperlyConfigured(
