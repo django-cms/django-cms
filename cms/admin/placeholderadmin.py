@@ -444,7 +444,7 @@ class PlaceholderAdmin(ModelAdmin):
             child.placeholder = placeholder
             child.language = language
             child.save()
-        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder).order_by('position')
+        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder, language=language).order_by('position')
         x = 0
         for level_plugin in plugins:
             if order:
