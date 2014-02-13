@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.contrib.sites.models import Site
-from django.db import DatabaseError
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.forms.fields import EMPTY_VALUES
@@ -8,20 +6,22 @@ from cms.models.pagemodel import Page
 from cms.forms.widgets import PageSelectWidget
 from cms.forms.utils import get_site_choices, get_page_choices
 
+
 class SuperLazyIterator(object):
     def __init__(self, func):
         self.func = func
-        
+
     def __iter__(self):
         return iter(self.func())
 
-class LazyChoiceField(forms.ChoiceField):
 
+class LazyChoiceField(forms.ChoiceField):
     def _set_choices(self, value):
         # we overwrite this function so no list(value) is called
         self._choices = self.widget.choices = value
 
     choices = property(forms.ChoiceField._get_choices, _set_choices)
+
 
 class PageSelectFormField(forms.MultiValueField):
     widget = PageSelectWidget
@@ -47,7 +47,7 @@ class PageSelectFormField(forms.MultiValueField):
     def compress(self, data_list):
         if data_list:
             page_id = data_list[1]
-            
+
             if page_id in EMPTY_VALUES:
                 if not self.required:
                     return None
@@ -56,5 +56,7 @@ class PageSelectFormField(forms.MultiValueField):
         return None
 
 
-class PlaceholderFormField(forms.Field):
-    pass
+
+
+    class PlaceholderFormField(forms.Field):
+        pass
