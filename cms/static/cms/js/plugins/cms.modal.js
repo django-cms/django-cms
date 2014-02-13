@@ -324,8 +324,8 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-shim').show();
 
 			$(document).bind('mousemove.cms', function (e) {
-				var left = position.left - (initial.pageX - e.pageX) - $(window).scrollLeft();
-				var top = position.top - (initial.pageY - e.pageY) - $(window).scrollTop();
+				var left = position.left - (initial.pageX - e.pageX);
+				var top = position.top - (initial.pageY - e.pageY);
 
 				that.modal.css({
 					'left': left,
@@ -371,9 +371,11 @@ $(document).ready(function () {
 				});
 				that.modal.css({
 					'left': modalLeft + mvX,
-					'top': modalTop + mvY - $(window).scrollTop()
+					'top': modalTop + mvY
 				});
 			});
+
+			console.log($(window).scrollTop());
 		},
 
 		_endResize: function () {
