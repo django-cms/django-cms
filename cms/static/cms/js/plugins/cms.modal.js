@@ -114,8 +114,8 @@ $(document).ready(function () {
 				'margin-right': 0
 			});
 			// lets set the modal width and height to the size of the browser
-			var widthOffset = 300;
-			var heightOffset = 350;
+			var widthOffset = 300; // adds margin left and right
+			var heightOffset = 350; // adds margin top and bottom;
 			var screenWidth = $(window).width(); // it has to be the height of the window not computer screen
 			var screenHeight = $(window).height(); // it has to be the height of the window and not computer screen
 
@@ -128,9 +128,8 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 			this.modal.find('.cms_modal-maximize').removeClass('cms_modal-maximize-active');
 			this.maximized = false;
-			
 			// in case, the window is larger than the windows height, we trigger fullscreen mode
-			if(screenHeight <= height + heightOffset) this.triggerMaximized = true;
+			if(height >= screenHeight) this.triggerMaximized = true;
 
 			// we need to render the breadcrumb
 			this._setBreadcrumb(breadcrumb);
