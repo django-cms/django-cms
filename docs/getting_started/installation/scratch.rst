@@ -56,7 +56,7 @@ a while :)
 
 .. code:: bash
 
-    (env) $ djangocms -p . my_demo
+    (env) $ djangocms --parent-dir . my_demo
 
 Windows
 ```````

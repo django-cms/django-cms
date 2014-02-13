@@ -75,7 +75,6 @@ Resources
     getting_started/resources/navigation
     getting_started/resources/plugin_reference
     getting_started/resources/using_south
-    getting_started/resources/using_south
     faq/common_issues
 
 
