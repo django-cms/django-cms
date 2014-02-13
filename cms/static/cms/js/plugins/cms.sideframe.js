@@ -255,12 +255,14 @@ $(document).ready(function () {
 
 		_startResize: function () {
 			var that = this;
+			var outerOffset = 20;
 			var timer = function () {};
 			// this prevents the iframe from being focusable
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
 
 			$(document).bind('mousemove.cms', function (e) {
 				if(e.clientX <= 320) e.clientX = 320;
+				if(e.clientX >= $(window).width() - outerOffset) e.clientX = $(window).width() - outerOffset;
 
 				that.sideframe.css('width', e.clientX);
 				that.body.css('margin-left', e.clientX);
