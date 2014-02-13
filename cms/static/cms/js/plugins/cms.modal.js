@@ -17,7 +17,7 @@ $(document).ready(function () {
 				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
 			},
 			'minHeight': 400,
-			'minWidth': 600,
+			'minWidth': 800,
 			'onClose': false,
 			'newPlugin': false
 		},
@@ -37,6 +37,7 @@ $(document).ready(function () {
 			this.minimized = false;
 			this.enforceReload = false;
 			this.enforceClose = false;
+			this.triggerMaximized = false;
 
 			// if the modal is initialized the first time, set the events
 			if(!this.modal.data('ready')) this._events();
@@ -115,8 +116,11 @@ $(document).ready(function () {
 			// lets set the modal width and height to the size of the browser
 			var widthOffset = 300;
 			var heightOffset = 350;
-			var width = (screen.width >= this.options.minWidth + widthOffset) ? screen.width - widthOffset : this.options.minWidth;
-			var height = (screen.height >= this.options.minHeight + heightOffset) ? screen.height - heightOffset : this.options.minHeight;
+			var screenWidth = $(window).width(); // it has to be the height of the window not computer screen
+			var screenHeight = $(window).height(); // it has to be the height of the window and not computer screen
+
+			var width = (screenWidth >= this.options.minWidth + widthOffset) ? screenWidth - widthOffset : this.options.minWidth;
+			var height = (screenHeight >= this.options.minHeight + heightOffset) ? screenHeight - heightOffset : this.options.minHeight;
 			this.modal.find('.cms_modal-body').css({
 				'width': width,
 				'height': height
@@ -124,6 +128,9 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
 			this.modal.find('.cms_modal-maximize').removeClass('cms_modal-maximize-active');
 			this.maximized = false;
+			
+			// in case, the window is larger than the windows height, we trigger fullscreen mode
+			if(screenHeight <= height + heightOffset) this.triggerMaximized = true;
 
 			// we need to render the breadcrumb
 			this._setBreadcrumb(breadcrumb);
@@ -186,6 +193,9 @@ $(document).ready(function () {
 
 				// hide loader
 				CMS.API.Toolbar._loader(false);
+
+				// check if we should maximize
+				if(that.triggerMaximized) that._maximize();
 			});
 
 			// prevent scrolling
