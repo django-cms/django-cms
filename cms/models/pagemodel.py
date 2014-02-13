@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from os.path import join
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable
+from cms.exceptions import PublicIsUnmodifiable, LanguageError
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -108,7 +108,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             'parent']
 
     def __str__(self):
-        title = self.get_menu_title(fallback=True)
+        try:
+            title = self.get_menu_title(fallback=True)
+        except LanguageError:
+            try:
+                title = self.title_set.all()[0]
+            except IndexError:
+                title = None
         if title is None:
             title = u""
         return force_unicode(title)
