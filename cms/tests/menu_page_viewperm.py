@@ -143,12 +143,6 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         default_users_count = get_user_model().objects.all().count()
         for username, is_staff, groupname in userdata:
             user = self._create_user(username, is_staff)
-            #user = get_user_model().objects.create(username=username,
-            #                           email=username + '@domain.com',
-            #                           is_active=True,
-            #                           is_staff=is_staff)
-            #user.set_password(username)
-            #user.save()
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
                 group.user_set.add(user)

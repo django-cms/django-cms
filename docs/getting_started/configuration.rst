@@ -7,6 +7,24 @@ Configuration
 django CMS has a number of settings to configure its behaviour. These should
 be available in your ``settings.py`` file.
 
+************************
+Custom User Requirements
+************************
+
+.. setting:: AUTH_USER_MODEL
+
+When using a custom user model (i.e. the AUTH_USER_MODEL Django setting), there are a few requirements that must be met.
+
+DjangoCMS expects a user model with at minimum the following fields: email, password, first_name, last_name, is_active, is_staff, and is_superuser.  Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as the USERNAME_FIELD (see Django documentation for more details).
+
+Lastly, your custom user model must be named "User" in order to support reverse relationships with the Group model and other models.
+
+.. note::
+
+    In most cases, it is better to create a UserProfile model with a one to one relationship to auth.User rather than creating a custom user model.  Custom user models are only necessary if you intended to alter the default behavior of the User model, not simply extend it.
+
+    Additionally, if you do intend to use a custom user model, it is generally advisable to do so only at the beginning of a project, before the database is created.
+
 *****************
 Required Settings
 *****************

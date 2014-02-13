@@ -86,8 +86,6 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         control = self._getfirst()
         request = self.get_request('/')
         request.GET = {"edit": ''}
-        #user = User(username="admin", password="admin", is_superuser=True, is_staff=True, is_active=True)
-        #user.save()
         user = self._create_user("admin", True, True)
         request.current_page = control
         request.user = user
@@ -291,8 +289,6 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         request = RequestFactory().get('/')
-        #user = User(username="admin", password="admin", is_superuser=True, is_staff=True, is_active=True)
-        #user.save()
         user = self._create_user("admin", True, True)
         request.current_page = page.publisher_public
         request.user = user
@@ -322,8 +318,6 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         template = Template(
             "{% load cms_tags %}{% render_plugin plugin %}")
         request = RequestFactory().get('/')
-        #user = User(username="admin", password="admin", is_superuser=True, is_staff=True, is_active=True)
-        #user.save()
         user = self._create_user("admin", True, True)
         request.user = user
         request.current_page = page

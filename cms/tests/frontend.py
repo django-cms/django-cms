@@ -116,15 +116,8 @@ class ToolbarBasicTests(CMSLiveTests):
 
     def setUp(self):
         self.user = self._create_user('admin', True, True, True)
-
-        #User = get_user_model()
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
-        #user = User()
-        #user.username = 'admin'
-        #user.set_password('admin')
-        #user.is_superuser = user.is_staff = user.is_active = True
-        #user.save()
         self.driver.implicitly_wait(2)
         super(ToolbarBasicTests, self).setUp()
 

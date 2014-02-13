@@ -46,10 +46,6 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
 
     def get_admin(self):
         usr = self._create_user("admin", True, True)
-        #User = get_user_model()
-        #usr = User(username="admin", email="admin@django-cms.org", is_staff=True, is_superuser=True)
-        #usr.set_password("admin")
-        #usr.save()
         return usr
 
     def test_template_creation(self):

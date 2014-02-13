@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 from cms.utils.conf import get_cms_setting
 from django.utils.translation import ugettext as _
-
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
 from cms.admin.forms import PageUserForm, PageUserGroupForm
 from cms.admin.permissionadmin import GenericCmsPermissionAdmin
 from cms.exceptions import NoPermissionsException
 from cms.models import PageUser, PageUserGroup
 from cms.utils.permissions import get_subordinate_users
-
-from cms.compat import get_user_model
+from cms.compat import get_user_model, UserAdmin
 
 class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     form = PageUserForm
@@ -26,9 +23,14 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     # get_fieldsets method may add fieldsets depending on user
     fieldsets = [
         (None, {'fields': (get_user_model().USERNAME_FIELD, ('password1', 'password2'), 'notify_user')}),
-        (_('User details'), {'fields': (('first_name', 'last_name'), 'email')}),
-        (_('Groups'), {'fields': ('groups',)}),
     ]
+
+    if get_user_model().USERNAME_FIELD != 'email':
+        fieldsets.append((_('User details'), {'fields': (('first_name', 'last_name'), 'email')}))
+    else:
+        fieldsets.append((_('User details'), {'fields': (('first_name', 'last_name'))}))
+        
+    fieldsets.append((_('Groups'), {'fields': ('groups',)}))
     
     add_fieldsets = fieldsets
     
@@ -62,6 +64,7 @@ class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     def get_fieldsets(self, request, obj=None):
         return self.update_permission_fieldsets(request, obj)
 
-#if get_cms_setting('PERMISSION'):
-    #admin.site.register(PageUser, PageUserAdmin)
-    #admin.site.register(PageUserGroup, PageUserGroupAdmin)
+if get_cms_setting('PERMISSION'):
+    import pdb; pdb.set_trace()
+    admin.site.register(PageUser, PageUserAdmin)
+    admin.site.register(PageUserGroup, PageUserGroupAdmin)

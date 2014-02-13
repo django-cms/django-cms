@@ -345,6 +345,10 @@ Since django CMS 2.0 plugins had their table names start with `cmsplugin_`. We r
 in 3.0 and will display a deprecation warning with the old and new table name. If your plugin uses
 south for migrations create a new empty schemamigration and rename the table by hand.
 
+Added support for custom user models
+====================================
+
+Since Django 1.5 it has been possible to swap out the default User model for a custom user model.  This is now fully supported by DjangoCMS, and in addition a new option has been added to the test runner to allow specifying the user model to use for tests (e.g. --user=customuserapp.User)
 
 ********************
 Pending deprecations
