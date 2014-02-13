@@ -24,3 +24,13 @@ class NoRenderButChildren(CMSPluginBase):
     name = 'norender2'
     render_plugin = False
     allow_children = True
+
+
+class DynTemplate(CMSPluginBase):
+    name = 'norender3'
+    render_plugin = True
+
+    def get_render_template(self):
+        raise KeyError('asd')
+
+    render_template = property(get_render_template)

@@ -65,6 +65,5 @@ class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
         return self.update_permission_fieldsets(request, obj)
 
 if get_cms_setting('PERMISSION'):
-    import pdb; pdb.set_trace()
     admin.site.register(PageUser, PageUserAdmin)
     admin.site.register(PageUserGroup, PageUserGroupAdmin)

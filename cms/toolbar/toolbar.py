@@ -88,6 +88,7 @@ class CMSToolbar(ToolbarAPIMixin):
     # Public API
 
     def get_or_create_menu(self, key, verbose_name=None, side=LEFT, position=None):
+        self.populate()
         if key in self.menus:
             return self.menus[key]
         menu = Menu(verbose_name, self.csrf_token, side=side)
@@ -97,12 +98,14 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def add_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
                    side=LEFT, position=None):
+        self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
         item.add_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes)
         self.add_item(item, position=position)
         return item
 
     def add_button_list(self, identifier=None, extra_classes=None, side=LEFT, position=None):
+        self.populate()
         item = ButtonList(identifier, extra_classes=extra_classes, side=side)
         self.add_item(item, position=position)
         return item
@@ -134,6 +137,7 @@ class CMSToolbar(ToolbarAPIMixin):
             return self.left_items.index(item)
 
     def get_clipboard_plugins(self):
+        self.populate()
         if not hasattr(self, "clipboard"):
             return []
         return self.clipboard.get_plugins()
@@ -159,6 +163,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self._call_toolbar('populate')
 
     def post_template_populate(self):
+        self.populate()
         if self.post_template_populated:
             return
         self.post_template_populated = True
@@ -190,7 +195,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 return HttpResponseRedirect(self.request.path)
 
     def _call_toolbar(self, func_name):
-        with force_language(self.language):
+        with force_language(self.toolbar_language):
             first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
             for key in first:
                 toolbar = self.toolbars[key]

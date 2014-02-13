@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from os.path import join
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable
+from cms.exceptions import PublicIsUnmodifiable, LanguageError
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -109,7 +109,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             'parent']
 
     def __str__(self):
-        title = self.get_menu_title(fallback=True)
+        try:
+            title = self.get_menu_title(fallback=True)
+        except LanguageError:
+            try:
+                title = self.title_set.all()[0]
+            except IndexError:
+                title = None
         if title is None:
             title = u""
         return force_unicode(title)
@@ -212,6 +218,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # TODO: Make this into a "graceful" copy instead of deleting and overwriting
         # copy the placeholders (and plugins on those placeholders!)
         from cms.plugin_pool import plugin_pool
+
         plugin_pool.set_plugin_meta()
         CMSPlugin.objects.filter(placeholder__page=target, language=language).delete()
         for ph in self.placeholders.all():
@@ -450,6 +457,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     def is_published(self, language, force_reload=False):
         from cms.models import Title
+
         try:
             return self.get_title_obj(language, False, force_reload=force_reload).published
         except Title.DoesNotExist:
@@ -457,6 +465,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     def get_publisher_state(self, language):
         from cms.models import Title
+
         try:
             return self.get_title_obj(language, False).publisher_state
         except Title.DoesNotExist:
@@ -570,7 +579,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                         draft_title.save()
             elif page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                 page.publish(language)
-            # fire signal after publishing is done
+                # fire signal after publishing is done
         import cms.signals as cms_signals
 
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
@@ -712,6 +721,38 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             return self.get_title(language, True, version_id, force_reload)
         return menu_title
 
+    def get_admin_tree_title(self):
+        language = get_language()
+        from cms.models.titlemodels import EmptyTitle
+        if not hasattr(self, 'title_cache'):
+            self.title_cache = {}
+            for title in self.title_set:
+                self.title_cache[title.language] = title
+        if not language in self.title_cache or isinstance(self.title_cache.get(language, EmptyTitle(language)),
+                                                          EmptyTitle):
+            fallback_langs = i18n.get_fallback_languages(language)
+            found = False
+            for lang in fallback_langs:
+                if lang in self.title_cache and not isinstance(self.title_cache.get(lang, EmptyTitle(lang)),
+                                                               EmptyTitle):
+                    found = True
+                    language = lang
+            if not found:
+                if self.title_cache.keys():
+                    language = self.title_cache.keys()[0]
+                else:
+                    language = None
+        if not language:
+            return _("Empty")
+        title = self.title_cache[language]
+        if title.title:
+            return title.title
+        if title.page_title:
+            return title.page_title
+        if title.menu_title:
+            return title.menu_title
+        return title.slug
+
     def get_changed_date(self, language=None, fallback=True, version_id=None, force_reload=False):
         """
         get when this page was last updated
@@ -767,8 +808,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             load = True
         if load:
             from cms.models.titlemodels import Title
+
             if version_id:
                 from reversion.models import Version
+
                 version = get_object_or_404(Version, pk=version_id)
                 revs = [related_version.object_version for related_version in version.revision.version_set.all()]
                 for rev in revs:
