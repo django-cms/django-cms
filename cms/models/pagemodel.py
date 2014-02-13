@@ -713,7 +713,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def get_admin_tree_title(self):
         language = get_language()
         from cms.models.titlemodels import EmptyTitle
-
+        if not hasattr(self, 'title_cache'):
+            self.title_cache = {}
+            for title in self.title_set:
+                self.title_cache[title.language] = title
         if not language in self.title_cache or isinstance(self.title_cache.get(language, EmptyTitle(language)),
                                                           EmptyTitle):
             fallback_langs = i18n.get_fallback_languages(language)

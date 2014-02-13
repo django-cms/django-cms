@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-12 14:47+0100\n"
+"POT-Creation-Date: 2014-02-12 16:47+0100\n"
 "PO-Revision-Date: 2009-11-10 22:37+0100\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -103,71 +103,71 @@ msgstr ""
 msgid "Edit this Page"
 msgstr ""
 
-#: cms_toolbar.py:256 templates/admin/cms/page/tree/menu_item.html:43
+#: cms_toolbar.py:259 templates/admin/cms/page/tree/menu_item.html:43
 msgid "Page settings"
 msgstr ""
 
-#: cms_toolbar.py:260
+#: cms_toolbar.py:263
 msgid "Templates"
 msgstr ""
 
-#: cms_toolbar.py:270 admin/pageadmin.py:285
+#: cms_toolbar.py:273 admin/pageadmin.py:285
 #, fuzzy
 msgid "Publishing dates"
 msgstr "publish request"
 
-#: cms_toolbar.py:275 templates/admin/cms/page/tree/menu_item.html:44
+#: cms_toolbar.py:281 templates/admin/cms/page/tree/menu_item.html:44
 msgid "Advanced settings"
 msgstr ""
 
-#: cms_toolbar.py:282
+#: cms_toolbar.py:288
 msgid "Permissions"
 msgstr ""
 
-#: cms_toolbar.py:288
+#: cms_toolbar.py:294
 msgid "Hide in navigation"
 msgstr ""
 
-#: cms_toolbar.py:290
+#: cms_toolbar.py:296
 msgid "Display in navigation"
 msgstr ""
 
-#: cms_toolbar.py:296
+#: cms_toolbar.py:302
 #, fuzzy
 msgid "Unpublish page"
 msgstr "unpublish request"
 
-#: cms_toolbar.py:299
+#: cms_toolbar.py:305
 #, fuzzy
 msgid "Publish page"
 msgstr "publish request"
 
-#: cms_toolbar.py:320
+#: cms_toolbar.py:326
 #, fuzzy
 msgid "Delete page"
 msgstr "deletion request"
 
-#: cms_toolbar.py:325 templates/admin/cms/page/history/revision_header.html:10
+#: cms_toolbar.py:331 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
 msgstr ""
 
-#: cms_toolbar.py:340
+#: cms_toolbar.py:346
 msgid "Undo"
 msgstr ""
 
-#: cms_toolbar.py:341
+#: cms_toolbar.py:347
 msgid "Redo"
 msgstr ""
 
-#: cms_toolbar.py:344
+#: cms_toolbar.py:350
 msgid "Are you sure you want to revert to live?"
 msgstr ""
 
-#: cms_toolbar.py:345
+#: cms_toolbar.py:351
 msgid "Revert to live"
 msgstr ""
 
-#: cms_toolbar.py:347
+#: cms_toolbar.py:353
 msgid "View history"
 msgstr ""
 
@@ -215,6 +215,10 @@ msgstr ""
 msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr ""
 
+#: admin/forms.py:68
+msgid "Description meta tag"
+msgstr ""
+
 #: admin/forms.py:70
 #, fuzzy
 msgid "A description of the page used by search engines."
@@ -226,6 +230,10 @@ msgstr ""
 
 #: admin/forms.py:117
 msgid "Another page with this slug already exists"
+msgstr ""
+
+#: admin/forms.py:145
+msgid "Slug must not be empty."
 msgstr ""
 
 #: admin/forms.py:178
@@ -293,7 +301,7 @@ msgstr ""
 
 #: admin/forms.py:374 admin/forms.py:381 admin/forms.py:385
 #: templates/admin/cms/usersettings/change_form.html:8
-#: templatetags/cms_tags.py:657
+#: templatetags/cms_tags.py:656
 msgid "Add"
 msgstr ""
 
@@ -706,7 +714,11 @@ msgstr ""
 msgid "pages"
 msgstr ""
 
-#: models/pagemodel.py:812
+#: models/pagemodel.py:735
+msgid "Empty"
+msgstr ""
+
+#: models/pagemodel.py:849
 msgid "default"
 msgstr ""
 
@@ -1280,8 +1292,8 @@ msgstr ""
 msgid "Drop a plugin here"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:652
-#: templatetags/cms_tags.py:655
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:651
+#: templatetags/cms_tags.py:654
 msgid "Edit"
 msgstr ""
 
