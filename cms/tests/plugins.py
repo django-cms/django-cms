@@ -12,7 +12,7 @@ from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.placeholderapp.cms_plugins import EmptyPlugin
-from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoSubPluginRender, NoRender, NoRenderButChildren
+from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoSubPluginRender, NoRender, NoRenderButChildren, DynTemplate
 from djangocms_googlemap.models import GoogleMap
 from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.utils.plugins import get_plugins_for_page
@@ -427,7 +427,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NonExisitngRenderTemplate)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRender)
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRenderButChildren)
-
+        plugin_pool.register_plugin(DynTemplate)
 
 
     def test_remove_plugin_before_published(self):
