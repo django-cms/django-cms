@@ -109,6 +109,7 @@ def configure(db_url, **extra):
             'reversion',
             'sekizai',
             'hvad',
+            'django_select2',
           #  'debug_toolbar',
         ],
         DEBUG_TOOLBAR_PATCH_SETTINGS = False,
