@@ -54,9 +54,3 @@ class PageSelectFormField(forms.MultiValueField):
                 raise forms.ValidationError(self.error_messages['invalid_page'])
             return Page.objects.get(pk=page_id)
         return None
-
-
-
-
-    class PlaceholderFormField(forms.Field):
-        pass
