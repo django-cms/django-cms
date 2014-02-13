@@ -155,6 +155,11 @@ $(document).ready(function () {
 				'width': this.options.sideframeWidth
 			};
 
+			// resets
+			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
+			this.sideframe.find('.cms_sideframe-hide').show();
+
+			// update settings
 			this.settings = this.setSettings(this.settings);
 		},
 
