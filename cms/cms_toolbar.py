@@ -82,7 +82,8 @@ class BasicToolbar(CMSToolbar):
 
     def populate(self):
         self.add_admin_menu()
-        self.add_language_menu()
+        if settings.USE_I18N:
+            self.add_language_menu()
 
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
