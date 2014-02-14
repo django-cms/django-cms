@@ -1,2 +1,6 @@
 {% load i18n %}
-<div id="loader-message">{% trans 'Loading...' %}</div>
+<div id="loader-message" style="display: none; position: absolute; left: 0; top: 0; margin-bottom: 150%; -moz-opacity: 0.30; opacity: .30; filter: alpha(opacity=30); background-color: #000; width: 100%; height: 100%; z-index: 10001;">
+    <div style="padding: 10% 20%; font-size: 100px; -moz-opacity: 1.0; opacity: 1.0; filter: alpha(opacity=100); color:#fff ;">
+        {% trans 'Loading...' %}
+    </div>
+</div>
