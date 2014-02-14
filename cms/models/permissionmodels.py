@@ -12,8 +12,6 @@ from cms.models.managers import BasicPagePermissionManager, PagePermissionManage
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
-from peak.util.proxies import LazyWrapper
-
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
 ACCESS_PAGE = 1
@@ -106,7 +104,6 @@ class PagePermission(AbstractPagePermission):
         page = self.page_id and force_unicode(self.page) or "None"
         return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
 
-#class PageUser(LazyWrapper(get_user_model())):
 class PageUser(get_user_model()):
     """Cms specific user data, required for permission system
     """
