@@ -14,7 +14,9 @@ from django.contrib.sites.models import Site
 from django.test import LiveServerTestCase, TestCase
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 
@@ -225,6 +227,11 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         self._login()
         self.driver.get('%s/it/?edit' % self.live_server_url)
 
+        # check if there are no plugins in italian version of the page
+
+        italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
+        self.assertEqual(len(italian_plugins), 0)
+
         build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?build"]')
         build_button.click()
 
@@ -236,11 +243,13 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         copy_from_english = self.driver.find_element_by_css_selector('.cms_submenu-item a[data-rel="copy-lang"][data-language="en"]')
         copy_from_english.click()
 
-        # Done, check if the text plugin was copied
-
-        time.sleep(1)
+        # Done, check if the text plugin was copied and it is only one
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
+        self.assertEqual(len(italian_plugins), 1)
+
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms_draggable:nth-child(1)')))
+
         plugin_instance = italian_plugins[0].get_plugin_instance()[0]
 
         self.assertEqual(plugin_instance.body, 'test')
