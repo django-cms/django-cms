@@ -719,17 +719,23 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def get_admin_tree_title(self):
         language = get_language()
         from cms.models.titlemodels import EmptyTitle
+
+        def validate_title(title):
+            if isinstance(title, EmptyTitle):
+                return False
+            if not title.title or not title.slug:
+                return False
+            return True
+
         if not hasattr(self, 'title_cache'):
             self.title_cache = {}
             for title in self.title_set:
                 self.title_cache[title.language] = title
-        if not language in self.title_cache or isinstance(self.title_cache.get(language, EmptyTitle(language)),
-                                                          EmptyTitle):
+        if not language in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
             found = False
             for lang in fallback_langs:
-                if lang in self.title_cache and not isinstance(self.title_cache.get(lang, EmptyTitle(lang)),
-                                                               EmptyTitle):
+                if lang in self.title_cache and validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
                     found = True
                     language = lang
             if not found:
