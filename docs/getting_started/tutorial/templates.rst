@@ -106,4 +106,24 @@ Here's a basic example:
 
 You should definitely check out the CMS' documentation on :doc:`../resources/navigation`.
 
+
+.. _sekizai-namespaces:
+
+Static files handling with sekizai
+----------------------------------
+
+The django CMS handles media files (css stylesheets and javascript files)
+required by CMS plugins using `django-sekizai`_. This requires you to define at
+least two sekizai namespaces in your templates: ``js`` and ``css``. You can do
+so using the ``render_block`` template tag from the ``sekizai_tags`` template
+tag libary. We highly recommended putting the ``{% render_block "css" %}`` tag
+as the last thing before the closing ``</head>`` HTML tag and the
+``{% render_block "js" %}`` tag as the last thing before the closing ``</body>``
+HTML tag.
+
+
+.. _django-sekizai: https://github.com/ojii/django-sekizai
+
+
+
 In the next step we're going to talk about :doc:`plugins`.

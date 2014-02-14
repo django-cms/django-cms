@@ -1,5 +1,5 @@
-Installing django CMS
-=====================
+Installing django CMS from scratch
+==================================
 
 Preparing your workstation
 --------------------------
@@ -56,7 +56,7 @@ a while :)
 
 .. code:: bash
 
-    (env) $ djangocms --parent-dir . my_demo
+    (env) $ djangocms my_demo --parent-dir .
 
 Windows
 ```````
@@ -96,28 +96,8 @@ the settings below:
     $ Password: admin
     $ Password (again): admin
 
-Let's run it
+Awesome job!
 ~~~~~~~~~~~~
 
 That's it! The installer took care of setting up you're whole
-environment, you're now ready to start the server:
-
-.. code:: bash
-
-    (env) $ python manage.py runserver
-
-Now you can open http://localhost:8000/ and should be presented with
-your brand new django CMS homepage!
-
-Congratulations, you now have a fully functional CMS! Awesome job!
-
-To log in, append ``?edit`` to the URL and hit enter. This will enable
-the toolbar, from where you can log in and manage your website. Switch
-to Draft Mode to add and edit content!
-
-Try to switch between Live and Draft view, between structure and content
-mode, add plugins, move them around and delete them again. Go mess with
-it and see how awesome it is!
-
-You can now start with an easy introduction into django CMS here:
-:doc:`../tutorial/index`.
+environment, you can now start with an easy introduction into django CMS here: :doc:`../tutorial/index`.

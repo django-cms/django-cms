@@ -1,15 +1,21 @@
-############
-Installation
-############
+Installing django CMS into an existing project
+==============================================
+
+Getting help
+------------
+
+Should you run into trouble and can't figure out how to solve it yourself, you
+can get help from either our `mailinglist`_ or IRC channel ``#django-cms`` on
+the ``irc.freenode.net`` network.
+
 
 This document assumes you are familiar with Python and Django. It should
 outline the steps necessary for you to follow the :doc:`../tutorial/index`.
 
 .. _requirements:
 
-************
 Requirements
-************
+------------
 
 * `Python`_ 2.6, 2.7 or 3.3.
 * `Django`_ 1.4.5, 1.5.x or 1.6.x
@@ -37,20 +43,20 @@ Requirements
 .. _djangocms-admin-style: https://github.com/divio/djangocms-admin-style
 
 Recommended
-===========
+~~~~~~~~~~~
 
 These packages are not *required*, but they provide useful functionality with
 minimal additional configuration and are well-proven.
 
 Text Editors
-------------
+^^^^^^^^^^^^
 
 * `Django CMS CKEditor`_ for a WYSIWYG editor 2.1.1 or higher
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
 Other Plugins
--------------
+^^^^^^^^^^^^^
 
 * djangocms-link
 * djangocms-snippet
@@ -62,7 +68,7 @@ Other Plugins
 
 
 File and image handling
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 * `Django Filer`_ for file and image management
 * `django-filer plugins for django CMS`_, required to use Django Filer with django CMS
@@ -73,7 +79,7 @@ File and image handling
 .. _Pillow: https://github.com/python-imaging/Pillow
 
 Revision management
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 * `django-reversion`_ 1.6.6 (with Django 1.4.5), 1.7 (with Django 1.5)
   or 1.8 (with Django 1.6)  to support versions of your content (If using
@@ -91,9 +97,9 @@ Revision management
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
-************************************
+
 Installing in a virtualenv using pip
-************************************
+------------------------------------
 
 .. warning::
 
@@ -184,9 +190,8 @@ One example of a script to create a virtualenv Python environment is as follows:
 .. _pip: http://www.pip-installer.org
 .. _requirements.txt: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
 
-*****************************
 Installing globally on Ubuntu
-*****************************
+-----------------------------
 
 .. warning::
 
@@ -221,9 +226,8 @@ You have now everything that is needed for you to follow an easy introduction
 into django CMS here: :doc:`../tutorial/index`.
 
 
-*********
 Databases
-*********
+---------
 
 We recommend using `PostgreSQL`_ or `MySQL`_ with django CMS. Installing and
 maintaining database systems is outside the scope of this documentation, but
@@ -236,3 +240,251 @@ To use django CMS efficiently, we recommend:
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com
+
+
+Configuration and setup
+-----------------------
+
+
+Preparing the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following assumes your django project is in ``~/workspace/myproject/myproject``.
+
+
+.. _configure-django-cms:
+
+Installing and configuring django CMS in your django project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Open the file ``~/workspace/myproject/myproject/settings.py``.
+
+To make your life easier, add the following at the top of the file::
+
+    # -*- coding: utf-8 -*-
+    import os
+    gettext = lambda s: s
+    PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
+
+
+Add the following apps to your :setting:`django:INSTALLED_APPS`.
+This includes django CMS itself as well as its dependenices and
+other highly recommended applications/libraries::
+
+    'cms',  # django CMS itself
+    'mptt',  # utilities for implementing a modified pre-order traversal tree
+    'menus',  # helper for model independent hierarchical website navigation
+    'south',  # intelligent schema and data migrations
+    'sekizai',  # for javascript and css management
+    'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list before 'django.contrib.admin'.
+    'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
+
+
+Also add any (or all) of the following plugins, depending on your needs::
+
+    'cms.plugins.file',
+    'cms.plugins.flash',
+    'cms.plugins.googlemap',
+    'cms.plugins.picture',
+    'cms.plugins.teaser',
+    'djangocms_link',
+    'djangocms_snippet',
+    'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
+    'cms.plugins.video',
+
+.. warning::
+
+    Adding the ``'djangocms_snippet'`` plugin is a potential security hazard.
+    For more information, refer to `snippet_plugin`_.
+
+    In addition, ``'cms.plugins.text'`` and ``'cms.plugins.twitter'`` have
+    been removed from the Django-CMS bundle. Read :ref:`upgrade-to-3.0` for
+    detailed information.
+
+The plugins are described in more detail in chapter :doc:`Plugins reference <../resources/plugin_reference>`.
+There are even more plugins available on the django CMS `extensions page`_.
+
+.. _snippet_plugin: https://github.com/divio/djangocms-snippet
+.. _extensions page: http://www.django-cms.org/en/extensions/
+
+In addition, make sure you uncomment (enable) ``'django.contrib.admin'``
+
+You may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
+instead of the :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
+:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins.
+In this case you should check the `django-filer documentation <django-filer:installation_and_configuration>`_
+and `django CMS plugin documentation`_ for detailed installation information, and
+then return to this tutorial.
+
+.. _django-filer: https://github.com/stefanfoulis/django-filer
+.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django CMS plugin documentation: https://github.com/stefanfoulis/cmsplugin-filer#installation
+
+If you opt for the core plugins you should take care that directory to which
+the :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
+relative to :setting:`django:MEDIA_ROOT`) is writable by the user under which Django
+will be running. If you have opted for django-filer there is a similar requirement
+for its configuration.
+
+If you want versioning of your content you should also install `django-reversion`_
+and add it to :setting:`django:INSTALLED_APPS`:
+
+* ``'reversion'``
+
+.. _django-reversion: https://github.com/etianen/django-reversion
+
+You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_CLASSES`
+at the right position::
+
+    MIDDLEWARE_CLASSES = (
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.doc.XViewMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
+    )
+
+You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
+
+    TEMPLATE_CONTEXT_PROCESSORS = (
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
+        'django.core.context_processors.i18n',
+        'django.core.context_processors.request',
+        'django.core.context_processors.media',
+        'django.core.context_processors.static',
+        'cms.context_processors.media',
+        'sekizai.context_processors.sekizai',
+    )
+
+.. note::
+
+    This setting will be missing from automatically generated Django settings
+    files, so you will have to add it.
+
+.. warning::
+
+    Be sure to have ``'django.contrib.sites'`` in INSTALLED_APPS and set
+    ``SITE_ID`` parameter in your ``settings``: they may be missing from the
+    settings file generated by ``django-admin`` depending on your Django version
+    and project template.
+
+.. _enable-messages:
+
+.. versionchanged:: 3.0.0
+
+.. warning::
+
+    Django ``messages`` framework is now required for the toolbar to work
+    properly.
+
+    To enable it you must be check the following settings:
+
+        * ``INSTALLED_APPS``: must contain ``'django.contrib.messages'``
+        * ``MIDDLEWARE_CLASSES``: must contain ``'django.contrib.messages.middleware.MessageMiddleware'``
+        * ``TEMPLATE_CONTEXT_PROCESSORS``: must contain ``'django.contrib.messages.context_processors.messages'``
+
+
+Point your :setting:`django:STATIC_ROOT` to where the static files should live
+(that is, your images, CSS files, Javascript files, etc.)::
+
+    STATIC_ROOT = os.path.join(PROJECT_PATH, "static")
+    STATIC_URL = "/static/"
+
+For uploaded files, you will need to set up the :setting:`django:MEDIA_ROOT`
+setting::
+
+    MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
+    MEDIA_URL = "/media/"
+
+.. note::
+
+    Please make sure both the ``static`` and ``media`` subfolders exist in your
+    project and are writable.
+
+Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::
+
+    TEMPLATE_DIRS = (
+        # The docs say it should be absolute path: PROJECT_PATH is precisely one.
+        # Life is wonderful!
+        os.path.join(PROJECT_PATH, "templates"),
+    )
+
+Add at least one template to :setting:`CMS_TEMPLATES`; for example::
+
+    CMS_TEMPLATES = (
+        ('template_1.html', 'Template One'),
+        ('template_2.html', 'Template Two'),
+    )
+
+We will create the actual template files at a later step, don't worry about it for
+now. Simply paste this code into your settings file.
+
+.. note::
+
+    The templates you define in :setting:`CMS_TEMPLATES` have to exist at runtime and
+    contain at least one ``{% placeholder <name> %}`` template tag to be useful
+    for django CMS. For more details see :doc:`../tutorial/templates`
+
+The django CMS allows you to edit all languages for which Django has built in
+translations. Since these are numerous, we'll limit it to English for now::
+
+    LANGUAGES = [
+        ('en', 'English'),
+    ]
+
+Finally, set up the :setting:`django:DATABASES` part of the file to reflect your
+database deployment. If you just want to try out things locally, sqlite3 is the
+easiest database to set up, however it should not be used in production. If you
+still wish to use it for now, this is what your :setting:`django:DATABASES`
+setting should look like::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(PROJECT_PATH, 'database.sqlite'),
+        }
+    }
+
+
+URL configuration
+~~~~~~~~~~~~~~~~~
+
+You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
+urlpatterns. We suggest starting with the following
+``~/workspace/myproject/myproject/urls.py``::
+
+    from django.conf.urls import include, patterns, url
+    from django.conf.urls.i18n import i18n_patterns
+    from django.contrib import admin
+    from django.conf import settings
+
+    admin.autodiscover()
+
+    urlpatterns = i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^', include('cms.urls')),
+    )
+
+    if settings.DEBUG:
+        urlpatterns = patterns('',
+        url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+        url(r'', include('django.contrib.staticfiles.urls')),
+    ) + urlpatterns
+
+
+
+Awesome job!
+------------
+
+That's it! You just set up django CMS! You can now start with an easy introduction into django CMS here:
+:doc:`../tutorial/index`.
+
+.. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
