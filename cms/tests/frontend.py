@@ -245,10 +245,10 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         # Done, check if the text plugin was copied and it is only one
 
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms_draggable:nth-child(1)')))
+
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 1)
-
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms_draggable:nth-child(1)')))
 
         plugin_instance = italian_plugins[0].get_plugin_instance()[0]
 
