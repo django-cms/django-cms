@@ -193,3 +193,9 @@ class PythonAPITests(TestCase):
         page = create_page(**page_attrs)
         self.assertTrue(page.get_title_obj_attribute('has_url_overwrite'))
         self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')
+
+    def test_create_reverse_id_collision(self):
+
+        page = create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
+        page = create_page('foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
+        self.assertTrue(Page.objects.count(), 4)
