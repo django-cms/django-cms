@@ -9,6 +9,7 @@ from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils.encoding import smart_text
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
 from django.core.urlresolvers import reverse
@@ -165,6 +166,25 @@ class ToolbarTests(ToolbarTestBase):
                             '<div class="cms_submenu-item"><a href="/some/url/" data-rel="ajax"')
         self.assertContains(response,
                             '<div class="cms_submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
+
+    def test_markup_plugin_template(self):
+        page = create_page("toolbar-page-1", "col_two.html", "en", published=True)
+        plugin_1 = add_plugin(page.placeholders.get(slot='col_left'), language='en',
+                              plugin_type='TestPluginAlpha', alpha='alpha')
+        plugin_2 = add_plugin(page.placeholders.get(slot='col_left'), language='en',
+                              plugin_type='TextPlugin', body='text')
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.assertEqual(response.status_code, 200)
+        response_text = smart_text(response)
+        self.assertTrue(re.search('edit_plugin.+/admin/custom/view/%s' % plugin_1.pk, response_text))
+        self.assertTrue(re.search('move_plugin.+/admin/custom/move/', response_text))
+        self.assertTrue(re.search('delete_plugin.+/admin/custom/delete/%s/' % plugin_1.pk, response_text))
+        self.assertTrue(re.search('add_plugin.+/admin/custom/view/', response_text))
+
+        self.assertTrue(re.search('edit_plugin.+/en/admin/cms/page/edit-plugin/%s' % plugin_2.pk, response_text))
+        self.assertTrue(re.search('delete_plugin.+/en/admin/cms/page/delete-plugin/%s/' % plugin_2.pk, response_text))
 
     def test_show_toolbar_to_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
@@ -981,7 +1001,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
-            response,"'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+            response, "'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
 
     def test_view_url(self):
         user = self.get_staff()
@@ -999,7 +1019,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
-            response,"'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+            response, "'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
 
     def test_method_attribute(self):
         user = self.get_staff()

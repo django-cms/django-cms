@@ -11,6 +11,22 @@ class TestPluginAlphaModel(CMSPlugin):
     """
     alpha = models.CharField('name', blank=False, default='test plugin alpha', max_length=32)
 
+    @property
+    def add_url(self):
+        return '/admin/custom/view/'
+
+    @property
+    def edit_url(self):
+        return '/admin/custom/view/%s/' % self.pk
+
+    @property
+    def move_url(self):
+        return '/admin/custom/move/'
+
+    @property
+    def delete_url(self):
+        return '/admin/custom/delete/%s/' % self.pk
+
 
 class TestPluginBetaModel(TestPluginAlphaModel):
     """
