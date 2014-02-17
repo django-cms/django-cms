@@ -413,7 +413,7 @@ $(document).ready(function () {
 					// save original state events
 					var original = $('.cms_plugin-' + that.getId(originalItem));
 					// cancel if item has no settings
-					if(original.data('settings') === undefined) return false;
+					if(original.data('settings') === null) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
 					var holder = placeholder.parent().prevAll('.cms_dragarea').first();

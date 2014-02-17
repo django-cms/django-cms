@@ -50,7 +50,6 @@ $color-background-blue-hover: #e6f6fd;
 	li .col-softroot span.icon { background-position:-80px 0; margin-top:0; }
 	li .col-apphook span.icon { background-position:-40px -80px; margin-top:0; }
 
-
 	li a.move span, li a.copy span, li a.selector-add span,
 	li a.addlink span, li a.deletelink span, li a.edit span, li a.advanced-settings span, li span.info span,
 	.col-navigation input, .col-published input { display:none; }
@@ -71,8 +70,10 @@ $color-background-blue-hover: #e6f6fd;
 	li.moveable > div { border-bottom:none !important; }
 	li.last.leaf .cont, li.last.closed .cont { border-bottom:none !important; }
 	.tree-default .col-navigation, .tree-default .col-published { line-height:30px; }
-
-
+	// add additional border to separate categories
+	li.open ul { margin-left:0; border-bottom:1px solid $color-border !important; }
+	li.open.last ul { border-bottom:none !important; }
+§
 	li .col1 > div { text-align:center; }
 	li .col1 .title { background:none; }
 	li .col1 .success { color:$color-font; padding-left:10px; }
@@ -161,7 +162,7 @@ $color-background-blue-hover: #e6f6fd;
 		}
 		&.empty { background-color:#e8e9e5; }
 		&.unpublished { background-color:#ff2942; }
-        &.unpublishedparent { background-color:#ff7787; }
+		&.unpublishedparent { background-color:#ff7787; }
 		&.published { background-color:#65b417; }
 	 }
 	 li .cont { overflow:visible !important; }

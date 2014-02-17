@@ -194,6 +194,13 @@ $(document).ready(function () {
 					that._setSwitcher($(e.currentTarget));
 				});
 			});
+
+			// attach event for first page publish
+			this.buttons.each(function () {
+				$(this).find('.cms_publish-page').bind(that.click, function (e) {
+					if(!confirm(that.config.lang.publish)) e.preventDefault();
+				});
+			});
 		},
 
 		// public methods
