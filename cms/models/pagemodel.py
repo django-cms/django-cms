@@ -21,6 +21,7 @@ from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -1164,19 +1165,24 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
  
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """
-        ancestors = self.get_ancestors(ascending=True, include_self=True)
+        xframe_options = cache.get('cms:xframe_options:%s' % self.pk)
+        if xframe_options is None:
+            ancestors = self.get_ancestors(ascending=True, include_self=True)
+            
+            # Ignore those pages which just inherit their value
+            ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
+            
+            # Now just give me the clickjacking setting (not anything else)
+            xframe_options = ancestors.values_list('xframe_options', flat=True)
 
-        # Ignore those pages which just inherit their value
-        ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
-        
-        # Now just give me the clickjacking setting (not anything else)
-        xframe_options = ancestors.values_list('xframe_options', flat=True)
+            if len(xframe_options) <= 0:
+                # No ancestors were found
+                return None
 
-        if len(xframe_options) <= 0:
-            # No ancestors were found
-            return None
+            xframe_options = xframe_options[0]
+            cache.set('cms:xframe_options:%s' % self.pk, xframe_options)
 
-        return xframe_options[0]
+        return xframe_options
 
 def _reversion():
     exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
