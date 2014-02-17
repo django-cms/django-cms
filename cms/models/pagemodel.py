@@ -21,6 +21,7 @@ from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -101,7 +102,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
             (X_FRAME_OPTIONS_ALLOW, _('Allow'))
         ),
-        default=X_FRAME_OPTIONS_INHERIT
+        default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
     )
  
 

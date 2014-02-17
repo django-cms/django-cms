@@ -357,7 +357,6 @@ Using ``placeholder_tags`` will cause a ``DeprecationWarning`` to occur.
 
 ``placeholder_tags`` will be removed in version 3.1.
 
-=======
 Per-page Clickjacking protection
 ================================
 

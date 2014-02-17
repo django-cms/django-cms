@@ -820,7 +820,6 @@ class PagesTestCase(CMSTestCase):
                         self.assertIn('text-%d-%d' % (i, j), content)
                         self.assertIn('link-%d-%d' % (i, j), content)
 
-
     def test_xframe_options_allow(self):
         """Test that no X-Frame-Options is set when page's xframe_options is set to allow"""
         page = create_page(
