@@ -1008,6 +1008,13 @@ class PluginsTestCase(PluginsTestBaseCase):
                                                     parent=KidnapperPlugin)
         self.assertFalse(expected_struct in toolbar_struct)
 
+        toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin, GenericParentPlugin],
+                                                    placeholder.slot,
+                                                    page)
+        expected_struct = {'module': u'Generic',
+                            'name': u'Generic Parent Plugin',
+                            'value': 'GenericParentPlugin'}
+        self.assertTrue(expected_struct in toolbar_struct)
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
             plugin_pool.unregister_plugin(plugin)
 
