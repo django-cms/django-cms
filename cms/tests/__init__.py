@@ -31,6 +31,7 @@ from cms.tests.static_placeholder import *
 from cms.tests.staticfiles import *
 from cms.tests.templatetags import *
 from cms.tests.toolbar import *
+from cms.tests.toolbar_pool import *
 from cms.tests.urlutils import *
 from cms.tests.views import *
 from cms.tests.management import *
