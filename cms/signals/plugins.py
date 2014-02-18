@@ -43,7 +43,7 @@ def pre_delete_plugins(**kwargs):
         try:
             placeholder = plugin.placeholder
         except Placeholder.DoesNotExist:
-            raise
+            pass
     if placeholder:
         attached_model = placeholder._get_attached_model()
         if attached_model == Page:
