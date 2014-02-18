@@ -49,7 +49,7 @@ def configure(db_url, **extra):
             "django.core.context_processors.request",
             "django.core.context_processors.media",
             'django.core.context_processors.csrf',
-            "cms.context_processors.media",
+            "cms.context_processors.cms_settings",
             "sekizai.context_processors.sekizai",
             "django.core.context_processors.static",
         ],
