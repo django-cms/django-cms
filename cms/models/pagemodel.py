@@ -729,7 +729,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         if not hasattr(self, 'title_cache'):
             self.title_cache = {}
-            for title in self.title_set:
+            for title in self.title_set.all():
                 self.title_cache[title.language] = title
         if not language in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
