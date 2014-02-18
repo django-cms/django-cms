@@ -5,6 +5,7 @@ from cms import constants, api
 import os.path
 
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib.sites.models import Site
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -43,6 +44,9 @@ class PageMigrationTestCase(CMSTestCase):
 
 
 class PagesTestCase(CMSTestCase):
+    def tearDown(self):
+        cache.clear()
+
     def test_add_page(self):
         """
         Test that the add admin page could be displayed via the admin
