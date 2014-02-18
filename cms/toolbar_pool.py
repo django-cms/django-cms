@@ -44,6 +44,7 @@ class ToolbarPool(object):
         if name in self.toolbars.keys():
             raise ToolbarAlreadyRegistered("[%s] a toolbar with this name is already registered" % name)
         self.toolbars[name] = toolbar
+        return toolbar
 
     def get_toolbars(self):
         self.discover_toolbars()
