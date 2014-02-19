@@ -190,6 +190,8 @@ $color-background-blue-hover: #e6f6fd;
 
 	.ld-switch { position:absolute; right:0; bottom:0;
 		width:24px; height:24px; background:#ededed; }
+	.ld-preview { position:absolute; right:0; top:0; cursor:pointer;
+		width:24px; height:28px; background:transparent; }
 }
 
 // animation for publishing

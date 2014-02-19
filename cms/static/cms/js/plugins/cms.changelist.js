@@ -102,7 +102,7 @@ $(document).ready(function () {
 
 	// TODO this will be refactored in 3.1
 
-	// add direct publishing
+	// ADD DIRECT PUBLISHING
 	$('.publish-trigger').bind('click', function (e) {
 		e.preventDefault();
 
@@ -112,16 +112,24 @@ $(document).ready(function () {
 		// publish page and update
 		$.get($(this).attr('href'), function () {
 			var el = $(e.currentTarget);
-			el.closest('.language-dropdown').find('a > span').attr('class', el.data('class'));
+			el.closest('.col-language').find('a > span').attr('class', el.data('class'));
+			window.location.reload();
 		});
 	});
+	// ensure seamless transition when hovering an element down
 	$('.ld-switch').on('mouseenter', function () {
 		$(this).closest('.language-dropdown').hide();
 	});
+	// still make the dot clickable using a transparent layer
+	$('.ld-preview').on('click', function () {
+		window.top.location.href = $(this).parent().find('a').eq(0).attr('href');
+	});
+	// resets display:none style added using javascript
 	$('.col-language a').on('mouseenter', function () {
 		$('.language-dropdown').removeAttr('style');
 	});
 
+	// TAB CLICK
 	// attach click event to the tree item and make sure open in new tab works
 	$('.tree .col1 .title').bind('click', function (e) {
 		if(!e.metaKey) {
