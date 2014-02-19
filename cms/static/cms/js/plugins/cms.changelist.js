@@ -102,6 +102,43 @@ $(document).ready(function () {
 
 	// TODO this will be refactored in 3.1
 
+	// ADD DIRECT PUBLISHING
+	$('.publish-trigger').bind('click', function (e) {
+		e.preventDefault();
+
+		// cancel if not confirmed
+		if(!confirm('Are you sure?')) return false;
+
+		// publish page and update
+		$.get($(this).attr('href'), function () {
+			var el = $(e.currentTarget);
+			el.closest('.col-language').find('a > span').attr('class', el.data('class'));
+			window.location.reload();
+		});
+	});
+	// ensure seamless transition when hovering an element down
+	$('.ld-switch').on('mouseenter', function () {
+		$(this).closest('.language-dropdown').hide();
+	});
+	// still make the dot clickable using a transparent layer
+	$('.ld-preview').on('click', function () {
+		window.top.location.href = $(this).parent().find('a').eq(0).attr('href');
+	});
+	// resets display:none style added using javascript
+	$('.col-language a').on('mouseenter', function () {
+		$('.language-dropdown').removeAttr('style');
+	});
+
+	// TAB CLICK
+	// attach click event to the tree item and make sure open in new tab works
+	$('.tree .col1 .title').bind('click', function (e) {
+		if(!e.metaKey) {
+			window.top.location.href = $(this).attr('href');
+		} else {
+			window.open($(this).attr('href'), '_blank');
+		}
+	});
+
 	// adds functionality to the filter
 	$('#changelist-filter-button').bind('click', function () {
 		$("#changelist-filter").toggle();
@@ -220,8 +257,6 @@ $(document).ready(function () {
 					moveTreeItem(what, item_id, target_id, position, false);
 				},
 				onchange: function(node){
-					url = $(node).find('a.title').attr("href");
-                    window.top.location = url;
                     reCalc();
 				},
                 onopen: function(){
