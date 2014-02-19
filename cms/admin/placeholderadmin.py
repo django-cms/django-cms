@@ -212,7 +212,7 @@ class PlaceholderAdmin(ModelAdmin):
         placeholder_id = request.POST.get('placeholder_id', None)
         parent_id = request.POST.get('parent_id', None)
         if parent_id:
-            warnings.warn("parent_id is deprecated and will be removed in 3.0.1, use plugin_parent instead",
+            warnings.warn("parent_id is deprecated and will be removed in 3.1, use plugin_parent instead",
                           DeprecationWarning)
         if not parent_id:
             parent_id = request.POST.get('plugin_parent', None)
@@ -444,7 +444,7 @@ class PlaceholderAdmin(ModelAdmin):
             child.placeholder = placeholder
             child.language = language
             child.save()
-        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder).order_by('position')
+        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder, language=language).order_by('position')
         x = 0
         for level_plugin in plugins:
             if order:

@@ -225,7 +225,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
-        # TODO: 3.0 remove 2 save steps
         language = get_language_from_request(request, obj)
         if "advanced" in request.path:
             form = super(PageAdmin, self).get_form(request, obj, form=AdvancedSettingsForm, **kwargs)
@@ -944,7 +943,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 user_id=request.user.id,
                 content_type_id=ContentType.objects.get_for_model(Page).pk,
                 object_id=page_id,
-                object_repr=page.get_title(),
+                object_repr=page.get_title(language),
                 action_flag=CHANGE,
             )
         else:
@@ -983,7 +982,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             if all_published:
                 if page:
                     public_page = Page.objects.get(publisher_public=page.pk)
-                    path = '%s?edit_off' % public_page.get_absolute_url()
+                    path = '%s?edit_off' % public_page.get_absolute_url(language, fallback=True)
                 else:
                     path = '%s?edit_off' % referrer
             else:

@@ -10,7 +10,7 @@ import datetime
 from cms.utils import copy_plugins
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError, FieldError
 from cms.utils.i18n import get_language_list
 
 from django.contrib.auth.models import User
@@ -173,6 +173,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         application_urls = _verify_apphook(apphook, apphook_namespace)
     else:
         application_urls = None
+
+    if reverse_id:
+        if Page.objects.drafts().filter(reverse_id=reverse_id).count():
+            raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
         created_by=created_by,

@@ -5,12 +5,14 @@ from cms.models import CMSPlugin, Title, Page, StaticPlaceholder, Placeholder
 
 def pre_save_plugins(**kwargs):
     plugin = kwargs['instance']
+    placeholder = None
     if plugin.placeholder:
-        placeholder = plugin.placeholder
+        try:
+            placeholder = plugin.placeholder
+        except Placeholder.DoesNotExist:
+            pass
     elif plugin.placeholder_id:
         placeholder = Placeholder.objects.get(pk=plugin.placeholder_id)
-    else:
-        placeholder = None
     if placeholder:
         attached_model = placeholder._get_attached_model()
         if attached_model == Page:
@@ -34,10 +36,14 @@ def pre_save_plugins(**kwargs):
 
 def pre_delete_plugins(**kwargs):
     plugin = kwargs['instance']
+    if hasattr(plugin, '_no_reorder'):
+        return
+    placeholder = None
     if plugin.placeholder_id:
-        placeholder = plugin.placeholder
-    else:
-        placeholder = None
+        try:
+            placeholder = plugin.placeholder
+        except Placeholder.DoesNotExist:
+            pass
     if placeholder:
         attached_model = placeholder._get_attached_model()
         if attached_model == Page:
@@ -49,7 +55,10 @@ def pre_delete_plugins(**kwargs):
 
 def post_delete_plugins(**kwargs):
     plugin = kwargs['instance']
-    plugins = CMSPlugin.objects.filter(language=plugin.language, placeholder=plugin.placeholder_id).order_by("position")
+    if hasattr(plugin, '_no_reorder'):
+        return
+    plugins = CMSPlugin.objects.filter(language=plugin.language, placeholder=plugin.placeholder_id,
+                                       parent=plugin.parent_id).order_by("position")
     last = 0
     for p in plugins:
         if p.position != last:

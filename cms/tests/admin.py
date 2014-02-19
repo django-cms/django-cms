@@ -299,14 +299,14 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin, published=True)
         child = create_page('child-page', "nav_playground.html", "en",
                             created_by=admin, published=True, parent=page)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
         with self.login_user_context(admin):
             data = {'post': 'yes'}
-            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            with self.assertNumQueries(FuzzyInt(300, 380)):
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            # TODO - The page should be marked for deletion, but nothing more
-            # until publishing
-            #self.assertRaises(Page.DoesNotExist, self.reload, page)
-            #self.assertRaises(Page.DoesNotExist, self.reload, child)
 
     def test_search_fields(self):
         superuser = self.get_superuser()

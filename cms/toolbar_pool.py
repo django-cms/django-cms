@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.exceptions import ToolbarAlreadyRegistered
+from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
 from django.core.exceptions import ImproperlyConfigured
@@ -44,6 +44,13 @@ class ToolbarPool(object):
         if name in self.toolbars.keys():
             raise ToolbarAlreadyRegistered("[%s] a toolbar with this name is already registered" % name)
         self.toolbars[name] = toolbar
+        return toolbar
+
+    def unregister(self, toolbar):
+        name = '%s.%s' % (toolbar.__module__, toolbar.__name__)
+        if name not in self.toolbars:
+            raise ToolbarNotRegistered('The toolbar %s is not registered' % name)
+        del self.toolbars[name]
 
     def get_toolbars(self):
         self.discover_toolbars()

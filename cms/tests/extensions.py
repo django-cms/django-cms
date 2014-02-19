@@ -1,4 +1,5 @@
 from cms.api import create_page
+from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import Page
 from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
@@ -88,17 +89,19 @@ class ExtensionsTestCase(TestCase):
         # publish first time
         page.publish('en')
         self.assertEqual(page_extension.extra, page.publisher_public.mypageextension.extra)
-
+        self.assertEqual(page.get_publisher_state('en'), 0)
         # change and publish again
         page = Page.objects.get(pk=page.pk)
         page_extension = page.mypageextension
         page_extension.extra = 'page extension 1 - changed'
         page_extension.save()
+        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
         page.publish('en')
-
+        self.assertEqual(page.get_publisher_state('en', True), 0)
         # delete
         page_extension.delete()
         self.assertFalse(MyPageExtension.objects.filter(pk=page_extension.pk).exists())
+        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
 
     def test_publish_title_extension(self):
         page = create_page('Test Title Extension', "nav_playground.html", "en")
@@ -110,6 +113,7 @@ class ExtensionsTestCase(TestCase):
         # publish first time
         page.publish('en')
         # import ipdb; ipdb.set_trace()
+        self.assertEqual(page.get_publisher_state('en'), 0)
         self.assertEqual(title_extension.extra_title, page.publisher_public.get_title_obj().mytitleextension.extra_title)
 
         # change and publish again
@@ -118,7 +122,9 @@ class ExtensionsTestCase(TestCase):
         title_extension = title.mytitleextension
         title_extension.extra_title = 'title extension 1 - changed'
         title_extension.save()
+        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
         page.publish('en')
+        self.assertEqual(page.get_publisher_state('en', True), 0)
 
         # delete
         title_extension.delete()

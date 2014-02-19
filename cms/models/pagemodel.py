@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from os.path import join
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable
+from cms.exceptions import PublicIsUnmodifiable, LanguageError
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -108,7 +108,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             'parent']
 
     def __str__(self):
-        title = self.get_menu_title(fallback=True)
+        try:
+            title = self.get_menu_title(fallback=True)
+        except LanguageError:
+            try:
+                title = self.title_set.all()[0]
+            except IndexError:
+                title = None
         if title is None:
             title = u""
         return force_unicode(title)
@@ -452,11 +458,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         except Title.DoesNotExist:
             return False
 
-    def get_publisher_state(self, language):
+    def get_publisher_state(self, language, force_reload=False):
         from cms.models import Title
 
         try:
-            return self.get_title_obj(language, False).publisher_state
+            return self.get_title_obj(language, False, force_reload=force_reload).publisher_state
         except Title.DoesNotExist:
             return None
 
@@ -713,17 +719,23 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def get_admin_tree_title(self):
         language = get_language()
         from cms.models.titlemodels import EmptyTitle
+
+        def validate_title(title):
+            if isinstance(title, EmptyTitle):
+                return False
+            if not title.title or not title.slug:
+                return False
+            return True
+
         if not hasattr(self, 'title_cache'):
             self.title_cache = {}
-            for title in self.title_set:
+            for title in self.title_set.all():
                 self.title_cache[title.language] = title
-        if not language in self.title_cache or isinstance(self.title_cache.get(language, EmptyTitle(language)),
-                                                          EmptyTitle):
+        if not language in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
             found = False
             for lang in fallback_langs:
-                if lang in self.title_cache and not isinstance(self.title_cache.get(lang, EmptyTitle(lang)),
-                                                               EmptyTitle):
+                if lang in self.title_cache and validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
                     found = True
                     language = lang
             if not found:
