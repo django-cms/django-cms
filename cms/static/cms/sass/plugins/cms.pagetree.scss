@@ -73,6 +73,7 @@ $color-background-blue-hover: #e6f6fd;
 	// add additional border to separate categories
 	li.open ul { margin-left:0; border-bottom:1px solid $color-border !important; }
 	li.open.last ul { border-bottom:none !important; }
+	li.open ul.last { border-bottom:none !important; }
 §
 	li .col1 > div { text-align:center; }
 	li .col1 .title { background:none; }
