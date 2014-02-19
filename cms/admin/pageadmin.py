@@ -130,7 +130,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
-
+            pat(r'^resolve/$', self.resolve),
         )
 
         if plugin_pool.get_all_plugins():
@@ -1176,6 +1176,16 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
                                                   template="admin/cms/page/tree/lazy_menu.html")
+
+    def resolve(self, request):
+        pk = request.REQUEST.get('pk')
+        app_label, model = request.REQUEST.get('model').split('.')
+        ctype = ContentType.objects.get(app_label=app_label, model=model)
+        try:
+            instance = ctype.get_object_for_this_type(pk=pk)
+        except ctype.model_class().DoesNotExist:
+            return HttpResponse('/')
+        return HttpResponse(instance.get_absolute_url())
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':

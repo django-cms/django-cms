@@ -45,6 +45,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        self.obj = None
         if settings.USE_I18N:
             self.language = get_language_from_request(request)
         else:
@@ -109,6 +110,15 @@ class CMSToolbar(ToolbarAPIMixin):
         item = ButtonList(identifier, extra_classes=extra_classes, side=side)
         self.add_item(item, position=position)
         return item
+
+    def set_object(self, obj):
+        self.obj = obj
+
+    def get_object_model(self):
+        return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+
+    def get_object_pk(self):
+        return self.obj.pk
 
     # Internal API
 
