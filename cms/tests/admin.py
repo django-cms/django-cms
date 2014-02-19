@@ -565,7 +565,7 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             response = self.admin_class.change_innavigation(request, page.pk)
-            self.assertEqual(response.status_code, 405)
+            self.assertEqual(response.status_code, 403)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'no': 'data'})
             self.assertRaises(Http404, self.admin_class.change_innavigation,

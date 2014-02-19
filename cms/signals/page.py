@@ -45,7 +45,6 @@ def post_save_page(instance, **kwargs):
             apphook_post_page_checker(instance)
 
 
-
 def pre_delete_page(instance, **kwargs):
     menu_pool.clear(instance.site_id)
     for placeholder in instance.placeholders.all():
