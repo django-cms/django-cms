@@ -20,3 +20,10 @@ class SettingsTests(CMSTestCase):
                 ImproperlyConfigured,
                 get_cms_setting, 'LANGUAGES'
             )
+
+    def test_invalid_language_code(self):
+        with SettingsOverride(LANGUAGE_CODE='en-us'):
+            self.assertRaises(
+                ImproperlyConfigured,
+                get_cms_setting, 'LANGUAGES'
+            )
