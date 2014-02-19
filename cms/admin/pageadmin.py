@@ -910,8 +910,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
-    #TODO: Make the change form buttons use POST
-    #@require_POST
     @transaction.commit_on_success
     @create_revision()
     def publish_page(self, request, page_id, language):
@@ -990,7 +988,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
         return HttpResponseRedirect(path)
 
-    @require_POST
+    @transaction.commit_on_success
     def unpublish(self, request, page_id, language):
         """
         Publish or unpublish a language of a page
@@ -1022,8 +1020,6 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             messages.error(request, exc.message)
         return admin_utils.render_admin_menu_item(request, page)
 
-    #TODO: Make the change form buttons use POST
-    #@require_POST
     @transaction.commit_on_success
     def revert_page(self, request, page_id, language):
         page = get_object_or_404(Page, id=page_id)
@@ -1158,12 +1154,10 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             page.site.domain, url)
         return HttpResponseRedirect(url)
 
-    @require_POST
     def change_innavigation(self, request, page_id):
         """
         Switch the in_navigation of a page
         """
-        # why require post and still have page id in the URL???
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
             page.in_navigation = not page.in_navigation
