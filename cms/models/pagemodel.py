@@ -608,18 +608,23 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         public_page.save()
         # trigger update home
         self.save()
-        # Go through all children of our public instance
-        descendants = public_page.get_descendants()
-        for child in descendants:
-            child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
-            draft = child.publisher_public
-            if draft and draft.is_published(language) and draft.get_publisher_state(
-                    language) == PUBLISHER_STATE_DEFAULT:
-                draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
+        self.mark_descendants_pending(language)
         from cms.signals import post_unpublish
-
         post_unpublish.send(sender=Page, instance=self, language=language)
         return True
+
+    def mark_descendants_pending(self, language):
+        assert self.publisher_is_draft
+        # Go through all children of our public instance
+        public_page = self.publisher_public
+        if public_page:
+            descendants = public_page.get_descendants()
+            for child in descendants:
+                child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
+                draft = child.publisher_public
+                if draft and draft.is_published(language) and draft.get_publisher_state(
+                        language) == PUBLISHER_STATE_DEFAULT:
+                    draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
 
     def revert(self, language):
         """Revert the draft version to the same state as the public version
