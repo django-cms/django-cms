@@ -91,6 +91,9 @@ Revision management
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
+
+.. _installing-in-a-virtualenv-using-pip:
+
 ************************************
 Installing in a virtualenv using pip
 ************************************
@@ -253,7 +256,7 @@ system path:
     (djangocms-env)$ pip install Django==1.5 South Django-CMS
 
 .. note:: You can see the general instructions on how to pip install packages
-          after creating the virtualenv :ref:`Installing in a virtualenv using pip <installing-in-a-virtualenv-using-pip>`
+          after creating the virtualenv here: :ref:`Installing in a virtualenv using pip <installing-in-a-virtualenv-using-pip>`
 
 .. _Homebrew: http://brew.sh/
 
