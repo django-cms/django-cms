@@ -14,7 +14,7 @@ def cms_settings(request):
         template = ''
     return {
         'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-        'PAGE_TEMPLATE': template,
+        'CMS_PAGE_TEMPLATE': template,
     }
 
 

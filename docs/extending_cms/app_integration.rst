@@ -587,12 +587,12 @@ use :ttag:`static_placeholder` instead.
 
 .. _page_template:
 
-PAGE_TEMPLATE
--------------
+CMS_PAGE_TEMPLATE
+-----------------
 .. versionadded:: 3.0
 
-``PAGE_TEMPLATE`` is a context variable available in the context for every page
-and application using apphooks, and holds the page template path.
+``CMS_PAGE_TEMPLATE`` is a context variable available in the context for every
+page and application using apphooks, and holds the page template path.
 
 This is mostly useful to use it in the ``extends`` templatetag in the application
 templates to get the current page template.
@@ -616,7 +616,7 @@ Example: application template
 
 .. code-block:: html+django
 
-    {% extends PAGE_TEMPLATE %}
+    {% extends CMS_PAGE_TEMPLATE %}
     {% load cms_tags %}
     {% block main %}
     {% for item in object_list %}
@@ -625,8 +625,8 @@ Example: application template
     {% static_placeholder "sidebar" %}
     {% endblock main %}
 
-PAGE_TEMPLATE carries the path of the cms template so the application template
-can dynamically import it
+``CMS_PAGE_TEMPLATE`` memorizes the path of the cms template so the application
+template can dynamically import it
 
 
 render_model
