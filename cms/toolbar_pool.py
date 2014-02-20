@@ -10,7 +10,7 @@ class ToolbarPool(object):
         self.toolbars = {}
         self.reverse = {}
         self.discovered = False
-        self.block_register = False
+        self.force_register = False
 
     def discover_toolbars(self):
         if self.discovered:
@@ -18,12 +18,10 @@ class ToolbarPool(object):
             #import all the modules
         toolbars = get_cms_setting('TOOLBARS')
         if toolbars:
-            self.block_register = True
             for cls in iterload_objects(toolbars):
-                self.block_register = False
+                self.force_register = True
                 self.register(cls)
-                self.block_register = True
-            self.block_register = False
+                self.force_register = False
         else:
             load('cms_toolbar')
         self.discovered = True
@@ -33,8 +31,8 @@ class ToolbarPool(object):
         self.discovered = False
 
     def register(self, toolbar):
-        if self.block_register:
-            return
+        if not self.force_register and get_cms_setting('TOOLBARS'):
+            return toolbar
         from cms.toolbar_base import CMSToolbar
         # validate the app
         if not issubclass(toolbar, CMSToolbar):

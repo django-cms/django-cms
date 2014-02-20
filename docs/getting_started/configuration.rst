@@ -686,8 +686,20 @@ CMS_TOOLBARS
 Default: ``None``
 
 If defined, specifies the list of toolbar modifiers to be used to populate the
-toolbar as import paths.
+toolbar as import paths. Otherwise, all available toolbars from both the CMS and
+the 3rd party apps will be loaded.
 
+Example::
+
+    CMS_TOOLBARS = [
+        # CMS Toolbars
+        'cms.cms_toolbar.PlaceholderToolbar',
+        'cms.cms_toolbar.BasicToolbar',
+        'cms.cms_toolbar.PageToolbar',
+
+        # 3rd Party Toolbar
+        'aldryn_blog.cms_toolbar.BlogToolbar',
+    ]
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
