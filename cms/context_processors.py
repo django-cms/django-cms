@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.functional import SimpleLazyObject
 from cms.utils.conf import get_cms_setting
 import warnings
 
@@ -7,9 +8,9 @@ def cms_settings(request):
     """
     Adds media-related context variables to the context.
     """
-    try:
-        template = request.current_page.get_template()
-    except AttributeError:
+    if getattr(request, 'current_page', None):
+        template = SimpleLazyObject(lambda: request.current_page.get_template())
+    else:
         template = ''
     return {
         'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
