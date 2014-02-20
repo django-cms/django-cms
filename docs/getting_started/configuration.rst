@@ -481,6 +481,28 @@ current language does not provide a specific decoder in
 :setting:`CMS_UNIHANDECODE_DECODERS`. If set to ``None``, failing to find a
 specific decoder will disable unihandecode.js for this language.
 
+Example
+-------
+
+Add these to your project's settings::
+
+    CMS_UNIHANDECODE_HOST = '/static/unihandecode/'
+    CMS_UNIHANDECODE_VERSION = '1.0.0'
+    CMS_UNIHANDECODE_DECODERS = ['ja', 'zh', 'vn', 'kr', 'diacritic']
+
+Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://github.com/ojii/unihandecode.js/tree/master/dist>`_ to your static folder::
+
+    project/
+        static/
+            unihandecode/
+                unihandecode-1.0.0.core.min.js
+                unihandecode-1.0.0.diacritic.min.js
+                unihandecode-1.0.0.ja.min.js
+                unihandecode-1.0.0.kr.min.js
+                unihandecode-1.0.0.vn.min.js
+                unihandecode-1.0.0.zh.min.js
+
+More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.org/>`_.
 
 **************
 Media Settings
