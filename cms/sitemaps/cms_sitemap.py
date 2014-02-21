@@ -25,7 +25,9 @@ class CMSSitemap(Sitemap):
         placeholders_ids = list(placeholders_qs.values_list('id', flat=True))
         plugins_qs = CMSPlugin.objects.filter(placeholder__in=placeholders_ids)
         latest_plg_mod_date = plugins_qs.order_by(
-            '-changed_date').values_list('changed_date', flat=True)[0]
-        return max([
-            page.changed_date, page.publication_date, latest_plg_mod_date])
+            '-changed_date').values_list('changed_date', flat=True)[:1]
+        mod_dates = [page.changed_date, page.publication_date]
+        if latest_plg_mod_date:
+            mod_dates.append(latest_plg_mod_date[0])
+        return max(mod_dates)
 
