@@ -23,3 +23,10 @@ urlpatterns += i18n_patterns('',
     url(r'^detail_multi/(?P<id>[0-9]+)/$', 'cms.test_utils.project.placeholderapp.views.detail_view_multi', name="detail_multi"),
     url(r'^', include('cms.urls')),
 )
+
+
+if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+    import debug_toolbar
+    urlpatterns += patterns('',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )

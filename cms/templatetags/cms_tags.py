@@ -159,14 +159,19 @@ def _get_placeholder(current_page, page, context, name):
     placeholder_cache[page.pk] = {}
     placeholders = page.rescan_placeholders().values()
     fetch_placeholders = []
-    for placeholder in placeholders:
-        cache_key = placeholder.get_cache_key(get_language())
-        content = cache.get(cache_key)
-        if content:
-            placeholder.content_cache = content
-        else:
-            fetch_placeholders.append(placeholder)
-    assign_plugins(context['request'], fetch_placeholders, page.get_template(),  get_language())
+    request = context['request']
+    if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
+        fetch_placeholders = placeholders
+    else:
+        for placeholder in placeholders:
+            cache_key = placeholder.get_cache_key(get_language())
+            content = cache.get(cache_key)
+            if not content is None:
+                placeholder.content_cache = content
+            else:
+                fetch_placeholders.append(placeholder)
+    if fetch_placeholders:
+        assign_plugins(context['request'], fetch_placeholders, page.get_template(),  get_language())
     for placeholder in placeholders:
         placeholder_cache[page.pk][placeholder.slot] = placeholder
         placeholder.page = page
@@ -191,11 +196,12 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
             continue
-        if not request.toolbar.edit_mode:
+        if not hasattr(request, 'toolbar') or not request.toolbar.edit_mode:
+            if hasattr(placeholder, 'content_cache'):
+                return mark_safe(placeholder.content_cache)
             cache_key = placeholder.get_cache_key(get_language())
             cached_value = cache.get(cache_key)
             if not cached_value is None:
-                print 'cache hit'
                 return mark_safe(cached_value)
         if not get_plugins(request, placeholder, page.get_template()):
             continue

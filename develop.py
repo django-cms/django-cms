@@ -174,14 +174,6 @@ if __name__ == '__main__':
                 USE_TZ=use_tz,
                 SOUTH_TESTS_MIGRATE=migrate
             )
-
-            try:
-                from debug_toolbar.panels.cache import CacheStatTracker, cache, get_cache, original_cache
-                cache.cache = CacheStatTracker(original_cache)
-                cache.get_cache = get_cache
-            except ImportError:
-                pass
-
             # run
             if args['test']:
                 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082,8090-8100,9000-9200,7041'

@@ -123,11 +123,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         processors = None
     from django.core.cache import cache
 
-    if not edit:
+    if not edit and placeholder:
         cache_key = placeholder.get_cache_key(lang)
         cached_value = cache.get(cache_key)
-        if cached_value:
-            print 'cache hit'
+        if not cached_value is None:
             return mark_safe(cached_value)
 
     if page:
@@ -174,7 +173,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['placeholder'] = toolbar_content
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)
-    if not edit and placeholder.cache_placeholder:
+    if placeholder and not edit and placeholder.cache_placeholder:
         cache.set(cache_key, result)
     context.pop()
     return result
