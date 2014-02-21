@@ -22,7 +22,6 @@ from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.cache import cache
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
@@ -123,6 +122,7 @@ class PageUrl(InclusionTag):
     )
 
     def get_context(self, context, page_lookup, lang, site):
+        from django.core.cache import cache
         site_id = get_site_id(site)
         request = context.get('request', False)
         if not request:
@@ -150,6 +150,7 @@ register.tag('page_id_url', PageUrl)
 
 
 def _get_placeholder(current_page, page, context, name):
+    from django.core.cache import cache
     placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
     if page.pk in placeholder_cache:
         placeholder = placeholder_cache[page.pk].get(name, None)
@@ -157,7 +158,15 @@ def _get_placeholder(current_page, page, context, name):
             return placeholder
     placeholder_cache[page.pk] = {}
     placeholders = page.rescan_placeholders().values()
-    assign_plugins(context['request'], placeholders, page.get_template(),  get_language())
+    fetch_placeholders = []
+    for placeholder in placeholders:
+        cache_key = placeholder.get_cache_key(get_language())
+        content = cache.get(cache_key)
+        if content:
+            placeholder.content_cache = content
+        else:
+            fetch_placeholders.append(placeholder)
+    assign_plugins(context['request'], fetch_placeholders, page.get_template(),  get_language())
     for placeholder in placeholders:
         placeholder_cache[page.pk][placeholder.slot] = placeholder
         placeholder.page = page
@@ -170,6 +179,7 @@ def _get_placeholder(current_page, page, context, name):
 
 
 def get_placeholder_content(context, request, current_page, name, inherit, default):
+    from django.core.cache import cache
     edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
     pages = [current_page]
     # don't display inherited plugins in edit mode, so that the user doesn't
@@ -181,6 +191,12 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
             continue
+        if not request.toolbar.edit_mode:
+            cache_key = placeholder.get_cache_key(get_language())
+            cached_value = cache.get(cache_key)
+            if not cached_value is None:
+                print 'cache hit'
+                return mark_safe(cached_value)
         if not get_plugins(request, placeholder, page.get_template()):
             continue
         content = render_placeholder(placeholder, context, name)
@@ -464,6 +480,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     See _get_page_by_untyped_arg() for detailed information on the allowed types
     and their interpretation for the page_lookup argument.
     """
+    from django.core.cache import cache
     validate_placeholder_name(placeholder_name)
 
     request = context.get('request', False)

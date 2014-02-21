@@ -114,6 +114,8 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     require_parent = False
     parent_classes = None
 
+    cache = True
+
     opts = {}
 
     action_options = {

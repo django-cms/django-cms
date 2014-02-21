@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 from django.utils.timezone import now
 
 from os.path import join

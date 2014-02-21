@@ -16,6 +16,7 @@ from django.contrib import admin
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
+    cache_placeholder = True
 
     class Meta:
         app_label = 'cms'
@@ -48,6 +49,9 @@ class Placeholder(models.Model):
 
     def get_copy_url(self):
         return self._get_url('copy_plugins')
+
+    def get_cache_key(self, lang):
+        return 'render_placeholder__placeholder:%s_lang:%s' % (self.pk, str(lang))
 
     def _get_url(self, key, pk=None):
         model = self._get_attached_model()
