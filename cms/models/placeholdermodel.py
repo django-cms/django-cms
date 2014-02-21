@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils import get_cms_setting
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
@@ -51,7 +52,7 @@ class Placeholder(models.Model):
         return self._get_url('copy_plugins')
 
     def get_cache_key(self, lang):
-        return 'render_placeholder__placeholder:%s_lang:%s' % (self.pk, str(lang))
+        return '%srender_placeholder__placeholder:%s_lang:%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
 
     def _get_url(self, key, pk=None):
         model = self._get_attached_model()

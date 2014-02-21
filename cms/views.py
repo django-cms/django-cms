@@ -13,7 +13,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.conf.urls import patterns
 from django.core.urlresolvers import resolve, Resolver404, reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
 from django.utils.http import urlquote
 
@@ -29,6 +29,13 @@ def details(request, slug):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
+    from django.core.cache import cache
+
+    if hasattr(request, 'toolbar') and not request.toolbar.edit_mode and not request.toolbar.show_toolbar:
+        content = cache.get(_get_cache_key(request))
+        if not content is None:
+            return HttpResponse(content)
+
     # get the right model
     context = RequestContext(request)
     # Get a Page model object from the request
@@ -54,7 +61,7 @@ def details(request, slug):
         attrs = '?preview=1'
         if 'draft' in request.GET:
             attrs += '&draft=1'
-        # Check that the language is in FRONTEND_LANGUAGES:
+            # Check that the language is in FRONTEND_LANGUAGES:
     if not current_language in user_languages:
         #are we on root?
         if not slug:
@@ -121,8 +128,8 @@ def details(request, slug):
                 # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
-        if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
-        and not redirect_url.startswith('/%s/' % current_language)):
+        if (is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
+                    '/%s/' % current_language)):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
@@ -152,7 +159,7 @@ def details(request, slug):
 
     response.add_post_render_callback(_cache_page)
 
-# Add headers for X Frame Options - this really should be changed upon moving to class based views
+    # Add headers for X Frame Options - this really should be changed upon moving to class based views
     xframe_options = page.get_xframe_options()
     if xframe_options == Page.X_FRAME_OPTIONS_INHERIT:
         # This is when we defer to django's own clickjacking handling
@@ -160,7 +167,7 @@ def details(request, slug):
 
     # We want to prevent django setting this in their middlewear
     response.xframe_options_exempt = True
-    
+
     if xframe_options == Page.X_FRAME_OPTIONS_ALLOW:
         # Do nothing, allowed is no header.
         return response
@@ -173,4 +180,24 @@ def details(request, slug):
 
 
 def _cache_page(response):
-    print response.request.toolbars
+    from django.core.cache import cache
+
+    request = response._request
+    save_cache = True
+    if hasattr(request, 'placeholders'):
+        for placeholder in request.placeholders:
+            if not placeholder.cache_placeholder:
+                save_cache = False
+                break
+    if hasattr(request, 'toolbar'):
+        if request.toolbar.edit_mode or request.toolbar.show_toolbar:
+            save_cache = False
+    if not save_cache:
+        response
+    if save_cache:
+        cache.set(_get_cache_key(request), response.content)
+
+
+def _get_cache_key(request):
+    key = "CMS:%s" % request.path
+    return key

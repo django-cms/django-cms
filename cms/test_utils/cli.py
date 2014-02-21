@@ -62,7 +62,7 @@ def configure(db_url, **extra):
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
-        #    'debug_toolbar.middleware.DebugToolbarMiddleware',
+            'debug_toolbar.middleware.DebugToolbarMiddleware',
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -78,7 +78,7 @@ def configure(db_url, **extra):
             'django.middleware.cache.FetchFromCacheMiddleware',
         ],
         INSTALLED_APPS=[
-        #    'debug_toolbar',
+            'debug_toolbar',
             'django.contrib.auth',
             'django.contrib.contenttypes',
             'django.contrib.sessions',

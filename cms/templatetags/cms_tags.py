@@ -169,6 +169,7 @@ def _get_placeholder(current_page, page, context, name):
             if not content is None:
                 placeholder.content_cache = content
             else:
+                placeholder.cache_checked = True
                 fetch_placeholders.append(placeholder)
     if fetch_placeholders:
         assign_plugins(context['request'], fetch_placeholders, page.get_template(),  get_language())
@@ -199,10 +200,11 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
         if not hasattr(request, 'toolbar') or not request.toolbar.edit_mode:
             if hasattr(placeholder, 'content_cache'):
                 return mark_safe(placeholder.content_cache)
-            cache_key = placeholder.get_cache_key(get_language())
-            cached_value = cache.get(cache_key)
-            if not cached_value is None:
-                return mark_safe(cached_value)
+            if not hasattr(placeholder, 'cache_checked'):
+                cache_key = placeholder.get_cache_key(get_language())
+                cached_value = cache.get(cache_key)
+                if not cached_value is None:
+                    return mark_safe(cached_value)
         if not get_plugins(request, placeholder, page.get_template()):
             continue
         content = render_placeholder(placeholder, context, name)
