@@ -20,10 +20,12 @@ class CMSSitemap(Sitemap):
         return all_pages
 
     def lastmod(self, page):
-        modification_dates = [page.changed_date, page.publication_date]
-        plugins_for_placeholder = lambda placeholder: placeholder.cmsplugin_set.all()
-        plugins = from_iterable(map(plugins_for_placeholder, page.placeholders.all()))
-        plugin_modification_dates = map(lambda plugin: plugin.changed_date, plugins)
-        modification_dates.extend(plugin_modification_dates)
-        return max(modification_dates)
-    
+        from cms.models import Placeholder, CMSPlugin
+        placeholders_qs = Placeholder.objects.filter(page=page)
+        placeholders_ids = list(placeholders_qs.values_list('id', flat=True))
+        plugins_qs = CMSPlugin.objects.filter(placeholder__in=placeholders_ids)
+        latest_plg_mod_date = plugins_qs.order_by(
+            '-changed_date').values_list('changed_date', flat=True)[0]
+        return max([
+            page.changed_date, page.publication_date, latest_plg_mod_date])
+
