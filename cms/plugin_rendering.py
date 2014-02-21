@@ -128,7 +128,6 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         cached_value = cache.get(cache_key)
         if not cached_value is None:
             return mark_safe(cached_value)
-
     if page:
         template = page.template
     else:

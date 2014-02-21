@@ -169,8 +169,8 @@ def _get_placeholder(current_page, page, context, name):
             if not content is None:
                 placeholder.content_cache = content
             else:
-                placeholder.cache_checked = True
                 fetch_placeholders.append(placeholder)
+            placeholder.cache_checked = True
     if fetch_placeholders:
         assign_plugins(context['request'], fetch_placeholders, page.get_template(),  get_language())
     for placeholder in placeholders:
@@ -197,7 +197,7 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
             continue
-        if not hasattr(request, 'toolbar') or not request.toolbar.edit_mode:
+        if not edit_mode:
             if hasattr(placeholder, 'content_cache'):
                 return mark_safe(placeholder.content_cache)
             if not hasattr(placeholder, 'cache_checked'):
