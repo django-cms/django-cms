@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.sitemaps import Sitemap
+from django.core import paginator
+
 
 def from_iterable(iterables):
     """
@@ -9,9 +11,29 @@ def from_iterable(iterables):
         for element in it:
             yield element
 
+
+class ObjectCachedPaginator(paginator.Paginator):
+    """
+        Custom paginator that will cache pages per page number
+        for a paginator instance.
+    """
+
+    def page(self, number):
+        if not hasattr(self, '_page_%d' % number):
+            setattr(self, '_page_%d' % number,
+                    super(ObjectCachedPaginator, self).page(number))
+        return getattr(self, '_page_%d' % number)
+
+
 class CMSSitemap(Sitemap):
     changefreq = "monthly"
     priority = 0.5
+
+    @property
+    def paginator(self):
+        if not hasattr(self, '_paginator'):
+            self._paginator = ObjectCachedPaginator(self.items(), self.limit)
+        return self._paginator
 
     def items(self):
         from cms.utils.moderator import get_page_queryset
