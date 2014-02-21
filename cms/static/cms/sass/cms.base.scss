@@ -50,7 +50,8 @@
 //##################################################
 // #GLOBALS#
 .cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
-#djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
+// removed as of: //github.com/divio/django-cms/issues/2476
+// #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
 
 //##################################################
 // #TOOLBAR#

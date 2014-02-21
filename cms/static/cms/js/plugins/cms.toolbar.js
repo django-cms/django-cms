@@ -397,22 +397,22 @@ $(document).ready(function () {
 
 		_delegate: function (el) {
 			// save local vars
-			var target = el.attr('data-rel');
+			var target = el.data('rel');
 
 			switch(target) {
 				case 'modal':
-					var modal = new CMS.Modal({'onClose': el.attr('data-on-close')});
-						modal.open(el.attr('href'), el.attr('data-name'));
+					var modal = new CMS.Modal({'onClose': el.data('on-close')});
+						modal.open(el.attr('href'), el.data('name'));
 					break;
 				case 'message':
-					this.openMessage(el.attr('data-text'));
+					this.openMessage(el.data('text'));
 					break;
 				case 'sideframe':
-					var sideframe = new CMS.Sideframe();
+					var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
 						sideframe.open(el.attr('href'), true);
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'), el.attr('data-post'), el.attr('data-text'));
+					this.openAjax(el.attr('href'), el.data('post'), el.data('text'));
 					break;
 				default:
 					window.location.href = el.attr('href');
