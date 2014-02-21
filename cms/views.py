@@ -148,4 +148,11 @@ def details(request, slug):
     if not context['has_view_permissions']:
         return _handle_no_page(request, slug)
 
-    return TemplateResponse(request, template_name, context)
+    response = TemplateResponse(request, template_name, context)
+    response.add_post_render_callback(_cache_page)
+
+    return response
+
+
+def _cache_page(response):
+    print response.request.toolbars
