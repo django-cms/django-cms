@@ -160,7 +160,7 @@ $(document).ready(function () {
 		}, langDelay * 2);
 	});
 	// attach double check event if publish or unpublish should be triggered
-	tree.delegate.bind('.language-tooltip a', 'click', function (e) {
+	tree.delegate('.language-tooltip a', 'click', function (e) {
 		e.preventDefault();
 
 		// cancel if not confirmed
