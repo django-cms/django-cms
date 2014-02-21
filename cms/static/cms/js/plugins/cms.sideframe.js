@@ -162,6 +162,9 @@ $(document).ready(function () {
 
 			// update settings
 			this.settings = this.setSettings(this.settings);
+
+			// handle refresh option
+			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
 		},
 
 		// private methods

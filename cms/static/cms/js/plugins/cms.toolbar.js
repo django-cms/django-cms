@@ -408,7 +408,7 @@ $(document).ready(function () {
 					this.openMessage(el.data('text'));
 					break;
 				case 'sideframe':
-					var sideframe = new CMS.Sideframe();
+					var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
 						sideframe.open(el.attr('href'), true);
 					break;
 				case 'ajax':
