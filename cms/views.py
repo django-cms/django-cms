@@ -4,7 +4,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
-from cms.models import Title
+from cms.models import Title, Page
 from cms.utils import get_template_from_request, get_language_from_request
 from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, \
     get_language_list, is_language_prefix_patterns_used
@@ -149,7 +149,25 @@ def details(request, slug):
         return _handle_no_page(request, slug)
 
     response = TemplateResponse(request, template_name, context)
+
     response.add_post_render_callback(_cache_page)
+
+# Add headers for X Frame Options - this really should be changed upon moving to class based views
+    xframe_options = page.get_xframe_options()
+    if xframe_options == Page.X_FRAME_OPTIONS_INHERIT:
+        # This is when we defer to django's own clickjacking handling
+        return response
+
+    # We want to prevent django setting this in their middlewear
+    response.xframe_options_exempt = True
+    
+    if xframe_options == Page.X_FRAME_OPTIONS_ALLOW:
+        # Do nothing, allowed is no header.
+        return response
+    elif xframe_options == Page.X_FRAME_OPTIONS_SAMEORIGIN:
+        response['X-Frame-Options'] = 'SAMEORIGIN'
+    elif xframe_options == Page.X_FRAME_OPTIONS_DENY:
+        response['X-Frame-Options'] = 'DENY'
 
     return response
 

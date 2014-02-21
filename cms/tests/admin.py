@@ -304,7 +304,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 380)):
+            with self.assertNumQueries(FuzzyInt(300, 382)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -1205,9 +1205,9 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(FuzzyInt(40, 60)):
                 output = force_unicode(self.client.get('/en/?edit').content)
             self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(FuzzyInt(18, 33)):
+        with self.assertNumQueries(FuzzyInt(18, 34)):
             output = force_unicode(self.client.get('/en/?edit').content)
-        with self.assertNumQueries(FuzzyInt(13, 14)):
+        with self.assertNumQueries(FuzzyInt(13, 15)):
             output = force_unicode(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):

@@ -198,7 +198,9 @@ class CMSToolbar(ToolbarAPIMixin):
         with force_language(self.toolbar_language):
             first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
             for key in first:
-                toolbar = self.toolbars[key]
+                toolbar = self.toolbars.get(key)
+                if not toolbar:
+                    continue
                 result = getattr(toolbar, func_name)()
                 if isinstance(result, HttpResponse):
                     return result
