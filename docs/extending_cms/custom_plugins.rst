@@ -712,3 +712,12 @@ translatable_content_excluded_fields
 Default: [ ]
 
 A list of plugin fields which will not be exported while using :meth:`get_translatable_content`
+
+
+cache
+-----
+
+Default: True
+
+Is this plugin cacheable? If your plugin displays content based on the user or request or other
+dynamic properties set this to False.

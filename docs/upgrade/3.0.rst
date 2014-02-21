@@ -345,6 +345,12 @@ Since django CMS 2.0 plugins had their table names start with `cmsplugin_`. We r
 in 3.0 and will display a deprecation warning with the old and new table name. If your plugin uses
 south for migrations create a new empty schemamigration and rename the table by hand.
 
+Placeholder caching
+===================
+
+Plugins have a new default property: `cache=True`. If all plugins in a placeholder have set this to
+``True`` the whole placeholder will be cached if the toolbar is not in edit mode.
+
 
 ********************
 Pending deprecations

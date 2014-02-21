@@ -89,6 +89,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
     """
+    if not placeholder:
+        return
     from cms.utils.plugins import get_plugins
     context = context_to_copy
     context.push()
@@ -96,10 +98,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if not hasattr(request, 'placeholder'):
         request.placeholders = []
     request.placeholders.append(placeholder)
-
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
-
     page = placeholder.page if placeholder else None
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work

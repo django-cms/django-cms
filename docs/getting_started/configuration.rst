@@ -609,7 +609,7 @@ This dictionary carries the various cache duration settings.
 
 Default: ``60``
 
-Cache expiration (in seconds) for :ttag:`show_placeholder` and :ttag:`page_url`
+Cache expiration (in seconds) for :ttag:`show_placeholder`, :ttag:`page_url`, :ttag:`placeholder` and :ttag:`static_placeholder`
 template tags.
 
 .. note::
