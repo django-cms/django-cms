@@ -171,27 +171,20 @@ $color-background-blue-hover: #e6f6fd;
 
 // dropdown for language change
 .col-language { position:relative; }
-#sitemap .tree li .col-language:hover .language-dropdown { display:block; }
 #sitemap .tree li .col-language
-.language-dropdown { display:none; position:absolute; right:-1px; top:-1px; z-index:9999;
-	line-height:18px; @include border-radius(3px 0 3px 3px);
-	background:none !important; border:1px solid #ccc !important;
-
-	.ld-item { display:block !important; background:#ededed !important; border-bottom:1px solid #ddd; padding:0 24px 0 0 !important; }
-	.ld-item.first { background:rgba(white, 0.5) !important; }
-	.ld-item.last { border:none; }
-	.ld-item span { display:block !important; padding:5px 10px 5px 20px !important;
-		text-align:right !important; text-transform:none !important; color:#333;
-		background:white !important; border-right:1px solid #ddd !important;
-		// resets
-		border-radius:0 !important;
-		width:auto !important; height:auto !important; margin:0 !important; }
-	.ld-item span a { text-transform:none !important; vertical-align:top !important; }
-
-	.ld-switch { position:absolute; right:0; bottom:0;
-		width:24px; height:24px; background:#ededed; }
-	.ld-preview { position:absolute; right:0; top:0; cursor:pointer;
-		width:24px; height:28px; background:transparent; }
+.language-tooltip { display:none; position:absolute; right:20px; top:4px; z-index:9999;
+	line-height:1; padding:4px 6px; font-size:11px; color:#ccc;
+	background-color:black; background:rgba(black, 0.8); border:none;
+	@include border-radius(3px);
+	a { color:#ddd; }
+	a:hover { color:white; text-decoration:none; }
+	&:before { display:block; width:0; height:0;
+		position:absolute; top:50%; right:-5px; margin-top:-4px; content:" ";
+		border-top: 4px solid transparent;
+		border-bottom: 4px solid transparent;
+		border-left: 5px solid rgba(black, 0.8);
+	}
+	&.language-tooltip-multiple a:first-child:after { content:" - "; }
 }
 
 // animation for publishing
