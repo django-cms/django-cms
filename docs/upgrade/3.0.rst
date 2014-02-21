@@ -349,7 +349,9 @@ Placeholder caching
 ===================
 
 Plugins have a new default property: `cache=True`. If all plugins in a placeholder have set this to
-``True`` the whole placeholder will be cached if the toolbar is not in edit mode.
+``True`` the whole placeholder and page will be cached if the toolbar is not in edit mode.
+
+.. warning:: If your plugin is dynamic and processes current user or request data be sure to set ``cache=False``
 
 
 ********************
