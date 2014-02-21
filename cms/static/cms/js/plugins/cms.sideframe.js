@@ -12,6 +12,7 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
+			'onClose': false,
 			'sideframeDuration': 300,
 			'sideframeWidth': 320,
 			'urls': {

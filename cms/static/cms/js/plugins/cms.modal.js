@@ -12,14 +12,14 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
-			'modalDuration': 300,
-			'urls': {
-				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
-			},
+			'onClose': false,
 			'minHeight': 400,
 			'minWidth': 800,
-			'onClose': false,
-			'newPlugin': false
+			'modalDuration': 300,
+			'newPlugin': false,
+			'urls': {
+				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
+			}
 		},
 
 		initialize: function (options) {
