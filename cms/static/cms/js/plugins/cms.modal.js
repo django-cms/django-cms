@@ -154,7 +154,6 @@ $(document).ready(function () {
 			}
 
 			// handle refresh option
-			if(this.options.redirectOnClose) this.reloadBrowser(this.options.redirectOnClose);
 			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
 		},
 
