@@ -35,9 +35,8 @@ $(document).ready(function () {
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 			this.maximized = false;
 			this.minimized = false;
-			this.enforceReload = false;
-			this.enforceClose = false;
 			this.triggerMaximized = false;
+			this.saved = false;
 
 			// if the modal is initialized the first time, set the events
 			if(!this.modal.data('ready')) this._events();
@@ -153,12 +152,10 @@ $(document).ready(function () {
 			} else {
 				this._hide(100);
 			}
+
 			// handle refresh option
-			if(this.options.onClose === 'REFRESH_PAGE') {
-				this.reloadBrowser();
-			} else if(this.options.redirectOnClose) {
-				this.reloadBrowser(this.options.redirectOnClose);
-			}
+			if(this.options.redirectOnClose) this.reloadBrowser(this.options.redirectOnClose);
+			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
 		},
 
 		// private methods
@@ -413,16 +410,14 @@ $(document).ready(function () {
 			var buttons = row.find('input, a');
 			var render = $('<span />'); // seriously jquery...
 
-			// if there are no buttons, try again
+			// if there are no given buttons within the submit-row area
+			// scan deeper within the form itself
 			if(!buttons.length) {
 				row = iframe.contents().find('form:eq(0)');
 				buttons = row.find('input[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
 					.hide();
-				this.enforceReload = true;
-			} else {
-				this.enforceReload = false;
 			}
 
 			// attach relation id
@@ -445,7 +440,7 @@ $(document).ready(function () {
 				if(item.hasClass('default')) cls = 'cms_btn cms_btn-action';
 				if(item.hasClass('deletelink')) cls = 'cms_btn cms_btn-caution';
 
-				// create the element
+				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
 						if(item.is('input')) item[0].click();
@@ -454,12 +449,12 @@ $(document).ready(function () {
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
  							that.options.newPlugin = null;
-							that.enforceClose = true;
-							if(item.hasClass('deletelink')) {
-								that.options.onClose = null;
-							}
-						} else {
-							that.enforceClose = false;
+ 							// reset onClose when delete is triggered
+							if(item.hasClass('deletelink')) that.options.onClose = null;
+							// hide iframe
+							that.modal.find('.cms_modal-frame iframe').css('visibility', 'hidden');
+							// page has been saved or deleted, run checkup
+							that.saved = true;
 						}
 					});
 
@@ -493,7 +488,7 @@ $(document).ready(function () {
 			var title = this.modal.find('.cms_modal-title');
 				title.html(name || '&nbsp;');
 
-			// insure previous iframe is hidden
+			// ensure previous iframe is hidden
 			holder.find('iframe').css('visibility', 'hidden');
 
 			// attach load event for iframe to prevent flicker effects
@@ -503,34 +498,37 @@ $(document).ready(function () {
 					if(messages.length) CMS.API.Toolbar.openMessage(messages.eq(0).text());
 					messages.remove();
 
-				// determine if we should close the modal or reload
-				if(messages.length && that.enforceReload) that.reloadBrowser();
-				if(messages.length && that.enforceClose) {
-					that.close();
-					return false;
-				}
-
 				// after iframe is loaded append css
 				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
-
-				// set title of not provided
-				var innerTitle = iframe.contents().find('#content h1:eq(0)');
-				if(name === undefined) title.html(innerTitle.text());
-				innerTitle.remove();
 
 				// set modal buttons
 				that._setButtons($(this));
 
-				// than show
-				iframe.css('visibility','visible');
+				// when an error occurs, reset the saved status so the form can be checked and validated again
+				if(iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
+					that.saved = false;
+				}
 
-				// append ready state
-				iframe.data('ready', true);
+				// when the window has been changed pressing the blue or red button, we need to run a reload check
+				if(that.saved) {
+					that.reloadBrowser(false, false, true);
+				} else {
+					// set title of not provided
+					var innerTitle = iframe.contents().find('#content h1:eq(0)');
+					if(name === undefined) title.html(innerTitle.text());
+					innerTitle.remove();
 
-				// attach close event
-				iframe.contents().find('body').bind('keydown.cms', function (e) {
-					if(e.keyCode === 27) that.close();
-				});
+					// than show
+					iframe.css('visibility', 'visible');
+
+					// append ready state
+					iframe.data('ready', true);
+
+					// attach close event
+					iframe.contents().find('body').bind('keydown.cms', function (e) {
+						if(e.keyCode === 27) that.close();
+					});
+				}
 			});
 
 			// inject
