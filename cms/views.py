@@ -5,7 +5,7 @@ from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Title, Page
-from cms.utils import get_template_from_request, get_language_from_request
+from cms.utils import get_template_from_request, get_language_from_request, get_cms_setting
 from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, \
     get_language_list, is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
@@ -31,10 +31,14 @@ def details(request, slug):
     """
     from django.core.cache import cache
 
-    if hasattr(request, 'toolbar') and not request.toolbar.edit_mode and not request.toolbar.show_toolbar:
-        content = cache.get(_get_cache_key(request))
-        if not content is None:
-            return HttpResponse(content)
+    if hasattr(request, 'toolbar') and not request.toolbar.edit_mode and \
+            not request.toolbar.show_toolbar and not request.user.is_authenticated:
+        cache_content = cache.get(_get_cache_key(request))
+        if not cache_content is None:
+            content, headers = cache_content
+            response = HttpResponse(content)
+            response._headers = headers
+            return response
 
     # get the right model
     context = RequestContext(request)
@@ -192,10 +196,13 @@ def _cache_page(response):
     if hasattr(request, 'toolbar'):
         if request.toolbar.edit_mode or request.toolbar.show_toolbar:
             save_cache = False
+    if request.user.is_authenticated:
+        save_cache = False
     if not save_cache:
         response
     if save_cache:
-        cache.set(_get_cache_key(request), response.content)
+        cache.set(_get_cache_key(request), (response.content, response._headers),
+                  get_cms_setting('CACHE_DURATIONS')['content'])
 
 
 def _get_cache_key(request):
