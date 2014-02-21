@@ -725,3 +725,17 @@ Example::
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
+
+CMS_DEFAULT_X_FRAME_OPTIONS
+===========================
+
+Default: ``Page.X_FRAME_OPTIONS_INHERIT``
+
+This setting is the default value for a Page's X Frame Options setting. 
+This should be an integer preferably taken from the Page object e.g.
+
+- X_FRAME_OPTIONS_INHERIT
+- X_FRAME_OPTIONS_ALLOW
+- X_FRAME_OPTIONS_SAMEORIGIN
+- X_FRAME_OPTIONS_DENY
+
