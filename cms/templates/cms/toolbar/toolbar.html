@@ -93,7 +93,7 @@
 	<div class="cms_structure">
 		<div class="cms_structure-content">
 			{% for placeholder in request.toolbar.placeholders.values %}
-			<div class="cms_dragarea cms_dragarea-{{ placeholder.pk }}{% if placeholder.is_static %} cms_dragarea-static{% endif %}">
+			<div class="cms_dragarea cms_dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms_dragarea-static{% endif %}">
 				{% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
 
 				{# <div class="cms_dragitem cms_dragitem-1888"> #}

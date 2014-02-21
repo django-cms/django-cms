@@ -194,6 +194,10 @@ def get_languages():
     if not settings.USE_I18N:
         return _ensure_languages_settings(
             {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
+    if not settings.LANGUAGE_CODE in dict(settings.LANGUAGES):
+        raise ImproperlyConfigured(
+                        'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
+                    )
     languages = getattr(settings, 'CMS_LANGUAGES', {
         settings.SITE_ID: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
     })

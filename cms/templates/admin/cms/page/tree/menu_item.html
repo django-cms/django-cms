@@ -25,7 +25,18 @@
         {% for lang in site_languages %}
 		<div class="col-language">
 		    {% if has_change_permission %}
-				<a href="{% if lang in page.languages %}./{{ page.id }}/{{ lang }}/preview/" target="_parent"{% else %}{{ url }}{{ page.id }}/?language={{ lang }}"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
+				<a href="{{ url }}{{ page.id }}/?language={{ lang }}" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
+				{% if lang in page.languages %}
+				<div class="language-dropdown" hidden="hidden">
+					<div class="ld-item first"><span><a href="./{{ page.id }}/{{ lang }}/preview/" target="_parent">{% trans "Preview and publish" %}</a></span></div>
+					<div class="ld-item last"><span>
+						<a href="./{{ page.id }}/{{ lang }}/publish/" class="publish-trigger" data-class="published">{% trans "Publish" %}</a>{% if page|is_published:lang %} /
+						<a href="./{{ page.id }}/{{ lang }}/unpublish/" class="publish-trigger" data-class="unpublished">{% trans "Unpublish" %}</a>{% endif %}
+					</span></div>
+					<div class="ld-switch"></div>
+					<div class="ld-preview"></div>
+				</div>
+				{% endif %}
 			{% else %}
 				{% tree_publish_row page lang %}
 			{% endif %}

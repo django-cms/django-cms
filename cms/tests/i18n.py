@@ -5,7 +5,7 @@ from cms.utils import i18n
 class TestLanguages(SettingsOverrideTestCase):
 
     settings_overrides = {
-        'LANGUAGE_CODE': 'en-us',
+        'LANGUAGE_CODE': 'en',
         'LANGUAGES': (('fr', 'French'),
                       ('en', 'English'),
                       ('de', 'German'),
@@ -73,7 +73,7 @@ class TestLanguages(SettingsOverrideTestCase):
 class TestLanguagesNoDefault(SettingsOverrideTestCase):
 
     settings_overrides = {
-        'LANGUAGE_CODE': 'en-us',
+        'LANGUAGE_CODE': 'en',
         'LANGUAGES': (('fr', 'French'),
                       ('en', 'English'),
                       ('de', 'German'),

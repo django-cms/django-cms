@@ -73,6 +73,7 @@ $color-background-blue-hover: #e6f6fd;
 	// add additional border to separate categories
 	li.open ul { margin-left:0; border-bottom:1px solid $color-border !important; }
 	li.open.last ul { border-bottom:none !important; }
+	li.open ul.last { border-bottom:none !important; }
 §
 	li .col1 > div { text-align:center; }
 	li .col1 .title { background:none; }
@@ -139,7 +140,7 @@ $color-background-blue-hover: #e6f6fd;
 // loader on top right
 #loader-message { position:fixed; top:0; right:0; padding:4px 8px; background:white; display:none; }
 
-/* TODO this should be defined inside djangocms-admin.css instead */
+/* TODO this should be defined inside djangocms-admin.css instead (3.1) */
 #sitemap {
 	border:1px solid $color-border;
 	ul.header li .col2 > div { padding:0 5.5px; }
@@ -166,6 +167,31 @@ $color-background-blue-hover: #e6f6fd;
 		&.published { background-color:#65b417; }
 	 }
 	 li .cont { overflow:visible !important; }
+}
+
+// dropdown for language change
+.col-language { position:relative; }
+#sitemap .tree li .col-language:hover .language-dropdown { display:block; }
+#sitemap .tree li .col-language
+.language-dropdown { display:none; position:absolute; right:-1px; top:-1px; z-index:9999;
+	line-height:18px; @include border-radius(3px 0 3px 3px);
+	background:none !important; border:1px solid #ccc !important;
+
+	.ld-item { display:block !important; background:#ededed !important; border-bottom:1px solid #ddd; padding:0 24px 0 0 !important; }
+	.ld-item.first { background:rgba(white, 0.5) !important; }
+	.ld-item.last { border:none; }
+	.ld-item span { display:block !important; padding:5px 10px 5px 20px !important;
+		text-align:right !important; text-transform:none !important; color:#333;
+		background:white !important; border-right:1px solid #ddd !important;
+		// resets
+		border-radius:0 !important;
+		width:auto !important; height:auto !important; margin:0 !important; }
+	.ld-item span a { text-transform:none !important; vertical-align:top !important; }
+
+	.ld-switch { position:absolute; right:0; bottom:0;
+		width:24px; height:24px; background:#ededed; }
+	.ld-preview { position:absolute; right:0; top:0; cursor:pointer;
+		width:24px; height:28px; background:transparent; }
 }
 
 // animation for publishing
