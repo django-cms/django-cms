@@ -354,10 +354,10 @@ page. If no ancestor specifies a value, no header will be set, allowing Django's
 own middleware to handle it (if enabled).
 
 CMS_TEMPLATE context variable
-==================================
+=============================
 
-A new ``CMS_TEMPLATE`` is available: it's available in pages and apphook-ed
-applications, and it contains the path to the current page template.
+A new ``CMS_TEMPLATE`` variable is now available in the context: it contains the path to the
+current page template.
 See :ref:`CMS_TEMPLATE reference <page_template>` for details.
 
 

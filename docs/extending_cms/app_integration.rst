@@ -591,8 +591,10 @@ CMS_TEMPLATE
 ------------
 .. versionadded:: 3.0
 
-``CMS_TEMPLATE`` is a context variable available in the context for every
-page and application using apphooks, and holds the page template path.
+``CMS_TEMPLATE`` is a context variable available in the context; it contains
+the template path for CMS pages and application using apphooks, and the default
+template (i.e.: the first template in :setting:`CMS_TEMPLATES`) for non-CMS
+managed urls.
 
 This is mostly useful to use it in the ``extends`` templatetag in the application
 templates to get the current page template.
