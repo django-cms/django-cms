@@ -185,7 +185,7 @@ class ContextTests(SettingsOverrideTestCase):
                 # 1 query is executed by get_app_patterns() at
                 # first request, so we need to factor off this
                 num_queries = len(context.captured_queries) - 1
-                self.assertFalse('CMS_PAGE_TEMPLATE' in response.context)
+                self.assertFalse('CMS_TEMPLATE' in response.context)
         cache.clear()
         menu_pool.clear()
         # Number of queries when context processor is enabled
@@ -201,7 +201,7 @@ class ContextTests(SettingsOverrideTestCase):
             # Zero more queries when determining the current template
             with self.assertNumQueries(0):
                 # Template is the first in the CMS_TEMPLATES list
-                self.assertEqual(response.context['CMS_PAGE_TEMPLATE'], get_cms_setting('TEMPLATES')[0][0])
+                self.assertEqual(response.context['CMS_TEMPLATE'], get_cms_setting('TEMPLATES')[0][0])
         cache.clear()
         menu_pool.clear()
 
@@ -220,7 +220,7 @@ class ContextTests(SettingsOverrideTestCase):
             # the context_processor
             with self.assertNumQueries(num_queries_page):
                 response = self.client.get("/en/page-2/")
-                self.assertEqual(response.context['CMS_PAGE_TEMPLATE'], page_template)
+                self.assertEqual(response.context['CMS_TEMPLATE'], page_template)
 
         page_2.template = 'INHERIT'
         page_2.save()
@@ -229,4 +229,4 @@ class ContextTests(SettingsOverrideTestCase):
             # One query more triggered as page inherits template from ancestor
             with self.assertNumQueries(num_queries_page + 1):
                 response = self.client.get("/en/page-2/")
-                self.assertEqual(response.context['CMS_PAGE_TEMPLATE'], page_template)
+                self.assertEqual(response.context['CMS_TEMPLATE'], page_template)

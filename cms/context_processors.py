@@ -12,7 +12,7 @@ def cms_settings(request):
     """
     return {
         'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-        'CMS_PAGE_TEMPLATE': SimpleLazyObject(
+        'CMS_TEMPLATE': SimpleLazyObject(
             lambda: get_template_from_request(request)),
     }
 
