@@ -8,6 +8,8 @@ from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission, Page
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.fuzzy_int import FuzzyInt
+from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.views import _handle_no_page, details
 from menus.menu_pool import menu_pool
@@ -166,6 +168,7 @@ class ContextTests(SettingsOverrideTestCase):
         Asserts the number of queries triggered by
         `cms.context_processors.cms_settings` and `cms.middleware.page`
         """
+        from django.template import context
         page_template = "nav_playground.html"
         original_context = settings.TEMPLATE_CONTEXT_PROCESSORS
         new_context = copy(original_context)
@@ -175,16 +178,23 @@ class ContextTests(SettingsOverrideTestCase):
                              parent=page)
 
         # Tests for standard django applications
+        # 1 query is executed in get_app_patterns(), not related
+        # to cms.context_processors.cms_settings.
+        # Executing this oputside queries assertion context ensure
+        # repetability
+        response = self.client.get("/en/admin/")
 
+        cache.clear()
+        menu_pool.clear()
+        context._standard_context_processors = None
         # Number of queries when context processors is not enabled
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
-            # 1 query is executed in get_app_patterns(), not related
-            # to cms.context_processors.cms_settings
-            with self.assertNumQueries(1) as context:
+            with self.assertNumQueries(FuzzyInt(0, 4)) as context:
                 response = self.client.get("/en/admin/")
-                # 1 query is executed by get_app_patterns() at
-                # first request, so we need to factor off this
-                num_queries = len(context.captured_queries) - 1
+                if DJANGO_1_5:
+                    num_queries = len(context.connection.queries) - context.starting_queries
+                else:
+                    num_queries = len(context.captured_queries)
                 self.assertFalse('CMS_TEMPLATE' in response.context)
         cache.clear()
         menu_pool.clear()
@@ -208,9 +218,12 @@ class ContextTests(SettingsOverrideTestCase):
         # Number of queries when context processors is not enabled
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
             # Baseline number of queries
-            with self.assertNumQueries(19) as context:
+            with self.assertNumQueries(FuzzyInt(18, 20)) as context:
                 response = self.client.get("/en/page-2/")
-                num_queries_page = len(context.captured_queries)
+                if DJANGO_1_5:
+                    num_queries_page = len(context.connection.queries) - context.starting_queries
+                else:
+                    num_queries_page = len(context.captured_queries)
         cache.clear()
         menu_pool.clear()
 
