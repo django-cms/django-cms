@@ -74,12 +74,8 @@ def get_visible_pages(request, pages, site=None):
 
     # authenticated user and global permission
     if is_auth_user:
-        query = dict()
-        query['group__' + user_related_query_name] = request.user
-        global_page_perm_q = Q(
-            Q(user=request.user) | Q(**query)
-        ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
-        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+        global_view_perms = GlobalPagePermission.objects.user_has_view_permission(
+            request.user, site.pk).exists()
 
         #no page perms edge case - all visible
         if ((is_setting_public_all or (

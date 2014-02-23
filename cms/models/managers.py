@@ -217,7 +217,8 @@ class TitleManager(PublisherManager):
 class BasicPagePermissionManager(models.Manager):
     """Global page permission manager accessible under objects.
 
-    !IMPORTANT: take care, PagePermissionManager extends this manager
+    !IMPORTANT: take care, PagePermissionManager and GlobalPagePermissionManager
+    both inherit from this manager
     """
 
     def with_user(self, user):
@@ -237,6 +238,29 @@ class BasicPagePermissionManager(models.Manager):
         return self.with_user(user).filter(can_change_permissions=True)
 
 
+class GlobalPagePermissionManager(BasicPagePermissionManager):
+ 
+    def user_has_permission(self, user, site_id, perm):
+        """
+        Provide a single point of entry for deciding whether any given global
+        permission exists.
+        """
+        # if the user has add rights to this site explicitly
+        this_site = Q(**{perm: True, 'sites__in':[site_id]})
+        # if the user can add to all sites
+        all_sites = Q(**{perm: True, 'sites__isnull': True})
+        return self.with_user(user).filter(this_site | all_sites)
+ 
+    def user_has_add_permission(self, user, site_id):
+        return self.user_has_permission(user, site_id, 'can_add')
+ 
+    def user_has_change_permission(self, user, site_id):
+        return self.user_has_permission(user, site_id, 'can_change')
+ 
+    def user_has_view_permission(self, user, site_id):
+        return self.user_has_permission(user, site_id, 'can_view')
+ 
+  
 class PagePermissionManager(BasicPagePermissionManager):
     """Page permission manager accessible under objects.
     """
@@ -463,10 +487,8 @@ class PagePermissionsPermissionManager(models.Manager):
         if cached is not None:
             return cached
             # check global permissions
-        global_permissions = GlobalPagePermission.objects.with_user(user)
-        if global_permissions.filter(**{
-            attr: True, 'sites__in': [site]
-        }).exists():
+        global_perm = GlobalPagePermission.objects.user_has_permission(user, site, attr).exists()
+        if global_perm:
             # user or his group are allowed to do `attr` action
             # !IMPORTANT: page permissions must not override global permissions
             return PagePermissionsPermissionManager.GRANT_ALL
