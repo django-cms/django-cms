@@ -1129,7 +1129,7 @@ class PageAdmin(ModelAdmin):
         # page add-plugin
         if page:
             # this only runs when both page and placeholder are not empty.
-            language = request.POST['language'] or get_language_from_request(request)
+            language = request.POST.get('language') or get_language_from_request(request)
             position = CMSPlugin.objects.filter(language=language, placeholder=placeholder).count()
             try:
                 has_reached_plugin_limit(placeholder, plugin_type, language, template=page.get_template())
