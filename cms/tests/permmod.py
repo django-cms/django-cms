@@ -21,6 +21,7 @@ from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
                                       URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride, disable_logger
 from cms.test_utils.util.request_factory import RequestFactory
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import (has_page_add_permission,
@@ -1109,7 +1110,7 @@ class GlobalPermissionTests(SettingsOverrideTestCase):
                 request.user = user
                 # Note, the query count is inflated by doing additional lookups
                 # because there's a site param in the request.
-                with self.assertNumQueries(6):
+                with self.assertNumQueries(FuzzyInt(6,7)):
                     # PageAdmin swaps out the methods called for permissions
                     # if the setting is true, it makes use of cms.utils.permissions
                     self.assertTrue(has_page_add_permission(request))
@@ -1125,7 +1126,7 @@ class GlobalPermissionTests(SettingsOverrideTestCase):
             request.session = {}
             # As before, the query count is inflated by doing additional lookups
             # because there's a site param in the request
-            with self.assertNumQueries(20):
+            with self.assertNumQueries(FuzzyInt(11,20)):
                 # this user shouldn't have access to site 2
                 request.user = USERS[1]
                 self.assertTrue(not has_page_add_permission(request))
