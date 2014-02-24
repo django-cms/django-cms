@@ -5,6 +5,9 @@
 
 {% block extrahead %}
 {{ block.super }}
+<script type="text/javascript">
+  var csrf_cookie_name = "{{CSRF_COOKIE_NAME|default:'csrftoken'}}";
+</script>
 <script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
 <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
 

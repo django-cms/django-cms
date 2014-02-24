@@ -34,7 +34,7 @@ $.ajaxSetup({
 					}
 					if(!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)) || base_doc_url == base_settings_url) {
 						// Only send the token to relative URLs i.e. locally.
-						xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+						xhr.setRequestHeader("X-CSRFToken", getCookie(csrf_cookie_name));
 						settings.csrfTokenSet = true;
 					}
 				}
@@ -81,7 +81,7 @@ base_settings_url = base_settings_url[0];
 }
 if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)) || base_doc_url == base_settings_url) {
 // Only send the token to relative URLs i.e. locally.
-xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+xhr.setRequestHeader("X-CSRFToken", getCookie(csrf_cookie_name));
 settings.csrfTokenSet = true;
 }
 }
