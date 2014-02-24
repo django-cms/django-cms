@@ -29,9 +29,44 @@ $(document).ready(function () {
 	CMS.API.Helpers = {
 
 		// redirects to a specific url or reloads browser
-		reloadBrowser: function (url, timeout) {
+		reloadBrowser: function (url, timeout, ajax) {
+			var that = this;
 			// is there a parent window?
 			var parent = (window.parent) ? window.parent : window;
+
+			// if there is an ajax reload, prioritize
+			if(ajax) {
+				// check if the url has changed, if true redirect to the new path
+				// this requires an ajax request
+				$.ajax({
+					'async': false,
+					'type': 'GET',
+					'url': CMS.config.reload.url,
+					'data': {
+						'model': CMS.config.reload.model,
+						'pk': CMS.config.reload.pk
+					},
+					'success': function (response) {
+						if(parent.location.pathname !== response) {
+							// api call to the backend to check if the current path is still the same
+							that.reloadBrowser(response);
+						} else if(url === 'REFRESH_PAGE') {
+							// if on_close provides REFRESH_PAGE, only do a reload
+							that.reloadBrowser();
+						} else {
+							// on_close can also provide a url, reload to the new destination
+							that.reloadBrowser(url);
+						}
+					},
+					'error': function (jqXHR) {
+						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+					}
+				});
+
+				// cancel further operations
+				return false;
+			}
+
 			// add timeout if provided
 			parent.setTimeout(function () {
 				(url) ? parent.location.href = url : parent.location.reload();
