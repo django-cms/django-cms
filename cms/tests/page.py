@@ -5,6 +5,7 @@ from cms import constants, api
 import os.path
 
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib.sites.models import Site
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -43,6 +44,9 @@ class PageMigrationTestCase(CMSTestCase):
 
 
 class PagesTestCase(CMSTestCase):
+    def tearDown(self):
+        cache.clear()
+
     def test_add_page(self):
         """
         Test that the add admin page could be displayed via the admin
@@ -820,6 +824,71 @@ class PagesTestCase(CMSTestCase):
                         self.assertIn('text-%d-%d' % (i, j), content)
                         self.assertIn('link-%d-%d' % (i, j), content)
 
+    def test_xframe_options_allow(self):
+        """Test that no X-Frame-Options is set when page's xframe_options is set to allow"""
+        page = create_page(
+            title='home',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='home',
+            xframe_options=Page.X_FRAME_OPTIONS_ALLOW
+        )
+
+        resp = self.client.get(page.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), None)
+
+    def test_xframe_options_sameorigin(self):
+        """Test that X-Frame-Options is 'SAMEORIGIN' when xframe_options is set to origin"""
+        page = create_page(
+            title='home',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='home',
+            xframe_options=Page.X_FRAME_OPTIONS_SAMEORIGIN
+        )
+
+        resp = self.client.get(page.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
+
+    def test_xframe_options_deny(self):
+        """Test that X-Frame-Options is 'DENY' when xframe_options is set to deny"""
+        page = create_page(
+            title='home',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='home',
+            xframe_options=Page.X_FRAME_OPTIONS_DENY
+        )
+
+        resp = self.client.get(page.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+
+    def test_xframe_options_inherit_with_parent(self):
+        """Test that X-Frame-Options is set to parent page's setting when inherit is set"""
+        parent = create_page(
+            title='home',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='home',
+            xframe_options=Page.X_FRAME_OPTIONS_DENY
+        )
+
+        page = create_page(
+            title='subpage', 
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='subpage',
+            parent=parent,
+            xframe_options=Page.X_FRAME_OPTIONS_INHERIT
+        )
+
+        resp = self.client.get(page.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
 
 class PageAdminTestBase(CMSTestCase):
     """

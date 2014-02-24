@@ -73,6 +73,7 @@ $color-background-blue-hover: #e6f6fd;
 	// add additional border to separate categories
 	li.open ul { margin-left:0; border-bottom:1px solid $color-border !important; }
 	li.open.last ul { border-bottom:none !important; }
+	li.open ul.last { border-bottom:none !important; }
 §
 	li .col1 > div { text-align:center; }
 	li .col1 .title { background:none; }
@@ -139,7 +140,7 @@ $color-background-blue-hover: #e6f6fd;
 // loader on top right
 #loader-message { position:fixed; top:0; right:0; padding:4px 8px; background:white; display:none; }
 
-/* TODO this should be defined inside djangocms-admin.css instead */
+/* TODO this should be defined inside djangocms-admin.css instead (3.1) */
 #sitemap {
 	border:1px solid $color-border;
 	ul.header li .col2 > div { padding:0 5.5px; }
@@ -166,6 +167,24 @@ $color-background-blue-hover: #e6f6fd;
 		&.published { background-color:#65b417; }
 	 }
 	 li .cont { overflow:visible !important; }
+}
+
+// dropdown for language change
+.col-language { position:relative; }
+#sitemap .tree li .col-language
+.language-tooltip { display:none; position:absolute; right:20px; top:4px; z-index:9999;
+	line-height:1; padding:4px 6px; font-size:11px; color:#ccc;
+	background-color:black; background:rgba(black, 0.8); border:none;
+	@include border-radius(3px);
+	a { color:#ddd; }
+	a:hover { color:white; text-decoration:none; }
+	&:before { display:block; width:0; height:0;
+		position:absolute; top:50%; right:-5px; margin-top:-4px; content:" ";
+		border-top: 4px solid transparent;
+		border-bottom: 4px solid transparent;
+		border-left: 5px solid rgba(black, 0.8);
+	}
+	&.language-tooltip-multiple a:first-child:after { content:" - "; }
 }
 
 // animation for publishing

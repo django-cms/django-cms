@@ -393,6 +393,13 @@ class PublishingTests(TestCase):
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(published, title_set__title=name)
 
+    def test_delete_title_unpublish(self):
+        page = self.create_page('test', published=True)
+        sub_page = self.create_page('test2', published=True, parent=page)
+        self.assertTrue(sub_page.publisher_public.is_published('en'))
+        page.title_set.all().delete()
+        self.assertFalse(sub_page.publisher_public.is_published('en', force_reload=True))
+
     def test_modify_child_while_pending(self):
         home = self.create_page("Home", published=True, in_navigation=True)
         child = self.create_page("Child", published=True, parent=home,
