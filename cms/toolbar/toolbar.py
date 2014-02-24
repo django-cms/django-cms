@@ -115,10 +115,14 @@ class CMSToolbar(ToolbarAPIMixin):
         self.obj = obj
 
     def get_object_model(self):
-        return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+        if self.obj:
+            return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+        return ''
 
     def get_object_pk(self):
-        return self.obj.pk
+        if self.obj:
+            return self.obj.pk
+        return ''
 
     # Internal API
 
