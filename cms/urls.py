@@ -2,7 +2,7 @@
 from cms.apphook_pool import apphook_pool
 from cms.views import details
 from django.conf import settings
-from django.conf.urls.defaults import url, patterns
+from django.conf.urls import url, patterns
 
 if settings.APPEND_SLASH:
     reg = url(r'^(?P<slug>[0-9A-Za-z-_.//]+)/$', details, name='pages-details-by-slug')
