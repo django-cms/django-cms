@@ -4,6 +4,7 @@ from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from django.core.cache import cache
 from django.db import connection
@@ -94,3 +95,15 @@ class CacheTestCase(CMSTestCase):
             template.render(rctx)
 
         plugin_pool.unregister_plugin(NoCachePlugin)
+
+    def test_cache_page(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        placeholder = page1.placeholders.filter(slot="body")[0]
+        add_plugin(placeholder, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
+        with self.assertNumQueries(FuzzyInt(10,20)):
+            self.client.get('/en/')
+        with self.assertNumQueries(0):
+            self.client.get('/en/')

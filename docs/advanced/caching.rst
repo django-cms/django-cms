@@ -15,7 +15,6 @@ In your middleware settings be sure to add ``django.middleware.cache.UpdateCache
 ``django.middleware.cache.FetchFromCacheMiddleware`` at the last position::
 
     MIDDLEWARE_CLASSES=[
-
             'django.middleware.cache.UpdateCacheMiddleware',
             ...
             'cms.middleware.language.LanguageCookieMiddleware',
@@ -24,6 +23,8 @@ In your middleware settings be sure to add ``django.middleware.cache.UpdateCache
             'cms.middleware.toolbar.ToolbarMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ],
+
+
 
 Plugins
 =======
@@ -43,6 +44,14 @@ Content Cache Duration
 Default: 60
 
 This can be changed in :setting:`CMS_CACHE_DURATIONS`
+
+
+Settings
+========
+
+CMS_PAGE_CACHE': True
+    'PLACEHOLDER_CACHE': True,
+    'PLUGIN_CACHE': True,
 
 
 

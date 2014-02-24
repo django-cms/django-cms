@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import hashlib
+
+from django.utils.encoding import iri_to_uri, force_bytes, force_text
 from django.contrib.auth.views import redirect_to_login
 from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
@@ -16,6 +19,7 @@ from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
 from django.utils.http import urlquote
+from django.utils.timezone import get_current_timezone_name
 
 
 def _handle_no_page(request, slug):
@@ -31,8 +35,8 @@ def details(request, slug):
     """
     from django.core.cache import cache
 
-    if hasattr(request, 'toolbar') and not request.toolbar.edit_mode and \
-            not request.toolbar.show_toolbar and not request.user.is_authenticated:
+    if get_cms_setting("PAGE_CACHE") and (not hasattr(request, 'toolbar') or (
+                    not request.toolbar.edit_mode and not request.toolbar.show_toolbar and not request.user.is_authenticated())):
         cache_content = cache.get(_get_cache_key(request))
         if not cache_content is None:
             content, headers = cache_content
@@ -186,6 +190,8 @@ def details(request, slug):
 def _cache_page(response):
     from django.core.cache import cache
 
+    if not get_cms_setting('PAGE_CACHE'):
+        return response
     request = response._request
     save_cache = True
     if hasattr(request, 'placeholders'):
@@ -196,7 +202,7 @@ def _cache_page(response):
     if hasattr(request, 'toolbar'):
         if request.toolbar.edit_mode or request.toolbar.show_toolbar:
             save_cache = False
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         save_cache = False
     if not save_cache:
         response
@@ -206,5 +212,16 @@ def _cache_page(response):
 
 
 def _get_cache_key(request):
-    key = "CMS:%s" % request.path
-    return key
+    #md5 key of current path
+    cache_key = "%s:%s" % (
+        get_cms_setting("CACHE_PREFIX"),
+        hashlib.md5(force_bytes(iri_to_uri(request.get_full_path()))).hexdigest()
+    )
+    if settings.USE_TZ:
+        # The datetime module doesn't restrict the output of tzname().
+        # Windows is known to use non-standard, locale-dependant names.
+        # User-defined tzinfo classes may return absolutely anything.
+        # Hence this paranoid conversion to create a valid cache key.
+        tz_name = force_text(get_current_timezone_name(), errors='ignore')
+        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
+    return cache_key

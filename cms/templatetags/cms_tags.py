@@ -160,7 +160,7 @@ def _get_placeholder(current_page, page, context, name):
     placeholders = page.rescan_placeholders().values()
     fetch_placeholders = []
     request = context['request']
-    if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
+    if not get_cms_setting('PLACEHOLDER_CACHE') or (hasattr(request, 'toolbar') and request.toolbar.edit_mode):
         fetch_placeholders = placeholders
     else:
         for placeholder in placeholders:
@@ -197,7 +197,7 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
             continue
-        if not edit_mode:
+        if not edit_mode and get_cms_setting('PLACEHOLDER_CACHE'):
             if hasattr(placeholder, 'content_cache'):
                 return mark_safe(placeholder.content_cache)
             if not hasattr(placeholder, 'cache_checked'):

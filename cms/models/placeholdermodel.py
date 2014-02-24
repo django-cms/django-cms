@@ -8,7 +8,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.template.defaultfilters import title
+from django.utils.encoding import force_text
+from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 import operator
 from django.contrib import admin
 
@@ -52,7 +55,11 @@ class Placeholder(models.Model):
         return self._get_url('copy_plugins')
 
     def get_cache_key(self, lang):
-        return '%srender_placeholder__placeholder:%s_lang:%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
+        cache_key = '%srender_placeholder:%s.%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
+        if settings.USE_TZ:
+            tz_name = force_text(get_current_timezone_name(), errors='ignore')
+            cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
+        return cache_key
 
     def _get_url(self, key, pk=None):
         model = self._get_attached_model()
