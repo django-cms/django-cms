@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import hashlib
 
-from django.utils.encoding import iri_to_uri, force_bytes, force_text
+from django.utils.encoding import iri_to_uri, force_text, force_bytes
 from django.contrib.auth.views import redirect_to_login
 from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
@@ -215,7 +215,7 @@ def _get_cache_key(request):
     #md5 key of current path
     cache_key = "%s:%s" % (
         get_cms_setting("CACHE_PREFIX"),
-        hashlib.md5(force_bytes(iri_to_uri(request.get_full_path()))).hexdigest()
+        hashlib.md5(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
     )
     if settings.USE_TZ:
         # The datetime module doesn't restrict the output of tzname().
