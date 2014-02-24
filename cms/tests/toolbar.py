@@ -452,7 +452,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(response,
                             '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                             'placeholderapp', 'example1', ex1.pk))
-        self.assertContains(response, '\'redirectOnClose\': false,')
+        self.assertContains(response, "'onClose': 'REFRESH_PAGE',")
 
     def test_icon_tag(self):
         user = self.get_staff()
