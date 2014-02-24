@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_static %}
+{% load i18n l10n admin_static %}
 
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
@@ -16,7 +16,7 @@ window.CMS || window.parent.CMS || document.write(
 Window.CMS.$(document).ready(function () {
 	// the dataBridge is used to access plugin information from different ressources
 	Window.CMS.API.Helpers.dataBridge = {
-		'plugin_id': '{{ plugin_id }}',
+		'plugin_id': '{{ plugin_id|unlocalize }}',
 		'plugin_type': '{{ type }}',
 		'plugin_name': '{{ name }}',
 		'plugin_icon': '{{ icon }}',

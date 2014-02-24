@@ -1221,7 +1221,7 @@ class AdminFormsTests(AdminTestsBase):
 
         user = self.get_superuser()
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(18, 25)):
+            with self.assertNumQueries(FuzzyInt(14, 25)):
                 output = force_unicode(self.client.get('/en/admin/cms/page/'))
 
 

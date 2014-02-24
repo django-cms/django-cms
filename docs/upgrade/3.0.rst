@@ -365,9 +365,28 @@ Plugin caching
 Plugins have a new attribute: ``cache=True``. Its default value can be configured with :setting:`CMS_PLUGIN_CACHE`.
 
 
+Per-page Clickjacking protection
+================================
+
+An advanced option has been added which controls, on a per-page basis, the
+``X-Frame-Options`` header. The default setting is to inherit from the parent
+page. If no ancestor specifies a value, no header will be set, allowing Django's
+own middleware to handle it (if enabled).
+
+CMS_TEMPLATE context variable
+=============================
+
+A new ``CMS_TEMPLATE`` variable is now available in the context: it contains the path to the
+current page template.
+See :ref:`CMS_TEMPLATE reference <page_template>` for details.
+
+
 ********************
 Pending deprecations
 ********************
+
+placeholder_tags
+================
 
 ``placeholder_tags`` is now deprecated, the ``render_placeholder`` template
 tag can now be loaded from the ``cms_tags`` template tag library.
@@ -376,10 +395,14 @@ Using ``placeholder_tags`` will cause a ``DeprecationWarning`` to occur.
 
 ``placeholder_tags`` will be removed in version 3.1.
 
-Per-page Clickjacking protection
-================================
 
-An advanced option has been added which controls, on a per-page basis, the
-``X-Frame-Options`` header. The default setting is to inherit from the parent
-page. If no ancestor specifies a value, no header will be set, allowing Django's
-own middleware to handle it (if enabled).
+cms.context_processors.media
+============================
+
+``cms.context_processors.media`` is now deprecated, please use
+``cms.context_processors.cms_settings`` by updating ``TEMPLATE_CONTEXT_PROCESSORS``
+in the settings
+
+Using ``cms.context_processors.media`` will cause a ``DeprecationWarning`` to occur.
+
+``cms.context_processors.media`` will be removed in version 3.1.

@@ -3,31 +3,37 @@ App Integration
 ###############
 
 It is pretty easy to integrate your own Django applications with django CMS.
-You have 5 ways of integrating your app:
+You have 7 ways of integrating your app:
 
-1. Menus
+1. :ref:`integration_menus`
 
     Statically extend the menu entries
 
-2. Attach Menus
+2. :ref:`integration_attach_menus`
 
     Attach your menu to a page.
 
-3. App-Hooks
+3. :ref:`integration_apphooks`
 
     Attach whole apps with optional menu to a page.
 
-4. Navigation Modifiers
+4. :ref:`integration_modifiers`
 
     Modify the whole menu tree
 
-5. Custom Plugins
+5. :ref:`integration_customplugins`
 
     Display your models / content in cms pages
 
-6. Toolbar
+6. :ref:`integration_toolbar`
 
     Add Entries to the toolbar to add/edit your models
+
+7. :ref:`integration_templates`
+
+    Templatetags and other CMS-provided utilities
+
+.. _integration_menus:
 
 *****
 Menus
@@ -116,6 +122,7 @@ Complete example::
                     NavigationNode(_("Log out"), reverse(logout), 2, attr={'visible_for_anonymous': False}),
                 ]
 
+.. _integration_attach_menus:
 
 ************
 Attach Menus
@@ -157,6 +164,7 @@ that with the example from above::
 Now you can link this Menu to a page in the 'Advanced' tab of the page
 settings under attached menu.
 
+.. _integration_apphooks:
 
 *********
 App-Hooks
@@ -415,6 +423,7 @@ should not be needed.
     The signal is fired **after** a request. If you change something via API
     you need a request for the signal to fire.
 
+.. _integration_modifiers:
 
 ********************
 Navigation Modifiers
@@ -535,6 +544,7 @@ Here is an example of a built-in modifier that marks all node levels::
     menu_pool.register_modifier(Level)
 
 
+.. _integration_customplugins:
 
 **************
 Custom Plugins
@@ -549,9 +559,81 @@ For a detailed explanation on how to write custom plugins please head over to
 the :doc:`custom_plugins` section.
 
 
-***************
-Further reading
-***************
+.. _integration_toolbar:
+
+*******
+Toolbar
+*******
 
 Your app might also want to integrate in the :doc:`toolbar` to
 provide a more streamlined user experience for your admins.
+
+
+.. _integration_templates:
+
+**********************
+Working with templates
+**********************
+
+Application can reuse cms templates by mixing cms templatetags and normal django
+templating language.
+
+
+static_placeholder
+------------------
+
+Plain :ttag:`placeholder` cannot be used in templates used by external applications,
+use :ttag:`static_placeholder` instead.
+
+.. _page_template:
+
+CMS_TEMPLATE
+------------
+.. versionadded:: 3.0
+
+``CMS_TEMPLATE`` is a context variable available in the context; it contains
+the template path for CMS pages and application using apphooks, and the default
+template (i.e.: the first template in :setting:`CMS_TEMPLATES`) for non-CMS
+managed urls.
+
+This is mostly useful to use it in the ``extends`` templatetag in the application
+templates to get the current page template.
+
+Example: cms template
+
+.. code-block:: html+django
+
+    {% load cms_tags %}
+    <html>
+        <body>
+        {% cms_toolbar %}
+        {% block main %}
+        {% placeholder "main" %}
+        {% endblock main %}
+        </body>
+    </html>
+
+
+Example: application template
+
+.. code-block:: html+django
+
+    {% extends CMS_TEMPLATE %}
+    {% load cms_tags %}
+    {% block main %}
+    {% for item in object_list %}
+        {{ item }}
+    {% endfor %}
+    {% static_placeholder "sidebar" %}
+    {% endblock main %}
+
+``CMS_TEMPLATE`` memorizes the path of the cms template so the application
+template can dynamically import it
+
+
+render_model
+------------
+.. versionadded:: 3.0
+
+:ttag:`render_model` allows to edit the django models from the frontend by
+reusing the django CMS frontend editor.
