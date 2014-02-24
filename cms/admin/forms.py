@@ -96,7 +96,7 @@ class PageForm(forms.ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         slug = cleaned_data.get('slug', '')
-
+        
         page = self.instance
         lang = cleaned_data.get('language', None)
         # No language, can not go further, but validation failed already
@@ -183,6 +183,13 @@ class AdvancedSettingsForm(forms.ModelForm):
     overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
                                     help_text=_('Keep this field empty if standard path should be used.'))
 
+    xframe_options = forms.ChoiceField(
+        choices=Page._meta.get_field('xframe_options').choices,
+        label=_('X Frame Options'),
+        help_text=_('Whether this page can be embedded in other pages or websites'),
+        initial=Page._meta.get_field('xframe_options').default,
+        required=False
+    )
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
                                help_text=_('Redirects to this URL.'))
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
@@ -232,6 +239,16 @@ class AdvancedSettingsForm(forms.ModelForm):
             raise ValidationError(_('A instance name with this name already exists.'))
         return namespace
 
+    def clean_xframe_options(self):
+        if 'xframe_options' not in self.fields:
+            return # nothing to do, field isn't present
+
+        xframe_options = self.cleaned_data['xframe_options']
+        if xframe_options == '':
+            return Page._meta.get_field('xframe_options').default
+
+        return xframe_options
+
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:
             url = self.cleaned_data['overwrite_url']
@@ -242,7 +259,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         model = Page
         fields = [
             'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
-            'application_urls', 'application_namespace'
+            'application_urls', 'application_namespace', "xframe_options",
         ]
 
 

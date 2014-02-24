@@ -8,5 +8,5 @@ def post_revision(instances, **kwargs):
             page = Page.objects.get(pk=inst.pk)
             page.revision_id = 0
             page._publisher_keep_state = True
-            page.save()
+            page.save(no_signals=True)
             return

@@ -271,3 +271,4 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 update_site_and_page_choices(lang='en-us')
             except LanguageError:
                 self.fail("LanguageError raised")
+

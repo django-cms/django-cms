@@ -26,6 +26,7 @@ def configure(db_url, **extra):
         DATABASES={
             'default': DB
         },
+        SESSION_ENGINE="django.contrib.sessions.backends.cache",
         SITE_ID=1,
         USE_I18N=True,
         MEDIA_ROOT='/media/',
@@ -50,7 +51,7 @@ def configure(db_url, **extra):
             "django.core.context_processors.request",
             "django.core.context_processors.media",
             'django.core.context_processors.csrf',
-            "cms.context_processors.media",
+            "cms.context_processors.cms_settings",
             "sekizai.context_processors.sekizai",
             "django.core.context_processors.static",
         ],
@@ -58,7 +59,7 @@ def configure(db_url, **extra):
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
-           # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+        #    'debug_toolbar.middleware.DebugToolbarMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',

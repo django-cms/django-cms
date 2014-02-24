@@ -10,7 +10,7 @@ import datetime
 from cms.utils import copy_plugins
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError, FieldError
 from cms.utils.i18n import get_language_list
 
 from cms.compat import get_user_model
@@ -130,7 +130,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
-                position="last-child", overwrite_url=None):
+                position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
     
@@ -190,6 +190,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
     else:
         application_urls = None
 
+    if reverse_id:
+        if Page.objects.drafts().filter(reverse_id=reverse_id).count():
+            raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
+
     page = Page(
         created_by=created_by,
         changed_by=created_by,
@@ -206,6 +210,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
+        xframe_options=xframe_options,    
     )
     page.insert_at(parent, position)
     page.save()

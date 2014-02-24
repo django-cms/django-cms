@@ -21,6 +21,8 @@ from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -40,7 +42,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         (2, _('for anonymous users only')),
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    X_FRAME_OPTIONS_INHERIT = 0
+    X_FRAME_OPTIONS_DENY = 1
+    X_FRAME_OPTIONS_SAMEORIGIN = 2
+    X_FRAME_OPTIONS_ALLOW= 3
+
+    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]   
 
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
     changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
@@ -88,6 +95,19 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     # If the draft is loaded from a reversion version save the revision id here.
     revision_id = models.PositiveIntegerField(default=0, editable=False)
+
+    # X Frame Options for clickjacking protection
+    xframe_options = models.IntegerField(
+        choices=(
+            (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
+            (X_FRAME_OPTIONS_DENY, _('Deny')),
+            (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
+            (X_FRAME_OPTIONS_ALLOW, _('Allow'))
+        ),
+        default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
+    )
+ 
+
     # Managers
     objects = PageManager()
     permissions = PagePermissionsPermissionManager()
@@ -251,6 +271,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         target.application_namespace = self.application_namespace
         target.template = self.template
         target.site_id = self.site_id
+        target.xframe_options = self.xframe_options
 
     def copy_page(self, target, site, position='first-child',
                   copy_permissions=True):
@@ -463,11 +484,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         except Title.DoesNotExist:
             return False
 
-    def get_publisher_state(self, language):
+    def get_publisher_state(self, language, force_reload=False):
         from cms.models import Title
 
         try:
-            return self.get_title_obj(language, False).publisher_state
+            return self.get_title_obj(language, False, force_reload=force_reload).publisher_state
         except Title.DoesNotExist:
             return None
 
@@ -613,18 +634,23 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         public_page.save()
         # trigger update home
         self.save()
-        # Go through all children of our public instance
-        descendants = public_page.get_descendants()
-        for child in descendants:
-            child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
-            draft = child.publisher_public
-            if draft and draft.is_published(language) and draft.get_publisher_state(
-                    language) == PUBLISHER_STATE_DEFAULT:
-                draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
+        self.mark_descendants_pending(language)
         from cms.signals import post_unpublish
-
         post_unpublish.send(sender=Page, instance=self, language=language)
         return True
+
+    def mark_descendants_pending(self, language):
+        assert self.publisher_is_draft
+        # Go through all children of our public instance
+        public_page = self.publisher_public
+        if public_page:
+            descendants = public_page.get_descendants()
+            for child in descendants:
+                child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
+                draft = child.publisher_public
+                if draft and draft.is_published(language) and draft.get_publisher_state(
+                        language) == PUBLISHER_STATE_DEFAULT:
+                    draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
 
     def revert(self, language):
         """Revert the draft version to the same state as the public version
@@ -724,17 +750,23 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def get_admin_tree_title(self):
         language = get_language()
         from cms.models.titlemodels import EmptyTitle
+
+        def validate_title(title):
+            if isinstance(title, EmptyTitle):
+                return False
+            if not title.title or not title.slug:
+                return False
+            return True
+
         if not hasattr(self, 'title_cache'):
             self.title_cache = {}
-            for title in self.title_set:
+            for title in self.title_set.all():
                 self.title_cache[title.language] = title
-        if not language in self.title_cache or isinstance(self.title_cache.get(language, EmptyTitle(language)),
-                                                          EmptyTitle):
+        if not language in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
             found = False
             for lang in fallback_langs:
-                if lang in self.title_cache and not isinstance(self.title_cache.get(lang, EmptyTitle(lang)),
-                                                               EmptyTitle):
+                if lang in self.title_cache and validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
                     found = True
                     language = lang
             if not found:
@@ -1135,7 +1167,27 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
         return found
+ 
+    def get_xframe_options(self):
+        """ Finds X_FRAME_OPTION from tree if inherited """
+        xframe_options = cache.get('cms:xframe_options:%s' % self.pk)
+        if xframe_options is None:
+            ancestors = self.get_ancestors(ascending=True, include_self=True)
+            
+            # Ignore those pages which just inherit their value
+            ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
+            
+            # Now just give me the clickjacking setting (not anything else)
+            xframe_options = ancestors.values_list('xframe_options', flat=True)
 
+            if len(xframe_options) <= 0:
+                # No ancestors were found
+                return None
+
+            xframe_options = xframe_options[0]
+            cache.set('cms:xframe_options:%s' % self.pk, xframe_options)
+
+        return xframe_options
 
 def _reversion():
     exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']

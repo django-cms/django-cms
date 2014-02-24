@@ -102,6 +102,86 @@ $(document).ready(function () {
 
 	// TODO this will be refactored in 3.1
 
+	// ADD DIRECT PUBLISHING
+	var tree = $('.tree');
+	var langTrigger = '.col-language .trigger-tooltip span';
+	var langTooltips = '.language-tooltip';
+	var langTimer = function () {};
+	var langDelay = 100;
+	var langFadeDuration = 200;
+
+	// show the tooltip
+	tree.delegate(langTrigger, 'mouseenter', function () {
+		var el = $(this).closest('.col-language').find('.language-tooltip');
+		var anchors = el.find('a');
+		var span = $(this);
+
+		// clear timer
+		clearTimeout(langTimer);
+
+		// cancel if tooltip already visible
+		if(el.is(':visible')) return false;
+
+		// set correct position
+		el.css('right', 20 + $(this).position().left);
+
+		// figure out what should be shown
+		anchors.hide();
+		if(span.hasClass('unpublished') || span.hasClass('unpublishedparent')) anchors.eq(1).show();
+		if(span.hasClass('published')) anchors.eq(0).show();
+		if(span.hasClass('dirty')) anchors.show().parent().addClass('language-tooltip-multiple');
+
+		// hide all elements
+		$(langTooltips).fadeOut(langDelay);
+
+		// use a timeout to display the tooltip
+		langTimer = setTimeout(function () {
+			el.stop(true, true).fadeIn(langFadeDuration);
+		}, langDelay);
+	});
+	// hide the tooltip when leaving the area
+	tree.delegate(langTrigger, 'mouseleave', function () {
+		// clear timer
+		clearTimeout(langTimer);
+		// hide all elements
+		langTimer = setTimeout(function () {
+			$(langTooltips).fadeOut(langFadeDuration);
+		}, langDelay * 2);
+	});
+	// reset hiding when entering the tooltip itself
+	tree.delegate(langTooltips, 'mouseover', function () {
+		// clear timer
+		clearTimeout(langTimer);
+	});
+	tree.delegate(langTooltips, 'mouseleave', function () {
+		// hide all elements
+		langTimer = setTimeout(function () {
+			$(langTooltips).fadeOut(langFadeDuration);
+		}, langDelay * 2);
+	});
+	// attach double check event if publish or unpublish should be triggered
+	tree.delegate('.language-tooltip a', 'click', function (e) {
+		e.preventDefault();
+
+		// cancel if not confirmed
+		if(!confirm('Are you sure?')) return false;
+
+		// publish page and update
+		$.get($(this).attr('href'), function () {
+			window.location.reload();
+		});
+	});
+
+	// TAB CLICK
+	// attach click event to the tree item and make sure open in new tab works
+	$('.tree .col1 .title').bind('click', function (e) {
+		if(!e.metaKey) {
+			window.top.location.href = $(this).attr('href');
+		} else {
+			window.open($(this).attr('href'), '_blank');
+		}
+	});
+
 	// adds functionality to the filter
 	$('#changelist-filter-button').bind('click', function () {
 		$("#changelist-filter").toggle();
@@ -220,8 +300,6 @@ $(document).ready(function () {
 					moveTreeItem(what, item_id, target_id, position, false);
 				},
 				onchange: function(node){
-					url = $(node).find('a.title').attr("href");
-                    window.top.location = url;
                     reCalc();
 				},
                 onopen: function(){

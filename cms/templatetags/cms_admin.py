@@ -93,6 +93,16 @@ class TreePublishRow(Tag):
 
 register.tag(TreePublishRow)
 
+@register.filter
+def is_published(page, language):
+    if page.is_published(language) and page.publisher_public_id and page.publisher_public.is_published(language):
+        return True
+    else:
+        if language in page.languages and page.publisher_public_id and page.publisher_public.get_publisher_state(
+                    language) == PUBLISHER_STATE_PENDING:
+            return True
+        return False
+
 
 class ShowLazyAdminMenu(InclusionTag):
     name = 'show_lazy_admin_menu'

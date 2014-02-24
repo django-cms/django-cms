@@ -6,6 +6,7 @@ from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
+from django.core.exceptions import FieldError
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -199,3 +200,9 @@ class PythonAPITests(TestCase):
         page = create_page(**page_attrs)
         self.assertTrue(page.get_title_obj_attribute('has_url_overwrite'))
         self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')
+
+    def test_create_reverse_id_collision(self):
+
+        page = create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
+        self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
+        self.assertTrue(Page.objects.count(), 2)
