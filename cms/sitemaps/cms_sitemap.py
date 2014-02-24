@@ -3,15 +3,6 @@ from django.contrib.sitemaps import Sitemap
 from django.core import paginator
 
 
-def from_iterable(iterables):
-    """
-    Backport of itertools.chain.from_iterable
-    """
-    for it in iterables:
-        for element in it:
-            yield element
-
-
 class ObjectCachedPaginator(paginator.Paginator):
     """
         Custom paginator that will cache pages per page number
