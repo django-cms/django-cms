@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import hashlib
 
-from django.utils.encoding import iri_to_uri, force_text, force_bytes
+from django.utils.encoding import iri_to_uri, force_text
 from django.contrib.auth.views import redirect_to_login
 from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
