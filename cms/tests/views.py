@@ -234,7 +234,8 @@ class ContextTests(SettingsOverrideTestCase):
             with self.assertNumQueries(num_queries_page):
                 response = self.client.get("/en/page-2/")
                 self.assertEqual(response.context['CMS_TEMPLATE'], page_template)
-
+        cache.clear()
+        menu_pool.clear()
         page_2.template = 'INHERIT'
         page_2.save()
         page_2.publish('en')
