@@ -1344,8 +1344,8 @@ class PageAdmin(ModelAdmin):
                 'name': unicode(cms_plugin),
                 "type": cms_plugin.get_plugin_name(),
                 'plugin_id': plugin_id,
-                'icon': force_escape(escapejs(cms_plugin.get_instance_icon_src())),
-                'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
+                'icon': force_escape(cms_plugin.get_instance_icon_src()),
+                'alt': force_escape(cms_plugin.get_instance_icon_alt()),
                 'cancel': True,
             }
             instance = cms_plugin.get_plugin_instance()[0]
