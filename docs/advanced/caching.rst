@@ -25,7 +25,6 @@ In your middleware settings be sure to add ``django.middleware.cache.UpdateCache
         ],
 
 
-
 Plugins
 =======
 
@@ -44,7 +43,6 @@ Content Cache Duration
 Default: 60
 
 This can be changed in :setting:`CMS_CACHE_DURATIONS`
-
 
 Settings
 ========
