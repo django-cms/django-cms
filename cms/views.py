@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import hashlib
+
+from django.utils.encoding import iri_to_uri, force_text
 from django.contrib.auth.views import redirect_to_login
 from django.template.response import TemplateResponse
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Title, Page
-from cms.utils import get_template_from_request, get_language_from_request
+from cms.utils import get_template_from_request, get_language_from_request, get_cms_setting
 from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, \
     get_language_list, is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
@@ -13,9 +16,10 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.conf.urls import patterns
 from django.core.urlresolvers import resolve, Resolver404, reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
 from django.utils.http import urlquote
+from django.utils.timezone import get_current_timezone_name
 
 
 def _handle_no_page(request, slug):
@@ -29,6 +33,17 @@ def details(request, slug):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
+    from django.core.cache import cache
+
+    if get_cms_setting("PAGE_CACHE") and (not hasattr(request, 'toolbar') or (
+                    not request.toolbar.edit_mode and not request.toolbar.show_toolbar and not request.user.is_authenticated())):
+        cache_content = cache.get(_get_cache_key(request))
+        if not cache_content is None:
+            content, headers = cache_content
+            response = HttpResponse(content)
+            response._headers = headers
+            return response
+
     # get the right model
     context = RequestContext(request)
     # Get a Page model object from the request
@@ -54,7 +69,7 @@ def details(request, slug):
         attrs = '?preview=1'
         if 'draft' in request.GET:
             attrs += '&draft=1'
-        # Check that the language is in FRONTEND_LANGUAGES:
+            # Check that the language is in FRONTEND_LANGUAGES:
     if not current_language in user_languages:
         #are we on root?
         if not slug:
@@ -121,8 +136,8 @@ def details(request, slug):
                 # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
-        if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
-        and not redirect_url.startswith('/%s/' % current_language)):
+        if (is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
+                    '/%s/' % current_language)):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
@@ -152,6 +167,8 @@ def details(request, slug):
 
     response = TemplateResponse(request, template_name, context)
 
+    response.add_post_render_callback(_cache_page)
+
     # Add headers for X Frame Options - this really should be changed upon moving to class based views
     xframe_options = page.get_xframe_options()
     if xframe_options == Page.X_FRAME_OPTIONS_INHERIT:
@@ -160,7 +177,7 @@ def details(request, slug):
 
     # We want to prevent django setting this in their middlewear
     response.xframe_options_exempt = True
-    
+
     if xframe_options == Page.X_FRAME_OPTIONS_ALLOW:
         # Do nothing, allowed is no header.
         return response
@@ -170,3 +187,43 @@ def details(request, slug):
         response['X-Frame-Options'] = 'DENY'
 
     return response
+
+
+def _cache_page(response):
+    from django.core.cache import cache
+
+    if not get_cms_setting('PAGE_CACHE'):
+        return response
+    request = response._request
+    save_cache = True
+    if hasattr(request, 'placeholders'):
+        for placeholder in request.placeholders:
+            if not placeholder.cache_placeholder:
+                save_cache = False
+                break
+    if hasattr(request, 'toolbar'):
+        if request.toolbar.edit_mode or request.toolbar.show_toolbar:
+            save_cache = False
+    if request.user.is_authenticated():
+        save_cache = False
+    if not save_cache:
+        response
+    if save_cache:
+        cache.set(_get_cache_key(request), (response.content, response._headers),
+                  get_cms_setting('CACHE_DURATIONS')['content'])
+
+
+def _get_cache_key(request):
+    #md5 key of current path
+    cache_key = "%s:%s" % (
+        get_cms_setting("CACHE_PREFIX"),
+        hashlib.md5(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
+    )
+    if settings.USE_TZ:
+        # The datetime module doesn't restrict the output of tzname().
+        # Windows is known to use non-standard, locale-dependant names.
+        # User-defined tzinfo classes may return absolutely anything.
+        # Hence this paranoid conversion to create a valid cache key.
+        tz_name = force_text(get_current_timezone_name(), errors='ignore')
+        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
+    return cache_key

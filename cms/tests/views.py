@@ -18,6 +18,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
+from django.template import Variable
 
 
 APP_NAME = 'SampleApp'
@@ -211,7 +212,8 @@ class ContextTests(SettingsOverrideTestCase):
             # Zero more queries when determining the current template
             with self.assertNumQueries(0):
                 # Template is the first in the CMS_TEMPLATES list
-                self.assertEqual(response.context['CMS_TEMPLATE'], get_cms_setting('TEMPLATES')[0][0])
+                template = Variable('CMS_TEMPLATE').resolve(response.context)
+                self.assertEqual(template, get_cms_setting('TEMPLATES')[0][0])
         cache.clear()
         menu_pool.clear()
 
@@ -233,8 +235,10 @@ class ContextTests(SettingsOverrideTestCase):
             # the context_processor
             with self.assertNumQueries(num_queries_page):
                 response = self.client.get("/en/page-2/")
-                self.assertEqual(response.context['CMS_TEMPLATE'], page_template)
-
+                template = Variable('CMS_TEMPLATE').resolve(response.context)
+                self.assertEqual(template, page_template)
+        cache.clear()
+        menu_pool.clear()
         page_2.template = 'INHERIT'
         page_2.save()
         page_2.publish('en')
@@ -242,4 +246,5 @@ class ContextTests(SettingsOverrideTestCase):
             # One query more triggered as page inherits template from ancestor
             with self.assertNumQueries(num_queries_page + 1):
                 response = self.client.get("/en/page-2/")
-                self.assertEqual(response.context['CMS_TEMPLATE'], page_template)
+                template = Variable('CMS_TEMPLATE').resolve(response.context)
+                self.assertEqual(template, page_template)

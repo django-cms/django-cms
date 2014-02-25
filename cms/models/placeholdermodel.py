@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils import get_cms_setting
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
@@ -7,7 +8,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.widgets import Media
 from django.template.defaultfilters import title
+from django.utils.encoding import force_text
+from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 import operator
 from django.contrib import admin
 
@@ -16,6 +20,7 @@ from django.contrib import admin
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
+    cache_placeholder = True
 
     class Meta:
         app_label = 'cms'
@@ -48,6 +53,13 @@ class Placeholder(models.Model):
 
     def get_copy_url(self):
         return self._get_url('copy_plugins')
+
+    def get_cache_key(self, lang):
+        cache_key = '%srender_placeholder:%s.%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
+        if settings.USE_TZ:
+            tz_name = force_text(get_current_timezone_name(), errors='ignore')
+            cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
+        return cache_key
 
     def _get_url(self, key, pk=None):
         model = self._get_attached_model()

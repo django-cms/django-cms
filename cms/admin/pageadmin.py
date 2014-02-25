@@ -932,7 +932,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             static_ids = statics .split(',')
             for pk in static_ids:
                 static_placeholder = StaticPlaceholder.objects.get(pk=pk)
-                published = static_placeholder.publish(request)
+                published = static_placeholder.publish(request, language)
                 if not published:
                     all_published = False
         if page and all_published:

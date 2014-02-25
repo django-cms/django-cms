@@ -56,7 +56,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
         if self.is_staff:
             try:
-                user_settings = UserSettings.objects.get(user=self.request.user)
+                user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
             except UserSettings.DoesNotExist:
                 user_settings = UserSettings(language=self.language, user=self.request.user)
                 placeholder = Placeholder(slot="clipboard")
