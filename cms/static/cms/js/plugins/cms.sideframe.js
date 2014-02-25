@@ -121,6 +121,9 @@ $(document).ready(function () {
 				iframe.contents().find('body').bind(that.click, function () {
 					$(document).trigger(that.click);
 				});
+
+				// attach reload event
+				that.reloadBrowser(false, false, true);
 			});
 
 			// cancel animation if sideframe is already shown
