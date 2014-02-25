@@ -1188,12 +1188,15 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 pass
         pk = request.REQUEST.get('pk')
         app_label, model = request.REQUEST.get('model').split('.')
-        ctype = ContentType.objects.get(app_label=app_label, model=model)
-        try:
-            instance = ctype.get_object_for_this_type(pk=pk)
-        except ctype.model_class().DoesNotExist:
+        if pk and app_label:
+            ctype = ContentType.objects.get(app_label=app_label, model=model)
+            try:
+                instance = ctype.get_object_for_this_type(pk=pk)
+            except ctype.model_class().DoesNotExist:
+                return HttpResponse('/')
+            return HttpResponse(instance.get_absolute_url())
+        else:
             return HttpResponse('/')
-        return HttpResponse(instance.get_absolute_url())
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':

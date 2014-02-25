@@ -1,4 +1,5 @@
 from __future__ import with_statement
+from cms.models import Page
 import re
 from django.template.defaultfilters import truncatewords
 import datetime
@@ -11,7 +12,7 @@ from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import AnonymousUser, User, Permission
 from django.test import TestCase
@@ -289,6 +290,35 @@ class ToolbarTests(ToolbarTestBase):
         # Where should beta go? It should go right where gamma is now...
         beta_position = admin_menu.get_alphabetical_insert_position('menu-beta', SubMenu)
         self.assertEqual(beta_position, gamma_position)
+
+    def test_page_create_redirect(self):
+        superuser = self.get_superuser()
+        page = create_page("home", "nav_playground.html", "en",
+                           published=True)
+        resolve_url = reverse('admin:cms_page_resolve')
+        with self.login_user_context(superuser):
+            response = self.client.post(resolve_url, {'pk':'', 'model':'cms.page'})
+            self.assertEqual(response.content, '/')
+            page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+
+            response = self.client.post(resolve_url, {'pk':Page.objects.all()[2].pk, 'model':'cms.page'})
+            self.assertEqual(response.content, '/en/test-page-1/')
+
+    def test_page_edit_redirect(self):
+        page1 = create_page("home", "nav_playground.html", "en",
+                           published=True)
+        page2 = create_page("test", "nav_playground.html", "en",
+                           published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
+            url = reverse('admin:cms_page_resolve')
+            response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
+            self.assertEqual(response.content, '/en/test-page-1/')
+            response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
+            self.assertEqual(response.content, '/en/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):
@@ -933,3 +963,4 @@ class ToolbarAPITests(TestCase):
         result += 2
         self.assertEqual(result.item, item)
         self.assertEqual(result.index, 4)
+
