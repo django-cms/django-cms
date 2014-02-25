@@ -1,8 +1,1 @@
-{# render the placeholder within placeholder.html - this is optional, you need to pass the edit context #}{% spaceless %}
-{% if edit and placeholder %}
-	{{ placeholder }}
-{% endif %}
-
-{# render the content within plugin.html #}
-{{ content }}
-{% endspaceless %}
+{% if edit and placeholder %}{{ placeholder }}{% endif %}{{ content }}
