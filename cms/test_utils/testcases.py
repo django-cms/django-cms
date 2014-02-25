@@ -141,7 +141,12 @@ class BaseCMSTestCase(object):
     def get_superuser(self):
         try:
             query = dict()
-            query[get_user_model().USERNAME_FIELD]="admin"
+
+            if get_user_model().USERNAME_FIELD != "email":
+                query[get_user_model().USERNAME_FIELD]="admin"
+            else:
+                query[get_user_model().USERNAME_FIELD]="admin@django-cms.org"
+            
             admin = get_user_model().objects.get(**query)
         except get_user_model().DoesNotExist:
             admin = self._create_user("admin", is_staff=True, is_superuser=True)

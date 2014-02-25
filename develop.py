@@ -19,7 +19,8 @@ from cms.test_utils.tmpdir import temp_dir
 __doc__ = '''django CMS development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
-dj-database-url compatible value.
+dj-database-url compatible value.  The AUTH_USER_MODEL environment variable can be
+used to change the user model in the same manner as the --user option.
 
 Usage:
     develop.py test [--parallel | --failfast] [--migrate] [--user=<user>] [<test-label>...]
@@ -181,13 +182,19 @@ if __name__ == '__main__':
                 SOUTH_TESTS_MIGRATE=migrate
             )
 
-            if args['--user']:
+            # Command line option takes precedent over environment variable
+            auth_user_model = args['--user']
+
+            if not auth_user_model:
+                auth_user_model = os.environ.get("AUTH_USER_MODEL", None)
+
+            if auth_user_model:
                 if VERSION[:2] < (1, 5):
                     print()
                     print("Custom user models are not supported before Django 1.5")
                     print()
                 else:
-                    test_settings['AUTH_USER_MODEL'] = args['--user']
+                    test_settings['AUTH_USER_MODEL'] = auth_user_model
 
             configure(**test_settings)
 
