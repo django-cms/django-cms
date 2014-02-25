@@ -1,4 +1,5 @@
 from __future__ import with_statement
+from cms.models import UserSettings
 import re
 from django.template.defaultfilters import truncatewords
 import datetime
@@ -262,6 +263,22 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/admin/cms/usersettings/')
             self.assertEqual(response.status_code, 200)
+
+    def test_remove_lang(self):
+        print 'hello'
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        superuser = self.get_superuser()
+        from django.conf import settings
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+            self.assertEqual(response.status_code, 200)
+            setting = UserSettings.objects.get(user=superuser)
+            setting.language = 'it'
+            setting.save()
+            with SettingsOverride(LANGUAGES=(('en', 'english'),)):
+                response = self.client.get('/en/?edit')
+                self.assertEqual(response.status_code, 200)
+                self.assertNotContains(response, '/it/')
 
     def test_get_alphabetical_insert_position(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
