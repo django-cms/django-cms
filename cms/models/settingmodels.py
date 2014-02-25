@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
-from cms.compat import user_model_label
+#from cms.compat import user_model_label
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
+user_model_label = 'auth.User'
+
+if settings.AUTH_USER_MODEL:
+    user_model_label = settings.AUTH_USER_MODEL
 
 @python_2_unicode_compatible
 class UserSettings(models.Model):
