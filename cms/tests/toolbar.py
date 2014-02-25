@@ -298,12 +298,12 @@ class ToolbarTests(ToolbarTestBase):
         resolve_url = reverse('admin:cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url, {'pk':'', 'model':'cms.page'})
-            self.assertEqual(response.content, '/')
+            self.assertEqual(str(response.content), '/')
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
 
             response = self.client.post(resolve_url, {'pk':Page.objects.all()[2].pk, 'model':'cms.page'})
-            self.assertEqual(response.content, '/en/test-page-1/')
+            self.assertEqual(str(response.content), '/en/test-page-1/')
 
     def test_page_edit_redirect(self):
         page1 = create_page("home", "nav_playground.html", "en",
@@ -316,11 +316,11 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
             url = reverse('admin:cms_page_resolve')
             response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
-            self.assertEqual(response.content, '/en/test-page-1/')
+            self.assertEqual(str(response.content), '/en/test-page-1/')
             response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
-            self.assertEqual(response.content, '/en/')
+            self.assertEqual(str(response.content), '/en/')
         response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
-        self.assertEqual(response.content,  '/')
+        self.assertEqual(str(response.content),  '/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):
