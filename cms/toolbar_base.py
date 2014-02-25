@@ -6,6 +6,8 @@ from django.contrib.sites.models import Site
 
 
 class CMSToolbar(object):
+    model = None
+
     def __init__(self, request, toolbar, is_current_app, app_path):
         self.request = request
         self.toolbar = toolbar

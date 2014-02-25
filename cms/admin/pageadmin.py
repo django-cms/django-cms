@@ -1178,6 +1178,16 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                                                   template="admin/cms/page/tree/lazy_menu.html")
 
     def resolve(self, request):
+        if request.session.get('cms_log_latest', False):
+            print 'latest found'
+            log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
+            obj = log.get_edited_object()
+            print obj
+            del request.session['cms_log_latest']
+            try:
+                return HttpResponse(obj.get_absolute_url())
+            except:
+                pass
         pk = request.REQUEST.get('pk')
         app_label, model = request.REQUEST.get('model').split('.')
         ctype = ContentType.objects.get(app_label=app_label, model=model)
