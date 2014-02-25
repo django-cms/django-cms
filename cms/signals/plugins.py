@@ -4,6 +4,7 @@ from cms.models import CMSPlugin, Title, Page, StaticPlaceholder, Placeholder
 
 
 def pre_save_plugins(**kwargs):
+    from django.core.cache import cache
     plugin = kwargs['instance']
     placeholder = None
     if plugin.placeholder:
@@ -14,6 +15,7 @@ def pre_save_plugins(**kwargs):
     elif plugin.placeholder_id:
         placeholder = Placeholder.objects.get(pk=plugin.placeholder_id)
     if placeholder:
+        cache.delete(placeholder.get_cache_key(plugin.language))
         attached_model = placeholder._get_attached_model()
         if attached_model == Page:
             Title.objects.filter(page=plugin.placeholder.page, language=plugin.language).update(
@@ -35,6 +37,7 @@ def pre_save_plugins(**kwargs):
 
 
 def pre_delete_plugins(**kwargs):
+    from django.core.cache import cache
     plugin = kwargs['instance']
     if hasattr(plugin, '_no_reorder'):
         return
@@ -45,6 +48,7 @@ def pre_delete_plugins(**kwargs):
         except Placeholder.DoesNotExist:
             pass
     if placeholder:
+        cache.delete(placeholder.get_cache_key(plugin.language))
         attached_model = placeholder._get_attached_model()
         if attached_model == Page:
             Title.objects.filter(page=plugin.placeholder.page, language=plugin.language).update(

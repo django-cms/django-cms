@@ -1,5 +1,6 @@
 #!/bin/env python
 from __future__ import print_function
+
 import multiprocessing
 import pkgutil
 import pyclbr
@@ -44,6 +45,7 @@ Options:
 
 
 def server(bind='127.0.0.1', port=8000, migrate=False):
+
     if os.environ.get("RUN_MAIN") != "true":
         from south.management.commands import syncdb, migrate
         if migrate:

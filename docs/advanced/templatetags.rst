@@ -328,7 +328,7 @@ Example:
 
 .. code-block:: html+django
 
-    <h1>{% render_model_block my_model "title" "title,abstract" %}</h1>
+    <h1>{% render_model my_model "title" "title,abstract" %}</h1>
 
 This will render to:
 

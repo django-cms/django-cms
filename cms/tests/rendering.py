@@ -9,6 +9,7 @@ from cms.plugin_rendering import render_plugins, PluginContext, render_placehold
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
+from django.core.cache import cache
 from django.template import Template, RequestContext
 from sekizai.context import SekizaiContext
 from cms.toolbar.toolbar import CMSToolbar
@@ -40,7 +41,6 @@ class RenderingTestCase(SettingsOverrideTestCase):
     }
 
     def setUp(self):
-        User = get_user_model()
         super(RenderingTestCase, self).setUp()
         self.test_user = self._create_user("test", True, True)
         
@@ -193,6 +193,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         t = u'{% load cms_tags %}{% placeholder "extra_context" %}'
         r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['no_extra'])
+        cache.clear()
         with SettingsOverride(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
             r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['extra'])
@@ -222,6 +223,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         t = u'{% load cms_tags %}{% show_uncached_placeholder "extra_context" ' + str(self.test_page4.pk) + ' %}'
         r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['no_extra'])
+        cache.clear()
         with SettingsOverride(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
             r = self.render(t, self.test_page4)
             self.assertEqual(r, self.test_data4['extra'])

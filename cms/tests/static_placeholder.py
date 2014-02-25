@@ -76,7 +76,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         self.assertEqual(static_placeholder.draft.cmsplugin_set.all().count(), 2)
         self.assertEqual(static_placeholder.public.cmsplugin_set.all().count(), 0)
         request = self.get_request()
-        static_placeholder.publish(request)
+        static_placeholder.publish(request, 'en')
 
     def test_move_plugin(self):
         static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar')

@@ -2,6 +2,7 @@
 from __future__ import with_statement
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.utils.i18n import force_language
+from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
 from cms.compat import get_user_model
@@ -549,6 +550,7 @@ class PublishingTests(TestCase):
 
         self.assertTrue(page.unpublish('en'), 'Unpublish was not successful')
         self.assertFalse(page.is_published('en'))
+        cache.clear()
         for url in (base, base + 'child/', base + 'child/grandchild/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)

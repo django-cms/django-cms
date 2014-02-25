@@ -53,10 +53,10 @@ class StaticPlaceholder(models.Model):
         if not self.code:
             self.code = u'static-%s' % uuid.uuid4()
 
-    def publish(self, request, force=False):
+    def publish(self, request, language, force=False):
         if force or self.has_publish_permission(request):
-            CMSPlugin.objects.filter(placeholder=self.public).delete()
-            plugins = self.draft.get_plugins_list()
+            CMSPlugin.objects.filter(placeholder=self.public, language=language).delete()
+            plugins = self.draft.get_plugins_list(language=language)
             copy_plugins_to(plugins, self.public)
             self.dirty = False
             self.save()

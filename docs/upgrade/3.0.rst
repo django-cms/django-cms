@@ -350,6 +350,25 @@ Added support for custom user models
 
 Since Django 1.5 it has been possible to swap out the default User model for a custom user model.  This is now fully supported by DjangoCMS, and in addition a new option has been added to the test runner to allow specifying the user model to use for tests (e.g. --user=customuserapp.User)
 
+Page caching
+============
+
+Pages are now cached by default.
+You can disable this behavior with :setting:`CMS_PAGE_CACHE`
+
+Placeholder caching
+===================
+
+Plugins have a new default property: `cache=True`. If all plugins in a placeholder have set this to
+``True`` the whole placeholder will be cached if the toolbar is not in edit mode.
+
+.. warning:: If your plugin is dynamic and processes current user or request data be sure to set ``cache=False``
+
+Plugin caching
+==============
+
+Plugins have a new attribute: ``cache=True``. Its default value can be configured with :setting:`CMS_PLUGIN_CACHE`.
+
 Per-page Clickjacking protection
 ================================
 

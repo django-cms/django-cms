@@ -649,7 +649,7 @@ This dictionary carries the various cache duration settings.
 
 Default: ``60``
 
-Cache expiration (in seconds) for :ttag:`show_placeholder` and :ttag:`page_url`
+Cache expiration (in seconds) for :ttag:`show_placeholder`, :ttag:`page_url`, :ttag:`placeholder` and :ttag:`static_placeholder`
 template tags.
 
 .. note::
@@ -696,7 +696,40 @@ Example::
     on :ref:`cache key prefixing <django:cache_key_prefixing>`
 
 
-.. setting::CMS_MAX_PAGE_PUBLISH_REVERSIONS
+.. setting:: CMS_PAGE_CACHE
+
+CMS_PAGE_CACHE
+==============
+
+Default: ``True``
+
+Should the output of pages be cached?
+Takes the language, and timezone into account. Pages for logged in users are not cached.
+If the toolbar is visible the page is not cached as well.
+
+
+.. setting:: CMS_PLACEHOLDER_CACHE
+
+CMS_PLACEHOLDER_CACHE
+=====================
+
+Default: ``True``
+
+Should the output of the various placeholder templatetags be cached?
+Takes the current language and timezone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
+present the placeholders will not be cached.
+
+.. setting:: CMS_PLUGIN_CACHE
+
+CMS_PLUGIN_CACHE
+================
+
+Default: ``True``
+
+Default value of the ``cache`` attribute of plugins. Should plugins be cached by default if not set explicitly?
+
+
+.. setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
 CMS_MAX_PAGE_PUBLISH_REVERSIONS
 ===============================

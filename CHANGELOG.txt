@@ -213,4 +213,8 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Publishing is now language independent and the tree-view has been updated to reflect this
 - Removed the plugin DB-name magic and added a compatibility layer
 - urls_need_reloading signal added when an apphook change is detected.
+<<<<<<< HEAD
 - Added support for custom user models
+=======
+- CMS_PAGE_CACHE, CMS_PLACEHOLDER_CACHE and CMS_PLUGIN_CACHE settings and functionality added. Default is True
+>>>>>>> 28b70a444050734880a107fe293dd965adb576e6

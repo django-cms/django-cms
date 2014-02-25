@@ -58,6 +58,7 @@ Advanced
     :numbered:
        
     advanced/i18n
+    advanced/caching
     advanced/sitemap
     advanced/templatetags
     advanced/cli

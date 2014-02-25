@@ -190,6 +190,9 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                ]}):
             from cms.views import details
 
+            def get_path():
+                return '/'
+
             User = get_user_model()
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
@@ -201,6 +204,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 COOKIES={},
                 META={},
                 user=User(),
+                get_full_path=get_path
             )
             self.assertRaises(Http404, details, request, '')
 
@@ -221,6 +225,9 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page.publish("x-klingon")
             from cms.views import details
 
+            def get_path():
+                return '/'
+
             User = get_user_model()
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
@@ -232,6 +239,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 COOKIES={},
                 META={},
                 user=User(),
+                get_full_path=get_path,
             )
 
             response = details(request, '')
