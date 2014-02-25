@@ -506,14 +506,6 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
 
-				// set title of not provided
-				var innerTitle = iframe.contents().find('#content h1:eq(0)');
-				if(name === undefined) title.html(innerTitle.text());
-				innerTitle.remove();
-
-				// set modal buttons
-				that._setButtons($(this));
-
 				// when an error occurs, reset the saved status so the form can be checked and validated again
 				if(iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
 					that.saved = false;
@@ -543,7 +535,6 @@ $(document).ready(function () {
 					if(contents.find('.object-tools').length) {
 						contents.find('#content').css('padding-top', 38);
 					}
-
 				}
 			});
 
