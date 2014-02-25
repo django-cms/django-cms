@@ -53,7 +53,7 @@ $(document).ready(function () {
 						} else if(url === 'REFRESH_PAGE') {
 							// if on_close provides REFRESH_PAGE, only do a reload
 							that.reloadBrowser();
-						} else {
+						} else if(url) {
 							// on_close can also provide a url, reload to the new destination
 							that.reloadBrowser(url);
 						}
