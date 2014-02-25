@@ -59,6 +59,9 @@ $(document).ready(function () {
 				e.preventDefault();
 				that._startMove(e);
 			});
+			this.modal.find('.cms_modal-title').bind('dblclick.cms', function (e) {
+				that._maximize();
+			});
 			this.modal.find('.cms_modal-resize').bind('mousedown.cms', function (e) {
 				e.preventDefault();
 				that._startResize(e);
