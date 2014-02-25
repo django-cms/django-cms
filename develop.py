@@ -167,13 +167,17 @@ if __name__ == '__main__':
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
             use_tz = VERSION[:2] >= (1, 4)
-            configure(db_url=db_url,
-                ROOT_URLCONF='cms.test_utils.project.urls',
-                STATIC_ROOT=STATIC_ROOT,
-                MEDIA_ROOT=MEDIA_ROOT,
-                USE_TZ=use_tz,
-                SOUTH_TESTS_MIGRATE=migrate
-            )
+            configs = {
+                'db_url': db_url,
+                'ROOT_URLCONF': 'cms.test_utils.project.urls',
+                'STATIC_ROOT': STATIC_ROOT,
+                'MEDIA_ROOT': MEDIA_ROOT,
+                'USE_TZ': use_tz,
+                'SOUTH_TESTS_MIGRATE': migrate,
+            }
+            if args['test']:
+                configs['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
+            configure(**configs)
             # run
             if args['test']:
                 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082,8090-8100,9000-9200,7041'
