@@ -129,6 +129,9 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 
 //.cms_placeholder .cms_draggables .cms_draggable { margin-left:0 !important; }
 
+// hide arrow when adding plugin-in-plugin within disabled item
+.cms_draggable-disabled > .cms_dragitem-collapsable { background:none; padding-left:0; }
+
 // end of dragarea
 }
 
