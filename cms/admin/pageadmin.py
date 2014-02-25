@@ -1179,10 +1179,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
 
     def resolve(self, request):
         if request.session.get('cms_log_latest', False):
-            print 'latest found'
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             obj = log.get_edited_object()
-            print obj
             del request.session['cms_log_latest']
             try:
                 return HttpResponse(obj.get_absolute_url())

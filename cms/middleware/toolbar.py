@@ -69,23 +69,17 @@ class ToolbarMiddleware(object):
             request.session['cms_log_entries'] = LogEntry.objects.filter(user=request.user).count()
         request.toolbar = CMSToolbar(request)
 
-
     def process_response(self, request, response):
         if request.user.is_staff:
-            print request.session.get('cms_log_entries', 0)
-            print LogEntry.objects.filter(user=request.user).count()
-            if request.session.get('cms_log_entries', 0) < LogEntry.objects.filter(user=request.user).count():
-                print 'new log entry found'
+            count = LogEntry.objects.filter(user=request.user).count()
+            if request.session.get('cms_log_entries', 0) < count:
+                request.session['cms_log_entries'] = count
                 log = LogEntry.objects.filter(user=request.user)[0]
-                if log.action_flag == 1:
+                if log.action_flag == 1 or log.action_falg == 2:
                     request.session['cms_log_latest'] = log.pk
-                print log
-                print dir(log)
         return response
 
     def process_view(self, request, view_func, view_args, view_kwarg):
         response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
-        return None
-

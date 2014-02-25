@@ -190,6 +190,8 @@ class CMSToolbar(ToolbarAPIMixin):
         # never populate the toolbar on is_staff=False
         if not self.is_staff:
             return
+        if self.request.session.get('cms_log_latest', False):
+            del self.request.session['cms_log_latest']
         self._call_toolbar('populate')
 
     def post_template_populate(self):
