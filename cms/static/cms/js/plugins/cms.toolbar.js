@@ -144,16 +144,17 @@ $(document).ready(function () {
 				});
 
 				// attach hover
-				lists.find('li').bind('mouseenter mouseleave', function () {
-					// reset
-					lists.find('li').removeClass(hover);
-
+				lists.find('li').bind('mouseenter mouseleave', function (e) {
 					var el = $(this);
 					var parent = el.closest('.cms_toolbar-item-navigation-children');
 					var hasChildren = el.hasClass(children) || parent.length;
 
 					// do not attach hover effect if disabled
-					if(el.hasClass(disabled)) return false;
+					// cancel event if element has already hover class
+					if(el.hasClass(disabled) || el.hasClass(hover)) return false;
+
+					// reset
+					lists.find('li').removeClass(hover);
 
 					// add hover effect
 					el.addClass(hover);
