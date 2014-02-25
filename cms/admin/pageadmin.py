@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import escape
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
@@ -636,6 +636,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': reverse('admin:index'),
             'app_label': app_label,
+            'preview_language': request.GET.get('language', get_language()),
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
             'DEBUG': settings.DEBUG,

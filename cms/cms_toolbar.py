@@ -101,7 +101,7 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-            # admin
+                # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)
         # cms users
@@ -138,7 +138,7 @@ class PageToolbar(CMSToolbar):
             self.change_admin_menu()
             if self.page:
                 self.add_page_menu()
-            # history menu
+                # history menu
         if self.page and self.toolbar.edit_mode:
             self.add_history_menu()
             self.change_language_menu()
@@ -247,7 +247,10 @@ class PageToolbar(CMSToolbar):
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         # cms page admin
-        admin_menu.add_sideframe_item(_('Pages'), url=reverse("admin:cms_page_changelist"), position=0)
+        url = "%s?language=%s" % (reverse("admin:cms_page_changelist"), self.toolbar.language)
+        if self.page:
+            url += "&page_id=%s" % self.page.pk
+        admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
 
     def add_page_menu(self):
         # menu for current page
