@@ -14,6 +14,9 @@ dj-database-url
 selenium
 sqlparse
 django-debug-toolbar
+docutils
+jinja2
+markupsafe
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
 -e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
