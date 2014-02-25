@@ -12,6 +12,7 @@ django-sekizai>=0.7
 argparse
 dj-database-url
 selenium
+sqlparse
 django-debug-toolbar
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
 -e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
