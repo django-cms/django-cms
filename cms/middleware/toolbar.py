@@ -75,7 +75,7 @@ class ToolbarMiddleware(object):
             if request.session.get('cms_log_entries', 0) < count:
                 request.session['cms_log_entries'] = count
                 log = LogEntry.objects.filter(user=request.user)[0]
-                if log.action_flag == 1 or log.action_falg == 2:
+                if log.action_flag == 1 or log.action_flag == 2:
                     request.session['cms_log_latest'] = log.pk
         return response
 

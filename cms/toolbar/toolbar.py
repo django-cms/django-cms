@@ -9,21 +9,11 @@ from cms.utils.i18n import force_language
 from django.contrib.auth.forms import AuthenticationForm
 from django import forms
 from django.contrib.auth import login, logout
-from django.db.models import signals
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-
-
-def object_saved(*args, **kwargs):
-    print 'object saved'
-    print args, kwargs
-
-
-def object_deleted(*args, **kwargs):
-    print args, kwargs
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -88,13 +78,9 @@ class CMSToolbar(ToolbarAPIMixin):
             app_name = ".".join(key.split(".")[:-2])
             if app_name in self.view_name and len(key) > len(app_key):
                 app_key = key
-        self.models = []
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, key == app_key, app_key)
             self.toolbars[key] = toolbar
-            if toolbar.model and self.is_staff:
-                self.models.append(toolbar.model)
-
 
     @property
     def csrf_token(self):
