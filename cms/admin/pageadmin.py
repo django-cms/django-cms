@@ -130,7 +130,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
-            pat(r'^resolve/$', self.resolve),
+            url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
         )
 
         if plugin_pool.get_all_plugins():
@@ -1178,6 +1178,8 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                                                   template="admin/cms/page/tree/lazy_menu.html")
 
     def resolve(self, request):
+        if not request.user.is_staff:
+            return HttpResponse('/')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             obj = log.get_edited_object()

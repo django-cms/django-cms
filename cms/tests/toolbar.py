@@ -319,6 +319,8 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.content, '/en/test-page-1/')
             response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
             self.assertEqual(response.content, '/en/')
+        response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
+        self.assertEqual(response.content,  '/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):
