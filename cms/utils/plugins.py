@@ -323,6 +323,8 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
                 for pl in placeholders:
                     if instance.placeholder_id == pl.pk:
                         instance.placeholder = pl
+                        if not cls.cache:
+                            pl.cache_placeholder = False
             # make the equivalent list of qs, but with downcasted instances
     plugin_list = []
     for p in queryset:

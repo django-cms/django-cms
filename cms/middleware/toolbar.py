@@ -72,3 +72,15 @@ class ToolbarMiddleware(object):
             return response
         return None
 
+    def process_response(self, request, response):
+        from django.utils.cache import add_never_cache_headers
+        found = False
+        if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
+            found = True
+        for placeholder in getattr(request, 'placeholders', []):
+            if not placeholder.cache_placeholder:
+                found = True
+                break
+        if found:
+            add_never_cache_headers(response)
+        return response

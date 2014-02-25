@@ -237,7 +237,8 @@ class ContextTests(SettingsOverrideTestCase):
                 response = self.client.get("/en/page-2/")
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)
-
+        cache.clear()
+        menu_pool.clear()
         page_2.template = 'INHERIT'
         page_2.save()
         page_2.publish('en')

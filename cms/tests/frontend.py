@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.core.cache import cache
 import os
 import time
 
@@ -8,7 +9,6 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 
 from django.utils import unittest
-from django.db import connections
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.test import LiveServerTestCase, TestCase
@@ -25,6 +25,7 @@ class CMSLiveTests(LiveServerTestCase, TestCase):
     @classmethod
     def setUpClass(cls):
         super(CMSLiveTests, cls).setUpClass()
+        cache.clear()
         if os.environ.get('SELENIUM', '') != '':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
@@ -54,6 +55,7 @@ class CMSLiveTests(LiveServerTestCase, TestCase):
     def tearDown(self):
         super(CMSLiveTests, self).tearDown()
         Page.objects.all().delete() # somehow the sqlite transaction got lost.
+        cache.clear()
 
 
     def wait_until(self, callback, timeout=10):

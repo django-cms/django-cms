@@ -27,3 +27,10 @@ if apphook_pool.get_apphooks():
     urlpatterns = get_app_patterns() + urlpatterns
 
 urlpatterns = patterns('', *urlpatterns)
+
+
+if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+    import debug_toolbar
+    urlpatterns += patterns('',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )
