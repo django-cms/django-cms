@@ -73,7 +73,6 @@ So you could do::
 
         def setUp(self):
             self.plugin = MyPlugin()
-            self.plugin.save()
 
         def test_plugin(self):
             context = {'info': 'value'}
