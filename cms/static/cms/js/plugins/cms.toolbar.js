@@ -57,11 +57,6 @@ $(document).ready(function () {
 			// add toolbar ready class to body
 			this.body.addClass('cms_toolbar-ready');
 
-			// check if we need to reset the current settings depending on a new release
-			if(CMS.config.settings.version !== this.settings.version) {
-				this.settings = this.setSettings(CMS.config.settings);
-			}
-
 			// check if debug is true
 			if(CMS.config.debug) this._debug();
 
@@ -72,7 +67,10 @@ $(document).ready(function () {
 			if(CMS.config.error) this.showError(CMS.config.error);
 
 			// enforce open state if user is not logged in but requests the toolbar
-			if(!CMS.config.auth) this.toggleToolbar(true);
+			if(!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
+				this.toggleToolbar(true);
+				this.settings = this.setSettings(CMS.config.settings);
+			}
 
 			// should switcher indicate that there is an unpublished page?
 			if(CMS.config.publisher) {
