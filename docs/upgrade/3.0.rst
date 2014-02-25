@@ -256,6 +256,10 @@ Details can be found in :ref:`multi_apphook`.
 ``PlaceholderAdmin``
 ====================
 
+``PlaceholderAdmin`` now is mixin class and not derived from ``admin.ModelAdmin`` anymore.
+Therefore when defining an admin class using ``PlaceholderAdmin``, additionally derive that
+class from ``admin.ModelAdmin``.
+
 ``PlaceholderAdmin`` doesn't have language tabs anymore and the plugin editor is gone.
 The plugin API has changed and is now more consistent. ``PageAdmin`` uses the
 same API as ``PlaceholderAdmin`` now. If your app talked with the Plugin API

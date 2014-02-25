@@ -4,16 +4,16 @@ from django.contrib import admin
 from hvad.admin import TranslatableAdmin
 
 
-class ExampleAdmin(FrontendEditableAdmin, PlaceholderAdmin):
+class ExampleAdmin(FrontendEditableAdmin, PlaceholderAdmin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1", "char_2")
 
 
-class TwoPlaceholderExampleAdmin(PlaceholderAdmin):
+class TwoPlaceholderExampleAdmin(PlaceholderAdmin, admin.ModelAdmin):
     pass
 
 
 class MultilingualAdmin(FrontendEditableAdmin, TranslatableAdmin,
-                        PlaceholderAdmin):
+                        PlaceholderAdmin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1", "char_2")
 
 

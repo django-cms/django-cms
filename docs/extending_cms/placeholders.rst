@@ -69,8 +69,8 @@ Admin Integration
 
 .. versionchanged:: 3.0
 
-If you install this model in the admin application, you have to use
-:class:`~cms.admin.placeholderadmin.PlaceholderAdmin` instead of
+If you install this model in the admin application, you have to use the mixin
+:class:`~cms.admin.placeholderadmin.PlaceholderAdmin` together with
 :class:`~django.contrib.admin.ModelAdmin` so the interface renders
 correctly::
 
@@ -78,7 +78,10 @@ correctly::
     from cms.admin.placeholderadmin import PlaceholderAdmin
     from myapp.models import MyModel
 
-    admin.site.register(MyModel, PlaceholderAdmin)
+    class MyModelAdmin(PlaceholderAdmin, admin.ModelAdmin):
+        pass
+
+    admin.site.register(MyModel, MyModelAdmin)
 
 
 .. warning::
@@ -117,7 +120,7 @@ registering your model with the admin site::
     from hvad.admin import TranslatableAdmin
     from myapp.models import MultilingualExample1
 
-    class MultilingualModelAdmin(TranslatableAdmin, PlaceholderAdmin):
+    class MultilingualModelAdmin(TranslatableAdmin, PlaceholderAdmin, admin.ModelAdmin):
         pass
 
     admin.site.register(MultilingualExample1, MultilingualModelAdmin)

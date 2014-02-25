@@ -3,7 +3,7 @@ from django.contrib import admin
 from cms.admin.placeholderadmin import PlaceholderAdmin
 
 
-class StaticPlaceholderAdmin(PlaceholderAdmin):
+class StaticPlaceholderAdmin(PlaceholderAdmin, admin.ModelAdmin):
     list_display = ('name', 'code', 'creation_method')
     search_fields = ('name', 'code',)
     exclude = ('creation_method',)
