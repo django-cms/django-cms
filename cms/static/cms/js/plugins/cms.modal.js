@@ -410,6 +410,7 @@ $(document).ready(function () {
 		_setButtons: function (iframe) {
 			var that = this;
 			var row = iframe.contents().find('.submit-row:eq(0)');
+				row.hide(); // hide submit-row
 			var buttons = row.find('input, a');
 			var render = $('<span />'); // seriously jquery...
 
@@ -474,9 +475,6 @@ $(document).ready(function () {
 				});
 			render.append(cancel);
 
-			// unwrap helper and ide row
-			row.hide();
-
 			// render buttons
 			this.modal.find('.cms_modal-buttons').html(render);
 		},
@@ -502,6 +500,7 @@ $(document).ready(function () {
 				var messages = iframe.contents().find('.messagelist li');
 					if(messages.length) CMS.API.Toolbar.openMessage(messages.eq(0).text());
 					messages.remove();
+				var contents = iframe.contents();
 
 				// determine if we should close the modal or reload
 				if(messages.length && that.enforceReload) that.reloadBrowser();
@@ -511,7 +510,7 @@ $(document).ready(function () {
 				}
 
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
+				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
 
 				// set title of not provided
 				var innerTitle = iframe.contents().find('#content h1:eq(0)');
@@ -528,9 +527,14 @@ $(document).ready(function () {
 				iframe.data('ready', true);
 
 				// attach close event
-				iframe.contents().find('body').bind('keydown.cms', function (e) {
+				contents.find('body').bind('keydown.cms', function (e) {
 					if(e.keyCode === 27) that.close();
 				});
+
+				// figure out if .object-tools is available
+				if(contents.find('.object-tools').length) {
+					contents.find('#content').css('padding-top', 38);
+				}
 			});
 
 			// inject
