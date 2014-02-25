@@ -628,7 +628,7 @@ Example: application template
     {% endblock main %}
 
 ``CMS_TEMPLATE`` memorizes the path of the cms template so the application
-template can dynamically import it
+template can dynamically import it.
 
 
 render_model
