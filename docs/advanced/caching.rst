@@ -47,9 +47,12 @@ This can be changed in :setting:`CMS_CACHE_DURATIONS`
 Settings
 ========
 
-CMS_PAGE_CACHE': True
-    'PLACEHOLDER_CACHE': True,
-    'PLUGIN_CACHE': True,
+Caching is set default to true.
+Have a look at the following settings to enable/disable various caching behaviors:
+
+- :setting:`CMS_PAGE_CACHE`
+- :setting:`CMS_PLACEHOLDER_CACHE`
+- :setting:`CMS_PLUGIN_CACHE`
 
 
 
