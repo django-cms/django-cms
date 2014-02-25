@@ -49,4 +49,3 @@ if is_user_swapped:
     		UserChangeForm = custom_forms.UserChangeForm
     except ImportError:
     	pass
-

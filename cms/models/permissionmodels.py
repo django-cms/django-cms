@@ -6,11 +6,15 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 
-from cms.compat import get_user_model, user_model_label
+from cms.compat import get_user_model
 from cms.models import Page
 from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+
+from peak.util.proxies import LazyWrapper
+
+user_model_label = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
