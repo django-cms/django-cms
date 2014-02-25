@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
 from cms.apphook_pool import apphook_pool
-from cms.compat import get_user_model, UserCreationForm
+from cms.compat import get_user_model
+from cms.compat_forms import UserCreationForm
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels
 from cms.utils.conf import get_cms_setting
