@@ -112,6 +112,10 @@ $(document).ready(function () {
 				var el = $(e.delegateTarget);
 				var dragitem = $('.cms_draggable-' + el.data('settings').plugin_id);
 				var placeholder_id = that._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_dragbar').first());
+
+				// if placeholder_id is empty, cancel
+				if(!placeholder_id) return false;
+
 				var data = el.data('settings');
 					data.target = placeholder_id;
 					data.parent= that._getId(dragitem.parent().closest('.cms_draggable'));
