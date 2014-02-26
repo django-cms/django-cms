@@ -37,8 +37,13 @@ def details(request, slug):
     """
     from django.core.cache import cache
 
-    if get_cms_setting("PAGE_CACHE") and (not hasattr(request, 'toolbar') or (
-                    not request.toolbar.edit_mode and not request.toolbar.show_toolbar and not request.user.is_authenticated())):
+    if get_cms_setting("PAGE_CACHE") and (
+        not hasattr(request, 'toolbar') or (
+            not request.toolbar.edit_mode and
+            not request.toolbar.show_toolbar and
+            not request.user.is_authenticated()
+        )
+    ):
         cache_content = cache.get(
             _get_cache_key(request),
             version=_get_cache_version()
