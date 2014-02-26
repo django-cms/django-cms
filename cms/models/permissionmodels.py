@@ -17,15 +17,19 @@ from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 # To avoid circular dependencies, don't use cms.compat.get_user_model, and
 # don't depend on the app registry, to get the custom user model if used
 if is_user_swapped:
-    user_app_name = user_model_label.split('.')[0]
+    user_app_name, user_model_name = user_model_label.rsplit('.', 1)
+    User = None
     for app in settings.INSTALLED_APPS:
-        if user_app_name in app:
-            try:
-                User = importlib.import_module(app + ".models").User
-            except AttributeError:
-                raise ImproperlyConfigured('''
-                    DjangoCMS requires the name of custom user models to be "User"
-                ''')
+        if app.endswith(user_app_name):
+            user_app_models = importlib.import_module(app + ".models")
+            User = getattr(user_app_models, user_model_name)
+            break
+    if User is None:
+        raise ImproperlyConfigured(
+            "You have defined a custom user model %s, but the app %s is not "
+            "in settings.INSTALLED_APPS" % (user_model_label, user_app_name)
+        )
+
 else:
     from django.contrib.auth.models import User
 
