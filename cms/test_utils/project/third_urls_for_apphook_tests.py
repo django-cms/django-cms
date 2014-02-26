@@ -21,3 +21,10 @@ urlpatterns = patterns('',
 urlpatterns += i18n_patterns('',
     url(r'^', include('cms.test_utils.project.third_cms_urls_for_apphook_tests')),
 )
+
+
+if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+    import debug_toolbar
+    urlpatterns += patterns('',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )

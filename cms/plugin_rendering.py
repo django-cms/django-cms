@@ -10,6 +10,7 @@ from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
+
 # these are always called before all other plugin context processors
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
     plugin_meta_context_processor,
@@ -88,6 +89,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
     """
+    if not placeholder:
+        return
     from cms.utils.plugins import get_plugins
     context = context_to_copy
     context.push()
@@ -95,11 +98,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if not hasattr(request, 'placeholder'):
         request.placeholders = []
     request.placeholders.append(placeholder)
+    if hasattr(placeholder, 'content_cache'):
+        return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
-    if page:
-        template = page.template
-    else:
-        template = None
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work
     if lang:
@@ -107,6 +108,31 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     else:
         lang = get_language_from_request(request)
         save_language = lang
+
+    # Prepend frontedit toolbar output if applicable
+    edit = False
+    toolbar = getattr(request, 'toolbar', None)
+
+    if getattr(toolbar, 'edit_mode', False):
+        edit = True
+    if edit:
+        from cms.middleware.toolbar import toolbar_plugin_processor
+
+        processors = (toolbar_plugin_processor,)
+    else:
+        processors = None
+    if get_cms_setting('PLACEHOLDER_CACHE'):
+        from django.core.cache import cache
+        cache_key = placeholder.get_cache_key(lang)
+        if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
+            cached_value = cache.get(cache_key)
+            if not cached_value is None:
+                return mark_safe(cached_value)
+    if page:
+        template = page.template
+    else:
+        template = None
+
     plugins = [plugin for plugin in get_plugins(request, placeholder, template, lang=lang)]
 
     # Add extra context as defined in settings, but do not overwrite existing context variables,
@@ -122,20 +148,6 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
             context[key] = value
 
     content = []
-
-    # Prepend frontedit toolbar output if applicable
-    edit = False
-    toolbar = getattr(request, 'toolbar', None)
-
-    if (getattr(toolbar, 'edit_mode', False) and
-        (not page or page.has_change_permission(request))):
-        edit = True
-    if edit:
-        from cms.middleware.toolbar import toolbar_plugin_processor
-
-        processors = (toolbar_plugin_processor,)
-    else:
-        processors = None
 
     content.extend(render_plugins(plugins, context, placeholder, processors))
     toolbar_content = ''
@@ -158,6 +170,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['placeholder'] = toolbar_content
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)
+    if placeholder and not edit and placeholder.cache_placeholder:
+        cache.set(cache_key, result, get_cms_setting('CACHE_DURATIONS')['content'])
     context.pop()
     return result
 

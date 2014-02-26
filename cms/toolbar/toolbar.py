@@ -55,14 +55,19 @@ class CMSToolbar(ToolbarAPIMixin):
 
         if self.is_staff:
             try:
-                user_settings = UserSettings.objects.get(user=self.request.user)
+                user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
             except UserSettings.DoesNotExist:
                 user_settings = UserSettings(language=self.language, user=self.request.user)
                 placeholder = Placeholder(slot="clipboard")
                 placeholder.save()
                 user_settings.clipboard = placeholder
                 user_settings.save()
-            self.toolbar_language = user_settings.language
+            if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
+                    not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
+                self.toolbar_language = user_settings.language
+            else:
+                user_settings.language = self.language
+                user_settings.save()
             self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.core.cache import cache
 from django.utils.numberformat import format
 from django.db import models
 from cms import constants
@@ -375,11 +376,13 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
             del(placeholder_de._plugins_cache)
+            cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^en body$")
 
             # remove the cached plugins instances
             del(placeholder_de._plugins_cache)
+            cache.clear()
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
@@ -409,11 +412,13 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         content_de = render_placeholder(placeholder_en, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
         del(placeholder_en._plugins_cache)
+        cache.clear()
         ## English page should have no text
         content_en = render_placeholder(placeholder_en, context_en)
         self.assertNotRegex(content_en, "^de body$")
         self.assertEqual(len(content_en), 0)
         del(placeholder_en._plugins_cache)
+        cache.clear()
         conf = {
             'col_left': {
                 'language_fallback': True,
@@ -426,6 +431,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
             # remove the cached plugins instances
             del(placeholder_en._plugins_cache)
+            cache.clear()
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
             content_en = render_placeholder(placeholder_en, context_en)
