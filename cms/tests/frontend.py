@@ -306,4 +306,4 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         plugins = self.page.placeholders.all()[0].get_plugins_list('en')
 
-        self.assertEqual(len(plugins), 2)
+        self.assertEqual(len(plugins), 1)

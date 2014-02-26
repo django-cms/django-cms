@@ -252,3 +252,26 @@ selected poll and its sub-methods::
         menu.add_sideframe_item(_('Delete this Poll'), url=reverse('admin:polls_poll_delete', args=[poll_id]))
 
         return render(request, 'polls/detail.html', {'poll': poll})
+
+
+---------------------
+Detecting url changes
+---------------------
+
+Sometimes toolbar entries allow that you change the url of the current object displayed in the website. For example you are
+inside a blog entry and the toolbar allows to edit the blog slug or url. The toolbar will watch the
+``django.contrib.admin.models.LogEntry`` model and detect if you create or edit an object in the admin via modal or sideframe view.
+After the modal or sideframe closes it will redirect to the new url of the object.
+
+To set this behavior manually you can set the ``request.toolbar.set_object()`` function on which you can set the current object.
+
+Example::
+
+    def detail(request, poll_id):
+        poll = get_object_or_404(Poll, pk=poll_id)
+        if hasattr(request, 'toolbar'):
+            request.toolbar.set_object(poll)
+        return render(request, 'polls/detail.html', {'poll': poll})
+
+
+

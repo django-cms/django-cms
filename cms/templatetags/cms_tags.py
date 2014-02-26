@@ -832,6 +832,7 @@ class CMSEditableObject(InclusionTag):
         extra_context = self._get_data_context(context, instance, attribute,
                                                edit_fields, language, filters,
                                                view_url, view_method)
+        extra_context['render_model'] = True
         return extra_context
 register.tag(CMSEditableObject)
 
@@ -943,6 +944,7 @@ class CMSEditableObjectBlock(CMSEditableObject):
         extra_context = self._get_empty_context(context, instance, edit_fields,
                                                 language, view_url, view_method)
         extra_context['instance'] = instance
+        extra_context['render_model_block'] = True
         return extra_context
 register.tag(CMSEditableObjectBlock)
 

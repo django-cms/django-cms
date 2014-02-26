@@ -677,6 +677,14 @@ Default: False
 Is it required that this plugin is a child of another plugin? Or can it be added to any placeholder, even one attached to a page.
 
 
+disable_child_plugin
+--------------------
+
+Default: False
+
+Disables dragging of child plugins in structure mode.
+
+
 get_translatable_content
 ------------------------
 

@@ -345,6 +345,17 @@ Since django CMS 2.0 plugins had their table names start with `cmsplugin_`. We r
 in 3.0 and will display a deprecation warning with the old and new table name. If your plugin uses
 south for migrations create a new empty schemamigration and rename the table by hand.
 
+.. warning:: When working in the django shell or coding at low level, you **must**
+             trigger the backward compatible behavior (a.k.a. magical rename
+             checking), otherwise non migrated plugins will fail.
+             To do this execute the following code::
+
+             >>> from cms.plugin_pool import plugin_pool
+             >>> plugin_pool.set_plugin_meta()
+
+             This code can be executed both in the shell or in your python
+             modules.
+
 Added support for custom user models
 ====================================
 
