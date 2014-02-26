@@ -1185,7 +1185,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             obj = log.get_edited_object()
             del request.session['cms_log_latest']
             try:
-                return HttpResponse(obj.get_absolute_url())
+                return HttpResponse(force_unicode(obj.get_absolute_url()))
             except:
                 pass
         pk = request.REQUEST.get('pk')
@@ -1196,7 +1196,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
                 instance = ctype.get_object_for_this_type(pk=pk)
             except ctype.model_class().DoesNotExist:
                 return HttpResponse('/')
-            return HttpResponse(instance.get_absolute_url())
+            return HttpResponse(force_unicode(instance.get_absolute_url()))
         else:
             return HttpResponse('/')
 
