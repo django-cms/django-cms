@@ -265,10 +265,8 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.status_code, 200)
 
     def test_remove_lang(self):
-        print 'hello'
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         superuser = self.get_superuser()
-        from django.conf import settings
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
             self.assertEqual(response.status_code, 200)
