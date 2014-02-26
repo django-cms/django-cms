@@ -614,6 +614,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
 
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+
         return published
 
     def unpublish(self, language):
@@ -647,8 +650,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         from cms.views import invalidate_cms_page_cache
         invalidate_cms_page_cache()
+
         from cms.signals import post_unpublish
         post_unpublish.send(sender=Page, instance=self, language=language)
+
         return True
 
     def mark_descendants_pending(self, language):
