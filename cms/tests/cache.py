@@ -100,31 +100,21 @@ class CacheTestCase(CMSTestCase):
     def test_cache_page(self):
         from cms.views import _get_cache_version
         from cms.utils import get_cms_setting
-        from django import db
 
         from django.conf import settings
+
+        # We'll store the old MW so that we can play nice with the other tests
+        old_middleware = settings.MIDDLEWARE_CLASSES[:]
 
         # Clear the entire cache for a clean slate
         cache.clear()
 
         # Ensure that we're testing in an environment WITHOUT the MW cache...
-        settings.MIDDLEWARE_CLASSES = [
-            # 'django.middleware.cache.UpdateCacheMiddleware',
-            'django.middleware.http.ConditionalGetMiddleware',
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.doc.XViewMiddleware',
-            'django.middleware.common.CommonMiddleware',
-            'cms.middleware.language.LanguageCookieMiddleware',
-            'cms.middleware.user.CurrentUserMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
-            # 'django.middleware.cache.FetchFromCacheMiddleware',
-            'django.middleware.transaction.TransactionMiddleware'
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware'
         ]
+        settings.MIDDLEWARE_CLASSES[:] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
         # Silly to do these tests if this setting isn't True
         page_cache_setting = get_cms_setting('PAGE_CACHE')
@@ -191,3 +181,8 @@ class CacheTestCase(CMSTestCase):
         with self.assertNumQueries(FuzzyInt(1, 20)):
             response = self.client.get('/en/')
         self.assertEqual(response.status_code, 200)
+
+        #
+        # Let's reset the original middleware for the remaining tests...
+        #
+        settings.MIDDLEWARE_CLASSES = old_middleware[:]
