@@ -631,6 +631,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # trigger update home
         self.save()
         self.mark_descendants_pending(language)
+
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
         from cms.signals import post_unpublish
         post_unpublish.send(sender=Page, instance=self, language=language)
         return True

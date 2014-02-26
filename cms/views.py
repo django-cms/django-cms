@@ -22,6 +22,8 @@ from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
 
 
+CMS_PAGE_CACHE_VERSION_KEY = 'CMS_PAGE_CACHE_VERSION'
+
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
         return TemplateResponse(request, "cms/welcome.html", RequestContext(request))
@@ -209,9 +211,22 @@ def _cache_page(response):
     if not save_cache:
         response
     if save_cache:
-        cache.set(_get_cache_key(request), (response.content, response._headers),
-                  get_cms_setting('CACHE_DURATIONS')['content'])
+        version = cache.get(CMS_PAGE_CACHE_VERSION_KEY, 1)
+        ttl = get_cms_setting('CACHE_DURATIONS')['content']
 
+        cache.set(
+            _get_cache_key(request),
+            (response.content, response._headers),
+            ttl,
+            version=version
+        )
+        # See note in invalidate_cms_page_cache()
+        cache.set(
+            CMS_PAGE_CACHE_VERSION_KEY,
+            version,
+            ttl
+        )
+    
 
 def _get_cache_key(request):
     #md5 key of current path
@@ -227,3 +242,45 @@ def _get_cache_key(request):
         tz_name = force_text(get_current_timezone_name(), errors='ignore')
         cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
+
+
+def invalidate_cms_page_cache():
+    from django.core.cache import cache
+
+    '''
+    Invalidates the CMS PAGE CACHE.
+    '''
+
+    #
+    # NOTE: We're using a cache versioning strategy for invalidating the page
+    # cache when necessary. Instead of wiping all the old entries, we simply
+    # increment the version number rendering all previous entries
+    # inaccessible and left to expire naturally.
+    #
+    # ALSO NOTE: According to the Django documentation, a timeout value of
+    # `None' (in version 1.6+) is supposed to mean "cache forever", however,
+    # this is actually only implemented as only slightly less than 30 days in
+    # some backends (memcached, in particular). In older Djangos, `None' means
+    # "use default value".  To avoid issues arising from different Django
+    # versions and cache backend implementations, we will explicitly set the
+    # lifespan of the CMS_PAGE_CACHE_VERSION entry to whatever is set in
+    # settings.CACHE_DURATIONS['content']. This allows users to adjust as
+    # necessary for their backend.
+    #
+    # To prevent writing cache entries that will live longer than our version
+    # key, we will always re-write the current version number into the cache
+    # just after we write any new cache entries, thus ensuring that the
+    # version number will always outlive any entries written against that
+    # version. This is a cheap operation.
+    #
+    # If there are no new cache writes before the version key expires, its
+    # perfectly OK, since any previous entries cached against that version
+    # will have also expired, so, it'd be pointless to try to access them
+    # anyway.
+    #
+
+    try:
+        cache.incr(CMS_PAGE_CACHE_VERSION_KEY)
+    except ValueError:
+        # Key doesn't exist, so just set it to the default
+        cache.set(CMS_PAGE_CACHE_VERSION_KEY, 1, get_cms_setting('CACHE_DURATIONS')['content'])
