@@ -98,6 +98,7 @@ class CacheTestCase(CMSTestCase):
 
 
     def test_cache_page(self):
+        from django.conf import settings
         from cms.views import details, _get_cache_version
         from cms.utils import get_cms_setting
         from django import db
@@ -106,6 +107,8 @@ class CacheTestCase(CMSTestCase):
         # Silly to do these tests if this setting isn't True
         page_cache_setting = get_cms_setting('PAGE_CACHE')
         self.assertTrue(page_cache_setting)
+
+        settings.CMS_PAGE_CACHE=False
 
         # Create a test page
         page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
@@ -119,17 +122,23 @@ class CacheTestCase(CMSTestCase):
         request = self.get_request(page1.get_path(), 'en')
 
         # Test that the page is initially uncached
+        db.reset_queries()
         with self.assertNumQueries(FuzzyInt(4, 10)):
             response = details(request, page1.get_path())
+        print('Initial request:')
+        print(db.connection.queries)
 
         # Test it was actually a valid page response and not a 302 or 404 or other
         self.assertEqual(response.status_code, 200)
 
-        # Test that subsequent requests of the same page are cached
+        #
+        # Test that subsequent requests of the same page are cached by
+        # asserting that they require fewer queries.
+        #
         db.reset_queries()
         with self.assertNumQueries(FuzzyInt(0, 2)):
             response = details(request, page1.get_path())
-
+        print('Subsequent (cached) request:')
         print(db.connection.queries)
 
         # Test it was actually a valid page response
@@ -140,11 +149,15 @@ class CacheTestCase(CMSTestCase):
         page1.unpublish('en')
         self.assertGreater(_get_cache_version(), old_version)
 
+        cache.clear() # WTF? How can this not force us to use more queries?!?
+
         # Test that this means the page is actually not cached
         page1.publish('en')
+        db.reset_queries()
         with self.assertNumQueries(FuzzyInt(4, 10)):
             response = details(request, page1.get_path())
+        print('Post re-published request:')
+        print(db.connection.queries)
 
         # Test it was actually a valid page response
         self.assertEqual(response.status_code, 200)
-
