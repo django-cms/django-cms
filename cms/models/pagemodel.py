@@ -481,6 +481,19 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         except Title.DoesNotExist:
             return False
 
+    def toggle_in_navigation(self, set_to=None):
+        '''
+        Toggles (or sets) in_navigation and invalidates the cms page cache
+        '''
+        if set_to in [True, False]:
+            self.in_navigation = set_to
+        else:
+            self.in_navigation = not self.in_navigation
+        self.save()
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+        return self.in_navigation
+
     def get_publisher_state(self, language, force_reload=False):
         from cms.models import Title
 

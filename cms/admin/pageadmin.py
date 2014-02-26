@@ -1160,8 +1160,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         """
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
-            page.in_navigation = not page.in_navigation
-            page.save()
+            page.toggle_in_navigation()
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page's in_navigation status")))
 
