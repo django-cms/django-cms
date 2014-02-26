@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-from cms.appresolver import clear_app_resolvers
 from django.core.management import color_style
 from django.core.urlresolvers import clear_url_caches
 from django.core.signals import request_finished
@@ -79,6 +78,7 @@ def trigger_restart(**kwargs):
 
 
 def debug_server_restart(**kwargs):
+    from cms.appresolver import clear_app_resolvers
     if 'runserver' in sys.argv or 'server' in sys.argv:
         clear_app_resolvers()
         clear_url_caches()

@@ -3,9 +3,9 @@
 <div class="cont {{ css_class }}">
 	<div class="col1">
 		{% if has_change_permission %}
-			<a href="{{ page.id }}/{{ lang }}/preview/" target="_parent" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_menu_title }}</a>
+			<a href="{{ page.id }}/{{ lang }}/preview/" target="_parent" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_admin_tree_title }}</a>
 		{% else %}
-			<span class="title">{{ page.get_slug }}</span>
+			<span class="title">{{ page.get_admin_tree_title }}</span>
 		{% endif %}
 	</div>
 	<div class="col2">
@@ -25,7 +25,13 @@
         {% for lang in site_languages %}
 		<div class="col-language">
 		    {% if has_change_permission %}
-				<a href="{% if lang in page.languages %}./{{ page.id }}/{{ lang }}/preview/" target="_parent"{% else %}{{ url }}{{ page.id }}/?language={{ lang }}"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
+				<a href="{% if page|is_published:lang %}./{{ page.id }}/{{ lang }}/preview/{% else %}./{{ page.id }}/{{ lang }}/publish/{% endif %}" class="trigger-tooltip"{% if page|is_published:lang %} target="_top"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
+				{% if lang in page.languages %}
+				<div class="language-tooltip" hidden="hidden">
+					<a href="./{{ page.id }}/{{ lang }}/unpublish/">{% trans "Unpublish" %}</a>
+					<a href="./{{ page.id }}/{{ lang }}/publish/">{% trans "Publish" %}</a>
+				</div>
+				{% endif %}
 			{% else %}
 				{% tree_publish_row page lang %}
 			{% endif %}

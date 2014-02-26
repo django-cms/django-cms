@@ -492,7 +492,7 @@ cms.toolbar.items
         closes, :attr:`REFRESH_PAGE` to refresh the page when it
         closes or a URL to open once it closes.
 
-    .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url_change=False, on_close=None, side=LEFT, position=None)
+    .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, close_on_url=False, on_close=None, side=LEFT, position=None)
 
         The same as :meth:`add_sideframe_item`, but opens the ``url`` in a
         modal dialog instead of the side frame.

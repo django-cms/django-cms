@@ -45,10 +45,13 @@ def post_save_page(instance, **kwargs):
             apphook_post_page_checker(instance)
 
 
-
 def pre_delete_page(instance, **kwargs):
     menu_pool.clear(instance.site_id)
-    instance.placeholders.all().delete()
+    for placeholder in instance.placeholders.all():
+        for plugin in placeholder.cmsplugin_set.all():
+            plugin._no_reorder = True
+            plugin.delete()
+        placeholder.delete()
     clear_permission_cache()
 
 
@@ -78,14 +81,14 @@ def update_home(instance, **kwargs):
         else:
             qs = Page.objects.public()
         try:
-            home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site).pk
+            home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site_id).pk
         except NoHomeFound:
             if instance.publisher_is_draft and instance.title_set.filter(published=True,
                                                                          publisher_public__published=True).count():
                 return
             home_pk = instance.pk
             #instance.is_home = True
-        for page in qs.filter(site=instance.site, is_home=True).exclude(pk=home_pk):
+        for page in qs.filter(site=instance.site_id, is_home=True).exclude(pk=home_pk):
             if instance.pk == page.pk:
                 instance.is_home = False
             page.is_home = False
@@ -93,7 +96,7 @@ def update_home(instance, **kwargs):
             page._home_checked = True
             page.save()
         try:
-            page = qs.get(pk=home_pk, site=instance.site)
+            page = qs.get(pk=home_pk, site=instance.site_id)
         except Page.DoesNotExist:
             return
         page.is_home = True

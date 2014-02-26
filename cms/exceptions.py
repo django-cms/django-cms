@@ -21,6 +21,9 @@ class AppAlreadyRegistered(Exception):
 class ToolbarAlreadyRegistered(Exception):
     pass
 
+class ToolbarNotRegistered(Exception):
+    pass
+
 
 class NotImplemented(Exception):
     pass
