@@ -30,7 +30,6 @@ def configure(db_url, **extra):
         DATABASES={
             'default': DB
         },
-        SESSION_ENGINE="django.contrib.sessions.backends.cache",
         SITE_ID=1,
         USE_I18N=True,
         MEDIA_ROOT='/media/',
