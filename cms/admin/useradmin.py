@@ -65,6 +65,6 @@ class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     def get_fieldsets(self, request, obj=None):
         return self.update_permission_fieldsets(request, obj)
 
-if get_cms_setting('PERMISSION'):
-    admin.site.register(PageUser, PageUserAdmin)
-    admin.site.register(PageUserGroup, PageUserGroupAdmin)
+#if get_cms_setting('PERMISSION'):
+#    admin.site.register(PageUser, PageUserAdmin)
+#    admin.site.register(PageUserGroup, PageUserGroupAdmin)
