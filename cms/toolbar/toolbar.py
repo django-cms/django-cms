@@ -45,6 +45,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        self.obj = None
         if settings.USE_I18N:
             self.language = get_language_from_request(request)
         else:
@@ -83,7 +84,8 @@ class CMSToolbar(ToolbarAPIMixin):
             if app_name in self.view_name and len(key) > len(app_key):
                 app_key = key
         for key in toolbars:
-            self.toolbars[key] = toolbars[key](self.request, self, key == app_key, app_key)
+            toolbar = toolbars[key](self.request, self, key == app_key, app_key)
+            self.toolbars[key] = toolbar
 
     @property
     def csrf_token(self):
@@ -114,6 +116,20 @@ class CMSToolbar(ToolbarAPIMixin):
         item = ButtonList(identifier, extra_classes=extra_classes, side=side)
         self.add_item(item, position=position)
         return item
+
+    def set_object(self, obj):
+        if not self.obj:
+            self.obj = obj
+
+    def get_object_model(self):
+        if self.obj:
+            return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+        return ''
+
+    def get_object_pk(self):
+        if self.obj:
+            return self.obj.pk
+        return ''
 
     # Internal API
 
@@ -165,6 +181,8 @@ class CMSToolbar(ToolbarAPIMixin):
         # never populate the toolbar on is_staff=False
         if not self.is_staff:
             return
+        if self.request.session.get('cms_log_latest', False):
+            del self.request.session['cms_log_latest']
         self._call_toolbar('populate')
 
     def post_template_populate(self):

@@ -120,6 +120,8 @@ class BasicToolbar(CMSToolbar):
 
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):
+    model = Title
+
     def populate(self):
         # always use draft if we have a page
         self.page = get_page_draft(self.request.current_page)

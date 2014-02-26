@@ -12,6 +12,7 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
+			'onClose': false,
 			'sideframeDuration': 300,
 			'sideframeWidth': 320,
 			'urls': {
@@ -120,6 +121,9 @@ $(document).ready(function () {
 				iframe.contents().find('body').bind(that.click, function () {
 					$(document).trigger(that.click);
 				});
+
+				// attach reload event
+				that.reloadBrowser(false, false, true);
 			});
 
 			// cancel animation if sideframe is already shown
@@ -161,6 +165,9 @@ $(document).ready(function () {
 
 			// update settings
 			this.settings = this.setSettings(this.settings);
+
+			// handle refresh option
+			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
 		},
 
 		// private methods

@@ -53,6 +53,9 @@ $(document).ready(function () {
 		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
 		node.append(msg);
 		msg.fadeOut(3000);
+		// check for reload changes
+		if(window.parent) window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
+
 	};
 	moveError = function(node,message){
 		if(message && message!="error") {
