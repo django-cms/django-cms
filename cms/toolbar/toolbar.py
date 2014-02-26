@@ -62,7 +62,12 @@ class CMSToolbar(ToolbarAPIMixin):
                 placeholder.save()
                 user_settings.clipboard = placeholder
                 user_settings.save()
-            self.toolbar_language = user_settings.language
+            if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
+                    not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
+                self.toolbar_language = user_settings.language
+            else:
+                user_settings.language = self.language
+                user_settings.save()
             self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:
