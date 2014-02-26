@@ -1,8 +1,7 @@
 from __future__ import with_statement
 from cms.models import Page
-import re
-from django.template.defaultfilters import truncatewords
 import datetime
+from cms.utils.compat.dj import force_unicode
 
 from django.template.defaultfilters import truncatewords
 from cms.views import details
@@ -298,12 +297,12 @@ class ToolbarTests(ToolbarTestBase):
         resolve_url = reverse('admin:cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url, {'pk':'', 'model':'cms.page'})
-            self.assertEqual(str(response.content), '/')
+            self.assertEqual(force_unicode(response.content), '/')
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
 
             response = self.client.post(resolve_url, {'pk':Page.objects.all()[2].pk, 'model':'cms.page'})
-            self.assertEqual(str(response.content), '/en/test-page-1/')
+            self.assertEqual(force_unicode(response.content), '/en/test-page-1/')
 
     def test_page_edit_redirect(self):
         page1 = create_page("home", "nav_playground.html", "en",
@@ -316,11 +315,11 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
             url = reverse('admin:cms_page_resolve')
             response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
-            self.assertEqual(str(response.content), '/en/test-page-1/')
+            self.assertEqual(force_unicode(response.content), '/en/test-page-1/')
             response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
-            self.assertEqual(str(response.content), '/en/')
+            self.assertEqual(force_unicode(response.content), '/en/')
         response = self.client.post(url, {'pk':page1.pk, 'model':'cms.page'})
-        self.assertEqual(str(response.content),  '/')
+        self.assertEqual(force_unicode(response.content),  '/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):
