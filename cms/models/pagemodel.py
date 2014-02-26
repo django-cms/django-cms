@@ -318,6 +318,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             page.lft = None
             page.tree_id = None
             page.publisher_public_id = None
+            page.is_home = False
             # only set reverse_id on standard copy
             if page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
@@ -579,10 +580,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             if page.publisher_public:
                 if page.publisher_public.parent.is_published(language):
                     from cms.models import Title
-
-                    public_title = Title.objects.get(page=page.publisher_public, language=language)
+                    try:
+                        public_title = Title.objects.get(page=page.publisher_public, language=language)
+                    except Title.DoesNotExist:
+                        public_title = None
                     draft_title = Title.objects.get(page=page, language=language)
-                    if not public_title.published:
+                    if public_title and not public_title.published:
                         public_title._publisher_keep_state = True
                         public_title.published = True
                         public_title.publisher_state = PUBLISHER_STATE_DEFAULT
