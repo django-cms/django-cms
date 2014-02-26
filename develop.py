@@ -177,6 +177,12 @@ if __name__ == '__main__':
 
             # run
             if args['test']:
+                # make "Address already in use" errors less likely, see Django
+                # docs for more details on this env variable.
+                os.environ.setdefault(
+                    'DJANGO_LIVE_TEST_SERVER_ADDRESS',
+                    'localhost:8000-9000'
+                )
                 if args['--xvfb']:
                     import xvfbwrapper
                     context = xvfbwrapper.Xvfb(width=1280, height=720)
