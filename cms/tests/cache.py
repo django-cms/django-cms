@@ -98,17 +98,37 @@ class CacheTestCase(CMSTestCase):
 
 
     def test_cache_page(self):
-        from django.conf import settings
-        from cms.views import details, _get_cache_version
+        from cms.views import _get_cache_version
         from cms.utils import get_cms_setting
         from django import db
 
+        from django.conf import settings
+
+        # Clear the entire cache for a clean slate
+        cache.clear()
+
+        # Ensure that we're testing in an environment WITHOUT the MW cache...
+        settings.MIDDLEWARE_CLASSES = [
+            # 'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.http.ConditionalGetMiddleware',
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.doc.XViewMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'cms.middleware.language.LanguageCookieMiddleware',
+            'cms.middleware.user.CurrentUserMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+            # 'django.middleware.cache.FetchFromCacheMiddleware',
+            'django.middleware.transaction.TransactionMiddleware'
+        ]
 
         # Silly to do these tests if this setting isn't True
         page_cache_setting = get_cms_setting('PAGE_CACHE')
         self.assertTrue(page_cache_setting)
-
-        settings.CMS_PAGE_CACHE=False
 
         # Create a test page
         page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
@@ -121,43 +141,33 @@ class CacheTestCase(CMSTestCase):
         # Create a request object
         request = self.get_request(page1.get_path(), 'en')
 
-        # Test that the page is initially uncached
-        db.reset_queries()
-        with self.assertNumQueries(FuzzyInt(4, 10)):
-            response = details(request, page1.get_path())
-        print('Initial request:')
-        print(db.connection.queries)
+        # Ensure that user is NOT authenticated
+        self.assertFalse(request.user.is_authenticated())
 
-        # Test it was actually a valid page response and not a 302 or 404 or other
+        # Test that the page is initially uncached
+        with self.assertNumQueries(FuzzyInt(1, 20)):
+            response = self.client.get('/en/')
         self.assertEqual(response.status_code, 200)
 
         #
         # Test that subsequent requests of the same page are cached by
         # asserting that they require fewer queries.
         #
-        db.reset_queries()
-        with self.assertNumQueries(FuzzyInt(0, 2)):
-            response = details(request, page1.get_path())
-        print('Subsequent (cached) request:')
-        print(db.connection.queries)
-
-        # Test it was actually a valid page response
+        with self.assertNumQueries(0):
+            response = self.client.get('/en/')
         self.assertEqual(response.status_code, 200)
 
+        #
         # Test that the cache is invalidated on unpublishing the page
+        #
         old_version = _get_cache_version()
         page1.unpublish('en')
         self.assertGreater(_get_cache_version(), old_version)
 
-        cache.clear() # WTF? How can this not force us to use more queries?!?
-
-        # Test that this means the page is actually not cached
+        #
+        # Test that this means the page is actually not cached.
+        #
         page1.publish('en')
-        db.reset_queries()
-        with self.assertNumQueries(FuzzyInt(4, 10)):
-            response = details(request, page1.get_path())
-        print('Post re-published request:')
-        print(db.connection.queries)
-
-        # Test it was actually a valid page response
+        with self.assertNumQueries(FuzzyInt(1, 20)):
+            response = self.client.get('/en/')
         self.assertEqual(response.status_code, 200)
