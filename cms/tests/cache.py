@@ -171,3 +171,23 @@ class CacheTestCase(CMSTestCase):
         with self.assertNumQueries(FuzzyInt(1, 20)):
             response = self.client.get('/en/')
         self.assertEqual(response.status_code, 200)
+
+        #
+        # Test that the above behavior is different when CMS_PAGE_CACHE is
+        # set to False (disabled)
+        #
+        cache.clear()
+        settings.CMS_PAGE_CACHE = False
+
+        # Test that the page is initially uncached
+        with self.assertNumQueries(FuzzyInt(1, 20)):
+            response = self.client.get('/en/')
+        self.assertEqual(response.status_code, 200)
+
+        #
+        # Test that subsequent requests of the same page are still requires DB
+        # access.
+        #
+        with self.assertNumQueries(FuzzyInt(1, 20)):
+            response = self.client.get('/en/')
+        self.assertEqual(response.status_code, 200)
