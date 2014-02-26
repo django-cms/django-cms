@@ -82,13 +82,14 @@ class BasicToolbar(CMSToolbar):
 
     def populate(self):
         self.add_admin_menu()
-        self.add_language_menu()
+        if settings.USE_I18N:
+            self.add_language_menu()
 
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
             admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
-        # sites menu
+            # sites menu
         if get_cms_setting('PERMISSION'):
             sites_queryset = get_user_sites_queryset(self.request.user)
         else:
@@ -100,7 +101,7 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-        # admin
+            # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)
         # cms users
@@ -126,7 +127,7 @@ class PageToolbar(CMSToolbar):
             self.title = Title.objects.get(page=self.page, language=self.current_lang, publisher_is_draft=True)
         except Title.DoesNotExist:
             self.title = None
-        # check global permissions if CMS_PERMISSIONS is active
+            # check global permissions if CMS_PERMISSIONS is active
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)
         else:
@@ -137,7 +138,7 @@ class PageToolbar(CMSToolbar):
             self.change_admin_menu()
             if self.page:
                 self.add_page_menu()
-        # history menu
+            # history menu
         if self.page and self.toolbar.edit_mode:
             self.add_history_menu()
             self.change_language_menu()
@@ -146,6 +147,7 @@ class PageToolbar(CMSToolbar):
         statics = getattr(self.request, 'static_placeholders', [])
         dirty_statics = [stpl for stpl in statics if stpl.dirty]
         placeholders = getattr(self.request, 'placeholders', [])
+        self.page = getattr(self, 'page', None)
         if self.page or statics:
             if self.toolbar.edit_mode:
                 # publish button
@@ -166,6 +168,7 @@ class PageToolbar(CMSToolbar):
                     title = _("Publish changes")
                 else:
                     title = _("Publish page now")
+                    classes.append("cms_publish-page")
                 pk = 0
                 if self.page:
                     pk = self.page.pk
@@ -175,7 +178,7 @@ class PageToolbar(CMSToolbar):
                     publish_url += "?statics=%s" % ','.join(str(static.pk) for static in dirty_statics)
                 if publish_permission:
                     self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
-                                        disabled=not dirty)
+                                            disabled=not dirty)
         if self.page:
             if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
                 self.add_draft_live()
@@ -251,7 +254,10 @@ class PageToolbar(CMSToolbar):
         not_edit_mode = not self.toolbar.edit_mode
         current_page_menu = self.toolbar.get_or_create_menu('page', _('Page'), position=1)
         current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?edit')
-        page_info_url = reverse('admin:cms_page_change', args=(self.page.pk,))
+        page_info_url = "%s?language=%s" % (
+            reverse('admin:cms_page_change', args=(self.page.pk,)),
+            self.toolbar.language
+        )
         current_page_menu.add_modal_item(_('Page settings'), url=page_info_url, disabled=not_edit_mode,
                                          close_on_url=self.toolbar.URL_CHANGE, on_close=self.toolbar.REFRESH_PAGE)
         if self.toolbar.build_mode or self.toolbar.edit_mode:
@@ -269,7 +275,10 @@ class PageToolbar(CMSToolbar):
         current_page_menu.add_modal_item(_('Publishing dates'), url=dates_url, close_on_url=self.toolbar.URL_CHANGE,
                                          disabled=(not self.toolbar.edit_mode))
         # advanced settings
-        advanced_url = reverse('admin:cms_page_advanced', args=(self.page.pk,))
+        advanced_url = "%s?language=%s" % (
+            reverse('admin:cms_page_advanced', args=(self.page.pk,)),
+            self.toolbar.language
+        )
         advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not self.toolbar.edit_mode
         current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, close_on_url=self.toolbar.URL_CHANGE,
                                          disabled=advanced_disabled)

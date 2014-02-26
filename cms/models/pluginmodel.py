@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-import os
-import warnings
 import json
 
+import os
+import warnings
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
@@ -186,6 +186,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             return render_plugin(context, instance, placeholder, template, processors, context.current_app)
         else:
             from cms.middleware.toolbar import toolbar_plugin_processor
+
             if processors and toolbar_plugin_processor in processors:
                 if not placeholder:
                     placeholder = self.placeholder
@@ -265,13 +266,18 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         # we assign a parent to our new plugin
         parent_cache[self.pk] = new_plugin
         if self.parent:
-            new_plugin.parent = parent_cache[self.parent_id]
+            parent = parent_cache[self.parent_id]
+            parent = CMSPlugin.objects.get(pk=parent.pk)
+            new_plugin.parent = parent
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
         new_plugin.position = self.position
         new_plugin.save()
         if plugin_instance:
+            if plugin_instance.__class__ == CMSPlugin:
+                #get a new instance so references do not get mixed up
+                plugin_instance = CMSPlugin.objects.get(pk=plugin_instance.pk)
             plugin_instance.pk = new_plugin.pk
             plugin_instance.id = new_plugin.pk
             plugin_instance.placeholder = target_placeholder
@@ -282,7 +288,8 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             plugin_instance.cmsplugin_ptr = new_plugin
             plugin_instance.language = target_language
             plugin_instance.parent = new_plugin.parent
-            plugin_instance.position = new_plugin.position  # added to retain the position when creating a public copy of a plugin
+            # added to retain the position when creating a public copy of a plugin
+            plugin_instance.position = new_plugin.position
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
@@ -390,7 +397,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         fields = []
         for field in self._meta.fields:
             if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices and
-                    field.editable and field.name not in self.translatable_content_excluded_fields and field):
+                field.editable and field.name not in self.translatable_content_excluded_fields and field):
                 fields.append(field)
 
         translatable_fields = {}
@@ -413,6 +420,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
                 return False
 
         return True
+
 
 reversion_register(CMSPlugin)
 

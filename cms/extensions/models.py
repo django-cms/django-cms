@@ -1,3 +1,4 @@
+from cms.constants import PUBLISHER_STATE_DIRTY
 from django.db import models
 
 from cms.models import Page, Title
@@ -42,16 +43,6 @@ class BaseExtension(models.Model):
 
         return this
 
-    def save(self, *args, **kwargs):
-        if kwargs.pop('mark_page', True):
-            self.get_page().save(no_signals=True)  # mark page unpublished
-        return super(BaseExtension, self).save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        if kwargs.pop('mark_page', True):
-            self.get_page().save(no_signals=True)  # mark page unpublished
-        return super(BaseExtension, self).delete(*args, **kwargs)
-
 
 class PageExtension(BaseExtension):
     extended_object = models.OneToOneField(Page, editable=False)
@@ -62,6 +53,16 @@ class PageExtension(BaseExtension):
     def get_page(self):
         return self.extended_object
 
+    def save(self, *args, **kwargs):
+        if kwargs.pop('mark_page', True):
+            self.get_page().title_set.update(publisher_state=PUBLISHER_STATE_DIRTY)  # mark page dirty
+        return super(BaseExtension, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if kwargs.pop('mark_page', True):
+            self.get_page().title_set.update(publisher_state=PUBLISHER_STATE_DIRTY)  # mark page dirty
+        return super(BaseExtension, self).delete(*args, **kwargs)
+
 
 class TitleExtension(BaseExtension):
     extended_object = models.OneToOneField(Title, editable=False)
@@ -71,6 +72,18 @@ class TitleExtension(BaseExtension):
 
     def get_page(self):
         return self.extended_object.page
+
+    def save(self, *args, **kwargs):
+        if kwargs.pop('mark_page', True):
+            Title.objects.filter(pk=self.extended_object.pk).update(
+                publisher_state=PUBLISHER_STATE_DIRTY) # mark title dirty
+        return super(BaseExtension, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if kwargs.pop('mark_page', True):
+            Title.objects.filter(pk=self.extended_object.pk).update(
+                publisher_state=PUBLISHER_STATE_DIRTY) # mark title dirty
+        return super(BaseExtension, self).delete(*args, **kwargs)
 
 
 

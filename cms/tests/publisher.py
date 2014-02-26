@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
+from cms.utils.i18n import force_language
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
@@ -11,7 +12,7 @@ from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
-from cms.test_utils.util.context_managers import StdoutOverride
+from cms.test_utils.util.context_managers import StdoutOverride, SettingsOverride
 
 from djangocms_text_ckeditor.models import Text
 
@@ -102,7 +103,7 @@ class PublisherCommandTests(TestCase):
             com = publisher_publish.Command()
             com.handle_noargs()
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
-        # Sanity check the database (we should have one draft and one public)
+            # Sanity check the database (we should have one draft and one public)
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEquals(not_drafts, 1)
@@ -157,6 +158,7 @@ class PublisherCommandTests(TestCase):
     def tearDown(self):
         plugin_pool.patched = False
         plugin_pool.set_plugin_meta()
+
 
 class PublishingTests(TestCase):
     def create_page(self, title=None, **kwargs):
@@ -214,6 +216,19 @@ class PublishingTests(TestCase):
         page = Page.objects.get(pk=page.pk)
 
         self.assertEqual(page.get_publisher_state('en'), 0)
+
+    def test_publish_wrong_lang(self):
+        page = self.create_page("test_admin", published=False)
+        superuser = self.get_superuser()
+        with SettingsOverride(
+                LANGUAGES=(('de', 'de'), ('en', 'en')),
+                CMS_LANGUAGES={1: [{'code': 'en', 'name': 'en', 'fallbacks': ['fr', 'de'], 'public': True}]}
+            ):
+            with self.login_user_context(superuser):
+                with force_language('de'):
+                    response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
+        self.assertEqual(response.status_code, 302)
+        page = Page.objects.get(pk=page.pk)
 
     def test_publish_child_first(self):
         parent = self.create_page('parent', published=False)
@@ -360,8 +375,6 @@ class PublishingTests(TestCase):
             x += 1
 
 
-
-
     def test_unpublish_unpublish(self):
         name = self._testMethodName
         page = self.create_page(name, published=True)
@@ -379,6 +392,13 @@ class PublishingTests(TestCase):
         self.assertTrue(page.publisher_public_id)
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(published, title_set__title=name)
+
+    def test_delete_title_unpublish(self):
+        page = self.create_page('test', published=True)
+        sub_page = self.create_page('test2', published=True, parent=page)
+        self.assertTrue(sub_page.publisher_public.is_published('en'))
+        page.title_set.all().delete()
+        self.assertFalse(sub_page.publisher_public.is_published('en', force_reload=True))
 
     def test_modify_child_while_pending(self):
         home = self.create_page("Home", published=True, in_navigation=True)
@@ -446,8 +466,10 @@ class PublishingTests(TestCase):
         home = self.reload(home)
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
+        dirty1.in_navigation = True
         dirty1.save()
         home.unpublish('en')
+        dirty2.in_navigation = True
         dirty2.save()
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
@@ -560,6 +582,7 @@ class PublishingTests(TestCase):
         drafts = Page.objects.drafts()
         public = Page.objects.public()
         published = Page.objects.public().published("en")
+        child.in_navigation = True
         child.save()
 
         self.assertTrue(child.is_dirty("en"))
@@ -613,10 +636,10 @@ class PublishingTests(TestCase):
         self.assertEqual(home.get_absolute_url(), root + 'page/')
         self.assertEqual(home.get_public_object().get_absolute_url(), root + 'page/')
 
-        self.assertEqual(child.get_absolute_url(), root+'page/child/')
-        self.assertEqual(child.get_public_object().get_absolute_url(), root+'page/child/')
-        self.assertEqual(child2.get_absolute_url(), root+'child/')
-        self.assertEqual(child2.get_public_object().get_absolute_url(), root+'child/')
+        self.assertEqual(child.get_absolute_url(), root + 'page/child/')
+        self.assertEqual(child.get_public_object().get_absolute_url(), root + 'page/child/')
+        self.assertEqual(child2.get_absolute_url(), root + 'child/')
+        self.assertEqual(child2.get_public_object().get_absolute_url(), root + 'child/')
         home.publish('en')
         home = self.reload(home)
         other = self.reload(other)

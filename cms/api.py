@@ -10,12 +10,11 @@ import datetime
 from cms.utils import copy_plugins
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError, FieldError
 from cms.utils.i18n import get_language_list
 
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.db.models import Max
 from django.template.defaultfilters import slugify
 from menus.menu_pool import menu_pool
 
@@ -116,7 +115,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
-                position="last-child", overwrite_url=None):
+                position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
     
@@ -175,6 +174,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
     else:
         application_urls = None
 
+    if reverse_id:
+        if Page.objects.drafts().filter(reverse_id=reverse_id).count():
+            raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
+
     page = Page(
         created_by=created_by,
         changed_by=created_by,
@@ -191,6 +194,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
+        xframe_options=xframe_options,    
     )
     page.insert_at(parent, position)
     page.save()
@@ -263,14 +267,27 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
 
     # validate and normalize plugin type
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
-
-    max_pos = CMSPlugin.objects.filter(language=language,
-                                       placeholder=placeholder).aggregate(Max('position'))['position__max'] or 0
+    if target:
+        if position == 'last-child':
+            new_pos = CMSPlugin.objects.filter(language=language, parent=target, tree_id=target.tree_id).count()
+        elif position == 'first-child':
+            new_pos = 0
+        elif position == 'left':
+            new_pos = target.position
+        elif position == 'right':
+            new_pos = target.position + 1
+        else:
+            raise Exception('position not supported: %s' % position)
+        for pl in CMSPlugin.objects.filter(language=language, parent=target.parent_id, tree_id=target.tree_id, position__gte=new_pos):
+            pl.position += 1
+            pl.save()
+    else:
+        new_pos = CMSPlugin.objects.filter(language=language, parent__isnull=True, placeholder=placeholder).count()
 
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
         placeholder=placeholder,
-        position=max_pos + 1,
+        position=new_pos,
         language=language
     )
     plugin_base.insert_at(target, position=position, save=False)

@@ -98,6 +98,8 @@ Revision management
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
 
+.. _installing-in-a-virtualenv-using-pip:
+
 Installing in a virtualenv using pip
 ------------------------------------
 
@@ -123,6 +125,12 @@ The first step is to create the virtualenv:
   #!/bin/sh
   sudo pip install --upgrade virtualenv
   virtualenv --distribute --no-site-packages env
+
+.. note:: Since virtualenv v1.10 (2013-07-23) --distribute or --setuptools are
+          the same because the new setuptools has been merged with Distribute.
+          Since virtualenv v1.7 (2011-11-30) --no-site-packages was made the
+          default behavior. By the way, we can create a virtualenv typing in our
+          console only `virtualenv env`.
 
 You can switch to your virtualenv at the command line by typing:
 
@@ -224,6 +232,37 @@ This will install Django, django CMS, South, Pillow, and your database's driver 
 
 You have now everything that is needed for you to follow an easy introduction
 into django CMS here: :doc:`../tutorial/index`.
+
+
+On Mac OSX
+----------
+
+All you need to do is
+
+.. code-block:: bash
+
+    $ sudo easy_install pip
+
+If you're using `Homebrew`_ you can install pip and virtualenv with the python
+generic package:
+
+.. code-block:: bash
+
+    $ sudo brew install python
+
+Then create an enviroment and work on it instead of install the packages in the
+system path:
+
+.. code-block:: bash
+
+    $ virtualenv djangocms-env
+    $ ./djangocms-env/bin/activate
+    (djangocms-env)$ pip install Django==1.5 South Django-CMS
+
+.. note:: You can see the general instructions on how to pip install packages
+          after creating the virtualenv here: :ref:`Installing in a virtualenv using pip <installing-in-a-virtualenv-using-pip>`
+
+.. _Homebrew: http://brew.sh/
 
 
 Databases
@@ -359,7 +398,7 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
         'django.core.context_processors.request',
         'django.core.context_processors.media',
         'django.core.context_processors.static',
-        'cms.context_processors.media',
+        'cms.context_processors.cms_settings',
         'sekizai.context_processors.sekizai',
     )
 

@@ -155,6 +155,11 @@ $(document).ready(function () {
 				'width': this.options.sideframeWidth
 			};
 
+			// resets
+			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
+			this.sideframe.find('.cms_sideframe-hide').show();
+
+			// update settings
 			this.settings = this.setSettings(this.settings);
 		},
 
@@ -180,6 +185,11 @@ $(document).ready(function () {
 				} else {
 					this.sideframe.animate({ 'width': width }, 0);
 					this.body.animate({ 'margin-left': width }, 0);
+					// reset width if larger than available space
+					if(width >= $(window).width()) {
+						this.sideframe.animate({ 'width': $(window).width() - 20 }, 0);
+						this.body.animate({ 'margin-left': $(window).width() - 20 }, 0);
+					}
 				}
 				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
 			}
@@ -250,12 +260,14 @@ $(document).ready(function () {
 
 		_startResize: function () {
 			var that = this;
+			var outerOffset = 20;
 			var timer = function () {};
 			// this prevents the iframe from being focusable
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
 
 			$(document).bind('mousemove.cms', function (e) {
 				if(e.clientX <= 320) e.clientX = 320;
+				if(e.clientX >= $(window).width() - outerOffset) e.clientX = $(window).width() - outerOffset;
 
 				that.sideframe.css('width', e.clientX);
 				that.body.css('margin-left', e.clientX);

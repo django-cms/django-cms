@@ -16,7 +16,7 @@ from cms import __version__
 from cms.test_utils.cli import configure
 from cms.test_utils.tmpdir import temp_dir
 
-__doc__ = '''django CMS development helper script. 
+__doc__ = '''django CMS development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
@@ -175,6 +175,8 @@ if __name__ == '__main__':
 
             # run
             if args['test']:
+                os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082,8090-8100,9000-9200,7041'
+
                 if args['isolated']:
                     failures = isolated(args['<test-label>'], args['--parallel'])
                     print()

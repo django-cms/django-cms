@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
-from django.test import Client
 from cms.api import create_page
-from cms.models import Page
+from cms.models import Page, Placeholder
 from cms.utils import get_cms_setting
-from cms.views import details
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+
 
 class SiteTestCase(CMSTestCase):
     """Site framework specific test cases.
     
     All stuff which is changing settings.SITE_ID for tests should come here.
     """
+
     def setUp(self):
         self.assertEqual(Site.objects.all().count(), 1)
         with SettingsOverride(SITE_ID=1):
-
             u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
             u.set_password("test")
             u.save()
@@ -108,3 +107,10 @@ class SiteTestCase(CMSTestCase):
                         page_url = page.get_absolute_url(language='de')
                     response = self.client.get(page_url)
                     self.assertEqual(response.status_code, 200)
+
+    def test_site_delete(self):
+        with SettingsOverride(SITE_ID=self.site2.pk):
+            create_page("page_2a", "nav_playground.html", "de", site=self.site2)
+            self.assertEqual(Placeholder.objects.count(), 2)
+            self.site2.delete()
+            self.assertEqual(Placeholder.objects.count(), 0)
