@@ -41,7 +41,7 @@ def details(request, slug):
                     not request.toolbar.edit_mode and not request.toolbar.show_toolbar and not request.user.is_authenticated())):
         cache_content = cache.get(
             _get_cache_key(request),
-            version=cache.get(CMS_PAGE_CACHE_VERSION_KEY, 1)
+            version=_get_cache_version()
         )
         if not cache_content is None:
             content, headers = cache_content
@@ -212,7 +212,7 @@ def _cache_page(response):
     if not save_cache:
         response
     if save_cache:
-        version = cache.get(CMS_PAGE_CACHE_VERSION_KEY, 1)
+        version = _get_cache_version()
         ttl = get_cms_setting('CACHE_DURATIONS')['content']
 
         cache.set(
@@ -243,6 +243,26 @@ def _get_cache_key(request):
         tz_name = force_text(get_current_timezone_name(), errors='ignore')
         cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
+
+def _get_cache_version():
+    from django.core.cache import cache
+
+    '''
+    Returns the current page cache version, explicitly setting one if not
+    defined.
+    '''
+
+    version = cache.get(CMS_PAGE_CACHE_VERSION_KEY)
+
+    if version:
+        return version
+    else:
+        cache.set(
+            CMS_PAGE_CACHE_VERSION_KEY,
+            1,
+            get_cms_setting('CACHE_DURATIONS')['content']
+        )
+        return 1
 
 
 def invalidate_cms_page_cache():
@@ -279,7 +299,6 @@ def invalidate_cms_page_cache():
     # will have also expired, so, it'd be pointless to try to access them
     # anyway.
     #
-
     try:
         cache.incr(CMS_PAGE_CACHE_VERSION_KEY)
     except ValueError:

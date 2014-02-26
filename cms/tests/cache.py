@@ -96,14 +96,53 @@ class CacheTestCase(CMSTestCase):
 
         plugin_pool.unregister_plugin(NoCachePlugin)
 
-    def test_cache_page(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
 
+    def test_cache_page(self):
+        from django.contrib.auth.models import User
+        from cms.test_utils.util.mock import AttributeObject
+        from cms.views import details, CMS_PAGE_CACHE_VERSION_KEY, _get_cache_version
+        from cms.utils import get_cms_setting
+
+
+        # Silly to do these tests if this setting isn't True
+        page_cache_setting = get_cms_setting('PAGE_CACHE')
+        self.assertTrue(page_cache_setting)
+
+        # Create a test page
+        page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+
+        # Add some content
         placeholder = page1.placeholders.filter(slot="body")[0]
         add_plugin(placeholder, "TextPlugin", 'en', body="English")
         add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
-        with self.assertNumQueries(FuzzyInt(10,20)):
-            self.client.get('/en/')
-        with self.assertNumQueries(0):
-            self.client.get('/en/')
+
+        # Create a request object
+        request = self.get_request(page1.get_path(), 'en')
+
+        # Test that the page is initially uncached
+        with self.assertNumQueries(FuzzyInt(4, 10)):
+            response = details(request, page1.get_path())
+
+        # Test it was actually a valid page response and not a 302 or 404 or other
+        self.assertEqual(response.status_code, 200)
+
+        # Test that subsequent requests of the same page are cached
+        with self.assertNumQueries(FuzzyInt(0, 2)):
+            response = details(request, page1.get_path())
+
+        # Test it was actually a valid page response
+        self.assertEqual(response.status_code, 200)
+
+        # Test that the cache is invalidated on unpublishing the page
+        old_version = _get_cache_version()
+        page1.unpublish('en')
+        self.assertGreater(_get_cache_version(), old_version)
+
+        # Test that this means the page is actually not cached
+        page1.publish('en')
+        with self.assertNumQueries(FuzzyInt(4, 10)):
+            response = details(request, page1.get_path())
+
+        # Test it was actually a valid page response
+        self.assertEqual(response.status_code, 200)
+
