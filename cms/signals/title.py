@@ -91,6 +91,8 @@ def pre_delete_title(instance, **kwargs):
         instance.page.languages = ",".join(languages)
         instance.page._publisher_keep_state = True
         instance.page.save(no_signals=True)
+    if instance.publisher_is_draft:
+        instance.page.mark_descendants_pending(instance.language)
 
 
 def post_delete_title(instance, **kwargs):

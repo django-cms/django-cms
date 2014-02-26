@@ -91,6 +91,9 @@ Revision management
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
 
+
+.. _installing-in-a-virtualenv-using-pip:
+
 ************************************
 Installing in a virtualenv using pip
 ************************************
@@ -99,13 +102,13 @@ Installing in a virtualenv using pip
 
     As django CMS 3.0 is still unreleased, you need to pick it from the github repository.
     Use ::
-        
+
         pip install https://github.com/divio/django-cms/archive/3.0.0.beta3.zip
-        
+
     to install django CMS 3.0 beta3 or::
-        
+
         pip install https://github.com/divio/django-cms/archive/develop.zip
-        
+
     to target the development branch.
 
 Installing inside a `virtualenv`_ is the preferred way to install any Django
@@ -117,6 +120,12 @@ The first step is to create the virtualenv:
   #!/bin/sh
   sudo pip install --upgrade virtualenv
   virtualenv --distribute --no-site-packages env
+
+.. note:: Since virtualenv v1.10 (2013-07-23) --distribute or --setuptools are
+          the same because the new setuptools has been merged with Distribute.
+          Since virtualenv v1.7 (2011-11-30) --no-site-packages was made the
+          default behavior. By the way, we can create a virtualenv typing in our
+          console only `virtualenv env`.
 
 You can switch to your virtualenv at the command line by typing:
 
@@ -133,10 +142,11 @@ its dependencies:
 
     # Bare minimum
     django-cms==3.0
-    
+
     #These dependencies are brought in by django CMS, but if you want to
     # lock-in their version, specify them
     Django==1.6.1
+
     django-classy-tags==0.4
     South==0.8.4
     html5lib==1.0b1
@@ -162,7 +172,7 @@ for Postgresql you would also add:
 ::
 
     psycopg2==2.5
-    
+
 and install libpq-dev (on Debian-based distro)
 
 for MySQL you would also add:
@@ -219,6 +229,36 @@ This will install Django, django CMS, South, Pillow, and your database's driver 
 
 You have now everything that is needed for you to follow the :doc:`tutorial`.
 
+**********
+On Mac OSX
+**********
+
+All you need to do is
+
+.. code-block:: bash
+
+    $ sudo easy_install pip
+
+If you're using `Homebrew`_ you can install pip and virtualenv with the python
+generic package:
+
+.. code-block:: bash
+
+    $ sudo brew install python
+
+Then create an enviroment and work on it instead of install the packages in the
+system path:
+
+.. code-block:: bash
+
+    $ virtualenv djangocms-env
+    $ ./djangocms-env/bin/activate
+    (djangocms-env)$ pip install Django==1.5 South Django-CMS
+
+.. note:: You can see the general instructions on how to pip install packages
+          after creating the virtualenv here: :ref:`Installing in a virtualenv using pip <installing-in-a-virtualenv-using-pip>`
+
+.. _Homebrew: http://brew.sh/
 
 *********
 Databases

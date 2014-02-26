@@ -63,9 +63,11 @@ pages have plugins that generate content::
 See also the :setting:`CMS_PLACEHOLDER_CONF` setting where you can also add extra
 context variables and change some other placeholder behavior.
 
+.. templatetag:: static_placeholder
 
 static_placeholder
 ==================
+.. versionadded:: 3.0
 
 The static_placeholder templatetag can be used anywhere in any template and is not bound to any page or model.
 It needs a name and it will create a placeholder that you can fill with plugins afterwards.
@@ -326,7 +328,7 @@ Example:
 
 .. code-block:: html+django
 
-    <h1>{% render_model_block my_model "title" "title,abstract" %}</h1>
+    <h1>{% render_model my_model "title" "title,abstract" %}</h1>
 
 This will render to:
 

@@ -227,7 +227,6 @@ class ShowSubMenu(InclusionTag):
                 cut_after(node, levels, [])
                 children = node.children
                 for child in children:
-                    child.parent = None
                     if child.sibling:
                         cut_after(child, nephews, [])
                         # if root_level was 0 we need to give the menu the entire tree

@@ -25,6 +25,7 @@ $(document).ready(function () {
 			this.toolbar = $('#cms_toolbar');
 			this.sortables = $('.cms_draggables'); // use global scope
 			this.plugins = $('.cms_plugin');
+			this.render_model = $('.cms_render_model');
 			this.placeholders = $('.cms_placeholder');
 			this.dragitems = $('.cms_draggable');
 			this.dragareas = $('.cms_dragarea');
@@ -274,8 +275,7 @@ $(document).ready(function () {
 				if(e.type === 'mouseup') clearTimeout(timer);
 			});
 
-			// hide stuff
-			this.plugins.hide();
+			this.plugins.not(this.render_model).hide();
 			this.placeholders.show();
 
 			// attach event
@@ -413,7 +413,7 @@ $(document).ready(function () {
 					// save original state events
 					var original = $('.cms_plugin-' + that.getId(originalItem));
 					// cancel if item has no settings
-					if(original.data('settings') === undefined) return false;
+					if(original.data('settings') === null) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
 					var holder = placeholder.parent().prevAll('.cms_dragarea').first();

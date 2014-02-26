@@ -481,6 +481,28 @@ current language does not provide a specific decoder in
 :setting:`CMS_UNIHANDECODE_DECODERS`. If set to ``None``, failing to find a
 specific decoder will disable unihandecode.js for this language.
 
+Example
+-------
+
+Add these to your project's settings::
+
+    CMS_UNIHANDECODE_HOST = '/static/unihandecode/'
+    CMS_UNIHANDECODE_VERSION = '1.0.0'
+    CMS_UNIHANDECODE_DECODERS = ['ja', 'zh', 'vn', 'kr', 'diacritic']
+
+Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://github.com/ojii/unihandecode.js/tree/master/dist>`_ to your static folder::
+
+    project/
+        static/
+            unihandecode/
+                unihandecode-1.0.0.core.min.js
+                unihandecode-1.0.0.diacritic.min.js
+                unihandecode-1.0.0.ja.min.js
+                unihandecode-1.0.0.kr.min.js
+                unihandecode-1.0.0.vn.min.js
+                unihandecode-1.0.0.zh.min.js
+
+More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.org/>`_.
 
 **************
 Media Settings
@@ -609,7 +631,7 @@ This dictionary carries the various cache duration settings.
 
 Default: ``60``
 
-Cache expiration (in seconds) for :ttag:`show_placeholder` and :ttag:`page_url`
+Cache expiration (in seconds) for :ttag:`show_placeholder`, :ttag:`page_url`, :ttag:`placeholder` and :ttag:`static_placeholder`
 template tags.
 
 .. note::
@@ -656,7 +678,40 @@ Example::
     on :ref:`cache key prefixing <django:cache_key_prefixing>`
 
 
-.. setting::CMS_MAX_PAGE_PUBLISH_REVERSIONS
+.. setting:: CMS_PAGE_CACHE
+
+CMS_PAGE_CACHE
+==============
+
+Default: ``True``
+
+Should the output of pages be cached?
+Takes the language, and timezone into account. Pages for logged in users are not cached.
+If the toolbar is visible the page is not cached as well.
+
+
+.. setting:: CMS_PLACEHOLDER_CACHE
+
+CMS_PLACEHOLDER_CACHE
+=====================
+
+Default: ``True``
+
+Should the output of the various placeholder templatetags be cached?
+Takes the current language and timezone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
+present the placeholders will not be cached.
+
+.. setting:: CMS_PLUGIN_CACHE
+
+CMS_PLUGIN_CACHE
+================
+
+Default: ``True``
+
+Default value of the ``cache`` attribute of plugins. Should plugins be cached by default if not set explicitly?
+
+
+.. setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
 CMS_MAX_PAGE_PUBLISH_REVERSIONS
 ===============================
@@ -686,8 +741,34 @@ CMS_TOOLBARS
 Default: ``None``
 
 If defined, specifies the list of toolbar modifiers to be used to populate the
-toolbar as import paths.
+toolbar as import paths. Otherwise, all available toolbars from both the CMS and
+the 3rd party apps will be loaded.
 
+Example::
+
+    CMS_TOOLBARS = [
+        # CMS Toolbars
+        'cms.cms_toolbar.PlaceholderToolbar',
+        'cms.cms_toolbar.BasicToolbar',
+        'cms.cms_toolbar.PageToolbar',
+
+        # 3rd Party Toolbar
+        'aldryn_blog.cms_toolbar.BlogToolbar',
+    ]
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
+
+CMS_DEFAULT_X_FRAME_OPTIONS
+===========================
+
+Default: ``Page.X_FRAME_OPTIONS_INHERIT``
+
+This setting is the default value for a Page's X Frame Options setting. 
+This should be an integer preferably taken from the Page object e.g.
+
+- X_FRAME_OPTIONS_INHERIT
+- X_FRAME_OPTIONS_ALLOW
+- X_FRAME_OPTIONS_SAMEORIGIN
+- X_FRAME_OPTIONS_DENY
+

@@ -31,6 +31,7 @@ from cms.tests.static_placeholder import *
 from cms.tests.staticfiles import *
 from cms.tests.templatetags import *
 from cms.tests.toolbar import *
+from cms.tests.toolbar_pool import *
 from cms.tests.urlutils import *
 from cms.tests.views import *
 from cms.tests.management import *
@@ -42,3 +43,4 @@ from cms.tests.check import *
 from cms.tests.frontend import *
 from cms.tests.signals import *
 from cms.tests.no_i18n import *
+from cms.tests.cache import *

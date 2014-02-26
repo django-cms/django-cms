@@ -11,6 +11,8 @@ from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.test_utils.project.placeholderapp.cms_plugins import EmptyPlugin
+from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoSubPluginRender, NoRender, NoRenderButChildren, DynTemplate
 from djangocms_googlemap.models import GoogleMap
 from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.utils.plugins import get_plugins_for_page
@@ -35,7 +37,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core import urlresolvers
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
@@ -48,7 +50,7 @@ class DumbFixturePlugin(CMSPluginBase):
     name = "Dumb Test Plugin. It does nothing."
     render_template = ""
     admin_preview = False
-    allow_children = True
+    render_plugin = False
 
     def render(self, context, instance, placeholder):
         return context
@@ -56,6 +58,7 @@ class DumbFixturePlugin(CMSPluginBase):
 
 class DumbFixturePluginWithUrls(DumbFixturePlugin):
     name = DumbFixturePlugin.name + " With custom URLs."
+    render_plugin = False
 
     def _test_view(self, request):
         return http.HttpResponse("It works")
@@ -420,6 +423,11 @@ class PluginsTestCase(PluginsTestBaseCase):
         mcol1 = self.reload(mcol1)
         self.assertEquals(mcol1.get_descendants().count(), 2)
 
+    def test_plugin_validation(self):
+        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NonExisitngRenderTemplate)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRender)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRenderButChildren)
+        plugin_pool.register_plugin(DynTemplate)
 
 
     def test_remove_plugin_before_published(self):
@@ -681,15 +689,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin.save()
 
         plugin_ref_1_base = CMSPlugin(
-            plugin_type='TextPlugin',
+            plugin_type='EmptyPlugin',
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
         plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)
-
-        plugin_ref_1 = Text(body='')
-        plugin_ref_1_base.set_base_attr(plugin_ref_1)
-        plugin_ref_1.save()
+        plugin_ref_1_base.save()
 
         plugin_ref_2_base = CMSPlugin(
             plugin_type='TextPlugin',
@@ -704,7 +709,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_ref_2.save()
 
         plugin.body = ' <img id="plugin_obj_%s" src=""/><img id="plugin_obj_%s" src=""/>' % (
-            str(plugin_ref_1.pk), str(plugin_ref_2.pk))
+            str(plugin_ref_1_base.pk), str(plugin_ref_2.pk))
         plugin.save()
 
         page_data = self.get_new_page_data()
@@ -735,8 +740,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
         self.assertEquals(CMSPlugin.objects.count(), 6)
-        plugins = list(Text.objects.all())
-        new_plugin = plugins[3]
+        plugins = list(CMSPlugin.objects.all())
+        new_plugin = plugins[3].get_plugin_instance()[0]
         idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
         expected = sorted([plugins[4].pk, plugins[5].pk])
         self.assertEquals(idlist, expected)
@@ -858,8 +863,8 @@ class PluginsTestCase(PluginsTestBaseCase):
                 'requires_reload': False
             },
         }
-        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options))
-        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options))
+        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options, render_plugin=False))
+        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
         plugin_pool.register_plugin(ReloadDrivenPlugin)
         plugin_pool.register_plugin(NonReloadDrivenPlugin)
         page = create_page("page", "nav_playground.html", "en", published=True)
@@ -910,8 +915,8 @@ class PluginsTestCase(PluginsTestBaseCase):
                 'requires_reload': False
             },
         }
-        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options))
-        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options))
+        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options, render_plugin=False))
+        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
         plugin_pool.register_plugin(ReloadDrivenPlugin)
         plugin_pool.register_plugin(NonReloadDrivenPlugin)
         page = create_page("page", "nav_playground.html", "en", published=True)
@@ -961,7 +966,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         in the plugin pool when a placeholder is specified
         """
         ParentRequiredPlugin = type('ParentRequiredPlugin', (CMSPluginBase,),
-                                    dict(require_parent=True))
+                                    dict(require_parent=True, render_plugin=False))
         plugin_pool.register_plugin(ParentRequiredPlugin)
         page = create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
@@ -976,9 +981,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         toolbar plugin struct for those given parent Plugins
         """
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['GenericParentPlugin']))
-        GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {})
-        KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {})
+                                    dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
+        GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {'render_plugin':False})
+        KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {'render_plugin':False})
 
         expected_struct = {'module': u'Generic',
                             'name': u'Parent Classes Plugin',
@@ -1003,6 +1008,13 @@ class PluginsTestCase(PluginsTestBaseCase):
                                                     parent=KidnapperPlugin)
         self.assertFalse(expected_struct in toolbar_struct)
 
+        toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin, GenericParentPlugin],
+                                                    placeholder.slot,
+                                                    page)
+        expected_struct = {'module': u'Generic',
+                            'name': u'Generic Parent Plugin',
+                            'value': 'GenericParentPlugin'}
+        self.assertTrue(expected_struct in toolbar_struct)
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
             plugin_pool.unregister_plugin(plugin)
 
@@ -1010,7 +1022,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
-                                    dict(child_classes=['TextPlugin']))
+                                    dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
         plugin_pool.register_plugin(ChildClassesPlugin)
         plugin = add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
@@ -1033,7 +1045,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['TextPlugin']))
+                                    dict(parent_classes=['TextPlugin'], render_plugin=False))
         plugin_pool.register_plugin(ParentClassesPlugin)
         plugin = add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()

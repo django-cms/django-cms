@@ -188,6 +188,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                     {'code':'x-elvish', 'name':'Elvish', 'public':True, 'fallbacks':[]},
                ]}):
             from cms.views import details
+            def get_path():
+                return '/'
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],
@@ -198,6 +200,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 COOKIES={},
                 META={},
                 user=User(),
+                get_full_path=get_path
             )
             self.assertRaises(Http404, details, request, '')
 
@@ -217,7 +220,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             create_title("x-klingon", "futla ak", page, slug=page.get_slug())
             page.publish("x-klingon")
             from cms.views import details
-
+            def get_path():
+                return '/'
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],
@@ -228,6 +232,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 COOKIES={},
                 META={},
                 user=User(),
+                get_full_path=get_path,
             )
 
             response = details(request, '')
@@ -267,3 +272,4 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 update_site_and_page_choices(lang='en-us')
             except LanguageError:
                 self.fail("LanguageError raised")
+

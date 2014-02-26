@@ -299,14 +299,14 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin, published=True)
         child = create_page('child-page', "nav_playground.html", "en",
                             created_by=admin, published=True, parent=page)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
         with self.login_user_context(admin):
             data = {'post': 'yes'}
-            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            with self.assertNumQueries(FuzzyInt(300, 382)):
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            # TODO - The page should be marked for deletion, but nothing more
-            # until publishing
-            #self.assertRaises(Page.DoesNotExist, self.reload, page)
-            #self.assertRaises(Page.DoesNotExist, self.reload, child)
 
     def test_search_fields(self):
         superuser = self.get_superuser()
@@ -565,7 +565,7 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             response = self.admin_class.change_innavigation(request, page.pk)
-            self.assertEqual(response.status_code, 405)
+            self.assertEqual(response.status_code, 403)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'no': 'data'})
             self.assertRaises(Http404, self.admin_class.change_innavigation,
@@ -1205,9 +1205,9 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(FuzzyInt(40, 60)):
                 output = force_unicode(self.client.get('/en/?edit').content)
             self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(FuzzyInt(18, 33)):
+        with self.assertNumQueries(FuzzyInt(18, 34)):
             output = force_unicode(self.client.get('/en/?edit').content)
-        with self.assertNumQueries(FuzzyInt(18, 19)):
+        with self.assertNumQueries(FuzzyInt(13, 15)):
             output = force_unicode(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):
@@ -1221,7 +1221,7 @@ class AdminFormsTests(AdminTestsBase):
 
         user = self.get_superuser()
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(18, 25)):
+            with self.assertNumQueries(FuzzyInt(14, 25)):
                 output = force_unicode(self.client.get('/en/admin/cms/page/'))
 
 

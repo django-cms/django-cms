@@ -1,5 +1,6 @@
 #!/bin/env python
 from __future__ import print_function
+
 import multiprocessing
 import pkgutil
 import pyclbr
@@ -16,7 +17,7 @@ from cms import __version__
 from cms.test_utils.cli import configure
 from cms.test_utils.tmpdir import temp_dir
 
-__doc__ = '''django CMS development helper script. 
+__doc__ = '''django CMS development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
@@ -42,6 +43,7 @@ Options:
 
 
 def server(bind='127.0.0.1', port=8000, migrate=False):
+
     if os.environ.get("RUN_MAIN") != "true":
         from south.management.commands import syncdb, migrate
         if migrate:
@@ -172,9 +174,10 @@ if __name__ == '__main__':
                 USE_TZ=use_tz,
                 SOUTH_TESTS_MIGRATE=migrate
             )
-
             # run
             if args['test']:
+                os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082,8090-8100,9000-9200,7041'
+
                 if args['isolated']:
                     failures = isolated(args['<test-label>'], args['--parallel'])
                     print()
