@@ -98,10 +98,9 @@ class CacheTestCase(CMSTestCase):
 
 
     def test_cache_page(self):
-        from django.contrib.auth.models import User
-        from cms.test_utils.util.mock import AttributeObject
-        from cms.views import details, CMS_PAGE_CACHE_VERSION_KEY, _get_cache_version
+        from cms.views import details, _get_cache_version
         from cms.utils import get_cms_setting
+        from django import db
 
 
         # Silly to do these tests if this setting isn't True
@@ -127,8 +126,11 @@ class CacheTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Test that subsequent requests of the same page are cached
+        db.reset_queries()
         with self.assertNumQueries(FuzzyInt(0, 2)):
             response = details(request, page1.get_path())
+
+        print(db.connection.queries)
 
         # Test it was actually a valid page response
         self.assertEqual(response.status_code, 200)
