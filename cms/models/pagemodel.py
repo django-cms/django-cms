@@ -193,6 +193,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             public_page.save()
             page_utils.check_title_slugs(public_page)
 
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+
     def _copy_titles(self, target, language, published):
         """
         Copy all the titles to a new page (which must have a pk).
