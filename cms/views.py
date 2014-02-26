@@ -84,6 +84,7 @@ def details(request, slug):
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
+                            print 'here'
                             return HttpResponseRedirect(pages_root + attrs)
             else:
                 _handle_no_page(request, slug)
@@ -95,7 +96,7 @@ def details(request, slug):
         found = False
         for alt_lang in get_fallback_languages(current_language):
             if alt_lang in available_languages:
-                if get_redirect_on_fallback(current_language):
+                if get_redirect_on_fallback(current_language) or slug == "":
                     with force_language(alt_lang):
                         path = page.get_absolute_url(language=alt_lang, fallback=True)
                         # In the case where the page is not available in the
@@ -103,6 +104,7 @@ def details(request, slug):
                     # is a design decision (instead of rendering in place)).
                     return HttpResponseRedirect(path + attrs)
                 else:
+                    print 'da'
                     found = True
         if not found:
             # There is a page object we can't find a proper language to render it
