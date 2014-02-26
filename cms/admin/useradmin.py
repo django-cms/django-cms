@@ -34,6 +34,11 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     fieldsets.append((_('Groups'), {'fields': ('groups',)}))
     
     add_fieldsets = fieldsets
+
+    ordering = ('last_name', 'first_name', 'email')
+
+    if get_user_model().USERNAME_FIELD != 'email':
+        ordering = (get_user_model().USERNAME_FIELD,) + ordering
     
     def get_fieldsets(self, request, obj=None):
         fieldsets = self.update_permission_fieldsets(request, obj)
@@ -52,7 +57,7 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
             return self.model.objects.get_empty_query_set()
     
     def add_view(self, request):
-        return super(UserAdmin, self).add_view(request) 
+        return super(UserAdmin, self).add_view(request)
     
 class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     form = PageUserGroupForm
@@ -65,6 +70,6 @@ class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     def get_fieldsets(self, request, obj=None):
         return self.update_permission_fieldsets(request, obj)
 
-#if get_cms_setting('PERMISSION'):
-#    admin.site.register(PageUser, PageUserAdmin)
-#    admin.site.register(PageUserGroup, PageUserGroupAdmin)
+if get_cms_setting('PERMISSION'):
+    admin.site.register(PageUser, PageUserAdmin)
+    admin.site.register(PageUserGroup, PageUserGroupAdmin)
