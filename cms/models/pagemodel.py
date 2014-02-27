@@ -57,6 +57,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True,
                                                 help_text=_('When to expire the page. Leave empty to never expire.'),
                                                 db_index=True)
+    #
+    # Please use toggle_in_navigation() instead of affecting this property
+    # directly so that the cms page cache can be invalidated as appropriate.
+    #
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
                                     help_text=_("All ancestors will not be displayed in the navigation"))
@@ -485,13 +489,20 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         '''
         Toggles (or sets) in_navigation and invalidates the cms page cache
         '''
+        old = self.in_navigation
         if set_to in [True, False]:
             self.in_navigation = set_to
         else:
             self.in_navigation = not self.in_navigation
         self.save()
-        from cms.views import invalidate_cms_page_cache
-        invalidate_cms_page_cache()
+
+        #
+        # If there was a change, invalidate the cms page cache
+        #
+        if self.in_navigation != old:
+            from cms.views import invalidate_cms_page_cache
+            invalidate_cms_page_cache()
+
         return self.in_navigation
 
     def get_publisher_state(self, language, force_reload=False):
