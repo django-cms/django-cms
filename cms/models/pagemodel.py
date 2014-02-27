@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from os.path import join
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable, LanguageError
+from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -192,6 +192,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             cms_signals.page_moved.send(sender=Page, instance=public_page)
             public_page.save()
             page_utils.check_title_slugs(public_page)
+
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
 
     def _copy_titles(self, target, language, published):
         """
@@ -478,6 +481,19 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         except Title.DoesNotExist:
             return False
 
+    def toggle_in_navigation(self, set_to=None):
+        '''
+        Toggles (or sets) in_navigation and invalidates the cms page cache
+        '''
+        if set_to in [True, False]:
+            self.in_navigation = set_to
+        else:
+            self.in_navigation = not self.in_navigation
+        self.save()
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+        return self.in_navigation
+
     def get_publisher_state(self, language, force_reload=False):
         from cms.models import Title
 
@@ -601,6 +617,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
 
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+
         return published
 
     def unpublish(self, language):
@@ -631,8 +650,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # trigger update home
         self.save()
         self.mark_descendants_pending(language)
+
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+
         from cms.signals import post_unpublish
         post_unpublish.send(sender=Page, instance=self, language=language)
+
         return True
 
     def mark_descendants_pending(self, language):
