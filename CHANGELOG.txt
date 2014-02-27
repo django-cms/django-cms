@@ -188,6 +188,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - moved apphooks from title to page model so we need to add them only once.
 - request.current_app has been removed.
 - added a namespace field, reverse_id is not used anymore for apphook namespaces.
+- PlaceholderAdmin is deprecated and available as mixin class renamed to PlaceholderAdminMixin.
 - PlaceholderAdmin does not have LanguageTabs anymore. It only has a PluginAPI now.
 - PageAdmin uses the same Plugin API as PlaceholderAdmin
 - Toolbar API for your own apps added

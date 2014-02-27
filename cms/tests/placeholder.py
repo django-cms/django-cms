@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import warnings
 from django.core.cache import cache
 from django.utils.numberformat import format
 from django.db import models
@@ -11,6 +12,7 @@ from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
+from cms.admin.placeholderadmin import PlaceholderAdmin, PlaceholderAdminMixin
 from djangocms_link.cms_plugins import LinkPlugin
 from cms.utils.compat.tests import UnittestCompatMixin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -605,6 +607,17 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         # get languages
         langs = [lang['code'] for lang in placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
+
+    def test_deprecated_PlaceholderAdmin(self):
+        admin_site = admin.sites.AdminSite()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            pa = PlaceholderAdmin(Placeholder, admin_site)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
+            self.assertTrue("PlaceholderAdminMixin with admin.ModelAdmin" in str(w[-1].message))
+            self.assertIsInstance(pa, admin.ModelAdmin, 'PlaceholderAdmin not admin.ModelAdmin')
+            self.assertIsInstance(pa, PlaceholderAdminMixin, 'PlaceholderAdmin not PlaceholderAdminMixin')
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):

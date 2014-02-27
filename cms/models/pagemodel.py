@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from os.path import join
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable, LanguageError
+from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
@@ -37,6 +37,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
     )
+    TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
     X_FRAME_OPTIONS_INHERIT = 0
     X_FRAME_OPTIONS_DENY = 1
@@ -56,6 +57,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True,
                                                 help_text=_('When to expire the page. Leave empty to never expire.'),
                                                 db_index=True)
+    #
+    # Please use toggle_in_navigation() instead of affecting this property
+    # directly so that the cms page cache can be invalidated as appropriate.
+    #
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
                                     help_text=_("All ancestors will not be displayed in the navigation"))
@@ -64,7 +69,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_INHERITANCE_MAGIC)
+                                default=TEMPLATE_DEFAULT)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"),
                              related_name='djangocms_pages')
 
@@ -191,6 +196,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             cms_signals.page_moved.send(sender=Page, instance=public_page)
             public_page.save()
             page_utils.check_title_slugs(public_page)
+
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
 
     def _copy_titles(self, target, language, published):
         """
@@ -481,6 +489,26 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         except Title.DoesNotExist:
             return False
 
+    def toggle_in_navigation(self, set_to=None):
+        '''
+        Toggles (or sets) in_navigation and invalidates the cms page cache
+        '''
+        old = self.in_navigation
+        if set_to in [True, False]:
+            self.in_navigation = set_to
+        else:
+            self.in_navigation = not self.in_navigation
+        self.save()
+
+        #
+        # If there was a change, invalidate the cms page cache
+        #
+        if self.in_navigation != old:
+            from cms.views import invalidate_cms_page_cache
+            invalidate_cms_page_cache()
+
+        return self.in_navigation
+
     def get_publisher_state(self, language, force_reload=False):
         from cms.models import Title
 
@@ -604,6 +632,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
 
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+
         return published
 
     def unpublish(self, language):
@@ -634,8 +665,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # trigger update home
         self.save()
         self.mark_descendants_pending(language)
+
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
+
         from cms.signals import post_unpublish
         post_unpublish.send(sender=Page, instance=self, language=language)
+
         return True
 
     def mark_descendants_pending(self, language):

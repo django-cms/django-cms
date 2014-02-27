@@ -1,9 +1,11 @@
 {% load cms_admin i18n %}
 
-<div class="cont {{ css_class }}">
+<div class="cont {{ css_class }}{% if page.id|lower == request.GET.page_id|lower %} cont-active{% endif %}">
 	<div class="col1">
 		{% if has_change_permission %}
-			<a href="{{ page.id }}/{{ lang }}/preview/" target="_parent" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_admin_tree_title }}</a>
+			{% language preview_language %}
+			<a href="{{ page.id }}/{{ preview_language }}/preview/" target="_parent" class="title" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_admin_tree_title }}</a>
+			{% endlanguage %}
 		{% else %}
 			<span class="title">{{ page.get_admin_tree_title }}</span>
 		{% endif %}
@@ -22,13 +24,13 @@
 
 		{% if page.soft_root or page.is_home %}<div class="col-softroot"><span class="icon softroot-icon" title="{% if page.soft_root %}{% trans 'softroot' %}{% else %}{% trans 'home' %}{% endif %}"></span></div>{% endif %}
 		{% if page.application_urls %}<div class="col-apphook"><a href="{{ page.id }}/advanced-settings/"><span class="icon apphook-icon" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}"></span></a></div>{% endif %}
-        {% for lang in site_languages %}
+		{% for lang in site_languages %}
 		<div class="col-language">
 		    {% if has_change_permission %}
 				<a href="{% if lang in page.languages %}./{{ page.id }}/{{ lang }}/preview/{% else %}./{{ page.id }}/?language={{ lang }}{% endif %}" class="trigger-tooltip"{% if lang in page.languages %} target="_top"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
 				{% if lang in page.languages %}
 				<div class="language-tooltip" hidden="hidden">
-					<a href="./{{ page.id }}/{{ lang }}/unpublish/">{% trans "Unpublish" %}</a>
+					<a href="./≈/{{ lang }}/unpublish/">{% trans "Unpublish" %}</a>
 					<a href="./{{ page.id }}/{{ lang }}/publish/">{% trans "Publish" %}</a>
 				</div>
 				{% endif %}
@@ -36,8 +38,8 @@
 				{% tree_publish_row page lang %}
 			{% endif %}
 		</div>
-        {% endfor %}
-        <div class="col-navigation">
+		{% endfor %}
+		<div class="col-navigation">
 			<label>
 				<img alt="{{ page.in_navigation|yesno:"True,False" }}" src="{% cms_admin_icon_base %}icon-{{ page.in_navigation|yesno:"yes,no" }}.gif" />
 				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" {% if page.in_navigation %}checked="checked"{% endif %} value="{{ page.in_navigation|yesno:"1,0" }}" />{% endif %}
@@ -46,9 +48,9 @@
 		<div class="col-actions">
 
 			{% if has_change_permission %}
-           	<a href="{{ url }}{{ page.id }}/" class="edit" title="{% trans "Page settings" %}"><span>{% trans "page settings" %}</span></a>
-            <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a-->
-            <a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
+		   	<a href="{{ url }}{{ page.id }}/" class="edit" title="{% trans "Page settings" %}"><span>{% trans "page settings" %}</span></a>
+			<!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a-->
+			<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
 
 			{% if has_add_page_permission and has_add_on_same_level_permission %}
 				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
@@ -58,7 +60,7 @@
 					<a href="./add/?target={{ page.id }}&amp;position=last-child" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
 				{% endif %}
 			{% endif %}
-            {% if not filtered %}
+			{% if not filtered %}
 				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
 			{% endif %}
 			{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}

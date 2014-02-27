@@ -239,7 +239,9 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
 
-        copy_from_english = self.driver.find_element_by_css_selector('.cms_submenu-item a[data-rel="copy-lang"][data-language="en"]')
+        submenu_link_selector = '.cms_submenu-item a[data-rel="copy-lang"][data-language="en"]'
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
+        copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
         copy_from_english.click()
 
         # Done, check if the text plugin was copied and it is only one
