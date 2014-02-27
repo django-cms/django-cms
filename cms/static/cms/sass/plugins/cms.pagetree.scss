@@ -103,6 +103,9 @@ $color-background-blue-hover: #e6f6fd;
 	// edit button
 	.cont:hover .col1 a.changelink { display:block; }
 
+	// active state
+	.cont-active { background:lighten(#ffff99, 10%); }
+
 	// drag modus
 	li#dragged { min-width:500px; }
 	li#dragged .col2 { display:none; }
