@@ -1,5 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.utils.datastructures import SortedDict
 
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.toolbar_base import CMSToolbar
@@ -23,11 +24,21 @@ class ToolbarPoolTests(TestCase):
             'cms.tests.toolbar_pool.TestToolbar': TestToolbar})
 
         self.assertRaises(ToolbarAlreadyRegistered,
-                self.pool.register, TestToolbar)
+                          self.pool.register, TestToolbar)
 
     def test_register_type(self):
         self.assertRaises(ImproperlyConfigured, self.pool.register, str)
         self.assertRaises(ImproperlyConfigured, self.pool.register, object)
+
+    def test_register_order(self):
+        print(self.pool.toolbars)
+        self.pool.register(TestToolbar)
+        self.pool.register(CMSToolbar)
+
+        test_toolbar = SortedDict()
+        test_toolbar['cms.tests.toolbar_pool.TestToolbar'] = TestToolbar
+        test_toolbar['cms.toolbar_base.CMSToolbar'] = CMSToolbar
+        self.assertEqual(list(test_toolbar.keys()), list(self.pool.toolbars.keys()))
 
     def test_unregister(self):
         self.pool.register(TestToolbar)
@@ -35,4 +46,4 @@ class ToolbarPoolTests(TestCase):
         self.assertEqual(self.pool.toolbars, {})
 
         self.assertRaises(ToolbarNotRegistered,
-                self.pool.unregister, TestToolbar)
+                          self.pool.unregister, TestToolbar)
