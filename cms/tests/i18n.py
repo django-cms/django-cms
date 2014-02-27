@@ -1,3 +1,4 @@
+from cms import api
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.utils import i18n
 
@@ -270,3 +271,38 @@ class TestLanguageCodesEnGB(SettingsOverrideTestCase):
         for lang in result:
             self.assertEqual(lang['public'], True)
             self.assertEqual(lang['hide_untranslated'], False)
+
+
+class TestLanguageFallbacks(SettingsOverrideTestCase):
+
+    settings_overrides = {
+        'LANGUAGE_CODE': 'en',
+        'LANGUAGES': (('fr', 'French'),
+                      ('en', 'English'),
+                      ('de', 'German'),
+                      ('es', 'Spanish')),
+        'CMS_LANGUAGES': {
+            1: [ {'code' : 'en',
+                  'name': 'English',
+                  'public': False},
+                 {'code': 'fr',
+                  'name': 'French',
+                  'public': True},
+            ],
+            'default': {
+                'fallbacks': ['en', 'fr'],
+                'redirect_on_fallback': False,
+                'public': True,
+                'hide_untranslated': False,
+            }
+        },
+        'SITE_ID': 1,
+    }
+
+    def test_language_code(self):
+        home = api.create_page("home", "nav_playground.html", "fr", published=True)
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get('/en/')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/fr/')

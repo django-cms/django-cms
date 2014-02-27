@@ -105,7 +105,7 @@ def details(request, slug):
         found = False
         for alt_lang in get_fallback_languages(current_language):
             if alt_lang in available_languages:
-                if get_redirect_on_fallback(current_language):
+                if get_redirect_on_fallback(current_language) or slug == "":
                     with force_language(alt_lang):
                         path = page.get_absolute_url(language=alt_lang, fallback=True)
                         # In the case where the page is not available in the
