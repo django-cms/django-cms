@@ -411,7 +411,7 @@ $(document).ready(function () {
 						sideframe.open(el.attr('href'), true);
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'), el.data('post'), el.data('text'));
+					this.openAjax(el.attr('href'), JSON.stringify(el.data('post')), el.data('text'));
 					break;
 				default:
 					window.location.href = el.attr('href');
