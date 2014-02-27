@@ -83,7 +83,7 @@ For our poll plugin, we're going to write the following plugin class:
             context.update({'instance': instance})
             return context
 
-    plugin_pool.register_plugin(PollPlugin)  # register the plugin
+    plugin_pool.register_plugin(CMSPollPlugin)  # register the plugin
 
 .. note:: All plugin classes must inherit from
     ``cms.plugin_base.CMSPluginBase`` and must register themselves with
@@ -119,7 +119,7 @@ plugin to the ``INSTALLED_APPS`` in your projects ``settings.py``:
 
 .. code:: python
 
-    INSTALLED_APPS += ['polls']
+    INSTALLED_APPS += ('polls')
 
 Secondly, add the following line to the project's ``urls.py``:
 
