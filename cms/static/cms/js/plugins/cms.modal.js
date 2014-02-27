@@ -517,7 +517,8 @@ $(document).ready(function () {
 
 				// when the window has been changed pressing the blue or red button, we need to run a reload check
 				if(that.saved) {
-					that.reloadBrowser(false, false, true);
+					iframe.hide();
+					that.reloadBrowser(window.location.href, false, true);
 				} else {
 					// set title of not provided
 					var innerTitle = iframe.contents().find('#content h1:eq(0)');
