@@ -546,6 +546,71 @@ In your ``yourapp.cms_plugin_processors.py``::
 .. _django-sekizai documentation: http://django-sekizai.readthedocs.org
 
 
+Nested Plugins
+==============
+
+You can nest CMS Plugins in themselves. There's a few things required to achieve this functionality:
+
+`models.py`::
+
+    class ParentPlugin(CMSPlugin):
+        # add your fields here
+
+    class ChildPlugin(CMSPlugin):
+        # add your fields here
+
+`cms_plugins.py`::
+
+    from .models import ParentPlugin, ChildPlugin
+
+    class ParentCMSPlugin(CMSPluginBase):
+        render_template = 'parent.html'
+        name = 'Parent'
+        model = ParentPlugin
+        allow_children = True  # This enables the parent plugin to accept child plugins
+        # child_classes = ['ChildCMSPlugin']  # You can also specify a list of which plugins are accepted as children,
+                                                or leave it away completely to accept all
+
+        def render(self, context, instance, placeholder):
+            context['instance'] = instance
+            return context
+
+    plugin_pool.register_plugin(ParentCMSPlugin)
+
+
+    class ChildCMSPlugin(CMSPluginBase):
+        render_template = 'child.html'
+        name = 'Child'
+        model = ChildPlugin
+        require_parent = True  # Is it required that this plugin is a child of another plugin?
+        # parent_classes = ['ParentCMSPlugin']  # You can also specify a list of which plugins are accepted as parents,
+                                                or leave it away completely to accept all
+
+        def render(self, context, instance, placeholder):
+            context['instance'] = instance
+            return context
+
+    plugin_pool.register_plugin(ChildCMSPlugin)
+
+
+`parent.html`::
+
+    {% load cms_tags %}
+
+    <div class="plugin parent">
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
+    </div>
+
+
+`child.html`::
+
+    <div class="plugin child">
+        {{ instance }}
+    </div>
+
+
 Plugin Attribute Reference
 ==========================
 
