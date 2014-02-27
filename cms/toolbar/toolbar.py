@@ -6,14 +6,15 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language
 
-from django.contrib.auth.forms import AuthenticationForm
 from django import forms
+from django.conf import settings
 from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
+from django.utils.datastructures import SortedDict
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -77,7 +78,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 self.view_name = ""
         toolbars = toolbar_pool.get_toolbars()
 
-        self.toolbars = {}
+        self.toolbars = SortedDict()
         app_key = ''
         for key in toolbars:
             app_name = ".".join(key.split(".")[:-2])

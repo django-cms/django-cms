@@ -3,11 +3,12 @@ from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.datastructures import SortedDict
 
 
 class ToolbarPool(object):
     def __init__(self):
-        self.toolbars = {}
+        self.toolbars = SortedDict()
         self.reverse = {}
         self.discovered = False
         self.force_register = False
