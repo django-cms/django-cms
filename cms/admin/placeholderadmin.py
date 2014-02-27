@@ -35,7 +35,7 @@ from cms.utils import copy_plugins, permissions, get_language_from_request
 from cms.utils.i18n import get_language_list
 
 
-class FrontendEditableAdmin(object):
+class FrontendEditableAdminMixin(object):
     frontend_editable_fields = []
 
     def get_urls(self):
@@ -51,7 +51,7 @@ class FrontendEditableAdmin(object):
             '',
             pat(r'edit-field/([0-9]+)/([a-z\-]+)/$', self.edit_field),
         )
-        return url_patterns + super(FrontendEditableAdmin, self).get_urls()
+        return url_patterns + super(FrontendEditableAdminMixin, self).get_urls()
 
     def _get_object_for_single_field(self, object_id, language):
         # Quick and dirty way to retrieve objects for django-hvad
