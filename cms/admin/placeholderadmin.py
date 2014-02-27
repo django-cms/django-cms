@@ -111,7 +111,7 @@ class FrontendEditableAdmin(object):
         return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
 
 
-class PlaceholderAdmin(ModelAdmin):
+class PlaceholderAdmin(object):
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)

@@ -756,9 +756,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         text = Text(body="hello", language="en", placeholder=placeholder, plugin_type="TextPlugin", position=1)
         text.save()
         page.publish('en')
-        pages = Page.objects.search("hi")
-        self.assertEqual(pages.count(), 0)
-        self.assertEqual(Page.objects.search("hello").count(),1)
+        self.assertEqual(Page.objects.search("hi").count(), 0)
+        self.assertEqual(Page.objects.search("hello").count(), 1)
 
     def test_empty_plugin_is_not_ignored(self):
         page = create_page("page", "nav_playground.html", "en")

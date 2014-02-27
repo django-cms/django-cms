@@ -189,6 +189,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - request.current_app has been removed.
 - added a namespace field, reverse_id is not used anymore for apphook namespaces.
 - PlaceholderAdmin does not have LanguageTabs anymore. It only has a PluginAPI now.
+- PlaceholderAdmin now is a mixin class and not derived from admin.ModelAdmin anymore.
 - PageAdmin uses the same Plugin API as PlaceholderAdmin
 - Toolbar API for your own apps added
 - twitter plugin removed
