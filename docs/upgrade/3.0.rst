@@ -259,7 +259,7 @@ Details can be found in :ref:`multi_apphook`.
 ``PlaceholderAdmin`` now is deprecated. Instead of deriving from ``admin.ModelAdmin``, a new mixin
 class ``PlaceholderAdminMixin`` has been introduced which shall be used together with ``admin.ModelAdmin``.
 Therefore when defining a model admin class containing a placeholder, now add ``PlaceholderAdminMixin``
-to the list of parent classes together with ``admin.ModelAdmin``.
+to the list of parent classes, together with ``admin.ModelAdmin``.
 
 ``PlaceholderAdmin`` doesn't have language tabs anymore and the plugin editor is gone.
 The plugin API has changed and is now more consistent. ``PageAdmin`` uses the
