@@ -136,9 +136,9 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 			@include single-transition(outline 0.2s);
 		}
 	}
-	input[type="submit"] { font-size:12px; text-transform:uppercase; cursor:pointer;
-		padding:1px 15px 0; @include border-radius(3px);
-		color:white; border:1px solid darken($color-grey, 20%);
+	input[type="submit"] { display:block; color:white; font-size:12px; text-transform:uppercase; cursor:pointer;
+		height:23px; padding:1px 15px 0; @include border-radius(3px);
+		border:1px solid darken($color-grey, 20%);
 		@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
 		@include background-image($gradient-dark);
 
