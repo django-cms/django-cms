@@ -37,8 +37,5 @@ class UserAdmin(OriginalUserAdmin):
     ordering = ('last_name', 'first_name', 'email')
 
 # Now register the emailuser admin
-<<<<<<< HEAD
+
 admin.site.register(EmailUser, UserAdmin)
-=======
-admin.site.register(User, UserAdmin)
->>>>>>> 0a262f538dc259bd608314d235f2c2d81f67ec42
