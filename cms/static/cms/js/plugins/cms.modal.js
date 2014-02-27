@@ -373,8 +373,6 @@ $(document).ready(function () {
 					'top': modalTop + mvY
 				});
 			});
-
-			console.log($(window).scrollTop());
 		},
 
 		_endResize: function () {
@@ -508,6 +506,9 @@ $(document).ready(function () {
 
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
+
+				// set modal buttons
+  				that._setButtons($(this));
 
 				// when an error occurs, reset the saved status so the form can be checked and validated again
 				if(iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
