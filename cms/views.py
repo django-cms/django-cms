@@ -157,7 +157,11 @@ def details(request, slug):
             request.path,
         ]
         if redirect_url not in own_urls:
-            return HttpResponseRedirect(redirect_url + attrs)
+            redirect_url += attrs
+        if request.toolbar.is_staff and request.toolbar.show_toolbar:
+            request.toolbar.redirect_url = redirect_url
+        else:
+            return HttpResponseRedirect(redirect_url)
 
     # permission checks
     if page.login_required and not request.user.is_authenticated():

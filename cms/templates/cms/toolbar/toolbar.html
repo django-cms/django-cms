@@ -111,5 +111,12 @@
 		<div class="cms_structure-dimmer"></div>
 	</div>
 	{# end: structure #}
+
+    {% if request.toolbar.redirect_url %}
+       <div class="cms_redirect_overlay">
+           {% trans "Redirect prevented because of toolbar." %}
+           {% trans "This page redirects to:" %} <a href="{{ request.toolbar.redirect_url }}" target="_blank">{{ request.toolbar.redirect_url }}</a>
+       </div>
+    {% endif %}
 </div>
 {% endlanguage %}
