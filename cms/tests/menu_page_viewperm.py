@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser, Group
 
 from cms.api import create_page
-from cms.compat import get_user_model
+from cms.compat import get_user_model, user_model_label
 from cms.menu import get_visible_pages
 from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
@@ -145,7 +145,8 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             user = self._create_user(username, is_staff)
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
-                group.user_set.add(user)
+                user_set = getattr(group, user_model_label.split('.')[1].lower()+'_set')
+                user_set.add(user)
                 group.save()
 
         self.assertEquals(11, get_user_model().objects.all().count()-default_users_count)
@@ -561,7 +562,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     def _setup_user(self):
         user = self._create_user('user_6', True)
         group = Group.objects.create(name=self.GROUPNAME_6)
-        group.user_set.add(user)
+        user_set = getattr(group, user_model_label.split('.')[1].lower()+'_set')
+        user_set.add(user)
         group.save()
 
     def _setup_permviewbug(self):

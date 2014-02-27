@@ -9,7 +9,7 @@ from cms.management.commands.subcommands.moderator import log
 from cms.api import (create_page, publish_page, add_plugin,
                      create_page_user, assign_user_to_page)
 
-from cms.compat import get_user_model
+from cms.compat import get_user_model, user_model_label
 
 from cms.models import Page, CMSPlugin, Title
 from cms.models.permissionmodels import ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
@@ -975,7 +975,8 @@ class ViewPermissionTests(PermissionTestsBase):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
-            group.user_set.add(user)
+            user_set = getattr(group, user_model_label.split('.')[1].lower()+'_set')
+            user_set.add(user)
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, group=group, page=page)
@@ -1008,7 +1009,8 @@ class PagePermissionTests(PermissionTestsBase):
         """
         user = self._create_user("user", is_staff=True)
         group = Group.objects.create(name='testgroup')
-        group.user_set.add(user)
+        user_set = getattr(group, user_model_label.split('.')[1].lower()+'_set')
+        user_set.add(user)
         page = create_page('A', 'nav_playground.html', 'en')
         page_permission = PagePermission.objects.create(
             can_change_permissions=True, group=group, page=page)

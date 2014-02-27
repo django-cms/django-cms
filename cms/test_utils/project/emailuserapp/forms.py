@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-from models import User
+from models import EmailUser
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -37,7 +37,7 @@ class UserCreationForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User
+        model = EmailUser
         fields = ('email',)
 
     def clean_email(self):
@@ -91,7 +91,7 @@ class UserChangeForm(forms.ModelForm):
                     "using <a href=\"password/\">this form</a>."))
 
     class Meta:
-        model = User
+        model = EmailUser
         fields = ('email', 'password', 'first_name', 'last_name', 'is_active',
             'is_staff', 'is_superuser', 'groups', 'user_permissions', 'last_login',
             'date_joined')

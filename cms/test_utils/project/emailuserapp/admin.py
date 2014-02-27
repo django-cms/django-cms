@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin as OriginalUserAdmin
 
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from models import User
+from models import EmailUser
 from forms import UserChangeForm, UserCreationForm
 
 class UserAdmin(OriginalUserAdmin):
@@ -37,4 +37,4 @@ class UserAdmin(OriginalUserAdmin):
     ordering = ('last_name', 'first_name', 'email')
 
 # Now register the emailuser admin
-admin.site.register(User, UserAdmin)
+admin.site.register(EmailUser, UserAdmin)

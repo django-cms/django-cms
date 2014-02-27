@@ -145,7 +145,7 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
-class User(AbstractEmailUser):
+class EmailUser(AbstractEmailUser):
     """
     Users within the Django authentication system are represented by this
     model.

@@ -5,6 +5,7 @@ from cms.models.query import PageQuerySet
 from cms.publisher import PublisherManager
 from cms.utils import get_cms_setting
 from cms.utils.i18n import get_fallback_languages
+from cms.compat import user_model_label
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
@@ -223,7 +224,10 @@ class BasicPagePermissionManager(models.Manager):
         """Get all objects for given user, also takes look if user is in some
         group.
         """
-        return self.filter(Q(user=user) | Q(group__user=user))
+        query = dict()
+        query['group__'+user_model_label.split('.')[1].lower()] = user
+
+        return self.filter(Q(user=user) | Q(**query))
 
     def with_can_change_permissions(self, user):
         """Set of objects on which user haves can_change_permissions. !But only

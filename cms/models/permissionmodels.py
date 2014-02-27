@@ -18,10 +18,11 @@ from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 # don't depend on the app registry, to get the custom user model if used
 if is_user_swapped:
     user_app_name = user_model_label.split('.')[0]
+    user_model_name = user_model_label.split('.')[1]
     for app in settings.INSTALLED_APPS:
         if user_app_name in app:
             try:
-                User = importlib.import_module(app + ".models").User
+                User = getattr(importlib.import_module(app + ".models"), user_model_name)
             except AttributeError:
                 raise ImproperlyConfigured('''
                     DjangoCMS requires the name of custom user models to be "User"
