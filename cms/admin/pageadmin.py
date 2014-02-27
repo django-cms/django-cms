@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import sys
-from cms.admin.placeholderadmin import PlaceholderAdmin
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.plugin_pool import plugin_pool
 from django.contrib.admin.helpers import AdminForm
 
@@ -87,7 +87,7 @@ PUBLISH_COMMENT = "Publish"
 INITIAL_COMMENT = "Initial version."
 
 
-class PageAdmin(PlaceholderAdmin, ModelAdmin):
+class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     form = PageForm
     search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"

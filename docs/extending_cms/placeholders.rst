@@ -69,17 +69,19 @@ Admin Integration
 
 .. versionchanged:: 3.0
 
-If you install this model in the admin application, you have to use
-:class:`~cms.admin.placeholderadmin.PlaceholderAdmin` instead of
-:class:`~django.contrib.admin.ModelAdmin` so the interface renders
+If you install this model in the admin application, you have to use the mixin
+:class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` together with
+:class:`~django.contrib.admin.ModelAdmin` so that the interface renders
 correctly::
 
     from django.contrib import admin
-    from cms.admin.placeholderadmin import PlaceholderAdmin
+    from cms.admin.placeholderadmin import PlaceholderAdminMixin
     from myapp.models import MyModel
 
-    admin.site.register(MyModel, PlaceholderAdmin)
+    class MyModelAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
+        pass
 
+    admin.site.register(MyModel, MyModelAdmin)
 
 .. warning::
 
@@ -92,8 +94,9 @@ correctly::
 I18N Placeholders
 =================
 
-Out of the box :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` supports multiple languages and will
-display language tabs. If you extend `PlaceholderAdmin` and overwrite `change_form_template` be sure to have a look at
+Out of the box :class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` supports multiple
+languages and will display language tabs. If you extend yout model admin class derived from
+`PlaceholderAdminMixin` and overwrite `change_form_template` be sure to have a look at
 'admin/placeholders/placeholder/change_form.html' on how to display the language tabs.
 
 If you need other fields then the placeholders translated as well: django CMS has support for `django-hvad`_. If you
@@ -109,15 +112,15 @@ use a `TranslatableModel` model be sure to not include the placeholder fields in
         def __unicode__(self):
             return self.title
 
-Be sure to combine both hvad's :class:`TranslatableAdmin` and :class:`~cms.admin.placeholderadmin.PlaceholderAdmin` when
+Be sure to combine both hvad's :class:`TranslatableAdmin` and :class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` when
 registering your model with the admin site::
 
-    from cms.admin.placeholderadmin import PlaceholderAdmin
+    from cms.admin.placeholderadmin import PlaceholderAdminMixin
     from django.contrib import admin
     from hvad.admin import TranslatableAdmin
     from myapp.models import MultilingualExample1
 
-    class MultilingualModelAdmin(TranslatableAdmin, PlaceholderAdmin):
+    class MultilingualModelAdmin(TranslatableAdmin, PlaceholderAdminMixin, admin.ModelAdmin):
         pass
 
     admin.site.register(MultilingualExample1, MultilingualModelAdmin)
