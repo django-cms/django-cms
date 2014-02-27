@@ -568,7 +568,7 @@ You can nest CMS Plugins in themselves. There's a few things required to achieve
         name = 'Parent'
         model = ParentPlugin
         allow_children = True  # This enables the parent plugin to accept child plugins
-        # child_classes = ['ChildCMSPlugin']  # You can also specify a list of which plugins are accepted as children,
+        # child_classes = ['ChildCMSPlugin']  # You can also specify a list of plugins that are accepted as children,
                                                 or leave it away completely to accept all
 
         def render(self, context, instance, placeholder):
@@ -583,7 +583,7 @@ You can nest CMS Plugins in themselves. There's a few things required to achieve
         name = 'Child'
         model = ChildPlugin
         require_parent = True  # Is it required that this plugin is a child of another plugin?
-        # parent_classes = ['ParentCMSPlugin']  # You can also specify a list of which plugins are accepted as parents,
+        # parent_classes = ['ParentCMSPlugin']  # You can also specify a list of plugins that are accepted as parents,
                                                 or leave it away completely to accept all
 
         def render(self, context, instance, placeholder):
