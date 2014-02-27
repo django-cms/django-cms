@@ -469,7 +469,7 @@ now. Simply paste this code into your settings file.
 
     The templates you define in :setting:`CMS_TEMPLATES` have to exist at runtime and
     contain at least one ``{% placeholder <name> %}`` template tag to be useful
-    for django CMS. For more details see :doc:`../tutorial/templates`
+    for django CMS.
 
 The django CMS allows you to edit all languages for which Django has built in
 translations. Since these are numerous, we'll limit it to English for now::
@@ -519,11 +519,247 @@ urlpatterns. We suggest starting with the following
     ) + urlpatterns
 
 
+Creating templates
+==================
 
-Awesome job!
-============
+django CMS uses templates to define how a page should look and what parts of
+it are editable. Editable areas are called **placeholders**. These templates are
+standard Django templates and you may use them as described in the
+`official documentation`_.
 
-That's it! You just set up django CMS! You can now start with an easy introduction into django CMS here:
-:doc:`../tutorial/index`.
+Templates you wish to use on your pages must be declared in the :setting:`CMS_TEMPLATES`
+setting::
 
+  CMS_TEMPLATES = (
+      ('template_1.html', 'Template One'),
+      ('template_2.html', 'Template Two'),
+  )
+
+If you have followed this tutorial from the beginning, this code  should already be in your settings file.
+
+Now, on with the actual template files!
+
+Fire up your favorite editor and create a file called ``base.html`` in a folder called ``templates``
+in your myproject directory.
+
+Here is a simple example for a base template called ``base.html``:
+
+.. code-block:: html+django
+
+  {% load cms_tags sekizai_tags %}
+  <html>
+    <head>
+        {% render_block "css" %}
+    </head>
+    <body>
+        {% cms_toolbar %}
+        {% placeholder base_content %}
+        {% block base_content %}{% endblock %}
+        {% render_block "js" %}
+    </body>
+  </html>
+
+Now, create a file called ``template_1.html`` in the same directory. This will use
+your base template, and add extra content to it:
+
+.. code-block:: html+django
+
+  {% extends "base.html" %}
+  {% load cms_tags %}
+
+  {% block base_content %}
+    {% placeholder template_1_content %}
+  {% endblock %}
+
+When you set ``template_1.html`` as a template on a page you will get two
+placeholders to put plugins in. One is ``template_1_content`` from the page
+template ``template_1.html`` and another is ``base_content`` from the extended
+``base.html``.
+
+When working with a lot of placeholders, make sure to give descriptive
+names to your placeholders so you can identify them more easily in the admin panel.
+
+Now, feel free to experiment and make a ``template_2.html`` file! If you don't
+feel creative, just copy template_1 and name the second placeholder something
+like "template_2_content".
+
+
+.. _sekizai-namespaces:
+
+Static files handling with sekizai
+----------------------------------
+
+The django CMS handles media files (css stylesheets and javascript files)
+required by CMS plugins using `django-sekizai`_. This requires you to define at
+least two sekizai namespaces in your templates: ``js`` and ``css``. You can do
+so using the ``render_block`` template tag from the ``sekizai_tags`` template
+tag libary. We highly recommended putting the ``{% render_block "css" %}`` tag
+as the last thing before the closing ``</head>`` HTML tag and the
+``{% render_block "js" %}`` tag as the last thing before the closing ``</body>``
+HTML tag.
+
+
+.. _django-sekizai: https://github.com/ojii/django-sekizai
+
+Initial database setup
+======================
+
+This command depends on whether you **upgrade** your installation or do a
+**fresh install**. We recommend that you get familiar with the way `South`_ works,
+as it is a very powerful, easy and convenient tool. django CMS uses it extensively.
+
+
+Fresh install
+-------------
+
+Run::
+
+    python manage.py syncdb --all
+    python manage.py migrate --fake
+
+The first command will prompt you to create a super user. Choose 'yes' and enter
+appropriate values.
+
+Upgrade
+-------
+
+Run::
+
+    python manage.py syncdb
+    python manage.py migrate
+
+
+Check you did everything right
+==============================
+
+Now, use the following command to check if you did everything correctly::
+
+    python manage.py cms check
+
+
+Up and running!
+===============
+
+That should be it. Restart your development server using ``python manage.py runserver``
+and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ : you should get
+the django CMS "It Worked" screen.
+
+|it-works-cms|
+
+.. |it-works-cms| image:: ../../images/it-works-cms.png
+
+Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
+the user you created during the database setup.
+
+To deploy your django CMS project on a production webserver, please refer to the
+`Django documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
+
+
+Creating your first CMS Page!
+-----------------------------
+
+That's it. Now the best part: you can start using the CMS!
+Run your server with ``python manage.py runserver``, then point a web browser to
+`127.0.0.1:8000/admin/ <http://127.0.0.1:8000/admin/>`_ , and log in using the super
+user credentials you defined when you ran ``syncdb`` earlier.
+
+Once in the admin part of your site, you should see something like the following:
+
+|first-admin|
+
+.. |first-admin| image:: ../../images/first-admin.png
+
+
+Adding a page
+-------------
+
+Adding a page is as simple as clicking "Pages" in the admin view, then the "add page" button
+at the top right-hand corner of the screen.
+
+This is where you select which template to use (remember, we created two), as well as
+pretty obvious things like which language the page is in (used for internationalisation),
+the page's title, and the url slug it will use.
+
+Hitting the "Save" button, unsurprisingly, saves the page. It will now display in the list of
+pages.
+
+|my-first-page|
+
+.. |my-first-page| image:: ../../images/my-first-page.png
+
+Congratulations! You now have a fully functional django CMS installation!
+
+
+Publishing a page
+-----------------
+
+The following is a list of parameters that can be changed for each of your pages:
+
+
+Visibility
+~~~~~~~~~~
+
+By default, pages are "invisible". To let people access them you should mark
+them as "published".
+
+
+Menus
+~~~~~
+
+Another option this view lets you tweak is whether or not the page should appear in
+your site's navigation (that is, whether there should be a menu entry to reach it
+or not)
+
+
+Adding content to a page
+------------------------
+
+So far, our page doesn't do much. Make sure it's marked as "published", then
+click on the page's "edit" button.
+
+Ignore most of the interface for now and click the "view on site" button at the
+top right-hand corner of the screen. As expected, your page is blank for the
+time being, since our template is a really minimal one.
+
+Let's get to it now then!
+
+Press your browser's back button, so as to see the page's admin interface. If you followed
+the tutorial so far, your template (``template_1.html``) defines two placeholders.
+The admin interfaces shows you theses placeholders as sub menus:
+
+|first-placeholders|
+
+.. |first-placeholders| image:: ../../images/first-placeholders.png
+
+Scroll down the "Available plugins" drop-down list. This displays the plugins you
+added to your :setting:`django:INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
+then press the "Add" button. If the "text" plugin is not listed, you need to add
+'djangocms_text_ckeditor' to your :setting:`django:INSTALLED_APPS` settings.
+
+The right part of the plugin area displays a rich text editor (`TinyMCE`_).
+
+In the editor, type in some text and then press the "Save" button.
+
+The new text is only visible on the draft copy so far, but you can see it by using the
+top button "Preview draft". If you use the "View on site" button instead, you can see that the
+page is still blank to the normal users.
+
+To publish the changes you have made, click on the "Publish draft" button.
+Go back to your website using the top right-hand "View on site" button. That's it!
+
+|hello-cms-world|
+
+.. |hello-cms-world| image:: ../../images/hello-cms-world.png
+
+
+Where to go from here
+---------------------
+
+Congratulations, you now have a fully functional CMS! Feel free to play around
+with the different plugins provided out of the box and to build great websites!
+
+Furthermore you can continue your introduction into django CMS on https://github.com/divio/django-cms-tutorial.
+
+.. _TinyMCE: http://tinymce.moxiecode.com/
+.. _official documentation: http://docs.djangoproject.com/en/1.5/topics/templates/
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
