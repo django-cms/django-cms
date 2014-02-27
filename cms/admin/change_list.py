@@ -62,6 +62,10 @@ class CMSChangeList(ChangeList):
     def get_query_set(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
+        if 'language' in self.params:
+            del self.params['language']
+        if 'page_id' in self.params:
+            del self.params['page_id']
         if django.VERSION[1] > 3:
             qs = super(CMSChangeList, self).get_query_set(request).drafts()
         else:
@@ -82,7 +86,7 @@ class CMSChangeList(ChangeList):
     def is_filtered(self):
         from cms.utils.plugins import SITE_VAR
         lookup_params = self.params.copy() # a dictionary of the query string
-        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR):
+        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR, 'language', 'page_id'):
             if i in lookup_params:
                 del lookup_params[i]
         if not lookup_params.items() and not self.query:

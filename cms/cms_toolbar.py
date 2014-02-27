@@ -249,7 +249,10 @@ class PageToolbar(CMSToolbar):
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         # cms page admin
-        admin_menu.add_sideframe_item(_('Pages'), url=reverse("admin:cms_page_changelist"), position=0)
+        url = "%s?language=%s" % (reverse("admin:cms_page_changelist"), self.toolbar.language)
+        if self.page:
+            url += "&page_id=%s" % self.page.pk
+        admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
 
     def add_page_menu(self):
         # menu for current page
