@@ -3,15 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-######################################
-Welcome to django CMS's documentation!
-######################################
+#####################################
+Welcome to django CMS' documentation!
+#####################################
 
 This document refers to version |release|
 
-*******
-Install
-*******
+*************
+Release Notes
+*************
 
 .. warning::
     Version 3.0 introduces some significant changes that **require** action if
@@ -22,7 +22,6 @@ Install
 .. toctree::
     :maxdepth: 1
 
-    getting_started/installation
     upgrade/3.0
     upgrade/2.4
     upgrade/2.3.4
@@ -37,32 +36,46 @@ Install
 Getting Started
 ***************
 
+Installation
+============
+
 .. toctree::
     :maxdepth: 2
     :numbered:
 
-    getting_started/tutorial
-    getting_started/using_south
-    getting_started/configuration
-    getting_started/navigation
-    getting_started/plugin_reference
+    getting_started/installation/overview
+    getting_started/installation/integrate
+    getting_started/installation/scratch
+
+
+Tutorial
+========
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    getting_started/tutorial/index
+    getting_started/tutorial/templates
+    getting_started/tutorial/plugins
+    getting_started/tutorial/apps
+    getting_started/tutorial/blog
+    getting_started/tutorial/toolbar
+    getting_started/tutorial/page_model
+
+
+Resources
+=========
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    getting_started/resources/configuration
+    getting_started/resources/navigation
+    getting_started/resources/plugin_reference
+    getting_started/resources/using_south
     faq/common_issues
-    
-
-********
-Advanced
-********
-
-.. toctree::
-    :maxdepth: 2
-    :numbered:
-       
-    advanced/i18n
-    advanced/caching
-    advanced/sitemap
-    advanced/templatetags
-    advanced/cli
-    advanced/permissions_reference
 
 
 *****************
@@ -84,6 +97,22 @@ Extending the CMS
     extending_cms/searchdocs
     extending_cms/fields
     extending_cms/testing
+
+
+********
+Advanced
+********
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    advanced/i18n
+    advanced/caching
+    advanced/sitemap
+    advanced/templatetags
+    advanced/cli
+    advanced/permissions_reference
 
 
 ********
@@ -112,9 +141,9 @@ Contributing to django CMS
     contributing/testing
 
 
-
+******************
 Indices and tables
-==================
+******************
 
 * :ref:`genindex`
 * :ref:`modindex`
