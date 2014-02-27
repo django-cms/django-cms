@@ -4,7 +4,7 @@ Installing django CMS into an existing project
 
 
 This document assumes you are familiar with Python and Django. It should
-outline the steps necessary for you to follow the :doc:`tutorial`.
+outline the steps necessary for you to follow the :doc:`../tutorial`.
 
 .. _requirements:
 
@@ -231,7 +231,7 @@ or
 
 This will install Django, django CMS, South, Pillow, and your database's driver globally.
 
-You have now everything that is needed for you to follow the :doc:`tutorial`.
+You have now everything that is needed for you to follow the :doc:`../tutorial`.
 
 
 On Mac OSX
