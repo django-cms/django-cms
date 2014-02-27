@@ -30,6 +30,7 @@ $(document).ready(function () {
 		'auth': {% if user.is_authenticated %}true{% else %}false{% endif %},
 		'debug': {% if debug %}true{% else %}false{% endif %},
 		'csrf': '{{ csrf_token }}',
+		'page_id': '{{ request.current_page.pk }}',
 		'lang': {
 			'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}',
 			'cancel': '{% trans "Cancel" %}',
