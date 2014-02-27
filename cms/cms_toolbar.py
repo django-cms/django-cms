@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.api import get_page_draft
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC, RIGHT
 from cms.exceptions import LanguageError
 from cms.models import Title
 from cms.toolbar.items import TemplateItem
@@ -101,7 +101,7 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-            # admin
+                # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)
         # cms users
@@ -140,7 +140,7 @@ class PageToolbar(CMSToolbar):
             self.change_admin_menu()
             if self.page:
                 self.add_page_menu()
-            # history menu
+                # history menu
         if self.page and self.toolbar.edit_mode:
             self.add_history_menu()
             self.change_language_menu()
@@ -329,6 +329,14 @@ class PageToolbar(CMSToolbar):
                 on_delete_redirect_url = reverse('pages-root')
         current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url=self.toolbar.URL_CHANGE,
                                          on_close=on_delete_redirect_url, disabled=not_edit_mode)
+
+        if not self.title:
+            self.toolbar.add_button(
+                _("Page settings"),
+                "%s?language=%s" % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language),
+                side=self.toolbar.RIGHT,
+                extra_classes=["cms_btn-action"],
+            )
 
     def add_history_menu(self):
         # history menu
