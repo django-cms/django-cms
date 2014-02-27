@@ -88,9 +88,10 @@ $(document).ready(function () {
 		open: function (url, animate) {
 			// prepare iframe
 			var that = this;
-			var param = 'page_id=' + CMS.config.page_id;
+			var language = 'language=' + CMS.config.request.language;
+			var page_id = 'page_id=' + CMS.config.request.page_id;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
-			var iframe = $('<iframe src="'+this._url(url, [param])+'" class="" frameborder="0" />');
+			var iframe = $('<iframe src="'+this._url(url, [language, page_id])+'" class="" frameborder="0" />');
 				iframe.hide();
 			var width = this.settings.sideframe.position || this.options.sideframeWidth;
 
