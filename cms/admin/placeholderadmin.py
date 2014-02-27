@@ -111,7 +111,7 @@ class FrontendEditableAdmin(object):
         return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
 
 
-class PlaceholderAdmin(ModelAdmin):
+class PlaceholderAdminMixin(object):
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
@@ -130,7 +130,7 @@ class PlaceholderAdmin(ModelAdmin):
             pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         )
-        return url_patterns + super(PlaceholderAdmin, self).get_urls()
+        return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
 
     def has_add_plugin_permission(self, request, placeholder, plugin_type):
         if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
@@ -547,3 +547,10 @@ class PlaceholderAdmin(ModelAdmin):
         }
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
+
+
+class PlaceholderAdmin(PlaceholderAdminMixin, ModelAdmin):
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Class PlaceholderAdmin is deprecated and will be removed in 3.1. "
+            "Instead, combine PlaceholderAdminMixin with admin.ModelAdmin.", DeprecationWarning)
+        super(PlaceholderAdmin, self).__init__(*args, **kwargs)
