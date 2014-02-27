@@ -84,7 +84,6 @@ def details(request, slug):
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
-                            print 'here'
                             return HttpResponseRedirect(pages_root + attrs)
             else:
                 _handle_no_page(request, slug)
@@ -104,7 +103,6 @@ def details(request, slug):
                     # is a design decision (instead of rendering in place)).
                     return HttpResponseRedirect(path + attrs)
                 else:
-                    print 'da'
                     found = True
         if not found:
             # There is a page object we can't find a proper language to render it
