@@ -154,7 +154,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 .cms_toolbar-item-buttons {
 	margin:4px 0 4px;
 
-	a { float:left; font-size:11px; line-height:11px; padding:5px 12px; }
+	a { float:left; font-size:11px; line-height:1; padding:5px 12px; }
 	a:first-child { @include border-radius(3px 0 0 3px); }
 	a:last-child { @include border-radius(0 3px 3px 0); }
 	a:only-child { @include border-radius(3px); }
