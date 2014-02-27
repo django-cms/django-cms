@@ -16,15 +16,17 @@ can get help from either our `mailinglist`_ or IRC channel ``#django-cms`` on
 the ``irc.freenode.net`` network.
 
 
-***********************
-Installing from scratch
-***********************
-You can install django CMS into a new django project:
-:doc:`scratch`
+**********************************************
+Installing django CMS into an existing project
+**********************************************
+
+You can integrate django CMS it into your existing django project: :doc:`integrate`
 
 
-****************************************
-Adding django CMS to an existing project
-****************************************
-Or you can also integrate it into your existing django project:
-:doc:`integrate`
+**********************************
+Installing django CMS from scratch
+**********************************
+
+Or you can start from scratch by following the tutorial on https://github.com/divio/django-cms-tutorial
+
+.. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
