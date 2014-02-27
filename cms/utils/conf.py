@@ -78,7 +78,8 @@ def get_media_url():
 
 def get_templates():
     templates = list(getattr(settings, 'CMS_TEMPLATES', []))
-    templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
+    if get_cms_setting('TEMPLATE_INHERITANCE'):
+        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
 
 
