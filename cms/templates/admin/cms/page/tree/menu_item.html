@@ -26,8 +26,8 @@
 		{% if page.application_urls %}<div class="col-apphook"><a href="{{ page.id }}/advanced-settings/"><span class="icon apphook-icon" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}"></span></a></div>{% endif %}
 		{% for lang in site_languages %}
 		<div class="col-language">
-			{% if has_change_permission %}
-				<a href="{% if page|is_published:lang %}./{{ page.id }}/{{ lang }}/preview/{% else %}./{{ page.id }}/{{ lang }}/publish/{% endif %}" class="trigger-tooltip"{% if page|is_published:lang %} target="_top"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
+		    {% if has_change_permission %}
+				<a href="{% if lang in page.languages %}./{{ page.id }}/{{ lang }}/preview/{% else %}./{{ page.id }}/?language={{ lang }}{% endif %}" class="trigger-tooltip"{% if lang in page.languages %} target="_top"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
 				{% if lang in page.languages %}
 				<div class="language-tooltip" hidden="hidden">
 					<a href="./≈/{{ lang }}/unpublish/">{% trans "Unpublish" %}</a>

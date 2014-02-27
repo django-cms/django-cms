@@ -22,6 +22,8 @@ from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
 
 
+CMS_PAGE_CACHE_VERSION_KEY = 'CMS_PAGE_CACHE_VERSION'
+
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
         return TemplateResponse(request, "cms/welcome.html", RequestContext(request))
@@ -35,9 +37,17 @@ def details(request, slug):
     """
     from django.core.cache import cache
 
-    if get_cms_setting("PAGE_CACHE") and (not hasattr(request, 'toolbar') or (
-                    not request.toolbar.edit_mode and not request.toolbar.show_toolbar and not request.user.is_authenticated())):
-        cache_content = cache.get(_get_cache_key(request))
+    if get_cms_setting("PAGE_CACHE") and (
+        not hasattr(request, 'toolbar') or (
+            not request.toolbar.edit_mode and
+            not request.toolbar.show_toolbar and
+            not request.user.is_authenticated()
+        )
+    ):
+        cache_content = cache.get(
+            _get_cache_key(request),
+            version=_get_cache_version()
+        )
         if not cache_content is None:
             content, headers = cache_content
             response = HttpResponse(content)
@@ -95,7 +105,7 @@ def details(request, slug):
         found = False
         for alt_lang in get_fallback_languages(current_language):
             if alt_lang in available_languages:
-                if get_redirect_on_fallback(current_language):
+                if get_redirect_on_fallback(current_language) or slug == "":
                     with force_language(alt_lang):
                         path = page.get_absolute_url(language=alt_lang, fallback=True)
                         # In the case where the page is not available in the
@@ -152,6 +162,8 @@ def details(request, slug):
     # permission checks
     if page.login_required and not request.user.is_authenticated():
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+    if hasattr(request, 'toolbar'):
+        request.toolbar.set_object(page)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
     # fill the context 
@@ -207,9 +219,22 @@ def _cache_page(response):
     if not save_cache:
         response
     if save_cache:
-        cache.set(_get_cache_key(request), (response.content, response._headers),
-                  get_cms_setting('CACHE_DURATIONS')['content'])
+        version = _get_cache_version()
+        ttl = get_cms_setting('CACHE_DURATIONS')['content']
 
+        cache.set(
+            _get_cache_key(request),
+            (response.content, response._headers),
+            ttl,
+            version=version
+        )
+        # See note in invalidate_cms_page_cache()
+        cache.set(
+            CMS_PAGE_CACHE_VERSION_KEY,
+            version,
+            ttl
+        )
+    
 
 def _get_cache_key(request):
     #md5 key of current path
@@ -225,3 +250,64 @@ def _get_cache_key(request):
         tz_name = force_text(get_current_timezone_name(), errors='ignore')
         cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
+
+def _get_cache_version():
+    from django.core.cache import cache
+
+    '''
+    Returns the current page cache version, explicitly setting one if not
+    defined.
+    '''
+
+    version = cache.get(CMS_PAGE_CACHE_VERSION_KEY)
+
+    if version:
+        return version
+    else:
+        cache.set(
+            CMS_PAGE_CACHE_VERSION_KEY,
+            1,
+            get_cms_setting('CACHE_DURATIONS')['content']
+        )
+        return 1
+
+
+def invalidate_cms_page_cache():
+    from django.core.cache import cache
+
+    '''
+    Invalidates the CMS PAGE CACHE.
+    '''
+
+    #
+    # NOTE: We're using a cache versioning strategy for invalidating the page
+    # cache when necessary. Instead of wiping all the old entries, we simply
+    # increment the version number rendering all previous entries
+    # inaccessible and left to expire naturally.
+    #
+    # ALSO NOTE: According to the Django documentation, a timeout value of
+    # `None' (in version 1.6+) is supposed to mean "cache forever", however,
+    # this is actually only implemented as only slightly less than 30 days in
+    # some backends (memcached, in particular). In older Djangos, `None' means
+    # "use default value".  To avoid issues arising from different Django
+    # versions and cache backend implementations, we will explicitly set the
+    # lifespan of the CMS_PAGE_CACHE_VERSION entry to whatever is set in
+    # settings.CACHE_DURATIONS['content']. This allows users to adjust as
+    # necessary for their backend.
+    #
+    # To prevent writing cache entries that will live longer than our version
+    # key, we will always re-write the current version number into the cache
+    # just after we write any new cache entries, thus ensuring that the
+    # version number will always outlive any entries written against that
+    # version. This is a cheap operation.
+    #
+    # If there are no new cache writes before the version key expires, its
+    # perfectly OK, since any previous entries cached against that version
+    # will have also expired, so, it'd be pointless to try to access them
+    # anyway.
+    #
+    try:
+        cache.incr(CMS_PAGE_CACHE_VERSION_KEY)
+    except ValueError:
+        # Key doesn't exist, so just set it to the default
+        cache.set(CMS_PAGE_CACHE_VERSION_KEY, 1, get_cms_setting('CACHE_DURATIONS')['content'])

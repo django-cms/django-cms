@@ -12,14 +12,14 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
-			'modalDuration': 300,
-			'urls': {
-				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
-			},
+			'onClose': false,
 			'minHeight': 400,
 			'minWidth': 800,
-			'onClose': false,
-			'newPlugin': false
+			'modalDuration': 300,
+			'newPlugin': false,
+			'urls': {
+				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
+			}
 		},
 
 		initialize: function (options) {
@@ -35,9 +35,8 @@ $(document).ready(function () {
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
 			this.maximized = false;
 			this.minimized = false;
-			this.enforceReload = false;
-			this.enforceClose = false;
 			this.triggerMaximized = false;
+			this.saved = false;
 
 			// if the modal is initialized the first time, set the events
 			if(!this.modal.data('ready')) this._events();
@@ -58,6 +57,9 @@ $(document).ready(function () {
 			this.modal.find('.cms_modal-title').bind('mousedown.cms', function (e) {
 				e.preventDefault();
 				that._startMove(e);
+			});
+			this.modal.find('.cms_modal-title').bind('dblclick.cms', function () {
+				that._maximize();
 			});
 			this.modal.find('.cms_modal-resize').bind('mousedown.cms', function (e) {
 				e.preventDefault();
@@ -153,12 +155,9 @@ $(document).ready(function () {
 			} else {
 				this._hide(100);
 			}
+
 			// handle refresh option
-			if(this.options.onClose === 'REFRESH_PAGE') {
-				this.reloadBrowser();
-			} else if(this.options.redirectOnClose) {
-				this.reloadBrowser(this.options.redirectOnClose);
-			}
+			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
 		},
 
 		// private methods
@@ -414,16 +413,14 @@ $(document).ready(function () {
 			var buttons = row.find('input, a');
 			var render = $('<span />'); // seriously jquery...
 
-			// if there are no buttons, try again
+			// if there are no given buttons within the submit-row area
+			// scan deeper within the form itself
 			if(!buttons.length) {
 				row = iframe.contents().find('form:eq(0)');
 				buttons = row.find('input[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
 					.hide();
-				this.enforceReload = true;
-			} else {
-				this.enforceReload = false;
 			}
 
 			// attach relation id
@@ -446,7 +443,7 @@ $(document).ready(function () {
 				if(item.hasClass('default')) cls = 'cms_btn cms_btn-action';
 				if(item.hasClass('deletelink')) cls = 'cms_btn cms_btn-caution';
 
-				// create the element
+				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
 						if(item.is('input')) item[0].click();
@@ -455,12 +452,12 @@ $(document).ready(function () {
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
  							that.options.newPlugin = null;
-							that.enforceClose = true;
-							if(item.hasClass('deletelink')) {
-								that.options.onClose = null;
-							}
-						} else {
-							that.enforceClose = false;
+ 							// reset onClose when delete is triggered
+							if(item.hasClass('deletelink')) that.options.onClose = null;
+							// hide iframe
+							that.modal.find('.cms_modal-frame iframe').css('visibility', 'hidden');
+							// page has been saved or deleted, run checkup
+							that.saved = true;
 						}
 					});
 
@@ -491,7 +488,7 @@ $(document).ready(function () {
 			var title = this.modal.find('.cms_modal-title');
 				title.html(name || '&nbsp;');
 
-			// insure previous iframe is hidden
+			// ensure previous iframe is hidden
 			holder.find('iframe').css('visibility', 'hidden');
 
 			// attach load event for iframe to prevent flicker effects
@@ -512,28 +509,35 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
 
-				// set title of not provided
-				var innerTitle = iframe.contents().find('#content h1:eq(0)');
-				if(name === undefined) title.html(innerTitle.text());
-				innerTitle.remove();
+				// when an error occurs, reset the saved status so the form can be checked and validated again
+				if(iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
+					that.saved = false;
+				}
 
-				// set modal buttons
-				that._setButtons($(this));
+				// when the window has been changed pressing the blue or red button, we need to run a reload check
+				if(that.saved) {
+					that.reloadBrowser(false, false, true);
+				} else {
+					// set title of not provided
+					var innerTitle = iframe.contents().find('#content h1:eq(0)');
+					if(name === undefined) title.html(innerTitle.text());
+					innerTitle.remove();
 
-				// than show
-				iframe.css('visibility','visible');
+					// than show
+					iframe.css('visibility', 'visible');
 
-				// append ready state
-				iframe.data('ready', true);
+					// append ready state
+					iframe.data('ready', true);
 
-				// attach close event
-				contents.find('body').bind('keydown.cms', function (e) {
-					if(e.keyCode === 27) that.close();
-				});
+					// attach close event
+					contents.find('body').bind('keydown.cms', function (e) {
+						if(e.keyCode === 27) that.close();
+					});
 
-				// figure out if .object-tools is available
-				if(contents.find('.object-tools').length) {
-					contents.find('#content').css('padding-top', 38);
+					// figure out if .object-tools is available
+					if(contents.find('.object-tools').length) {
+						contents.find('#content').css('padding-top', 38);
+					}
 				}
 			});
 

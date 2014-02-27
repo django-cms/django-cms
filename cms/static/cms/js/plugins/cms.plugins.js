@@ -253,7 +253,7 @@ $(document).ready(function () {
 			var modal = new CMS.Modal({
 				'newPlugin': this.newPlugin || false,
 				'onClose': this.options.onClose || false,
-				'redirectOnClose': this.options.redirectOnClose || false,
+				'redirectOnClose': this.options.redirectOnClose || false
 			});
 			modal.open(url, name, breadcrumb);
 		},
