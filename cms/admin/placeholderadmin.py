@@ -554,3 +554,10 @@ class PlaceholderAdmin(PlaceholderAdminMixin, ModelAdmin):
         warnings.warn("Class PlaceholderAdmin is deprecated and will be removed in 3.1. "
             "Instead, combine PlaceholderAdminMixin with admin.ModelAdmin.", DeprecationWarning)
         super(PlaceholderAdmin, self).__init__(*args, **kwargs)
+
+
+class FrontendEditableAdmin(FrontendEditableAdminMixin):
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Class FrontendEditableAdmin is deprecated and will be removed in 3.1. "
+            "Instead, use FrontendEditableAdminMixin.", DeprecationWarning)
+        super(PlaceholderAdmin, self).__init__(*args, **kwargs)
