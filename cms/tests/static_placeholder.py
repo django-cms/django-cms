@@ -6,7 +6,7 @@ from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.utils.compat.dj import force_unicode
-from django.contrib.auth.models import User
+from cms.compat import get_user_model
 from django.contrib.admin.sites import site
 from django.template.base import Template
 
@@ -45,9 +45,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         return placeholder
 
     def get_admin(self):
-        usr = User(username="admin", email="admin@django-cms.org", is_staff=True, is_superuser=True)
-        usr.set_password("admin")
-        usr.save()
+        usr = self._create_user("admin", True, True)
         return usr
 
     def test_template_creation(self):

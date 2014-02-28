@@ -13,7 +13,7 @@ from cms.utils.conf import get_cms_setting
 from django.core.exceptions import PermissionDenied, ValidationError, FieldError
 from cms.utils.i18n import get_language_list
 
-from django.contrib.auth.models import User
+from cms.compat import get_user_model
 from django.contrib.sites.models import Site
 from django.template.defaultfilters import slugify
 from menus.menu_pool import menu_pool
@@ -21,14 +21,29 @@ from menus.menu_pool import menu_pool
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
+from cms.compat import get_user_model
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import PageUser, PagePermission, GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models.permissionmodels import PageUser, PagePermission, \
+    GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.utils.compat.type_checks import string_types
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_list
 from cms.utils.permissions import _thread_locals
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Max
+from django.template.defaultfilters import slugify
+from menus.menu_pool import menu_pool
+import datetime
+
+
+
 
 
 #===============================================================================
@@ -122,9 +137,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
     See docs/extending_cms/api_reference.rst for more info
     """
     # ugly permissions hack
-    if created_by and isinstance(created_by, User):
+    if created_by and isinstance(created_by, get_user_model()):
         _thread_locals.user = created_by
-        created_by = created_by.username
+
+        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
     else:
         _thread_locals.user = None
 
@@ -317,7 +333,7 @@ def create_page_user(created_by, user,
                                 True, True, True, True, True, True, True)
 
     # validate created_by
-    assert isinstance(created_by, User)
+    assert isinstance(created_by, get_user_model())
 
     data = {
         'can_add_page': can_add_page,
@@ -335,7 +351,7 @@ def create_page_user(created_by, user,
     user.is_staff = True
     user.is_active = True
     page_user = PageUser(created_by=created_by)
-    for field in [f.name for f in User._meta.local_fields]:
+    for field in [f.name for f in get_user_model()._meta.local_fields]:
         setattr(page_user, field, getattr(user, field))
     user.save()
     page_user.save()

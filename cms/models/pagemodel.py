@@ -28,7 +28,6 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 
-
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
@@ -38,6 +37,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
     )
+    TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
     X_FRAME_OPTIONS_INHERIT = 0
     X_FRAME_OPTIONS_DENY = 1
@@ -69,7 +69,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_INHERITANCE_MAGIC)
+                                default=TEMPLATE_DEFAULT)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"),
                              related_name='djangocms_pages')
 
@@ -425,7 +425,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         user = getattr(_thread_locals, "user", None)
         if user:
-            self.changed_by = user.username
+            try:
+                self.changed_by = str(user)
+            except AttributeError:
+                # AnonymousUser may not have USERNAME_FIELD
+                self.changed_by = "anonymous"
         else:
             self.changed_by = "script"
         if created:

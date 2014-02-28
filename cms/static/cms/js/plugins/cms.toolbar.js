@@ -144,7 +144,7 @@ $(document).ready(function () {
 				});
 
 				// attach hover
-				lists.find('li').bind('mouseenter mouseleave', function (e) {
+				lists.find('li').bind('mouseenter mouseleave', function () {
 					var el = $(this);
 					var parent = el.closest('.cms_toolbar-item-navigation-children');
 					var hasChildren = el.hasClass(children) || parent.length;
@@ -411,7 +411,7 @@ $(document).ready(function () {
 						sideframe.open(el.attr('href'), true);
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'), el.data('post'), el.data('text'));
+					this.openAjax(el.attr('href'), JSON.stringify(el.data('post')), el.data('text'));
 					break;
 				default:
 					window.location.href = el.attr('href');

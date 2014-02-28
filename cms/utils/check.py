@@ -5,8 +5,6 @@ from contextlib import contextmanager
 import os
 from django.template import Lexer, TOKEN_BLOCK
 from cms import constants
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import get_app_paths
 from cms.management.commands.subcommands.list import plugin_report
@@ -221,6 +219,7 @@ def check_deprecated_settings(output):
 
 @define_check
 def check_plugin_instances(output):
+    from cms.management.commands.subcommands.list import plugin_report
     with output.section("Plugin instances") as section:
         # get the report
         report = plugin_report()
@@ -241,6 +240,8 @@ def check_plugin_instances(output):
 
 @define_check
 def check_copy_relations(output):
+    from cms.plugin_pool import plugin_pool
+    from cms.models.pluginmodel import CMSPlugin
     c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):

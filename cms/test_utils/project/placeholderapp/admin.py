@@ -1,19 +1,19 @@
-from cms.admin.placeholderadmin import PlaceholderAdmin, FrontendEditableAdmin
+from cms.admin.placeholderadmin import PlaceholderAdminMixin, FrontendEditableAdminMixin
 from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1, TwoPlaceholderExample)
 from django.contrib import admin
 from hvad.admin import TranslatableAdmin
 
 
-class ExampleAdmin(FrontendEditableAdmin, PlaceholderAdmin):
+class ExampleAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1", "char_2")
 
 
-class TwoPlaceholderExampleAdmin(PlaceholderAdmin):
+class TwoPlaceholderExampleAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     pass
 
 
-class MultilingualAdmin(FrontendEditableAdmin, TranslatableAdmin,
-                        PlaceholderAdmin):
+class MultilingualAdmin(FrontendEditableAdminMixin, TranslatableAdmin,
+                        PlaceholderAdminMixin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1", "char_2")
 
 

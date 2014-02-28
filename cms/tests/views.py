@@ -12,6 +12,8 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.views import _handle_no_page, details
+from cms.compat import get_user_model
+
 from menus.menu_pool import menu_pool
 from django.core.cache import cache
 from django.conf import settings
@@ -144,7 +146,8 @@ class ViewTests(SettingsOverrideTestCase):
 
         # Superuser
         user = self.get_superuser()
-        self.client.login(username=user.username, password=user.username)
+        self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
+                          password=getattr(user, get_user_model().USERNAME_FIELD))
         response = self.client.get("/en/?edit")
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
@@ -152,7 +155,9 @@ class ViewTests(SettingsOverrideTestCase):
         user = self.get_staff_user_with_no_permissions()
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
-        self.client.login(username=user.username, password=user.username)
+        self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
+                          password=getattr(user, get_user_model().USERNAME_FIELD))
+
         response = self.client.get("/en/?edit")
         self.assertNotContains(response, "cms_toolbar-item_switch", 200)
 
