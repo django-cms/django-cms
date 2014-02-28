@@ -4,12 +4,13 @@ from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from django.core.cache import cache
 from django.db import connection
 from django.template import Template, RequestContext
-
+from django.conf import settings
 
 class CacheTestCase(CMSTestCase):
     def tearDown(self):
@@ -48,6 +49,21 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(3):
             template.render(rctx)
+        page1.publish('en')
+        cache.clear()
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware'
+        ]
+        middlewares = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middlewares):
+            with self.assertNumQueries(FuzzyInt(14, 18)):
+                response = self.client.get('/en/')
+            with self.assertNumQueries(FuzzyInt(7, 11)):
+                response = self.client.get('/en/')
+            with SettingsOverride(CMS_PLACEHOLDER_CACHE=False):
+                with self.assertNumQueries(FuzzyInt(9, 13)):
+                    response = self.client.get('/en/')
 
     def test_no_cache_plugin(self):
         create_page

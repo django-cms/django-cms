@@ -170,7 +170,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['placeholder'] = toolbar_content
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)
-    if placeholder and not edit and placeholder.cache_placeholder:
+
+    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
         cache.set(cache_key, result, get_cms_setting('CACHE_DURATIONS')['content'])
     context.pop()
     return result
