@@ -280,3 +280,17 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             except LanguageError:
                 self.fail("LanguageError raised")
 
+    def test_wrong_plugin_language(self):
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        ph_en = page.placeholders.get(slot="body")
+        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        title = Title(title="page", slug="page", language="ru", page=page)
+        title.save()
+        # add wrong plugin language
+        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "ru", body="I'm the second")
+        page.publish('en')
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+            self.assertEqual(response.status_code, 200)
+

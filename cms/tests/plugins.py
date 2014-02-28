@@ -5,15 +5,13 @@ import json
 from cms import api
 
 from cms.api import create_page, publish_page, add_plugin
-from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.project.placeholderapp.cms_plugins import EmptyPlugin
-from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoSubPluginRender, NoRender, NoRenderButChildren, DynTemplate
+from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate
 from djangocms_googlemap.models import GoogleMap
 from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.utils.plugins import get_plugins_for_page

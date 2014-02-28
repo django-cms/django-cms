@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.exceptions import LanguageError
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
@@ -223,7 +224,13 @@ class Placeholder(models.Model):
 
         This is not cached as it's meant to eb used in the frontend editor.
         """
-        return [get_language_object(lang_code) for lang_code in set(self.get_plugins().values_list('language', flat=True))]
+        languages = []
+        for lang_code in set(self.get_plugins().values_list('language', flat=True)):
+            try:
+                languages.append(get_language_object(lang_code))
+            except LanguageError:
+                pass
+        return languages
 
     def get_cached_plugins(self):
         return getattr(self, '_plugins_cache', [])
