@@ -21,8 +21,8 @@ from django.template.context import RequestContext
 from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
 
-
 CMS_PAGE_CACHE_VERSION_KEY = 'CMS_PAGE_CACHE_VERSION'
+
 
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
