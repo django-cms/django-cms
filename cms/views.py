@@ -20,14 +20,23 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
 from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
+from django.utils.translation import get_language
 
 
 CMS_PAGE_CACHE_VERSION_KEY = 'CMS_PAGE_CACHE_VERSION'
 
+
 def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
         return TemplateResponse(request, "cms/welcome.html", RequestContext(request))
-    raise Http404('CMS: Page not found for "%s"' % slug)
+    try:
+        #add a $ to the end of the url (does not match on the cms anymore)
+        resolve('%s$' % request.path)
+    except Resolver404 as e:
+        # raise a django http 404 page
+        exc = Http404(dict(path=request.path, tried=e.args[0]['tried']))
+        raise exc
+    raise Http404('CMS Page not found: %s' % request.path)
 
 
 def details(request, slug):
