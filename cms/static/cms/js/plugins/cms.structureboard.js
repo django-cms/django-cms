@@ -51,6 +51,9 @@ $(document).ready(function () {
 		_setup: function () {
 			var that = this;
 
+			// cancel if there are no dragareas
+			if(!this.dragareas.length) return false;
+
 			// setup toolbar mode
 			if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
 
