@@ -149,7 +149,7 @@ $(document).ready(function () {
 				var text = this.config.lang.confirm;
 
 				// trigger an ajax request
-				CMS.API.Toolbar.openAjax(data.delete, post, text, function () {
+				CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
 					that._hide(100);
 				});
 			} else {
