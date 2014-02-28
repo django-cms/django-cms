@@ -110,51 +110,67 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 mail_managers(subject, body, fail_silently=True)
             return None
 
-
-class PageUrlAs(AsTag):
-
-    """This is essentially the plain_jane page_url template tag from django-
-    cms, except that it is written (and used as) an AsTag rather than an
-    InclusionTag"""
-
-    template = 'cms/content.html'
-    name = 'page_url_as'
+#
+# This is borrowed from https://github.com/okfn/foundation
+#
+class PageUrl(AsTag):
+    name = 'page_url'
 
     options = Options(
         Argument('page_lookup'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
         'as',
-        Argument('varname', resolve=False),
+        Argument('varname', required=False, resolve=False),
     )
+
+    # We override render_tag here so as to provide backwards-compatible
+    # behaviour when varname is not provided. If varname is not provided, and
+    # the specified page cannot be found, we pass through the Page.DoesNotExist
+    # exception. If varname is provided, we swallow the exception and just set
+    # the value to None.
+    def render_tag(self, context, **kwargs):
+        varname = kwargs.pop(self.varname_name)
+        try:
+            value = self.get_value(context, **kwargs)
+        except Page.DoesNotExist:
+            if not varname:
+                raise
+            else:
+                value = None
+
+        if varname:
+            context[varname] = value
+            return ''
+        return value
 
     def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
         site_id = get_site_id(site)
         request = context.get('request', False)
         if not request:
-            return ''
+            return None
 
         if request.current_page == "dummy":
-            return ''
-
+            return None
         if lang is None:
             lang = get_language_from_request(request)
-
-        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
+        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + \
+            '_type:absolute_url'
         url = cache.get(cache_key)
         if not url:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
+                cache.set(cache_key, url,
+                          get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
             return url
-        return ''
+        return None
 
-register.tag(PageUrlAs)
 
-register.tag('page_id_url', PageUrlAs)
+register.tag(PageUrl)
+register.tag('page_id_url', PageUrl)
 
 
 def _get_placeholder(current_page, page, context, name):
