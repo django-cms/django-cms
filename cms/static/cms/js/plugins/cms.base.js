@@ -2,13 +2,13 @@
 /* #CMS# */
 
 // ensuring django namespace is set correctly
-var django = window.django || undefined;
+window.django = window.django || undefined;
 
 // ensuring jQuery namespace is set correctly
-var jQuery = (django) ? django.jQuery : window.jQuery || undefined;
+window.jQuery = (django) ? django.jQuery : window.jQuery || undefined;
 
 // ensuring Class namespace is set correctly
-var Class = window.Class || undefined;
+window.Class = window.Class || undefined;
 
 // ensuring CMS namespace is set correctly
 var CMS = {
