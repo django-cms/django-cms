@@ -321,11 +321,13 @@ $(document).ready(function () {
 
 			// merge manually because jquery...
 			$.each(arr, function (index, item) {
-				if(keys.indexOf(item.param) === -1) {
+				var i = $.inArray(item.param, keys);
+
+				if(i === -1) {
 					keys.push(item.param);
 					values.push(item.value);
 				} else {
-					values[keys.indexOf(item.param)] = item.value;
+					values[i] = item.value;
 				}
 			});
 
