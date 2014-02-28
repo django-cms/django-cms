@@ -219,6 +219,14 @@ a urls.py that looks like this::
 The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the url ``/hello/world/sublevel/``.
 
+
+.. note::
+
+    CMS pages **below** the page to which the apphook is attached to, **can** be visible,
+    provided that the apphook urlconf regexps are not too greedy. From a URL resolution
+    perspective, attaching an apphook works in same way than inserting the apphook urlconf
+    in the root urlconf at the same path as the page is attached to.
+
 .. note::
 
     All views that are attached like this must return a
