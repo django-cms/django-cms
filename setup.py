@@ -32,7 +32,7 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         'Django>=1.4',
-        'django-classy-tags>=0.3.4.1',
+        'django-classy-tags>=0.5',
         'south>=0.7.2',
         'html5lib',
         'django-mptt==0.5.2,==0.6',
