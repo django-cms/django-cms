@@ -2,11 +2,10 @@
 from __future__ import with_statement
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.utils.i18n import force_language
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
-
+from cms.compat import get_user_model
 from cms.api import create_page, add_plugin, create_title
 from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
@@ -16,7 +15,6 @@ from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride, SettingsOverride
 
 from djangocms_text_ckeditor.models import Text
-
 
 class PublisherCommandTests(TestCase):
     """
@@ -34,7 +32,7 @@ class PublisherCommandTests(TestCase):
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
-        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
 
         pages_from_output = 0
         published_from_output = 0
@@ -56,7 +54,7 @@ class PublisherCommandTests(TestCase):
 
     def test_command_line_ignores_draft_page(self):
         # we need to create a superuser (the db is empty)
-        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
 
         create_page("The page!", "nav_playground.html", "en", published=False)
 
@@ -84,6 +82,7 @@ class PublisherCommandTests(TestCase):
         """
         This tests the plugin models patching when publishing from the command line
         """
+        User = get_user_model()
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
         published = create_page("The page!", "nav_playground.html", "en", published=True)
         draft = Page.objects.drafts()[0]
@@ -121,7 +120,7 @@ class PublisherCommandTests(TestCase):
         filters on purpose (this helps test the managers)
         """
         # we need to create a superuser (the db is empty)
-        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
 
         # Now, let's create a page. That actually creates 2 Page objects
         create_page("The page!", "nav_playground.html", "en", published=True)

@@ -3,11 +3,12 @@ from __future__ import with_statement
 from cms.admin import forms
 from cms.admin.forms import PageUserForm
 from cms.api import create_page, create_page_user
+from cms.compat import get_user_model
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
-from django.contrib.auth.models import User
+from cms.test_utils.util.context_managers import SettingsOverride
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 
@@ -39,9 +40,15 @@ class FormsTestCase(CMSTestCase):
 
     def test_get_site_choices_without_moderator_with_superuser(self):
         # boilerplate (creating a page)
-        user_super = User(username="super", is_staff=True, is_active=True,
-                          is_superuser=True)
-        user_super.set_password("super")
+        User = get_user_model()
+
+        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+
+        if User.USERNAME_FIELD != 'email':
+            fields[User.USERNAME_FIELD] = "super"
+
+        user_super = User(**fields)
+        user_super.set_password(getattr(user_super, User.USERNAME_FIELD))
         user_super.save()
         with self.login_user_context(user_super):
             create_page("home", "nav_playground.html", "en", created_by=user_super)
@@ -74,10 +81,17 @@ class FormsTestCase(CMSTestCase):
 
     def test_compress_function_gets_a_page_when_one_exists(self):
         # boilerplate (creating a page)
-        user_super = User(username="super", is_staff=True, is_active=True,
-                          is_superuser=True)
-        user_super.set_password("super")
+        User = get_user_model()
+        
+        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+
+        if User.USERNAME_FIELD != 'email':
+            fields[User.USERNAME_FIELD] = "super"
+
+        user_super = User(**fields)
+        user_super.set_password(getattr(user_super, User.USERNAME_FIELD))
         user_super.save()
+
         with self.login_user_context(user_super):
             home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The actual test
@@ -119,7 +133,11 @@ class FormsTestCase(CMSTestCase):
         self.assertEquals(normal_result, list(lazy_result))
 
     def test_page_user_form_initial(self):
-        myuser = User.objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
+        if get_user_model().USERNAME_FIELD == 'email':
+            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser@django-cms.org")
+        else:
+            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
+        
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',

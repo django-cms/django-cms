@@ -4,6 +4,7 @@ import copy
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from django.db import connection
 from cms.api import create_page
+from cms.compat import get_user_model, user_related_name
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -16,7 +17,7 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User, Permission, Group
+from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.utils.translation import activate
@@ -920,7 +921,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             get_visible_pages(request, pages)
 
     def test_public_for_all(self):
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
         page = Page()
         page.pk = 1
@@ -931,7 +932,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         self.assertEqual(result, [1])
 
     def test_public_for_all_num_queries(self):
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
         site = Site()
         site.pk = 1
@@ -978,6 +979,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_authed_basic_perm(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            User = get_user_model()
             user = User()
             user.username = "test"
             user.is_staff = True
@@ -996,6 +998,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            User = get_user_model()
             user = User()
             user.username = "test"
             user.is_staff = True
@@ -1017,7 +1020,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_authed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = Page()
             page.pk = 1
@@ -1031,7 +1034,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = Page()
             page.pk = 1
@@ -1071,7 +1074,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, user=user, page=page)
@@ -1081,7 +1084,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions_num_queries(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, user=user, page=page)
@@ -1096,9 +1099,12 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions_view_groups(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
-            group.user_set.add(user)
+            
+            user_set = getattr(group, user_related_name)
+            user_set.add(user)
+            
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, group=group, page=page)
@@ -1108,9 +1114,12 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions_view_groups_num_queries(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
-            group.user_set.add(user)
+
+            user_set = getattr(group, user_related_name)
+            user_set.add(user)
+            
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, group=group, page=page)
@@ -1126,7 +1135,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_global_permission(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             GlobalPagePermission.objects.create(can_view=True, user=user)
             request = self.get_request(user)
             page = Page()
@@ -1140,7 +1149,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
     def test_global_permission_num_queries(self):
         site = Site()
         site.pk = 1
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         GlobalPagePermission.objects.create(can_view=True, user=user)
         request = self.get_request(user)
         site = Site()

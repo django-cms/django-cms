@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
 from cms.apphook_pool import apphook_pool
+from cms.compat import get_user_model
+from cms.compat_forms import UserCreationForm
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels
 from cms.utils.conf import get_cms_setting
@@ -11,8 +13,7 @@ from cms.utils.page_resolver import is_valid_url
 from cms.utils.permissions import get_current_user, get_subordinate_users, get_subordinate_groups, \
     get_user_permission_level
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -25,6 +26,8 @@ from menus.menu_pool import menu_pool
 
 
 def get_permission_acessor(obj):
+    User = get_user_model()
+    
     if isinstance(obj, (PageUser, User,)):
         rel_name = 'user_permissions'
     else:
@@ -451,6 +454,12 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         if self.instance:
             return self.cleaned_data['username']
         return super(PageUserForm, self).clean_username()
+
+    # required if the User model's USERNAME_FIELD is the email field
+    def clean_email(self):
+        if self.instance:
+            return self.cleaned_data['email']
+        return super(PageUserForm, self).clean_email()
 
     def clean_password2(self):
         if self.instance and self.cleaned_data['password1'] == '' and self.cleaned_data['password2'] == '':

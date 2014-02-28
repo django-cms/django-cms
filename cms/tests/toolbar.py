@@ -10,19 +10,19 @@ from cms.views import details
 import re
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from cms.compat import get_user_model, is_user_swapped
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import AnonymousUser, User, Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
 from django.core.urlresolvers import reverse
 from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
-
 
 class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
@@ -47,39 +47,17 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         return AnonymousUser()
 
     def get_staff(self):
-        staff = User(
-            username='staff',
-            email='staff@staff.org',
-            is_active=True,
-            is_staff=True,
-        )
-        staff.set_password('staff')
-        staff.save()
+        staff = self._create_user('staff', True, False)
         staff.user_permissions.add(Permission.objects.get(codename='change_page'))
         return staff
 
     def get_nonstaff(self):
-        nonstaff = User(
-            username='nonstaff',
-            email='nonstaff@staff.org',
-            is_active=True,
-            is_staff=False,
-        )
-        nonstaff.set_password('nonstaff')
-        nonstaff.save()
+        nonstaff = self._create_user('nonstaff')
         nonstaff.user_permissions.add(Permission.objects.get(codename='change_page'))
         return nonstaff
 
     def get_superuser(self):
-        superuser = User(
-            username='superuser',
-            email='superuser@superuser.org',
-            is_active=True,
-            is_staff=True,
-            is_superuser=True,
-        )
-        superuser.set_password('superuser')
-        superuser.save()
+        superuser = self._create_user('superuser', True, True)
         return superuser
 
 
@@ -114,7 +92,11 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+
+        if is_user_swapped:
+            self.assertEqual(len(admin_items), 6, admin_items)
+        else:
+            self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from cms.compat import get_user_model, user_related_query_name
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
-from django.contrib.auth.models import User, Group
+from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
 
@@ -196,14 +198,14 @@ def get_subordinate_users(user):
 
     if user.is_superuser or \
             GlobalPagePermission.objects.with_can_change_permissions(user):
-        return User.objects.all()
+        return get_user_model().objects.all()
     site = Site.objects.get_current()
     page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:
         # no permission so only staff and no page permissions 
-        qs = User.objects.distinct().filter(
+        qs = get_user_model().objects.distinct().filter(
                 Q(is_staff=True) &
                 Q(pageuser__created_by=user) &
                 Q(pagepermission__page=None)
@@ -211,7 +213,7 @@ def get_subordinate_users(user):
         qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
         return qs
     # normal query
-    qs = User.objects.distinct().filter(
+    qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) &
         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
         | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
@@ -291,7 +293,9 @@ def get_user_sites_queryset(user):
             # so he haves access to all sites
             return qs
     # add some pages if he has permission to add / change them
-    query |= Q(Q(djangocms_pages__pagepermission__user=user) | Q(djangocms_pages__pagepermission__group__user=user)) & \
+    user_query = dict()
+    user_query['djangocms_pages__pagepermission__group__'+user_related_query_name] = user
+    query |= Q(Q(djangocms_pages__pagepermission__user=user) | Q(**user_query)) & \
         (Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True)))
     return qs.filter(query).distinct()
 

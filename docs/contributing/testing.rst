@@ -66,6 +66,10 @@ dj-database-url compatible value.
 
     Show CMS version.
 
+.. option:: --user
+
+    Specifies a custom user model to use for testing, the shell, or the server.  The name must be in the format <app name>.<model name>, and the custom app must reside in the cms.test_utils.projects module.
+
 
 ``develop.py test``
 -------------------

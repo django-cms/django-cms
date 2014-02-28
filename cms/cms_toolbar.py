@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import urllib
+from cms.compat import user_model_label
 from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, RIGHT
 from cms.exceptions import LanguageError
@@ -88,7 +90,7 @@ class BasicToolbar(CMSToolbar):
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
-            admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
+            admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:"+user_model_label.replace('.','_').lower()+"_changelist"))
             # sites menu
         if get_cms_setting('PERMISSION'):
             sites_queryset = get_user_sites_queryset(self.request.user)
@@ -253,6 +255,7 @@ class PageToolbar(CMSToolbar):
         if self.page:
             url += "&page_id=%s" % self.page.pk
         admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
+
 
     def add_page_menu(self):
         # menu for current page

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from cms.compat import get_user_model
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser, Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
@@ -111,9 +112,19 @@ class BaseCMSTestCase(object):
         Set `permissions` parameter to an iterable of permission codes to add
         custom permissios.
         """
-        user = User(username=username, email=username+'@django-cms.org',
-                    is_staff=is_staff, is_active=is_active, is_superuser=is_superuser)
-        user.set_password(username)
+        User = get_user_model()
+
+        fields = dict(email=username+'@django-cms.org',
+            is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
+        )
+
+        # Check for special case where email is used as username
+        if(get_user_model().USERNAME_FIELD != 'email'):
+            fields[get_user_model().USERNAME_FIELD] = username
+
+        user = User(**fields)
+        
+        user.set_password(getattr(user, get_user_model().USERNAME_FIELD))
         user.save()
         if is_staff and not is_superuser and add_default_permissions:
             user.user_permissions.add(Permission.objects.get(codename='add_text'))
@@ -131,8 +142,15 @@ class BaseCMSTestCase(object):
 
     def get_superuser(self):
         try:
-            admin = User.objects.get(username="admin")
-        except User.DoesNotExist:
+            query = dict()
+
+            if get_user_model().USERNAME_FIELD != "email":
+                query[get_user_model().USERNAME_FIELD]="admin"
+            else:
+                query[get_user_model().USERNAME_FIELD]="admin@django-cms.org"
+            
+            admin = get_user_model().objects.get(**query)
+        except get_user_model().DoesNotExist:
             admin = self._create_user("admin", is_staff=True, is_superuser=True)
         return admin
 
