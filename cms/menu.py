@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 from cms.apphook_pool import apphook_pool
+from cms.compat import get_user_model, user_model_label
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
     ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
@@ -72,8 +73,10 @@ def get_visible_pages(request, pages, site=None):
 
     # authenticated user and global permission
     if is_auth_user:
+        query = dict()
+        query['group__'+user_model_label.split('.')[1].lower()] = request.user
         global_page_perm_q = Q(
-            Q(user=request.user) | Q(group__user=request.user)
+            Q(user=request.user) | Q(**query)
         ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
         global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
 
@@ -110,7 +113,8 @@ def get_visible_pages(request, pages, site=None):
                 has_perm = True
             if not perm.group_id:
                 continue
-            group_user_ids = perm.group.user_set.values_list('pk', flat=True)
+            user_set = getattr(perm.group, user_model_label.split('.')[1].lower()+'_set')
+            group_user_ids = user_set.values_list('pk', flat=True)
             if user_pk in group_user_ids:
                 has_perm = True
         return has_perm

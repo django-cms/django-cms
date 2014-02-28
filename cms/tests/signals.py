@@ -3,7 +3,7 @@ from __future__ import with_statement
 from contextlib import contextmanager
 from cms.api import create_page
 from cms.signals import urls_need_reloading
-from django.contrib.auth.models import User
+from cms.compat import get_user_model
 from django.test import TestCase
 
 
@@ -30,7 +30,7 @@ def signal_tester(signal):
 
 class SignalTests(TestCase):
     def test_urls_need_reloading_signal_create(self):
-        superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         with signal_tester(urls_need_reloading) as env:
             create_page("apphooked-page", "nav_playground.html", "en",
                 created_by=superuser, published=True, apphook="SampleApp")
@@ -38,7 +38,7 @@ class SignalTests(TestCase):
             self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_delete(self):
-        superuser = User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("apphooked-page", "nav_playground.html", "en",
             created_by=superuser, published=True, apphook="SampleApp")
         with signal_tester(urls_need_reloading) as env:

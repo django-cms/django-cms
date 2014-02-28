@@ -28,7 +28,6 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
 from mptt.models import MPTTModel
 
-
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
@@ -426,7 +425,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         user = getattr(_thread_locals, "user", None)
         if user:
-            self.changed_by = user.username
+            try:
+                self.changed_by = str(user)
+            except AttributeError:
+                # AnonymousUser may not have USERNAME_FIELD
+                self.changed_by = "anonymous"
         else:
             self.changed_by = "script"
         if created:

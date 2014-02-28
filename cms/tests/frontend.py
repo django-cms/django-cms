@@ -7,9 +7,10 @@ from cms.models import Page
 from cms.api import create_page, create_title, add_plugin
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
 
 from django.utils import unittest
-from django.contrib.auth.models import User
+from django.db import connections
 from django.contrib.sites.models import Site
 from django.test import LiveServerTestCase, TestCase
 
@@ -20,8 +21,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 
+from cms.compat import get_user_model
 
-class CMSLiveTests(LiveServerTestCase, TestCase):
+
+class CMSLiveTests(LiveServerTestCase, CMSTestCase):
     @classmethod
     def setUpClass(cls):
         super(CMSLiveTests, cls).setUpClass()
@@ -124,41 +127,39 @@ class CMSLiveTests(LiveServerTestCase, TestCase):
 class ToolbarBasicTests(CMSLiveTests):
 
     def setUp(self):
+        self.user = self._create_user('admin', True, True, True)
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
-        user = User()
-        user.username = 'admin'
-        user.set_password('admin')
-        user.is_superuser = user.is_staff = user.is_active = True
-        user.save()
         self.driver.implicitly_wait(2)
         super(ToolbarBasicTests, self).setUp()
 
     def test_toolbar_login(self):
+        User = get_user_model()
         create_page('Home', 'simple.html', 'en', published=True)
         url = '%s/?edit' % self.live_server_url
         self.assertTrue(User.objects.all().count(), 1)
         self.driver.get(url)
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys('admin')
+        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys('admin')
+        password_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input.submit()
         self.wait_page_loaded()
         self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
 
     def test_basic_add_pages(self):
         with SettingsOverride(DEBUG=True):
+            User = get_user_model()
             self.assertEqual(Page.objects.all().count(), 0)
             self.assertTrue(User.objects.all().count(), 1)
             driver = self.driver
             driver.get(self.base_url + "/de/")
             driver.find_element_by_id("add-page").click()
             driver.find_element_by_id("id_username").clear()
-            driver.find_element_by_id("id_username").send_keys("admin")
+            driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
             driver.find_element_by_id("id_password").clear()
-            driver.find_element_by_id("id_password").send_keys("admin")
+            driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
             driver.find_element_by_css_selector("input[type=\"submit\"]").click()
             driver.find_element_by_name("_save").click()
             driver.find_element_by_link_text(u"Seite hinzufügen").click()
@@ -201,11 +202,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         self.base_url = self.live_server_url
 
-        user = User()
-        user.username = 'admin'
-        user.set_password('admin')
-        user.is_superuser = user.is_staff = user.is_active = True
-        user.save()
+        self.user = self._create_user('admin', True, True, True)
 
         self.driver.implicitly_wait(5)
 
@@ -214,12 +211,12 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
     def _login(self):
         url = '%s/?edit' % self.live_server_url
         self.driver.get(url)
-
+        
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys('admin')
+        username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys('admin')
+        password_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input.submit()
         self.wait_page_loaded()
 
@@ -311,4 +308,4 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         plugins = self.page.placeholders.all()[0].get_plugins_list('en')
 
-        self.assertEqual(len(plugins), 2)
+        self.assertEqual(len(plugins), 1)

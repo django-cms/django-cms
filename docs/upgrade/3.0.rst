@@ -361,6 +361,10 @@ south for migrations create a new empty schemamigration and rename the table by 
              This code can be executed both in the shell or in your python
              modules.
 
+Added support for custom user models
+====================================
+
+Since Django 1.5 it has been possible to swap out the default User model for a custom user model.  This is now fully supported by DjangoCMS, and in addition a new option has been added to the test runner to allow specifying the user model to use for tests (e.g. --user=customuserapp.User)
 
 Page caching
 ============
@@ -381,7 +385,6 @@ Plugin caching
 
 Plugins have a new attribute: ``cache=True``. Its default value can be configured with :setting:`CMS_PLUGIN_CACHE`.
 
-
 Per-page Clickjacking protection
 ================================
 
@@ -396,7 +399,6 @@ CMS_TEMPLATE context variable
 A new ``CMS_TEMPLATE`` variable is now available in the context: it contains the path to the
 current page template.
 See :ref:`CMS_TEMPLATE reference <page_template>` for details.
-
 
 ********************
 Pending deprecations
