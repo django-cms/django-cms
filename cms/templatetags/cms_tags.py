@@ -111,27 +111,36 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
             return None
 
 
-class PageUrl(InclusionTag):
+class PageUrlAs(AsTag):
+
+    """This is essentially the plain_jane page_url template tag from django-
+    cms, except that it is written (and used as) an AsTag rather than an
+    InclusionTag"""
+
     template = 'cms/content.html'
-    name = 'page_url'
+    name = 'page_url_as'
 
     options = Options(
         Argument('page_lookup'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
+        'as',
+        Argument('varname', resolve=False),
     )
 
-    def get_context(self, context, page_lookup, lang, site):
+    def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
         site_id = get_site_id(site)
         request = context.get('request', False)
         if not request:
-            return {'content': ''}
+            return ''
 
         if request.current_page == "dummy":
-            return {'content': ''}
+            return ''
+
         if lang is None:
             lang = get_language_from_request(request)
+
         cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
         url = cache.get(cache_key)
         if not url:
@@ -140,13 +149,12 @@ class PageUrl(InclusionTag):
                 url = page.get_absolute_url(language=lang)
                 cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
-            return {'content': url}
-        return {'content': ''}
+            return url
+        return ''
 
+register.tag(PageUrlAs)
 
-register.tag(PageUrl)
-
-register.tag('page_id_url', PageUrl)
+register.tag('page_id_url', PageUrlAs)
 
 
 def _get_placeholder(current_page, page, context, name):
