@@ -282,9 +282,9 @@ class RenderingTestCase(SettingsOverrideTestCase):
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
     def test_page_url_by_page_as_for_bogus_page(self):
-        template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{% if test_url %}{{ test_url }}{% else %}DNE{% endif %}'
+        template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
         output = self.render(template, self.test_page, {'test_page': self.test_page2})
-        self.assertEqual(output, 'DNE')
+        self.assertEqual(output, '')
 
     def test_page_attribute(self):
         """

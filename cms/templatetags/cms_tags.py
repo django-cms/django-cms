@@ -135,18 +135,18 @@ class PageUrl(AsTag):
     # to None.
     #
 
-    def render_tag(self, context, **kwargs):
-        varname = kwargs.get(self.varname_name, None)
-        if varname:
-            # mimic Djangos built-in url tag by not raising an exception if 
-            # used as an "as-tag" if the page is not found.
-            try:
-                return super(PageUrl, self).render_tag(context, **kwargs)
-            except Page.DoesNotExist:
-                context[varname] = ''
-                return ''
-        else:
-            return super(PageUrl, self).render_tag(context, **kwargs)
+    # def render_tag(self, context, **kwargs):
+    #     varname = kwargs.get(self.varname_name, None)
+    #     if varname:
+    #         # mimic Djangos built-in url tag by not raising an exception if 
+    #         # used as an "as-tag" if the page is not found.
+    #         try:
+    #             return super(PageUrl, self).render_tag(context, **kwargs)
+    #         except Page.DoesNotExist:
+    #             context[varname] = ''
+    #             return ''
+    #     else:
+    #         return super(PageUrl, self).render_tag(context, **kwargs)
 
     def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
@@ -155,7 +155,7 @@ class PageUrl(AsTag):
         request = context.get('request', False)
 
         if not request:
-            return None
+            return ''
 
         if lang is None:
             lang = get_language_from_request(request)
@@ -173,7 +173,7 @@ class PageUrl(AsTag):
                           get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
             return url
-        return None
+        return ''
 
 
 register.tag(PageUrl)
