@@ -110,9 +110,6 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 mail_managers(subject, body, fail_silently=True)
             return None
 
-#
-# This is borrowed from https://github.com/okfn/foundation
-#
 class PageUrl(AsTag):
     name = 'page_url'
 
@@ -123,17 +120,6 @@ class PageUrl(AsTag):
         'as',
         Argument('varname', required=False, resolve=False),
     )
-
-    #
-    # We override render_tag here so as to provide backwards-compatible
-    # behaviour when varname is not provided.
-    #
-    # If varname is not provided, and the specified page cannot be found, we
-    # pass through the Page.DoesNotExist exception.
-    #
-    # If varname is provided, we swallow the exception and just set the value
-    # to None.
-    #
 
     def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
