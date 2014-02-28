@@ -121,8 +121,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         processors = (toolbar_plugin_processor,)
     else:
         processors = None
+    from django.core.cache import cache
     if get_cms_setting('PLACEHOLDER_CACHE'):
-        from django.core.cache import cache
         cache_key = placeholder.get_cache_key(lang)
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
             cached_value = cache.get(cache_key)
