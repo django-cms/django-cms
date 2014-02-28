@@ -234,16 +234,18 @@ addresses to inform them of the broken link.
     emits nothing, but sets a variable in the context with the specified name
     to the resulting value.
 
+    If the requested page is not found when using the ``as`` argument, the
+    PageNotFound exception is supressed and the context variable is set to an
+    empty string.
+
     Arguments:
 
     - ``page_lookup`` (see `page_lookup`_ for more information)
     - ``as var_name`` page_url can be used as an As Tag 
 
     Example::
-
+        {# Emit a 'canonical' tag when the page is displayed on an alternate url #}
         {% page_url request.current_page as current_url %}{% if current_url and current_url != request.get_full_path %}<link rel="canonical" href="{% page_url request.current_page %}">{% endif %}
-
-Additionally page lookup errors are now suppressed when using the as variant.
 
 
 .. templatetag:: page_attribute
