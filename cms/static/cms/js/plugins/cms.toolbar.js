@@ -31,6 +31,7 @@ $(document).ready(function () {
 			this.buttons = this.container.find('.cms_toolbar-item-buttons');
 			this.switcher = this.container.find('.cms_toolbar-item_switch');
 			this.messages = this.container.find('.cms_messages');
+			this.screenBlock = this.container.find('.cms_screenblock');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
@@ -85,6 +86,9 @@ $(document).ready(function () {
 				var sideframe = new CMS.Sideframe();
 					sideframe.open(this.settings.sideframe.url, false);
 			}
+
+			// if there is a screenblock, do some resize magic
+			if(this.screenBlock.length) this._screenBlock();
 		},
 
 		_events: function () {
@@ -454,6 +458,27 @@ $(document).ready(function () {
 						}, timeout);
 					}
 				});
+		},
+
+		_screenBlock: function () {
+			var interval = 20;
+			var blocker = this.screenBlock;
+			var sideframe = $('.cms_sideframe');
+
+			// automatically resize screenblock window according to given attributes
+			$(window).on('resize.cms.screenblock', function () {
+				var width = $(this).width() - sideframe.width();
+
+				blocker.css({
+					'width': width,
+					'height': $(document).height()
+				});
+			}).trigger('resize');
+
+			// set update interval
+			setInterval(function () {
+				$(window).trigger('resize.cms.screenblock');
+			}, interval);
 		}
 
 	});

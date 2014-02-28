@@ -151,13 +151,6 @@ def details(request, slug):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
-        own_urls = [
-            'http%s://%s%s' % ('s' if request.is_secure() else '', request.get_host(), request.path),
-            '/%s' % request.path,
-            request.path,
-        ]
-        if redirect_url not in own_urls:
-            redirect_url += attrs
         if request.toolbar.is_staff and request.toolbar.show_toolbar:
             request.toolbar.redirect_url = redirect_url
         else:
