@@ -163,6 +163,8 @@ $(document).ready(function () {
 				id = cls.replace('cms_placeholder-', '');
 			} else if(el.hasClass('cms_dragbar')) {
 				id = cls.replace('cms_dragbar-', '');
+			} else if(el.hasClass('cms_dragarea')) {
+				id = cls.replace('cms_dragarea-', '');
 			}
 
 			return id;
@@ -419,7 +421,8 @@ $(document).ready(function () {
 					if(original.data('settings') === null) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
-					var holder = placeholder.parent().prevAll('.cms_dragarea').first();
+					var holderId = that.getId(placeholder.closest('.cms_dragarea'));
+					var holder = $('.cms_placeholder-' + holderId);
 					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
