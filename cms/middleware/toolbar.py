@@ -85,7 +85,7 @@ class ToolbarMiddleware(object):
                 break
         if found:
             add_never_cache_headers(response)
-        if request.user.is_staff:
+        if hasattr(request, 'user') and request.user.is_staff:
             count = LogEntry.objects.filter(user=request.user).count()
             if request.session.get('cms_log_entries', 0) < count:
                 request.session['cms_log_entries'] = count
