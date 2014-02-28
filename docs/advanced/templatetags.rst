@@ -234,8 +234,9 @@ addresses to inform them of the broken link.
     emits nothing, but sets a variable in the context with the specified name
     to the resulting value.
 
-    If the requested page is not found when using the ``as`` argument, the
-    PageNotFound exception is supressed and the context variable is set to an
+    When using the ``as`` argument, any PageNotFound exceptions are always
+    suppressed, regardless of the setting of :setting:`django:DEBUG`.  In the
+    event the page is not found, the context variable is set to an
     empty string.
 
     Arguments:
