@@ -34,7 +34,7 @@ def _handle_no_page(request, slug):
             resolve('/%s//' % get_language())
         else:
             resolve('//')
-    except Resolver404, e:
+    except Resolver404 as e:
         exc = Http404(dict(path=request.path, tried=e.args[0]['tried']))
         raise exc
 
