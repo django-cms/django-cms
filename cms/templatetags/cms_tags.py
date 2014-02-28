@@ -134,21 +134,19 @@ class PageUrl(AsTag):
     # If varname is provided, we swallow the exception and just set the value
     # to None.
     #
+
     def render_tag(self, context, **kwargs):
-        varname = kwargs.pop(self.varname_name)
-        try:
-            value = self.get_value(context, **kwargs)
-        except Page.DoesNotExist:
-            if not varname:
-                raise
-            else:
-                value = None
-
+        varname = kwargs.get(self.varname_name, None)
         if varname:
-            context[varname] = value
-            return ''
-
-        return value
+            # mimic Djangos built-in url tag by not raising an exception if 
+            # used as an "as-tag" if the page is not found.
+            try:
+                return super(PageUrl, self).render_tag(context, **kwargs)
+            except Page.DoesNotExist:
+                context[varname] = ''
+                return ''
+        else:
+            return super(PageUrl, self).render_tag(context, **kwargs)
 
     def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
