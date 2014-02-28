@@ -4,7 +4,7 @@ import copy
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from django.db import connection
 from cms.api import create_page
-from cms.compat import get_user_model, user_model_label
+from cms.compat import get_user_model, user_related_name
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -1102,7 +1102,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
             
-            user_set = getattr(group, user_model_label.split('.')[1].lower()+'_set')
+            user_set = getattr(group, user_related_name)
             user_set.add(user)
             
             request = self.get_request(user)
@@ -1117,7 +1117,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
 
-            user_set = getattr(group, user_model_label.split('.')[1].lower()+'_set')
+            user_set = getattr(group, user_related_name)
             user_set.add(user)
             
             request = self.get_request(user)

@@ -5,7 +5,7 @@ from cms.models.query import PageQuerySet
 from cms.publisher import PublisherManager
 from cms.utils import get_cms_setting
 from cms.utils.i18n import get_fallback_languages
-from cms.compat import user_model_label
+from cms.compat import user_related_query_name
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
@@ -225,7 +225,7 @@ class BasicPagePermissionManager(models.Manager):
         group.
         """
         query = dict()
-        query['group__'+user_model_label.split('.')[1].lower()] = user
+        query['group__' + user_related_query_name] = user
 
         return self.filter(Q(user=user) | Q(**query))
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.compat import get_user_model, user_model_label
+from cms.compat import get_user_model, user_related_query_name
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
@@ -294,7 +294,7 @@ def get_user_sites_queryset(user):
             return qs
     # add some pages if he has permission to add / change them
     user_query = dict()
-    user_query['djangocms_pages__pagepermission__group__'+user_model_label.split('.')[1].lower()] = user
+    user_query['djangocms_pages__pagepermission__group__'+user_related_query_name] = user
     query |= Q(Q(djangocms_pages__pagepermission__user=user) | Q(**user_query)) & \
         (Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True)))
     return qs.filter(query).distinct()
