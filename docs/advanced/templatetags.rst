@@ -229,6 +229,25 @@ exception will not be raised. Additionally, if
 some addresses in :setting:`django:MANAGERS`, an email will be sent to those
 addresses to inform them of the broken link.
 
+.. versionadded:: 3.0
+    page_url now supports the ``as`` argument. When used this way, the tag
+    emits nothing, but sets a variable in the context with the specified name
+    to the resulting value.
+
+    If the requested page is not found when using the ``as`` argument, the
+    PageNotFound exception is supressed and the context variable is set to an
+    empty string.
+
+    Arguments:
+
+    - ``page_lookup`` (see `page_lookup`_ for more information)
+    - ``as var_name`` page_url can be used as an As Tag 
+
+    Example::
+        {# Emit a 'canonical' tag when the page is displayed on an alternate url #}
+        {% page_url request.current_page as current_url %}{% if current_url and current_url != request.get_full_path %}<link rel="canonical" href="{% page_url request.current_page %}">{% endif %}
+
+
 .. templatetag:: page_attribute
 
 page_attribute

@@ -110,42 +110,60 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 mail_managers(subject, body, fail_silently=True)
             return None
 
-
-class PageUrl(InclusionTag):
-    template = 'cms/content.html'
+#
+# This is borrowed from https://github.com/okfn/foundation
+#
+class PageUrl(AsTag):
     name = 'page_url'
 
     options = Options(
         Argument('page_lookup'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
+        'as',
+        Argument('varname', required=False, resolve=False),
     )
 
-    def get_context(self, context, page_lookup, lang, site):
+    #
+    # We override render_tag here so as to provide backwards-compatible
+    # behaviour when varname is not provided.
+    #
+    # If varname is not provided, and the specified page cannot be found, we
+    # pass through the Page.DoesNotExist exception.
+    #
+    # If varname is provided, we swallow the exception and just set the value
+    # to None.
+    #
+
+    def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
+
         site_id = get_site_id(site)
         request = context.get('request', False)
-        if not request:
-            return {'content': ''}
 
-        if request.current_page == "dummy":
-            return {'content': ''}
+        if not request:
+            return ''
+
         if lang is None:
             lang = get_language_from_request(request)
-        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
+
+        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + \
+            '_type:absolute_url'
+
         url = cache.get(cache_key)
+
         if not url:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
+                cache.set(cache_key, url,
+                          get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
-            return {'content': url}
-        return {'content': ''}
+            return url
+        return ''
 
 
 register.tag(PageUrl)
-
 register.tag('page_id_url', PageUrl)
 
 
