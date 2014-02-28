@@ -30,11 +30,10 @@ def _handle_no_page(request, slug):
     if not slug and settings.DEBUG:
         return TemplateResponse(request, "cms/welcome.html", RequestContext(request))
     try:
-        if settings.USE_I18N:
-            resolve('/%s//' % get_language())
-        else:
-            resolve('//')
+        #add a $ to the end of the url (does not match on the cms anymore)
+        resolve('%s$' % request.path)
     except Resolver404 as e:
+        # raise a django http 404 page
         exc = Http404(dict(path=request.path, tried=e.args[0]['tried']))
         raise exc
 
