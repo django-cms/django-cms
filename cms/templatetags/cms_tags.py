@@ -111,7 +111,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
             return None
 
 #
-# This is borrowed from https://github.com/okfn/foundation
+# This is borrowed/adapted from https://github.com/okfn/foundation
 #
 class PageUrl(AsTag):
     name = 'page_url'
@@ -124,11 +124,13 @@ class PageUrl(AsTag):
         Argument('varname', required=False, resolve=False),
     )
 
+    #
     # We override render_tag here so as to provide backwards-compatible
-    # behaviour when varname is not provided. If varname is not provided, and
-    # the specified page cannot be found, we pass through the Page.DoesNotExist
-    # exception. If varname is provided, we swallow the exception and just set
-    # the value to None.
+    # behaviour when varname is not provided.
+    #
+    # If varname is not provided, and the specified page cannot be found, we
+    # pass through the Page.DoesNotExist exception.
+    #
     def render_tag(self, context, **kwargs):
         varname = kwargs.pop(self.varname_name)
         try:
@@ -144,20 +146,24 @@ class PageUrl(AsTag):
             return ''
         return value
 
+    #
+    # If varname is provided, we swallow the exception and just set the value
+    # to an empty string.
+    #
     def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
         site_id = get_site_id(site)
         request = context.get('request', False)
-        if not request:
-            return None
 
-        if request.current_page == "dummy":
-            return None
+        if not request:
+            return ''
+
         if lang is None:
             lang = get_language_from_request(request)
         cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + \
             '_type:absolute_url'
         url = cache.get(cache_key)
+
         if not url:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
@@ -166,7 +172,7 @@ class PageUrl(AsTag):
                           get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
             return url
-        return None
+        return ''
 
 
 register.tag(PageUrl)
