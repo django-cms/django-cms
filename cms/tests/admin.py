@@ -8,6 +8,8 @@ from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
+from cms.apphook_pool import apphook_pool, ApphookPool
+from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import UserSettings, StaticPlaceholder
 from cms.models.pagemodel import Page
@@ -25,7 +27,7 @@ from cms.utils.compat import DJANGO_1_4
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
-from django.contrib.auth.models import User, Permission, AnonymousUser
+from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
@@ -46,7 +48,11 @@ class AdminTestsBase(CMSTestCase):
             return admin
         USERNAME = 'test'
 
-        normal_guy = User.objects.create_user(USERNAME, 'test@test.com', USERNAME)
+        if get_user_model().USERNAME_FIELD == 'email':
+            normal_guy = get_user_model().objects.create_user(USERNAME, 'test@test.com', 'test@test.com')
+        else:
+            normal_guy = get_user_model().objects.create_user(USERNAME, 'test@test.com', USERNAME)
+
         normal_guy.is_staff = True
         normal_guy.is_active = True
         normal_guy.save()
@@ -473,7 +479,12 @@ class AdminTestCase(AdminTestsBase):
                                        created_by=admin, published=True, parent=second_level_page_top)
 
         url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
-        self.client.login(username='admin', password='admin')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='admin@django-cms.org', password='admin@django-cms.org')
+        else:    
+            self.client.login(username='admin', password='admin')
+        
         self.client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_2'
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
@@ -490,7 +501,12 @@ class AdminTestCase(AdminTestsBase):
 
     def test_unihandecode_doesnt_break_404_in_admin(self):
         admin = self.get_superuser()
-        self.client.login(username='admin', password='admin')
+
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='admin@django-cms.org', password='admin@django-cms.org')
+        else:
+            self.client.login(username='admin', password='admin')
+        
         response = self.client.get('/en/admin/cms/page/1/?language=en')
         self.assertEqual(response.status_code, 404)
 
@@ -502,14 +518,28 @@ class AdminTests(AdminTestsBase):
         self.page = create_page("testpage", "nav_playground.html", "en")
 
     def get_admin(self):
-        usr = User(username="admin", email="admin@django-cms.org", is_staff=True, is_superuser=True)
-        usr.set_password("admin")
+        User = get_user_model()
+
+        fields = dict(email="admin@django-cms.org", is_staff=True, is_superuser=True)
+
+        if(User.USERNAME_FIELD != 'email'):
+            fields[User.USERNAME_FIELD] = "admin"
+
+        usr = User(**fields)
+        usr.set_password(getattr(usr, User.USERNAME_FIELD))
         usr.save()
         return usr
 
     def get_permless(self):
-        usr = User(username="permless", email="permless@django-cms.org", is_staff=True)
-        usr.set_password("permless")
+        User = get_user_model()
+
+        fields = dict(email="permless@django-cms.org", is_staff=True)
+
+        if(User.USERNAME_FIELD != 'email'):
+            fields[User.USERNAME_FIELD] = "permless"
+
+        usr = User(**fields)
+        usr.set_password(getattr(usr, User.USERNAME_FIELD))
         usr.save()
         return usr
 
@@ -813,12 +843,15 @@ class PluginPermissionTests(AdminTestsBase):
         self._placeholder = self._page.placeholders.all()[0]
 
     def _get_admin(self):
-        admin = User(
-            username='admin',
-            email='admin@admin.com',
-            is_active=True,
-            is_staff=True,
-        )
+        User = get_user_model()
+
+        fields = dict(email="admin@django-cms.org", is_staff=True, is_active=True)
+
+        if(User.USERNAME_FIELD != 'email'):
+            fields[User.USERNAME_FIELD] = "admin"
+
+        admin = User(**fields)
+
         admin.set_password('admin')
         admin.save()
         return admin
@@ -866,7 +899,12 @@ class PluginPermissionTests(AdminTestsBase):
         """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
         admin = self._get_admin()
         self._give_cms_permissions(admin)
-        self.client.login(username='admin', password='admin')
+
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='admin@django-cms.org', password='admin')
+        else:
+            self.client.login(username='admin', password='admin')
+        
         url = reverse('admin:cms_page_add_plugin')
         data = {
             'plugin_type': 'TextPlugin',
@@ -884,7 +922,12 @@ class PluginPermissionTests(AdminTestsBase):
         """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        self.client.login(username='test', password='test')
+
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='test@test.com', password='test@test.com')
+        else:
+            self.client.login(username='test', password='test')
+        
         url = reverse('admin:cms_page_edit_plugin', args=[plugin.id])
         response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -897,7 +940,12 @@ class PluginPermissionTests(AdminTestsBase):
         """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        self.client.login(username='test', password='test')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='test@test.com', password='test@test.com')
+        else:
+            self.client.login(username='test', password='test')
+
         url = reverse('admin:cms_page_delete_plugin', args=[plugin.pk])
         data = dict(plugin_id=plugin.id)
         response = self.client.post(url, data)
@@ -911,7 +959,12 @@ class PluginPermissionTests(AdminTestsBase):
         """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        self.client.login(username='test', password='test')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='test@test.com', password='test@test.com')
+        else:
+            self.client.login(username='test', password='test')
+
         url = reverse('admin:cms_page_move_plugin')
         data = dict(plugin_id=plugin.id,
                     placeholder_id=self._placeholder.pk,
@@ -928,7 +981,12 @@ class PluginPermissionTests(AdminTestsBase):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        self.client.login(username='test', password='test')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='test@test.com', password='test@test.com')
+        else:
+            self.client.login(username='test', password='test')
+
         url = reverse('admin:cms_page_copy_plugins')
         data = dict(source_plugin_id=plugin.id,
                     source_placeholder_id=self._placeholder.pk,
@@ -956,7 +1014,12 @@ class PluginPermissionTests(AdminTestsBase):
         settings = UserSettings(language="fr", clipboard=clipboard, user=admin)
         settings.save()
         self.assertEqual(Placeholder.objects.count(), 3)
-        self.client.login(username='admin', password='admin')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='admin@django-cms.org', password='admin@django-cms.org')
+        else:
+            self.client.login(username='admin', password='admin')
+
         url = reverse('admin:cms_page_copy_plugins')
         data = dict(source_plugin_id='',
                     source_placeholder_id=self._placeholder.pk,
@@ -997,7 +1060,12 @@ class PluginPermissionTests(AdminTestsBase):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
         plugin = self._create_plugin()
         _, normal_guy = self._get_guys()
-        self.client.login(username='test', password='test')
+
+        if get_user_model().USERNAME_FIELD != 'email':
+            self.client.login(username='test', password='test')
+        else:
+            self.client.login(username='test@test.com', password='test@test.com')
+        
         self.assertEqual(1, CMSPlugin.objects.all().count())
         url = reverse('admin:cms_page_copy_language', args=[self._page.pk])
         data = dict(
@@ -1013,8 +1081,14 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(2, CMSPlugin.objects.all().count())
 
     def test_page_permission_inline_visibility(self):
-        user = User(username='user', email='user@domain.com', password='user',
-                    is_staff=True)
+        User = get_user_model()
+
+        fields = dict(email='user@domain.com', password='user', is_staff=True)
+
+        if get_user_model().USERNAME_FIELD != 'email':
+            fields[get_user_model().USERNAME_FIELD] = 'user'
+
+        user = User(**fields)
         user.save()
         self._give_page_permission_rights(user)
         page = create_page('A', 'nav_playground.html', 'en')
@@ -1056,17 +1130,20 @@ class PluginPermissionTests(AdminTestsBase):
         page_admin = PageAdmin(Page, None)
         page_admin._current_page = page
 
-        self.client.login(username=user.username, password=user.username)
+        username = getattr(user, get_user_model().USERNAME_FIELD)
+        self.client.login(username=username, password=username)
         response = self.client.get(admin_url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
         assign_user_to_page(page, user, grant_all=True)
-        self.client.login(username=user.username, password=user.username)
+        username = getattr(user, get_user_model().USERNAME_FIELD)
+        self.client.login(username=username, password=username)
         response = self.client.get(admin_url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
         self._give_cms_permissions(another_user)
-        self.client.login(username=another_user.username, password=another_user.username)
+        username = getattr(another_user, get_user_model().USERNAME_FIELD)
+        self.client.login(username=username, password=username)
         response = self.client.get(admin_url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
@@ -1074,7 +1151,10 @@ class PluginPermissionTests(AdminTestsBase):
         admin = self._get_admin()
         self._give_cms_permissions(admin)
         self._give_permission(admin, Text, 'add')
-        self.client.login(username='admin', password='admin')
+
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        self.client.login(username=username, password='admin')
+        
         url = reverse('admin:cms_page_add_plugin')
         data = {
             'plugin_type': 'TextPlugin',
@@ -1195,7 +1275,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(40, 61)):
+            with self.assertNumQueries(FuzzyInt(40, 63)):
                 output = force_unicode(self.client.get('/en/?edit').content)
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 9)
@@ -1252,10 +1332,10 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
                 old_response_size = len(response.content)
-                old_user_count = User.objects.count()
+                old_user_count = get_user_model().objects.count()
                 # create additionals user and reload the page
-                User.objects.create(username=USER_NAME, is_active=True)
-                user_count = User.objects.count()
+                get_user_model().objects.create_user(username=USER_NAME, email=USER_NAME+'@django-cms.org', password=USER_NAME)
+                user_count = get_user_model().objects.count()
                 more_users_in_db = old_user_count < user_count
                 # we have more users
                 self.assertTrue(more_users_in_db, "New users got NOT created")

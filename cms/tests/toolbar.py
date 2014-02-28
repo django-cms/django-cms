@@ -4,24 +4,25 @@ import re
 from django.template.defaultfilters import truncatewords
 import datetime
 
+from cms.models import Page
 from django.template.defaultfilters import truncatewords
 from cms.views import details
 import re
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from cms.compat import get_user_model, is_user_swapped
 from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import AnonymousUser, User, Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
 from django.core.urlresolvers import reverse
 from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
-
 
 class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
@@ -46,39 +47,17 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         return AnonymousUser()
 
     def get_staff(self):
-        staff = User(
-            username='staff',
-            email='staff@staff.org',
-            is_active=True,
-            is_staff=True,
-        )
-        staff.set_password('staff')
-        staff.save()
+        staff = self._create_user('staff', True, False)
         staff.user_permissions.add(Permission.objects.get(codename='change_page'))
         return staff
 
     def get_nonstaff(self):
-        nonstaff = User(
-            username='nonstaff',
-            email='nonstaff@staff.org',
-            is_active=True,
-            is_staff=False,
-        )
-        nonstaff.set_password('nonstaff')
-        nonstaff.save()
+        nonstaff = self._create_user('nonstaff')
         nonstaff.user_permissions.add(Permission.objects.get(codename='change_page'))
         return nonstaff
 
     def get_superuser(self):
-        superuser = User(
-            username='superuser',
-            email='superuser@superuser.org',
-            is_active=True,
-            is_staff=True,
-            is_superuser=True,
-        )
-        superuser.set_password('superuser')
-        superuser.save()
+        superuser = self._create_user('superuser', True, True)
         return superuser
 
 
@@ -113,7 +92,11 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+
+        if is_user_swapped:
+            self.assertEqual(len(admin_items), 6, admin_items)
+        else:
+            self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -305,6 +288,37 @@ class ToolbarTests(ToolbarTestBase):
         beta_position = admin_menu.get_alphabetical_insert_position('menu-beta', SubMenu)
         self.assertEqual(beta_position, gamma_position)
 
+    def test_page_create_redirect(self):
+        superuser = self.get_superuser()
+        page = create_page("home", "nav_playground.html", "en",
+                           published=True)
+        resolve_url = reverse('admin:cms_page_resolve')
+        with self.login_user_context(superuser):
+            response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '/')
+            page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+
+            response = self.client.post(resolve_url, {'pk': Page.objects.all()[2].pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
+
+    def test_page_edit_redirect(self):
+        page1 = create_page("home", "nav_playground.html", "en",
+                            published=True)
+        page2 = create_page("test", "nav_playground.html", "en",
+                            published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
+            url = reverse('admin:cms_page_resolve')
+            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
+            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '/en/')
+        response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
+        self.assertEqual(response.content.decode('utf-8'), '/')
+
 
 class EditModelTemplateTagTest(ToolbarTestBase):
     urls = 'cms.test_utils.project.placeholderapp_urls'
@@ -483,7 +497,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', ex1.pk))
-        self.assertContains(response, '\'redirectOnClose\': false,')
+        self.assertContains(response, "'onClose': 'REFRESH_PAGE',")
 
     def test_icon_tag(self):
         user = self.get_staff()
@@ -679,7 +693,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
-            'placeholderapp', 'example1', 'callable_item', ex1.pk))
+                'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_view_method(self):
         user = self.get_staff()
@@ -699,7 +713,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
-            'placeholderapp', 'example1', 'callable_item', ex1.pk))
+                'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_method_attribute(self):
         user = self.get_staff()
@@ -720,7 +734,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
-            'placeholderapp', 'example1', 'callable_item', ex1.pk))
+                'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_admin_url(self):
         user = self.get_staff()
@@ -737,8 +751,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
-            'placeholderapp', 'example1', 'callable_item', ex1.pk))
+        self.assertContains(response,
+                            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+                                'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_admin_url_extra_field(self):
         user = self.get_staff()
@@ -755,8 +770,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response, '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
-        'placeholderapp', 'example1', 'callable_item', ex1.pk))
+        self.assertContains(response,
+                            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+                                'placeholderapp', 'example1', 'callable_item', ex1.pk))
         self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
         self.assertTrue(re.search(self.edit_fields_rx % "char_2", response.content.decode('utf8')))
 
@@ -1003,3 +1019,4 @@ class ToolbarAPITests(TestCase):
         result += 2
         self.assertEqual(result.item, item)
         self.assertEqual(result.index, 4)
+

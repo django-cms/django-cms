@@ -90,6 +90,9 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
   is "it should look good in a terminal-base editor" (eg vim), but we try not be
   [Godwin's law] about it.
 
+It is worth to mention that we use **tabs** within HTML, SASS/SCSS and JavaScript.
+Please refrain from using spaces anywhere except if it helps code readability.
+
 
 Process
 =======
@@ -188,6 +191,18 @@ contribute. All changes there will be automatically sent to the project.
 
         <img border="0" src="https://www.transifex.com/projects/p/django-cms/resource/core/chart/image_png"/>
 
+
+********
+Frontend
+********
+
+
+We are using `SASS/Compass <compass-style.org>`_ for our styles. The files
+are located within ``cms/static/cms/sass`` and can be compiled using the compass
+command ``compass watch cms/static/cms/`` from within the django-cms root.
+
+This will invoke the **config.rb** within ``cms/static/cms/`` using the predefined
+settings.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org

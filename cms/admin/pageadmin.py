@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import sys
-from cms.admin.placeholderadmin import PlaceholderAdmin
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.plugin_pool import plugin_pool
 from django.contrib.admin.helpers import AdminForm
 
@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import escape
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
@@ -87,7 +87,7 @@ PUBLISH_COMMENT = "Publish"
 INITIAL_COMMENT = "Initial version."
 
 
-class PageAdmin(PlaceholderAdmin, ModelAdmin):
+class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     form = PageForm
     search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"
@@ -130,7 +130,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
-
+            url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
         )
 
         if plugin_pool.get_all_plugins():
@@ -636,6 +636,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': reverse('admin:index'),
             'app_label': app_label,
+            'preview_language': request.GET.get('language', get_language()),
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
             'DEBUG': settings.DEBUG,
@@ -1160,8 +1161,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         """
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
-            page.in_navigation = not page.in_navigation
-            page.save()
+            page.toggle_in_navigation()
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page's in_navigation status")))
 
@@ -1176,6 +1176,29 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
                                                   template="admin/cms/page/tree/lazy_menu.html")
+
+    def resolve(self, request):
+        if not request.user.is_staff:
+            return HttpResponse('/')
+        if request.session.get('cms_log_latest', False):
+            log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
+            obj = log.get_edited_object()
+            del request.session['cms_log_latest']
+            try:
+                return HttpResponse(force_unicode(obj.get_absolute_url()))
+            except:
+                pass
+        pk = request.REQUEST.get('pk')
+        app_label, model = request.REQUEST.get('model').split('.')
+        if pk and app_label:
+            ctype = ContentType.objects.get(app_label=app_label, model=model)
+            try:
+                instance = ctype.get_object_for_this_type(pk=pk)
+            except ctype.model_class().DoesNotExist:
+                return HttpResponse('/')
+            return HttpResponse(force_unicode(instance.get_absolute_url()))
+        else:
+            return HttpResponse('/')
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':

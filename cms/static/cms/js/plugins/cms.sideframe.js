@@ -12,6 +12,7 @@ $(document).ready(function () {
 		implement: [CMS.API.Helpers],
 
 		options: {
+			'onClose': false,
 			'sideframeDuration': 300,
 			'sideframeWidth': 320,
 			'urls': {
@@ -88,8 +89,10 @@ $(document).ready(function () {
 		open: function (url, animate) {
 			// prepare iframe
 			var that = this;
+			var language = 'language=' + CMS.config.request.language;
+			var page_id = 'page_id=' + CMS.config.request.page_id;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
-			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
+			var iframe = $('<iframe src="'+this._url(url, [language, page_id])+'" class="" frameborder="0" />');
 				iframe.hide();
 			var width = this.settings.sideframe.position || this.options.sideframeWidth;
 
@@ -120,6 +123,9 @@ $(document).ready(function () {
 				iframe.contents().find('body').bind(that.click, function () {
 					$(document).trigger(that.click);
 				});
+
+				// attach reload event
+				that.reloadBrowser(false, false, true);
 			});
 
 			// cancel animation if sideframe is already shown
@@ -161,6 +167,9 @@ $(document).ready(function () {
 
 			// update settings
 			this.settings = this.setSettings(this.settings);
+
+			// handle refresh option
+			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
 		},
 
 		// private methods
@@ -287,6 +296,47 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 1);
 
 			$(document).unbind('mousemove.cms');
+		},
+
+		_url: function (url, params) {
+			// return url if there is no param
+			if(url.split('?').length <= 1 || window.JSON === undefined) return url;
+			// setup local vars
+			var urlArray = url.split('?');
+			var urlParams = urlArray[1].split('&');
+			var origin = urlArray[0];
+			var arr = [];
+			var keys = [];
+			var values = [];
+			var tmp = '';
+
+			// loop through the available params
+			$.each(urlParams, function (index, param) {
+				arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+			});
+			// loop through the new params
+			$.each(params, function (index, param) {
+				arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+			});
+
+			// merge manually because jquery...
+			$.each(arr, function (index, item) {
+				if(keys.indexOf(item.param) === -1) {
+					keys.push(item.param);
+					values.push(item.value);
+				} else {
+					values[keys.indexOf(item.param)] = item.value;
+				}
+			});
+
+			// merge new url
+			$.each(keys, function (index, key) {
+				tmp += '&' + key + '=' + values[index];
+			});
+			tmp = tmp.replace('&', '?');
+			url = origin + tmp;
+
+			return url;
 		}
 
 	});

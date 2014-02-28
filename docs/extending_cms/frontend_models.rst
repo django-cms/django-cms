@@ -122,16 +122,16 @@ and the resulting forms.
 Complete changeform edit
 ========================
 
-You need to properly setup your admin class by adding the
-``FrontendEditableAdmin`` mixin to the parents of your admin class (see
+You need to properly setup your admin class by adding the ``FrontendEditableAdminMixin``
+mixin to the parents of your admin class (see
 :mod:`Django admin documentation <django.contrib.admin>` for further information)
 on Django admin::
 
-    from cms.admin.placeholderadmin import FrontendEditableAdmin
+    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
     from django.contrib import admin
 
 
-    class MyModelAdmin(FrontendEditableAdmin, admin.ModelAdmin):
+    class MyModelAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
         ...
 
 Then setup the templates adding ``render_model`` templatetag::
@@ -156,11 +156,11 @@ Set up the admin
 You need to add to your model admin a tuple of fields editable from the frontend
 admin::
 
-    from cms.admin.placeholderadmin import FrontendEditableAdmin
+    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
     from django.contrib import admin
 
 
-    class MyModelAdmin(FrontendEditableAdmin, admin.ModelAdmin):
+    class MyModelAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
         frontend_editable_fields = ("foo", "bar")
         ...
 

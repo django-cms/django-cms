@@ -130,8 +130,8 @@ class Placeholder(models.Model):
             for rel in self._meta.get_all_related_objects():
                 if issubclass(rel.model, CMSPlugin):
                     continue
-                from cms.admin.placeholderadmin import PlaceholderAdmin
-                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdmin):
+                from cms.admin.placeholderadmin import PlaceholderAdminMixin
+                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     if field.count():
                         self._attached_fields_cache.append(rel.field)
@@ -149,8 +149,8 @@ class Placeholder(models.Model):
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
-                from cms.admin.placeholderadmin import PlaceholderAdmin
-                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdmin):
+                from cms.admin.placeholderadmin import PlaceholderAdminMixin
+                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     if field.count():
                         self._attached_field_cache = rel.field

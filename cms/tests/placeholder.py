@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import warnings
 from django.core.cache import cache
 from django.utils.numberformat import format
 from django.db import models
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
+from cms.compat import get_user_model
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
+from cms.admin.placeholderadmin import PlaceholderAdmin, PlaceholderAdminMixin
 from djangocms_link.cms_plugins import LinkPlugin
 from cms.utils.compat.tests import UnittestCompatMixin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -31,7 +34,8 @@ from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, g
 from cms.utils.plugins import get_placeholders
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
+from cms.compat import get_user_model
 from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from django.contrib.messages.storage import default_storage
 from django.core.exceptions import ImproperlyConfigured
@@ -46,9 +50,7 @@ import itertools
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def setUp(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-        u.set_password("test")
-        u.save()
+        u = self._create_user("test", True, True)
 
         self._login_context = self.login_user_context(u)
         self._login_context.__enter__()
@@ -541,7 +543,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
             user = self.get_superuser()
-            self.client.login(username=user.username, password=user.username)
+            self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
+                              password=getattr(user, get_user_model().USERNAME_FIELD))
             response = self.client.get("/en/?edit")
             for placeholder in page.placeholders.all():
                 self.assertContains(
@@ -604,6 +607,17 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         # get languages
         langs = [lang['code'] for lang in placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
+
+    def test_deprecated_PlaceholderAdmin(self):
+        admin_site = admin.sites.AdminSite()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            pa = PlaceholderAdmin(Placeholder, admin_site)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
+            self.assertTrue("PlaceholderAdminMixin with admin.ModelAdmin" in str(w[-1].message))
+            self.assertIsInstance(pa, admin.ModelAdmin, 'PlaceholderAdmin not admin.ModelAdmin')
+            self.assertIsInstance(pa, PlaceholderAdminMixin, 'PlaceholderAdmin not PlaceholderAdminMixin')
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
@@ -899,7 +913,9 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
     def _testuser(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=False)
+        User = get_user_model()
+        u = User(is_staff=True, is_active=True, is_superuser=False)
+        setattr(u, u.USERNAME_FIELD, "test")
         u.set_password("test")
         u.save()
         return u
@@ -1018,7 +1034,9 @@ class PlaceholderConfTests(TestCase):
 
 class PlaceholderI18NTest(CMSTestCase):
     def _testuser(self):
-        u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
+        User = get_user_model()
+        u = User(is_staff=True, is_active=True, is_superuser=True)
+        setattr(u, u.USERNAME_FIELD, "test")
         u.set_password("test")
         u.save()
         return u

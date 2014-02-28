@@ -424,6 +424,9 @@ $(document).ready(function () {
 					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
 					if(holder.length) bounds = holder.data('settings').plugin_restriction;
 
+					// if parent has class disabled, dissalow drop
+					if(placeholder.parent().hasClass('cms_draggable-disabled')) return false;
+
 					// if restrictions is still empty, proceed
 					that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;
 

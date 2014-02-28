@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import copy
 from cms.api import create_page, create_title, publish_page, add_plugin
+from cms.compat import get_user_model
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
 from cms.models import Title
@@ -13,7 +14,6 @@ from cms.utils import get_cms_setting
 from cms.utils.conf import get_languages
 from django.contrib.sites.models import Site
 
-from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
@@ -133,7 +133,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         add_plugin(placeholder, "TextPlugin", TESTLANG, body="test")
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
-        user = User.objects.create_superuser('super', 'super@django-cms.org', 'super')
+        user = get_user_model().objects.create_superuser('super', 'super@django-cms.org', 'super')
         page = publish_page(page, user, TESTLANG)
         page = publish_page(page, user, TESTLANG2)
         public = page.publisher_public
@@ -169,7 +169,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             self.assertEqual(response.status_code, 200)
             # check if the admin can see non-public langs
             admin = self.get_superuser()
-            if self.client.login(username=admin.username, password="admin"):
+            if self.client.login(username=getattr(admin, get_user_model().USERNAME_FIELD),
+                                 password=getattr(admin, get_user_model().USERNAME_FIELD)):
                 response = self.client.get("/en/page2/")
                 self.assertEqual(response.status_code, 200)
                 response = self.client.get("/en/page4/")
@@ -188,8 +189,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                     {'code':'x-elvish', 'name':'Elvish', 'public':True, 'fallbacks':[]},
                ]}):
             from cms.views import details
+
             def get_path():
                 return '/'
+
+            User = get_user_model()
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],
@@ -220,8 +224,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             create_title("x-klingon", "futla ak", page, slug=page.get_slug())
             page.publish("x-klingon")
             from cms.views import details
+
             def get_path():
                 return '/'
+
+            User = get_user_model()
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],
@@ -259,7 +266,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         lang_settings[1][1]['redirect_on_fallback'] = False
         with SettingsOverride(CMS_LANGUAGES=lang_settings):
             response = self.client.get("/de/")
-            self.assertEquals(response.status_code, 200)
+            self.assertEquals(response.status_code, 302)
 
     def test_no_english_defined(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],

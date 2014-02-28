@@ -253,7 +253,7 @@ $(document).ready(function () {
 			var modal = new CMS.Modal({
 				'newPlugin': this.newPlugin || false,
 				'onClose': this.options.onClose || false,
-				'redirectOnClose': this.options.redirectOnClose || false,
+				'redirectOnClose': this.options.redirectOnClose || false
 			});
 			modal.open(url, name, breadcrumb);
 		},
@@ -544,7 +544,9 @@ $(document).ready(function () {
 			// calculate subnav bounds
 			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10) {
 				dropdown.css('top', 'auto');
-				dropdown.css('bottom', offset - 1);
+				dropdown.css('bottom', offset);
+				// if parent is within a plugin, add additional offset
+				if(dropdown.closest('.cms_draggable').length) dropdown.css('bottom', offset - 1);
 			} else {
 				dropdown.css('top', offset);
 				dropdown.css('bottom', 'auto');

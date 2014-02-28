@@ -3,6 +3,7 @@ from __future__ import with_statement
 import os
 import dj_database_url
 from cms.utils.compat import DJANGO_1_5
+import django
 
 gettext = lambda s: s
 
@@ -108,7 +109,6 @@ def configure(db_url, **extra):
             'cms.test_utils.project.pluginapp.plugins.extra_context',
             'cms.test_utils.project.pluginapp.plugins.meta',
             'cms.test_utils.project.pluginapp.plugins.one_thing',
-
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
             'cms.test_utils.project.objectpermissionsapp',
@@ -315,10 +315,16 @@ def configure(db_url, **extra):
 
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
+
+    if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in extra:
+        custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
+        defaults['INSTALLED_APPS'].append(custom_user_app)
+
     settings._wrapped = empty
     defaults.update(extra)
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
+    
     if extra_settings:
         from json import load, loads
 
@@ -327,6 +333,7 @@ def configure(db_url, **extra):
                 defaults.update(load(fobj))
         else:
             defaults.update(loads(extra_settings))
+    
     settings.configure(**defaults)
     from south.management.commands import patch_for_test_db_setup
 

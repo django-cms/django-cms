@@ -5,6 +5,7 @@ Edit Toolbar middleware
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.i18n import force_language
+from django.contrib.admin.models import LogEntry
 from menus.menu_pool import menu_pool
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -64,13 +65,14 @@ class ToolbarMiddleware(object):
                 request.session['cms_build'] = False
         if 'build' in request.GET and not request.session.get('cms_build', False):
             request.session['cms_build'] = True
+        if request.user.is_staff:
+            request.session['cms_log_entries'] = LogEntry.objects.filter(user=request.user).count()
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):
         response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
-        return None
 
     def process_response(self, request, response):
         from django.utils.cache import add_never_cache_headers
@@ -83,4 +85,11 @@ class ToolbarMiddleware(object):
                 break
         if found:
             add_never_cache_headers(response)
+        if request.user.is_staff:
+            count = LogEntry.objects.filter(user=request.user).count()
+            if request.session.get('cms_log_entries', 0) < count:
+                request.session['cms_log_entries'] = count
+                log = LogEntry.objects.filter(user=request.user)[0]
+                if log.action_flag == 1 or log.action_flag == 2:
+                    request.session['cms_log_latest'] = log.pk
         return response
