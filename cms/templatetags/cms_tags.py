@@ -111,7 +111,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
             return None
 
 #
-# This is borrowed/adapted from https://github.com/okfn/foundation
+# This is borrowed from https://github.com/okfn/foundation
 #
 class PageUrl(AsTag):
     name = 'page_url'
@@ -131,6 +131,9 @@ class PageUrl(AsTag):
     # If varname is not provided, and the specified page cannot be found, we
     # pass through the Page.DoesNotExist exception.
     #
+    # If varname is provided, we swallow the exception and just set the value
+    # to None.
+    #
     def render_tag(self, context, **kwargs):
         varname = kwargs.pop(self.varname_name)
         try:
@@ -144,24 +147,24 @@ class PageUrl(AsTag):
         if varname:
             context[varname] = value
             return ''
+
         return value
 
-    #
-    # If varname is provided, we swallow the exception and just set the value
-    # to an empty string.
-    #
     def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
+
         site_id = get_site_id(site)
         request = context.get('request', False)
 
         if not request:
-            return ''
+            return None
 
         if lang is None:
             lang = get_language_from_request(request)
+
         cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + \
             '_type:absolute_url'
+
         url = cache.get(cache_key)
 
         if not url:
@@ -172,7 +175,7 @@ class PageUrl(AsTag):
                           get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
             return url
-        return ''
+        return None
 
 
 register.tag(PageUrl)
