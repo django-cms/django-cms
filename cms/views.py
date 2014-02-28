@@ -22,7 +22,6 @@ from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
-
 CMS_PAGE_CACHE_VERSION_KEY = 'CMS_PAGE_CACHE_VERSION'
 
 
