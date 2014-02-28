@@ -36,6 +36,7 @@ def _handle_no_page(request, slug):
         # raise a django http 404 page
         exc = Http404(dict(path=request.path, tried=e.args[0]['tried']))
         raise exc
+    raise Http404('CMS Page not found: %s' % request.path)
 
 
 def details(request, slug):
