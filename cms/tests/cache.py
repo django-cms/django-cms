@@ -77,6 +77,17 @@ class CacheTestCase(CMSTestCase):
         with self.assertNumQueries(1):
             template.render(rctx)
         add_plugin(placeholder1, "NoCachePlugin", 'en')
+        page1.publish('en')
+        request = self.get_request('/en/')
+        request.current_page = Page.objects.get(pk=page1.pk)
+        request.toolbar = CMSToolbar(request)
+        template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
+        rctx = RequestContext(request)
+        with self.assertNumQueries(4):
+            render = template.render(rctx)
+        with self.assertNumQueries(FuzzyInt(14, 18)):
+            response = self.client.get('/en/')
+            resp1 = response.content.split("$$$")[1]
 
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
@@ -84,15 +95,12 @@ class CacheTestCase(CMSTestCase):
         template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
-            template.render(rctx)
-
-        request = self.get_request('/en/')
-        request.current_page = Page.objects.get(pk=page1.pk)
-        request.toolbar = CMSToolbar(request)
-        template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
-        rctx = RequestContext(request)
-        with self.assertNumQueries(4):
-            template.render(rctx)
+            render2 = template.render(rctx)
+        with self.assertNumQueries(FuzzyInt(10, 14)):
+            response = self.client.get('/en/')
+            resp2 = response.content.split("$$$")[1]
+        self.assertNotEqual(render, render2)
+        self.assertNotEqual(resp1, resp2)
 
         plugin_pool.unregister_plugin(NoCachePlugin)
 
