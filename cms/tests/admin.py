@@ -1055,7 +1055,6 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(CMSPlugin.objects.count(), 4)
         self.assertEqual(Placeholder.objects.count(), 3)
 
-
     def test_plugins_copy_language(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
         plugin = self._create_plugin()

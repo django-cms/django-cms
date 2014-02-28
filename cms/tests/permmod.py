@@ -1058,8 +1058,8 @@ class GlobalPermissionTests(SettingsOverrideTestCase):
         allow access to all sites.
         """
         # create and then ignore this user.
-        superuser = User(username="super", is_staff=True, is_active=True,
-            is_superuser=True)
+        superuser = self._create_user("super", is_staff=True, is_active=True,
+                                      is_superuser=True)
         superuser.set_password("super")
         superuser.save()
         # create 2 staff users
@@ -1068,8 +1068,8 @@ class GlobalPermissionTests(SettingsOverrideTestCase):
             Site.objects.create(domain='example2.com', name='example2.com'),
         ]
         USERS = [
-            User(username="staff", is_staff=True, is_active=True),
-            User(username="staff2", is_staff=True, is_active=True)
+            self._create_user("staff", is_staff=True, is_active=True),
+            self._create_user("staff_2", is_staff=True, is_active=True),
         ]
         for user in USERS:
             user.set_password('staff')
@@ -1117,7 +1117,7 @@ class GlobalPermissionTests(SettingsOverrideTestCase):
                     self.assertTrue(has_page_change_permission(request))
                     # internally this calls PageAdmin.has_[add|change|delete]_permission()
                     self.assertEqual({'add': True, 'change': True, 'delete': False},
-                        site._registry[Page].get_model_perms(request))
+                                     site._registry[Page].get_model_perms(request))
 
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
@@ -1126,17 +1126,17 @@ class GlobalPermissionTests(SettingsOverrideTestCase):
             request.session = {}
             # As before, the query count is inflated by doing additional lookups
             # because there's a site param in the request
-            with self.assertNumQueries(FuzzyInt(11,20)):
+            with self.assertNumQueries(FuzzyInt(11, 20)):
                 # this user shouldn't have access to site 2
                 request.user = USERS[1]
                 self.assertTrue(not has_page_add_permission(request))
                 self.assertTrue(not has_page_change_permission(request))
                 self.assertEqual({'add': False, 'change': False, 'delete': False},
-                    site._registry[Page].get_model_perms(request))
+                                 site._registry[Page].get_model_perms(request))
                 # but, going back to the first user, they should.
                 request = RequestFactory().get('/', data={'site__exact': 2})
                 request.user = USERS[0]
                 self.assertTrue(has_page_add_permission(request))
                 self.assertTrue(has_page_change_permission(request))
                 self.assertEqual({'add': True, 'change': True, 'delete': False},
-                    site._registry[Page].get_model_perms(request))
+                                 site._registry[Page].get_model_perms(request))
