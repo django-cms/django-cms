@@ -454,6 +454,16 @@ A **bad** example:
 .. _plugin-context-processors:
 
 
+Plugin Context
+==============
+
+The plugin has access to the django template context. You can override variables using the ``with`` tag.
+
+Example::
+
+    {% with 320 as width %}{% placeholder "content" %}{% endwith %}
+
+
 Plugin Context Processors
 =========================
 
