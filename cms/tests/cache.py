@@ -12,12 +12,12 @@ from django.db import connection
 from django.template import Template, RequestContext
 from django.conf import settings
 
+
 class CacheTestCase(CMSTestCase):
     def tearDown(self):
         cache.clear()
 
     def test_cache_placeholder(self):
-        create_page
         template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
@@ -55,8 +55,8 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        middlewares = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-        with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middlewares):
+        middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
             with self.assertNumQueries(FuzzyInt(14, 18)):
                 response = self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(7, 11)):
@@ -66,7 +66,6 @@ class CacheTestCase(CMSTestCase):
                     response = self.client.get('/en/')
 
     def test_no_cache_plugin(self):
-        create_page
         template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
