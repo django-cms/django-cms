@@ -2,23 +2,33 @@
 Plugins reference
 #################
 
-.. :module:: cms.plugins.file
+.. warning::
+    In version 3 of the CMS we removed all the plugins from the
+    into seperate repositories to continue their development there.
+    you are upgrading from a previous version. Please refer to
+    :ref:`Upgrading from previous versions <upgrade-to-3.0>`
 
-.. :class:: cms.plugins.file.models.FilePlugin
+These are the recommended plugins to use with django CMS.
+
+.. :module:: djangocms_file
+
+.. :class:: djangocms_file.cms_plugins.FilePlugin
 
 ****
 File
 ****
 
+Available on `GitHub (divio/djangocms-file) <http://github.com/divio/djangocms-file>`_ and on `PyPi (djangocms-file) <https://pypi.python.org/pypi/djangocms-file>`_.
+
 Allows you to upload a file. A filetype icon will be assigned based on the file
 extension.
 
-For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
+Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
         # ...
-        'cms.plugins.file',
+        'djangocms_file',
         # ...
     )
 
@@ -27,44 +37,50 @@ You should take care that the directory defined by the configuration setting
 :setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
 running.
 
-You might consider using `django-filer`_ with `django CMS plugin`_ and its
+You might consider using `django-filer`_ with `django filer CMS plugin`_ and its
 ``cmsplugin_filer_file`` component instead.
 
 .. warning::
 
-    The builtin file plugin only works with local storages. If you need
+    The ``djangocms_file`` file plugin only works with local storages. If you need
     more advanced solutions, please look at alternative file plugins for the
     django CMS, such as `django-filer`_.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
-.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django filer CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 
-.. :module:: cms.plugins.flash
+.. :module:: djangocms_flash
 
-.. :class:: cms.plugins.flash.cms_plugins.FlashPlugin
+.. :class:: djangocms_flash.cms_plugins.FlashPlugin
 
 *****
 Flash
 *****
 
+Available on `GitHub (divio/djangocms-flash) <http://github.com/divio/djangocms-flash>`_
+and on `PyPi (djangocms-flash) <https://pypi.python.org/pypi/djangocms-flash>`_.
+
 Allows you to upload and display a Flash SWF file on your page.
 
-For installation be sure you have the following in the
+Please install it using ``pip`` or similar and be sure you have the following in the
 :setting:`django:INSTALLED_APPS` setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
         # ...
-        'cms.plugins.flash',
+        'djangocms_flash',
         # ...
     )
 
-.. :module:: cms.plugins.googlemap
+.. :module:: djangocms_googlemap
 
-.. :class:: cms.plugins.googlemap.cms_plugins.GoogleMapPlugin
+.. :class:: djangocms_googlemap.cms_plugins.GoogleMapPlugin
 
 *********
 GoogleMap
 *********
+
+Available on `GitHub (divio/djangocms-googlemap) <http://github.com/divio/djangocms-googlemap>`_
+and on `PyPi (djangocms-googlemap) <https://pypi.python.org/pypi/djangocms-googlemap>`_.
 
 Displays a map of an address on your page.
 
@@ -82,32 +98,35 @@ route planner can be set when adding/editing plugin in the admin.
     and a datamigration has been introduced to modify existing googlemap plugin
     instance to set the default value if `level` if is `NULL`.
 
-For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
+Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
         # ...
-        'cms.plugins.googlemap',
+        'djangocms_googlemap',
         # ...
     )
 
 
-.. :module:: cms.plugins.picture
+.. :module:: djangocms_picture
 
-.. :class:: cms.plugins.picture.cms_plugins.PicturePlugin
+.. :class:: djangocms_picture.cms_plugins.PicturePlugin
 
 *******
 Picture
 *******
 
+Available on `GitHub (divio/djangocms-picture) <http://github.com/divio/djangocms-picture>`_
+and on `PyPi (djangocms-picture) <https://pypi.python.org/pypi/djangocms-picture>`_.
+
 Displays a picture in a page.
 
-For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
+Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
 setting in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
         # ...
-        'cms.plugins.picture',
+        'djangocms_picture',
         # ...
     )
 
@@ -115,7 +134,7 @@ There are several solutions for Python and Django out there to automatically
 resize your pictures, you can find some on `Django Packages`_ and compare them
 there.
 
-In your project template directory create a folder called ``cms/plugins`` and
+In your project template directory create a folder called ``djangocms_picture/plugins`` and
 in it create a file called ``picture.html``. Here is an example
 ``picture.html`` template using `easy-thumbnails`_:
 
@@ -147,25 +166,28 @@ running.
 
 .. note:: For more advanced use cases where you would like to upload your media
           to a central location, consider using  `django-filer`_ with
-          `django CMS plugin`_ and its ``cmsplugin_filer_image`` component
+          `django filer CMS plugin`_ and its ``cmsplugin_filer_image`` component
           instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
-.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django filer CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 
 ******
 Teaser
 ******
 
+Available on `GitHub (divio/djangocms-teaser) <http://github.com/divio/djangocms-teaser>`_
+and on `PyPi (djangocms-teaser) <https://pypi.python.org/pypi/djangocms-teaser>`_.
+
 Displays a teaser box for another page or a URL. A picture and a description
 can be added.
 
-For installation be sure you have the following in the :setting:`django:INSTALLED_APPS`
+Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
 settings in your project's ``settings.py`` file::
 
     INSTALLED_APPS = (
         # ...
-        'cms.plugins.teaser',
+        'djangocms_teaser',
         # ...
     )
 
@@ -176,11 +198,11 @@ running.
 
 .. note:: For more advanced use cases where you would like to upload your media
           to a central location, consider using  `django-filer`_ with
-          `django CMS plugin`_ and its ``cmsplugin_filer_teaser`` component
+          `django filer CMS plugin`_ and its ``cmsplugin_filer_teaser`` component
           instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
-.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django filer CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 
 ****
 Text
@@ -190,24 +212,27 @@ Consider using `djangocms-text-ckeditor
 <https://github.com/divio/djangocms-text-ckeditor>`_ for displaying text. You
 may of course use your preferred editor; others are available.
 
-.. :module:: cms.plugins.video
+.. :module:: djangocms_video
 
-.. :class:: cms.plugins.video.cms_plugins.VideoPlugin
+.. :class:: djangocms_video.cms_plugins.VideoPlugin
 
 *****
 Video
 *****
 
+Available on `GitHub (divio/djangocms-file) <http://github.com/divio/djangocms-file>`_
+and on `PyPi (djangocms-file) <https://pypi.python.org/pypi/djangocms-file>`_.
+
 Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 <http://github.com/FlashJunior/OSFlashVideoPlayer>`_. When uploading videos use either
 .flv files or h264 encoded video files.
 
-For installation be sure you have the following in your project's
+Please install it using ``pip`` or similar and be sure you have the following in your project's
 :setting:`django:INSTALLED_APPS` setting::
 
     INSTALLED_APPS = (
         # ...
-        'cms.plugins.video',
+        'djangocms_video',
         # ...
     )
 
@@ -235,52 +260,51 @@ running.
 
 .. note:: For more advanced use cases where you would like to upload your media
           to a central location, consider using  `django-filer`_ with
-          `django CMS plugin`_ and its ``cmsplugin_filer_video`` component
+          `django filer CMS plugin`_ and its ``cmsplugin_filer_video`` component
           instead.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
-.. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
+.. _django filer CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 
-.. :module:: cms.plugins.twitter
+.. :module:: djangocms_twitter
 
-.. :class:: cms.plugins.twitter.cms_plugins.TwitterRecentEntriesPlugin
+.. :class:: djangocms_twitter.cms_plugins.TwitterRecentEntriesPlugin
 
-.. :class:: cms.plugins.twitter.cms_plugins.TwitterSearchPlugin
+.. :class:: djangocms_twitter.cms_plugins.TwitterSearchPlugin
 
 *******
 Twitter
 *******
 
-Twitter disabled V1 of their API, thus we've removed the twitter plugin
-(``cms.plugins.twitter``).
-
-For alternatives have a look at these plugins:
+We recommend one of the following plugins:
 
 * https://github.com/nephila/djangocms_twitter
 * https://github.com/changer/cmsplugin-twitter
 
-.. :module:: cms.plugins.inherit
+.. :module:: djangocms_inherit
 
-.. :class:: cms.plugins.twitter.cms_plugins.InheritPagePlaceholderPlugin
+.. :class:: djangocms_inherit.cms_plugins.InheritPagePlaceholderPlugin
 
 *******
 Inherit
 *******
 
+Available on `GitHub (divio/djangocms-inherit) <http://github.com/divio/djangocms-inherit>`_
+and on `PyPi (djangocms-inherit) <https://pypi.python.org/pypi/djangocms-inherit>`_.
+
 Displays all plugins of another page or another language. Great if you always
 need the same plugins on a lot of pages.
 
-For installation be sure you have the following in your project's
+Please install it using ``pip`` or similar and be sure you have the following in your project's
 :setting:`django:INSTALLED_APPS` setting::
 
     INSTALLED_APPS = (
         # ...
-        'cms.plugins.inherit',
+        'djangocms_inherit',
         # ...
     )
 
-.. warning:: The inherit plugin is currently the only core-plugin which
-             **cannot** be used in non-cms placeholders.
+.. warning:: The inherit plugin **cannot** be used in non-cms placeholders.
 
 .. _Django Packages: http://djangopackages.com/grids/g/thumbnails/
 .. _easy-thumbnails: https://github.com/SmileyChris/easy-thumbnails

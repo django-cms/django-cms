@@ -290,4 +290,4 @@ Mark a page as *soft root* in the 'Advanced Settings' window of a page.
 Modifying & Extending the menu
 ******************************
 
-Please refer to the :doc:`../extending_cms/app_integration` documentation
+Please refer to the :doc:`../../extending_cms/app_integration` documentation

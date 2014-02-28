@@ -255,7 +255,7 @@ Default: ``[]``
 
 A list of plugin context processors. Plugin context processors are callables
 that modify all plugins' context *before* rendering. See
-:doc:`../extending_cms/custom_plugins` for more information.
+:doc:`../../extending_cms/custom_plugins` for more information.
 
 .. setting:: CMS_PLUGIN_PROCESSORS
 
@@ -265,7 +265,7 @@ CMS_PLUGIN_PROCESSORS
 Default: ``[]``
 
 A list of plugin processors. Plugin processors are callables that modify all
-plugins' output *after* rendering. See :doc:`../extending_cms/custom_plugins`
+plugins' output *after* rendering. See :doc:`../../extending_cms/custom_plugins`
 for more information.
 
 .. setting:: CMS_APPHOOKS
