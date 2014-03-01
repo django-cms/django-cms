@@ -1,17 +1,19 @@
 from __future__ import with_statement
-from cms.models import UserSettings
+from cms.models import UserSettings, PagePermission
 import re
 from django.template.defaultfilters import truncatewords
 import datetime
 
 from cms.models import Page
 from django.template.defaultfilters import truncatewords
+from cms.utils import get_cms_setting
 from cms.views import details
 import re
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.compat import get_user_model, is_user_swapped
-from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu, \
+    AjaxItem
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE
@@ -20,6 +22,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
+from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
@@ -318,6 +321,56 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.content.decode('utf-8'), '/en/')
         response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
         self.assertEqual(response.content.decode('utf-8'), '/')
+
+    def test_toolbar_logout_redirect(self):
+        """
+        Tests the logount AjaxItem on_success parameter in four different conditions:
+
+         * published page: no redirect
+         * unpublished page: redirect to the home page
+         * published page with login_required: redirect to the home page
+         * published page with view permissions: redirect to the home page
+        """
+        superuser = self.get_superuser()
+        page0 = create_page("home", "nav_playground.html", "en",
+                            published=True)
+        page1 = create_page("internal", "nav_playground.html", "en",
+                            published=True, parent=page0)
+        page2 = create_page("unpublished", "nav_playground.html", "en",
+                            published=False, parent=page0)
+        page3 = create_page("login_restricted", "nav_playground.html", "en",
+                            published=True, parent=page0, login_required=True)
+        page4 = create_page("view_restricted", "nav_playground.html", "en",
+                            published=True, parent=page0)
+        perms = PagePermission.objects.create(page=page4, can_view=True,
+                                              user=superuser)
+        page4.publish('en')
+        page4 = page4.get_public_object()
+        request = self.get_page_request(page4, superuser, '/')
+        with self.login_user_context(superuser):
+            # Published page, no redirect
+            response = self.client.get(page1.get_absolute_url('en') + '?edit')
+            toolbar = response.context['request'].toolbar
+            admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+            self.assertFalse(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success)
+
+            # Unpublished page, redirect
+            response = self.client.get(page2.get_absolute_url('en') + '?edit')
+            toolbar = response.context['request'].toolbar
+            admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success, '/')
+
+            # Published page with login restrictions, redirect
+            response = self.client.get(page3.get_absolute_url('en') + '?edit')
+            toolbar = response.context['request'].toolbar
+            admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success, '/')
+
+            # Published page with view permissions, redirect
+            response = self.client.get(page4.get_absolute_url('en') + '?edit')
+            toolbar = response.context['request'].toolbar
+            admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success, '/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):
