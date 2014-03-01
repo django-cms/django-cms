@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import json
 import datetime
+import re
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
@@ -509,6 +510,34 @@ class AdminTestCase(AdminTestsBase):
         
         response = self.client.get('/en/admin/cms/page/1/?language=en')
         self.assertEqual(response.status_code, 404)
+
+    def test_tree_displays_in_correct_language(self):
+        '''
+        Test to prove and protect that the page titles in the tree are
+        displayed in the currently set language.
+        '''
+        admin_guy, normal_guy = self._get_guys(use_global_permissions=False)
+        site = Site.objects.get(pk=1)
+
+        en_title = "EN Page"
+        es_title = "ES Page"
+
+        # Create a page in en
+        page = create_page(en_title, "nav_playground.html", "en", site=site, created_by=admin)
+        # Add a es-mx translation for this page
+        create_title("es-mx", es_title, page, slug="es_pagina")
+
+        url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
+        url_pat = r'<a href="%s/%s/preview/"[^>]*>%s</a>'
+
+        with self.login_user_context(admin_guy):
+            # Check the EN version of the tree...
+            response = self.client.get(url, {'language': 'en'})
+            self.assertRegexpMatches(str(response), url_pat % (page.pk, 'en', en_title, ))
+
+            # Check the ES version of the tree...
+            response = self.client.get(url, {'language': 'es-mx'})
+            self.assertRegexpMatches(str(response), url_pat % (page.pk, 'es-mx', es_title, ))
 
 
 class AdminTests(AdminTestsBase):
