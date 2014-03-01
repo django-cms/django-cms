@@ -1068,7 +1068,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, user=user, page=page)
             pages = [page]
-            with self.assertNumQueries(2):
+            with self.assertNumQueries(3):
                 """
                 The queries are:
                 PagePermission query for affected pages
@@ -1097,7 +1097,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, group=group, page=page)
             pages = [page]
-            with self.assertNumQueries(3):
+            with self.assertNumQueries(4):
                 """
                 The queries are:
                 PagePermission query for affected pages
