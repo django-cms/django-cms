@@ -7,7 +7,6 @@ from django.template.loader import render_to_string
 from django.utils.functional import Promise
 
 
-
 class ItemSearchResult(object):
     def __init__(self, item, index):
         self.item = item
@@ -98,7 +97,8 @@ class ToolbarAPIMixin(object):
     # This will only work if it is used to determine the insert position for
     # all items in the same menu.
     #
-    def get_alphabetical_insert_position(self, new_menu_name, item_type, default=0):
+    def get_alphabetical_insert_position(self, new_menu_name, item_type,
+                                         default=0):
         results = self.find_items(item_type)
 
         # No items yet? Use the default value provided
@@ -120,51 +120,55 @@ class ToolbarAPIMixin(object):
         self._remove_item(item)
         self._unmemoize(item)
 
-    def add_sideframe_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=None,
-                 on_close=None, side=LEFT, position=None):
+    def add_sideframe_item(self, name, url, active=False, disabled=False,
+                           extra_classes=None, close_on_url=None,
+                           on_close=None, side=LEFT, position=None):
         item = SideframeItem(name, url,
-            active=active,
-            disabled=disabled,
-            extra_classes=extra_classes,
-            close_on_url=close_on_url,
-            on_close=on_close,
-            side=side,
+                             active=active,
+                             disabled=disabled,
+                             extra_classes=extra_classes,
+                             close_on_url=close_on_url,
+                             on_close=on_close,
+                             side=side,
         )
         self.add_item(item, position=position)
         return item
 
-    def add_modal_item(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=URL_CHANGE,
-                 on_close=REFRESH_PAGE, side=LEFT, position=None):
+    def add_modal_item(self, name, url, active=False, disabled=False,
+                       extra_classes=None, close_on_url=URL_CHANGE,
+                       on_close=REFRESH_PAGE, side=LEFT, position=None):
         item = ModalItem(name, url,
-            active=active,
-            disabled=disabled,
-            extra_classes=extra_classes,
-            close_on_url=close_on_url,
-            on_close=on_close,
-            side=side,
+                         active=active,
+                         disabled=disabled,
+                         extra_classes=extra_classes,
+                         close_on_url=close_on_url,
+                         on_close=on_close,
+                         side=side,
         )
         self.add_item(item, position=position)
         return item
 
-    def add_link_item(self, name, url, active=False, disabled=False, extra_classes=None, side=LEFT, position=None):
+    def add_link_item(self, name, url, active=False, disabled=False,
+                      extra_classes=None, side=LEFT, position=None):
         item = LinkItem(name, url,
-            active=active,
-            disabled=disabled,
-            extra_classes=extra_classes,
-            side=side
+                        active=active,
+                        disabled=disabled,
+                        extra_classes=extra_classes,
+                        side=side
         )
         self.add_item(item, position=position)
         return item
 
-    def add_ajax_item(self, name, action, active=False, disabled=False, extra_classes=None, data=None, question=None,
+    def add_ajax_item(self, name, action, active=False, disabled=False,
+                      extra_classes=None, data=None, question=None,
                       side=LEFT, position=None):
         item = AjaxItem(name, action, self.csrf_token,
-            active=active,
-            disabled=disabled,
-            extra_classes=extra_classes,
-            data=data,
-            question=question,
-            side=side,
+                        active=active,
+                        disabled=disabled,
+                        extra_classes=extra_classes,
+                        data=data,
+                        question=question,
+                        side=side,
         )
         self.add_item(item, position=position)
         return item
@@ -244,7 +248,8 @@ class Menu(SubMenu):
 class LinkItem(BaseItem):
     template = "cms/toolbar/items/item_link.html"
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, side=LEFT):
+    def __init__(self, name, url, active=False, disabled=False,
+                 extra_classes=None, side=LEFT):
         super(LinkItem, self).__init__(side)
         self.name = name
         self.url = url
@@ -268,7 +273,8 @@ class LinkItem(BaseItem):
 class SideframeItem(BaseItem):
     template = "cms/toolbar/items/item_sideframe.html"
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=None,
+    def __init__(self, name, url, active=False, disabled=False,
+                 extra_classes=None, close_on_url=None,
                  on_close=None, side=LEFT):
         super(SideframeItem, self).__init__(side)
         self.name = "%s ..." % force_unicode(name)
@@ -297,7 +303,8 @@ class SideframeItem(BaseItem):
 class AjaxItem(BaseItem):
     template = "cms/toolbar/items/item_ajax.html"
 
-    def __init__(self, name, action, csrf_token, data=None, active=False, disabled=False, extra_classes=None,
+    def __init__(self, name, action, csrf_token, data=None, active=False,
+                 disabled=False, extra_classes=None,
                  question=None, side=LEFT):
         super(AjaxItem, self).__init__(side)
         self.name = name
@@ -331,7 +338,8 @@ class AjaxItem(BaseItem):
 class ModalItem(BaseItem):
     template = "cms/toolbar/items/item_modal.html"
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, close_on_url=URL_CHANGE,
+    def __init__(self, name, url, active=False, disabled=False,
+                 extra_classes=None, close_on_url=URL_CHANGE,
                  on_close=None, side=LEFT):
         super(ModalItem, self).__init__(side)
         self.name = "%s ..." % force_unicode(name)
@@ -365,7 +373,8 @@ class Break(BaseItem):
 
 
 class Button(object):
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None):
+    def __init__(self, name, url, active=False, disabled=False,
+                 extra_classes=None):
         self.name = name
         self.url = url
         self.active = active
@@ -393,11 +402,12 @@ class ButtonList(BaseItem):
             raise ValueError("Expected instance of cms.toolbar.items.Button, got %r instead" % item)
         self.buttons.append(item)
 
-    def add_button(self, name, url, active=False, disabled=False, extra_classes=None):
+    def add_button(self, name, url, active=False, disabled=False,
+                   extra_classes=None):
         item = Button(name, url,
-            active=active,
-            disabled=disabled,
-            extra_classes=extra_classes
+                      active=active,
+                      disabled=disabled,
+                      extra_classes=extra_classes
         )
         self.buttons.append(item)
         return item
