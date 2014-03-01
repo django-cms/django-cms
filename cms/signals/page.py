@@ -22,7 +22,7 @@ def pre_save_page(instance, **kwargs):
 def post_save_page(instance, **kwargs):
     if not kwargs.get('raw'):
         instance.rescan_placeholders()
-    update_home(instance)
+        update_home(instance)
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
         for page in instance.get_descendants(include_self=True):
             for title in page.title_set.all().select_related('page'):
