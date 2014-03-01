@@ -127,7 +127,7 @@ class ApphooksTestCase(CMSTestCase):
             blank_page = create_page("not-apphooked-page", "nav_playground.html", "en",
                                      created_by=superuser, published=True, apphook="", slug='blankapp')
             english_title = page.title_set.all()[0]
-            self.assertEquals(english_title.language, 'en')
+            self.assertEqual(english_title.language, 'en')
             create_title("de", "aphooked-page-de", page)
             self.assertTrue(page.publish('en'))
             self.assertTrue(page.publish('de'))
@@ -167,10 +167,10 @@ class ApphooksTestCase(CMSTestCase):
             request.LANGUAGE_CODE = 'en'
 
             attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-            self.assertEquals(attached_to_page.pk, en_title.page.pk)
+            self.assertEqual(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
             self.assertTemplateUsed(response, 'sampleapp/home.html')
             self.assertContains(response, en_title.title)
@@ -179,10 +179,10 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
             attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash and language prefix
-            self.assertEquals(attached_to_page.pk, de_title.page.pk)
+            self.assertEqual(attached_to_page.pk, de_title.page.pk)
 
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/home.html')
             self.assertContains(response, de_title.title)
 
@@ -208,13 +208,13 @@ class ApphooksTestCase(CMSTestCase):
                 request = self.get_request(path + '?edit')
                 request.LANGUAGE_CODE = 'en'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-                self.assertEquals(attached_to_page.pk, public_page.pk)
+                self.assertEqual(attached_to_page.pk, public_page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
                 request = self.get_request(path + '?edit')
                 request.LANGUAGE_CODE = 'de'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-                self.assertEquals(attached_to_page.pk, public_page.pk)
+                self.assertEqual(attached_to_page.pk, public_page.pk)
 
     def test_get_root_page_for_apphook_with_instance_namespace(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
@@ -227,13 +227,13 @@ class ApphooksTestCase(CMSTestCase):
                 path3 = reverse("example2:example")
                 path = reverse('namespaced_app_ns:sample-root')
                 path_instance = reverse('instance_ns:sample-root')
-            self.assertEquals(path, path_instance)
+            self.assertEqual(path, path_instance)
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
 
             attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-            self.assertEquals(attached_to_page.pk, en_title.page.pk)
+            self.assertEqual(attached_to_page.pk, en_title.page.pk)
 
             apphook_pool.clear()
 
@@ -244,13 +244,13 @@ class ApphooksTestCase(CMSTestCase):
                 path = reverse('namespaced_app_ns:sample-settings')
                 path_instance1 = reverse('instance_ns:sample-settings')
                 path_instance2 = reverse('namespaced_app_ns:sample-settings', current_app='instance_ns')
-            self.assertEquals(path, path_instance1)
-            self.assertEquals(path, path_instance2)
+            self.assertEqual(path, path_instance1)
+            self.assertEqual(path, path_instance2)
 
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
             attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-            self.assertEquals(attached_to_page.pk, en_title.page_id)
+            self.assertEqual(attached_to_page.pk, en_title.page_id)
             apphook_pool.clear()
 
     def test_get_sub_page_for_apphook_with_implicit_current_app(self):
@@ -262,10 +262,10 @@ class ApphooksTestCase(CMSTestCase):
             request.LANGUAGE_CODE = 'en'
 
             attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-            self.assertEquals(attached_to_page.pk, en_title.page.pk)
+            self.assertEqual(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/app.html')
             self.assertContains(response, 'namespaced_app_ns')
             self.assertContains(response, path)
@@ -311,7 +311,7 @@ class ApphooksTestCase(CMSTestCase):
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, 'someopts')
 
@@ -325,10 +325,10 @@ class ApphooksTestCase(CMSTestCase):
             request.LANGUAGE_CODE = 'en'
 
             attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-            self.assertEquals(attached_to_page.pk, en_title.page.pk)
+            self.assertEqual(attached_to_page.pk, en_title.page.pk)
 
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/app.html')
             self.assertContains(response, 'instance_ns')
             self.assertContains(response, path)
@@ -341,25 +341,25 @@ class ApphooksTestCase(CMSTestCase):
 
             path = reverse('extra_second')
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test included urlconf")
 
             path = reverse('extra_first')
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test urlconf")
             with force_language("de"):
                 path = reverse('extra_first')
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test urlconf")
             with force_language("de"):
                 path = reverse('extra_second')
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test included urlconf")
 
@@ -387,7 +387,7 @@ class ApphooksTestCase(CMSTestCase):
             self.create_base_structure(APP_NAME, 'en')
             path = reverse('extra_second')
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/extra.html')
             self.assertContains(response, "test included urlconf")
 
@@ -397,7 +397,7 @@ class ApphooksTestCase(CMSTestCase):
             self.create_base_structure(APP_NAME, 'en')
             path = reverse('sample-params', kwargs=dict(my_params='is-my-param-really-in-the-context-QUESTIONMARK'))
             response = self.client.get(path)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'sampleapp/home.html')
             self.assertContains(response, 'my_params: is-my-param-really-in-the-context-QUESTIONMARK')
 

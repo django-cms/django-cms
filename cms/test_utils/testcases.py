@@ -264,10 +264,10 @@ class BaseCMSTestCase(object):
         }
 
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # Altered to reflect the new django-js jsonified response messages
         expected = {"status": 200, "content": "ok"}
-        self.assertEquals(json.loads(response.content.decode('utf8')), expected)
+        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)

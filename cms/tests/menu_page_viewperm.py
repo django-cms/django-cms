@@ -149,7 +149,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
                 user_set.add(user)
                 group.save()
 
-        self.assertEquals(11, get_user_model().objects.all().count()-default_users_count)
+        self.assertEqual(11, get_user_model().objects.all().count()-default_users_count)
 
     def _setup_view_restrictions(self):
         """
@@ -166,20 +166,20 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             group = Group.objects.get(name__iexact=groupname)
             PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=inherit)
 
-        self.assertEquals(5, PagePermission.objects.all().count())
-        self.assertEquals(0, GlobalPagePermission.objects.all().count())
+        self.assertEqual(5, PagePermission.objects.all().count())
+        self.assertEqual(0, GlobalPagePermission.objects.all().count())
 
     def assertPageFound(self, url, client=None):
         if not client:
             client = self.client
         response = client.get(url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def assertPageNotFound(self, url, client=None):
         if not client:
             client = self.client
         response = client.get(url)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def assertViewAllowed(self, page, user):
         request = self.get_request(user, page)
@@ -246,7 +246,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         visible_page_ids = get_visible_pages(request, all_pages, self.site)
         public_page_ids = Page.objects.drafts().filter(title_set__title__in=expected_granted_pages).values_list('id',
                                                                                                                 flat=True)
-        self.assertEquals(len(visible_page_ids), len(expected_granted_pages))
+        self.assertEqual(len(visible_page_ids), len(expected_granted_pages))
         restricted_pages = Page.objects.public().exclude(title_set__title__in=expected_granted_pages).values_list('id',
                                                                                                                   flat=True)
         self.assertNodeMemberships(visible_page_ids, restricted_pages, public_page_ids)
@@ -285,7 +285,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         all_pages = self._setup_tree_pages()
         request = self.get_request()
         visible_page_ids = get_visible_pages(request, all_pages, self.site)
-        self.assertEquals(len(all_pages), len(visible_page_ids))
+        self.assertEqual(len(all_pages), len(visible_page_ids))
         nodes = menu_pool.get_nodes(request)
         self.assertEqual(len(nodes), len(all_pages))
 
@@ -311,7 +311,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         user = AnonymousUser()
         request = self.get_request(user, urls['/en/'])
         nodes = menu_pool.get_nodes(request)
-        self.assertEquals(len(nodes), 4)
+        self.assertEqual(len(nodes), 4)
         self.assertInMenu(urls["/en/"], user)
         self.assertInMenu(urls["/en/page_c/"], user)
         self.assertInMenu(urls["/en/page_c/page_c_a/"], user)
@@ -583,10 +583,10 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             perm = PagePermission.objects.for_page(page=page)
             # only page_6 has a permission assigned
             if page.get_title() == 'page_6':
-                self.assertEquals(len(perm), 2)
+                self.assertEqual(len(perm), 2)
             else:
                 msg = "Permission wrong at page %s" % (page.get_title())
-                self.assertEquals(len(perm), 0, msg)
+                self.assertEqual(len(perm), 0, msg)
         granted = ['page_1',
             'page_2',
             'page_3',

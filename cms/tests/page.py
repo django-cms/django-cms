@@ -231,7 +231,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertEquals(response.status_code, 302)
+            self.assertEqual(response.status_code, 302)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             response = self.client.get('/en/admin/cms/page/%s/' % page.id)
             self.assertEqual(response.status_code, 200)
@@ -941,7 +941,7 @@ class PageAdminTest(PageAdminTestBase):
                 request, str(page.pk),
                 form_url=form_url)
             self.assertTrue('form_url' in response.context_data)
-            self.assertEquals(response.context_data['form_url'], form_url)
+            self.assertEqual(response.context_data['form_url'], form_url)
 
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()

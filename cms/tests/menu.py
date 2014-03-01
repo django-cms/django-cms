@@ -151,7 +151,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(menu_pool.menus), 1)
         with force_language("en"):
             response = self.client.get(self.get_pages_root())  # path = '/'
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         request = self.get_request()
 
         # test the cms menu class
