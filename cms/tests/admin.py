@@ -2,14 +2,13 @@
 from __future__ import with_statement
 import json
 import datetime
-import re
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
-from cms.apphook_pool import apphook_pool, ApphookPool
+# from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import UserSettings, StaticPlaceholder
