@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-import urllib
+from cms.admin.forms import save_permissions
 from cms.constants import PUBLISHER_STATE_PENDING
 
 from cms.management.commands.subcommands.moderator import log
@@ -12,19 +12,25 @@ from cms.api import (create_page, publish_page, add_plugin,
 from cms.compat import get_user_model, user_related_name
 
 from cms.models import Page, CMSPlugin, Title
-from cms.models.permissionmodels import ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
+                                         ACCESS_PAGE_AND_DESCENDANTS)
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
                                       SettingsOverrideTestCase,
                                       URL_CMS_PLUGIN_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import SettingsOverride, disable_logger
+from cms.test_utils.util.request_factory import RequestFactory
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
-from cms.utils.permissions import has_generic_permission
+from cms.utils.permissions import (has_page_add_permission,
+                                   has_page_change_permission,
+                                   has_generic_permission)
 from cms.utils.compat.urls import unquote
 
-from django.contrib.auth.models import Permission, AnonymousUser, Group
+from django.contrib.admin.sites import site
+from django.contrib.auth.models import User, Permission, AnonymousUser, Group
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
@@ -1023,3 +1029,114 @@ class PagePermissionTests(PermissionTestsBase):
         # the permission_user_cache attribute set
         page = Page.objects.get(pk=page.pk)
         self.assertFalse(page.has_change_permissions_permission(request))
+
+
+class GlobalPermissionTests(SettingsOverrideTestCase):
+
+    def test_sanity_check(self):
+        """ Because we have a new manager, we'll do some basic checks."""
+        # manager is still named the same.
+        self.assertTrue(hasattr(GlobalPagePermission, 'objects'))
+        self.assertEqual(0, GlobalPagePermission.objects.all().count())
+
+        # we are correctly inheriting from BasicPagePermissionManager
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'with_user'))
+
+        # If we're using the new manager, we have extra methods which ensure
+        # This site access OR all site access.
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_permission'))
+        # these are just convienence methods for the above.
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_add_permission'))
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_change_permission'))
+        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_view_permission'))
+
+    def test_emulate_admin_index(self):
+        """ Call methods that emulate the adminsite instance's index.
+        This test was basically the reason for the new manager, in light of the
+        problem highlighted in ticket #1120, which asserts that giving a user
+        no site-specific rights when creating a GlobalPagePermission should
+        allow access to all sites.
+        """
+        # create and then ignore this user.
+        superuser = self._create_user("super", is_staff=True, is_active=True,
+                                      is_superuser=True)
+        superuser.set_password("super")
+        superuser.save()
+        # create 2 staff users
+        SITES = [
+            Site.objects.get(pk=1),
+            Site.objects.create(domain='example2.com', name='example2.com'),
+        ]
+        USERS = [
+            self._create_user("staff", is_staff=True, is_active=True),
+            self._create_user("staff_2", is_staff=True, is_active=True),
+        ]
+        for user in USERS:
+            user.set_password('staff')
+            # re-use the same methods the UserPage form does.
+            # Note that it internally calls .save(), as we've not done so.
+            save_permissions({
+                'can_add_page': True,
+                'can_change_page': True,
+                'can_delete_page': False
+            }, user)
+
+        GlobalPagePermission.objects.create(can_add=True, can_change=True,
+                                            can_delete=False, user=USERS[0])
+        # we're querying here to ensure that even though we've created two users
+        # above, we should have successfully filtered to just one perm.
+        self.assertEqual(1, GlobalPagePermission.objects.with_user(USERS[0]).count())
+
+        # this will confirm explicit permissions still work, by adding the first
+        # site instance to the many2many relationship 'sites'
+        GlobalPagePermission.objects.create(can_add=True, can_change=True,
+                                            can_delete=False,
+                                            user=USERS[1]).sites.add(SITES[0])
+        self.assertEqual(1, GlobalPagePermission.objects.with_user(USERS[1]).count())
+
+        homepage = create_page(title="master", template="nav_playground.html",
+                               language="en", in_navigation=True, slug='/')
+        publish_page(page=homepage, user=superuser, language='en')
+
+        with SettingsOverride(CMS_PERMISSION=True):
+            # for all users, they should have access to site 1
+            request = RequestFactory().get(path='/', data={'site__exact': 1})
+            # we need a session attribute for current_site(request), which is
+            # used by has_page_add_permission and has_page_change_permission
+            request.session = {}
+            for user in USERS:
+                # has_page_add_permission and has_page_change_permission both test
+                # for this explicitly, to see if it's a superuser.
+                request.user = user
+                # Note, the query count is inflated by doing additional lookups
+                # because there's a site param in the request.
+                with self.assertNumQueries(FuzzyInt(6,7)):
+                    # PageAdmin swaps out the methods called for permissions
+                    # if the setting is true, it makes use of cms.utils.permissions
+                    self.assertTrue(has_page_add_permission(request))
+                    self.assertTrue(has_page_change_permission(request))
+                    # internally this calls PageAdmin.has_[add|change|delete]_permission()
+                    self.assertEqual({'add': True, 'change': True, 'delete': False},
+                                     site._registry[Page].get_model_perms(request))
+
+            # can't use the above loop for this test, as we're testing that
+            # user 1 has access, but user 2 does not, as they are only assigned
+            # to site 1
+            request = RequestFactory().get('/', data={'site__exact': 2})
+            request.session = {}
+            # As before, the query count is inflated by doing additional lookups
+            # because there's a site param in the request
+            with self.assertNumQueries(FuzzyInt(11, 20)):
+                # this user shouldn't have access to site 2
+                request.user = USERS[1]
+                self.assertTrue(not has_page_add_permission(request))
+                self.assertTrue(not has_page_change_permission(request))
+                self.assertEqual({'add': False, 'change': False, 'delete': False},
+                                 site._registry[Page].get_model_perms(request))
+                # but, going back to the first user, they should.
+                request = RequestFactory().get('/', data={'site__exact': 2})
+                request.user = USERS[0]
+                self.assertTrue(has_page_add_permission(request))
+                self.assertTrue(has_page_change_permission(request))
+                self.assertEqual({'add': True, 'change': True, 'delete': False},
+                                 site._registry[Page].get_model_perms(request))

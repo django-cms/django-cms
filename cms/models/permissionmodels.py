@@ -10,7 +10,9 @@ from django.contrib.sites.models import Site
 
 from cms.compat import is_user_swapped, user_model_label
 from cms.models import Page
-from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
+from cms.models.managers import (BasicPagePermissionManager,
+                                 PagePermissionManager,
+                                 GlobalPagePermissionManager)
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
@@ -51,7 +53,7 @@ ACCESS_CHOICES = (
     (ACCESS_PAGE_AND_CHILDREN, _('Page and children (immediate)')),
     (ACCESS_DESCENDANTS, _('Page descendants')),
     (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
-    )
+)
 
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
@@ -95,7 +97,7 @@ class GlobalPagePermission(AbstractPagePermission):
     can_recover_page = models.BooleanField(_("can recover pages"), default=True, help_text=_("can recover any deleted page"))
     sites = models.ManyToManyField(Site, null=True, blank=True, help_text=_('If none selected, user haves granted permissions to all sites.'), verbose_name=_('sites'))
 
-    objects = BasicPagePermissionManager()
+    objects = GlobalPagePermissionManager()
 
     class Meta:
         verbose_name = _('Page global permission')
