@@ -35,10 +35,9 @@ def get_visible_pages(request, pages, site=None):
     visible_page_ids = []
     restricted_pages = defaultdict(list)
     page_permissions = PagePermission.objects.filter(can_view=True).select_related(
-            'page', 'group__' + user_related_query_name)
+            'page').prefetch_related('group__' + user_related_name)
 
     for perm in page_permissions:
-
         # collect the pages that are affected by permissions
         if site and perm.page.site_id != site.pk:
             continue
@@ -104,17 +103,17 @@ def get_visible_pages(request, pages, site=None):
         """
         user_pk = request.user.pk
         page_pk = page.pk
-        has_perm = False
         for perm in restricted_pages[page_pk]:
             if perm.user_id == user_pk:
-                has_perm = True
+                return True
             if not perm.group_id:
                 continue
             user_set = getattr(perm.group, user_related_name)
-            group_user_ids = user_set.values_list('pk', flat=True)
-            if user_pk in group_user_ids:
-                has_perm = True
-        return has_perm
+            # Optimization equivalent to
+            # if user_pk in user_set.values_list('pk', flat=True)
+            if any(user_pk == user.pk for user in user_set.all()):
+                return True
+        return False
 
     for page in pages:
         to_add = False
