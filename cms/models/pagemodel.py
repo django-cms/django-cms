@@ -926,16 +926,19 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 return t[1]
         return _("default")
 
-    def has_view_permission(self, request):
+    def has_view_permission(self, request, user=None):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
         from cms.utils.plugins import current_site
 
+        if not user:
+            user = request.user
+
         if not self.publisher_is_draft:
-            return self.publisher_draft.has_view_permission(request)
+            return self.publisher_draft.has_view_permission(request, user)
             # does any restriction exist?
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
-        if request.user.is_authenticated():
+        if user.is_authenticated():
             global_view_perms = GlobalPagePermission.objects.user_has_view_permission(
                 request.user, current_site(request)).exists()
 
@@ -945,19 +948,18 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             elif not is_restricted:
                 if ((get_cms_setting('PUBLIC_FOR') == 'all') or
                     (get_cms_setting('PUBLIC_FOR') == 'staff' and
-                        request.user.is_staff)):
+                        user.is_staff)):
                     return True
 
             # a restricted page and an authenticated user
             elif is_restricted:
                 opts = self._meta
                 codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-                user_perm = request.user.has_perm(codename)
+                user_perm = user.has_perm(codename)
                 generic_perm = self.has_generic_permission(request, "view")
                 return (user_perm or generic_perm)
 
         else:
-            #anonymous user
             if is_restricted or not get_cms_setting('PUBLIC_FOR') == 'all':
                 # anyonymous user, page has restriction and global access is permitted
                 return False
@@ -968,65 +970,74 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-        return (request.user.has_perm(codename) or
+        return (user.has_perm(codename) or
                 self.has_generic_permission(request, "view"))
 
-    def has_change_permission(self, request):
+    def has_change_permission(self, request, user=None):
         opts = self._meta
-        if request.user.is_superuser:
+        if not user:
+            user = request.user
+        if user.is_superuser:
             return True
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
-               self.has_generic_permission(request, "change")
+        return (user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+                and self.has_generic_permission(request, "change"))
 
-    def has_delete_permission(self, request):
+    def has_delete_permission(self, request, user=None):
         opts = self._meta
-        if request.user.is_superuser:
+        if not user:
+            user = request.user
+        if user.is_superuser:
             return True
-        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
-               self.has_generic_permission(request, "delete")
+        return (user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
+                and self.has_generic_permission(request, "delete"))
 
-    def has_publish_permission(self, request):
-        if request.user.is_superuser:
+    def has_publish_permission(self, request, user=None):
+        if not user:
+            user = request.user
+        if user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + "publish_page") and \
-               self.has_generic_permission(request, "publish")
+        return (user.has_perm(opts.app_label + '.' + "publish_page")
+                and self.has_generic_permission(request, "publish"))
 
     has_moderate_permission = has_publish_permission
 
-    def has_advanced_settings_permission(self, request):
-        return self.has_generic_permission(request, "advanced_settings")
+    def has_advanced_settings_permission(self, request, user=None):
+        return self.has_generic_permission(request, "advanced_settings", user)
 
-    def has_change_permissions_permission(self, request):
+    def has_change_permissions_permission(self, request, user=None):
         """
         Has user ability to change permissions for current page?
         """
-        return self.has_generic_permission(request, "change_permissions")
+        return self.has_generic_permission(request, "change_permissions", user)
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, user=None):
         """
         Has user ability to add page under current page?
         """
-        return self.has_generic_permission(request, "add")
+        return self.has_generic_permission(request, "add", user)
 
-    def has_move_page_permission(self, request):
+    def has_move_page_permission(self, request, user=None):
         """Has user ability to move current page?
         """
-        return self.has_generic_permission(request, "move_page")
+        return self.has_generic_permission(request, "move_page", user)
 
-    def has_generic_permission(self, request, perm_type):
+    def has_generic_permission(self, request, perm_type, user=None):
         """
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
+        if not user:
+            user = request.user
         att_name = "permission_%s_cache" % perm_type
-        if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
-            or request.user.pk != self.permission_user_cache.pk:
+        if (not hasattr(self, "permission_user_cache")
+                or not hasattr(self, att_name)
+                or user.pk != self.permission_user_cache.pk):
             from cms.utils.permissions import has_generic_permission
 
-            self.permission_user_cache = request.user
+            self.permission_user_cache = user
             setattr(self, att_name, has_generic_permission(
-                self.id, request.user, perm_type, self.site_id))
+                self.id, user, perm_type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
