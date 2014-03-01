@@ -161,7 +161,7 @@ class ToolbarAPIMixin(object):
 
     def add_ajax_item(self, name, action, active=False, disabled=False,
                       extra_classes=None, data=None, question=None,
-                      side=LEFT, position=None):
+                      side=LEFT, position=None, on_success=None):
         item = AjaxItem(name, action, self.csrf_token,
                         active=active,
                         disabled=disabled,
@@ -169,6 +169,7 @@ class ToolbarAPIMixin(object):
                         data=data,
                         question=question,
                         side=side,
+                        on_success=on_success,
         )
         self.add_item(item, position=position)
         return item
@@ -305,7 +306,7 @@ class AjaxItem(BaseItem):
 
     def __init__(self, name, action, csrf_token, data=None, active=False,
                  disabled=False, extra_classes=None,
-                 question=None, side=LEFT):
+                 question=None, side=LEFT, on_success=None):
         super(AjaxItem, self).__init__(side)
         self.name = name
         self.action = action
@@ -315,6 +316,7 @@ class AjaxItem(BaseItem):
         self.data = data or {}
         self.extra_classes = extra_classes or []
         self.question = question
+        self.on_success = on_success
 
     def __repr__(self):
         return '<AjaxItem:%s>' % force_unicode(self.name)
@@ -331,7 +333,8 @@ class AjaxItem(BaseItem):
             'disabled': self.disabled,
             'extra_classes': self.extra_classes,
             'data': data,
-            'question': self.question
+            'question': self.question,
+            'on_success': self.on_success
         }
 
 
