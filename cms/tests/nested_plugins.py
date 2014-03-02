@@ -44,14 +44,14 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             copied_plugins = copied_placeholder.get_plugins()
 
             # we should find the same number of plugins in both placeholders
-            self.assertEquals(
+            self.assertEqual(
                 original_plugins.count(),
                 copied_plugins.count()
             )
 
             # quick check: make sure the two querysets match:
             for original, copy in zip(original_plugins, copied_plugins):
-                self.assertEquals(
+                self.assertEqual(
                     Text.objects.get(id=original.id).body,
                     Text.objects.get(id=copy.id).body
                 )
@@ -88,31 +88,31 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 # simply comparing *exactly the same items* in all these tests. 
                 # It could happen...
                 self.assertNotEquals(original.id, copy.id)
-                self.assertEquals(
+                self.assertEqual(
                     original_text_plugin.body,
                     copied_text_plugin.body
                 )
-                self.assertEquals(
+                self.assertEqual(
                     original_text_plugin.level,
                     copied_text_plugin.level
                 )
-                self.assertEquals(
+                self.assertEqual(
                     original_text_plugin.position,
                     copied_text_plugin.position
                 )
-                self.assertEquals(
+                self.assertEqual(
                     original_text_plugin.rght,
                     copied_text_plugin.rght
                 )
-                self.assertEquals(
+                self.assertEqual(
                     original_text_plugin.lft,
                     copied_text_plugin.lft
                 )
-                self.assertEquals(
+                self.assertEqual(
                     original_text_plugin.get_descendant_count(),
                     copied_text_plugin.get_descendant_count()
                 )
-                self.assertEquals(
+                self.assertEqual(
                     original_text_plugin.get_ancestors().count(),
                     copied_text_plugin.get_ancestors().count()
                 )
@@ -313,7 +313,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             [CMSPlugin.objects.get(id=plugin_10.pk)])
 
         original_plugins = placeholder.get_plugins()
-        self.assertEquals(original_plugins.count(), 10)
+        self.assertEqual(original_plugins.count(), 10)
 
         # elder sibling of plugin_1
         plugin_1 = self.reload(plugin_1)
@@ -380,7 +380,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 CMSPlugin.objects.get(id=plugin_5.pk),
                 CMSPlugin.objects.get(id=plugin_14.pk)
             ])
-        self.assertEquals(CMSPlugin.objects.get(id=plugin_11.pk).tree_id, 1)
+        self.assertEqual(CMSPlugin.objects.get(id=plugin_11.pk).tree_id, 1)
         self.copy_placeholders_and_check_results([placeholder])
 
         # now let's move plugins around in the tree
@@ -389,7 +389,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_2 = self.reload(plugin_2)
         plugin_2.move_to(target=plugin_1, position="left")
         plugin_2.save()
-        self.assertEquals(CMSPlugin.objects.get(id=plugin_2.pk).tree_id, 1)
+        self.assertEqual(CMSPlugin.objects.get(id=plugin_2.pk).tree_id, 1)
         self.copy_placeholders_and_check_results([placeholder])
 
         # move plugin_6 after plugin_7
@@ -471,7 +471,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
             text_plugin = self.reload(text_plugin)
             # none of the descendants should have a placeholder other then my own one
-            self.assertEquals(text_plugin.get_descendants().exclude(placeholder=text_plugin.placeholder).count(), 0)
+            self.assertEqual(text_plugin.get_descendants().exclude(placeholder=text_plugin.placeholder).count(), 0)
             post_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(post_add_plugin_count, 2)
 
@@ -494,8 +494,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             page_one.placeholders.get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body="Hello World")
-            self.assertEquals(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
-            self.assertEquals(text_plugin_en.get_children().count(), 0)
+            self.assertEqual(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
+            self.assertEqual(text_plugin_en.get_children().count(), 0)
             pre_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(pre_add_plugin_count, 1)
             ###
@@ -522,7 +522,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin_two.save()
             text_plugin_two = self.reload(text_plugin_two)
             # the link is attached as a child?
-            self.assertEquals(text_plugin_two.get_children().count(), 1)
+            self.assertEqual(text_plugin_two.get_children().count(), 1)
             post_add_plugin_count = CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count()
             self.assertEqual(post_add_plugin_count, 3)
             page_one.save()
@@ -533,15 +533,15 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
             # verify that the plugins got created
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
-            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            self.assertEqual(len(org_placeholder_one_plugins), 1)
             org_placeholder_two_plugins = page_one_ph_two.get_plugins()
-            self.assertEquals(len(org_placeholder_two_plugins), 2)
+            self.assertEqual(len(org_placeholder_two_plugins), 2)
             org_placeholder_three_plugins = page_one_ph_three.get_plugins()
-            self.assertEquals(len(org_placeholder_three_plugins), 0)
-            self.assertEquals(page_one.placeholders.count(), 3)
+            self.assertEqual(len(org_placeholder_three_plugins), 0)
+            self.assertEqual(page_one.placeholders.count(), 3)
             placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
-            self.assertEquals(placeholder_count, 3)
-            self.assertEquals(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 3)
+            self.assertEqual(placeholder_count, 3)
+            self.assertEqual(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 3)
             ##
             # setup page_copy_target page
             ##
@@ -549,14 +549,14 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                            position="last-child", published=True, in_navigation=True)
             all_page_count = Page.objects.drafts().count()
             pre_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
-            self.assertEquals(pre_copy_placeholder_count, 6)
+            self.assertEqual(pre_copy_placeholder_count, 6)
             # copy the page
             superuser = self.get_superuser()
             with self.login_user_context(superuser):
                 page_two = self.copy_page(page_one, page_copy_target)
                 # validate the expected pages,placeholders,plugins,pluginbodies
             after_copy_page_plugin_count = CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count()
-            self.assertEquals(after_copy_page_plugin_count, 6)
+            self.assertEqual(after_copy_page_plugin_count, 6)
             # check the amount of copied stuff
             after_copy_page_count = Page.objects.drafts().count()
             after_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
@@ -601,34 +601,34 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
             # get the plugins from the original page
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
-            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            self.assertEqual(len(org_placeholder_one_plugins), 1)
             org_placeholder_two_plugins = page_one_ph_two.get_plugins()
-            self.assertEquals(len(org_placeholder_two_plugins), 2)
+            self.assertEqual(len(org_placeholder_two_plugins), 2)
             org_placeholder_three_plugins = page_one_ph_three.get_plugins()
-            self.assertEquals(len(org_placeholder_three_plugins), 0)
+            self.assertEqual(len(org_placeholder_three_plugins), 0)
             # get the plugins from the copied page
             copied_placeholder_one_plugins = page_two_ph_one.get_plugins()
-            self.assertEquals(len(copied_placeholder_one_plugins), 1)
+            self.assertEqual(len(copied_placeholder_one_plugins), 1)
             copied_placeholder_two_plugins = page_two_ph_two.get_plugins()
-            self.assertEquals(len(copied_placeholder_two_plugins), 2)
+            self.assertEqual(len(copied_placeholder_two_plugins), 2)
             copied_placeholder_three_plugins = page_two_ph_three.get_plugins()
-            self.assertEquals(len(copied_placeholder_three_plugins), 0)
+            self.assertEqual(len(copied_placeholder_three_plugins), 0)
             # verify the plugins got copied
             # placeholder 1
             count_plugins_copied = len(copied_placeholder_one_plugins)
             count_plugins_org = len(org_placeholder_one_plugins)
             msg = u"plugin count %s %s for placeholder one not equal" % (count_plugins_copied, count_plugins_org)
-            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 2
             count_plugins_copied = len(copied_placeholder_two_plugins)
             count_plugins_org = len(org_placeholder_two_plugins)
             msg = u"plugin count %s %s for placeholder two not equal" % (count_plugins_copied, count_plugins_org)
-            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 3
             count_plugins_copied = len(copied_placeholder_three_plugins)
             count_plugins_org = len(org_placeholder_three_plugins)
             msg = u"plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
-            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # verify the body of text plugin with nested link plugin
             # org to copied  
             org_nested_text_plugin = None
@@ -703,8 +703,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             page_one.placeholders.get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
-            self.assertEquals(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
-            self.assertEquals(text_plugin_en.get_children().count(), 0)
+            self.assertEqual(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
+            self.assertEqual(text_plugin_en.get_children().count(), 0)
             pre_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(pre_add_plugin_count, 1)
             # add a plugin to placeholder twho
@@ -729,7 +729,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin_two.save()
             text_plugin_two = self.reload(text_plugin_two)
             # the link is attached as a child?
-            self.assertEquals(text_plugin_two.get_children().count(), 1)
+            self.assertEqual(text_plugin_two.get_children().count(), 1)
             post_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(post_add_plugin_count, 3)
             page_one.save()
@@ -740,22 +740,22 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
             # verify the plugins got created
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
-            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            self.assertEqual(len(org_placeholder_one_plugins), 1)
             org_placeholder_two_plugins = page_one_ph_two.get_plugins()
-            self.assertEquals(len(org_placeholder_two_plugins), 2)
+            self.assertEqual(len(org_placeholder_two_plugins), 2)
             org_placeholder_three_plugins = page_one_ph_three.get_plugins()
-            self.assertEquals(len(org_placeholder_three_plugins), 0)
-            self.assertEquals(page_one.placeholders.count(), 3)
+            self.assertEqual(len(org_placeholder_three_plugins), 0)
+            self.assertEqual(page_one.placeholders.count(), 3)
 
             placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
-            self.assertEquals(placeholder_count, 3)
-            self.assertEquals(CMSPlugin.objects.count(), 3)
+            self.assertEqual(placeholder_count, 3)
+            self.assertEqual(CMSPlugin.objects.count(), 3)
             # setup page_copy_target
             page_copy_target = create_page("Three Placeholder - page copy target", "col_three.html", "en",
                                            position="last-child", published=True, in_navigation=True)
             all_page_count = Page.objects.drafts().count()
             pre_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
-            self.assertEquals(pre_copy_placeholder_count, 6)
+            self.assertEqual(pre_copy_placeholder_count, 6)
             superuser = self.get_superuser()
             with self.login_user_context(superuser):
                 # now move the parent text plugin to another placeholder
@@ -771,7 +771,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 edit_url = URL_CMS_MOVE_PLUGIN % page_one.id
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
-                self.assertEquals(json.loads(response.content.decode('utf8')), expected)
+                self.assertEqual(json.loads(response.content.decode('utf8')), expected)
                 # check if the plugin got moved
                 page_one = self.reload(page_one)
                 self.reload(text_plugin_two)
@@ -780,24 +780,24 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
 
                 org_placeholder_one_plugins = page_one_ph_one.get_plugins()
-                self.assertEquals(len(org_placeholder_one_plugins), 1)
+                self.assertEqual(len(org_placeholder_one_plugins), 1)
                 org_placeholder_two_plugins = page_one_ph_two.get_plugins()
                 # the plugin got moved and child got moved
-                self.assertEquals(len(org_placeholder_two_plugins), 0)
+                self.assertEqual(len(org_placeholder_two_plugins), 0)
                 org_placeholder_three_plugins = page_one_ph_three.get_plugins()
-                self.assertEquals(len(org_placeholder_three_plugins), 2)
+                self.assertEqual(len(org_placeholder_three_plugins), 2)
                 # copy the page
                 page_two = self.copy_page(page_one, page_copy_target)
                 # validate the expected pages,placeholders,plugins,pluginbodies
             after_copy_page_plugin_count = CMSPlugin.objects.count()
-            self.assertEquals(after_copy_page_plugin_count, 6)
+            self.assertEqual(after_copy_page_plugin_count, 6)
             after_copy_page_count = Page.objects.drafts().count()
             after_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertGreater(after_copy_page_count, all_page_count, u"no new page after copy")
             self.assertGreater(after_copy_page_plugin_count, post_add_plugin_count, u"plugin count is not grown")
             self.assertGreater(after_copy_placeholder_count, pre_copy_placeholder_count,
                                u"placeholder count is not grown")
-            self.assertEquals(after_copy_page_count, 3, u"no new page after copy")
+            self.assertEqual(after_copy_page_count, 3, u"no new page after copy")
             # validate the structure
             # orginal placeholder
             page_one = self.reload(page_one)
@@ -834,34 +834,34 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
             # get the plugins from the original page
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
-            self.assertEquals(len(org_placeholder_one_plugins), 1)
+            self.assertEqual(len(org_placeholder_one_plugins), 1)
             org_placeholder_two_plugins = page_one_ph_two.get_plugins()
-            self.assertEquals(len(org_placeholder_two_plugins), 0)
+            self.assertEqual(len(org_placeholder_two_plugins), 0)
             org_placeholder_three_plugins = page_one_ph_three.get_plugins()
-            self.assertEquals(len(org_placeholder_three_plugins), 2)
+            self.assertEqual(len(org_placeholder_three_plugins), 2)
             # get the plugins from the copied page
             copied_placeholder_one_plugins = page_two_ph_one.get_plugins()
-            self.assertEquals(len(copied_placeholder_one_plugins), 1)
+            self.assertEqual(len(copied_placeholder_one_plugins), 1)
             copied_placeholder_two_plugins = page_two_ph_two.get_plugins()
-            self.assertEquals(len(copied_placeholder_two_plugins), 0)
+            self.assertEqual(len(copied_placeholder_two_plugins), 0)
             copied_placeholder_three_plugins = page_two_ph_three.get_plugins()
-            self.assertEquals(len(copied_placeholder_three_plugins), 2)
+            self.assertEqual(len(copied_placeholder_three_plugins), 2)
             # verify the plugins got copied
             # placeholder 1
             count_plugins_copied = len(copied_placeholder_one_plugins)
             count_plugins_org = len(org_placeholder_one_plugins)
             msg = u"plugin count %s %s for placeholder one not equal" % (count_plugins_copied, count_plugins_org)
-            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 2
             count_plugins_copied = len(copied_placeholder_two_plugins)
             count_plugins_org = len(org_placeholder_two_plugins)
             msg = u"plugin count %s %s for placeholder two not equal" % (count_plugins_copied, count_plugins_org)
-            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 3
             count_plugins_copied = len(copied_placeholder_three_plugins)
             count_plugins_org = len(org_placeholder_three_plugins)
             msg = u"plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
-            self.assertEquals(count_plugins_copied, count_plugins_org, msg)
+            self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # verify the body of text plugin with nested link plugin
             # org to copied  
             org_nested_text_plugin = None

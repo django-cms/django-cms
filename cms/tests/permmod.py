@@ -428,10 +428,10 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             }
             remove_url = URL_CMS_PLUGIN_REMOVE + "%s/" % plugin.pk
             response = self.client.post(remove_url, plugin_data)
-            self.assertEquals(response.status_code, 302)
+            self.assertEqual(response.status_code, 302)
 
             # there should only be a public plugin - since the draft has been deleted
-            self.assertEquals(CMSPlugin.objects.all().count(), 1)
+            self.assertEqual(CMSPlugin.objects.all().count(), 1)
 
             page = self.reload(page)
 
@@ -439,7 +439,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             publish_page(page, self.user_super, 'en')
 
             # there should now be 0 plugins
-            self.assertEquals(CMSPlugin.objects.all().count(), 0)
+            self.assertEqual(CMSPlugin.objects.all().count(), 0)
 
     def test_superuser_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
@@ -465,7 +465,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertTrue('_auth_user_id' in self.client.session)
         login_user_id = self.client.session.get('_auth_user_id')
         user = get_user_model().objects.get(pk=self.user_staff.pk)
-        self.assertEquals(login_user_id, user.id)
+        self.assertEqual(login_user_id, user.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -797,8 +797,8 @@ class ModeratorSwitchCommandTest(CMSTestCase):
         # Sanity check the database (we should have one draft and one public)
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
-        self.assertEquals(not_drafts, 1)
-        self.assertEquals(drafts, 1)
+        self.assertEqual(not_drafts, 1)
+        self.assertEqual(drafts, 1)
 
     def test_switch_moderator_off(self):
         with force_language("en"):

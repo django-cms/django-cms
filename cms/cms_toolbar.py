@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
@@ -113,7 +114,28 @@ class BasicToolbar(CMSToolbar):
         admin_menu.add_sideframe_item(_('User settings'), url=reverse('admin:cms_usersettings_change'))
         admin_menu.add_break(USER_SETTINGS_BREAK)
         # logout
-        admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'), active=True)
+        # If current page is not published or has view restrictions user is
+        # redirected to the home page:
+        # * published page: no redirect
+        # * unpublished page: redirect to the home page
+        # * published page with login_required: redirect to the home page
+        # * published page with view permissions: redirect to the home page
+        if self.request.current_page:
+            if not self.request.current_page.is_published(self.current_lang):
+                page = self.request.current_page
+            else:
+                page = self.request.current_page.get_public_object()
+        else:
+            page = None
+        redirect_url = '/'
+        if (page and
+                (not page.is_published(self.current_lang) or page.login_required
+                 or not page.has_view_permission(self.request, AnonymousUser()))):
+            admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
+                                     active=True, on_success=redirect_url)
+        else:
+            admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
+                                     active=True)
 
     def add_language_menu(self):
         language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))

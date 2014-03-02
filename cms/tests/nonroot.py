@@ -48,8 +48,8 @@ class NonRootCase(CMSTestCase):
 
     def test_basic_cms_menu(self):
         response = self.client.get(self.get_pages_root())
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(self.get_pages_root(), "/en/content/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.get_pages_root(), "/en/content/")
 
     def test_show_menu(self):
         context = self.get_context()

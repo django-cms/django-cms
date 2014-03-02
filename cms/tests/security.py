@@ -192,6 +192,6 @@ class SecurityTests(CMSTestCase):
             }
             edit_url = '%s%s/' % (URL_CMS_PLUGIN_EDIT, plugin.pk)
             response = self.client.post(edit_url, data)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             txt = Text.objects.all()[0]
-            self.assertEquals(txt.body, '<div>divcontent</div><a>acontent</a>')
+            self.assertEqual(txt.body, '<div>divcontent</div><a>acontent</a>')

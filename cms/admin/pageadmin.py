@@ -627,6 +627,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
         except IndexError:
             open_menu_trees = []
+        # Language may be present in the GET dictionary but empty
+        language = request.GET.get('language', get_language())
+        if not language:
+            language = get_language()
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -635,7 +639,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': reverse('admin:index'),
             'app_label': app_label,
-            'preview_language': request.GET.get('language', get_language()),
+            'preview_language': language,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
             'DEBUG': settings.DEBUG,

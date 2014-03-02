@@ -106,8 +106,8 @@ class PublisherCommandTests(TestCase):
             com.handle_noargs()
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
-        self.assertEquals(not_drafts, 1)
-        self.assertEquals(drafts, 1)
+        self.assertEqual(not_drafts, 1)
+        self.assertEqual(drafts, 1)
 
     def test_command_line_publishes_one_page(self):
         """
@@ -148,12 +148,12 @@ class PublisherCommandTests(TestCase):
         # Sanity check the database (we should have one draft and one public)
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
-        self.assertEquals(not_drafts, 1)
-        self.assertEquals(drafts, 1)
+        self.assertEqual(not_drafts, 1)
+        self.assertEqual(drafts, 1)
 
         # Now check that the non-draft has the attribute we set to the draft.
         non_draft = Page.objects.public()[0]
-        self.assertEquals(non_draft.reverse_id, 'a_test')
+        self.assertEqual(non_draft.reverse_id, 'a_test')
 
     def tearDown(self):
         plugin_pool.patched = False
@@ -169,7 +169,7 @@ class PublishingTests(TestCase):
         name = self._testMethodName
         page = self.create_page(name, published=False)
         self.assertFalse(page.publisher_public_id)
-        self.assertEquals(Page.objects.all().count(), 1)
+        self.assertEqual(Page.objects.all().count(), 1)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
@@ -329,13 +329,13 @@ class PublishingTests(TestCase):
 
         drafts = Page.objects.drafts().order_by('tree_id', 'lft')
         draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
-        self.assertEquals([('parent', 1, 8),
+        self.assertEqual([('parent', 1, 8),
                               ('pageA', 2, 3),
                               ('pageB', 4, 5),
                               ('pageC', 6, 7)], draft_titles)
         public = Page.objects.public().order_by('tree_id', 'lft')
         public_titles = [(p.get_title('en'), p.lft, p.rght) for p in public]
-        self.assertEquals([('parent', 1, 8),
+        self.assertEqual([('parent', 1, 8),
                               ('pageA', 2, 3),
                               ('pageB', 4, 5),
                               ('pageC', 6, 7)], public_titles)
@@ -344,13 +344,13 @@ class PublishingTests(TestCase):
 
         drafts = Page.objects.drafts().order_by('tree_id', 'lft')
         draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
-        self.assertEquals([('parent', 1, 8),
+        self.assertEqual([('parent', 1, 8),
                               ('pageA', 2, 3),
                               ('pageB', 4, 5),
                               ('pageC', 6, 7)], draft_titles)
         public = Page.objects.public().order_by('tree_id', 'lft')
         public_titles = [(p.get_title('en'), p.lft, p.rght) for p in public]
-        self.assertEquals([('parent', 1, 8),
+        self.assertEqual([('parent', 1, 8),
                               ('pageA', 2, 3),
                               ('pageB', 4, 5),
                               ('pageC', 6, 7)], public_titles)
@@ -667,19 +667,19 @@ class PublishingTests(TestCase):
         text_plugin.body = "<p>Draft content</p>"
         text_plugin.save()
         deleted_plugin.delete()
-        self.assertEquals(CMSPlugin.objects.count(), 3)
+        self.assertEqual(CMSPlugin.objects.count(), 3)
 
         # Now let's revert and restore
         page.revert('en')
-        self.assertEquals(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
+        self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
 
-        self.assertEquals(CMSPlugin.objects.count(), 4)
+        self.assertEqual(CMSPlugin.objects.count(), 4)
         plugins = CMSPlugin.objects.filter(placeholder__page=page)
-        self.assertEquals(plugins.count(), 2)
+        self.assertEqual(plugins.count(), 2)
 
         plugins = [plugin.get_plugin_instance()[0] for plugin in plugins]
-        self.assertEquals(plugins[0].body, "Deleted content")
-        self.assertEquals(plugins[1].body, "Public content")
+        self.assertEqual(plugins[0].body, "Deleted content")
+        self.assertEqual(plugins[1].body, "Public content")
 
     def test_revert_move(self):
         parent = create_page("Parent", "nav_playground.html", "en", published=True)
@@ -734,8 +734,8 @@ class PublishingTests(TestCase):
         not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
         drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
 
-        self.assertEquals(len(not_drafts), 5)
-        self.assertEquals(len(drafts), 5)
+        self.assertEqual(len(not_drafts), 5)
+        self.assertEqual(len(drafts), 5)
 
         for idx, draft in enumerate(drafts):
             public = not_drafts[idx]
@@ -745,7 +745,7 @@ class PublishingTests(TestCase):
                 # Let's assert the MPTT tree is consistent
                 self.assertTrue(public.lft > public.parent.lft)
                 self.assertTrue(public.rght < public.parent.rght)
-                self.assertEquals(public.tree_id, public.parent.tree_id)
+                self.assertEqual(public.tree_id, public.parent.tree_id)
                 self.assertTrue(public.parent in public.get_ancestors())
                 self.assertTrue(public in public.parent.get_descendants())
                 self.assertTrue(public in public.parent.get_children())
@@ -753,7 +753,7 @@ class PublishingTests(TestCase):
                 # Same principle for the draft tree
                 self.assertTrue(draft.lft > draft.parent.lft)
                 self.assertTrue(draft.rght < draft.parent.rght)
-                self.assertEquals(draft.tree_id, draft.parent.tree_id)
+                self.assertEqual(draft.tree_id, draft.parent.tree_id)
                 self.assertTrue(draft.parent in draft.get_ancestors())
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
@@ -764,8 +764,8 @@ class PublishingTests(TestCase):
         not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
         drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
 
-        self.assertEquals(len(not_drafts), 5)
-        self.assertEquals(len(drafts), 5)
+        self.assertEqual(len(not_drafts), 5)
+        self.assertEqual(len(drafts), 5)
 
         for idx, draft in enumerate(drafts):
             public = not_drafts[idx]
@@ -775,7 +775,7 @@ class PublishingTests(TestCase):
                 # Let's assert the MPTT tree is consistent
                 self.assertTrue(public.lft > public.parent.lft)
                 self.assertTrue(public.rght < public.parent.rght)
-                self.assertEquals(public.tree_id, public.parent.tree_id)
+                self.assertEqual(public.tree_id, public.parent.tree_id)
                 self.assertTrue(public.parent in public.get_ancestors())
                 self.assertTrue(public in public.parent.get_descendants())
                 self.assertTrue(public in public.parent.get_children())
@@ -783,7 +783,7 @@ class PublishingTests(TestCase):
                 # Same principle for the draft tree
                 self.assertTrue(draft.lft > draft.parent.lft)
                 self.assertTrue(draft.rght < draft.parent.rght)
-                self.assertEquals(draft.tree_id, draft.parent.tree_id)
+                self.assertEqual(draft.tree_id, draft.parent.tree_id)
                 self.assertTrue(draft.parent in draft.get_ancestors())
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())

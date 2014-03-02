@@ -121,6 +121,21 @@ class PageUrl(AsTag):
         Argument('varname', required=False, resolve=False),
     )
 
+    def get_value_for_context(self, context, **kwargs):
+        #
+        # A design decision with several active members of the django-cms
+        # community that using this tag with the 'as' breakpoint should never
+        # return Exceptions regardless of the setting of settings.DEBUG.
+        #
+        # We wish to maintain backwards functionality where the non-as-variant
+        # of using this tag will raise DNE exceptions only when
+        # settings.DEBUG=False.
+        #
+        try:
+            return super(PageUrl, self).get_value_for_context(context, **kwargs)
+        except Page.DoesNotExist:
+            return ''
+
     def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
 

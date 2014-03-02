@@ -433,7 +433,7 @@ class AdminTestCase(AdminTestsBase):
                                                created_by=admin_user, published=True, parent=self.reload(first_level_page))
         third_level_page = create_page('level3', "nav_playground.html", "en",
                                        created_by=admin_user, published=True, parent=second_level_page_top)
-        self.assertEquals(Page.objects.all().count(), 4)
+        self.assertEqual(Page.objects.all().count(), 4)
 
         url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
         request = self.get_request(url)
@@ -485,12 +485,12 @@ class AdminTestCase(AdminTestsBase):
         
         self.client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_2'
         response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.context["open_menu_trees"], [1, 2])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["open_menu_trees"], [1, 2])
         # tests descendants method for the lazy load ajax call
         url = "%s%d/descendants/" % (url, first_level_page.pk)
         response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # should include both direct descendant pages
         self.assertContains(response, 'id="page_%s"' % second_level_page_top.pk)
         self.assertContains(response, 'id="page_%s"' % second_level_page_bottom.pk)
@@ -671,23 +671,23 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
-            self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
+            self.assertEqual(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEquals(json.loads(response.content.decode('utf8')), expected)
+            self.assertEqual(json.loads(response.content.decode('utf8')), expected)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
-            self.assertEquals(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
+            self.assertEqual(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEquals(json.loads(response.content.decode('utf8')), expected)
+            self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
     def test_move_language(self):
         page = self.get_page()
@@ -701,10 +701,10 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'plugin_id': sub_col.pk,
                 'placeholder_id': source.id, 'plugin_parent': col2.pk, 'plugin_language': 'de'})
             response = self.admin_class.move_plugin(request)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
         sub_col = CMSPlugin.objects.get(pk=sub_col.pk)
-        self.assertEquals(sub_col.language, "de")
-        self.assertEquals(sub_col.parent_id, col2.pk)
+        self.assertEqual(sub_col.language, "de")
+        self.assertEqual(sub_col.parent_id, col2.pk)
 
     def test_preview_page(self):
         permless = self.get_permless()

@@ -28,14 +28,14 @@ class BasicReversionTestCase(CMSTestCase):
 
     def test_number_revisions(self):
         with self.login_user_context(self.user):
-            self.assertEquals(Revision.objects.all().count(), 0)
+            self.assertEqual(Revision.objects.all().count(), 0)
             self.page_data = self.get_new_page_data()
 
             response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
 
             self.assertRedirects(response, URL_CMS_PAGE)
-            self.assertEquals(Page.objects.all().count(), 2)
-            self.assertEquals(Revision.objects.all().count(), 1)
+            self.assertEqual(Page.objects.all().count(), 2)
+            self.assertEqual(Revision.objects.all().count(), 1)
 
 
 class ReversionTestCase(TransactionCMSTestCase):
@@ -57,22 +57,22 @@ class ReversionTestCase(TransactionCMSTestCase):
                 'plugin_parent': '',
             }
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             # now edit the plugin
             edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[
                 0] + "/"
             response = self.client.get(edit_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             txt = Text.objects.all()[0]
-            self.assertEquals("Hello World", txt.body)
+            self.assertEqual("Hello World", txt.body)
             self.txt = txt
             # change the content
             response = self.client.post(edit_url, {"body": "Bye Bye World"})
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             txt = Text.objects.all()[0]
-            self.assertEquals("Bye Bye World", txt.body)
+            self.assertEqual("Bye Bye World", txt.body)
             p_data = self.page_data.copy()
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
@@ -85,10 +85,10 @@ class ReversionTestCase(TransactionCMSTestCase):
         Test that you can revert a plugin
         """
         with self.login_user_context(self.user):
-            self.assertEquals(Page.objects.all().count(), 2)
-            self.assertEquals(Title.objects.all().count(), 2)
-            self.assertEquals(CMSPlugin.objects.all().count(), 2)
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEqual(Page.objects.all().count(), 2)
+            self.assertEqual(Title.objects.all().count(), 2)
+            self.assertEqual(CMSPlugin.objects.all().count(), 2)
+            self.assertEqual(Revision.objects.all().count(), 5)
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
@@ -97,32 +97,32 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             history_url = URL_CMS_PAGE_CHANGE % (page.pk) + "history/"
             response = self.client.get(history_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
             revert_url = history_url + "%s/" % version.pk
             response = self.client.get(revert_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             response = self.client.post("%s?language=en&" % revert_url, self.page_data)
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
             # test for publisher_is_draft, published is set for both draft and
             # published page
-            self.assertEquals(Page.objects.all()[0].publisher_is_draft, True)
-            self.assertEquals(CMSPlugin.objects.all().count(), 2)
+            self.assertEqual(Page.objects.all()[0].publisher_is_draft, True)
+            self.assertEqual(CMSPlugin.objects.all().count(), 2)
 
             # test that CMSPlugin subclasses are reverted
-            self.assertEquals(Text.objects.all().count(), 2)
-            self.assertEquals(Text.objects.get(pk=self.txt.pk).body, "Hello World")
-            self.assertEquals(Revision.objects.all().count(), 6)
+            self.assertEqual(Text.objects.all().count(), 2)
+            self.assertEqual(Text.objects.get(pk=self.txt.pk).body, "Hello World")
+            self.assertEqual(Revision.objects.all().count(), 6)
 
     def test_undo_redo(self):
         """
         Test that you can revert a plugin
         """
         with self.login_user_context(self.user):
-            self.assertEquals(Page.objects.all().count(), 2)
-            self.assertEquals(Title.objects.all().count(), 2)
-            self.assertEquals(CMSPlugin.objects.all().count(), 2)
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEqual(Page.objects.all().count(), 2)
+            self.assertEqual(Title.objects.all().count(), 2)
+            self.assertEqual(CMSPlugin.objects.all().count(), 2)
+            self.assertEqual(Revision.objects.all().count(), 5)
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
@@ -131,19 +131,19 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             undo_url = reverse("admin:cms_page_undo", args=[page.pk])
             response = self.client.post(undo_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             page = Page.objects.all()[0]
             self.assertTrue(page.revision_id != 0)
             rev = page.revision_id
             redo_url = reverse("admin:cms_page_redo", args=[page.pk])
             response = self.client.post(redo_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             page = Page.objects.all()[0]
             self.assertTrue(page.revision_id != rev)
             txt = Text.objects.all()[0]
             edit_url = URL_CMS_PLUGIN_EDIT + str(txt.pk) + "/"
             response = self.client.post(edit_url, {"body": "Hello World2"})
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             page = Page.objects.all()[0]
             self.assertEqual(page.revision_id, 0)
             self.assertEqual(2, CMSPlugin.objects.all().count())
@@ -155,14 +155,14 @@ class ReversionTestCase(TransactionCMSTestCase):
                 'plugin_parent': '',
             }
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             # now edit the plugin
             edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[
                 0] + "/"
             response = self.client.get(edit_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertEqual(3, CMSPlugin.objects.all().count())
             response = self.client.post(undo_url)
             response = self.client.post(undo_url)
@@ -173,58 +173,58 @@ class ReversionTestCase(TransactionCMSTestCase):
         Test that you can recover a page
         """
         with self.login_user_context(self.user):
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEqual(Revision.objects.all().count(), 5)
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[4]
             version = Version.objects.filter(content_type=ctype, revision=revision)[0]
 
-            self.assertEquals(Page.objects.all().count(), 2)
-            self.assertEquals(CMSPlugin.objects.all().count(), 2)
-            self.assertEquals(Text.objects.all().count(), 2)
+            self.assertEqual(Page.objects.all().count(), 2)
+            self.assertEqual(CMSPlugin.objects.all().count(), 2)
+            self.assertEqual(Text.objects.all().count(), 2)
 
             page = Page.objects.all()[0]
             page_pk = page.pk
             page.delete()
 
-            self.assertEquals(Page.objects.all().count(), 0)
-            self.assertEquals(CMSPlugin.objects.all().count(), 0)
-            self.assertEquals(Text.objects.all().count(), 0)
+            self.assertEqual(Page.objects.all().count(), 0)
+            self.assertEqual(CMSPlugin.objects.all().count(), 0)
+            self.assertEqual(Text.objects.all().count(), 0)
 
             recover_url = URL_CMS_PAGE + "recover/"
             response = self.client.get(recover_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
             recover_url += "%s/" % version.pk
             response = self.client.get(recover_url)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             response = self.client.post(recover_url, self.page_data)
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page_pk)
-            self.assertEquals(Page.objects.all().count(), 1)
-            self.assertEquals(CMSPlugin.objects.all().count(), 1)
+            self.assertEqual(Page.objects.all().count(), 1)
+            self.assertEqual(CMSPlugin.objects.all().count(), 1)
 
             # test that CMSPlugin subclasses are recovered
-            self.assertEquals(Text.objects.all().count(), 1)
+            self.assertEqual(Text.objects.all().count(), 1)
 
     def test_publish(self):
         with self.login_user_context(self.user):
             page = Page.objects.all()[0]
             page_pk = page.pk
-            self.assertEquals(Revision.objects.all().count(), 5)
+            self.assertEqual(Revision.objects.all().count(), 5)
             publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
             response = self.client.get(publish_url)
-            self.assertEquals(response.status_code, 302)
-            self.assertEquals(Revision.objects.all().count(), 2)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(Revision.objects.all().count(), 2)
 
     def test_publish_limit(self):
         with self.login_user_context(self.user):
             with SettingsOverride(CMS_MAX_PAGE_PUBLISH_REVERSIONS=5):
                 page = Page.objects.all()[0]
                 page_pk = page.pk
-                self.assertEquals(Revision.objects.all().count(), 5)
+                self.assertEqual(Revision.objects.all().count(), 5)
                 for x in range(10):
                     publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
                     response = self.client.get(publish_url)
-                    self.assertEquals(response.status_code, 302)
+                    self.assertEqual(response.status_code, 302)
                 self.assertEqual(Revision.objects.all().count(), 6)
 
 
