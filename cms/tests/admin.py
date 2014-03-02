@@ -527,16 +527,16 @@ class AdminTestCase(AdminTestsBase):
         create_title("es-mx", es_title, page, slug="es_pagina")
 
         url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
-        url_pat = r'<a href="%s/%s/preview/"[^>]*>%s</a>'
+        url_pat = r'<a href="{0}/{1}/preview/"[^>]*>{2}</a>'
 
         with self.login_user_context(admin_guy):
             # Check the EN version of the tree...
             response = self.client.get(url, {'language': 'en'})
-            self.assertRegexpMatches(str(response), url_pat % (page.pk, 'en', en_title, ))
+            self.assertRegexpMatches(str(response), url_pat.format(page.pk, 'en', en_title, ))
 
             # Check the ES version of the tree...
             response = self.client.get(url, {'language': 'es-mx'})
-            self.assertRegexpMatches(str(response), url_pat % (page.pk, 'es-mx', es_title, ))
+            self.assertRegexpMatches(str(response), url_pat.format(page.pk, 'es-mx', es_title, ))
 
 
 class AdminTests(AdminTestsBase):
