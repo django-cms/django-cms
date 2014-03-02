@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
+import datetime
+from cms.test_utils.project.placeholderapp.models import Example1
+from django.core.urlresolvers import clear_url_caches, resolve
+from cms.appresolver import clear_app_resolvers
+from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from django.core.cache import cache
 import os
 import time
@@ -117,6 +123,30 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         finally:
             self.accept_next_alert = True
 
+    def reload_urls(self):
+        """
+         Code borrowed from ApphooksTestCase
+        """
+        from django.conf import settings
+
+        url_modules = [
+            'cms.urls',
+            # TODO: Add here intermediary modules which may
+            #       include() the 'cms.urls' if it isn't included
+            #       directly in the root urlconf.
+            # '...',
+            'cms.test_utils.project.second_cms_urls_for_apphook_tests',
+            'cms.test_utils.project.urls_for_apphook_tests',
+            settings.ROOT_URLCONF,
+        ]
+
+        clear_app_resolvers()
+        clear_url_caches()
+
+        for module in url_modules:
+            if module in sys.modules:
+                del sys.modules[module]
+
 
 class ToolbarBasicTests(CMSLiveTests):
 
@@ -141,6 +171,48 @@ class ToolbarBasicTests(CMSLiveTests):
         password_input.submit()
         self.wait_page_loaded()
         self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+
+    def test_toolbar_login_view(self):
+        User = get_user_model()
+        create_page('Home', 'simple.html', 'en', published=True)
+        ex1 = Example1.objects.create(
+            char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
+            date_field=datetime.datetime.now()
+        )
+        apphook = create_page('apphook', 'simple.html', 'en', published=True,
+                              apphook=Example1App)
+        self.reload_urls()
+
+        url = '%s/%s/?edit' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk)
+        self.driver.get(url)
+        username_input = self.driver.find_element_by_id("id_cms-username")
+        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
+        password_input = self.driver.find_element_by_id("id_cms-password")
+        password_input.send_keys("what")
+        password_input.submit()
+        self.wait_page_loaded()
+        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
+
+    def test_toolbar_login_cbv(self):
+        User = get_user_model()
+        create_page('Home', 'simple.html', 'en', published=True)
+        ex1 = Example1.objects.create(
+            char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
+            date_field=datetime.datetime.now()
+        )
+        apphook = create_page('apphook', 'simple.html', 'en', published=True,
+                              apphook=Example1App)
+        self.reload_urls()
+
+        url = '%s/%s/?edit' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk)
+        self.driver.get(url)
+        username_input = self.driver.find_element_by_id("id_cms-username")
+        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
+        password_input = self.driver.find_element_by_id("id_cms-password")
+        password_input.send_keys("what")
+        password_input.submit()
+        self.wait_page_loaded()
+        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
 
     def test_basic_add_pages(self):
         with SettingsOverride(DEBUG=True):
