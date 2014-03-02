@@ -4,6 +4,7 @@ from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from django.core.cache import cache
@@ -103,9 +104,6 @@ class CacheTestCase(CMSTestCase):
 
         from django.conf import settings
 
-        # We'll store the old MW so that we can play nice with the other tests
-        old_middleware = settings.MIDDLEWARE_CLASSES[:]
-
         # Clear the entire cache for a clean slate
         cache.clear()
 
@@ -114,75 +112,72 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        settings.MIDDLEWARE_CLASSES[:] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
-        # Silly to do these tests if this setting isn't True
-        page_cache_setting = get_cms_setting('PAGE_CACHE')
-        self.assertTrue(page_cache_setting)
+        with SettingsOverride(MIDDLEWARE_CLASSES = mw_classes):
 
-        # Create a test page
-        page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+            # Silly to do these tests if this setting isn't True
+            page_cache_setting = get_cms_setting('PAGE_CACHE')
+            self.assertTrue(page_cache_setting)
 
-        # Add some content
-        placeholder = page1.placeholders.filter(slot="body")[0]
-        add_plugin(placeholder, "TextPlugin", 'en', body="English")
-        add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
+            # Create a test page
+            page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
 
-        # Create a request object
-        request = self.get_request(page1.get_path(), 'en')
+            # Add some content
+            placeholder = page1.placeholders.filter(slot="body")[0]
+            add_plugin(placeholder, "TextPlugin", 'en', body="English")
+            add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
 
-        # Ensure that user is NOT authenticated
-        self.assertFalse(request.user.is_authenticated())
+            # Create a request object
+            request = self.get_request(page1.get_path(), 'en')
 
-        # Test that the page is initially uncached
-        with self.assertNumQueries(FuzzyInt(1, 20)):
-            response = self.client.get('/en/')
-        self.assertEqual(response.status_code, 200)
+            # Ensure that user is NOT authenticated
+            self.assertFalse(request.user.is_authenticated())
 
-        #
-        # Test that subsequent requests of the same page are cached by
-        # asserting that they require fewer queries.
-        #
-        with self.assertNumQueries(0):
-            response = self.client.get('/en/')
-        self.assertEqual(response.status_code, 200)
+            # Test that the page is initially uncached
+            with self.assertNumQueries(FuzzyInt(1, 20)):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
 
-        #
-        # Test that the cache is invalidated on unpublishing the page
-        #
-        old_version = _get_cache_version()
-        page1.unpublish('en')
-        self.assertGreater(_get_cache_version(), old_version)
+            #
+            # Test that subsequent requests of the same page are cached by
+            # asserting that they require fewer queries.
+            #
+            with self.assertNumQueries(0):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
 
-        #
-        # Test that this means the page is actually not cached.
-        #
-        page1.publish('en')
-        with self.assertNumQueries(FuzzyInt(1, 20)):
-            response = self.client.get('/en/')
-        self.assertEqual(response.status_code, 200)
+            #
+            # Test that the cache is invalidated on unpublishing the page
+            #
+            old_version = _get_cache_version()
+            page1.unpublish('en')
+            self.assertGreater(_get_cache_version(), old_version)
 
-        #
-        # Test that the above behavior is different when CMS_PAGE_CACHE is
-        # set to False (disabled)
-        #
-        cache.clear()
-        settings.CMS_PAGE_CACHE = False
+            #
+            # Test that this means the page is actually not cached.
+            #
+            page1.publish('en')
+            with self.assertNumQueries(FuzzyInt(1, 20)):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
 
-        # Test that the page is initially uncached
-        with self.assertNumQueries(FuzzyInt(1, 20)):
-            response = self.client.get('/en/')
-        self.assertEqual(response.status_code, 200)
+            #
+            # Test that the above behavior is different when CMS_PAGE_CACHE is
+            # set to False (disabled)
+            #
+            cache.clear()
+            settings.CMS_PAGE_CACHE = False
 
-        #
-        # Test that subsequent requests of the same page are still requires DB
-        # access.
-        #
-        with self.assertNumQueries(FuzzyInt(1, 20)):
-            response = self.client.get('/en/')
-        self.assertEqual(response.status_code, 200)
+            # Test that the page is initially uncached
+            with self.assertNumQueries(FuzzyInt(1, 20)):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
 
-        #
-        # Let's reset the original middleware for the remaining tests...
-        #
-        settings.MIDDLEWARE_CLASSES = old_middleware[:]
+            #
+            # Test that subsequent requests of the same page are still requires DB
+            # access.
+            #
+            with self.assertNumQueries(FuzzyInt(1, 20)):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)

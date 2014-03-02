@@ -31,7 +31,6 @@ class ToolbarPoolTests(TestCase):
         self.assertRaises(ImproperlyConfigured, self.pool.register, object)
 
     def test_register_order(self):
-        print(self.pool.toolbars)
         self.pool.register(TestToolbar)
         self.pool.register(CMSToolbar)
 
