@@ -28,15 +28,15 @@ class FormsTestCase(CMSTestCase):
 
     def test_get_site_choices(self):
         result = get_site_choices()
-        self.assertEquals(result, [])
+        self.assertEqual(result, [])
 
     def test_get_page_choices(self):
         result = get_page_choices()
-        self.assertEquals(result, [('', '----')])
+        self.assertEqual(result, [('', '----')])
 
     def test_get_site_choices_without_moderator(self):
         result = get_site_choices()
-        self.assertEquals(result, [])
+        self.assertEqual(result, [])
 
     def test_get_site_choices_without_moderator_with_superuser(self):
         # boilerplate (creating a page)
@@ -54,7 +54,7 @@ class FormsTestCase(CMSTestCase):
             create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The proper test
             result = get_site_choices()
-            self.assertEquals(result, [(1, 'example.com')])
+            self.assertEqual(result, [(1, 'example.com')])
 
     def test_compress_function_raises_when_page_is_none(self):
         raised = False
@@ -71,13 +71,13 @@ class FormsTestCase(CMSTestCase):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = (0, None) #(site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
     def test_compress_function_returns_none_when_no_data_list(self):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = None
         result = fake_field.compress(data_list)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
     def test_compress_function_gets_a_page_when_one_exists(self):
         # boilerplate (creating a page)
@@ -98,7 +98,7 @@ class FormsTestCase(CMSTestCase):
             fake_field = Mock_PageSelectFormField()
             data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
             result = fake_field.compress(data_list)
-            self.assertEquals(home_page, result)
+            self.assertEqual(home_page, result)
 
     def test_update_site_and_page_choices(self):
         Site.objects.all().delete()
@@ -124,13 +124,13 @@ class FormsTestCase(CMSTestCase):
         normal_result = get_site_choices()
         lazy_result = SuperLazyIterator(get_site_choices)
 
-        self.assertEquals(normal_result, list(lazy_result))
+        self.assertEqual(normal_result, list(lazy_result))
 
     def test_superlazy_iterator_behaves_properly_for_pages(self):
         normal_result = get_page_choices()
         lazy_result = SuperLazyIterator(get_page_choices)
 
-        self.assertEquals(normal_result, list(lazy_result))
+        self.assertEqual(normal_result, list(lazy_result))
 
     def test_page_user_form_initial(self):
         if get_user_model().USERNAME_FIELD == 'email':

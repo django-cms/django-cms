@@ -130,7 +130,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
         self.assertContains(response, '<div id="cms_toolbar"')
         self.assertContains(response, 'cms.base.css')
@@ -140,7 +140,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Generic</span>')
 
     def test_markup_flash_custom_module(self):
@@ -148,7 +148,7 @@ class ToolbarTests(ToolbarTestBase):
         create_page("toolbar-page", "col_two.html", "en", published=True)
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="LinkPlugin">')
         self.assertContains(response,
                             '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
@@ -241,7 +241,7 @@ class ToolbarTests(ToolbarTestBase):
             create_page("toolbar-page", "col_two.html", "en", published=True)
             with self.login_user_context(superuser):
                 response = self.client.get('/en/?edit')
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'PPPP')
 
     def test_user_settings(self):
@@ -284,7 +284,7 @@ class ToolbarTests(ToolbarTestBase):
 
         # Insert gamma (should return alpha_position + 1)
         gamma_position = admin_menu.get_alphabetical_insert_position('menu-gamma', SubMenu)
-        self.assertEquals(int(gamma_position), int(alpha_position) + 1)
+        self.assertEqual(int(gamma_position), int(alpha_position) + 1)
         admin_menu.get_or_create_menu('menu-gamma', 'menu-gamma', position=gamma_position)
 
         # Where should beta go? It should go right where gamma is now...

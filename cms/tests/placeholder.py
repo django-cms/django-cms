@@ -308,8 +308,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_field_dynamic_slot_generation(self):
         instance = DynamicPlaceholderSlotExample.objects.create(char_1='slot1', char_2='slot2')
-        self.assertEquals(instance.char_1, instance.placeholder_1.slot)
-        self.assertEquals(instance.char_2, instance.placeholder_2.slot)
+        self.assertEqual(instance.char_1, instance.placeholder_1.slot)
+        self.assertEqual(instance.char_2, instance.placeholder_2.slot)
 
     def test_placeholder_field_dynamic_slot_update(self):
         instance = DynamicPlaceholderSlotExample.objects.create(char_1='slot1', char_2='slot2')
@@ -332,11 +332,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         current_placeholder_2_plugin_count = len(instance.placeholder_2.get_plugins())
 
         # Now test that the placeholder slots have changed
-        self.assertEquals(instance.char_2, 'slot1')
-        self.assertEquals(instance.char_1, 'slot2')
+        self.assertEqual(instance.char_2, 'slot1')
+        self.assertEqual(instance.char_1, 'slot2')
         # Test that a new placeholder was never created
-        self.assertEquals(instance.placeholder_1.pk, placeholder_1_id)
-        self.assertEquals(instance.placeholder_2.pk, placeholder_2_id)
+        self.assertEqual(instance.placeholder_1.pk, placeholder_1_id)
+        self.assertEqual(instance.placeholder_2.pk, placeholder_2_id)
         # And test the plugin counts remain the same
         self.assertEqual(old_placeholder_1_plugin_count, current_placeholder_1_plugin_count)
         self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
@@ -897,7 +897,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 response = admin.edit_plugin(request, plugin_id)
                 self.assertEqual(response.status_code, 200)
                 text_plugin = Text.objects.get(pk=plugin_id)
-                self.assertEquals('Hello World', text_plugin.body)
+                self.assertEqual('Hello World', text_plugin.body)
 
                 # edit again, but this time press cancel
                 data = {
@@ -908,7 +908,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 response = admin.edit_plugin(request, plugin_id)
                 self.assertEqual(response.status_code, 200)
                 text_plugin = Text.objects.get(pk=plugin_id)
-                self.assertEquals('Hello World', text_plugin.body)
+                self.assertEqual('Hello World', text_plugin.body)
 
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
