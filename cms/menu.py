@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
+
+from django.contrib.sites.models import Site
+from django.utils.translation import get_language
+
 from cms.apphook_pool import apphook_pool
-from cms.compat import get_user_model, user_related_query_name, user_related_name
-from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
-    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
+from cms.compat import user_related_name
+from cms.models.permissionmodels import ACCESS_DESCENDANTS
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS
+from cms.models.permissionmodels import ACCESS_CHILDREN
+from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
+from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
@@ -14,10 +21,6 @@ from cms.utils.moderator import get_title_queryset, use_draft
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
-
-from django.contrib.sites.models import Site
-from django.db.models.query_utils import Q
-from django.utils.translation import get_language
 
 
 def get_visible_pages(request, pages, site=None):

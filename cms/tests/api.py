@@ -203,6 +203,6 @@ class PythonAPITests(TestCase):
 
     def test_create_reverse_id_collision(self):
 
-        page = create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
+        create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertTrue(Page.objects.count(), 2)

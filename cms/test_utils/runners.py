@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.test.simple import DjangoTestSuiteRunner
 from cms.utils.compat.dj import force_unicode
 import operator

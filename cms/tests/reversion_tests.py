@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import shutil
+from os.path import join
 
-from cms.compat import get_user_model
-from cms.admin import pageadmin
-from django.contrib import admin
-
-from cms.models import Page, Title
-from cms.models.pluginmodel import CMSPlugin
 from djangocms_text_ckeditor.models import Text
-from cms.test_utils.project.fileapp.models import FileModel
-from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
-from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
-from os.path import join
 import reversion
 from reversion.models import Revision, Version
+
+from cms.models import Page, Title
+from cms.models.pluginmodel import CMSPlugin
+from cms.test_utils.project.fileapp.models import FileModel
+from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
+from cms.test_utils.util.context_managers import SettingsOverride
 
 if hasattr(reversion.models, 'VERSION_CHANGE'):
     from reversion.models import VERSION_CHANGE
@@ -105,7 +102,6 @@ class ReversionTestCase(TransactionCMSTestCase):
             revert_url = history_url + "%s/" % version.pk
             response = self.client.get(revert_url)
             self.assertEqual(response.status_code, 200)
-            data = self.page_data
             response = self.client.post("%s?language=en&" % revert_url, self.page_data)
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
             # test for publisher_is_draft, published is set for both draft and
@@ -130,7 +126,7 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
-            version = Version.objects.get(content_type=ctype, revision=revision)
+            Version.objects.get(content_type=ctype, revision=revision)
             page = Page.objects.all()[0]
 
             undo_url = reverse("admin:cms_page_undo", args=[page.pk])

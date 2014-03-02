@@ -2,12 +2,13 @@
 from __future__ import with_statement
 import json
 
+from djangocms_text_ckeditor.models import Text
+
 from cms.api import create_page, add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from djangocms_text_ckeditor.models import Text
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
@@ -119,7 +120,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         # just in case the test method that called us wants it:
         return copied_placeholder
 
-
     def test_plugin_deep_nesting_and_copying(self):
         """
         Create a deeply-nested plugin structure, tests its properties, and tests
@@ -158,13 +158,11 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         """
 
         placeholder = Placeholder(slot=u"some_slot")
-        placeholder.save() # a good idea, if not strictly necessary
-
+        placeholder.save()  # a good idea, if not strictly necessary
 
         # plugin in placeholder
         plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"01",
-        )
+                              body=u"01")
         plugin_1.save()
 
         # IMPORTANT: plugins must be reloaded, before they can be assigned 
@@ -416,12 +414,11 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         self.copy_placeholders_and_check_results([placeholder])
 
         # make plugin_7 plugin_2's first-child
-        plugin_2 = self.reload(plugin_2)
+        self.reload(plugin_2)
         plugin_7 = self.reload(plugin_7)
         plugin_7.move_to(target=plugin_3, position="right")
         plugin_7.save()
         self.copy_placeholders_and_check_results([placeholder, ])
-
 
     def test_nested_plugin_on_page(self):
         """
@@ -478,7 +475,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             post_add_plugin_count = CMSPlugin.objects.count()
             self.assertEqual(post_add_plugin_count, 2)
 
-
     def test_copy_page_nested_plugin(self):
         """
         Test to verify that page copy with a nested plugin works
@@ -490,13 +486,12 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         Verify copied page, placeholders, plugins and body text
         """
         with SettingsOverride(CMS_PERMISSION=False):
-            templates = []
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
             page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
             page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
-            page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
+            page_one.placeholders.get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body="Hello World")
             self.assertEqual(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
@@ -547,7 +542,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEqual(placeholder_count, 3)
             self.assertEqual(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 3)
-            page_one_plugins = CMSPlugin.objects.all()
             ##
             # setup page_copy_target page
             ##
@@ -683,7 +677,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             ok = ((org_placeholder.id != copied_placeholder.id))
             self.assertTrue(ok, msg)
 
-
     def test_copy_page_nested_plugin_moved_parent_plugin(self):
         """
         Test to verify that page copy with a nested plugin works
@@ -702,13 +695,12 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         verify the copied page structure
         """
         with SettingsOverride(CMS_PERMISSION=False):
-            templates = []
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
             page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
             page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
-            page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
+            page_one.placeholders.get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
             self.assertEqual(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
@@ -758,7 +750,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEqual(placeholder_count, 3)
             self.assertEqual(CMSPlugin.objects.count(), 3)
-            page_one_plugins = CMSPlugin.objects.all()
             # setup page_copy_target
             page_copy_target = create_page("Three Placeholder - page copy target", "col_three.html", "en",
                                            position="last-child", published=True, in_navigation=True)
@@ -783,7 +774,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 self.assertEqual(json.loads(response.content.decode('utf8')), expected)
                 # check if the plugin got moved
                 page_one = self.reload(page_one)
-                text_plugin_two = self.reload(text_plugin_two)
+                self.reload(text_plugin_two)
                 page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
                 page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
                 page_one_ph_three = page_one.placeholders.get(slot=u"col_right")

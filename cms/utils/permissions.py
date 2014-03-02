@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-from cms.compat import get_user_model, user_related_query_name
-from cms.exceptions import NoPermissionsException
-from cms.models import Page, PagePermission, GlobalPagePermission
-from cms.plugin_pool import plugin_pool
-from cms.utils import get_cms_setting
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
 
+from cms.compat import get_user_model, user_related_query_name
+from cms.exceptions import NoPermissionsException
+from cms.models import Page, PagePermission, GlobalPagePermission
+from cms.plugin_pool import plugin_pool
 
 
 try:
@@ -19,6 +17,7 @@ except ImportError:
 # thread local support
 _thread_locals = local()
 
+
 def set_current_user(user):
     """
     Assigns current user from request to thread_locals, used by
@@ -26,11 +25,13 @@ def set_current_user(user):
     """
     _thread_locals.user = user
 
+
 def get_current_user():
     """
     Returns current user, or None
     """
     return getattr(_thread_locals, 'user', None)
+
 
 def has_page_add_permission(request):
     """
@@ -50,6 +51,9 @@ def has_page_add_permission(request):
     target = request.GET.get('target', None)
     position = request.GET.get('position', None)
 
+    from cms.utils.plugins import current_site
+    site = current_site(request)
+
     if target is not None:
         try:
             page = Page.objects.get(pk=target)
@@ -66,14 +70,13 @@ def has_page_add_permission(request):
             if page.parent_id:
                 return has_generic_permission(page.parent_id, request.user, "add", page.site)
     else:
-        from cms.utils.plugins import current_site
-        site = current_site(request)
         global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
             request.user, site).exists()
         if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
                 and global_add_perm):
             return True
     return False
+
 
 def has_any_page_change_permissions(request):
     from cms.utils.plugins import current_site
@@ -85,6 +88,7 @@ def has_any_page_change_permissions(request):
             Q(user=request.user) |
             Q(group__in=request.user.groups.all())
         )).exists()
+
 
 def has_page_change_permission(request):
     """
@@ -166,6 +170,7 @@ def get_user_permission_level(user):
         raise NoPermissionsException
     return permission.page.level
 
+
 def get_subordinate_users(user):
     """
     Returns users queryset, containing all subordinate users to given user
@@ -224,6 +229,7 @@ def get_subordinate_users(user):
     qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
     return qs
 
+
 def get_subordinate_groups(user):
     """
     Similar to get_subordinate_users, but returns queryset of Groups instead
@@ -251,6 +257,7 @@ def get_subordinate_groups(user):
     )
     return qs
 
+
 def has_global_change_permissions_permission(request):
     opts = GlobalPagePermission._meta
     user = request.user
@@ -259,6 +266,7 @@ def has_global_change_permissions_permission(request):
         has_global_page_permission(request, can_change=True)):
         return True
     return False
+
 
 def has_generic_permission(page_id, user, attr, site):
     """

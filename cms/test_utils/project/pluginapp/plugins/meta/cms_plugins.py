@@ -2,7 +2,12 @@
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from .models import *
+from .models import TestPluginModel
+from .models import TestPluginModel2
+from .models import TestPluginModel3
+from .models import TestPluginModel4
+from .models import TestPluginModel5
+
 
 class TestPlugin(CMSPluginBase):
     model = TestPluginModel

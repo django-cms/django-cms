@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from django import forms
-
-from django.utils.translation import ugettext, ugettext_lazy as _
-
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from cms.compat import get_user_model
 
 from .models import EmailUser
+
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -22,7 +20,7 @@ class UserCreationForm(forms.ModelForm):
 
     email = forms.EmailField(
         label=_('Email'),
-        help_text = "Required.  Standard format email address.",
+        help_text="Required.  Standard format email address.",
     )
 
     password1 = forms.CharField(
@@ -44,6 +42,8 @@ class UserCreationForm(forms.ModelForm):
         # Since User.username is unique, this check is redundant,
         # but it sets a nicer error message than the ORM. See #13147.
         email = self.cleaned_data["email"]
+
+        User = get_user_model()
         
         try:
             User._default_manager.get(email=email)
@@ -73,6 +73,7 @@ class UserCreationForm(forms.ModelForm):
             user.save()
 
         return user
+
 
 class UserChangeForm(forms.ModelForm):
     """

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from cms.models import Page, Title, CMSPlugin, Placeholder
-from cms.utils import get_language_from_request
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+
+from cms.models import Page, Title, CMSPlugin, Placeholder
 
 
 def revert_plugins(request, version_id, obj):
@@ -15,7 +15,6 @@ def revert_plugins(request, version_id, obj):
     titles = []
     others = []
     page = obj
-    lang = get_language_from_request(request)
     for rev in revs:
         obj = rev.object
         if obj.__class__ == Placeholder:

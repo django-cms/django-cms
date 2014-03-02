@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+
+from django.template import Template
+
 from cms.api import create_page
-from cms.compat import get_user_model
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.i18n import force_language
-from django.middleware.locale import LocaleMiddleware
-from django.template import Template
-from menus.base import NavigationNode
-from django.http import HttpResponse
 from cms.templatetags.cms_admin import preview_link
+from cms.utils.i18n import force_language
+from menus.base import NavigationNode
 
 
 class NonRootCase(CMSTestCase):

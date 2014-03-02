@@ -2,10 +2,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as OriginalUserAdmin
 
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 from .models import EmailUser
 from .forms import UserChangeForm, UserCreationForm
+
 
 class UserAdmin(OriginalUserAdmin):
     # The form to add and change user instances

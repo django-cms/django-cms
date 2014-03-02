@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-import urllib
-from cms.compat import user_model_label
-from cms.api import get_page_draft
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, RIGHT
-from cms.exceptions import LanguageError
-from cms.models import Title
-from cms.toolbar.items import TemplateItem
-from cms.toolbar_base import CMSToolbar
-from cms.utils.i18n import get_language_objects, force_language, get_language_object
-from django.contrib.sites.models import Site
-from cms.utils import get_cms_setting
-from cms.toolbar_pool import toolbar_pool
-from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+
+from cms.api import get_page_draft
+from cms.compat import user_model_label
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.exceptions import LanguageError
+from cms.models import Title
+from cms.toolbar.items import TemplateItem
+from cms.toolbar_base import CMSToolbar
+from cms.toolbar_pool import toolbar_pool
+from cms.utils.i18n import get_language_objects
+from cms.utils.i18n import force_language
+from cms.utils.i18n import get_language_object
+from cms.utils import get_cms_setting
+from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.permissions import has_page_change_permission
 from menus.utils import DefaultLanguageChanger
 
 
