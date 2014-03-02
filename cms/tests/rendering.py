@@ -299,13 +299,13 @@ class RenderingTestCase(SettingsOverrideTestCase):
 
         with SettingsOverride(DEBUG=True):
             template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
-            try:
-                self.render(template, self.test_page, {'test_page': self.test_page2})
-                self.fail('No exception raised')
-            except Page.DoesNotExist:
-                pass
-            except:
-                self.fail('Wrong exception raised')
+            self.assertRaises(
+                Page.DoesNotExist,
+                self.render,
+                template,
+                self.test_page,
+                {'test_page': self.test_page2}
+            )
 
     #
     # In the 'as varname' form, ensure that the tag will always swallow
