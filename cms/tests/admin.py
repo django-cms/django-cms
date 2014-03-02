@@ -8,7 +8,6 @@ from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page
-from cms.apphook_pool import apphook_pool, ApphookPool
 from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import UserSettings, StaticPlaceholder
@@ -509,6 +508,34 @@ class AdminTestCase(AdminTestsBase):
         
         response = self.client.get('/en/admin/cms/page/1/?language=en')
         self.assertEqual(response.status_code, 404)
+
+    def test_tree_displays_in_correct_language(self):
+        '''
+        Test to prove and protect that the page titles in the tree are
+        displayed in the currently set language.
+        '''
+        admin_guy, normal_guy = self._get_guys(use_global_permissions=False)
+        site = Site.objects.get(pk=1)
+
+        en_title = "EN Page"
+        es_title = "ES Pagina"
+
+        # Create a page in en
+        page = create_page(en_title, "nav_playground.html", "en", site=site, created_by=admin)
+        # Add a es-mx translation for this page
+        create_title("es-mx", es_title, page, slug="es_pagina")
+
+        url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
+        url_pat = '<a href="{0}/{1}/preview/"[^>]*>{2}</a>'
+
+        with self.login_user_context(admin_guy):
+            # Check the EN version of the tree...
+            response = self.client.get(url, {'language': 'en'})
+            self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'en', en_title, ))
+
+            # Check the ES version of the tree...
+            response = self.client.get(url, {'language': 'es-mx'})
+            self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'es-mx', es_title, ))
 
 
 class AdminTests(AdminTestsBase):
