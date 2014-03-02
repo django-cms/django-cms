@@ -1,27 +1,29 @@
 from __future__ import with_statement
 import copy
+import os
+
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.sites.models import Site
+from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest
+from django.template import RequestContext, Context
+from django.test import RequestFactory, TestCase
+from django.template.base import Template
+from django.utils.html import escape
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.toolbar.toolbar import CMSToolbar
-from django.test import RequestFactory, TestCase
-import os
 from cms.api import create_page, create_title, add_plugin
 from cms.compat import get_user_model
 from cms.models.pagemodel import Page, Placeholder
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from cms.templatetags.cms_tags import _get_page_by_untyped_arg, _show_placeholder_for_page, _get_placeholder
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase, CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import get_cms_setting, get_site_id
 from cms.utils.plugins import get_placeholders
-from django.contrib.sites.models import Site
-from django.core import mail
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
-from django.template import RequestContext, Context
-from django.template.base import Template
-from django.utils.html import escape
-from django.contrib.auth.models import AnonymousUser
 
 
 class TemplatetagTests(TestCase):
@@ -81,8 +83,6 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         self.assertEqual(page, control)
 
     def test_get_page_by_pk_arg_edit_mode(self):
-        User = get_user_model()
-
         control = self._getfirst()
         request = self.get_request('/')
         request.GET = {"edit": ''}
@@ -228,7 +228,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             REQUEST = {'language': 'en'}
 
         placeholder = _get_placeholder(page, page, dict(request=FakeRequest()), 'col_right')
-        db_placeholder = page.placeholders.get(slot='col_right')
+        page.placeholders.get(slot='col_right')
         self.assertEqual(placeholder.slot, 'col_right')
 
 
@@ -282,8 +282,6 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_cached_show_placeholder_preview(self):
         from django.core.cache import cache
-        User = get_user_model()
-
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
         placeholder = page.placeholders.all()[0]
@@ -309,8 +307,6 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_plugin(self):
         from django.core.cache import cache
-        User = get_user_model()
-
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
         placeholder = page.placeholders.all()[0]

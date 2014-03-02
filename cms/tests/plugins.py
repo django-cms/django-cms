@@ -2,9 +2,29 @@
 from __future__ import with_statement
 import datetime
 import json
-from cms import api
+import os
 
-from cms.api import create_page, publish_page, add_plugin
+from djangocms_googlemap.models import GoogleMap
+from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
+from djangocms_file.models import File
+from djangocms_inherit.models import InheritPagePlaceholder
+from djangocms_link.forms import LinkForm
+from djangocms_link.models import Link
+from djangocms_picture.models import Picture
+from djangocms_text_ckeditor.models import Text
+from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
+from django import http
+from django.utils import timezone
+from django.conf import settings
+from django.contrib import admin
+from django.core import urlresolvers
+from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
+from django.forms.widgets import Media
+from django.test.testcases import TestCase
+
+from cms import api
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
@@ -12,17 +32,8 @@ from cms.models.pluginmodel import CMSPlugin, PluginModelBase
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate
-from djangocms_googlemap.models import GoogleMap
-from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
 from cms.utils.plugins import get_plugins_for_page
-from djangocms_file.models import File
-from djangocms_inherit.models import InheritPagePlaceholder
-from djangocms_link.forms import LinkForm
-from djangocms_link.models import Link
-from djangocms_picture.models import Picture
 from cms.toolbar.toolbar import CMSToolbar
-from djangocms_text_ckeditor.models import Text
-from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, Section, ArticlePluginModel
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
@@ -30,18 +41,6 @@ from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_M
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
-from django import http
-from django.utils import timezone
-from django.conf import settings
-from django.contrib import admin
-from cms.compat import get_user_model
-from django.core import urlresolvers
-from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management import call_command
-from django.forms.widgets import Media
-from django.test.testcases import TestCase
-import os
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -72,8 +71,6 @@ plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 class PluginsTestBaseCase(CMSTestCase):
     def setUp(self):
-        User = get_user_model()
-        
         self.super_user = self._create_user("test", True, True)
         self.slave = self._create_user("slave", True)
 
@@ -134,7 +131,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         # add a new text plugin
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
         created_plugin_id = self._create_text_plugin_on_page(page)
         # now edit the plugin
@@ -165,23 +162,22 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 302)
         page = Page.objects.all()[0]
         self.assertEqual(page.is_dirty('en'), False)
-        txt = self._edit_text_plugin(created_plugin_id, "Hello World")
+        self._edit_text_plugin(created_plugin_id, "Hello World")
         page = Page.objects.all()[0]
         self.assertEqual(page.is_dirty('en'), True)
-
 
     def test_plugin_order(self):
         """
         Test that plugin position is saved after creation
         """
-        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                               slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
 
         # We check created objects and objects from the DB to be sure the position value
         # has been saved correctly
-        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
-        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
+        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        text_plugin_2 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
         db_plugin_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk)
         db_plugin_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk)
 
@@ -201,7 +197,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         # add a new text plugin
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type': "TextPlugin",
@@ -237,7 +233,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_extract_images_from_text(self):
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type': "TextPlugin",
@@ -260,14 +256,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         txt = Text.objects.all()[0]
         self.assertTrue('id="plugin_obj_%s"' % (txt.pk + 1) in txt.body)
 
-
     def test_add_text_plugin_empty_tag(self):
         """
         Test that you can add a text plugin
         """
         # add a new text plugin
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type': "TextPlugin",
@@ -295,7 +290,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         # add a new text plugin
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
         plugin_data = {
             'plugin_type': "TextPlugin",
@@ -322,17 +317,17 @@ class PluginsTestCase(PluginsTestBaseCase):
         Test that copying plugins works as expected.
         """
         # create some objects
-        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
-        page_de = create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
         ph_en = page_en.placeholders.get(slot="body")
         ph_de = page_de.placeholders.get(slot="body")
 
         # add the text plugin
-        text_plugin_en = add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
+        text_plugin_en = api.add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
         self.assertEquals(text_plugin_en.pk, CMSPlugin.objects.all()[0].pk)
 
         # add a *nested* link plugin
-        link_plugin_en = add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
+        link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
                                     name="A Link", url="https://www.django-cms.org")
 
         # the call above to add a child makes a plugin reload required here.
@@ -352,7 +347,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         text_plugin_de = ph_de.cmsplugin_set.get(parent=None).get_plugin_instance()[0]
         self.assertEqual(text_plugin_de.get_children().count(), 1)
         link_plugin_de = text_plugin_de.get_children().get().get_plugin_instance()[0]
-
 
         # check we have twice as many plugins as before
         self.assertEqual(CMSPlugin.objects.count(), 4)
@@ -377,31 +371,31 @@ class PluginsTestCase(PluginsTestBaseCase):
         copy_plugins_to([link_plugin_en], ph_de, 'de')
 
     def test_deep_copy_plugins(self):
-        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
-        page_de = create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
         ph_en = page_en.placeholders.get(slot="body")
         ph_de = page_de.placeholders.get(slot="body")
 
         # add the text plugin
-        mcol1 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
-        mcol2 = add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+        mcol1 = api.add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+        mcol2 = api.add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
         mcol1 = self.reload(mcol1)
-        col1 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        col1 = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
         mcol1 = self.reload(mcol1)
-        col2 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        col2 = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
 
         mcol2 = self.reload(mcol2)
-        col3 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
+        col3 = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
         mcol2 = self.reload(mcol2)
-        col4 = add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
-        mcol1 = add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")
+        api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
+        mcol1 = api.add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")
         # add a *nested* link plugin
         mcol1 = self.reload(mcol1)
         mcol2 = self.reload(mcol2)
         col3 = self.reload(col3)
         col2 = self.reload(col2)
         col1 = self.reload(col1)
-        link_plugin_en = add_plugin(ph_en, "LinkPlugin", "en", target=col2,
+        link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=col2,
                                     name="A Link", url="https://www.django-cms.org")
         mcol1 = self.reload(mcol1)
         mcol2 = self.reload(mcol2)
@@ -411,10 +405,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         copy_plugins_to([col2, link_plugin_en], ph_de, 'de', mcol1.pk)
         mcol1 = self.reload(mcol1)
         mcol2 = self.reload(mcol2)
-        col3 = self.reload(col3)
-        col2 = self.reload(col2)
-        col1 = self.reload(col1)
-        link_plugin_en = self.reload(link_plugin_en)
+        self.reload(col3)
+        self.reload(col2)
+        self.reload(col1)
+        self.reload(link_plugin_en)
         mcol1 = self.reload(mcol1)
         self.assertEquals(mcol1.get_descendants().count(), 2)
 
@@ -424,14 +418,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRenderButChildren)
         plugin_pool.register_plugin(DynTemplate)
 
-
     def test_remove_plugin_before_published(self):
         """
         When removing a draft plugin we would expect the public copy of the plugin to also be removed
         """
         # add a page
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
 
         # add a plugin
@@ -459,9 +452,9 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_remove_plugin_after_published(self):
         # add a page
-        home = api.create_page("home", "nav_playground.html", "en")
+        api.create_page("home", "nav_playground.html", "en")
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
 
         # add a plugin
@@ -505,7 +498,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         Test case for PlaceholderField
         """
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
 
         # add a plugin
@@ -571,7 +564,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test case for InheritPagePlaceholder
         """
-        inheritfrompage = create_page('page to inherit from',
+        inheritfrompage = api.create_page('page to inherit from',
                                       'nav_playground.html',
                                       'en')
 
@@ -589,7 +582,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin.insert_at(None, position='last-child', save=True)
         inheritfrompage.publish('en')
 
-        page = create_page('inherit from page',
+        page = api.create_page('inherit from page',
                            'nav_playground.html',
                            'en',
                            published=True)
@@ -613,7 +606,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             response.content)
 
     def test_inherit_plugin_with_empty_plugin(self):
-        inheritfrompage = create_page('page to inherit from',
+        inheritfrompage = api.create_page('page to inherit from',
                                       'nav_playground.html',
                                       'en', published=True)
 
@@ -625,25 +618,25 @@ class PluginsTestCase(PluginsTestBaseCase):
             language='en',
         )
         empty_plugin.insert_at(None, position='last-child', save=True)
-        other_page = create_page('other page', 'nav_playground.html', 'en', published=True)
+        other_page = api.create_page('other page', 'nav_playground.html', 'en', published=True)
         inherited_body = other_page.placeholders.get(slot="body")
 
-        add_plugin(inherited_body, InheritPagePlaceholderPlugin, 'en', position='last-child',
+        api.add_plugin(inherited_body, InheritPagePlaceholderPlugin, 'en', position='last-child',
                    from_page=inheritfrompage, from_language='en')
 
-        add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
+        api.add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
         # this should not fail, even if there in an empty plugin
         rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url(), page=other_page), width=200)
         self.assertIn("foobar", rendered)
 
     def test_render_textplugin(self):
         # Setup
-        page = create_page("render test", "nav_playground.html", "en")
+        page = api.create_page("render test", "nav_playground.html", "en")
         ph = page.placeholders.get(slot="body")
-        text_plugin = add_plugin(ph, "TextPlugin", "en", body="Hello World")
+        text_plugin = api.add_plugin(ph, "TextPlugin", "en", body="Hello World")
         link_plugins = []
         for i in range(0, 10):
-            link_plugins.append(add_plugin(ph, "LinkPlugin", "en",
+            link_plugins.append(api.add_plugin(ph, "LinkPlugin", "en",
                                            target=text_plugin,
                                            name="A Link %d" % i,
                                            url="http://django-cms.org"))
@@ -668,7 +661,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test that copying of textplugins replaces references to copied plugins
         """
-        page = create_page("page", "nav_playground.html", "en")
+        page = api.create_page("page", "nav_playground.html", "en")
 
         placeholder = page.placeholders.get(slot='body')
 
@@ -745,7 +738,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test search for pages
         """
-        page = create_page("page", "nav_playground.html", "en")
+        page = api.create_page("page", "nav_playground.html", "en")
 
         placeholder = page.placeholders.get(slot='body')
         text = Text(body="hello", language="en", placeholder=placeholder, plugin_type="TextPlugin", position=1)
@@ -756,7 +749,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(Page.objects.search("hello").count(),1)
 
     def test_empty_plugin_is_not_ignored(self):
-        page = create_page("page", "nav_playground.html", "en")
+        page = api.create_page("page", "nav_playground.html", "en")
 
         placeholder = page.placeholders.get(slot='body')
 
@@ -775,7 +768,7 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
@@ -788,7 +781,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_moving_plugin_to_different_placeholder(self):
         plugin_pool.register_plugin(DumbFixturePlugin)
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         plugin_data = {
             'plugin_type': 'DumbFixturePlugin',
             'plugin_language': settings.LANGUAGES[0][0],
@@ -816,13 +809,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_pool.unregister_plugin(DumbFixturePlugin)
 
     def test_get_plugins_for_page(self):
-        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                               slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
-        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm inside an existing placeholder.")
+        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm inside an existing placeholder.")
         # This placeholder is not in the template.
         ph_en_not_used = page_en.placeholders.create(slot="not_used")
-        text_plugin_2 = add_plugin(ph_en_not_used, "TextPlugin", "en", body="I'm inside a non-existent placeholder.")
+        text_plugin_2 = api.add_plugin(ph_en_not_used, "TextPlugin", "en", body="I'm inside a non-existent placeholder.")
         page_plugins = get_plugins_for_page(None, page_en, page_en.get_title_obj_attribute('language'))
         db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
         self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
@@ -832,12 +825,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Tests that children plugins don't affect the is_last_in_placeholder plugin method.
         """
-        page_en = create_page("PluginOrderPage", "col_two.html", "en",
+        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                               slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
-        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
-        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
-        inner_text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1")
+        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        text_plugin_2 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
+        inner_text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1")
         text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
         self.assertEquals(text_plugin_2.is_last_in_placeholder(), True)
 
@@ -862,13 +855,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
         plugin_pool.register_plugin(ReloadDrivenPlugin)
         plugin_pool.register_plugin(NonReloadDrivenPlugin)
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         source_placeholder = page.placeholders.get(slot='body')
         target_placeholder = page.placeholders.get(slot='right-column')
         reload_expected = {'reload': True}
         no_reload_expected = {'reload': False}
-        plugin_1 = add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
-        plugin_2 = add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
+        plugin_1 = api.add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
+        plugin_2 = api.add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
 
         # Test Plugin reload == True on Move
         post = {
@@ -914,11 +907,11 @@ class PluginsTestCase(PluginsTestBaseCase):
         NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
         plugin_pool.register_plugin(ReloadDrivenPlugin)
         plugin_pool.register_plugin(NonReloadDrivenPlugin)
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         source_placeholder = page.placeholders.get(slot='body')
         target_placeholder = page.placeholders.get(slot='right-column')
-        plugin_1 = add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
-        plugin_2 = add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
+        api.add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
+        plugin_2 = api.add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
 
         # Test Plugin reload == True on Copy
         copy_data = {
@@ -963,7 +956,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         ParentRequiredPlugin = type('ParentRequiredPlugin', (CMSPluginBase,),
                                     dict(require_parent=True, render_plugin=False))
         plugin_pool.register_plugin(ParentRequiredPlugin)
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
 
         plugin_list = plugin_pool.get_all_plugins(placeholder=placeholder, page=page)
@@ -987,7 +980,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
             plugin_pool.register_plugin(plugin)
 
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
 
         from cms.utils.placeholder import get_toolbar_plugin_struct
@@ -1014,12 +1007,12 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin_pool.unregister_plugin(plugin)
 
     def test_plugin_child_classes_from_settings(self):
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
                                     dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
         plugin_pool.register_plugin(ChildClassesPlugin)
-        plugin = add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
+        plugin = api.add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
         ## assert baseline
         self.assertEquals(['TextPlugin'], plugin.get_child_classes(placeholder.slot, page))
@@ -1037,12 +1030,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_pool.unregister_plugin(ChildClassesPlugin)
 
     def test_plugin_parent_classes_from_settings(self):
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
                                     dict(parent_classes=['TextPlugin'], render_plugin=False))
         plugin_pool.register_plugin(ParentClassesPlugin)
-        plugin = add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
+        plugin = api.add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
         ## assert baseline
         self.assertEquals(['TextPlugin'], plugin.get_parent_classes(placeholder.slot, page))
@@ -1065,7 +1058,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         # add a new text plugin
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
         created_plugin_id = self._create_text_plugin_on_page(page)
 
@@ -1105,7 +1098,7 @@ class FileSystemPluginTests(PluginsTestBaseCase):
         super(FileSystemPluginTests, self).tearDown()
 
     def test_fileplugin_icon_uppercase(self):
-        page = create_page('testpage', 'nav_playground.html', 'en')
+        page = api.create_page('testpage', 'nav_playground.html', 'en')
         body = page.placeholders.get(slot="body")
         plugin = File(
             plugin_type='FilePlugin',
@@ -1189,7 +1182,6 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(plugin.sections.through._meta.db_table, 'manytomany_rel_articlepluginmodel_sections')
 
-
     def test_add_plugin_with_m2m_and_publisher(self):
         self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
@@ -1242,7 +1234,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 
         # check publish box
-        page = publish_page(page, self.super_user, 'en')
+        page = api.publish_page(page, self.super_user, 'en')
 
         # there should now be two plugins - 1 draft, 1 public
         self.assertEquals(2, CMSPlugin.objects.all().count())
@@ -1254,7 +1246,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 
     def test_copy_plugin_with_m2m(self):
-        page = create_page("page", "nav_playground.html", "en")
+        page = api.create_page("page", "nav_playground.html", "en")
 
         placeholder = page.placeholders.get(slot='body')
 
@@ -1304,8 +1296,8 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEquals(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEquals(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)
         self.assertEquals(CMSPlugin.objects.count(), 2)
-        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
-        expected = [self.section_count for i in range(len(db_counts))]
+        db_counts = [plgn.sections.count() for plgn in ArticlePluginModel.objects.all()]
+        expected = [self.section_count for _ in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
 
 
@@ -1435,7 +1427,7 @@ class NoDatabasePluginTests(TestCase):
 
     def test_pickle(self):
         text = Text()
-        a = text.__reduce__()
+        text.__reduce__()
 
 
 class PicturePluginTests(PluginsTestBaseCase):
@@ -1443,7 +1435,7 @@ class PicturePluginTests(PluginsTestBaseCase):
         """Test a validator: you can enter a url or a page_link, but not both."""
 
         page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.all()[0]
 
         picture = Picture(url="test")

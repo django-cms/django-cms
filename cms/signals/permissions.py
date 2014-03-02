@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
+from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup
 from cms.compat import user_related_name
 from menus.menu_pool import menu_pool

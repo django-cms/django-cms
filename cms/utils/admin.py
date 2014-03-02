@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
 import json
-from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 
 import django
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.contrib.sites.models import Site
+from django.utils.encoding import smart_str
 
 from cms.models import Page, GlobalPagePermission
-from cms.utils import permissions, get_language_from_request, get_language_list, get_cms_setting
-from cms.utils.permissions import has_global_page_permission
-from django.utils.encoding import smart_str
+from cms.utils import permissions
+from cms.utils import get_language_from_request
+from cms.utils import get_language_list
+from cms.utils import get_cms_setting
+from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 
 NOT_FOUND_RESPONSE = "NotFound"
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
+
 
 def jsonify_request(response):
     """ Turn any response in a 200 response to let jQuery code handle it nicely.

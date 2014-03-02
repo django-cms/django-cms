@@ -9,7 +9,6 @@ from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
 from cms.compat import get_user_model
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 PERMISSION_ADMIN_INLINES = []
@@ -159,7 +158,7 @@ class GenericCmsPermissionAdmin(object):
         permission on some page.
         """
         try:
-            user_level = get_user_permission_level(request.user)
+            get_user_permission_level(request.user)
         except NoPermissionsException:
             return False
         return True

@@ -13,7 +13,7 @@ try:
         return klass
 except ImportError:
     force_unicode = lambda s: str(s)
-    from django.utils.encoding import python_2_unicode_compatible
+    from django.utils.encoding import python_2_unicode_compatible  # nopyflakes
 
 try:
     from django.db.models.loading import get_app_paths

@@ -1,4 +1,17 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
+from itertools import groupby
+import operator
+import warnings
+
+from django.contrib.sites.models import Site, SITE_CACHE
+from django.shortcuts import get_object_or_404
+from django.template import NodeList, VariableNode, TemplateSyntaxError
+from django.template.loader import get_template
+from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
+from django.utils.translation import ugettext as _
+from sekizai.helpers import is_variable_extend_node
+
 from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
@@ -8,17 +21,7 @@ from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.placeholder import validate_placeholder_name, \
     get_placeholder_conf
-from django.contrib.sites.models import Site, SITE_CACHE
-from django.shortcuts import get_object_or_404
-from django.template import NodeList, VariableNode, TemplateSyntaxError
-from django.template.loader import get_template
-from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
-from django.utils.translation import ugettext as _
-from sekizai.helpers import is_variable_extend_node
-from collections import defaultdict
-from itertools import groupby
-import operator
-import warnings
+
 
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)

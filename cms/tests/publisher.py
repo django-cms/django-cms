@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
-from cms.utils.i18n import force_language
+
+from djangocms_text_ckeditor.models import Text
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
+
+from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
+from cms.utils.i18n import force_language
 from cms.compat import get_user_model
 from cms.api import create_page, add_plugin, create_title
 from cms.management.commands import publisher_publish
@@ -14,7 +17,6 @@ from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride, SettingsOverride
 
-from djangocms_text_ckeditor.models import Text
 
 class PublisherCommandTests(TestCase):
     """
@@ -84,7 +86,7 @@ class PublisherCommandTests(TestCase):
         """
         User = get_user_model()
         User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
-        published = create_page("The page!", "nav_playground.html", "en", published=True)
+        create_page("The page!", "nav_playground.html", "en", published=True)
         draft = Page.objects.drafts()[0]
         draft.reverse_id = 'a_test' # we have to change *something*
         draft.save()
@@ -98,12 +100,10 @@ class PublisherCommandTests(TestCase):
         Text._meta.db_table = 'djangocms_text_ckeditor_text'
         plugin_pool.patched = False
 
-        with StdoutOverride() as buffer:
+        with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
             com = publisher_publish.Command()
             com.handle_noargs()
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
-            # Sanity check the database (we should have one draft and one public)
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEquals(not_drafts, 1)
@@ -580,9 +580,6 @@ class PublishingTests(TestCase):
         page = self.create_page("Page", published=True)
         child = self.create_page("Child", parent=page, published=True)
         gchild = self.create_page("Grandchild", parent=child, published=True)
-        drafts = Page.objects.drafts()
-        public = Page.objects.public()
-        published = Page.objects.public().published("en")
         child.in_navigation = True
         child.save()
 

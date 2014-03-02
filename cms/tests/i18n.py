@@ -300,7 +300,7 @@ class TestLanguageFallbacks(SettingsOverrideTestCase):
     }
 
     def test_language_code(self):
-        home = api.create_page("home", "nav_playground.html", "fr", published=True)
+        api.create_page("home", "nav_playground.html", "fr", published=True)
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         response = self.client.get('/en/')

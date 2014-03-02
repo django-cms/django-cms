@@ -594,11 +594,11 @@ class CMSToolbar(RenderBlock):
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
-                js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
+                # needed to populate the context with sekizai content
+                render_to_string('cms/toolbar/toolbar_javascript.html', context)
                 clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
         else:
             language = None
-            js = ''
             clipboard = ''
         # render everything below the tag
         rendered_contents = nodelist.render(context)

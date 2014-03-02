@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
-from cms import constants
-from cms.utils.conf import get_cms_setting, get_site_id
-from cms.utils.i18n import get_default_language, get_language_list, get_language_code
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
-import os
+
+from cms import constants
+from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_site_id  # nopyflakes
+from cms.utils.i18n import get_default_language
+from cms.utils.i18n import get_language_list
+from cms.utils.i18n import get_language_code
 
 
 def get_template_from_request(request, obj=None, no_current_page=False):

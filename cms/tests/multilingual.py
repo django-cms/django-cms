@@ -83,9 +83,9 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             
             # Publish page using the admin
             page_data['published'] = True
-            response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
+            self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
                                         page_data)
-            response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, TESTLANG))
+            self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, TESTLANG))
             page = page.reload()
             self.assertTrue(page.is_published(TESTLANG))
             
@@ -105,8 +105,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                               language=TESTLANG2, fallback=False)
             
             # Now create it
-            response = self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2),
-                                        page_data2)
+            self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2),
+                             page_data2)
             
             page = page.reload()
             
@@ -283,11 +283,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
     def test_wrong_plugin_language(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
         ph_en = page.placeholders.get(slot="body")
-        text_plugin_1 = add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
+        add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         title = Title(title="page", slug="page", language="ru", page=page)
         title.save()
         # add wrong plugin language
-        text_plugin_2 = add_plugin(ph_en, "TextPlugin", "ru", body="I'm the second")
+        add_plugin(ph_en, "TextPlugin", "ru", body="I'm the second")
         page.publish('en')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):

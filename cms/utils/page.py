@@ -52,7 +52,6 @@ def get_available_slug(title, new_slug=None):
 
     Returns: slug
     """
-    rewrite_slug = False
     slug = new_slug or title.slug
     # We need the full path for the title to check for conflicting urls
     title.slug = slug
@@ -66,9 +65,9 @@ def get_available_slug(title, new_slug=None):
         match = COPY_SLUG_REGEX.match(slug)
         if match:
             try:
-                next = int(match.groups()[0]) + 1
-                slug = "-".join(slug.split('-')[:-1]) + "-%d" % next
-            except TypeError as e:
+                next_id = int(match.groups()[0]) + 1
+                slug = "-".join(slug.split('-')[:-1]) + "-%d" % next_id
+            except TypeError:
                 slug += "-2"
         else:
             slug += APPEND_TO_SLUG

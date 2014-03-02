@@ -1,4 +1,4 @@
-from django.conf.urls import *
+from django.conf.urls import patterns, url, include
 from django.utils.translation import ugettext_lazy as _
 
 """

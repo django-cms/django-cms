@@ -2,25 +2,31 @@
 from __future__ import with_statement
 import hashlib
 
-from django.utils.encoding import iri_to_uri, force_text
-from django.contrib.auth.views import redirect_to_login
-from django.template.response import TemplateResponse
-from cms.apphook_pool import apphook_pool
-from cms.appresolver import get_app_urls
-from cms.models import Title, Page
-from cms.utils import get_template_from_request, get_language_from_request, get_cms_setting
-from cms.utils.i18n import get_fallback_languages, force_language, get_public_languages, get_redirect_on_fallback, \
-    get_language_list, is_language_prefix_patterns_used
-from cms.utils.page_resolver import get_page_from_request
-from cms.test_utils.util.context_managers import SettingsOverride
 from django.conf import settings
 from django.conf.urls import patterns
+from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
+from django.template.response import TemplateResponse
+from django.utils.encoding import iri_to_uri, force_text
 from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
-from django.utils.translation import get_language
+
+from cms.apphook_pool import apphook_pool
+from cms.appresolver import get_app_urls
+from cms.models import Title, Page
+from cms.utils import get_template_from_request
+from cms.utils import get_language_from_request
+from cms.utils import get_cms_setting
+from cms.utils.i18n import get_fallback_languages
+from cms.utils.i18n import force_language
+from cms.utils.i18n import get_public_languages
+from cms.utils.i18n import get_redirect_on_fallback
+from cms.utils.i18n import get_language_list
+from cms.utils.i18n import is_language_prefix_patterns_used
+from cms.utils.page_resolver import get_page_from_request
+from cms.test_utils.util.context_managers import SettingsOverride
 
 CMS_PAGE_CACHE_VERSION_KEY = 'CMS_PAGE_CACHE_VERSION'
 

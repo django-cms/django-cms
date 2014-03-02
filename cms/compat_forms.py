@@ -4,33 +4,40 @@ from django.db import models
 
 from cms.compat import is_user_swapped, user_model_label
 
-# Some custom user models may require a custom UserAdmin class and associated forms,
-# so check if they exist and import them
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.contrib.auth.admin import UserAdmin
 
 # overide with custom classes if they exist
 if is_user_swapped:
-	# UserAdmin class
+    # UserAdmin class
     user_app_name = user_model_label.split('.')[0]
     app = models.get_app(user_app_name)
 
     try:
-    	custom_admin = importlib.import_module(app.__name__[:-6] + "admin")
+        custom_admin = importlib.import_module(app.__name__[:-6] + "admin")
 
-    	if hasattr(custom_admin, 'UserAdmin'):
-    		UserAdmin = custom_admin.UserAdmin
+        if hasattr(custom_admin, 'UserAdmin'):
+            UserAdmin = custom_admin.UserAdmin
+        else:
+            from django.contrib.auth.admin import UserAdmin
     except ImportError:
-    	pass
+        from django.contrib.auth.admin import UserAdmin  # nopyflakes
 
     # user form classes
     try:
-    	custom_forms = importlib.import_module(app.__name__[:-6] + "forms")
+        custom_forms = importlib.import_module(app.__name__[:-6] + "forms")
 
-    	if hasattr(custom_forms, 'UserCreationForm'):
-    		UserCreationForm = custom_forms.UserCreationForm
+        if hasattr(custom_forms, 'UserCreationForm'):
+            UserCreationForm = custom_forms.UserCreationForm
+        else:
+            from django.contrib.auth.forms import UserCreationForm
 
-    	if hasattr(custom_forms, 'UserChangeForm'):
-    		UserChangeForm = custom_forms.UserChangeForm
+        if hasattr(custom_forms, 'UserChangeForm'):
+            UserChangeForm = custom_forms.UserChangeForm
+        else:
+            from django.contrib.auth.forms import UserChangeForm
     except ImportError:
-    	pass
+        from django.contrib.auth.forms import UserCreationForm  # nopyflakes
+        from django.contrib.auth.forms import UserChangeForm  # nopyflakes
+else:
+    from django.contrib.auth.admin import UserAdmin  # nopyflakes
+    from django.contrib.auth.forms import UserCreationForm  # nopyflakes
+    from django.contrib.auth.forms import UserChangeForm  # nopyflakes
