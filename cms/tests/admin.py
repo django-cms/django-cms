@@ -532,11 +532,11 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin_guy):
             # Check the EN version of the tree...
             response = self.client.get(url, {'language': 'en'})
-            self.assertRegexpMatches(str(response), url_pat.format(page.pk, 'en', en_title, ))
+            self.assertRegexpMatches(response.content, url_pat.format(page.pk, 'en', en_title, ))
 
             # Check the ES version of the tree...
             response = self.client.get(url, {'language': 'es-mx'})
-            self.assertRegexpMatches(str(response), url_pat.format(page.pk, 'es-mx', es_title, ))
+            self.assertRegexpMatches(response.content, url_pat.format(page.pk, 'es-mx', es_title, ))
 
 
 class AdminTests(AdminTestsBase):
