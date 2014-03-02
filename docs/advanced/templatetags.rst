@@ -216,6 +216,9 @@ Displays the URL of a page in the current language.
 Arguments:
 
 - ``page_lookup`` (see `page_lookup`_ for more information)
+- ``as var_name`` (version 3.0 or later, optional; page_url can now be used to assign the resulting
+  URL to a context variable ``var_name``)
+
 
 Example::
 
@@ -234,19 +237,14 @@ addresses to inform them of the broken link.
     emits nothing, but sets a variable in the context with the specified name
     to the resulting value.
 
-    When using the ``as`` argument, any PageNotFound exceptions are always
-    suppressed, regardless of the setting of :setting:`django:DEBUG`.  In the
-    event the page is not found, the context variable is set to an
-    empty string.
+    When using the ``as`` argument PageNotFound exceptions are always
+    suppressed, regardless of the setting of :setting:`django:DEBUG` and the
+    tag will simply emit an empty string in these cases.
 
-    Arguments:
+Example::
 
-    - ``page_lookup`` (see `page_lookup`_ for more information)
-    - ``as var_name`` page_url can be used as an As Tag 
-
-    Example::
-        {# Emit a 'canonical' tag when the page is displayed on an alternate url #}
-        {% page_url request.current_page as current_url %}{% if current_url and current_url != request.get_full_path %}<link rel="canonical" href="{% page_url request.current_page %}">{% endif %}
+    {# Emit a 'canonical' tag when the page is displayed on an alternate url #}
+    {% page_url request.current_page as current_url %}{% if current_url and current_url != request.get_full_path %}<link rel="canonical" href="{% page_url request.current_page %}">{% endif %}
 
 
 .. templatetag:: page_attribute

@@ -2,7 +2,6 @@
 from __future__ import with_statement
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
-from cms.compat import get_user_model
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar
@@ -12,7 +11,6 @@ from cms.test_utils.util.mock import AttributeObject
 from django.core.cache import cache
 from django.template import Template, RequestContext
 from sekizai.context import SekizaiContext
-from cms.toolbar.toolbar import CMSToolbar
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -281,10 +279,52 @@ class RenderingTestCase(SettingsOverrideTestCase):
         output = self.render(template, self.test_page, {'test_page': self.test_page2})
         self.assertEqual(output, self.test_page2.get_absolute_url())
 
-    def test_page_url_by_page_as_for_bogus_page(self):
-        template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
-        output = self.render(template, self.test_page, {'test_page': self.test_page2})
-        self.assertEqual(output, '')
+    #
+    # To ensure compatible behaviour, test that page_url swallows any
+    # Page.DoesNotExist exceptions when NOT in DEBUG mode.
+    #
+    def test_page_url_on_bogus_page(self):
+        with SettingsOverride(DEBUG=False):
+            template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
+            output = self.render(template, self.test_page, {'test_page': self.test_page2})
+            self.assertEqual(output, '')
+
+    #
+    # To ensure compatible behaviour, test that page_url will raise a
+    # Page.DoesNotExist exception when the page argument does not eval to a
+    # valid page
+    #
+    def test_page_url_on_bogus_page_in_debug(self):
+        from cms.models import Page
+
+        with SettingsOverride(DEBUG=True):
+            template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
+            try:
+                self.render(template, self.test_page, {'test_page': self.test_page2})
+                self.fail('No exception raised')
+            except Page.DoesNotExist:
+                pass
+            except:
+                self.fail('Wrong exception raised')
+
+    #
+    # In the 'as varname' form, ensure that the tag will always swallow
+    # Page.DoesNotExist exceptions both when DEBUG is False and...
+    #
+    def test_page_url_as_on_bogus_page(self):
+        with SettingsOverride(DEBUG=False):
+            template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
+            output = self.render(template, self.test_page, {'test_page': self.test_page2})
+            self.assertEqual(output, '')
+
+    #
+    # ...when it is True.
+    #
+    def test_page_url_as_on_bogus_page_in_debug(self):
+        with SettingsOverride(DEBUG=True):
+            template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
+            output = self.render(template, self.test_page, {'test_page': self.test_page2})
+            self.assertEqual(output, '')
 
     def test_page_attribute(self):
         """
