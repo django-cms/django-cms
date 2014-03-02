@@ -519,7 +519,7 @@ class AdminTestCase(AdminTestsBase):
         site = Site.objects.get(pk=1)
 
         en_title = "EN Page"
-        es_title = "ES Page"
+        es_title = "ES Pagina"
 
         # Create a page in en
         page = create_page(en_title, "nav_playground.html", "en", site=site, created_by=admin)
@@ -527,16 +527,16 @@ class AdminTestCase(AdminTestsBase):
         create_title("es-mx", es_title, page, slug="es_pagina")
 
         url = reverse('admin:cms_%s_changelist' % Page._meta.module_name)
-        url_pat = r'<a href="{0}/{1}/preview/"[^>]*>{2}</a>'
+        url_pat = '<a href="{0}/{1}/preview/"[^>]*>{2}</a>'
 
         with self.login_user_context(admin_guy):
             # Check the EN version of the tree...
             response = self.client.get(url, {'language': 'en'})
-            self.assertRegexpMatches(response.content, url_pat.format(page.pk, 'en', en_title, ))
+            self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'en', en_title, ))
 
             # Check the ES version of the tree...
             response = self.client.get(url, {'language': 'es-mx'})
-            self.assertRegexpMatches(response.content, url_pat.format(page.pk, 'es-mx', es_title, ))
+            self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'es-mx', es_title, ))
 
 
 class AdminTests(AdminTestsBase):
