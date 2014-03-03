@@ -494,7 +494,9 @@ $(document).ready(function () {
 			this.timer = setTimeout(function () {
 				// reset z indexes
 				var reset = $('.cms_submenu').parentsUntil('.cms_dragarea');
-					reset.css('z-index', 0);
+				var scrollHint = nav.find('.cms_submenu-scroll-hint');
+
+				reset.css('z-index', 0);
 
 				var parents = nav.parentsUntil('.cms_dragarea');
 					parents.css('z-index', 999);
@@ -503,7 +505,14 @@ $(document).ready(function () {
 				nav.find('.cms_submenu-quicksearch').show();
 
 				// set visible states
-				nav.find('> .cms_submenu-dropdown').show();
+				nav.find('> .cms_submenu-dropdown').show().on('scroll', function () {
+					scrollHint.fadeOut(100);
+					$(this).off('scroll');
+				});
+
+				// show scrollHint for FF on OSX
+				if(nav[0].scrollHeight > 230) scrollHint.show();
+
 			}, 100);
 
 			// add key events
