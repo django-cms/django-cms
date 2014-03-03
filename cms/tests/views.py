@@ -121,7 +121,7 @@ class ViewTests(SettingsOverrideTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_with_toolbar(self):
-        one = create_page("one", "nav_playground.html", "en", published=True,
+        create_page("one", "nav_playground.html", "en", published=True,
                           redirect='/en/page2')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
