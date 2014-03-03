@@ -18,6 +18,14 @@
 	border:1px solid $color-grey-10; background:white;
 	@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
 
+	// force scrollbars on subnav menu
+	// not yet working on firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=77790
+	&::-webkit-scrollbar, &::scrollbar { -webkit-appearance:none; width:7px; background:$color-grey-10; }
+	&::-webkit-scrollbar-thumb, &::scrollbar-thumb { background-color:$color-grey-70;
+		border-left:1px solid $color-grey-10;
+		@include box-shadow(0 0 1px rgba(white,0.5));
+	}
+
 	.cms_submenu-item { zoom:1; }
 	.cms_submenu-item a, span { display:block; font-size:12px; line-height:15px; text-align:left; padding:4px 8px 3px 8px; }
 
