@@ -23,7 +23,6 @@ def clear_app_resolvers():
     APP_RESOLVERS = []
 
 
-
 def applications_page_check(request, current_page=None, path=None):
     """Tries to find if given path was resolved over application.
     Applications have higher priority than other cms pages.
@@ -159,14 +158,14 @@ def get_patterns_for_title(path, title):
     Returns a list of url objects.
     """
     app = apphook_pool.get_apphook(title.page.application_urls)
-    patterns = []
+    url_patterns = []
     for pattern_list in get_app_urls(app.urls):
         if path and not path.endswith('/'):
             path += '/'
         page_id = title.page.id
-        patterns += recurse_patterns(path, pattern_list, page_id)
-    patterns = _flatten_patterns(patterns)
-    return patterns
+        url_patterns += recurse_patterns(path, pattern_list, page_id)
+    url_patterns = _flatten_patterns(url_patterns)
+    return url_patterns
 
 
 def get_app_patterns():

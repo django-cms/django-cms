@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+
 from cms.admin import forms
 from cms.admin.forms import PageUserForm
 from cms.api import create_page, create_page_user
@@ -8,9 +12,6 @@ from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.sites.models import Site
-from django.core.cache import cache
 
 
 class Mock_PageSelectFormField(PageSelectFormField):

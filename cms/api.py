@@ -7,16 +7,12 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
-from cms.utils import copy_plugins
-from cms.utils.compat.type_checks import string_types
-from cms.utils.conf import get_cms_setting
-from django.core.exceptions import PermissionDenied, ValidationError, FieldError
-from cms.utils.i18n import get_language_list
 
-from cms.compat import get_user_model
 from django.contrib.sites.models import Site
+from django.core.exceptions import FieldError
+from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
-from menus.menu_pool import menu_pool
 
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
@@ -30,20 +26,12 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from cms.utils import copy_plugins
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.permissions import _thread_locals
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Max
-from django.template.defaultfilters import slugify
 from menus.menu_pool import menu_pool
-import datetime
-
-
-
 
 
 #===============================================================================
@@ -57,6 +45,7 @@ VISIBILITY_STAFF = 2
 #===============================================================================
 # Helpers/Internals
 #===============================================================================
+
 
 def _generate_valid_slug(source, parent, language):
     """

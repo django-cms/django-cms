@@ -2,6 +2,8 @@
 from __future__ import with_statement
 import sys
 
+from django.core.urlresolvers import clear_url_caches, reverse
+
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
@@ -12,11 +14,11 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
 from cms.utils.compat.type_checks import string_types
 from cms.utils.i18n import force_language
-from django.core.urlresolvers import clear_url_caches, reverse
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
+
 
 class ApphooksTestCase(CMSTestCase):
     def setUp(self):
@@ -222,9 +224,9 @@ class ApphooksTestCase(CMSTestCase):
 
             self.reload_urls()
             with force_language("en"):
-                path1 = reverse("example_app:example")
-                path2 = reverse("example1:example")
-                path3 = reverse("example2:example")
+                reverse("example_app:example")
+                reverse("example1:example")
+                reverse("example2:example")
                 path = reverse('namespaced_app_ns:sample-root')
                 path_instance = reverse('instance_ns:sample-root')
             self.assertEqual(path, path_instance)
@@ -285,7 +287,7 @@ class ApphooksTestCase(CMSTestCase):
                                 "en", created_by=self.superuser, published=True, parent=de_title.page.parent,
                                 apphook=NS_APP_NAME,
                                 apphook_namespace="instance_2")
-            de_title2 = create_title("de", "de_title", page2, slug="slug")
+            create_title("de", "de_title", page2, slug="slug")
             page2.publish('de')
             clear_app_resolvers()
             clear_url_caches()
@@ -295,17 +297,17 @@ class ApphooksTestCase(CMSTestCase):
 
             self.reload_urls()
             with force_language("de"):
-                path = reverse('namespaced_app_ns:current-app', current_app="instance_1")
-                path = reverse('namespaced_app_ns:current-app', current_app="instance_2")
-                path = reverse('namespaced_app_ns:current-app')
+                reverse('namespaced_app_ns:current-app', current_app="instance_1")
+                reverse('namespaced_app_ns:current-app', current_app="instance_2")
+                reverse('namespaced_app_ns:current-app')
             with force_language("en"):
-                path = reverse('namespaced_app_ns:current-app', current_app="instance_1")
-                path = reverse('namespaced_app_ns:current-app', current_app="instance_2")
-                path = reverse('namespaced_app_ns:current-app')
+                reverse('namespaced_app_ns:current-app', current_app="instance_1")
+                reverse('namespaced_app_ns:current-app', current_app="instance_2")
+                reverse('namespaced_app_ns:current-app')
 
     def test_apphook_include_extra_parameters(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
-            titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
+            self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
             with force_language("en"):
                 path = reverse('namespaced_app_ns:extra_second')
             request = self.get_request(path)
@@ -406,11 +408,11 @@ class ApphooksTestCase(CMSTestCase):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.third_urls_for_apphook_tests'):
             apphook_pool.clear()
             superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-            home_page = create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
-            apphook1_page = create_page("apphook1-page", "nav_playground.html", "en",
-                                        created_by=superuser, published=True, apphook="SampleApp")
-            apphook2_page = create_page("apphook2-page", "nav_playground.html", "en",
-                                        created_by=superuser, published=True, apphook="SampleApp2")
+            create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
+            create_page("apphook1-page", "nav_playground.html", "en",
+                        created_by=superuser, published=True, apphook="SampleApp")
+            create_page("apphook2-page", "nav_playground.html", "en",
+                        created_by=superuser, published=True, apphook="SampleApp2")
 
             reverse('sample-root')
             reverse('sample2-root')

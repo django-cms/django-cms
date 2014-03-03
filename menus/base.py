@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import get_language
 from django.utils.encoding import smart_str
 
 

@@ -3,17 +3,9 @@ from django.core.cache import cache
 import os
 import time
 
-from cms.models import Page
-from cms.api import create_page, create_title, add_plugin
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
-from cms.test_utils.testcases import CMSTestCase
-
 from django.utils import unittest
-from django.db import connections
 from django.contrib.sites.models import Site
-from django.test import LiveServerTestCase, TestCase
-
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -21,6 +13,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 
+from cms.models import Page, CMSPlugin
+from cms.api import create_page, create_title, add_plugin
+from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
 from cms.compat import get_user_model
 
 
@@ -60,7 +57,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         Page.objects.all().delete() # somehow the sqlite transaction got lost.
         cache.clear()
 
-
     def wait_until(self, callback, timeout=10):
         """
         Helper function that blocks the execution of the tests until the
@@ -68,8 +64,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         be called, for example, after clicking a link or submitting a form.
         See the other public methods that call this function for more details.
         """
-        from selenium.webdriver.support.wait import WebDriverWait
-
         WebDriverWait(self.driver, timeout).until(callback)
 
     def wait_loaded_tag(self, tag_name, timeout=10):
@@ -198,7 +192,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         self.placeholder = self.page.placeholders.all()[0]
 
-        plugin = add_plugin(self.placeholder, 'TextPlugin', 'en', body='test')
+        add_plugin(self.placeholder, 'TextPlugin', 'en', body='test')
 
         self.base_url = self.live_server_url
 
@@ -256,6 +250,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         self.assertEqual(plugin_instance.body, 'test')
 
     def test_copy_to_from_clipboard(self):
+        self.assertEqual(CMSPlugin.objects.count(), 1)
         self._login()
 
         build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?build"]')
@@ -285,6 +280,8 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         time.sleep(0.1)
 
+        self.assertEqual(CMSPlugin.objects.count(), 2)
+
         drag = ActionChains(self.driver).click_and_hold(
             clipboard.find_element_by_css_selector('.cms_draggable:nth-child(1)')
         );
@@ -306,6 +303,10 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         drag.perform()
 
+        time.sleep(0.5)
+
+        self.assertEqual(CMSPlugin.objects.count(), 3)
+
         plugins = self.page.placeholders.all()[0].get_plugins_list('en')
 
-        self.assertEqual(len(plugins), 1)
+        self.assertEqual(len(plugins), 2)

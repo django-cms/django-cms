@@ -1,9 +1,11 @@
 from __future__ import with_statement
-from cms.test_utils.util.context_managers import SettingsOverride, StdoutOverride, TemporaryDirectory
-import django
+
 from django.core import management
 from django.test import TestCase
-from distutils.version import LooseVersion
+
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.context_managers import StdoutOverride
+from cms.test_utils.util.context_managers import TemporaryDirectory
 
 
 class StaticFilesTest(TestCase):
@@ -14,6 +16,6 @@ class StaticFilesTest(TestCase):
         with TemporaryDirectory() as tmpdir:
             with SettingsOverride(STATIC_ROOT=tmpdir,
                 STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage'):
-                with StdoutOverride() as output:
+                with StdoutOverride():
                     management.call_command('collectstatic', interactive=False)
 

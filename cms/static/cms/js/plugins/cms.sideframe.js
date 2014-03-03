@@ -243,7 +243,7 @@ $(document).ready(function () {
 			this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
 
 			// remove event
-			$(window).unbind('resize.cms');
+			$(window).unbind('resize.cms.sideframe');
 		},
 
 		_maximize: function () {
@@ -262,7 +262,7 @@ $(document).ready(function () {
 			// invert icon position
 			this.sideframe.find('.cms_sideframe-btn').css('right', -2);
 			// attach resize event
-			$(window).bind('resize.cms', function () {
+			$(window).bind('resize.cms.sideframe', function () {
 				that.sideframe.css('width', $(window).width());
 			});
 		},

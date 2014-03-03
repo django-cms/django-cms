@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 from __future__ import print_function, with_statement
 import contextlib
 import multiprocessing
@@ -13,8 +13,9 @@ from docopt import docopt
 from django import VERSION
 from django.utils import autoreload
 
-from cms import __version__
+import cms
 from cms.test_utils.cli import configure
+from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
 
 __doc__ = '''django CMS development helper script. 
@@ -31,6 +32,7 @@ Usage:
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
+    develop.py pyflakes
 
 Options:
     -h --help                   Show this screen.
@@ -86,12 +88,14 @@ def server(bind='127.0.0.1', port=8000, migrate=False):
         'use_threading': True
     })
 
+
 def _split(itr, num):
     split = []
     size = int(len(itr) / num)
     for index in range(num):
         split.append(itr[size * index:size * (index + 1)])
     return split
+
 
 def _get_test_labels():
     test_labels = []
@@ -102,6 +106,7 @@ def _get_test_labels():
                 if method.startswith('test_'):
                     test_labels.append('cms.%s.%s' % (clsname, method))
     return test_labels
+
 
 def _test_run_worker(test_labels, failfast=False, test_runner='django.test.simple.DjangoTestSuiteRunner'):
     warnings.filterwarnings(
@@ -116,8 +121,10 @@ def _test_run_worker(test_labels, failfast=False, test_runner='django.test.simpl
     failures = test_runner.run_tests(test_labels)
     return failures
 
+
 def _test_in_subprocess(test_labels):
     return subprocess.call(['python', 'develop.py', 'test'] + test_labels)
+
 
 def isolated(test_labels, parallel=False):
     test_labels = test_labels or _get_test_labels()
@@ -130,8 +137,10 @@ def isolated(test_labels, parallel=False):
     failures = [test_label for test_label, return_code in zip(test_labels, results) if return_code != 0]
     return failures
 
+
 def timed(test_labels):
     return _test_run_worker(test_labels, test_runner='cms.test_utils.runners.TimedTestRunner')
+
 
 def test(test_labels, parallel=False, failfast=False):
     test_labels = test_labels or _get_test_labels()
@@ -144,22 +153,29 @@ def test(test_labels, parallel=False, failfast=False):
     else:
         return _test_run_worker(test_labels, failfast)
 
+
 def compilemessages():
     from django.core.management import call_command
     os.chdir('cms')
     call_command('compilemessages', all=True)
+
 
 def makemessages():
     from django.core.management import call_command
     os.chdir('cms')
     call_command('makemessages', locale='en')
 
+
 def shell():
     from django.core.management import call_command
     call_command('shell')
 
-if __name__ == '__main__':
-    args = docopt(__doc__, version=__version__)
+
+def main():
+    args = docopt(__doc__, version=cms.__version__)
+
+    if args['pyflakes']:
+        return static_analysis.pyflakes()
 
     # configure django
     warnings.filterwarnings(
@@ -186,7 +202,7 @@ if __name__ == '__main__':
 
             if args['test']:
                 configs['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
-            
+
             # Command line option takes precedent over environment variable
             auth_user_model = args['--user']
 
@@ -245,3 +261,7 @@ if __name__ == '__main__':
                 compilemessages()
             elif args['makemessages']:
                 compilemessages()
+
+
+if __name__ == '__main__':
+    main()

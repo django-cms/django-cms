@@ -77,7 +77,8 @@ def make_revision_with_plugins(obj, user=None, message=None):
                     revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
                 else:
                     revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin))
-                
+
+
 def find_placeholder_relation(obj):
     return 'page'
 

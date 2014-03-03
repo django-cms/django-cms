@@ -3,9 +3,16 @@ import sys
 import re
 from copy import copy
 
+from django.core.cache import cache
+from django.conf import settings
+from django.contrib.auth.models import Permission
+from django.core.urlresolvers import clear_url_caches
+from django.http import Http404
+from django.template import Variable
+
 from cms.api import create_page
 from cms.apphook_pool import apphook_pool
-from cms.models import PagePermission, Page
+from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -13,14 +20,7 @@ from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.views import _handle_no_page, details
 from cms.compat import get_user_model
-
 from menus.menu_pool import menu_pool
-from django.core.cache import cache
-from django.conf import settings
-from django.contrib.auth.models import Permission
-from django.core.urlresolvers import clear_url_caches
-from django.http import Http404
-from django.template import Variable
 
 
 APP_NAME = 'SampleApp'
@@ -120,6 +120,14 @@ class ViewTests(SettingsOverrideTestCase):
         response = details(request, one.get_path())
         self.assertEqual(response.status_code, 200)
 
+    def test_redirect_with_toolbar(self):
+        create_page("one", "nav_playground.html", "en", published=True,
+                          redirect='/en/page2')
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+            self.assertEqual(response.status_code, 200)
+
     def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,
                     login_required=True)
@@ -188,7 +196,7 @@ class ContextTests(SettingsOverrideTestCase):
         # to cms.context_processors.cms_settings.
         # Executing this oputside queries assertion context ensure
         # repetability
-        response = self.client.get("/en/admin/")
+        self.client.get("/en/admin/")
 
         cache.clear()
         menu_pool.clear()

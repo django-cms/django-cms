@@ -1,31 +1,30 @@
 from __future__ import with_statement
-from cms.models import UserSettings, PagePermission
-import re
-from django.template.defaultfilters import truncatewords
 import datetime
-
-from cms.models import Page
-from django.template.defaultfilters import truncatewords
-from cms.utils import get_cms_setting
-from cms.views import details
 import re
-from cms.api import create_page, create_title
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
-from cms.compat import get_user_model, is_user_swapped
-from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu, \
-    AjaxItem
-from cms.toolbar.toolbar import CMSToolbar
-from cms.middleware.toolbar import ToolbarMiddleware
-from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE
-from cms.test_utils.util.context_managers import SettingsOverride
+
+from django.template.defaultfilters import truncatewords
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+
+from cms.models import UserSettings, PagePermission
+from cms.models import Page
+from cms.views import details
+from cms.api import create_page, create_title
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from cms.compat import is_user_swapped
+from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu, \
+    AjaxItem
+from cms.toolbar.toolbar import CMSToolbar
+from cms.middleware.toolbar import ToolbarMiddleware
+from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
+
 
 class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
@@ -251,7 +250,7 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.status_code, 200)
 
     def test_remove_lang(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        create_page('test', 'nav_playground.html', 'en', published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
@@ -280,7 +279,7 @@ class ToolbarTests(ToolbarTestBase):
         # As this will be the first item added to this, this use should return the default, or namely None
         if not alpha_position:
             alpha_position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK) + 1
-        menu = admin_menu.get_or_create_menu('menu-alpha', 'menu-alpha', position=alpha_position)
+        admin_menu.get_or_create_menu('menu-alpha', 'menu-alpha', position=alpha_position)
 
         # Insert gamma (should return alpha_position + 1)
         gamma_position = admin_menu.get_alphabetical_insert_position('menu-gamma', SubMenu)
@@ -293,14 +292,14 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_page_create_redirect(self):
         superuser = self.get_superuser()
-        page = create_page("home", "nav_playground.html", "en",
+        create_page("home", "nav_playground.html", "en",
                            published=True)
         resolve_url = reverse('admin:cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/')
             page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
 
             response = self.client.post(resolve_url, {'pk': Page.objects.all()[2].pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
@@ -313,7 +312,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
+            self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
             url = reverse('admin:cms_page_resolve')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
@@ -342,11 +341,11 @@ class ToolbarTests(ToolbarTestBase):
                             published=True, parent=page0, login_required=True)
         page4 = create_page("view_restricted", "nav_playground.html", "en",
                             published=True, parent=page0)
-        perms = PagePermission.objects.create(page=page4, can_view=True,
-                                              user=superuser)
+        PagePermission.objects.create(page=page4, can_view=True,
+                                      user=superuser)
         page4.publish('en')
         page4 = page4.get_public_object()
-        request = self.get_page_request(page4, superuser, '/')
+        self.get_page_request(page4, superuser, '/')
         with self.login_user_context(superuser):
             # Published page, no redirect
             response = self.client.get(page1.get_absolute_url('en') + '?edit')

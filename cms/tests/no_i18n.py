@@ -54,7 +54,7 @@ class TestNoI18N(SettingsOverrideTestCase):
 
     def test_language_chooser(self):
         # test simple language chooser with default args
-        page1 = create_page("home", template="col_two.html", language="en-us", published=True)
+        create_page("home", template="col_two.html", language="en-us", published=True)
         context = self.get_context(path="/")
         del context['request'].LANGUAGE_CODE
         tpl = Template("{% load menu_tags %}{% language_chooser %}")
@@ -72,7 +72,7 @@ class TestNoI18N(SettingsOverrideTestCase):
 
     def test_page_language_url(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_no18n'):
-            page1 = create_page("home", template="col_two.html", language="en-us", published=True)
+            create_page("home", template="col_two.html", language="en-us", published=True)
             path = "/"
             context = self.get_context(path=path)
             del context['request'].LANGUAGE_CODE

@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
+
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.contrib.sites.models import Site
+from django.template import Template, TemplateSyntaxError
+from django.utils.translation import activate
+
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from django.db import connection
 from cms.api import create_page
 from cms.compat import get_user_model, user_related_name
 from cms.menu import CMSMenu, get_visible_pages
@@ -16,11 +22,6 @@ from cms.test_utils.util.context_managers import (SettingsOverride,
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Permission, Group
-from django.contrib.sites.models import Site
-from django.template import Template, TemplateSyntaxError
-from django.utils.translation import activate
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
@@ -810,6 +811,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
 
+
 class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation(self):
         """
@@ -1314,7 +1316,7 @@ class SoftrootTests(SettingsOverrideTestCase):
         projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
         djangocms = create_page("django CMS", parent=projects, **stdkwargs)
         djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
-        people = create_page("People", parent=home, **stdkwargs)
+        create_page("People", parent=home, **stdkwargs)
         # On Projects
         context = self.get_context(projects.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1357,7 +1359,7 @@ class SoftrootTests(SettingsOverrideTestCase):
         projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
         djangocms = create_page("django CMS", parent=projects, **stdkwargs)
         djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
-        people = create_page("People", parent=home, **stdkwargs)
+        create_page("People", parent=home, **stdkwargs)
         # On django CMS
         context = self.get_context(djangocms.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")

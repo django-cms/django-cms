@@ -10,6 +10,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from django.core.cache import cache
 from django.db import connection
 from django.template import Template, RequestContext
+from django.conf import settings
 
 
 class CacheTestCase(CMSTestCase):
@@ -17,7 +18,6 @@ class CacheTestCase(CMSTestCase):
         cache.clear()
 
     def test_cache_placeholder(self):
-        create_page
         template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
@@ -49,9 +49,23 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(3):
             template.render(rctx)
+        page1.publish('en')
+        cache.clear()
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware'
+        ]
+        middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
+            with self.assertNumQueries(FuzzyInt(14, 18)):
+                self.client.get('/en/')
+            with self.assertNumQueries(FuzzyInt(7, 11)):
+                self.client.get('/en/')
+            with SettingsOverride(CMS_PLACEHOLDER_CACHE=False):
+                with self.assertNumQueries(FuzzyInt(9, 13)):
+                    self.client.get('/en/')
 
     def test_no_cache_plugin(self):
-        create_page
         template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
@@ -78,6 +92,17 @@ class CacheTestCase(CMSTestCase):
         with self.assertNumQueries(1):
             template.render(rctx)
         add_plugin(placeholder1, "NoCachePlugin", 'en')
+        page1.publish('en')
+        request = self.get_request('/en/')
+        request.current_page = Page.objects.get(pk=page1.pk)
+        request.toolbar = CMSToolbar(request)
+        template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
+        rctx = RequestContext(request)
+        with self.assertNumQueries(4):
+            render = template.render(rctx)
+        with self.assertNumQueries(FuzzyInt(14, 18)):
+            response = self.client.get('/en/')
+            resp1 = response.content.decode('utf8').split("$$$")[1]
 
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
@@ -85,15 +110,12 @@ class CacheTestCase(CMSTestCase):
         template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
-            template.render(rctx)
-
-        request = self.get_request('/en/')
-        request.current_page = Page.objects.get(pk=page1.pk)
-        request.toolbar = CMSToolbar(request)
-        template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
-        rctx = RequestContext(request)
-        with self.assertNumQueries(4):
-            template.render(rctx)
+            render2 = template.render(rctx)
+        with self.assertNumQueries(FuzzyInt(10, 14)):
+            response = self.client.get('/en/')
+            resp2 = response.content.decode('utf8').split("$$$")[1]
+        self.assertNotEqual(render, render2)
+        self.assertNotEqual(resp1, resp2)
 
         plugin_pool.unregister_plugin(NoCachePlugin)
 

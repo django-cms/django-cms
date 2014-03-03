@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+
+from django.core.cache import cache
+from django.template import Template, RequestContext
+from sekizai.context import SekizaiContext
+
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
 from cms.models.placeholdermodel import Placeholder
@@ -8,9 +13,6 @@ from cms.plugin_rendering import render_plugins, PluginContext, render_placehold
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
-from django.core.cache import cache
-from django.template import Template, RequestContext
-from sekizai.context import SekizaiContext
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 

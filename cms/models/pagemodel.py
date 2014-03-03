@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
-from django.utils.timezone import now
-
 from os.path import join
+
+from django.utils.timezone import now
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+from django.core.cache import cache
+from django.conf import settings
+from django.db import models
+from django.shortcuts import get_object_or_404
+from django.utils.translation import get_language, ugettext_lazy as _
+from mptt.models import MPTTModel
+
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
@@ -17,16 +26,7 @@ from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
-from django.conf import settings
-from django.db import models
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
-from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
-from mptt.models import MPTTModel
 
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
