@@ -821,7 +821,7 @@ class CMSEditableObject(InclusionTag):
         extra_context = copy(context)
         # ugly-ish
         if instance and isinstance(instance, Page):
-            if not edit_fields:
+            if edit_fields == 'titles':
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         if edit_fields == 'changelist':
