@@ -1,6 +1,8 @@
 from cms import api
 from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import i18n
+from django.utils.importlib import import_module
 
 
 class TestLanguages(SettingsOverrideTestCase):
@@ -306,3 +308,38 @@ class TestLanguageFallbacks(SettingsOverrideTestCase):
         response = self.client.get('/en/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/fr/')
+
+    def test_session_language(self):
+        with SettingsOverride(CMS_LANGUAGES={
+            1: [ {'code' : 'en',
+                  'name': 'English',
+                  'public': True},
+                 {'code': 'fr',
+                  'name': 'French',
+                  'public': True},
+                 ]}):
+            page = api.create_page("home", "nav_playground.html", "en", published=True)
+            api.create_title('fr', "home", page)
+            page.publish('fr')
+            page.publish('en')
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, '/en/')
+            from django.conf import settings
+            engine = import_module(settings.SESSION_ENGINE)
+            store = engine.SessionStore()
+            store.save()  # we need to make load() work, or the cookie is worthless
+            self.client.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
+
+            #   ugly and long set of session
+            session = self.client.session
+            session['django_language'] = 'fr'
+            session.save()
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, '/fr/')
+            self.client.get('/en/')
+            self.assertEqual(self.client.session['django_language'], 'en')
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, '/en/')
