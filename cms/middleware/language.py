@@ -12,7 +12,6 @@ class LanguageCookieMiddleware(object):
                         request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language:
             return response
         max_age = 365 * 24 * 60 * 60  # 10 years
-        expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
-                                             "%a, %d-%b-%Y %H:%M:%S GMT")
-        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language, expires=expires, max_age=max_age)
+        expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age)
+        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language, expires=expires)
         return response
