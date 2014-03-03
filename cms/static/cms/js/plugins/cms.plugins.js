@@ -493,10 +493,10 @@ $(document).ready(function () {
 			// add small delay before showing submenu
 			this.timer = setTimeout(function () {
 				// reset z indexes
-				var reset = $('.cms_submenu').parentsUntil('.cms_dragarea'),
-                    $scrollHint = $('.cms_submenu-scroll-for-more');
+				var reset = $('.cms_submenu').parentsUntil('.cms_dragarea');
+				var scrollHint = nav.find('.cms_submenu-scroll-hint');
 
-					reset.css('z-index', 0);
+				reset.css('z-index', 0);
 
 				var parents = nav.parentsUntil('.cms_dragarea');
 					parents.css('z-index', 999);
@@ -505,17 +505,13 @@ $(document).ready(function () {
 				nav.find('.cms_submenu-quicksearch').show();
 
 				// set visible states
-				nav.find('> .cms_submenu-dropdown').show(function(){
-                    // Show scroll hint.
-                    if (nav[0].scrollHeight > 230){
-                        $scrollHint.show();
-                    }
-                }).on('scroll', function(){
-                    // Hide scroll hint when we scroll.
-                    $scrollHint.hide();
-                    $(this).off('scroll');
-                });
+				nav.find('> .cms_submenu-dropdown').show().on('scroll', function () {
+					scrollHint.fadeOut(100);
+					$(this).off('scroll');
+				});
 
+				// show scrollHint for FF on OSX
+				if(nav[0].scrollHeight > 230) scrollHint.show();
 
 			}, 100);
 
