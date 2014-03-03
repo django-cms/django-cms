@@ -58,12 +58,12 @@ class CacheTestCase(CMSTestCase):
         middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
         with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
             with self.assertNumQueries(FuzzyInt(14, 18)):
-                response = self.client.get('/en/')
+                self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(7, 11)):
-                response = self.client.get('/en/')
+                self.client.get('/en/')
             with SettingsOverride(CMS_PLACEHOLDER_CACHE=False):
                 with self.assertNumQueries(FuzzyInt(9, 13)):
-                    response = self.client.get('/en/')
+                    self.client.get('/en/')
 
     def test_no_cache_plugin(self):
         template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
