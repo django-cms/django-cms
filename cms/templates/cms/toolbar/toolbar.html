@@ -112,11 +112,13 @@
 	</div>
 	{# end: structure #}
 
-    {% if request.toolbar.redirect_url %}
-       <div class="cms_redirect_overlay">
-           {% trans "Redirect prevented because of toolbar." %}
-           {% trans "This page redirects to:" %} <a href="{{ request.toolbar.redirect_url }}" target="_blank">{{ request.toolbar.redirect_url }}</a>
-       </div>
-    {% endif %}
+	{% if request.toolbar.redirect_url %}
+	<div class="cms_screenblock">
+		<div class="cms_screenblock-inner">
+			<h1>{% trans "This page has no preview!" %}</h1>
+			<p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}" target="_blank">{{ request.toolbar.redirect_url }}</a></p>
+		</div>
+	</div>
+	{% endif %}
 </div>
 {% endlanguage %}
