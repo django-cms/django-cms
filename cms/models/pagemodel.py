@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
-from django.utils.timezone import now
-
 from os.path import join
+
+from django.utils.timezone import now
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+from django.core.cache import cache
+from django.conf import settings
+from django.db import models
+from django.shortcuts import get_object_or_404
+from django.utils.translation import get_language, ugettext_lazy as _
+from mptt.models import MPTTModel
+
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
@@ -17,17 +26,7 @@ from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
-from django.conf import settings
-from django.db import models
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
-from django.utils.translation import get_language, ugettext_lazy as _
 from menus.menu_pool import menu_pool
-from mptt.models import MPTTModel
-
 
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
@@ -38,6 +37,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         (1, _('for logged in users only')),
         (2, _('for anonymous users only')),
     )
+    TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
     X_FRAME_OPTIONS_INHERIT = 0
     X_FRAME_OPTIONS_DENY = 1
@@ -69,7 +69,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_INHERITANCE_MAGIC)
+                                default=TEMPLATE_DEFAULT)
     site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"),
                              related_name='djangocms_pages')
 
@@ -425,7 +425,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         user = getattr(_thread_locals, "user", None)
         if user:
-            self.changed_by = user.username
+            try:
+                self.changed_by = str(user)
+            except AttributeError:
+                # AnonymousUser may not have USERNAME_FIELD
+                self.changed_by = "anonymous"
         else:
             self.changed_by = "script"
         if created:
@@ -922,22 +926,21 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 return t[1]
         return _("default")
 
-    def has_view_permission(self, request):
+    def has_view_permission(self, request, user=None):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
         from cms.utils.plugins import current_site
 
+        if not user:
+            user = request.user
+
         if not self.publisher_is_draft:
-            return self.publisher_draft.has_view_permission(request)
+            return self.publisher_draft.has_view_permission(request, user)
             # does any restriction exist?
         # inherited and direct
         is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
-        if request.user.is_authenticated():
-            site = current_site(request)
-            global_perms_q = Q(can_view=True) & Q(
-                Q(sites__in=[site]) | Q(sites__isnull=True)
-            )
-            global_view_perms = GlobalPagePermission.objects.with_user(
-                request.user).filter(global_perms_q).exists()
+        if user.is_authenticated():
+            global_view_perms = GlobalPagePermission.objects.user_has_view_permission(
+                request.user, current_site(request)).exists()
 
             # a global permission was given to the request's user
             if global_view_perms:
@@ -945,19 +948,18 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             elif not is_restricted:
                 if ((get_cms_setting('PUBLIC_FOR') == 'all') or
                     (get_cms_setting('PUBLIC_FOR') == 'staff' and
-                        request.user.is_staff)):
+                        user.is_staff)):
                     return True
 
             # a restricted page and an authenticated user
             elif is_restricted:
                 opts = self._meta
                 codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-                user_perm = request.user.has_perm(codename)
+                user_perm = user.has_perm(codename)
                 generic_perm = self.has_generic_permission(request, "view")
                 return (user_perm or generic_perm)
 
         else:
-            #anonymous user
             if is_restricted or not get_cms_setting('PUBLIC_FOR') == 'all':
                 # anyonymous user, page has restriction and global access is permitted
                 return False
@@ -968,65 +970,74 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 # Django wide auth perms "can_view" or cms auth perms "can_view"
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-        return (request.user.has_perm(codename) or
+        return (user.has_perm(codename) or
                 self.has_generic_permission(request, "view"))
 
-    def has_change_permission(self, request):
+    def has_change_permission(self, request, user=None):
         opts = self._meta
-        if request.user.is_superuser:
+        if not user:
+            user = request.user
+        if user.is_superuser:
             return True
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
-               self.has_generic_permission(request, "change")
+        return (user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+                and self.has_generic_permission(request, "change"))
 
-    def has_delete_permission(self, request):
+    def has_delete_permission(self, request, user=None):
         opts = self._meta
-        if request.user.is_superuser:
+        if not user:
+            user = request.user
+        if user.is_superuser:
             return True
-        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission()) and \
-               self.has_generic_permission(request, "delete")
+        return (user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
+                and self.has_generic_permission(request, "delete"))
 
-    def has_publish_permission(self, request):
-        if request.user.is_superuser:
+    def has_publish_permission(self, request, user=None):
+        if not user:
+            user = request.user
+        if user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + "publish_page") and \
-               self.has_generic_permission(request, "publish")
+        return (user.has_perm(opts.app_label + '.' + "publish_page")
+                and self.has_generic_permission(request, "publish"))
 
     has_moderate_permission = has_publish_permission
 
-    def has_advanced_settings_permission(self, request):
-        return self.has_generic_permission(request, "advanced_settings")
+    def has_advanced_settings_permission(self, request, user=None):
+        return self.has_generic_permission(request, "advanced_settings", user)
 
-    def has_change_permissions_permission(self, request):
+    def has_change_permissions_permission(self, request, user=None):
         """
         Has user ability to change permissions for current page?
         """
-        return self.has_generic_permission(request, "change_permissions")
+        return self.has_generic_permission(request, "change_permissions", user)
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, user=None):
         """
         Has user ability to add page under current page?
         """
-        return self.has_generic_permission(request, "add")
+        return self.has_generic_permission(request, "add", user)
 
-    def has_move_page_permission(self, request):
+    def has_move_page_permission(self, request, user=None):
         """Has user ability to move current page?
         """
-        return self.has_generic_permission(request, "move_page")
+        return self.has_generic_permission(request, "move_page", user)
 
-    def has_generic_permission(self, request, perm_type):
+    def has_generic_permission(self, request, perm_type, user=None):
         """
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
+        if not user:
+            user = request.user
         att_name = "permission_%s_cache" % perm_type
-        if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
-            or request.user.pk != self.permission_user_cache.pk:
+        if (not hasattr(self, "permission_user_cache")
+                or not hasattr(self, att_name)
+                or user.pk != self.permission_user_cache.pk):
             from cms.utils.permissions import has_generic_permission
 
-            self.permission_user_cache = request.user
+            self.permission_user_cache = user
             setattr(self, att_name, has_generic_permission(
-                self.id, request.user, perm_type, self.site_id))
+                self.id, user, perm_type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)

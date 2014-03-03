@@ -54,7 +54,6 @@ class ManagementTestCase(CMSTestCase):
             self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
 
     def test_list_plugins(self):
-        out = StringIO()
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
         with SettingsOverride(INSTALLED_APPS=apps):
             placeholder = Placeholder.objects.create(slot="test")
@@ -141,8 +140,8 @@ class ManagementTestCase(CMSTestCase):
             placeholder = Placeholder.objects.create(slot="test")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
-            link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                                     name="A Link", url="https://www.django-cms.org")
+            add_plugin(placeholder, "LinkPlugin", "en",
+                       name="A Link", url="https://www.django-cms.org")
 
             instanceless_plugin = CMSPlugin(
                 language="en", plugin_type="TextPlugin")
@@ -235,17 +234,17 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         ph_en = page.placeholders.get(slot="body")
         # add misc plugins
         mcol1 = add_plugin(ph_en, "MultiColumnPlugin", lang, position="first-child")
-        col1 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)
+        add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)
         col2 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)
         mcol2 = add_plugin(ph_en, "MultiColumnPlugin", lang, position="first-child", target=col2)
-        col3 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
+        add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         col4 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         # add a *nested* link plugin
-        link_plugin_en = add_plugin(ph_en, "LinkPlugin", lang, target=col4,
+        add_plugin(ph_en, "LinkPlugin", lang, target=col4,
                                     name="A Link", url="https://www.django-cms.org")
         static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()))
         static_placeholder.save()
-        stack_text_plugin = add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
+        add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
 
     def setUp(self):
         pages = Page.objects.drafts()
@@ -337,7 +336,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         root_page = Page.objects.on_site(site).get_home()
         create_title("de", "root page de", root_page)
         ph = root_page.placeholders.get(slot="body")
-        text_plugin_de = add_plugin(ph, "TextPlugin", "de", body="Hello World")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World")
 
         out = StringIO()
         command = cms.Command()
@@ -361,7 +360,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         root_page = Page.objects.on_site(site).get_home()
         create_title("de", "root page de", root_page)
         ph = root_page.placeholders.get(slot="body")
-        text_plugin_de = add_plugin(ph, "TextPlugin", "de", body="Hello World")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World")
 
         root_plugins = CMSPlugin.objects.filter(placeholder=ph)
         text_de_orig, _ = root_plugins.get(language='de', plugin_type='TextPlugin').get_plugin_instance()
@@ -371,7 +370,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         command.stdout = out
         command.handle("copy-lang", "en", "de", "force-copy")
 
-        root_plugins = CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
+        CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         # we have an existing plugin in one placeholder, so we have one more
@@ -409,8 +408,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             origina_site1_langs[page.pk] = set(page.get_languages())
 
         p1 = create_page('page1', published=True, in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
-        p4 = create_page('page4', published=True, in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
-        p2 = create_page('page2', published=True, in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj)
+        create_page('page4', published=True, in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
+        create_page('page2', published=True, in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj)
 
         for page in Page.objects.on_site(site_active).drafts():
             self._fill_page_body(page, 'de')

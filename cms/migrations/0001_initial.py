@@ -5,6 +5,17 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
+
+user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
+user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
+user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
@@ -75,7 +86,7 @@ class Migration(SchemaMigration):
         db.create_table('cms_pagemoderator', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('page', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cms.Page'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[user_orm_label])),
             ('moderate_page', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('moderate_children', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('moderate_descendants', self.gf('django.db.models.fields.BooleanField')(default=False)),
@@ -86,7 +97,7 @@ class Migration(SchemaMigration):
         db.create_table('cms_pagemoderatorstate', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('page', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cms.Page'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[user_orm_label], null=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('action', self.gf('django.db.models.fields.CharField')(max_length=3, null=True, blank=True)),
             ('message', self.gf('django.db.models.fields.TextField')(default='', max_length=1000, blank=True)),
@@ -96,7 +107,7 @@ class Migration(SchemaMigration):
         # Adding model 'GlobalPagePermission'
         db.create_table('cms_globalpagepermission', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[user_orm_label], null=True, blank=True)),
             ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group'], null=True, blank=True)),
             ('can_change', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('can_add', self.gf('django.db.models.fields.BooleanField')(default=True)),
@@ -122,7 +133,7 @@ class Migration(SchemaMigration):
         # Adding model 'PagePermission'
         db.create_table('cms_pagepermission', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[user_orm_label], null=True, blank=True)),
             ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group'], null=True, blank=True)),
             ('can_change', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('can_add', self.gf('django.db.models.fields.BooleanField')(default=True)),
@@ -140,15 +151,15 @@ class Migration(SchemaMigration):
 
         # Adding model 'PageUser'
         db.create_table('cms_pageuser', (
-            ('user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True, primary_key=True)),
-            ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(related_name='created_users', to=orm['auth.User'])),
+            (user_ptr_name, self.gf('django.db.models.fields.related.OneToOneField')(to=orm[user_orm_label], unique=True, primary_key=True)),
+            ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(related_name='created_users', to=orm[user_orm_label])),
         ))
         db.send_create_signal('cms', ['PageUser'])
 
         # Adding model 'PageUserGroup'
         db.create_table('cms_pageusergroup', (
             ('group_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.Group'], unique=True, primary_key=True)),
-            ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(related_name='created_usergroups', to=orm['auth.User'])),
+            ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(related_name='created_usergroups', to=orm[user_orm_label])),
         ))
         db.send_create_signal('cms', ['PageUserGroup'])
 
@@ -230,8 +241,8 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
+        user_model_label: {
+            'Meta': {'object_name': User.__name__, 'db_table': "'%s'" % User._meta.db_table},
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
@@ -276,7 +287,7 @@ class Migration(SchemaMigration):
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.Group']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'sites': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sites.Site']", 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % user_orm_label, 'null': 'True', 'blank': 'True'})
         },
         'cms.page': {
             'Meta': {'ordering': "('site', 'tree_id', 'lft')", 'object_name': 'Page'},
@@ -314,7 +325,7 @@ class Migration(SchemaMigration):
             'moderate_descendants': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'moderate_page': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Page']"}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % user_orm_label})
         },
         'cms.pagemoderatorstate': {
             'Meta': {'ordering': "('page', 'action', '-created')", 'object_name': 'PageModeratorState'},
@@ -323,7 +334,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'message': ('django.db.models.fields.TextField', [], {'default': "''", 'max_length': '1000', 'blank': 'True'}),
             'page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Page']"}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True'})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % user_orm_label, 'null': 'True'})
         },
         'cms.pagepermission': {
             'Meta': {'object_name': 'PagePermission'},
@@ -340,16 +351,16 @@ class Migration(SchemaMigration):
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.Group']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Page']", 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % user_orm_label, 'null': 'True', 'blank': 'True'})
         },
         'cms.pageuser': {
-            'Meta': {'object_name': 'PageUser', '_ormbases': ['auth.User']},
-            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_users'", 'to': "orm['auth.User']"}),
-            'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
+            'Meta': {'object_name': 'PageUser', '_ormbases': [user_orm_label]},
+            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_users'", 'to': "orm['%s']" % user_orm_label}),
+            'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['%s']" % user_orm_label, 'unique': 'True', 'primary_key': 'True'})
         },
         'cms.pageusergroup': {
             'Meta': {'object_name': 'PageUserGroup', '_ormbases': ['auth.Group']},
-            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_usergroups'", 'to': "orm['auth.User']"}),
+            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_usergroups'", 'to': "orm['%s']" % user_orm_label}),
             'group_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.Group']", 'unique': 'True', 'primary_key': 'True'})
         },
         'cms.placeholder': {

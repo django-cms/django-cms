@@ -8,6 +8,7 @@ def _skipIf(check, message=''):
             return meth
     return _deco
 
+
 try:
     from django.utils import unittest as djut
 except ImportError:

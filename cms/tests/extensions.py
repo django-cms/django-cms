@@ -1,14 +1,17 @@
+from django.contrib.auth.models import Permission
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+
 from cms.api import create_page
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import Page
 from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
-
-from cms.extensions import *
+from cms.extensions import extension_pool
+from cms.extensions import TitleExtension
+from cms.extensions import PageExtension
 from cms.tests import AdminTestsBase
-from django.contrib.auth.models import Permission, User
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from cms.compat import get_user_model
 
 
 class ExtensionsTestCase(TestCase):
@@ -133,8 +136,15 @@ class ExtensionsTestCase(TestCase):
 
 class ExtensionAdminTestCase(AdminTestsBase):
     def setUp(self):
+        User = get_user_model()
+        
         self.admin, self.normal_guy = self._get_guys()
-        self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'no_page_permission')
+
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'test2@test.com')
+        else:
+            self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'no_page_permission')
+        
         self.no_page_permission_user.is_staff = True
         self.no_page_permission_user.is_active = True
         self.no_page_permission_user.save()
@@ -161,7 +171,6 @@ class ExtensionAdminTestCase(AdminTestsBase):
             'A Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
         self.page_title_without_extension = self.page_without_extension.get_title_obj()
-
 
     def test_admin_page_extension(self):
         with self.login_user_context(self.admin):
@@ -198,7 +207,7 @@ class ExtensionAdminTestCase(AdminTestsBase):
             post_data = {
                 'extra': 'my extra text'
             }
-            response = self.client.post(
+            self.client.post(
                 reverse('admin:extensionapp_mypageextension_change', args=(self.page_extension.pk,)),
                 post_data, follow=True
             )
@@ -223,7 +232,6 @@ class ExtensionAdminTestCase(AdminTestsBase):
             self.assertEqual(response.status_code, 403)
             self.assertTrue(MyPageExtension.objects.filter(extended_object=self.page).exists())
 
-
     def test_admin_title_extension(self):
         with self.login_user_context(self.admin):
             # add a new extension
@@ -236,14 +244,14 @@ class ExtensionAdminTestCase(AdminTestsBase):
             post_data = {
                 'extra_title': 'my extra title'
             }
-            response = self.client.post(
+            self.client.post(
                 reverse('admin:extensionapp_mytitleextension_add') + '?extended_object=%s' % self.page_title_without_extension.pk,
                 post_data, follow=True
             )
             created_title_extension = MyTitleExtension.objects.get(extended_object=self.page_title_without_extension)
 
             # can delete extension
-            response = self.client.post(
+            self.client.post(
                 reverse('admin:extensionapp_mytitleextension_delete', args=(created_title_extension.pk,)),
                 {'post': 'yes'}, follow=True
             )
@@ -259,7 +267,7 @@ class ExtensionAdminTestCase(AdminTestsBase):
             post_data = {
                 'extra_title': 'my extra text'
             }
-            response = self.client.post(
+            self.client.post(
                 reverse('admin:extensionapp_mytitleextension_change', args=(self.title_extension.pk,)),
                 post_data, follow=True
             )

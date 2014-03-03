@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+
 from cms.admin import forms
 from cms.admin.forms import PageUserForm
 from cms.api import create_page, create_page_user
+from cms.compat import get_user_model
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
-from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
-from django.core.cache import cache
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
@@ -27,27 +29,33 @@ class FormsTestCase(CMSTestCase):
 
     def test_get_site_choices(self):
         result = get_site_choices()
-        self.assertEquals(result, [])
+        self.assertEqual(result, [])
 
     def test_get_page_choices(self):
         result = get_page_choices()
-        self.assertEquals(result, [('', '----')])
+        self.assertEqual(result, [('', '----')])
 
     def test_get_site_choices_without_moderator(self):
         result = get_site_choices()
-        self.assertEquals(result, [])
+        self.assertEqual(result, [])
 
     def test_get_site_choices_without_moderator_with_superuser(self):
         # boilerplate (creating a page)
-        user_super = User(username="super", is_staff=True, is_active=True,
-                          is_superuser=True)
-        user_super.set_password("super")
+        User = get_user_model()
+
+        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+
+        if User.USERNAME_FIELD != 'email':
+            fields[User.USERNAME_FIELD] = "super"
+
+        user_super = User(**fields)
+        user_super.set_password(getattr(user_super, User.USERNAME_FIELD))
         user_super.save()
         with self.login_user_context(user_super):
             create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The proper test
             result = get_site_choices()
-            self.assertEquals(result, [(1, 'example.com')])
+            self.assertEqual(result, [(1, 'example.com')])
 
     def test_compress_function_raises_when_page_is_none(self):
         raised = False
@@ -64,27 +72,34 @@ class FormsTestCase(CMSTestCase):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = (0, None) #(site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
     def test_compress_function_returns_none_when_no_data_list(self):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = None
         result = fake_field.compress(data_list)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
     def test_compress_function_gets_a_page_when_one_exists(self):
         # boilerplate (creating a page)
-        user_super = User(username="super", is_staff=True, is_active=True,
-                          is_superuser=True)
-        user_super.set_password("super")
+        User = get_user_model()
+        
+        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+
+        if User.USERNAME_FIELD != 'email':
+            fields[User.USERNAME_FIELD] = "super"
+
+        user_super = User(**fields)
+        user_super.set_password(getattr(user_super, User.USERNAME_FIELD))
         user_super.save()
+
         with self.login_user_context(user_super):
             home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The actual test
             fake_field = Mock_PageSelectFormField()
             data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
             result = fake_field.compress(data_list)
-            self.assertEquals(home_page, result)
+            self.assertEqual(home_page, result)
 
     def test_update_site_and_page_choices(self):
         Site.objects.all().delete()
@@ -110,16 +125,20 @@ class FormsTestCase(CMSTestCase):
         normal_result = get_site_choices()
         lazy_result = SuperLazyIterator(get_site_choices)
 
-        self.assertEquals(normal_result, list(lazy_result))
+        self.assertEqual(normal_result, list(lazy_result))
 
     def test_superlazy_iterator_behaves_properly_for_pages(self):
         normal_result = get_page_choices()
         lazy_result = SuperLazyIterator(get_page_choices)
 
-        self.assertEquals(normal_result, list(lazy_result))
+        self.assertEqual(normal_result, list(lazy_result))
 
     def test_page_user_form_initial(self):
-        myuser = User.objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
+        if get_user_model().USERNAME_FIELD == 'email':
+            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser@django-cms.org")
+        else:
+            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
+        
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',

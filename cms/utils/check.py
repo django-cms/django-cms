@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-import inspect
 from contextlib import contextmanager
+import inspect
 import os
-from django.template import Lexer, TOKEN_BLOCK
-from cms import constants
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
-from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_app_paths
-from cms.management.commands.subcommands.list import plugin_report
+
 from django.conf import settings
+from django.template import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
+
+from cms import constants
+from cms.utils import get_cms_setting
+from cms.utils.compat.dj import get_app_paths
 
 SUCCESS = 1
 WARNING = 2
@@ -221,6 +220,7 @@ def check_deprecated_settings(output):
 
 @define_check
 def check_plugin_instances(output):
+    from cms.management.commands.subcommands.list import plugin_report
     with output.section("Plugin instances") as section:
         # get the report
         report = plugin_report()
@@ -241,6 +241,8 @@ def check_plugin_instances(output):
 
 @define_check
 def check_copy_relations(output):
+    from cms.plugin_pool import plugin_pool
+    from cms.models.pluginmodel import CMSPlugin
     c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):
@@ -328,7 +330,7 @@ def check(output):
     for checker in CHECKERS:
         checker(output)
     output.write_line()
-    with output.section("OVERALL RESULTS") as section:
+    with output.section("OVERALL RESULTS"):
         if output.errors:
             output.write_stderr_line(output.colorize("%s errors!" % output.errors, opts=['bold'], fg='red'))
         if output.warnings:

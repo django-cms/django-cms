@@ -1,15 +1,36 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.db import models
+from django.utils import importlib
 from django.utils.translation import ugettext_lazy as _
-
-from django.contrib.auth.models import User, Group
+from django.core.exceptions import ImproperlyConfigured
+from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 
+from cms.compat import is_user_swapped, user_model_label
 from cms.models import Page
-from cms.models.managers import BasicPagePermissionManager, PagePermissionManager
+from cms.models.managers import (PagePermissionManager,
+                                 GlobalPagePermissionManager)
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 
+# To avoid circular dependencies, don't use cms.compat.get_user_model, and
+# don't depend on the app registry, to get the custom user model if used
+if is_user_swapped:
+    user_app_name, user_model_name = user_model_label.rsplit('.', 1)
+    User = None
+    for app in settings.INSTALLED_APPS:
+        if app.endswith(user_app_name):
+            user_app_models = importlib.import_module(app + ".models")
+            User = getattr(user_app_models, user_model_name)
+            break
+    if User is None:
+        raise ImproperlyConfigured(
+            "You have defined a custom user model %s, but the app %s is not "
+            "in settings.INSTALLED_APPS" % (user_model_label, user_app_name)
+        )
+else:
+    from django.contrib.auth.models import User
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
@@ -30,14 +51,13 @@ ACCESS_CHOICES = (
     (ACCESS_PAGE_AND_CHILDREN, _('Page and children (immediate)')),
     (ACCESS_DESCENDANTS, _('Page descendants')),
     (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
-    )
-
+)
 
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
     """
     # who:
-    user = models.ForeignKey(User, verbose_name=_("user"), blank=True, null=True)
+    user = models.ForeignKey(user_model_label, verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
 
     # what:
@@ -75,7 +95,7 @@ class GlobalPagePermission(AbstractPagePermission):
     can_recover_page = models.BooleanField(_("can recover pages"), default=True, help_text=_("can recover any deleted page"))
     sites = models.ManyToManyField(Site, null=True, blank=True, help_text=_('If none selected, user haves granted permissions to all sites.'), verbose_name=_('sites'))
 
-    objects = BasicPagePermissionManager()
+    objects = GlobalPagePermissionManager()
 
     class Meta:
         verbose_name = _('Page global permission')
@@ -108,7 +128,7 @@ class PagePermission(AbstractPagePermission):
 class PageUser(User):
     """Cms specific user data, required for permission system
     """
-    created_by = models.ForeignKey(User, related_name="created_users")
+    created_by = models.ForeignKey(user_model_label, related_name="created_users")
 
     class Meta:
         verbose_name = _('User (page)')
@@ -119,7 +139,7 @@ class PageUser(User):
 class PageUserGroup(Group):
     """Cms specific group data, required for permission system
     """
-    created_by = models.ForeignKey(User, related_name="created_usergroups")
+    created_by = models.ForeignKey(user_model_label, related_name="created_usergroups")
 
     class Meta:
         verbose_name = _('User group (page)')

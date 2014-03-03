@@ -144,7 +144,7 @@ $(document).ready(function () {
 				});
 
 				// attach hover
-				lists.find('li').bind('mouseenter mouseleave', function (e) {
+				lists.find('li').bind('mouseenter mouseleave', function () {
 					var el = $(this);
 					var parent = el.closest('.cms_toolbar-item-navigation-children');
 					var hasChildren = el.hasClass(children) || parent.length;
@@ -292,7 +292,7 @@ $(document).ready(function () {
 			this._lock(false);
 		},
 
-		openAjax: function (url, post, text, callback) {
+		openAjax: function (url, post, text, callback, onSuccess) {
 			var that = this;
 
 			// check if we have a confirmation text
@@ -307,6 +307,8 @@ $(document).ready(function () {
 				'success': function () {
 					if(callback) {
 						callback(that);
+					} else if(onSuccess) {
+						CMS.API.Helpers.reloadBrowser(onSuccess);
 					} else {
 						// reload
 						CMS.API.Helpers.reloadBrowser();
@@ -411,7 +413,7 @@ $(document).ready(function () {
 						sideframe.open(el.attr('href'), true);
 					break;
 				case 'ajax':
-					this.openAjax(el.attr('href'), el.data('post'), el.data('text'));
+					this.openAjax(el.attr('href'), JSON.stringify(el.data('post')), el.data('text'), null, el.data('on-success'));
 					break;
 				default:
 					window.location.href = el.attr('href');

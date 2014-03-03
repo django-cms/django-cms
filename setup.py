@@ -32,12 +32,12 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         'Django>=1.4',
-        'django-classy-tags>=0.3.4.1',
+        'django-classy-tags>=0.5',
         'south>=0.7.2',
         'html5lib',
         'django-mptt==0.5.2,==0.6',
         'django-sekizai>=0.7',
-        'djangocms-admin-style'
+	    'djangocms-admin-style'
     ],
     tests_require=[
         'django-reversion==1.6.6',

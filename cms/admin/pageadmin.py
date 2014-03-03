@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import sys
-from cms.admin.placeholderadmin import PlaceholderAdmin
-from cms.plugin_pool import plugin_pool
-from django.contrib.admin.helpers import AdminForm
 
 import django
+from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
@@ -20,10 +18,12 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.template.defaultfilters import escape
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.plugin_pool import plugin_pool
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.urls import unquote
@@ -37,10 +37,9 @@ from cms.admin.views import revert_plugins
 from cms.models import Page, Title, CMSPlugin, PagePermission, EmptyTitle, GlobalPagePermission, \
     titlemodels, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
-from cms.utils import helpers, moderator, permissions, get_language_from_request, admin as admin_utils, copy_plugins
+from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
 from cms.utils.admin import jsonify_request
-
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
 from cms.utils.compat import DJANGO_1_4
@@ -87,7 +86,7 @@ PUBLISH_COMMENT = "Publish"
 INITIAL_COMMENT = "Initial version."
 
 
-class PageAdmin(PlaceholderAdmin, ModelAdmin):
+class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     form = PageForm
     search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"
@@ -628,6 +627,10 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
         except IndexError:
             open_menu_trees = []
+        # Language may be present in the GET dictionary but empty
+        language = request.GET.get('language', get_language())
+        if not language:
+            language = get_language()
         context = {
             'title': cl.title,
             'is_popup': cl.is_popup,
@@ -636,6 +639,7 @@ class PageAdmin(PlaceholderAdmin, ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'root_path': reverse('admin:index'),
             'app_label': app_label,
+            'preview_language': language,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
             'DEBUG': settings.DEBUG,

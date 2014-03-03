@@ -149,7 +149,7 @@ $(document).ready(function () {
 				var text = this.config.lang.confirm;
 
 				// trigger an ajax request
-				CMS.API.Toolbar.openAjax(data.delete, post, text, function () {
+				CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
 					that._hide(100);
 				});
 			} else {
@@ -373,8 +373,6 @@ $(document).ready(function () {
 					'top': modalTop + mvY
 				});
 			});
-
-			console.log($(window).scrollTop());
 		},
 
 		_endResize: function () {
@@ -509,6 +507,9 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
 
+				// set modal buttons
+  				that._setButtons($(this));
+
 				// when an error occurs, reset the saved status so the form can be checked and validated again
 				if(iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
 					that.saved = false;
@@ -516,7 +517,8 @@ $(document).ready(function () {
 
 				// when the window has been changed pressing the blue or red button, we need to run a reload check
 				if(that.saved) {
-					that.reloadBrowser(false, false, true);
+					iframe.hide();
+					that.reloadBrowser(window.location.href, false, true);
 				} else {
 					// set title of not provided
 					var innerTitle = iframe.contents().find('#content h1:eq(0)');

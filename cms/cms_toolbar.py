@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
+from django.contrib import admin
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+
 from cms.api import get_page_draft
+from cms.compat import user_model_label
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
 from cms.models import Title
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
-from cms.utils.i18n import get_language_objects, force_language, get_language_object
-from django.contrib.sites.models import Site
-from cms.utils import get_cms_setting
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import admin
-from django.contrib.auth.models import User
+from cms.utils.i18n import get_language_objects
+from cms.utils.i18n import force_language
+from cms.utils.i18n import get_language_object
+from cms.utils import get_cms_setting
+from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.permissions import has_page_change_permission
 from menus.utils import DefaultLanguageChanger
 
 
@@ -88,7 +94,7 @@ class BasicToolbar(CMSToolbar):
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
-            admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:auth_user_changelist"))
+            admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:"+user_model_label.replace('.','_').lower()+"_changelist"))
             # sites menu
         if get_cms_setting('PERMISSION'):
             sites_queryset = get_user_sites_queryset(self.request.user)
@@ -101,14 +107,35 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-            # admin
+                # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)
         # cms users
         admin_menu.add_sideframe_item(_('User settings'), url=reverse('admin:cms_usersettings_change'))
         admin_menu.add_break(USER_SETTINGS_BREAK)
         # logout
-        admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'), active=True)
+        # If current page is not published or has view restrictions user is
+        # redirected to the home page:
+        # * published page: no redirect
+        # * unpublished page: redirect to the home page
+        # * published page with login_required: redirect to the home page
+        # * published page with view permissions: redirect to the home page
+        if self.request.current_page:
+            if not self.request.current_page.is_published(self.current_lang):
+                page = self.request.current_page
+            else:
+                page = self.request.current_page.get_public_object()
+        else:
+            page = None
+        redirect_url = '/'
+        if (page and
+                (not page.is_published(self.current_lang) or page.login_required
+                 or not page.has_view_permission(self.request, AnonymousUser()))):
+            admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
+                                     active=True, on_success=redirect_url)
+        else:
+            admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
+                                     active=True)
 
     def add_language_menu(self):
         language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
@@ -140,7 +167,7 @@ class PageToolbar(CMSToolbar):
             self.change_admin_menu()
             if self.page:
                 self.add_page_menu()
-            # history menu
+                # history menu
         if self.page and self.toolbar.edit_mode:
             self.add_history_menu()
             self.change_language_menu()
@@ -249,7 +276,11 @@ class PageToolbar(CMSToolbar):
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         # cms page admin
-        admin_menu.add_sideframe_item(_('Pages'), url=reverse("admin:cms_page_changelist"), position=0)
+        url = "%s?language=%s" % (reverse("admin:cms_page_changelist"), self.toolbar.language)
+        if self.page:
+            url += "&page_id=%s" % self.page.pk
+        admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
+
 
     def add_page_menu(self):
         # menu for current page
@@ -329,6 +360,14 @@ class PageToolbar(CMSToolbar):
                 on_delete_redirect_url = reverse('pages-root')
         current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url=self.toolbar.URL_CHANGE,
                                          on_close=on_delete_redirect_url, disabled=not_edit_mode)
+
+        if not self.title:
+            self.toolbar.add_button(
+                _("Page settings"),
+                "%s?language=%s" % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language),
+                side=self.toolbar.RIGHT,
+                extra_classes=["cms_btn-action"],
+            )
 
     def add_history_menu(self):
         # history menu

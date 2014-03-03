@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
+
+from django.contrib.sites.models import Site
+
 from cms.api import create_page
 from cms.models import Page, Placeholder
 from cms.utils import get_cms_setting
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 
 
 class SiteTestCase(CMSTestCase):
@@ -19,9 +20,7 @@ class SiteTestCase(CMSTestCase):
     def setUp(self):
         self.assertEqual(Site.objects.all().count(), 1)
         with SettingsOverride(SITE_ID=1):
-            u = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-            u.set_password("test")
-            u.save()
+            u = self._create_user("test", True, True)
 
             # setup sites
             self.site2 = Site.objects.create(domain="sample2.com", name="sample2.com", pk=2)

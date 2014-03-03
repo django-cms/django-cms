@@ -51,6 +51,9 @@ $(document).ready(function () {
 		_setup: function () {
 			var that = this;
 
+			// cancel if there are no dragareas
+			if(!this.dragareas.length) return false;
+
 			// setup toolbar mode
 			if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
 
@@ -160,6 +163,8 @@ $(document).ready(function () {
 				id = cls.replace('cms_placeholder-', '');
 			} else if(el.hasClass('cms_dragbar')) {
 				id = cls.replace('cms_dragbar-', '');
+			} else if(el.hasClass('cms_dragarea')) {
+				id = cls.replace('cms_dragarea-', '');
 			}
 
 			return id;
@@ -416,13 +421,17 @@ $(document).ready(function () {
 					if(original.data('settings') === null) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
-					var holder = placeholder.parent().prevAll('.cms_dragarea').first();
+					var holderId = that.getId(placeholder.closest('.cms_dragarea'));
+					var holder = $('.cms_placeholder-' + holderId);
 					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
 					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
 					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
 					if(holder.length) bounds = holder.data('settings').plugin_restriction;
+
+					// if parent has class disabled, dissalow drop
+					if(placeholder.parent().hasClass('cms_draggable-disabled')) return false;
 
 					// if restrictions is still empty, proceed
 					that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;

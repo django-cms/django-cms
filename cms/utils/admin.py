@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
 import json
-from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 
 import django
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.contrib.sites.models import Site
-
-from cms.models import Page
-from cms.utils import permissions, get_language_from_request, get_language_list, get_cms_setting
-from cms.utils.permissions import has_global_page_permission
 from django.utils.encoding import smart_str
+
+from cms.models import Page, GlobalPagePermission
+from cms.utils import permissions
+from cms.utils import get_language_from_request
+from cms.utils import get_language_list
+from cms.utils import get_cms_setting
+from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 
 NOT_FOUND_RESPONSE = "NotFound"
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
+
 
 def jsonify_request(response):
     """ Turn any response in a 200 response to let jQuery code handle it nicely.
@@ -62,8 +65,9 @@ def get_admin_menu_item_context(request, page, filtered=False):
     has_add_on_same_level_permission = False
     opts = Page._meta
     if get_cms_setting('PERMISSION'):
-        perms = has_global_page_permission(request, page.site_id, can_add=True)
-        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and perms):
+        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
+            request.user, page.site_id).exists()
+        if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
             has_add_on_same_level_permission = True
 
     if not has_add_on_same_level_permission and page.parent_id:

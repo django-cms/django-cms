@@ -110,42 +110,61 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 mail_managers(subject, body, fail_silently=True)
             return None
 
-
-class PageUrl(InclusionTag):
-    template = 'cms/content.html'
+class PageUrl(AsTag):
     name = 'page_url'
 
     options = Options(
         Argument('page_lookup'),
         Argument('lang', required=False, default=None),
         Argument('site', required=False, default=None),
+        'as',
+        Argument('varname', required=False, resolve=False),
     )
 
-    def get_context(self, context, page_lookup, lang, site):
+    def get_value_for_context(self, context, **kwargs):
+        #
+        # A design decision with several active members of the django-cms
+        # community that using this tag with the 'as' breakpoint should never
+        # return Exceptions regardless of the setting of settings.DEBUG.
+        #
+        # We wish to maintain backwards functionality where the non-as-variant
+        # of using this tag will raise DNE exceptions only when
+        # settings.DEBUG=False.
+        #
+        try:
+            return super(PageUrl, self).get_value_for_context(context, **kwargs)
+        except Page.DoesNotExist:
+            return ''
+
+    def get_value(self, context, page_lookup, lang, site):
         from django.core.cache import cache
+
         site_id = get_site_id(site)
         request = context.get('request', False)
-        if not request:
-            return {'content': ''}
 
-        if request.current_page == "dummy":
-            return {'content': ''}
+        if not request:
+            return ''
+
         if lang is None:
             lang = get_language_from_request(request)
-        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
+
+        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + \
+            '_type:absolute_url'
+
         url = cache.get(cache_key)
+
         if not url:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url, get_cms_setting('CACHE_DURATIONS')['content'])
+                cache.set(cache_key, url,
+                          get_cms_setting('CACHE_DURATIONS')['content'])
         if url:
-            return {'content': url}
-        return {'content': ''}
+            return url
+        return ''
 
 
 register.tag(PageUrl)
-
 register.tag('page_id_url', PageUrl)
 
 
@@ -590,11 +609,11 @@ class CMSToolbar(RenderBlock):
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
-                js = render_to_string('cms/toolbar/toolbar_javascript.html', context)
+                # needed to populate the context with sekizai content
+                render_to_string('cms/toolbar/toolbar_javascript.html', context)
                 clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
         else:
             language = None
-            js = ''
             clipboard = ''
         # render everything below the tag
         rendered_contents = nodelist.render(context)

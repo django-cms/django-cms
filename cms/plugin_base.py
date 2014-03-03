@@ -21,7 +21,6 @@ from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 
-
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
     """
     Ensure the CMSPlugin subclasses have sane values and set some defaults if 
@@ -122,7 +121,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     action_options = {
         PLUGIN_MOVE_ACTION: {
-            'requires_reload': True
+            'requires_reload': False
         },
         PLUGIN_COPY_ACTION: {
             'requires_reload': True
@@ -213,6 +212,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         New version will be created in admin.views.edit_plugin
         """
         self.object_successfully_changed = True
+
         if not DJANGO_1_4:
             post_url_continue = reverse('admin:cms_page_edit_plugin',
                     args=(obj._get_pk_val(),),

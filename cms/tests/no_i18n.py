@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from djangocms_text_ckeditor.models import Text
-from django.contrib.auth.models import User
+from cms.compat import get_user_model
 from cms.models import Page, CMSPlugin
 from django.core.urlresolvers import clear_url_caches
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -54,7 +54,7 @@ class TestNoI18N(SettingsOverrideTestCase):
 
     def test_language_chooser(self):
         # test simple language chooser with default args
-        page1 = create_page("home", template="col_two.html", language="en-us", published=True)
+        create_page("home", template="col_two.html", language="en-us", published=True)
         context = self.get_context(path="/")
         del context['request'].LANGUAGE_CODE
         tpl = Template("{% load menu_tags %}{% language_chooser %}")
@@ -72,7 +72,7 @@ class TestNoI18N(SettingsOverrideTestCase):
 
     def test_page_language_url(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_no18n'):
-            page1 = create_page("home", template="col_two.html", language="en-us", published=True)
+            create_page("home", template="col_two.html", language="en-us", published=True)
             path = "/"
             context = self.get_context(path=path)
             del context['request'].LANGUAGE_CODE
@@ -116,10 +116,10 @@ class TestNoI18N(SettingsOverrideTestCase):
             'site': 1,
         }
         # required only if user haves can_change_permission
-        self.super_user = User(username="test", is_staff=True, is_active=True, is_superuser=True)
-        self.super_user.set_password("test")
-        self.super_user.save()
-        self.client.login(username="test", password="test")
+        self.super_user = self._create_user("test", True, True)
+        self.client.login(username=getattr(self.super_user, get_user_model().USERNAME_FIELD),
+                          password=getattr(self.super_user, get_user_model().USERNAME_FIELD))
+
         response = self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
         page = Page.objects.all()[0]
         response = self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
@@ -131,20 +131,20 @@ class TestNoI18N(SettingsOverrideTestCase):
             'placeholder_id': page.placeholders.get(slot="body").pk,
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD[3:], plugin_data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         created_plugin_id = int(response.content.decode('utf8').split("/edit-plugin/")[1].split("/")[0])
-        self.assertEquals(created_plugin_id, CMSPlugin.objects.all()[0].pk)
+        self.assertEqual(created_plugin_id, CMSPlugin.objects.all()[0].pk)
         # now edit the plugin
         edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
         response = self.client.get(edit_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         data = {
             "body": "Hello World"
         }
         response = self.client.post(edit_url, data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         txt = Text.objects.get(pk=created_plugin_id)
-        self.assertEquals("Hello World", txt.body)
+        self.assertEqual("Hello World", txt.body)
         # edit body, but click cancel button
         data = {
             "body": "Hello World!!",
@@ -152,6 +152,6 @@ class TestNoI18N(SettingsOverrideTestCase):
         }
         edit_url = '%s%d/' % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
         response = self.client.post(edit_url, data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         txt = Text.objects.all()[0]
-        self.assertEquals("Hello World", txt.body)
+        self.assertEqual("Hello World", txt.body)

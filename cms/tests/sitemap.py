@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import ugettext_lazy as _
 from cms.models import Title, Page
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
@@ -59,7 +58,7 @@ class SitemapTestCase(CMSTestCase):
             p10 = create_page('P10', published=False, in_navigation=True, parent=p9, **defaults)
             create_title(language='de', title="other title %s" % p10.get_title('en'), page=p10)
 
-            p11 = create_page('P11', published=True, in_navigation=True, parent=p9, **defaults)
+            create_page('P11', published=True, in_navigation=True, parent=p9, **defaults)
             p1 = p1.reload()
             p2 = p2.reload()
             p3 = p3.reload()

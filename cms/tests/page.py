@@ -226,12 +226,12 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be edited multiple times with moderator
         """
-        home = api.create_page("home", "nav_playground.html", "en", published=True)
+        api.create_page("home", "nav_playground.html", "en", published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertEquals(response.status_code, 302)
+            self.assertEqual(response.status_code, 302)
             page = Page.objects.get(title_set__slug=page_data['slug'])
             response = self.client.get('/en/admin/cms/page/%s/' % page.id)
             self.assertEqual(response.status_code, 200)
@@ -240,7 +240,7 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post('/en/admin/cms/page/%s/advanced-settings/' % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_absolute_url(), '/en/hello/')
-            title = Title.objects.all()[0]
+            Title.objects.all()[0]
             page = page.reload()
             page.publish('en')
             page_data['title'] = 'new title'
@@ -258,7 +258,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             page_data["meta_description"] = "I am a page"
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             response = self.client.get('/en/admin/cms/page/%s/' % page.id)
             self.assertEqual(response.status_code, 200)
@@ -739,7 +739,7 @@ class PagesTestCase(CMSTestCase):
         """ Tests if a URL-Override clashes with a normal page url
         """
         with SettingsOverride(CMS_PERMISSION=False):
-            home = create_page('home', 'nav_playground.html', 'en', published=True)
+            create_page('home', 'nav_playground.html', 'en', published=True)
             bar = create_page('bar', 'nav_playground.html', 'en', published=False)
             foo = create_page('foo', 'nav_playground.html', 'en', published=True)
             # Tests to assure is_valid_url is ok on plain pages
@@ -941,7 +941,7 @@ class PageAdminTest(PageAdminTestBase):
                 request, str(page.pk),
                 form_url=form_url)
             self.assertTrue('form_url' in response.context_data)
-            self.assertEquals(response.context_data['form_url'], form_url)
+            self.assertEqual(response.context_data['form_url'], form_url)
 
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()
