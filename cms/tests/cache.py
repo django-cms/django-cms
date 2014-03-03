@@ -102,7 +102,7 @@ class CacheTestCase(CMSTestCase):
             render = template.render(rctx)
         with self.assertNumQueries(FuzzyInt(14, 18)):
             response = self.client.get('/en/')
-            resp1 = response.content.split("$$$")[1]
+            resp1 = response.content.decode('utf8').split("$$$")[1]
 
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
@@ -113,7 +113,7 @@ class CacheTestCase(CMSTestCase):
             render2 = template.render(rctx)
         with self.assertNumQueries(FuzzyInt(10, 14)):
             response = self.client.get('/en/')
-            resp2 = response.content.split("$$$")[1]
+            resp2 = response.content.decode('utf8').split("$$$")[1]
         self.assertNotEqual(render, render2)
         self.assertNotEqual(resp1, resp2)
 
