@@ -86,14 +86,7 @@ def details(request, slug):
     for frontend_lang in user_languages:
         if frontend_lang in page_languages:
             available_languages.append(frontend_lang)
-    attrs = ''
-    if 'edit' in request.GET:
-        attrs = '?edit=1'
-    elif 'preview' in request.GET:
-        attrs = '?preview=1'
-        if 'draft' in request.GET:
-            attrs += '&draft=1'
-            # Check that the language is in FRONTEND_LANGUAGES:
+    # Check that the language is in FRONTEND_LANGUAGES:
     if not current_language in user_languages:
         #are we on root?
         if not slug:
@@ -108,7 +101,7 @@ def details(request, slug):
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
-                            return HttpResponseRedirect(pages_root + attrs)
+                            return HttpResponseRedirect(pages_root)
             else:
                 _handle_no_page(request, slug)
         else:
@@ -125,7 +118,7 @@ def details(request, slug):
                         # In the case where the page is not available in the
                     # preferred language, *redirect* to the fallback page. This
                     # is a design decision (instead of rendering in place)).
-                    return HttpResponseRedirect(path + attrs)
+                    return HttpResponseRedirect(path)
                 else:
                     found = True
         if not found:
@@ -170,11 +163,9 @@ def details(request, slug):
             '/%s' % request.path,
             request.path,
         ]
-        if redirect_url not in own_urls:
-            redirect_url += attrs
-        if request.toolbar.is_staff and request.toolbar.show_toolbar:
+        if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
             request.toolbar.redirect_url = redirect_url
-        else:
+        elif redirect_url not in own_urls:
             return HttpResponseRedirect(redirect_url)
 
     # permission checks
