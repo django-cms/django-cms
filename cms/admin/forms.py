@@ -3,8 +3,9 @@ import sys
 from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
 from cms.compat_forms import UserCreationForm
+from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget
-from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels
+from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels, Title
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change
@@ -74,7 +75,7 @@ class PageForm(forms.ModelForm):
                                        max_length=155)
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
-
+    page_type = forms.ChoiceField(label=_("Page type"), required=False)
 
     class Meta:
         model = Page
@@ -93,6 +94,20 @@ class PageForm(forms.ModelForm):
         self.fields['language'].choices = languages
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
+        if 'page_type' in self.fields:
+            try:
+                type_root = Page.objects.get(publisher_is_draft=True, reverse_id=PAGE_TYPES_ID)
+            except Page.DoesNotExist:
+                type_root = None
+            if type_root:
+                language = self.fields['language'].initial
+                type_ids = type_root.get_descendants().values_list('pk', flat=True)
+                titles = Title.objects.filter(page__in=type_ids, language=language)
+                choices = [('', '----')]
+                for title in titles:
+                    choices.append((title.page_id, title.title))
+                self.fields['page_type'].choices = choices
+
 
     def clean(self):
         cleaned_data = self.cleaned_data

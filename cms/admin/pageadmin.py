@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import sys
+from cms.constants import PAGE_TYPES_ID
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -14,6 +15,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction
+from django.forms import HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
@@ -129,6 +131,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
+            pat(r'^add-page-type/$', self.add_page_type),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
         )
 
@@ -208,6 +211,19 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 pass
             else:
                 obj.move_to(target, position)
+        page_type_id = form.cleaned_data.get('page_type')
+        if 'copy_target' in request.GET or page_type_id:
+            copy_target_id = request.GET.get('copy_target')
+            if page_type_id:
+                copy_target_id = page_type_id
+            copy_target = Page.objects.get(pk=copy_target_id)
+            obj = Page.objects.get(pk=obj.pk) #mptt reload
+            if not 'add_page_type' in request.GET:
+                site_id = obj.site_id
+                copy_target._copy_attributes(obj)
+                obj.site_id = site_id
+                obj.save()
+            copy_target._copy_contents(obj, form.cleaned_data['language'])
         if not 'permission' in request.path:
             language = form.cleaned_data['language']
             Title.objects.set_or_create(
@@ -235,6 +251,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language
+        if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj:
+            del form.base_fields['page_type']
+        if 'add_page_type' in request.GET:
+            del form.base_fields['menu_title']
+            del form.base_fields['meta_description']
+            del form.base_fields['page_title']
         if obj:
             if "permission" in request.path:
                 self.inlines = PERMISSION_ADMIN_INLINES
@@ -331,6 +353,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         extra_context.update({
             'language': language,
         })
+        if not request.GET.get('add_page_type') is None:
+            extra_context.update({
+                'add_page_type': True,
+                'title':  _("Add Page Type"),
+            })
+        elif 'copy_target' in request.GET:
+            extra_context.update({
+                'title':  _("Add Page Copy"),
+            })
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
@@ -1172,13 +1203,32 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         Get html for descendants of given page
         Used for lazy loading pages in cms.changelist.js
-        
+
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
         """
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
                                                   template="admin/cms/page/tree/lazy_menu.html")
+
+    def add_page_type(self, request):
+        site = Site.objects.get_current()
+        language = request.GET.get('language')
+        target = request.GET.get('copy-target')
+        try:
+            type_root = Page.objects.get(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site_id=site.pk)
+        except Page.DoesNotExist:
+            type_root = Page(reverse_id=PAGE_TYPES_ID, site=site, in_navigation=False)
+            type_root.save()
+            language = get_language()
+            type_title = Title(title=_("Page Types"), language=language, slug=PAGE_TYPES_ID, page=type_root)
+            type_title.save()
+        return HttpResponseRedirect("%s?target=%s&position=first-child&add_page_type=1&copy_target=%s&language=%s" % (
+            reverse("admin:cms_page_add"),
+            type_root.pk,
+            target,
+            language
+        ))
 
     def resolve(self, request):
         if not request.user.is_staff:

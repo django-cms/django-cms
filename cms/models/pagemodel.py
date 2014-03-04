@@ -118,7 +118,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
         )
-        unique_together = (("publisher_is_draft", "application_namespace"),)
+        unique_together = (("publisher_is_draft", "application_namespace"), ("reverse_id", "site"))
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('tree_id', 'lft')
