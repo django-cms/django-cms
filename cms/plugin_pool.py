@@ -183,21 +183,17 @@ class PluginPool(object):
             setting_key,
             placeholder,
             template,
-        ) or []
+        ) or ()
         for plugin in plugins:
             include_plugin = False
             if placeholder and not plugin.require_parent:
-                if allowed_plugins:
-                    if plugin.__name__ in allowed_plugins:
-                        include_plugin = True
-                elif setting_key == "plugins":
-                    include_plugin = True
+                include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
             if plugin.page_only and not include_page_only:
                 include_plugin = False
             if include_plugin:
                 final_plugins.append(plugin)
 
-        if final_plugins:
+        if final_plugins or placeholder:
             plugins = final_plugins
 
         # plugins sorted by modules
