@@ -23,6 +23,17 @@ def _pyflakes_no_migrations(self, tree, filename='(none)', builtins=None):
         Checker.___init___(self, tree, filename, builtins)
 
 
+def _check_recursive(paths, reporter):
+    """
+    The builtin recursive checker tries to check .pyc files.
+    """
+    num_warnings = 0
+    for path in api.iterSourceCode(paths):
+        if path.endswith('.py'):
+            num_warnings += api.checkPath(path, reporter)
+    return num_warnings
+
+
 def pyflakes():
     """
     Unfortunately, pyflakes does not have a way to suppress certain errors or
@@ -39,4 +50,4 @@ def pyflakes():
         os.path.abspath(os.path.dirname(menus.__file__)),
         os.path.abspath(__file__),
     ]
-    return api.checkRecursive(paths, reporter)
+    return _check_recursive(paths, reporter)
