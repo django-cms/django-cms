@@ -120,6 +120,14 @@ class ViewTests(SettingsOverrideTestCase):
         response = details(request, one.get_path())
         self.assertEqual(response.status_code, 200)
 
+    def test_redirect_with_toolbar(self):
+        create_page("one", "nav_playground.html", "en", published=True,
+                          redirect='/en/page2')
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?edit')
+            self.assertEqual(response.status_code, 200)
+
     def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,
                     login_required=True)
