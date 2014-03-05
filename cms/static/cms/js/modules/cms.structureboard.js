@@ -114,7 +114,7 @@ $(document).ready(function () {
 				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
 
 			// show clipboard
-			this.clipboard.fadeIn(this.options.speed);
+			this.clipboard.css('opacity', 1).fadeIn(this.options.speed);
 
 			// apply new settings
 			this.settings.mode = 'structure';
@@ -197,6 +197,9 @@ $(document).ready(function () {
 			if(state) {
 				// quick show
 				this._showBoard();
+
+				// show clipboard
+				this.clipboard.show().css('opacity', 0.2);
 
 				// prevent default visibility
 				this.dragareas.css('opacity', 0.2);
