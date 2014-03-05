@@ -1,7 +1,7 @@
 {% load i18n l10n cms_tags %}
 {% load url from future %}
 
-<div class="cms_draggable cms_draggable-{{ plugin.pk|unlocalize }}{% if not plugin.child_plugin_instances or plugin.disable_child_plugins %} cms_draggable-disabled{% endif %}">
+<div class="cms_draggable cms_draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms_draggable-disabled{% endif %}">
 	<div class="cms_dragitem cms_dragitem-handler{% if plugin.child_plugin_instances %} cms_dragitem-collapsable{% endif %}">
 		{% language request.toolbar.toolbar_language %}
 		<div class="cms_switcher"></div>
