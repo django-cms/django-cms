@@ -28,7 +28,7 @@ from cms.utils.i18n import is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 
-CMS_PAGE_CACHE_VERSION_KEY = 'CMS_PAGE_CACHE_VERSION'
+CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
 
 
 def _handle_no_page(request, slug):
@@ -238,11 +238,7 @@ def _cache_page(response):
             version=version
         )
         # See note in invalidate_cms_page_cache()
-        cache.set(
-            CMS_PAGE_CACHE_VERSION_KEY,
-            version,
-            ttl
-        )
+        _set_cache_version(version)
     
 
 def _get_cache_key(request):
@@ -273,17 +269,25 @@ def _get_cache_version():
     if version:
         return version
     else:
-        cache.set(
-            CMS_PAGE_CACHE_VERSION_KEY,
-            1,
-            get_cms_setting('CACHE_DURATIONS')['content']
-        )
+        _set_cache_version(1)
         return 1
 
 
-def invalidate_cms_page_cache():
+def _set_cache_version(version):
+    '''
+    Set the cache version to the specified value.
+    '''
+
     from django.core.cache import cache
 
+    cache.set(
+        CMS_PAGE_CACHE_VERSION_KEY,
+        version,
+        get_cms_setting('CACHE_DURATIONS')['content']
+    )
+
+
+def invalidate_cms_page_cache():
     '''
     Invalidates the CMS PAGE CACHE.
     '''
@@ -315,8 +319,5 @@ def invalidate_cms_page_cache():
     # will have also expired, so, it'd be pointless to try to access them
     # anyway.
     #
-    try:
-        cache.incr(CMS_PAGE_CACHE_VERSION_KEY)
-    except ValueError:
-        # Key doesn't exist, so just set it to the default
-        cache.set(CMS_PAGE_CACHE_VERSION_KEY, 1, get_cms_setting('CACHE_DURATIONS')['content'])
+    version = _get_cache_version()
+    _set_cache_version(version + 1)

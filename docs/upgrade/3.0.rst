@@ -44,6 +44,13 @@ objects. See :doc:`../extending_cms/toolbar`.
     toolbar to work. See :ref:`Enable messages <enable-messages>` for how to
     enable it.
 
+New Page Types
+==============
+
+You can now save pages as page types. If you then create a new page you may
+select a page type and all plugins and contents will be pre-filled.
+
+
 Experimental Python 3.3 support
 ===============================
 

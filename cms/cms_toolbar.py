@@ -31,6 +31,8 @@ TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_FIRST_BREAK = 'Page Menu First Break'
 PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'
 PAGE_MENU_THIRD_BREAK = 'Page Menu Third Break'
+PAGE_MENU_FOURTH_BREAK = 'Page Menu Fourth Break'
+PAGE_MENU_LAST_BREAK = 'Page Menu Last Break'
 HISTORY_MENU_BREAK = 'History Menu Break'
 MANAGE_PAGES_BREAK = 'Manage Pages Break'
 ADMIN_SITES_BREAK = 'Admin Sites Break'
@@ -94,7 +96,8 @@ class BasicToolbar(CMSToolbar):
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
         if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
-            admin_menu.add_sideframe_item(_('Users'), url=reverse("admin:"+user_model_label.replace('.','_').lower()+"_changelist"))
+            admin_menu.add_sideframe_item(_('Users'), url=reverse(
+                "admin:" + user_model_label.replace('.', '_').lower() + "_changelist"))
             # sites menu
         if get_cms_setting('PERMISSION'):
             sites_queryset = get_user_sites_queryset(self.request.user)
@@ -129,8 +132,8 @@ class BasicToolbar(CMSToolbar):
             page = None
         redirect_url = '/'
         if (page and
-                (not page.is_published(self.current_lang) or page.login_required
-                 or not page.has_view_permission(self.request, AnonymousUser()))):
+            (not page.is_published(self.current_lang) or page.login_required
+            or not page.has_view_permission(self.request, AnonymousUser()))):
             admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
                                      active=True, on_success=redirect_url)
         else:
@@ -281,11 +284,36 @@ class PageToolbar(CMSToolbar):
             url += "&page_id=%s" % self.page.pk
         admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
 
-
     def add_page_menu(self):
         # menu for current page
         not_edit_mode = not self.toolbar.edit_mode
         current_page_menu = self.toolbar.get_or_create_menu('page', _('Page'), position=1)
+
+        add_page_menu = current_page_menu.get_or_create_menu('add_page', _("Add Page"))
+        add_page_menu.add_sideframe_item(
+            _("New Page"),
+            url="%s?language=%s" % (
+                reverse("admin:cms_page_add"),
+                self.toolbar.language
+            )
+        )
+        add_page_menu.add_sideframe_item(
+            _("New Sub Page"),
+            url="%s?target=%s&position=last-child&language=%s" % (
+                reverse("admin:cms_page_add"),
+                self.page.pk,
+                self.toolbar.language,
+            )
+        )
+        add_page_menu.add_sideframe_item(
+            _("Duplicate this Page"),
+            url="%s?copy_target=%s&language=%s" % (
+                reverse("admin:cms_page_add"),
+                self.page.pk,
+                self.toolbar.language,
+            )
+        )
+        current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
         current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?edit')
         page_info_url = "%s?language=%s" % (
             reverse('admin:cms_page_change', args=(self.page.pk,)),
@@ -302,11 +330,8 @@ class PageToolbar(CMSToolbar):
                 if path == TEMPLATE_INHERITANCE_MAGIC:
                     templates_menu.add_break(TEMPLATE_MENU_BREAK)
                 templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active)
-        current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
-        # dates settings
-        dates_url = reverse('admin:cms_page_dates', args=(self.page.pk,))
-        current_page_menu.add_modal_item(_('Publishing dates'), url=dates_url, close_on_url=self.toolbar.URL_CHANGE,
-                                         disabled=(not self.toolbar.edit_mode))
+        current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
+
         # advanced settings
         advanced_url = "%s?language=%s" % (
             reverse('admin:cms_page_advanced', args=(self.page.pk,)),
@@ -323,7 +348,13 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_modal_item(_('Permissions'), url=permissions_url,
                                              close_on_url=self.toolbar.URL_CHANGE,
                                              disabled=permission_disabled)
-        current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
+
+        # dates settings
+        dates_url = reverse('admin:cms_page_dates', args=(self.page.pk,))
+        current_page_menu.add_modal_item(_('Publishing dates'), url=dates_url, close_on_url=self.toolbar.URL_CHANGE,
+                                         disabled=(not self.toolbar.edit_mode))
+
+        current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
         # navigation toggle
         if self.page.in_navigation:
             nav_title = _("Hide in navigation")
@@ -341,7 +372,7 @@ class PageToolbar(CMSToolbar):
                 publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk, self.current_lang))
 
             current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
-        current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
+        current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
         # delete
         delete_url = reverse('admin:cms_page_delete', args=(self.page.pk,))
         with force_language(self.current_lang):
@@ -358,6 +389,7 @@ class PageToolbar(CMSToolbar):
                 # Let's keep in mind that if the user has deleted the last page, and django is running on DEBUG == False
                 # this redirect will cause a 404...
                 on_delete_redirect_url = reverse('pages-root')
+
         current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url=self.toolbar.URL_CHANGE,
                                          on_close=on_delete_redirect_url, disabled=not_edit_mode)
 
@@ -368,6 +400,17 @@ class PageToolbar(CMSToolbar):
                 side=self.toolbar.RIGHT,
                 extra_classes=["cms_btn-action"],
             )
+        current_page_menu.add_break(PAGE_MENU_LAST_BREAK)
+        current_page_menu.add_modal_item(
+            _("Save as Page Type"),
+            url="%s?copy_target=%s&language=%s" % (
+                reverse("admin:cms_page_add_page_type"),
+                self.page.pk,
+                self.toolbar.language),
+            close_on_url=self.toolbar.URL_CHANGE,
+            disabled=not_edit_mode
+        )
+
 
     def add_history_menu(self):
         # history menu
