@@ -68,7 +68,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         self.assertNotIn("No Content", rendered)
 
     def test_publish_stack(self):
-        static_placeholder = StaticPlaceholder.objects.create(name='foo', code='bar')
+        static_placeholder = StaticPlaceholder.objects.create(name='foo', code='bar', site_id=1)
         self.fill_placeholder(static_placeholder.draft)
         static_placeholder.dirty = True
         static_placeholder.save()
@@ -78,8 +78,8 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         static_placeholder.publish(request, 'en')
 
     def test_move_plugin(self):
-        static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar')
-        static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo')
+        static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar', site_id=1)
+        static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo', site_id=1)
         sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test')
         plugin_class = sourceplugin.get_plugin_class_instance()
         expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
@@ -98,8 +98,8 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             self.assertTrue(target.dirty)
 
     def test_copy_plugin(self):
-        static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar')
-        static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo')
+        static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar', site_id=1)
+        static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo', site_id=1)
         sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test source')
         targetplugin = add_plugin(static_placeholder_target.draft, 'TextPlugin', 'en', body='test dest')
         StaticPlaceholder.objects.filter(pk=static_placeholder_source.pk).update(dirty=False)

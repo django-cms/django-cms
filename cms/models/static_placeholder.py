@@ -1,6 +1,7 @@
 import uuid
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.copy_plugins import copy_plugins_to
+from django.contrib.sites.models import Site
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -30,7 +31,7 @@ class StaticPlaceholder(models.Model):
         verbose_name=_(u'static placeholder name'), max_length=255, blank=True, default='',
         help_text=_(u'Descriptive name to identify this static placeholder. Not displayed to users.'))
     code = models.CharField(
-        verbose_name=_(u'placeholder code'), max_length=255, unique=True, blank=True,
+        verbose_name=_(u'placeholder code'), max_length=255, blank=True,
         help_text=_(u'To render the static placeholder in templates.'))
     draft = PlaceholderField(static_slotname, verbose_name=_(u'placeholder content'), related_name='static_draft')
     public = PlaceholderField(static_slotname, editable=False, related_name='static_public')
@@ -39,11 +40,13 @@ class StaticPlaceholder(models.Model):
         verbose_name=_('creation_method'), choices=CREATION_METHODS,
         default=CREATION_BY_CODE, max_length=20, blank=True,
     )
+    site = models.ForeignKey(Site, editable=False)
 
     class Meta:
         verbose_name = _(u'static placeholder')
         verbose_name_plural = _(u'static placeholders')
         app_label = 'cms'
+        unique_together = (('code', 'site'),)
 
     def __str__(self):
         return self.name
