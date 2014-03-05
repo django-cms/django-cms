@@ -1251,8 +1251,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 except:
                     pass
         pk = request.REQUEST.get('pk')
-        full_model = request.REQUEST.get('model').split('.')
-        if pk:
+        full_model = request.REQUEST.get('model')
+        if pk and full_model:
             app_label, model = full_model.split('.')
             if pk and app_label:
                 ctype = ContentType.objects.get(app_label=app_label, model=model)

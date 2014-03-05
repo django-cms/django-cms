@@ -297,7 +297,7 @@ class ToolbarTests(ToolbarTestBase):
         resolve_url = reverse('admin:cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '/')
+            self.assertEqual(response.content.decode('utf-8'), '')
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
 
