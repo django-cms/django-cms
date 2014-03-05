@@ -5,7 +5,7 @@
 
 //##################################################
 // #IMPORT SETTINGS#
-@import "settings";
+@import "settings/default";
 
 //##################################################
 // #RESET#
@@ -55,12 +55,12 @@
 
 //##################################################
 // #TOOLBAR#
-@import "modules/common";
-@import "modules/content";
-@import "modules/toolbar";
-@import "modules/modal";
-@import "modules/sideframe";
-@import "modules/clipboard";
-@import "modules/structureboard";
-@import "modules/subnav";
-@import "modules/retina";
+@import "includes/common";
+@import "includes/content";
+@import "includes/toolbar";
+@import "includes/modal";
+@import "includes/sideframe";
+@import "includes/clipboard";
+@import "includes/structureboard";
+@import "includes/subnav";
+@import "includes/retina";

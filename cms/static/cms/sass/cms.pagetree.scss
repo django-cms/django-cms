@@ -5,7 +5,7 @@
 
 //######################################################################################################################
 // #IMPORT SETTINGS#
-@import "settings";
+@import "settings/default";
 
 //######################################################################################################################
 // #PAGETREE#
@@ -36,7 +36,7 @@ $color-background-blue-hover: #e6f6fd;
 	// icons
 	li a.icon, li span.icon, li a.move, li a.copy, li a.edit, li a.advanced-settings, li span.info {
 		display: inline-block; width: 18px; height: 18px; margin-top:5px;
-		background: url('../../img/pagetree/sprite.png') no-repeat 0 0; }
+		background: url('../img/pagetree/sprite.png') no-repeat 0 0; }
 	li a.move { background-position:-20px -20px; margin-top:0; }
 	li a.copy { background-position:-40px -60px;  margin-top:0; }
     li a.edit { background-position:-40px -20px;  margin-top:0; }
@@ -97,7 +97,7 @@ $color-background-blue-hover: #e6f6fd;
 	li .cont:hover { background:$color-border-light; }
 
 	// custom col asignments
-	li.moveable .col1 .title { background:url('../../img/pagetree/tree-li-drag.gif') no-repeat 0 0; }
+	li.moveable .col1 .title { background:url('../img/pagetree/tree-li-drag.gif') no-repeat 0 0; }
 	li .col-language a { text-transform:uppercase; }
 
 	// edit button
@@ -149,10 +149,10 @@ $color-background-blue-hover: #e6f6fd;
 	ul.header li .col2 > div { padding:0 5.5px; }
 	li .col-softroot span.icon {
 		width: 18px !important; height: 18px !important; margin:0 !important;
-		background: url('../../img/pagetree/sprite.png') -80px 0 no-repeat !important; }
+		background: url('../img/pagetree/sprite.png') -80px 0 no-repeat !important; }
 	li .col-apphook span.icon {
 		width: 18px !important; height: 18px !important; margin:0 !important;
-		background: url('../../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
+		background: url('../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
 	li .col-language span {
 		width:14px !important; height:14px !important; margin:-3px 0 0 !important;
 		@include inline-block();
