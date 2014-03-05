@@ -96,7 +96,7 @@ $(document).ready(function () {
 			// push required params if defined
 			var params = [];
 			if(CMS.config.request.language) params.push(language);
-			params.push(page_id);
+			if(CMS.config.request.page_id) params.push(page_id);
 
 			var iframe = $('<iframe src="'+this._url(url, params)+'" class="" frameborder="0" />');
 				iframe.hide();
