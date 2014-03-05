@@ -601,6 +601,9 @@ $(document).ready(function () {
 				return false;
 			}
 
+			// hide scrollHint
+			nav.find('.cms_submenu-scroll-hint').hide();
+
 			// loop through items and figure out if we need to hide items
 			items.find('a, span').each(function (index, item) {
 				item = $(item);
@@ -659,7 +662,7 @@ $(document).ready(function () {
 
 				// collapsable function and save states
 				if(el.hasClass('cms_dragitem-expanded')) {
-					settings.states.splice(settings.states.indexOf(id), 1);
+					settings.states.splice($.inArray(id, settings.states), 1);
 					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
 				} else {
 					settings.states.push(id);

@@ -69,9 +69,17 @@ class FrontendEditableAdminMixin(object):
         raw_fields = request.GET.get("edit_fields")
         fields = [field for field in raw_fields.split(",") if field in self.frontend_editable_fields]
         if not fields:
-            return HttpResponseBadRequest(force_unicode(_("Fields %s not editabled in the frontend")) % raw_fields)
+            context = {
+                'opts': opts,
+                'message': force_unicode(_("Field %s not found")) % raw_fields
+            }
+            return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
         if not request.user.has_perm("%s_change" % self.model._meta.module_name):
-            return HttpResponseForbidden(force_unicode(_("You do not have permission to edit this item")))
+            context = {
+                'opts': opts,
+                'message': force_unicode(_("You do not have permission to edit this item"))
+            }
+            return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
             # Dinamically creates the form class with only `field_name` field
         # enabled
         form_class = self.get_form(request, obj, fields=fields)

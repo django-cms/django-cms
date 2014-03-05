@@ -18,7 +18,7 @@ $(document).ready(function () {
 			'modalDuration': 300,
 			'newPlugin': false,
 			'urls': {
-				'css_modal': 'cms/css/plugins/cms.toolbar.modal.css'
+				'css_modal': 'cms/css/cms.toolbar.modal.css'
 			}
 		},
 

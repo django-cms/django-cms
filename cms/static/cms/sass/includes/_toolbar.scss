@@ -224,7 +224,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 .cms_screenblock { color:white; text-align:center;
 	position:absolute; right:0; top:0; z-index:100;
 	width:100%; height:100%;
-	background:rgba(black, 0.9); }
+	background-color:black; background:rgba(black, 0.9); }
 
 .cms_screenblock .cms_screenblock-inner { margin-top:300px;
 	h1 { font-size:28px; line-height:30px; }
