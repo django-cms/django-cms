@@ -47,7 +47,10 @@ $(document).ready(function () {
 						'pk': CMS.config.reload.pk
 					},
 					'success': function (response) {
-						if(parent.location.pathname !== response) {
+						if(response === '' && url === '') {
+							// cancel if response is empty
+							return false;
+						} else if(parent.location.pathname !== response) {
 							// api call to the backend to check if the current path is still the same
 							that.reloadBrowser(response);
 						} else if(url === 'REFRESH_PAGE') {
