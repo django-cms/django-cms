@@ -1318,7 +1318,7 @@ class AdminFormsTests(AdminTestsBase):
             }
             response = self.client.post(
                 "/en/admin/cms/page/add/?target=%s&position=first-child&add_page_type=1&copy_target=%s&language=en" % (
-                page_types.pk, page.pk), data=page_data)
+                    page_types.pk, page.pk), data=page_data)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Page.objects.count(), 4)
             self.assertEqual(CMSPlugin.objects.count(), 6)
@@ -1369,51 +1369,51 @@ class AdminFormsTests(AdminTestsBase):
                 force_unicode(self.client.get('/en/admin/cms/page/'))
 
 
-    class AdminPageEditContentSizeTests(AdminTestsBase):
+class AdminPageEditContentSizeTests(AdminTestsBase):
+    """
+    System user count influences the size of the page edit page,
+    but the users are only 2 times present on the page
+
+    The test relates to extra=0
+    at PagePermissionInlineAdminForm and ViewRestrictionInlineAdmin
+    """
+
+    def test_editpage_contentsize(self):
         """
-        System user count influences the size of the page edit page,
-        but the users are only 2 times present on the page
-
-        The test relates to extra=0
-        at PagePermissionInlineAdminForm and ViewRestrictionInlineAdmin
+        Expected a username only 2 times in the content, but a relationship
+        between usercount and pagesize
         """
+        with SettingsOverride(CMS_PERMISSION=True):
+            admin_user = self.get_superuser()
+            PAGE_NAME = 'TestPage'
+            USER_NAME = 'test_size_user_0'
+            current_site = Site.objects.get(pk=1)
+            page = create_page(PAGE_NAME, "nav_playground.html", "en", site=current_site, created_by=admin_user)
+            page.save()
+            self._page = page
+            with self.login_user_context(admin_user):
+                url = base.URL_CMS_PAGE_PERMISSION_CHANGE % self._page.pk
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                old_response_size = len(response.content)
+                old_user_count = get_user_model().objects.count()
+                # create additionals user and reload the page
+                get_user_model().objects.create_user(username=USER_NAME, email=USER_NAME + '@django-cms.org',
+                                                     password=USER_NAME)
+                user_count = get_user_model().objects.count()
+                more_users_in_db = old_user_count < user_count
+                # we have more users
+                self.assertTrue(more_users_in_db, "New users got NOT created")
+                response = self.client.get(url)
+                new_response_size = len(response.content)
+                page_size_grown = old_response_size < new_response_size
+                # expect that the pagesize gets influenced by the useramount of the system
+                self.assertTrue(page_size_grown, "Page size has not grown after user creation")
+                # usernames are only 2 times in content
+                text = smart_str(response.content, response._charset)
 
-        def test_editpage_contentsize(self):
-            """
-            Expected a username only 2 times in the content, but a relationship
-            between usercount and pagesize
-            """
-            with SettingsOverride(CMS_PERMISSION=True):
-                admin_user = self.get_superuser()
-                PAGE_NAME = 'TestPage'
-                USER_NAME = 'test_size_user_0'
-                current_site = Site.objects.get(pk=1)
-                page = create_page(PAGE_NAME, "nav_playground.html", "en", site=current_site, created_by=admin_user)
-                page.save()
-                self._page = page
-                with self.login_user_context(admin_user):
-                    url = base.URL_CMS_PAGE_PERMISSION_CHANGE % self._page.pk
-                    response = self.client.get(url)
-                    self.assertEqual(response.status_code, 200)
-                    old_response_size = len(response.content)
-                    old_user_count = get_user_model().objects.count()
-                    # create additionals user and reload the page
-                    get_user_model().objects.create_user(username=USER_NAME, email=USER_NAME + '@django-cms.org',
-                                                         password=USER_NAME)
-                    user_count = get_user_model().objects.count()
-                    more_users_in_db = old_user_count < user_count
-                    # we have more users
-                    self.assertTrue(more_users_in_db, "New users got NOT created")
-                    response = self.client.get(url)
-                    new_response_size = len(response.content)
-                    page_size_grown = old_response_size < new_response_size
-                    # expect that the pagesize gets influenced by the useramount of the system
-                    self.assertTrue(page_size_grown, "Page size has not grown after user creation")
-                    # usernames are only 2 times in content
-                    text = smart_str(response.content, response._charset)
-
-                    foundcount = text.count(USER_NAME)
-                    # 2 forms contain usernames as options
-                    self.assertEqual(foundcount, 2,
-                                     "Username %s appeared %s times in response.content, expected 2 times" % (
-                                         USER_NAME, foundcount))
+                foundcount = text.count(USER_NAME)
+                # 2 forms contain usernames as options
+                self.assertEqual(foundcount, 2,
+                                 "Username %s appeared %s times in response.content, expected 2 times" % (
+                                     USER_NAME, foundcount))
