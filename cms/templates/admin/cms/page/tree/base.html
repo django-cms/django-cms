@@ -18,7 +18,7 @@
 {% block extrastyle %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />
-<link rel="stylesheet" href="{% static "cms/css/plugins/cms.pagetree.css" %}" />
+<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" />
 <link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" />
 {% if cl.is_filtered %}
 <link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" />
@@ -32,9 +32,9 @@
 <script src="{% static "cms/js/jstree/_lib/_all.js" %}"></script>
 <script src="{% static "cms/js/jstree/tree_component.js" %}"></script>
 <!-- load changelist -->
-<script src="{% static "cms/js/plugins/jquery.ui.custom.js" %}"></script>
-<script src="{% static "cms/js/plugins/cms.base.js" %}"></script>
-<script src="{% static "cms/js/plugins/cms.changelist.js" %}"></script>
+<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}"></script>
+<script src="{% static "cms/js/modules/cms.base.js" %}"></script>
+<script src="{% static "cms/js/modules/cms.changelist.js" %}"></script>
 <script>
 (function($) {
 // CMS.$ will be passed for $

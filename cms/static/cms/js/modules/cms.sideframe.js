@@ -16,7 +16,7 @@ $(document).ready(function () {
 			'sideframeDuration': 300,
 			'sideframeWidth': 320,
 			'urls': {
-				'css_sideframe': 'cms/css/plugins/cms.toolbar.sideframe.css'
+				'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
 			}
 		},
 
