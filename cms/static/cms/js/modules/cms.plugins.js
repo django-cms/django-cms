@@ -662,7 +662,7 @@ $(document).ready(function () {
 
 				// collapsable function and save states
 				if(el.hasClass('cms_dragitem-expanded')) {
-					settings.states.splice(settings.states.indexOf(id), 1);
+					settings.states.splice($.inArray(id, settings.states), 1);
 					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
 				} else {
 					settings.states.push(id);
