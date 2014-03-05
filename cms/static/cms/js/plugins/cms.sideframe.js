@@ -92,7 +92,13 @@ $(document).ready(function () {
 			var language = 'language=' + CMS.config.request.language;
 			var page_id = 'page_id=' + CMS.config.request.page_id;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
-			var iframe = $('<iframe src="'+this._url(url, [language, page_id])+'" class="" frameborder="0" />');
+
+			// push required params if defined
+			var params = [];
+			if(CMS.config.request.language) params.push(language);
+			if(CMS.config.request.page_id) params.push(page_id);
+
+			var iframe = $('<iframe src="'+this._url(url, params)+'" class="" frameborder="0" />');
 				iframe.hide();
 			var width = this.settings.sideframe.position || this.options.sideframeWidth;
 
