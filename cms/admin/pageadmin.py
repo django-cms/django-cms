@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import sys
+from cms.toolbar_pool import toolbar_pool
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -1187,10 +1188,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             obj = log.get_edited_object()
             del request.session['cms_log_latest']
-            try:
-                return HttpResponse(force_unicode(obj.get_absolute_url()))
-            except:
-                pass
+            if obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
+                try:
+                    return HttpResponse(force_unicode(obj.get_absolute_url()))
+                except:
+                    pass
         pk = request.REQUEST.get('pk')
 
         try:

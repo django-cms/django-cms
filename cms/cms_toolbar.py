@@ -11,7 +11,7 @@ from cms.api import get_page_draft
 from cms.compat import user_model_label
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import LanguageError
-from cms.models import Title
+from cms.models import Title, Page
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -147,7 +147,7 @@ class BasicToolbar(CMSToolbar):
 
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):
-    model = Title
+    watch_models = [Page]
 
     def populate(self):
         # always use draft if we have a page
