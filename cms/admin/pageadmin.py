@@ -15,7 +15,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction
-from django.forms import HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
@@ -254,11 +253,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language
-        if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj and 'page_type' in form.base_fields:
-            del form.base_fields['page_type']
-        else:
-            if not Page.objects.filter(parent__reverse_id=PAGE_TYPES_ID).count():
+        if 'page_type' in form.base_fields:
+            if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj:
                 del form.base_fields['page_type']
+            else:
+                if not Page.objects.filter(parent__reverse_id=PAGE_TYPES_ID).count():
+                    del form.base_fields['page_type']
         if 'add_page_type' in request.GET:
             del form.base_fields['menu_title']
             del form.base_fields['meta_description']
