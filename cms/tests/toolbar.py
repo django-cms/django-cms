@@ -924,7 +924,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request.GET['edit_fields'] = 'char_3'
         response = exadmin.edit_field(request, ex1.pk, "en")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode('utf8'), 'Fields char_3 not editabled in the frontend')
+        self.assertContains(response, 'Field char_3 not found')
 
     def test_multi_edit(self):
         user = self.get_staff()
