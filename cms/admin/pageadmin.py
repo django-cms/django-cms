@@ -1194,9 +1194,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 except:
                     pass
         pk = request.REQUEST.get('pk')
-
-        try:
-            app_label, model = request.REQUEST.get('model').split('.')
+        full_model = request.REQUEST.get('model').split('.')
+        if pk:
+            app_label, model = full_model.split('.')
             if pk and app_label:
                 ctype = ContentType.objects.get(app_label=app_label, model=model)
                 try:
@@ -1204,10 +1204,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 except ctype.model_class().DoesNotExist:
                     return HttpResponse('/')
                 return HttpResponse(force_unicode(instance.get_absolute_url()))
-        except ValueError:
-            pass
-
-        return HttpResponse('/')
+        return HttpResponse('')
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
