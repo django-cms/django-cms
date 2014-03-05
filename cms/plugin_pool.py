@@ -178,31 +178,22 @@ class PluginPool(object):
         plugins = list(self.plugins.values())
         plugins.sort(key=lambda obj: force_unicode(obj.name))
         final_plugins = []
-        if page:
-            template = page.get_template()
-        else:
-            template = None
+        template = page and page.get_template() or None
         allowed_plugins = get_placeholder_conf(
             setting_key,
             placeholder,
             template,
-        )
+        ) or ()
         for plugin in plugins:
             include_plugin = False
-            if placeholder:
-                if plugin.require_parent:
-                    include_plugin = False
-                elif allowed_plugins:
-                    if plugin.__name__ in allowed_plugins:
-                        include_plugin = True
-                elif setting_key == "plugins":
-                    include_plugin = True
+            if placeholder and not plugin.require_parent:
+                include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
             if plugin.page_only and not include_page_only:
                 include_plugin = False
             if include_plugin:
                 final_plugins.append(plugin)
 
-        if final_plugins:
+        if final_plugins or placeholder:
             plugins = final_plugins
 
         # plugins sorted by modules
