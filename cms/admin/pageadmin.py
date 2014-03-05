@@ -254,8 +254,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language
-        if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj:
+        if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj and 'page_type' in form.base_fields:
             del form.base_fields['page_type']
+        else:
+            if not Page.objects.filter(parent__reverse_id=PAGE_TYPES_ID).count():
+                del form.base_fields['page_type']
         if 'add_page_type' in request.GET:
             del form.base_fields['menu_title']
             del form.base_fields['meta_description']
@@ -1217,7 +1220,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def add_page_type(self, request):
         site = Site.objects.get_current()
         language = request.GET.get('language')
-        target = request.GET.get('copy-target')
+        target = request.GET.get('copy_target')
         try:
             type_root = Page.objects.get(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site_id=site.pk)
         except Page.DoesNotExist:

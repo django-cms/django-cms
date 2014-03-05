@@ -108,7 +108,6 @@ class PageForm(forms.ModelForm):
                     choices.append((title.page_id, title.title))
                 self.fields['page_type'].choices = choices
 
-
     def clean(self):
         cleaned_data = self.cleaned_data
         slug = cleaned_data.get('slug', '')

@@ -403,7 +403,7 @@ class PageToolbar(CMSToolbar):
         current_page_menu.add_break(PAGE_MENU_LAST_BREAK)
         current_page_menu.add_modal_item(
             _("Save as Page Type"),
-            url="%s?copy-target=%s&language=%s" % (
+            url="%s?copy_target=%s&language=%s" % (
                 reverse("admin:cms_page_add_page_type"),
                 self.page.pk,
                 self.toolbar.language),
