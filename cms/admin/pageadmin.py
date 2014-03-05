@@ -212,16 +212,19 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             else:
                 obj.move_to(target, position)
         page_type_id = form.cleaned_data.get('page_type')
-        if 'copy_target' in request.GET or page_type_id:
-            copy_target_id = request.GET.get('copy_target')
+        copy_target_id = request.GET.get('copy_target')
+        if copy_target_id or page_type_id:
             if page_type_id:
                 copy_target_id = page_type_id
             copy_target = Page.objects.get(pk=copy_target_id)
+            if not copy_target.has_view_permission(request):
+                raise PermissionDenied()
             obj = Page.objects.get(pk=obj.pk) #mptt reload
             if not 'add_page_type' in request.GET:
                 site_id = obj.site_id
                 copy_target._copy_attributes(obj)
                 obj.site_id = site_id
+                obj.reverse_id = None
                 obj.save()
             copy_target._copy_contents(obj, form.cleaned_data['language'])
         if not 'permission' in request.path:
@@ -350,8 +353,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         language = get_language_from_request(request)
-        print "--------------"
-        print language
         extra_context.update({
             'language': language,
         })

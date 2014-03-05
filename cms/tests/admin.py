@@ -1289,6 +1289,9 @@ class AdminFormsTests(AdminTestsBase):
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
             self.assertContains(resp, '<div class="form-row errors reverse_id">')
 
+    def test_create_page_type(self):
+        create_page('Home', 'nav_playground.html', 'en', reverse_id="home")
+
     def test_render_edit_mode(self):
         from django.core.cache import cache
 
