@@ -350,6 +350,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         language = get_language_from_request(request)
+        print "--------------"
+        print language
         extra_context.update({
             'language': language,
         })

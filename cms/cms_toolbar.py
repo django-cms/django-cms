@@ -290,8 +290,29 @@ class PageToolbar(CMSToolbar):
         current_page_menu = self.toolbar.get_or_create_menu('page', _('Page'), position=1)
 
         add_page_menu = current_page_menu.get_or_create_menu('add_page', _("Add Page"))
-        add_page_menu.add_sideframe_item(_("New Page"), url=reverse("admin:cms_page_add"))
-        add_page_menu.add_sideframe_item(_("New Sub Page"), url=reverse("admin:cms_page_add"))
+        add_page_menu.add_sideframe_item(
+            _("New Page"),
+            url="%s?language=%s" % (
+                reverse("admin:cms_page_add"),
+                self.toolbar.language
+            )
+        )
+        add_page_menu.add_sideframe_item(
+            _("New Sub Page"),
+            url="%s?target=%s&position=last-child&language=%s" % (
+                reverse("admin:cms_page_add"),
+                self.page.pk,
+                self.toolbar.language,
+            )
+        )
+        add_page_menu.add_sideframe_item(
+            _("Duplicate this Page"),
+            url="%s?copy_target=%s&language=%s" % (
+                reverse("admin:cms_page_add"),
+                self.page.pk,
+                self.toolbar.language,
+            )
+        )
         current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
         current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?edit')
         page_info_url = "%s?language=%s" % (
