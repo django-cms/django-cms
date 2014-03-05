@@ -5,7 +5,7 @@
 
 //##################################################
 // #IMPORT SETTINGS#
-@import "settings";
+@import "settings/default";
 
 //##################################################
 // #SIDEFRAME#
@@ -28,6 +28,7 @@
 	&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg) !important; @include box-shadow(none !important); }
 	&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%) !important; }
 }
+
 .object-tools .recoverlink, .submit-row input {
 	font-weight:200 !important; padding:5px 12px !important; margin-bottom:5px !important;
 	border:1px solid $color-grey-10 !important; @include box-shadow(none !important);
