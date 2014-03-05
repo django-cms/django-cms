@@ -217,3 +217,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_PAGE_CACHE, CMS_PLACEHOLDER_CACHE and CMS_PLUGIN_CACHE settings and functionality added. Default is True
 - Detect admin object creation and changes via toolbar and redirect to them.
 - Added support for custom user models
+- Added PageTypes

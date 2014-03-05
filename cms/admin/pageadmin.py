@@ -225,7 +225,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 obj.site_id = site_id
                 obj.reverse_id = None
                 obj.save()
-            copy_target._copy_contents(obj, form.cleaned_data['language'])
+            for lang in copy_target.languages.split(','):
+                copy_target._copy_contents(obj, lang)
         if not 'permission' in request.path:
             language = form.cleaned_data['language']
             Title.objects.set_or_create(
