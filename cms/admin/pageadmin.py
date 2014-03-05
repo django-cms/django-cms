@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import sys
+from cms.toolbar_pool import toolbar_pool
 from cms.constants import PAGE_TYPES_ID
 
 import django
@@ -1244,14 +1245,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             obj = log.get_edited_object()
             del request.session['cms_log_latest']
-            try:
-                return HttpResponse(force_unicode(obj.get_absolute_url()))
-            except:
-                pass
+            if obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
+                try:
+                    return HttpResponse(force_unicode(obj.get_absolute_url()))
+                except:
+                    pass
         pk = request.REQUEST.get('pk')
-
-        try:
-            app_label, model = request.REQUEST.get('model').split('.')
+        full_model = request.REQUEST.get('model')
+        if pk and full_model:
+            app_label, model = full_model.split('.')
             if pk and app_label:
                 ctype = ContentType.objects.get(app_label=app_label, model=model)
                 try:
@@ -1259,10 +1261,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 except ctype.model_class().DoesNotExist:
                     return HttpResponse('/')
                 return HttpResponse(force_unicode(instance.get_absolute_url()))
-        except ValueError:
-            pass
-
-        return HttpResponse('/')
+        return HttpResponse('')
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':

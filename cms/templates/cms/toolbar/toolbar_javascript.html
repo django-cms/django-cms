@@ -32,7 +32,10 @@ $(document).ready(function () {
 		'csrf': '{{ csrf_token }}',
 		'request': {
 			'language': '{{ request.GET.language }}',
-			'page_id': '{{ request.current_page.pk }}'
+			'model': '{{ request.toolbar.get_object_model }}',
+			'page_id': '{{ request.current_page.pk }}',
+			'pk': '{{ request.toolbar.get_object_pk }}',
+			'url': '{% language request.toolbar.language %}{% url "admin:cms_page_resolve" %}{% endlanguage %}'
 		},
 		'lang': {
 			'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}',
@@ -56,11 +59,6 @@ $(document).ready(function () {
 		'clipboard': {
 			'id': '{{ request.toolbar.clipboard.pk|unlocalize }}',
 			'url': '{% if request.toolbar.clipboard.pk %}{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}{% endif %}'
-		},
-		'reload': {
-			'url': '{% url "admin:cms_page_resolve" %}',
-			'model': '{{ request.toolbar.get_object_model }}',
-			'pk': '{{ request.toolbar.get_object_pk }}'
 		},
 		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
 		'error': '{% if request.toolbar.login_form.errors %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}',

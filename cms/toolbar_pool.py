@@ -55,4 +55,12 @@ class ToolbarPool(object):
         self.discover_toolbars()
         return self.toolbars
 
+    def get_watch_models(self):
+        models = []
+        for toolbar in self.toolbars.values():
+            if hasattr(toolbar, 'watch_models'):
+                models += toolbar.watch_models
+        return models
+
+
 toolbar_pool = ToolbarPool()

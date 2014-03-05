@@ -275,3 +275,19 @@ Example::
 
 
 
+If you want to watch for object creation or editing of models and redirect after they have been added or changed add a
+``watch_models`` attribute to your toolbar.
+
+Example::
+
+    class PollToolbar(CMSToolbar):
+
+        watch_models = [Poll]
+
+        def populate(self):
+            ...
+
+After you add this every change to an instance of ``Poll`` via sideframe or modal window will trigger a redirect to
+the ``get_absolute_url()`` of the poll instance that was edited.
+
+
