@@ -319,7 +319,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/')
         response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-        self.assertEqual(response.content.decode('utf-8'), '/')
+        self.assertEqual(response.content.decode('utf-8'), '')
 
     def test_toolbar_logout_redirect(self):
         """
