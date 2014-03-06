@@ -47,6 +47,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
         self.obj = None
+        self.redirect_url = None
         if settings.USE_I18N:
             self.language = get_language_from_request(request)
         else:

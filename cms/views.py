@@ -110,7 +110,7 @@ def details(request, slug):
                                 request.toolbar.redirect_url = pages_root
                             elif pages_root not in own_urls:
                                 return HttpResponseRedirect(pages_root)
-            elif not request.toolbar.redirect_url:
+            elif not hasattr(request, 'toolbar') or not request.toolbar.redirect_url:
                 _handle_no_page(request, slug)
         else:
             return _handle_no_page(request, slug)
@@ -128,11 +128,11 @@ def details(request, slug):
                     # is a design decision (instead of rendering in place)).
                     if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
                         request.toolbar.redirect_url = path
-                    elif pages_root not in own_urls:
+                    elif path not in own_urls:
                         return HttpResponseRedirect(path)
                 else:
                     found = True
-        if not found and not request.toolbar.redirect_url:
+        if not found and (not hasattr(request, 'toolbar') or not request.toolbar.redirect_url):
             # There is a page object we can't find a proper language to render it
             _handle_no_page(request, slug)
 
@@ -148,7 +148,7 @@ def details(request, slug):
         except Title.DoesNotExist:
             app_urls = []
         skip_app = False
-        if not page.is_published(current_language) and request.toolbar.edit_mode:
+        if not page.is_published(current_language) and hasattr(request, 'toolbar') and request.toolbar.edit_mode:
             skip_app = True
         if app_urls and not skip_app:
             app = apphook_pool.get_apphook(app_urls)

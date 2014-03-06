@@ -12,6 +12,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.conf import get_languages
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 
 from django.http import Http404, HttpResponseRedirect
@@ -174,7 +175,11 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 response = self.client.get("/en/page2/")
                 self.assertEqual(response.status_code, 200)
                 response = self.client.get("/en/page4/")
-                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.status_code, 200)
+            self.client.logout()
+            response = self.client.get("/en/page4/")
+            self.assertEqual(response.status_code, 404)
+
 
     def test_detail_view_404_when_no_language_is_found(self):
         page = create_page("page1", "nav_playground.html", "en")
@@ -193,7 +198,12 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             def get_path():
                 return '/'
 
-            User = get_user_model()
+            def is_secure():
+                return False
+
+            def get_host():
+                return 'testserver'
+
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
                 GET=[],
@@ -203,8 +213,10 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 method='GET',
                 COOKIES={},
                 META={},
-                user=User(),
-                get_full_path=get_path
+                user=AnonymousUser(),
+                get_full_path=get_path,
+                is_secure=is_secure,
+                get_host=get_host,
             )
             self.assertRaises(Http404, details, request, '')
 
@@ -228,6 +240,12 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             def get_path():
                 return '/'
 
+            def is_secure():
+                return False
+
+            def get_host():
+                return 'testserver'
+
             User = get_user_model()
             request = AttributeObject(
                 REQUEST={'language': 'x-elvish'},
@@ -240,6 +258,8 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 META={},
                 user=User(),
                 get_full_path=get_path,
+                is_secure=is_secure,
+                get_host=get_host,
             )
 
             response = details(request, '')
