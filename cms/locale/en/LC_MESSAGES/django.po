@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-06 13:28+0100\n"
+"POT-Creation-Date: 2014-03-06 13:45+0100\n"
 "PO-Revision-Date: 2009-11-10 22:37+0100\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -133,7 +133,7 @@ msgstr ""
 msgid "Advanced settings"
 msgstr ""
 
-#: cms_toolbar.py:348 test_utils/project/emailuserapp/admin.py:23
+#: cms_toolbar.py:348
 msgid "Permissions"
 msgstr ""
 
@@ -312,7 +312,6 @@ msgid "A instance name with this name already exists."
 msgstr ""
 
 #: admin/forms.py:294 models/permissionmodels.py:60
-#: test_utils/project/emailuserapp/models.py:97
 msgid "user"
 msgstr ""
 
@@ -637,8 +636,6 @@ msgid "Groups"
 msgstr ""
 
 #: admin/useradmin.py:48 templates/cms/toolbar/items/login.html:5
-#: test_utils/project/emailuserapp/forms.py:27
-#: test_utils/project/emailuserapp/forms.py:89
 msgid "Password"
 msgstr ""
 
@@ -1545,82 +1542,6 @@ msgstr ""
 msgid "right column"
 msgstr "background color"
 
-#: test_utils/project/emailuserapp/admin.py:22
-msgid "Personal Info"
-msgstr ""
-
-#: test_utils/project/emailuserapp/admin.py:25
-msgid "Important dates"
-msgstr ""
-
-#: test_utils/project/emailuserapp/forms.py:17
-msgid "A user with that email already exists."
-msgstr ""
-
-#: test_utils/project/emailuserapp/forms.py:18
-msgid "The two password fields didn't match."
-msgstr ""
-
-#: test_utils/project/emailuserapp/forms.py:22
-#: test_utils/project/emailuserapp/forms.py:85
-#, fuzzy
-msgid "Email"
-msgstr "email address"
-
-#: test_utils/project/emailuserapp/forms.py:32
-msgid "Password confirmation"
-msgstr ""
-
-#: test_utils/project/emailuserapp/forms.py:34
-msgid "Enter the same password as above, for verification."
-msgstr ""
-
-#: test_utils/project/emailuserapp/forms.py:90
-msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:57
-msgid "email address"
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:64
-msgid "first name"
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:70
-#, fuzzy
-msgid "last name"
-msgstr "publish request"
-
-#: test_utils/project/emailuserapp/models.py:76
-msgid "staff status"
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:78
-msgid "Designates whether the user can log into this admin site."
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:83
-msgid "active"
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:85
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:89
-msgid "date joined"
-msgstr ""
-
-#: test_utils/project/emailuserapp/models.py:98
-msgid "users"
-msgstr ""
-
 #: test_utils/project/extensionapp/cms_toolbar.py:46
 msgid "Page Extension"
 msgstr ""
@@ -1742,6 +1663,14 @@ msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr ""
+
+#, fuzzy
+#~ msgid "Email"
+#~ msgstr "email address"
+
+#, fuzzy
+#~ msgid "last name"
+#~ msgstr "publish request"
 
 #, fuzzy
 #~ msgid "Use latitude & longitude to fine tune the map position."
