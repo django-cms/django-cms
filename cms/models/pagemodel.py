@@ -147,7 +147,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return object.__repr__(self)
 
     def is_dirty(self, language):
-        return self.get_publisher_state(language) == PUBLISHER_STATE_DIRTY
+        state = self.get_publisher_state(language)
+        return state == PUBLISHER_STATE_DIRTY or state == PUBLISHER_STATE_PENDING
 
     def get_absolute_url(self, language=None, fallback=True):
         if self.is_home:

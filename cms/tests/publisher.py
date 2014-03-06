@@ -574,7 +574,7 @@ class PublishingTests(TestCase):
                 self.assertFalse(item.publisher_public.is_published('en'), title)
                 self.assertEqual(item.get_publisher_state('en'), PUBLISHER_STATE_PENDING,
                                  title)
-                self.assertFalse(item.is_dirty('en'), title)
+                self.assertTrue(item.is_dirty('en'), title)
 
     def test_unpublish_with_dirty_descendants(self):
         page = self.create_page("Page", published=True)
@@ -591,9 +591,9 @@ class PublishingTests(TestCase):
         page.unpublish('en')
         child = self.reload(child)
         gchild = self.reload(gchild)
-        # Descendants keep their dirty status after unpublish
+        # Descendants become dirty after unpublish
         self.assertTrue(child.is_dirty('en'))
-        self.assertFalse(gchild.is_dirty('en'))
+        self.assertTrue(gchild.is_dirty('en'))
         # However, their public version is still removed no matter what
         self.assertFalse(child.publisher_public.is_published('en'))
         self.assertFalse(gchild.publisher_public.is_published('en'))
