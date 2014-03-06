@@ -220,9 +220,8 @@ $(document).ready(function () {
 
 		// prevents scrolling when another scrollbar is used (for better ux)
 		preventScroll: function (disable) {
-			// disable
-			return false;
-
+			// TODO: currently disabled
+/*
 			// cancel if scrollbar is not visible
 			if($(document).height() <= $(window).height()) return false;
 
@@ -235,6 +234,7 @@ $(document).ready(function () {
 				html.removeClass('cms_toolbar-noscroll');
 				$(window).scrollTop(html.data('scroll'));
 			}
+*/
 		}
 
 	};
