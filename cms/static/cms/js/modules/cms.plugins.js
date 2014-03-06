@@ -348,16 +348,7 @@ $(document).ready(function () {
 			var dragitem = $('.cms_draggable-' + options.plugin_id);
 
 			// SETTING POSITION
-			// after we insert the plugin onto its new place, we need to figure out whats above it
-			var parent_id = this._getId(dragitem.prev('.cms_draggable'));
-
-			if(parent_id) {
-				// if we find a previous item, attach it afterwards
-				plugin.insertAfter($('.cms_plugin-' + parent_id));
-			} else {
-				// if we dont find out, we need to figure out where it belongs and get the previous item
-				dragitem.parent().parent().next().prepend(plugin);
-			}
+			this._setPosition(options.plugin_id, plugin, dragitem);
 
 			// SAVING POSITION
 			var placeholder_id = this._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_dragbar').first());
@@ -411,6 +402,35 @@ $(document).ready(function () {
 		},
 
 		// private methods
+		_setPosition: function (id, plugin, dragitem) {
+			// after we insert the plugin onto its new place, we need to figure out where to position it
+			var prevItem = dragitem.prev('.cms_draggable');
+			var nextItem = dragitem.next('.cms_draggable');
+			var parent = dragitem.parent().closest('.cms_draggable');
+			var child = $('.cms_plugin-' + this._getId(parent));
+			var placeholder = dragitem.closest('.cms_dragarea');
+
+			// determine if there are other plugins within the same level, this makes the move easier
+			if(prevItem.length) {
+				plugin.insertAfter($('.cms_plugin-' + this._getId(prevItem)));
+			} else if(nextItem.length) {
+				plugin.insertBefore($('.cms_plugin-' + this._getId(nextItem)));
+			} else if(parent.length) {
+				// if we can't find a plugin on the same level, we need to travel higher
+				// for this we need to find the deepest child
+				while(child.children().length) {
+					child = child.children();
+				}
+				child.append(plugin);
+			} else if(placeholder.length) {
+				// we also need to cover the case if we move the plugin to an empty placeholder
+				plugin.append($('.cms_plugin-' + this._getId(placeholder)));
+			} else {
+				// if we did not found a match, reload
+				CMS.API.Helpers.reloadBrowser();
+			}
+		},
+
 		_setSubnav: function (nav) {
 			var that = this;
 
