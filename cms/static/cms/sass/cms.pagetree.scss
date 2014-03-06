@@ -165,7 +165,7 @@ $color-background-blue-hover: #e6f6fd;
 			animation:pulsate 2.5s ease-out infinite;
 		}
 		&.empty { background-color:#e8e9e5; }
-		&.unpublished { background-color:#ff2942; }
+		&.unpublished { background-color:#cccccc; }
 		&.unpublishedparent { background-color:#ff7787; }
 		&.published { background-color:#65b417; }
 	 }
