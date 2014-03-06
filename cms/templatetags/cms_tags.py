@@ -605,6 +605,7 @@ class CMSToolbar(RenderBlock):
         # render JS
         request = context.get('request', None)
         toolbar = getattr(request, 'toolbar', None)
+        toolbar.populate()
         context['cms_version'] = __version__
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language

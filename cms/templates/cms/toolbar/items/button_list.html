@@ -1,5 +1,5 @@
 <div class="cms_toolbar-item cms_toolbar-item-buttons {{ extra_classes|join:' ' }}">
 	{% for button in buttons %}
-		<a href="{{ button.url }}" class="cms_btn{% if button.active %} cms_btn-active{% endif %}{% if button.disabled %} cms_btn-disabled{% endif %} {{ button.extra_classes|join:' ' }}">{{ button.name }}</a>
+		{{ button.render }}
 	{% endfor %}
 </div>

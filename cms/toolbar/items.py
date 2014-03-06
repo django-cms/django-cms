@@ -121,13 +121,11 @@ class ToolbarAPIMixin(object):
         self._unmemoize(item)
 
     def add_sideframe_item(self, name, url, active=False, disabled=False,
-                           extra_classes=None, close_on_url=None,
-                           on_close=None, side=LEFT, position=None):
+                           extra_classes=None, on_close=None, side=LEFT, position=None):
         item = SideframeItem(name, url,
                              active=active,
                              disabled=disabled,
                              extra_classes=extra_classes,
-                             close_on_url=close_on_url,
                              on_close=on_close,
                              side=side,
         )
@@ -135,8 +133,7 @@ class ToolbarAPIMixin(object):
         return item
 
     def add_modal_item(self, name, url, active=False, disabled=False,
-                       extra_classes=None, close_on_url=URL_CHANGE,
-                       on_close=REFRESH_PAGE, side=LEFT, position=None):
+                       extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None):
         item = ModalItem(name, url,
                          active=active,
                          disabled=disabled,
@@ -249,8 +246,7 @@ class Menu(SubMenu):
 class LinkItem(BaseItem):
     template = "cms/toolbar/items/item_link.html"
 
-    def __init__(self, name, url, active=False, disabled=False,
-                 extra_classes=None, side=LEFT):
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, side=LEFT):
         super(LinkItem, self).__init__(side)
         self.name = name
         self.url = url
@@ -274,9 +270,7 @@ class LinkItem(BaseItem):
 class SideframeItem(BaseItem):
     template = "cms/toolbar/items/item_sideframe.html"
 
-    def __init__(self, name, url, active=False, disabled=False,
-                 extra_classes=None, close_on_url=None,
-                 on_close=None, side=LEFT):
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT):
         super(SideframeItem, self).__init__(side)
         self.name = "%s ..." % force_unicode(name)
         self.url = url
@@ -284,7 +278,6 @@ class SideframeItem(BaseItem):
         self.disabled = disabled
         self.extra_classes = extra_classes or []
         self.on_close = on_close
-        self.close_on_url = close_on_url
 
     def __repr__(self):
         return '<SideframeItem:%s>' % force_unicode(self.name)
@@ -297,8 +290,14 @@ class SideframeItem(BaseItem):
             'disabled': self.disabled,
             'extra_classes': self.extra_classes,
             'on_close': self.on_close,
-            'close_on_url': self.close_on_url,
         }
+
+
+class ModalItem(SideframeItem):
+    template = "cms/toolbar/items/item_modal.html"
+
+    def __repr__(self):
+        return '<ModalItem:%s>' % force_unicode(self.name)
 
 
 class AjaxItem(BaseItem):
@@ -338,34 +337,6 @@ class AjaxItem(BaseItem):
         }
 
 
-class ModalItem(BaseItem):
-    template = "cms/toolbar/items/item_modal.html"
-
-    def __init__(self, name, url, active=False, disabled=False,
-                 extra_classes=None, close_on_url=URL_CHANGE,
-                 on_close=None, side=LEFT):
-        super(ModalItem, self).__init__(side)
-        self.name = "%s ..." % force_unicode(name)
-        self.url = url
-        self.active = active
-        self.disabled = disabled
-        self.extra_classes = extra_classes or []
-        self.close_on_url = close_on_url
-        self.on_close = on_close
-
-    def __repr__(self):
-        return '<ModalItem:%s>' % force_unicode(self.name)
-
-    def get_context(self):
-        return {
-            'name': self.name,
-            'url': self.url,
-            'active': self.active,
-            'disabled': self.disabled,
-            'extra_classes': self.extra_classes,
-            'close_on_url': self.close_on_url,
-            'on_close': self.on_close,
-        }
 
 
 class Break(BaseItem):
@@ -375,7 +346,20 @@ class Break(BaseItem):
         self.identifier = identifier
 
 
-class Button(object):
+class BaseButton(object):
+    __metaclass__ = abc.ABCMeta
+    template = None
+
+    def render(self):
+        return render_to_string(self.template, self.get_context())
+
+    def get_context(self):
+        return {}
+
+
+class Button(BaseButton):
+    template = "cms/toolbar/items/button.html"
+
     def __init__(self, name, url, active=False, disabled=False,
                  extra_classes=None):
         self.name = name
@@ -386,6 +370,47 @@ class Button(object):
 
     def __repr__(self):
         return '<Button:%s>' % force_unicode(self.name)
+
+    def get_context(self):
+        return {
+            'name': self.name,
+            'url': self.url,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
+        }
+
+
+class ModalButton(Button):
+    template = "cms/toolbar/items/button_modal.html"
+
+    def __init__(self, name, url, active=False, disabled=False,  extra_classes=None, on_close=None):
+        self.name = name
+        self.url = url
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
+        self.on_close = on_close
+
+    def __repr__(self):
+        return '<ModalButton:%s>' % force_unicode(self.name)
+
+    def get_context(self):
+        return {
+            'name': self.name,
+            'url': self.url,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
+            'on_close': self.on_close,
+        }
+
+
+class SideframeButton(ModalButton):
+    template = "cms/toolbar/items/button_sideframe.html"
+
+    def __repr__(self):
+        return '<SideframeButton:%s>' % force_unicode(self.name)
 
 
 class ButtonList(BaseItem):
@@ -411,6 +436,16 @@ class ButtonList(BaseItem):
                       active=active,
                       disabled=disabled,
                       extra_classes=extra_classes
+        )
+        self.buttons.append(item)
+        return item
+
+    def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE):
+        item = ModalButton(name, url,
+                      active=active,
+                      disabled=disabled,
+                      extra_classes=extra_classes,
+                      on_close=on_close,
         )
         self.buttons.append(item)
         return item

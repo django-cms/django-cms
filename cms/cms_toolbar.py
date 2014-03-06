@@ -394,7 +394,7 @@ class PageToolbar(CMSToolbar):
                                          on_close=on_delete_redirect_url, disabled=not_edit_mode)
 
         if not self.title:
-            self.toolbar.add_button(
+            self.toolbar.add_modal_button(
                 _("Page settings"),
                 "%s?language=%s" % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language),
                 side=self.toolbar.RIGHT,
