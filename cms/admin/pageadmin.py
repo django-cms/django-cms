@@ -2,7 +2,7 @@
 from functools import wraps
 import sys
 from cms.toolbar_pool import toolbar_pool
-from cms.constants import PAGE_TYPES_ID
+from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -988,7 +988,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 action_flag=CHANGE,
             )
         else:
-            messages.warning(request, _("There was a problem publishing your content"))
+            if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+                messages.warning(request, _("Page not be published. A parent page is not published yet"))
+            else:
+                messages.warning(request, _("There was a problem publishing your content"))
         if "reversion" in settings.INSTALLED_APPS and page:
             # delete revisions that are not publish revisions
             from reversion.models import Version
