@@ -1240,7 +1240,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def resolve(self, request):
         if not request.user.is_staff:
-            return HttpResponse('/')
+            return HttpResponse('')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             obj = log.get_edited_object()
