@@ -138,7 +138,6 @@ class ToolbarAPIMixin(object):
                          active=active,
                          disabled=disabled,
                          extra_classes=extra_classes,
-                         close_on_url=close_on_url,
                          on_close=on_close,
                          side=side,
         )

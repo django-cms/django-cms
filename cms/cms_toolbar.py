@@ -320,7 +320,7 @@ class PageToolbar(CMSToolbar):
             self.toolbar.language
         )
         current_page_menu.add_modal_item(_('Page settings'), url=page_info_url, disabled=not_edit_mode,
-                                         close_on_url=self.toolbar.URL_CHANGE, on_close=self.toolbar.REFRESH_PAGE)
+                                         on_close=self.toolbar.REFRESH_PAGE)
         if self.toolbar.build_mode or self.toolbar.edit_mode:
             # add templates
             templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
@@ -338,21 +338,17 @@ class PageToolbar(CMSToolbar):
             self.toolbar.language
         )
         advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not self.toolbar.edit_mode
-        current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, close_on_url=self.toolbar.URL_CHANGE,
-                                         disabled=advanced_disabled)
+        current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
         # permissions
         if get_cms_setting('PERMISSION'):
             permissions_url = reverse('admin:cms_page_permissions', args=(self.page.pk,))
             permission_disabled = not self.toolbar.edit_mode or not self.page.has_change_permissions_permission(
                 self.request)
-            current_page_menu.add_modal_item(_('Permissions'), url=permissions_url,
-                                             close_on_url=self.toolbar.URL_CHANGE,
-                                             disabled=permission_disabled)
+            current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, disabled=permission_disabled)
 
         # dates settings
         dates_url = reverse('admin:cms_page_dates', args=(self.page.pk,))
-        current_page_menu.add_modal_item(_('Publishing dates'), url=dates_url, close_on_url=self.toolbar.URL_CHANGE,
-                                         disabled=(not self.toolbar.edit_mode))
+        current_page_menu.add_modal_item(_('Publishing dates'), url=dates_url, disabled=(not self.toolbar.edit_mode))
 
         current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
         # navigation toggle
@@ -390,8 +386,8 @@ class PageToolbar(CMSToolbar):
                 # this redirect will cause a 404...
                 on_delete_redirect_url = reverse('pages-root')
 
-        current_page_menu.add_modal_item(_('Delete page'), url=delete_url, close_on_url=self.toolbar.URL_CHANGE,
-                                         on_close=on_delete_redirect_url, disabled=not_edit_mode)
+        current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
+                                         disabled=not_edit_mode)
 
         if not self.title:
             self.toolbar.add_modal_button(
@@ -407,7 +403,6 @@ class PageToolbar(CMSToolbar):
                 reverse("admin:cms_page_add_page_type"),
                 self.page.pk,
                 self.toolbar.language),
-            close_on_url=self.toolbar.URL_CHANGE,
             disabled=not_edit_mode
         )
 
