@@ -133,7 +133,7 @@ class BasicToolbar(CMSToolbar):
         redirect_url = '/'
         if (page and
             (not page.is_published(self.current_lang) or page.login_required
-            or not page.has_view_permission(self.request, AnonymousUser()))):
+                or not page.has_view_permission(self.request, AnonymousUser()))):
             admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
                                      active=True, on_success=redirect_url)
         else:
@@ -292,14 +292,14 @@ class PageToolbar(CMSToolbar):
         add_page_menu = current_page_menu.get_or_create_menu('add_page', _("Add Page"))
         add_page_menu.add_sideframe_item(
             _("New Page"),
-            url="%s?language=%s" % (
+            url="%s?language=%s&edit=1" % (
                 reverse("admin:cms_page_add"),
                 self.toolbar.language
             )
         )
         add_page_menu.add_sideframe_item(
             _("New Sub Page"),
-            url="%s?target=%s&position=last-child&language=%s" % (
+            url="%s?target=%s&position=last-child&language=%s&edit=1" % (
                 reverse("admin:cms_page_add"),
                 self.page.pk,
                 self.toolbar.language,
