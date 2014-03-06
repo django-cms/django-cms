@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django import forms
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from cms.compat import get_user_model
 
@@ -14,24 +13,24 @@ class UserCreationForm(forms.ModelForm):
     """
 
     error_messages = {
-        'duplicate_email': _("A user with that email already exists."),
-        'password_mismatch': _("The two password fields didn't match."),
+        'duplicate_email': "A user with that email already exists.",
+        'password_mismatch': "The two password fields didn't match.",
     }
 
     email = forms.EmailField(
-        label=_('Email'),
+        label='Email',
         help_text="Required.  Standard format email address.",
     )
 
     password1 = forms.CharField(
-        label=_('Password'),
+        label='Password',
         widget=forms.PasswordInput
     )
 
     password2 = forms.CharField(
-        label=_('Password confirmation'),
+        label='Password confirmation',
         widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification.")
+        help_text="Enter the same password as above, for verification."
     )
 
     class Meta:
@@ -82,14 +81,14 @@ class UserChangeForm(forms.ModelForm):
     field.
     """
     email = forms.EmailField(
-        label=_('Email'),
+        label='Email',
         help_text = "Required.  Standard format email address.",
     )
 
-    password = ReadOnlyPasswordHashField(label=_("Password"),
-        help_text=_("Raw passwords are not stored, so there is no way to see "
+    password = ReadOnlyPasswordHashField(label="Password",
+        help_text="Raw passwords are not stored, so there is no way to see "
                     "this user's password, but you can change the password "
-                    "using <a href=\"password/\">this form</a>."))
+                    "using <a href=\"password/\">this form</a>.")
 
     class Meta:
         model = EmailUser
