@@ -200,7 +200,18 @@ $(document).ready(function () {
 
 			// attach event for first page publish
 			this.buttons.each(function () {
-				$(this).find('.cms_publish-page').bind(that.click, function (e) {
+				var btn = $(this);
+
+				// in case the button has a data-rel attribute
+				if(btn.find('a').attr('data-rel')) {
+					btn.on('click', function (e) {
+						e.preventDefault();
+						that._delegate($(this).find('a'));
+					})
+				}
+
+				// in case of the publish button
+				btn.find('.cms_publish-page').bind(that.click, function (e) {
 					if(!confirm(that.config.lang.publish)) e.preventDefault();
 				});
 			});

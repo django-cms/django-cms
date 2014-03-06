@@ -87,6 +87,11 @@ def details(request, slug):
         if frontend_lang in page_languages:
             available_languages.append(frontend_lang)
     # Check that the language is in FRONTEND_LANGUAGES:
+    own_urls = [
+        'http%s://%s%s' % ('s' if request.is_secure() else '', request.get_host(), request.path),
+        '/%s' % request.path,
+        request.path,
+    ]
     if not current_language in user_languages:
         #are we on root?
         if not slug:
@@ -101,8 +106,11 @@ def details(request, slug):
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
-                            return HttpResponseRedirect(pages_root)
-            else:
+                            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
+                                request.toolbar.redirect_url = pages_root
+                            elif pages_root not in own_urls:
+                                return HttpResponseRedirect(pages_root)
+            elif not hasattr(request, 'toolbar') or not request.toolbar.redirect_url:
                 _handle_no_page(request, slug)
         else:
             return _handle_no_page(request, slug)
@@ -118,10 +126,13 @@ def details(request, slug):
                         # In the case where the page is not available in the
                     # preferred language, *redirect* to the fallback page. This
                     # is a design decision (instead of rendering in place)).
-                    return HttpResponseRedirect(path)
+                    if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
+                        request.toolbar.redirect_url = path
+                    elif path not in own_urls:
+                        return HttpResponseRedirect(path)
                 else:
                     found = True
-        if not found:
+        if not found and (not hasattr(request, 'toolbar') or not request.toolbar.redirect_url):
             # There is a page object we can't find a proper language to render it
             _handle_no_page(request, slug)
 
@@ -137,7 +148,7 @@ def details(request, slug):
         except Title.DoesNotExist:
             app_urls = []
         skip_app = False
-        if not page.is_published(current_language) and request.toolbar.edit_mode:
+        if not page.is_published(current_language) and hasattr(request, 'toolbar') and request.toolbar.edit_mode:
             skip_app = True
         if app_urls and not skip_app:
             app = apphook_pool.get_apphook(app_urls)
@@ -158,11 +169,7 @@ def details(request, slug):
             # add language prefix to url
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
-        own_urls = [
-            'http%s://%s%s' % ('s' if request.is_secure() else '', request.get_host(), request.path),
-            '/%s' % request.path,
-            request.path,
-        ]
+
         if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
             request.toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:

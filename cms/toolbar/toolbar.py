@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.constants import LEFT
+from cms.constants import LEFT, REFRESH_PAGE
 from cms.models import UserSettings, Placeholder
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
@@ -47,6 +47,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
         self.obj = None
+        self.redirect_url = None
         if settings.USE_I18N:
             self.language = get_language_from_request(request)
         else:
@@ -109,6 +110,22 @@ class CMSToolbar(ToolbarAPIMixin):
         self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
         item.add_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes)
+        self.add_item(item, position=position)
+        return item
+
+    def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
+                   side=LEFT, position=None, on_close=REFRESH_PAGE):
+        self.populate()
+        item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
+        item.add_modal_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes, on_close=on_close)
+        self.add_item(item, position=position)
+        return item
+
+    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
+                   side=LEFT, position=None, on_close=None):
+        self.populate()
+        item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
+        item.add_sideframe_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes, on_close=on_close)
         self.add_item(item, position=position)
         return item
 
