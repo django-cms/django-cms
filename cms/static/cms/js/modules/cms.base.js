@@ -79,14 +79,14 @@ $(document).ready(function () {
 		// disable multiple form submissions
 		preventSubmit: function () {
 			var forms = $('#cms_toolbar').find('form');
-			forms.submit(function (e) {
-				// show loader
-				CMS.API.Toolbar._loader(true);
-				// we cannot use disabled as the name action will be ignored
-				$('input[type="submit"]').bind('click', function (e) {
-					e.preventDefault();
-				}).css('opacity', 0.5);
-			});
+				forms.submit(function () {
+					// show loader
+					CMS.API.Toolbar._loader(true);
+					// we cannot use disabled as the name action will be ignored
+					$('input[type="submit"]').bind('click', function (e) {
+						e.preventDefault();
+					}).css('opacity', 0.5);
+				});
 		},
 
 		// fixes csrf behaviour
