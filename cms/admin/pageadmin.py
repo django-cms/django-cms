@@ -1249,14 +1249,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def resolve(self, request):
         if not request.user.is_staff:
-            return HttpResponse('')
+            return HttpResponse('', content_type='application/json')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             obj = log.get_edited_object()
             del request.session['cms_log_latest']
             if obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
                 try:
-                    return HttpResponse(force_unicode(obj.get_absolute_url()))
+                    return HttpResponse(force_unicode(obj.get_absolute_url()), content_type='application/json')
                 except:
                     pass
         pk = request.REQUEST.get('pk')
@@ -1268,9 +1268,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 try:
                     instance = ctype.get_object_for_this_type(pk=pk)
                 except ctype.model_class().DoesNotExist:
-                    return HttpResponse('/')
-                return HttpResponse(force_unicode(instance.get_absolute_url()))
-        return HttpResponse('')
+                    return HttpResponse('/', content_type='application/json')
+                return HttpResponse(force_unicode(instance.get_absolute_url()), content_type='application/json')
+        return HttpResponse('', content_type='application/json')
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
