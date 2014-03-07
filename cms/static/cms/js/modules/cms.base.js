@@ -62,7 +62,9 @@ $(document).ready(function () {
 						}
 					},
 					'error': function (jqXHR) {
-						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+						if (that && that.showError && that.showError instanceof Function) {
+							that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);						
+						}
 					}
 				});
 
