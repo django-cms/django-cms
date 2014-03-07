@@ -174,7 +174,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
-
         if (position in ('left', 'right') and not target.parent and is_inherited_template):
             self.template = self.get_template()
         self.move_to(target, position)
@@ -610,6 +609,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                                                     title_set__language=language).select_related('publisher_public')
         for page in publish_set:
             if page.publisher_public:
+                if not page.publisher_public.parent_id:
+                    page.publisher_public.parent = page.parent.publisher_public
+                    page.publisher_public.save()
                 if page.publisher_public.parent.is_published(language):
                     from cms.models import Title
                     try:
