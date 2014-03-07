@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from django.db.models import Q
 from functools import wraps
+import json
 import sys
 from cms.toolbar_pool import toolbar_pool
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
@@ -132,6 +134,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
             pat(r'^add-page-type/$', self.add_page_type),
+            pat(r'^published/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
         )
 
@@ -1342,6 +1345,23 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
         return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
 
+    def get_published_pagelist(self, *args, **kwargs):
+        request = args[0]
+
+        query_term = request.GET.get('q','').strip('/')
+
+        language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
+        published_title = Page.objects.published().public().filter(
+            Q(title_set__title__icontains=query_term, title_set__language=language_code)
+            | Q(title_set__path__icontains=query_term, title_set__language=language_code)
+        )
+
+        return HttpResponse(json.dumps(list(published_title.values(
+            'id',
+            'title_set__path',
+            'title_set__title',
+        ))))
+
     def add_plugin(self, *args, **kwargs):
         with create_revision():
             return super(PageAdmin, self).add_plugin(*args, **kwargs)
@@ -1365,6 +1385,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def clear_placeholder(self, *args, **kwargs):
         with create_revision():
             return super(PageAdmin, self).clear_placeholder(*args, **kwargs)
+
 
 
 admin.site.register(Page, PageAdmin)
