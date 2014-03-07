@@ -602,7 +602,7 @@ class PublishingTests(TestCase):
         page = self.create_page("Page", published=True)
         child = self.create_page("Child", parent=page, published=False)
         gchild2 = self.create_page("Grandchild2", parent=child, published=False)
-        gchild3 = self.create_page("Grandchild3", parent=child, published=False)
+        self.create_page("Grandchild3", parent=child, published=False)
         gchild = self.create_page("Grandchild", published=True)
         gchild.move_page(target=child, position='last-child')
 
