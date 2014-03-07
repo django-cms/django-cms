@@ -2,7 +2,7 @@
 from functools import wraps
 import sys
 from cms.toolbar_pool import toolbar_pool
-from cms.constants import PAGE_TYPES_ID
+from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -979,7 +979,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 if not published:
                     all_published = False
         if page and all_published:
-            messages.info(request, _('The content was successfully published.'))
+            if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+                messages.warning(request, _("Page not published! A parent page is not published yet."))
+            else:
+                messages.info(request, _('The content was successfully published.'))
             LogEntry.objects.log_action(
                 user_id=request.user.id,
                 content_type_id=ContentType.objects.get_for_model(Page).pk,
@@ -988,7 +991,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 action_flag=CHANGE,
             )
         else:
-            messages.warning(request, _("There was a problem publishing your content"))
+            if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+                messages.warning(request, _("Page not published! A parent page is not published yet."))
+            else:
+                messages.warning(request, _("There was a problem publishing your content"))
         if "reversion" in settings.INSTALLED_APPS and page:
             # delete revisions that are not publish revisions
             from reversion.models import Version
@@ -1022,8 +1028,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if 'admin' not in referrer:
             if all_published:
                 if page:
-                    public_page = Page.objects.get(publisher_public=page.pk)
-                    path = '%s?edit_off' % public_page.get_absolute_url(language, fallback=True)
+                    if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+                        path = page.get_absolute_url(language, fallback=True)
+                    else:
+                        public_page = Page.objects.get(publisher_public=page.pk)
+                        path = '%s?edit_off' % public_page.get_absolute_url(language, fallback=True)
                 else:
                     path = '%s?edit_off' % referrer
             else:
