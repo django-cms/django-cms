@@ -154,7 +154,8 @@ $color-background-blue-hover: #e6f6fd;
 		width: 18px !important; height: 18px !important; margin:0 !important;
 		background: url('../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
 	li .col-language span {
-		width:14px !important; height:14px !important; margin:-3px 0 0 !important;
+		border: 1px solid transparent;
+		width:12px !important; height:12px !important; margin:-3px 0 0 !important;
 		@include inline-block();
 		@include border-radius(7px);
 		color: transparent;
@@ -164,8 +165,8 @@ $color-background-blue-hover: #e6f6fd;
 			-moz-animation:pulsate 2.5s ease-out infinite;
 			animation:pulsate 2.5s ease-out infinite;
 		}
-		&.empty { background-color:#d9d9d9; /* hsl(0, 0%, 85%) */ }
-		&.unpublished { background-color:#b3b3b3; /* hsl(0, 0%, 70%) */ }
+		&.empty { border: 1px dashed #808080; background-color:transparent; /* hsl(0, 0%, 50%) */ }
+		&.unpublished { background-color:#b3b3b3; /* hsl(0, 0%, 70%) */  }
 		&.unpublishedparent { background-color:#bff08e; /* hsl(90, 77%, 75%) */ }
 		&.published { background-color:#65b417; }
 	 }
