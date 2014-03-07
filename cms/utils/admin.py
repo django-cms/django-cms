@@ -37,7 +37,7 @@ publisher_classes = {
 }
 
 
-def get_admin_menu_item_context(request, page, filtered=False):
+def get_admin_menu_item_context(request, page, filtered=False, language=None):
     """
     Used for rendering the page tree, inserts into context everything what
     we need for single item
@@ -80,6 +80,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
         'lang': lang,
         'filtered': filtered,
         'metadata': metadata,
+        'preview_language': language,
         'has_change_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
@@ -91,7 +92,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     return context
 
 
-def render_admin_menu_item(request, page, template=None):
+def render_admin_menu_item(request, page, template=None, language=None):
     """
     Renders requested page item for the tree. This is used in case when item
     must be reloaded over ajax.
@@ -110,7 +111,7 @@ def render_admin_menu_item(request, page, template=None):
     })
 
     filtered = 'filtered' in request.REQUEST
-    context.update(get_admin_menu_item_context(request, page, filtered))
+    context.update(get_admin_menu_item_context(request, page, filtered, language))
     # add mimetype to help out IE
     if DJANGO_1_4:
         return render_to_response(template, context, mimetype="text/html; charset=utf-8")
