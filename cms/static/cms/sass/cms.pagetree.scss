@@ -165,9 +165,9 @@ $color-background-blue-hover: #e6f6fd;
 			-moz-animation:pulsate 2.5s ease-out infinite;
 			animation:pulsate 2.5s ease-out infinite;
 		}
-		&.empty { border: 1px dashed #808080; background-color:transparent; /* hsl(0, 0%, 50%) */ }
-		&.unpublished { background-color:#b3b3b3; /* hsl(0, 0%, 70%) */  }
-		&.unpublishedparent { background-color:#bff08e; /* hsl(90, 77%, 75%) */ }
+		&.empty { border: 1px dashed #808080; background-color:transparent; }
+		&.unpublished { background-color:#b3b3b3; }
+		&.unpublishedparent { background-color:#b3b3b3; }
 		&.published { background-color:#65b417; }
 	 }
 	 li .cont { overflow:visible !important; }
