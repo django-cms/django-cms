@@ -220,12 +220,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             if not copy_target.has_view_permission(request):
                 raise PermissionDenied()
             obj = Page.objects.get(pk=obj.pk) #mptt reload
-            if not 'add_page_type' in request.GET:
-                site_id = obj.site_id
-                copy_target._copy_attributes(obj)
-                obj.site_id = site_id
-                obj.reverse_id = None
-                obj.save()
+            copy_target._copy_attributes(obj, clean=True)
+            obj.save()
             for lang in copy_target.languages.split(','):
                 copy_target._copy_contents(obj, lang)
         if not 'permission' in request.path:
@@ -236,6 +232,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 form,
                 language,
             )
+        # is it home? publish it right away
         if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
             obj.publish(language)
 
