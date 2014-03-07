@@ -174,12 +174,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
-        new_parent = target
-        if position in ('left', 'right'):
-            if target.parent_id:
-                new_parent = target.parent
-            else:
-                new_parent = None
         if (position in ('left', 'right') and not target.parent and is_inherited_template):
             self.template = self.get_template()
         self.move_to(target, position)
