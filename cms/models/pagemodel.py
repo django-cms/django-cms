@@ -257,19 +257,20 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             if plugins:
                 copy_plugins_to(plugins, ph)
 
-    def _copy_attributes(self, target):
+    def _copy_attributes(self, target, clean=False):
         """
         Copy all page data to the target. This excludes parent and other values
         that are specific to an exact instance.
         :param target: The Page to copy the attributes to
         """
-        target.publication_date = self.publication_date
-        target.publication_end_date = self.publication_end_date
-        target.in_navigation = self.in_navigation
+        if not clean:
+            target.publication_date = self.publication_date
+            target.publication_end_date = self.publication_end_date
+            target.reverse_id = self.reverse_id
         target.login_required = self.login_required
-        target.limit_visibility_in_menu = self.limit_visibility_in_menu
+        target.in_navigation = self.in_navigation
         target.soft_root = self.soft_root
-        target.reverse_id = self.reverse_id
+        target.limit_visibility_in_menu = self.limit_visibility_in_menu
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
         target.application_namespace = self.application_namespace
