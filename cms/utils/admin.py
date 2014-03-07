@@ -15,6 +15,7 @@ from cms.utils import get_language_from_request
 from cms.utils import get_language_list
 from cms.utils import get_cms_setting
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
+from django.utils.translation.trans_real import get_language
 
 NOT_FOUND_RESPONSE = "NotFound"
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
@@ -37,7 +38,7 @@ publisher_classes = {
 }
 
 
-def get_admin_menu_item_context(request, page, filtered=False):
+def get_admin_menu_item_context(request, page, filtered=False, language=None):
     """
     Used for rendering the page tree, inserts into context everything what
     we need for single item
@@ -74,12 +75,15 @@ def get_admin_menu_item_context(request, page, filtered=False):
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site)
         #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
+    if not language:
+        language = get_language()
     context = {
         'page': page,
         'site': site,
         'lang': lang,
         'filtered': filtered,
         'metadata': metadata,
+        'preview_language': language,
         'has_change_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),
@@ -91,7 +95,7 @@ def get_admin_menu_item_context(request, page, filtered=False):
     return context
 
 
-def render_admin_menu_item(request, page, template=None):
+def render_admin_menu_item(request, page, template=None, language=None):
     """
     Renders requested page item for the tree. This is used in case when item
     must be reloaded over ajax.
@@ -110,7 +114,7 @@ def render_admin_menu_item(request, page, template=None):
     })
 
     filtered = 'filtered' in request.REQUEST
-    context.update(get_admin_menu_item_context(request, page, filtered))
+    context.update(get_admin_menu_item_context(request, page, filtered, language))
     # add mimetype to help out IE
     if DJANGO_1_4:
         return render_to_response(template, context, mimetype="text/html; charset=utf-8")
