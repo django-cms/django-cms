@@ -598,6 +598,32 @@ class PublishingTests(TestCase):
         self.assertFalse(child.publisher_public.is_published('en'))
         self.assertFalse(gchild.publisher_public.is_published('en'))
 
+    def test_prepublish_descendants(self):
+        page = self.create_page("Page", published=True)
+        child = self.create_page("Child", parent=page, published=False)
+        gchild2 = self.create_page("Grandchild2", parent=child, published=False)
+        gchild3 = self.create_page("Grandchild3", parent=child, published=False)
+        gchild = self.create_page("Grandchild", published=True)
+        gchild.move_page(target=child, position='last-child')
+
+        gchild.publish('en')
+        self.assertFalse(child.is_published('en'))
+        self.assertTrue(gchild.is_published('en'))
+        self.assertEqual(gchild.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
+        child = child.reload()
+        child.publish('en')
+        gchild2 = gchild2.reload()
+        gchild2.publish('en')
+        self.assertTrue(child.is_published("en"))
+        self.assertTrue(gchild.is_published("en"))
+        self.assertEqual(gchild.get_publisher_state('en', force_reload=True), PUBLISHER_STATE_DEFAULT)
+        gchild = gchild.reload()
+        gchild2 = gchild2.reload()
+        self.assertEqual(gchild.lft, gchild.publisher_public.lft)
+        self.assertEqual(gchild.rght, gchild.publisher_public.rght)
+
+
+
     def test_republish_multiple_root(self):
         # TODO: The paths do not match expected behaviour
         home = self.create_page("Page", published=True)
