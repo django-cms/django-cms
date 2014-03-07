@@ -489,7 +489,7 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["open_menu_trees"], [1, 2])
         # tests descendants method for the lazy load ajax call
-        url = "%s%d/descendants/" % (url, first_level_page.pk)
+        url = "%s%d/en/descendants/" % (url, first_level_page.pk)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         # should include both direct descendant pages

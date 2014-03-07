@@ -15,7 +15,6 @@ from cms.utils import get_language_from_request
 from cms.utils import get_language_list
 from cms.utils import get_cms_setting
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
-from django.utils.translation.trans_real import get_language
 
 NOT_FOUND_RESPONSE = "NotFound"
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
@@ -75,8 +74,6 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site)
         #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
-    if not language:
-        language = get_language()
     context = {
         'page': page,
         'site': site,
