@@ -302,7 +302,7 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user, published=True)
         page = create_page("delete-page", "nav_playground.html", "en",
                            created_by=admin_user, published=True)
-        child = create_page('child-page', "nav_playground.html", "en",
+        create_page('child-page', "nav_playground.html", "en",
                     created_by=admin_user, published=True, parent=page)
         body = page.placeholders.get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
