@@ -62,7 +62,12 @@ $(document).ready(function () {
 						}
 					},
 					'error': function (jqXHR) {
-						that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+						if(CMS && CMS.API.Toolbar) {
+							CMS.API.Toolbar.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+						} else {
+							$('.messagelist').remove();
+							$('.breadcrumbs').after('<ul class="messagelist"><li class="error">' + jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText + '</li></ul>');
+						}
 					}
 				});
 
