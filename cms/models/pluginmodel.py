@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 import json
-
 import os
 import warnings
 from cms.exceptions import DontUsePageAttributeWarning
@@ -20,6 +19,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import signals
 from mptt.models import MPTTModel, MPTTModelBase
 
 
@@ -247,7 +247,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, parent_cache):
+    def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
         """
         Copy this plugin and return the new plugin.
         """
@@ -273,6 +273,11 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
         new_plugin.position = self.position
+        if no_signals:
+            from cms.signals import pre_save_plugins
+            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
+            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin)
+            new_plugin._no_reorder = True
         new_plugin.save()
         if plugin_instance:
             if plugin_instance.__class__ == CMSPlugin:
@@ -293,6 +298,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
+        if no_signals:
+
+            signals.pre_save.connect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
 
         return new_plugin
 
