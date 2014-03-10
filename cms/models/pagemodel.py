@@ -682,10 +682,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         assert self.publisher_is_draft
         # Go through all children of our public instance
         public_page = self.publisher_public
+        from cms.models import Title
         if public_page:
             descendants = public_page.get_descendants()
             for child in descendants:
-                child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
+                try:
+                    child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
+                except Title.DoesNotExist:
+                    continue
                 draft = child.publisher_public
                 if draft and draft.is_published(language) and draft.get_publisher_state(
                         language) == PUBLISHER_STATE_DEFAULT:

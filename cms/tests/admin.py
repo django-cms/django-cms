@@ -298,9 +298,28 @@ class AdminTestCase(AdminTestsBase):
 
     def test_delete(self):
         admin_user = self.get_superuser()
+        create_page("home", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
         page = create_page("delete-page", "nav_playground.html", "en",
                            created_by=admin_user, published=True)
-        create_page('child-page', "nav_playground.html", "en",
+        child = create_page('child-page', "nav_playground.html", "en",
+                    created_by=admin_user, published=True, parent=page)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
+        with self.login_user_context(admin_user):
+            data = {'post': 'yes'}
+            with self.assertNumQueries(FuzzyInt(300, 382)):
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+    def test_delete_diff_language(self):
+        admin_user = self.get_superuser()
+        create_page("home", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        create_page('child-page', "nav_playground.html", "de",
                     created_by=admin_user, published=True, parent=page)
         body = page.placeholders.get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
