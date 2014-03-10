@@ -58,7 +58,9 @@ class StaticPlaceholder(models.Model):
 
     def publish(self, request, language, force=False):
         if force or self.has_publish_permission(request):
-            CMSPlugin.objects.filter(placeholder=self.public, language=language).delete()
+            for plugin in CMSPlugin.objects.filter(placeholder=self.public, language=language).order_by('-level'):
+                plugin._no_reorder = True
+                plugin.delete()
             plugins = self.draft.get_plugins_list(language=language)
             copy_plugins_to(plugins, self.public)
             self.dirty = False

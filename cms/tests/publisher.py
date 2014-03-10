@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 
 from djangocms_text_ckeditor.models import Text
 from django.core.cache import cache
@@ -479,7 +480,8 @@ class PublishingTests(TestCase):
         self.assertEqual(dirty2.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
         home = self.reload(home)
-        home.publish('en')
+        with self.assertNumQueries(FuzzyInt(0, 100)):
+            home.publish('en')
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
         self.assertTrue(dirty1.is_published("en"))

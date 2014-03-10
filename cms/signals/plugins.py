@@ -39,6 +39,7 @@ def pre_save_plugins(**kwargs):
 def pre_delete_plugins(**kwargs):
     from django.core.cache import cache
     plugin = kwargs['instance']
+    print hasattr(plugin, '_no_reorder')
     if hasattr(plugin, '_no_reorder'):
         return
     placeholder = None
