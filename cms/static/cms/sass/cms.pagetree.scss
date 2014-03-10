@@ -39,9 +39,9 @@ $color-background-blue-hover: #e6f6fd;
 		background: url('../img/pagetree/sprite.png') no-repeat 0 0; }
 	li a.move { background-position:-20px -20px; margin-top:0; }
 	li a.copy { background-position:-40px -60px;  margin-top:0; }
-    li a.edit { background-position:-40px -20px;  margin-top:0; }
-    li a.advanced-settings { background-position:-60px -60px; margin-top:0; }
-    li span.info { background-position:-81px -20px; margin-top:-1px; cursor:pointer; }
+	li a.edit { background-position:-40px -20px;  margin-top:0; }
+	li a.advanced-settings { background-position:-60px -60px; margin-top:0; }
+	li span.info { background-position:-81px -20px; margin-top:-1px; cursor:pointer; }
 
 	li a.selector-add { background-position:-20px 0; margin-left:4px; margin-top:-1px; }
 
@@ -195,7 +195,7 @@ $color-background-blue-hover: #e6f6fd;
 
 // animation for publishing
 @-webkit-keyframes pulsate {
-    0% { opacity:0.5; }
-    50% { opacity:1; }
-    100% { opacity:0.5; }
+	0% { opacity:0.5; }
+	50% { opacity:1; }
+	100% { opacity:0.5; }
 }
