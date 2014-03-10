@@ -119,13 +119,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/copy-language/$', self.copy_language),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
-            pat(r'^([0-9]+)/descendants/$', self.descendants),  # menu html for page descendants
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
             pat(r'^([0-9]+)/change_template/$', self.change_template),
+            pat(r'^([0-9]+)/([a-z\-]+)/descendants/$', self.descendants),  # menu html for page descendants
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -220,12 +220,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             if not copy_target.has_view_permission(request):
                 raise PermissionDenied()
             obj = Page.objects.get(pk=obj.pk) #mptt reload
-            if not 'add_page_type' in request.GET:
-                site_id = obj.site_id
-                copy_target._copy_attributes(obj)
-                obj.site_id = site_id
-                obj.reverse_id = None
-                obj.save()
+            copy_target._copy_attributes(obj, clean=True)
+            obj.save()
             for lang in copy_target.languages.split(','):
                 copy_target._copy_contents(obj, lang)
         if not 'permission' in request.path:
@@ -236,6 +232,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 form,
                 language,
             )
+        # is it home? publish it right away
         if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
             obj.publish(language)
 
@@ -1216,7 +1213,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page)
         return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page's in_navigation status")))
 
-    def descendants(self, request, page_id):
+    def descendants(self, request, page_id, language):
         """
         Get html for descendants of given page
         Used for lazy loading pages in cms.changelist.js
@@ -1226,7 +1223,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         page = get_object_or_404(Page, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
-                                                  template="admin/cms/page/tree/lazy_menu.html")
+                                                  template="admin/cms/page/tree/lazy_menu.html", language=language)
 
     def add_page_type(self, request):
         site = Site.objects.get_current()

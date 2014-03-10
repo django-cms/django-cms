@@ -468,8 +468,8 @@ $(document).ready(function () {
 				// the other click event on this element to fire
 				jtarget.addClass("loading");
 				var pageId = $(jtarget).attr("id").split("page_")[1];
-
-				$.get(admin_base_url + "cms/page/" + pageId + "/descendants/", {}, function(r, status) {
+                var language = $(jtarget).children('div.cont').children('div.col1').children('.title').attr('lang')
+				$.get(admin_base_url + "cms/page/" + pageId + "/" + language + "/descendants/", {}, function(r, status) {
 					jtarget.children('ul').append(r);
 					// show move targets if needed
 					if($('span.move-target-container:visible').length > 0) {
