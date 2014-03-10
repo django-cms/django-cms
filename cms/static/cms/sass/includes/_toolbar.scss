@@ -222,7 +222,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 //##################################################################################################################
 // #TOOLBAR/blocker#
 .cms_screenblock { color:white; text-align:center;
-	position:absolute; right:0; top:0; z-index:100;
+	position:fixed; right:0; top:0; z-index:100;
 	width:100%; height:100%;
 	background-color:black; background:rgba(black, 0.9); }
 

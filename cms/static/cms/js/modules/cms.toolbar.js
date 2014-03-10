@@ -484,7 +484,7 @@ $(document).ready(function () {
 
 				blocker.css({
 					'width': width,
-					'height': $(document).height()
+					'height': $(window).height()
 				});
 			}).trigger('resize');
 
