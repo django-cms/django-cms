@@ -60,14 +60,6 @@ $(document).ready(function () {
 							// on_close can also provide a url, reload to the new destination
 							that.reloadBrowser(url);
 						}
-					},
-					'error': function (jqXHR) {
-						if(CMS && CMS.API.Toolbar) {
-							CMS.API.Toolbar.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
-						} else {
-							$('.messagelist').remove();
-							$('.breadcrumbs').after('<ul class="messagelist"><li class="error">' + jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText + '</li></ul>');
-						}
 					}
 				});
 
