@@ -2,7 +2,7 @@
 
 
 
-def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin_id=None):
+def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin_id=None, no_signals=False):
     """
     Copies a list of plugins to a placeholder to a language.
     """
@@ -19,7 +19,7 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin
             plugin_language = old_plugin.language
             # do the simple copying
 
-        new_plugin = old_plugin.copy_plugin(to_placeholder, plugin_language, old_parent_cache)
+        new_plugin = old_plugin.copy_plugin(to_placeholder, plugin_language, old_parent_cache, no_signals=no_signals)
         if first:
             first = False
             if parent_plugin_id:

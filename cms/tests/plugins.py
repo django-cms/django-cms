@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import datetime
 import json
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 import os
 
 from djangocms_googlemap.models import GoogleMap
@@ -411,6 +412,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.reload(link_plugin_en)
         mcol1 = self.reload(mcol1)
         self.assertEqual(mcol1.get_descendants().count(), 2)
+
+        with self.assertNumQueries(FuzzyInt(0, 200)):
+            page_en.publish('en')
 
     def test_plugin_validation(self):
         self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NonExisitngRenderTemplate)

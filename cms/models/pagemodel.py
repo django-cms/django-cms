@@ -244,7 +244,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         from cms.plugin_pool import plugin_pool
 
         plugin_pool.set_plugin_meta()
-        CMSPlugin.objects.filter(placeholder__page=target, language=language).delete()
+        for plugin in CMSPlugin.objects.filter(placeholder__page=target, language=language).order_by('-level'):
+            inst, cls = plugin.get_plugin_instance()
+            inst.cmsplugin_ptr._no_reorder = True
+            inst.delete()
         for ph in self.placeholders.all():
             plugins = ph.get_plugins_list(language)
             try:
@@ -255,7 +258,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 target.placeholders.add(ph)
                 # update the page copy
             if plugins:
-                copy_plugins_to(plugins, ph)
+                copy_plugins_to(plugins, ph, no_signals=True)
 
     def _copy_attributes(self, target, clean=False):
         """

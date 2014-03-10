@@ -6,6 +6,8 @@ from cms.models import CMSPlugin, Title, Page, StaticPlaceholder, Placeholder
 def pre_save_plugins(**kwargs):
     from django.core.cache import cache
     plugin = kwargs['instance']
+    if hasattr(plugin, '_no_reorder'):
+        return
     placeholder = None
     if plugin.placeholder:
         try:
@@ -37,6 +39,7 @@ def pre_save_plugins(**kwargs):
 
 
 def pre_delete_plugins(**kwargs):
+
     from django.core.cache import cache
     plugin = kwargs['instance']
     if hasattr(plugin, '_no_reorder'):
