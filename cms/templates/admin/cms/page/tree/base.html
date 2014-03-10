@@ -50,11 +50,24 @@ $(document).ready(function () {
 	moveSuccess = function(node){
         $.syncHeights();
         $.syncCols();
+
 		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
+		var parent = window.parent;
+
 		node.append(msg);
-		msg.fadeOut(3000);
+		node.parent().find('.col2').hide();
+		msg.fadeOut(2000, function () {
+			node.parent().find('.col2').show()
+		});
 		// check for reload changes
-		if(window.parent) window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
+		if(parent) {
+			// attach message
+			if(parent.CMS && parent.CMS.API.Toolbar) {
+				parent.CMS.API.Toolbar.openMessage('{% trans "Changes within the tree might require a refresh." %}', false, 0);
+			}
+
+			window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
+		}
 
 	};
 	moveError = function(node,message){
@@ -64,6 +77,7 @@ $(document).ready(function () {
 		else {
 			var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
 		}
+		node.parent().find('.col2').hide();
 		node.append(msg);
 	};
 	// some settings used by javascript functions
