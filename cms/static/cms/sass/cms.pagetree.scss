@@ -191,6 +191,8 @@ $color-background-blue-hover: #e6f6fd;
 	&.language-tooltip-multiple a:first-child:after { content:" - "; }
 }
 
+#marker { margin-top:8px; }
+
 // animation for publishing
 @-webkit-keyframes pulsate {
     0% { opacity:0.5; }
