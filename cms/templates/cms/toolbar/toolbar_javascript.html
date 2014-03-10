@@ -33,7 +33,7 @@ $(document).ready(function () {
 		'request': {
 			'language': '{{ request.GET.language }}',
 			'model': '{{ request.toolbar.get_object_model }}',
-			'page_id': '{{ request.current_page.pk }}',
+			'page_id': '{% if request.current_page.publisher_is_draft %}{{ request.current_page.pk }}{% else %}{{ request.current_page.publisher_public_id }}{% endif %}',
 			'pk': '{{ request.toolbar.get_object_pk }}',
 			'url': '{% language request.toolbar.language %}{% url "admin:cms_page_resolve" %}{% endlanguage %}'
 		},

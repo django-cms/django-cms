@@ -287,13 +287,13 @@ $(document).ready(function () {
 			this.placeholders.show();
 
 			// attach event
-			$(window).bind('resize', function () {
+			$(window).bind('resize.sideframe', function () {
 				that._resizeBoard();
-			}).trigger('resize');
+			}).trigger('resize.sideframe');
 
 			// setup an interval
 			this.interval = setInterval(function () {
-				$(window).trigger('resize');
+				$(window).trigger('resize.sideframe');
 			}, interval);
 		},
 
@@ -305,7 +305,7 @@ $(document).ready(function () {
 			this.dimmer.hide();
 
 			// detach event
-			$(window).unbind('resize');
+			$(window).unbind('resize.sideframe');
 
 			// clear interval
 			clearInterval(this.interval);

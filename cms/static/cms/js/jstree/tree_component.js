@@ -193,7 +193,7 @@ function tree_component () {
 						_this.moveType	= mov;
 						_this.moveRef	= event.target;
 						jQuery(_this.drag).children("IMG").remove();
-						jQuery("#marker").css({ "left" : goTo.x-1 , "top" : goTo.y+6 }).show();
+						jQuery("#marker").css({ "left" : goTo.x-1 , "top" : goTo.y-2 }).show();
 					}
 					else {
 						if(jQuery(_this.drag).children("IMG").size() == 0) {

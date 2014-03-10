@@ -4,14 +4,13 @@
 
 (function($) {
 	$.syncCols = function(){
-
 		$('#sitemap .col-softroot').syncWidth(0);
 		$('#sitemap .col-apphook').syncWidth(0);
 		$('#sitemap .col-language').syncWidth(0);
 		$('#sitemap .col-navigation').syncWidth(0);
 		$('#sitemap .col-actions').syncWidth(0);
 		$('#sitemap .col-info').syncWidth(0);
-	}
+	};
 
 	$.syncHeights = function(){
 		$('ul.tree-default li').syncHeight();
@@ -20,10 +19,9 @@
 	/* Colums width sync */
 	$.fn.syncWidth = function(max) {
 		var visible = false;
-		$(this).each(function() {
-			$(this).css('width', null)
-			if ($(this).is(':visible')) {
 
+		$(this).each(function() {
+			if($(this).is(':visible')) {
 				visible = true;
 				var val= $(this).width();
 				if(val > max){
@@ -33,7 +31,7 @@
 		});
 		if (visible && max > 0) {
 			$(this).each(function() {
-				$(this).css('width', max + 'px');
+				$(this).css('width', max);
 			});
 		}
 	};
@@ -42,11 +40,12 @@
 		$('div.col2').children('div').each(function(index, item){
 			$(item).attr('style', 'display:block !important;');
 		});
-		var min_width = 100000;
+		var min_width = 10000;
+		var offset = 80;
 		var max_col2_width = 0;
 		var max_col2 = null;
 		$(this).each(function() {
-			var cont = $(this).children('div.cont')
+			var cont = $(this).children('div.cont');
 			if (!cont.is(':visible')) {
 				return;
 			}
@@ -71,16 +70,15 @@
 		if(max_col2){
 			max_col2.children('div').each(function(){
 				if(!max_reached){
-					w += $(this).outerWidth()
+					w += $(this).outerWidth();
 				}
 
-				if(max_reached || w > min_width){
-					hidden_count ++
+				if(max_reached || w > (min_width - offset)){
+					hidden_count = hidden_count + 1;
 					max_reached = true
 				}
 			});
 
-			var count = 0
 			if(hidden_count){
 				$(this).each(function() {
 					$(this).children('div.cont').children('div.col2').children('div').slice(-hidden_count).each(function(){
@@ -452,12 +450,13 @@ $(document).ready(function () {
 		admin_base_url = document.URL.split("/cms/page/")[0] + "/";
 
 		// in navigation
-		if(jtarget.hasClass("navigation-checkbox")) {
-			pageId = jtarget.attr("name").split("navigation-")[1];
-			// if I don't put data in the post, django doesn't get it
-			reloadItem(jtarget, admin_base_url + "cms/page/" + pageId + "/change-navigation/", { 1:1 });
+		if(jtarget.hasClass('navigation-checkbox')) {
 			e.stopPropagation();
-			return true;
+
+			var pageId = jtarget.attr('name').split('navigation-')[1];
+
+			// if I don't put data in the post, django doesn't get it
+			reloadItem(jtarget, admin_base_url + 'cms/page/' + pageId + '/change-navigation/', { 1:1 });
 		}
 
 		 // lazy load descendants on tree open
@@ -513,13 +512,13 @@ $(document).ready(function () {
 	});
 	$("div#sitemap").show();
 	function resized(){
-		//$.syncCols();
 		$.syncHeights();
+		$.syncCols();
 	}
 
 	function reCalc(){
-		$.syncCols();
 		$.syncHeights();
+		$.syncCols();
 	}
 
 	$(window).bind('resize', resized);
@@ -538,13 +537,6 @@ $(document).ready(function () {
 		var action = mark_copy_node(id);
 		selected_page = id;
 	}
-
-	// moderation checkboxes over livequery
-	// TODO jquery.livequery has been removed
-	//$('div.col-moderator input').livequery(function() {
-		// TODO jquery.checkbox.ui has been removed
-		// $(this).checkBox({addLabel:false});
-	//});
 
 	function copyTreeItem(item_id, target_id, position, site){
 		if (cmsSettings.cmsPermission || cmsSettings.cmsModerator) {
@@ -603,7 +595,6 @@ $(document).ready(function () {
 		if (/\/\?/ig.test(window.location.href)) {
 			// probably some filter here, tell backend, we need a filtered
 			// version of item	
-			
 			data['fitlered'] = 1;
 		}
 		
@@ -611,8 +602,8 @@ $(document).ready(function () {
 			var status = true;
 			var target = null;
 
-			if (callback) status = callback(response, textStatus);
-			if (status) {
+			if(callback) status = callback(response, textStatus);
+			if(status) {
 				if (/page_\d+/.test($(el).attr('id'))) {
 					// one level higher
 					target = $(el).find('div.cont:first');
@@ -621,34 +612,35 @@ $(document).ready(function () {
 				}
 
 				var parent = target.parent();
-				if (response == "NotFound") {
-					return parent.remove();
-				}
+
+				// remove the element if something went wrong
+				if(response == 'NotFound') return parent.remove();
+
 				var origin = $('.messagelist');
 				target.replace(response);
 
 				var messages = $(parent).find('.messagelist');
-				if (messages.length) {
+				if(messages.length) {
 					origin.remove();
 					messages.insertAfter('.breadcrumbs');
 				}
 				parent.find('div.cont:first').yft();
-			}
 
-			return true;
-		}
-		
-		function onError(XMLHttpRequest, textStatus, errorThrown) {
-			if (errorCallback) errorCallback(XMLHttpRequest, textStatus, errorThrown);
+				// ensure after removal everything is aligned again
+				$(window).trigger('resize');
+			}
 		}
 		
 		$.ajax({
-			'data': data,
-			'success': onSuccess,
-			'error': onError,
 			'type': 'POST',
+			'data': data,
 			'url': url,
-			'xhr': (window.ActiveXObject) ? function(){try {return new window.ActiveXObject("Microsoft.XMLHTTP");} catch(e) {}} : function() {return new window.XMLHttpRequest();}				
+			'success': onSuccess,
+			'error': function (XMLHttpRequest, textStatus, errorThrown) {
+				// errorCallback is passed through the reloadItem function
+				if(errorCallback) errorCallback(XMLHttpRequest, textStatus, errorThrown);
+			},
+			'xhr': (window.ActiveXObject) ? function(){try {return new window.ActiveXObject("Microsoft.XMLHTTP");} catch(e) {}} : function() {return new window.XMLHttpRequest();}
 		});
 	}
 	

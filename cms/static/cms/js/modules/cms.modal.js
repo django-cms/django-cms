@@ -87,6 +87,14 @@ $(document).ready(function () {
 
 		// public methods
 		open: function (url, name, breadcrumb) {
+			// cancel if another lightbox is already being opened
+			if(CMS.API.locked) {
+				CMS.API.locked = false;
+				return false
+			} else {
+				CMS.API.locked = true;
+			}
+
 			// show loader
 			CMS.API.Toolbar._loader(true);
 
@@ -194,6 +202,9 @@ $(document).ready(function () {
 
 				// check if we should maximize
 				if(that.triggerMaximized) that._maximize();
+
+				// changed locked status to allow other modals again
+				CMS.API.locked = false;
 			});
 
 			// prevent scrolling
