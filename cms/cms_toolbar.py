@@ -294,9 +294,10 @@ class PageToolbar(CMSToolbar):
         add_page_menu = current_page_menu.get_or_create_menu('add_page', _("Add Page"))
         add_page_menu.add_sideframe_item(
             _("New Page"),
-            url="%s?language=%s&edit=1" % (
+            url="%s?language=%s&edit=1&target=%s&position=last-child" % (
                 reverse("admin:cms_page_add"),
-                self.toolbar.language
+                self.toolbar.language,
+                self.page.parent_id or ''
             )
         )
         add_page_menu.add_sideframe_item(
