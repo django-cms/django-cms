@@ -1388,6 +1388,42 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(FuzzyInt(18, 33)):
                 force_unicode(self.client.get('/en/admin/cms/page/'))
 
+    def test_smart_link_published_pages(self):
+        admin, staff_guy = self._get_guys()
+        page_url = '/en/admin/cms/page/published-pages/' # Not sure how to achieve this with reverse...
+
+        with self.login_user_context(staff_guy):
+            multi_title_page = create_page('main_title', 'col_two.html', 'en', published=True,
+                                           overwrite_url='overwritten_url',
+                                           menu_title='menu_title')
+
+            title = multi_title_page.get_title_obj()
+            title.page_title = 'page_title'
+            title.save()
+
+            multi_title_page.save()
+
+            # Non ajax call should return a 403 as this page shouldn't be accessed by anything else but ajax queries
+            self.assertEqual(403, self.client.get(page_url).status_code)
+
+            self.assertEqual(200,
+                             self.client.get(page_url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code
+            )
+
+            # Test that the query param is working as expected.
+            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'main_title'},
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+
+            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'menu_title'},
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+
+            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'overwritten_url'},
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+
+            # this one fail ? Should I use a special method to actually publish my changes on the title object above?
+            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'page_title'},
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
     """

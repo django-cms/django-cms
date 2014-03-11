@@ -136,7 +136,7 @@ class PageSmartLinkWidget(TextInput):
             placeholder: "%(placeholder_text)s",
             minimumInputLength: 3,
             ajax: {
-                url: "/%(language_code)s/admin/cms/page/published/",
+                url: "/%(language_code)s/admin/cms/page/published-pages/",
                 dataType: 'json',
                 data: function (term, page) {
                     return {
