@@ -687,7 +687,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         public_page = self.publisher_public
         from cms.models import Title
         if public_page:
-            descendants = public_page.get_descendants()
+            descendants = public_page.get_descendants().filter(title_set__language=language)
             for child in descendants:
                 try:
                     child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
