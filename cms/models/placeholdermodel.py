@@ -209,12 +209,6 @@ class Placeholder(models.Model):
         return [obj for field in self._get_attached_fields()
                 for obj in getattr(self, field.related.get_accessor_name()).all()]
 
-    def _get_attached_object(self):
-        """
-        Returns a list of objects attached to this placeholder.
-        """
-        getattr(self, self._get_attached_field().related.get_accessor_name())
-
     def page_getter(self):
         if not hasattr(self, '_page'):
             from cms.models.pagemodel import Page
