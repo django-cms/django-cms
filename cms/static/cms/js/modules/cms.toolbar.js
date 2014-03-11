@@ -89,6 +89,10 @@ $(document).ready(function () {
 
 			// if there is a screenblock, do some resize magic
 			if(this.screenBlock.length) this._screenBlock();
+
+			// add toolbar ready class to body and fire event
+			this.body.addClass('cms-ready');
+			$(document).trigger('cms-ready');
 		},
 
 		_events: function () {
