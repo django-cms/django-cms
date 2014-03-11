@@ -37,10 +37,9 @@
 	};
 	$.fn.syncHeight = function() {
 		$('div.col2').children('div').each(function(index, item){
-			$(item).css('display', 'block !important');
+			$(item).css('display', 'block');
 		});
 		var min_width = 100000;
-		var offset = 10;
 		var max_col2_width = 0;
 		var max_col2 = null;
 		$(this).each(function() {
@@ -73,7 +72,7 @@
 					w += $(this).outerWidth(true);
 				}
 
-				if(max_reached || w > (min_width - offset)){
+				if(max_reached || w > min_width){
 					hidden_count = hidden_count + 1;
 					max_reached = true
 				}
@@ -82,17 +81,15 @@
 			if(hidden_count){
 				$(this).each(function() {
 					$(this).children('div.cont').children('div.col2').children('div').slice(-hidden_count).each(function(){
-						this.style.setProperty('display','none', 'important' );
+						$(this).css('display', 'none');
 					})
 				});
 				$('div#sitemap ul.header div.col2').children().slice(-hidden_count).each(function(){
-					this.style.setProperty('display','none', 'important' );
+					$(this).css('display','none');
 				})
 			}
 		}
 	};
-
-
 
 // CMS.$ will be passed for $
 $(document).ready(function () {

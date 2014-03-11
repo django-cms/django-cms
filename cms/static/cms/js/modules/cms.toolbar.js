@@ -55,9 +55,6 @@ $(document).ready(function () {
 				publishBtn.hide();
 			if($('.cms_btn-publish-active').length) publishBtn.show();
 
-			// add toolbar ready class to body
-			this.body.addClass('cms_toolbar-ready');
-
 			// check if debug is true
 			if(CMS.config.debug) this._debug();
 

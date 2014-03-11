@@ -54,9 +54,9 @@ $(document).ready(function () {
 		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
 		var parent = window.parent;
 
-		node.append(msg);
+		node.after(msg);
 		node.parent().find('.col2').hide();
-		msg.fadeOut(2000, function () {
+		msg.fadeOut(1000, function () {
 			node.parent().find('.col2').show()
 		});
 		// check for reload changes
@@ -78,7 +78,7 @@ $(document).ready(function () {
 			var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
 		}
 		node.parent().find('.col2').hide();
-		node.append(msg);
+		node.after(msg);
 	};
 	// some settings used by javascript functions
 	cmsSettings = {
