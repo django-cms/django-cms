@@ -1249,9 +1249,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponse('', content_type='application/json')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
-            obj = log.get_edited_object()
+            try:
+                obj = log.get_edited_object()
+            except ObjectDoesNotExist:
+                obj = None
             del request.session['cms_log_latest']
-            if obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
+            if obj and obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
                 try:
                     return HttpResponse(force_unicode(obj.get_absolute_url()), content_type='application/json')
                 except:
