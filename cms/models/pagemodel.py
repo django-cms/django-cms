@@ -246,8 +246,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         plugin_pool.set_plugin_meta()
         for plugin in CMSPlugin.objects.filter(placeholder__page=target, language=language).order_by('-level'):
             inst, cls = plugin.get_plugin_instance()
-            inst.cmsplugin_ptr._no_reorder = True
-            inst.delete()
+            if inst:
+                inst.cmsplugin_ptr._no_reorder = True
+                inst.delete()
+            else:
+                plugin._no_reorder = True
+                plugin.delete()
         for ph in self.placeholders.all():
             plugins = ph.get_plugins_list(language)
             try:
