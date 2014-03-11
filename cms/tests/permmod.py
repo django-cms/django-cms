@@ -209,11 +209,11 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
             # publish as slave, published as user_master before 
             publish_page(page, self.user_slave, 'en')
-
-    def test_default_plugins(self):
             # user_slave is moderator for this page
             # approve / publish as user_slave
             # user master should be able to approve as well
+
+    def test_default_plugins(self):
             with SettingsOverride(CMS_PLACEHOLDER_CONF={
                 'col_left': {
                     'default_plugins': [
