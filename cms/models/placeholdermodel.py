@@ -94,8 +94,11 @@ class Placeholder(models.Model):
         for object in self._get_attached_objects():
             model = object.__class__
             opts = model._meta
+            print object
             perm_accessor = getattr(opts, 'get_%s_permission' % key)
             perm_code = '%s.%s' % (opts.app_label, perm_accessor())
+            print perm_accessor
+            print perm_code
             # if they don't have the permission for this attached model or object, bail out
             if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, object)):
                 return False

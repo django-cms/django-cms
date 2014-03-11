@@ -1021,7 +1021,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
         referrer = request.META.get('HTTP_REFERER', '')
-        path = '../../'
+        path = '../../?language=%s&page_id=%s' % (language, page_id)
         if 'admin' not in referrer:
             if all_published:
                 if page:
