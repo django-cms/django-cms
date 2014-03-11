@@ -175,7 +175,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                 response = self.client.get("/en/page2/")
                 self.assertEqual(response.status_code, 200)
                 response = self.client.get("/en/page4/")
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 302)
             self.client.logout()
             response = self.client.get("/en/page4/")
             self.assertEqual(response.status_code, 404)
