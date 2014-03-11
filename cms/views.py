@@ -106,7 +106,7 @@ def details(request, slug):
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
-                            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
+                            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
                                 request.toolbar.redirect_url = pages_root
                             elif pages_root not in own_urls:
                                 return HttpResponseRedirect(pages_root)
@@ -126,7 +126,7 @@ def details(request, slug):
                         # In the case where the page is not available in the
                     # preferred language, *redirect* to the fallback page. This
                     # is a design decision (instead of rendering in place)).
-                    if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
+                    if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
                         request.toolbar.redirect_url = path
                     elif path not in own_urls:
                         return HttpResponseRedirect(path)
@@ -170,7 +170,7 @@ def details(request, slug):
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
 
-        if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.show_toolbar:
+        if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
             request.toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:
             return HttpResponseRedirect(redirect_url)
