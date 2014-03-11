@@ -92,6 +92,7 @@ $(document).ready(function () {
 			var language = 'language=' + CMS.config.request.language;
 			var page_id = 'page_id=' + CMS.config.request.page_id;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
+			var initialized = false;
 
 			// push required params if defined
 			var params = [];
@@ -131,7 +132,8 @@ $(document).ready(function () {
 				});
 
 				// attach reload event
-				that.reloadBrowser(false, false, true);
+				if(initialized) that.reloadBrowser(false, false, true);
+				initialized = true;
 			});
 
 			// cancel animation if sideframe is already shown
