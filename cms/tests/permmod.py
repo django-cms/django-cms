@@ -124,7 +124,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
             # slave page & slave user
 
-            self.slave_page = create_page("slave-home", "nav_playground.html", "en",
+            self.slave_page = create_page("slave-home", "col_two.html", "en",
                                           parent=self.master_page, created_by=self.user_super)
 
             assign_user_to_page(self.slave_page, self.user_slave, grant_all=True)
@@ -228,7 +228,8 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             }):
                 with self.login_user_context(self.user_slave):
                     self.assertEqual(CMSPlugin.objects.count(), 0)
-                    self.client.get(self.slave_page.get_absolute_url(), {'edit':True})
+                    response = self.client.get(self.slave_page.get_absolute_url(), {'edit': 1})
+                    self.assertEqual(response.status_code, 200)
                     self.assertEqual(CMSPlugin.objects.count(), 1)
 
     def test_page_added_by_slave_can_be_published_by_user_master(self):

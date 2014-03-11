@@ -208,7 +208,6 @@ def configure(db_url, **extra):
                 'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
-
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                 'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
@@ -219,16 +218,7 @@ def configure(db_url, **extra):
                 'plugin_labels': {
                     'LinkPlugin': gettext('Add a link')
                 },
-                'default_plugins': [
-                    {
-                        'plugin_type': 'TextPlugin',
-                        'values': {
-                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
-                        },
-                    },
-                ]
             },
-
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                 'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
