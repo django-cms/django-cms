@@ -208,7 +208,6 @@ def configure(db_url, **extra):
                 'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
-
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                 'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
@@ -218,9 +217,8 @@ def configure(db_url, **extra):
                 },
                 'plugin_labels': {
                     'LinkPlugin': gettext('Add a link')
-                }
+                },
             },
-
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
                 'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),

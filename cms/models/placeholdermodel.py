@@ -89,18 +89,26 @@ class Placeholder(models.Model):
         """
         if request.user.is_superuser:
             return True
+        if self.page:
+            return self._get_object_permission(self.page, request, key)
+        for obj in self._get_attached_objects():
+            return self._get_object_permission(obj, request, key)
+
+    def _get_object_permission(self, obj, request, key):
         found = False
-        # check all attached models/objects for change permissions
-        for object in self._get_attached_objects():
-            model = object.__class__
-            opts = model._meta
-            perm_accessor = getattr(opts, 'get_%s_permission' % key)
-            perm_code = '%s.%s' % (opts.app_label, perm_accessor())
-            # if they don't have the permission for this attached model or object, bail out
-            if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, object)):
-                return False
-            else:
-                found = True
+        model = obj.__class__
+        opts = model._meta
+        perm_accessor = getattr(opts, 'get_%s_permission' % key)
+        perm_code = '%s.%s' % (opts.app_label, perm_accessor())
+        # if they don't have the permission for this attached model or object, bail out
+        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
+            return False
+        else:
+            found = True
+        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
+            return False
+        else:
+            found = True
         return found
 
     def has_change_permission(self, request):
