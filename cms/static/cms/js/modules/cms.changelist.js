@@ -41,7 +41,7 @@
 			$(item).attr('style', 'display:block !important;');
 		});
 		var min_width = 10000;
-		var offset = 80;
+		var offset = 20;
 		var max_col2_width = 0;
 		var max_col2 = null;
 		$(this).each(function() {

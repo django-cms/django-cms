@@ -76,8 +76,8 @@ File and image handling
 Revision management
 -------------------
 
-* `django-reversion`_ 1.6.6 (with Django 1.4.5), 1.7 (with Django 1.5)
-  or 1.8 (with Django 1.6)  to support versions of your content (If using
+* `django-reversion`_ 1.6.6 (with Django 1.4.X), 1.7 (with Django 1.5.X)
+  or 1.8 (with Django 1.6.X)  to support versions of your content (If using
   a different Django version it is a good idea to check the page
   `Compatible-Django-Versions`_ in the django-reversion wiki in order
   to make sure that the package versions are compatible.)
@@ -136,7 +136,7 @@ You can switch to your virtualenv at the command line by typing:
 .. code-block:: bash
 
   source env/bin/activate
-  
+
 Next, you can install packages one at a time using `pip`_, but we recommend
 using a `requirements.txt`_ file. The following is an example
 requirements.txt file that can be used with pip to install django CMS and
@@ -147,9 +147,9 @@ its dependencies:
     # Bare minimum
     django-cms==3.0
 
-    #These dependencies are brought in by django CMS, but if you want to
+    # These dependencies are brought in by django CMS, but if you want to
     # lock-in their version, specify them
-    Django==1.6.1
+    Django==1.6.2
 
     django-classy-tags==0.4
     South==0.8.4
@@ -158,8 +158,8 @@ its dependencies:
     django-sekizai==0.7
     six==1.3.0
     djangocms-admin-style==0.1.2
-    
-    #Optional, recommended packages
+
+    # Optional, recommended packages
     Pillow==2.0.0
     django-filer==0.9.5
     cmsplugin-filer==0.9.5

@@ -1246,14 +1246,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def resolve(self, request):
         if not request.user.is_staff:
-            return HttpResponse('', content_type='application/json')
+            return HttpResponse('', content_type='text/plain')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
-            obj = log.get_edited_object()
+            try:
+                obj = log.get_edited_object()
+            except ObjectDoesNotExist:
+                obj = None
             del request.session['cms_log_latest']
-            if obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
+            if obj and obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
                 try:
-                    return HttpResponse(force_unicode(obj.get_absolute_url()), content_type='application/json')
+                    return HttpResponse(force_unicode(obj.get_absolute_url()), content_type='text/plain')
                 except:
                     pass
         pk = request.REQUEST.get('pk')
@@ -1265,9 +1268,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 try:
                     instance = ctype.get_object_for_this_type(pk=pk)
                 except ctype.model_class().DoesNotExist:
-                    return HttpResponse('/', content_type='application/json')
-                return HttpResponse(force_unicode(instance.get_absolute_url()), content_type='application/json')
-        return HttpResponse('', content_type='application/json')
+                    return HttpResponse('/', content_type='text/plain')
+                return HttpResponse(force_unicode(instance.get_absolute_url()), content_type='text/plain')
+        return HttpResponse('', content_type='text/plain')
 
     def lookup_allowed(self, key, *args, **kwargs):
         if key == 'site__exact':
