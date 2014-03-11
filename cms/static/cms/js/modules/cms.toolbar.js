@@ -55,9 +55,6 @@ $(document).ready(function () {
 				publishBtn.hide();
 			if($('.cms_btn-publish-active').length) publishBtn.show();
 
-			// add toolbar ready class to body
-			this.body.addClass('cms_toolbar-ready');
-
 			// check if debug is true
 			if(CMS.config.debug) this._debug();
 
@@ -89,6 +86,10 @@ $(document).ready(function () {
 
 			// if there is a screenblock, do some resize magic
 			if(this.screenBlock.length) this._screenBlock();
+
+			// add toolbar ready class to body and fire event
+			this.body.addClass('cms-ready');
+			$(document).trigger('cms-ready');
 		},
 
 		_events: function () {

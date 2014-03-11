@@ -36,12 +36,10 @@
 		}
 	};
 	$.fn.syncHeight = function() {
-
 		$('div.col2').children('div').each(function(index, item){
-			$(item).attr('style', 'display:block !important;');
+			$(item).css('display', 'block');
 		});
-		var min_width = 10000;
-		var offset = 20;
+		var min_width = 100000;
 		var max_col2_width = 0;
 		var max_col2 = null;
 		$(this).each(function() {
@@ -51,9 +49,9 @@
 			}
 			var col1 = cont.children('div.col1');
 			var col2 = cont.children('div.col2');
-			var col1_width = col1.width();
-			var col2_width = col2.width();
-			var total_width = cont.outerWidth();
+			var col1_width = col1.outerWidth(true);
+			var col2_width = col2.outerWidth(true);
+			var total_width = cont.outerWidth(true);
 
 			var dif = total_width - col1_width;
 			if(dif < min_width){
@@ -64,16 +62,17 @@
 				max_col2 = col2
 			}
 		});
+
 		var w = 0;
 		var hidden_count = 0;
 		var max_reached = false;
 		if(max_col2){
 			max_col2.children('div').each(function(){
 				if(!max_reached){
-					w += $(this).outerWidth();
+					w += $(this).outerWidth(true);
 				}
 
-				if(max_reached || w > (min_width - offset)){
+				if(max_reached || w > min_width){
 					hidden_count = hidden_count + 1;
 					max_reached = true
 				}
@@ -82,17 +81,15 @@
 			if(hidden_count){
 				$(this).each(function() {
 					$(this).children('div.cont').children('div.col2').children('div').slice(-hidden_count).each(function(){
-						this.style.setProperty('display','none', 'important' );
+						$(this).css('display', 'none');
 					})
 				});
 				$('div#sitemap ul.header div.col2').children().slice(-hidden_count).each(function(){
-					this.style.setProperty('display','none', 'important' );
+					$(this).css('display','none');
 				})
 			}
 		}
 	};
-
-
 
 // CMS.$ will be passed for $
 $(document).ready(function () {
@@ -164,9 +161,7 @@ $(document).ready(function () {
 		if(!confirm('Are you sure?')) return false;
 
 		// publish page and update
-		$.get($(this).attr('href'), function () {
-			window.location.reload();
-		});
+		window.location.href = $(this).attr('href');
 	});
 
 	// TAB CLICK
@@ -511,17 +506,13 @@ $(document).ready(function () {
 		return true;
 	});
 	$("div#sitemap").show();
-	function resized(){
-		$.syncHeights();
-		$.syncCols();
-	}
 
 	function reCalc(){
-		$.syncHeights();
 		$.syncCols();
+		$.syncHeights();
 	}
 
-	$(window).bind('resize', resized);
+	$(window).bind('resize', reCalc);
 	/* Site Selector */
 	$('#site-select').change(function(){
 		var form = $(this).closest('form');

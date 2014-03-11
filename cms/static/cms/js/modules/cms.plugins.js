@@ -308,6 +308,10 @@ $(document).ready(function () {
 		},
 
 		cutPlugin: function () {
+			// if cut is once triggered, prevend additional actions
+			if(CMS.API.locked) return false;
+			CMS.API.locked = true;
+
 			var that = this;
 			var data = {
 				'placeholder_id': CMS.config.clipboard.id,
@@ -328,7 +332,7 @@ $(document).ready(function () {
 					'success': function (response) {
 						CMS.API.Toolbar.openMessage(CMS.config.lang.success);
 						// if response is reload
-						if(response.reload) CMS.API.Helpers.reloadBrowser();
+						CMS.API.Helpers.reloadBrowser();
 					},
 					'error': function (jqXHR) {
 						var msg = CMS.config.lang.error;

@@ -619,7 +619,7 @@ class AdminTests(AdminTestsBase):
             self.assertTrue(page.is_published('en'))
 
             response = self.admin_class.unpublish(request, page.pk, "en")
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
 
             page = self.reload(page)
             self.assertFalse(page.is_published('en'))
