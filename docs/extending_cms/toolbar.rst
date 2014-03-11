@@ -79,7 +79,7 @@ exposed by the toolbar and its items.
 
 To add a :class:`cms.toolbar.items.Menu` to the toolbar, use
 :meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu` which will either add a menu if
-it doesn't exist, or create it. 
+it doesn't exist, or create it.
 
 Then, to add a link to your changelist that will open in the sideframe, use the
 :meth:`cms.toolbar.items.ToolbarMixin.add_sideframe_item` method on the menu
@@ -131,6 +131,11 @@ menus::
             url = reverse('admin:polls_poll_changelist')
             menu.add_sideframe_item(_('Poll overview'), url=url)
             admin_menu.add_break('poll-break', position=menu)
+
+
+If you wish to simply detect the presence of a menu without actually creating
+it, you can use :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`, which will
+return the menu if it is present, or, if not, will return `None`.
 
 
 ===========================

@@ -96,6 +96,12 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Public API
 
+    def get_menu(self, key, verbose_name=None, side=LEFT, position=None):
+        self.populate()
+        if key in self.menus:
+            return self.menus[key]
+        return None
+
     def get_or_create_menu(self, key, verbose_name=None, side=LEFT, position=None):
         self.populate()
         if key in self.menus:
