@@ -164,9 +164,7 @@ $(document).ready(function () {
 		if(!confirm('Are you sure?')) return false;
 
 		// publish page and update
-		$.get($(this).attr('href'), function () {
-			window.location.reload();
-		});
+		window.location.href = $(this).attr('href');
 	});
 
 	// TAB CLICK
