@@ -96,6 +96,9 @@ $color-background-blue-hover: #e6f6fd;
 	.cont { position:relative; }
 	.col1, .col2 { position:relative; z-index:10; }
 	.col2 { position:absolute; top:0; right:0; z-index:100; }
+	.moveable { position:relative; z-index:100; }
+	.moveable:hover { z-index:1000; }
+	.moveable:hover .cont { position:relative; z-index:1000; }
 
 	// row hover states
 	li .cont:hover { background:$color-border-light; }
