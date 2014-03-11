@@ -210,9 +210,26 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
             # publish as slave, published as user_master before 
             publish_page(page, self.user_slave, 'en')
 
+    def test_default_plugins(self):
             # user_slave is moderator for this page
             # approve / publish as user_slave
             # user master should be able to approve as well
+            with SettingsOverride(CMS_PLACEHOLDER_CONF={
+                'col_left': {
+                    'default_plugins': [
+                        {
+                            'plugin_type': 'TextPlugin',
+                            'values': {
+                                'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
+                            },
+                        },
+                    ]
+                },
+            }):
+                with self.login_user_context(self.user_slave):
+                    self.assertEqual(CMSPlugin.objects.count(), 0)
+                    self.client.get(self.slave_page.get_absolute_url(), {'edit':True})
+                    self.assertEqual(CMSPlugin.objects.count(), 1)
 
     def test_page_added_by_slave_can_be_published_by_user_master(self):
         # add page
