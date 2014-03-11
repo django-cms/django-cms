@@ -516,6 +516,7 @@ class AdminTestCase(AdminTestsBase):
         self.assertContains(response, 'id="page_%s"' % second_level_page_bottom.pk)
         # but not any further down the tree
         self.assertNotContains(response, 'id="page_%s"' % third_level_page.pk)
+        self.assertNotContains(response, 'None')
 
     def test_unihandecode_doesnt_break_404_in_admin(self):
         self.get_superuser()
