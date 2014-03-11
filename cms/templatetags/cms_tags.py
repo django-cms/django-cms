@@ -424,8 +424,8 @@ class PageAttribute(AsTag):
     page_lookup -- lookup argument for Page, if omitted field-name of current page is returned.
     See _get_page_by_untyped_arg() for detailed information on the allowed types and their interpretation
     for the page_lookup argument.
-    
-    varname -- context variable name. Output will be added to template context as this variable. 
+
+    varname -- context variable name. Output will be added to template context as this variable.
     This argument is required to follow the 'as' keyword.
     """
     name = 'page_attribute'
@@ -605,7 +605,8 @@ class CMSToolbar(RenderBlock):
         # render JS
         request = context.get('request', None)
         toolbar = getattr(request, 'toolbar', None)
-        toolbar.populate()
+        if toolbar:
+            toolbar.populate()
         context['cms_version'] = __version__
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
