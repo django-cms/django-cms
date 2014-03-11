@@ -92,6 +92,13 @@ $color-background-blue-hover: #e6f6fd;
 		width:auto; height:28px; padding:0 5px; border-left:1px solid $color-border-medium;
 	}
 	li .col2 > div a, li .col2 > div span { vertical-align:middle; }
+	// hide items
+	.cont { position:relative; }
+	.col1, .col2 { position:relative; z-index:10; }
+	.col2 { position:absolute; top:0; right:0; z-index:100; }
+	.moveable { position:relative; z-index:100; }
+	.moveable:hover { z-index:1000; }
+	.moveable:hover .cont { position:relative; z-index:1000; }
 
 	// row hover states
 	li .cont:hover { background:$color-border-light; }
@@ -191,7 +198,7 @@ $color-background-blue-hover: #e6f6fd;
 	&.language-tooltip-multiple a:first-child:after { content:" - "; }
 }
 
-#marker { margin-top:8px; }
+#marker { margin-top:1px; }
 
 // animation for publishing
 @-webkit-keyframes pulsate {

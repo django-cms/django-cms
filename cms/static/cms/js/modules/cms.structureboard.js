@@ -430,8 +430,8 @@ $(document).ready(function () {
 
 					// now set the correct bounds
 					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
-					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
 					if(holder.length) bounds = holder.data('settings').plugin_restriction;
+					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
 
 					// if parent has class disabled, dissalow drop
 					if(placeholder.parent().hasClass('cms_draggable-disabled')) return false;
