@@ -105,7 +105,15 @@ class CMSToolbar(ToolbarAPIMixin):
     def get_or_create_menu(self, key, verbose_name=None, side=LEFT, position=None):
         self.populate()
         if key in self.menus:
-            return self.menus[key]
+            menu = self.menus[key]
+            if verbose_name:
+                menu.name = verbose_name
+            if menu.side != side:
+                menu.side = side
+            if position:
+                self.remove_item(menu)
+                self.add_item(menu, position=position)
+            return menu
         menu = Menu(verbose_name, self.csrf_token, side=side)
         self.menus[key] = menu
         self.add_item(menu, position=position)

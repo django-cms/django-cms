@@ -290,6 +290,18 @@ class ToolbarTests(ToolbarTestBase):
         beta_position = admin_menu.get_alphabetical_insert_position('menu-beta', SubMenu)
         self.assertEqual(beta_position, gamma_position)
 
+    def test_out_of_order(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), '/')
+        toolbar = CMSToolbar(request)
+        menu1 = toolbar.get_or_create_menu("test")
+        menu2 = toolbar.get_or_create_menu("test", "Test", side=toolbar.RIGHT, position=2)
+
+        self.assertEqual(menu1, menu2)
+        self.assertEqual(menu1.name, 'Test')
+        self.assertEqual(len(toolbar.get_right_items()), 1)
+
     def test_page_create_redirect(self):
         superuser = self.get_superuser()
         create_page("home", "nav_playground.html", "en",
