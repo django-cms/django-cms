@@ -38,3 +38,4 @@ lib/
 man/
 share/
 echo .tox
+*.pyo
