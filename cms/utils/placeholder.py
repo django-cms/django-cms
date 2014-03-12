@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from cms.utils.compat.dj import force_unicode
 from django.db.models.query_utils import Q
+from sekizai.helpers import get_varname
 
 
 def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
@@ -136,3 +137,12 @@ class MLNGPlaceholderActions(PlaceholderNoAction):
 
         language_codes = manager.filter(query).values_list('language_code', flat=True).distinct()
         return [(lc, dict(settings.LANGUAGES)[lc]) for lc in language_codes]
+
+
+def restore_sekizai_context(context, changes):
+    varname = get_varname()
+    sekizai_container = context[varname]
+    for key, values in changes.items():
+        sekizai_namespace = sekizai_container[key]
+        for value in values:
+            sekizai_namespace.append(value)

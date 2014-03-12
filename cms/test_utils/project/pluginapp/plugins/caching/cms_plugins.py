@@ -13,3 +13,14 @@ class NoCachePlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         context['now'] = datetime.now().microsecond
         return context
+
+
+class SekizaiPlugin(CMSPluginBase):
+    name = 'WITH SEki'
+    module = 'Test'
+    render_plugin = True
+    render_template = "plugins/sekizai.html"
+
+    def render(self, context, instance, placeholder):
+        context['now'] = datetime.now().microsecond
+        return context
