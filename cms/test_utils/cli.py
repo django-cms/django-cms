@@ -2,6 +2,8 @@
 from __future__ import with_statement
 import os
 import dj_database_url
+from cms.utils.compat import DJANGO_1_5
+import django
 
 gettext = lambda s: s
 
@@ -17,7 +19,12 @@ def configure(db_url, **extra):
     else:
         DB = {}
     defaults = dict(
-        CACHE_BACKEND='locmem:///',
+        CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            }
+        },
+        CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
@@ -48,7 +55,7 @@ def configure(db_url, **extra):
             "django.core.context_processors.request",
             "django.core.context_processors.media",
             'django.core.context_processors.csrf',
-            "cms.context_processors.media",
+            "cms.context_processors.cms_settings",
             "sekizai.context_processors.sekizai",
             "django.core.context_processors.static",
         ],
@@ -56,6 +63,9 @@ def configure(db_url, **extra):
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
+            #'debug_toolbar.middleware.DebugToolbarMiddleware',
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.http.ConditionalGetMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
             'django.contrib.messages.middleware.MessageMiddleware',
@@ -63,17 +73,18 @@ def configure(db_url, **extra):
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
-            'django.middleware.transaction.TransactionMiddleware',
-            'django.middleware.cache.FetchFromCacheMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
         ],
         INSTALLED_APPS=[
+            'debug_toolbar',
             'django.contrib.auth',
             'django.contrib.contenttypes',
             'django.contrib.sessions',
+            'djangocms_admin_style',
             'django.contrib.admin',
             'django.contrib.sites',
             'django.contrib.staticfiles',
@@ -81,29 +92,39 @@ def configure(db_url, **extra):
             'cms',
             'menus',
             'mptt',
-            'cms.plugins.text',
-            'cms.plugins.picture',
-            'cms.plugins.file',
-            'cms.plugins.flash',
-            'cms.plugins.link',
-            'cms.plugins.snippet',
-            'cms.plugins.googlemap',
-            'cms.plugins.teaser',
-            'cms.plugins.video',
-            'cms.plugins.twitter',
-            'cms.plugins.inherit',
+            'djangocms_text_ckeditor',
+            'djangocms_column',
+            'djangocms_picture',
+            'djangocms_file',
+            'djangocms_flash',
+            'djangocms_googlemap',
+            'djangocms_teaser',
+            'djangocms_video',
+            'djangocms_inherit',
+            'djangocms_style',
+            'djangocms_link',
             'cms.test_utils.project.sampleapp',
             'cms.test_utils.project.placeholderapp',
-            'cms.test_utils.project.pluginapp',
             'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
             'cms.test_utils.project.pluginapp.plugins.extra_context',
+            'cms.test_utils.project.pluginapp.plugins.meta',
+            'cms.test_utils.project.pluginapp.plugins.one_thing',
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
+            'cms.test_utils.project.objectpermissionsapp',
+            'cms.test_utils.project.extensionapp',
             'south',
             'reversion',
             'sekizai',
             'hvad',
+
         ],
+        DEBUG_TOOLBAR_PATCH_SETTINGS = False,
+        INTERNAL_IPS = ['127.0.0.1'],
+        AUTHENTICATION_BACKENDS=(
+            'django.contrib.auth.backends.ModelBackend',
+            'cms.test_utils.project.objectpermissionsapp.backends.ObjectPermissionBackend',
+        ),
         LANGUAGE_CODE="en",
         LANGUAGES=(
             ('en', gettext('English')),
@@ -111,6 +132,7 @@ def configure(db_url, **extra):
             ('de', gettext('German')),
             ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
+            ('es-mx', u'Español'),
         ),
         CMS_LANGUAGES={
             1: [
@@ -136,12 +158,17 @@ def configure(db_url, **extra):
                     'name': gettext('Brazilian Portuguese'),
                     'public': False,
                 },
+                {
+                    'code': 'es-mx',
+                    'name': u'Español',
+                    'public': True,
+                },
             ],
             2: [
                 {
                     'code': 'de',
                     'name': gettext('German'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['fr'],
                     'public': True,
                 },
                 {
@@ -154,13 +181,13 @@ def configure(db_url, **extra):
                 {
                     'code': 'nl',
                     'name': gettext('Dutch'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['de'],
                     'public': True,
                 },
                 {
                     'code': 'de',
                     'name': gettext('German'),
-                    'fallbacks': ['fr', 'en'],
+                    'fallbacks': ['nl'],
                     'public': False,
                 },
             ],
@@ -172,6 +199,8 @@ def configure(db_url, **extra):
             ('col_two.html', gettext('two columns')),
             ('col_three.html', gettext('three columns')),
             ('nav_playground.html', gettext('navigation examples')),
+            ('simple.html', 'simple'),
+            ('static.html', 'static placeholders'),
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
@@ -179,16 +208,20 @@ def configure(db_url, **extra):
                 'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
-
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin'),
-                'name': gettext("left column")
+                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                'name': gettext("left column"),
+                'plugin_modules': {
+                    'LinkPlugin': 'Different Grouper'
+                },
+                'plugin_labels': {
+                    'LinkPlugin': gettext('Add a link')
+                },
             },
-
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin'),
+                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {
@@ -197,7 +230,6 @@ def configure(db_url, **extra):
                 "name": "extra context"
             },
         },
-        CMS_SOFTROOT=True,
         CMS_PERMISSION=True,
         CMS_PUBLIC_FOR='all',
         CMS_CACHE_DURATIONS={
@@ -206,11 +238,6 @@ def configure(db_url, **extra):
             'permissions': 0,
         },
         CMS_APPHOOKS=[],
-        CMS_REDIRECTS=True,
-        CMS_MENU_TITLE_OVERWRITE=True,
-        CMS_URL_OVERWRITE=True,
-        CMS_SHOW_END_DATE=True,
-        CMS_SHOW_START_DATE=True,
         CMS_PLUGIN_PROCESSORS=tuple(),
         CMS_PLUGIN_CONTEXT_PROCESSORS=tuple(),
         CMS_SITE_CHOICES_CACHE_KEY='CMS:site_choices',
@@ -225,22 +252,86 @@ def configure(db_url, **extra):
         ROOT_URLCONF='cms.test_utils.cli',
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.MD5PasswordHasher',
-        )
+        ),
+        ALLOWED_HOSTS=['localhost'],
+        # LOGGING={
+        #     'version': 1,
+        #     'disable_existing_loggers': True,
+        #     'formatters': {
+        #         'verbose': {
+        #             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        #         },
+        #         'simple': {
+        #             'format': '%(levelname)s %(message)s'
+        #         },
+        #     },
+        #     'handlers': {
+        #         'null': {
+        #             'level': 'DEBUG',
+        #             'class': 'django.utils.log.NullHandler',
+        #         },
+        #         'console': {
+        #             'level': 'DEBUG',
+        #             'class': 'logging.StreamHandler',
+        #             'formatter': 'simple'
+        #         },
+        #         'mail_admins': {
+        #             'level': 'ERROR',
+        #              'filters': ['require_debug_false'],
+        #             'class': 'django.utils.log.AdminEmailHandler',
+        #         }
+        #     },
+        #     'filters': {
+        #         'require_debug_false': {
+        #             '()': 'django.utils.log.RequireDebugFalse'
+        #         }
+        #     },
+        #     'loggers': {
+        #         'django': {
+        #             'handlers': ['console'],
+        #             'propagate': True,
+        #             'level': 'INFO',
+        #         },
+        #         'django.request': {
+        #             'handlers': ['console'],
+        #             'level': 'ERROR',
+        #             'propagate': False,
+        #         },
+        #         'django.db': {
+        #             'handlers': ['console'],
+        #             'level': 'ERROR',
+        #             'propagate': False,
+        #         },
+        #         'cms': {
+        #             'handlers': ['console'],
+        #             'level': 'INFO',
+        #         }
+        #     }
+        # }
     )
     from django.utils.functional import empty
+
+    if DJANGO_1_5:
+        defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
+
+    if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in extra:
+        custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
+        defaults['INSTALLED_APPS'].append(custom_user_app)
 
     settings._wrapped = empty
     defaults.update(extra)
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
+    
     if extra_settings:
-        from django.utils.simplejson import load, loads
+        from json import load, loads
 
         if os.path.exists(extra_settings):
             with open(extra_settings) as fobj:
                 defaults.update(load(fobj))
         else:
             defaults.update(loads(extra_settings))
+    
     settings.configure(**defaults)
     from south.management.commands import patch_for_test_db_setup
 

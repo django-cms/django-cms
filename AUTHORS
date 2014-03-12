@@ -5,11 +5,15 @@ Current or previous core committers:
 * Chris Glass
 * Daniele Procida
 * Eric Robitaille
+* Iacopo Spalletti
 * Jonas Obrist
+* Martin Koistinen
 * Patrick Lauber
 * Peter Ciciman
+* Paulo Alvarado
 * Stefan Foulis
 * Øyvind Saltvik
+
 
 Current and previous core designers:
 
@@ -19,6 +23,7 @@ Contributors (in alphabetical order):
 
 * A. Bram Neijt
 * aaloy
+* Aaron Fay
 * Aaron Renner
 * aball
 * Adi Sieker
@@ -31,15 +36,21 @@ Contributors (in alphabetical order):
 * Alexandre Leray
 * Alexey Subbotin
 * Alvin Mites
+* Andre Bossard
+* Andrei Avram
+* Andrei Fokau
 * Andrew Cassidy
 * Andrew Schoen
 * angular_circle
 * Anton Parkhomenko
 * Antoni Aloy López
 * Arne Gellhaus
+* Arne Schauf
 * Artem Skoretskiy
+* Artis Avotins
 * Arthur Debert
 * Aymeric Augustin
+* Bashar Al-Abdulhadi
 * Batiste Bieler
 * behrooz
 * Behrooz Nobakht
@@ -55,18 +66,26 @@ Contributors (in alphabetical order):
 * brightwhitefox
 * Calvin Cheng
 * Chanita Siridechkun
+* Charlie Denton
 * Charpentier Johan
 * Cheng-Chia Tseng
 * Chris Adams
+* Chris Franklin
 * Chris Hughes
+* Chris Jones
 * Chris Wesseling
 * Christof Hagedorn
+* Christos Kopanos
 * Conrado Bührer
+* Craig de Stigter
+* Damir Arbula
 * DaNmarner
 * Daniel Barden
+* Danilo Bargen
 * Darryl Woods
 * David Jean Louis
 * David Thompson
+* deshack
 * Diógenes Augusto Fernandes Hermínio
 * dstufft
 * DZ
@@ -89,13 +108,17 @@ Contributors (in alphabetical order):
 * GaretJax
 * Geoffrey Hing
 * George Marshall
-* Gerard Świderski
+* Gerard Świdersk
+* Germano Gabbianellii
+* Gilles Lenfant
 * guandalino
+* Hamish Downer
+* Henning Spran
 * hedberg
 * Herbert Poul
+* hjkelly
 * homebrew79
 * hysia
-* Iacopo Spalletti
 * Ian Lewis
 * indexofire
 * Ionel Cristian Maries
@@ -104,6 +127,7 @@ Contributors (in alphabetical order):
 * izi
 * J. Cliff Dyer
 * Jacob Rief
+* Jakob Hedman
 * Jameel Al-Aziz
 * James Richards
 * Jannis Leidel
@@ -115,13 +139,16 @@ Contributors (in alphabetical order):
 * Javi Nievas
 * Johannes Bornhold
 * John-Scott Atlakson
+* Jon Prindiville
 * Jonathan Stoppani
 * jordanjambazov
 * Jorge Vargas (elpargo)
 * Joseph Bergantine
 * kar1m
+* Kegan Holtzhausen
 * Keryn Knight
 * Kim Blomqvist
+* Kim Thoenen
 * kochin
 * Kristian Øllegaard
 * Krzysztof Bandurski
@@ -140,11 +167,12 @@ Contributors (in alphabetical order):
 * Manuel Schmidt
 * Marc-Olivier Titeux
 * Marco Bonetti
+* Marco Paolini
 * Marco Rimoldi
 * Mark Rogers
+* Markus Holtermann
 * Martin Bommeli
 * Martin Brochhaus
-* Martin Koistinen
 * Martin Kosír
 * martinkosir
 * mathijs
@@ -157,6 +185,8 @@ Contributors (in alphabetical order):
 * meers
 * MerLex
 * Michael P. Jung
+* Michael Thornhill
+* Mike Dory
 * Mike Johnson
 * Mitar
 * Mokys
@@ -164,14 +194,16 @@ Contributors (in alphabetical order):
 * MW
 * neoprolog
 * Nickolay V. Shmyrev
+* Oliver Zander
+* Olivier Le Brouster
 * Orne Brocaar
 * padelt
 * Paolo
 * Pascal Mouret
 * Patrick Toal
+* Patryk Zawadzki
 * Paul van der Linden
 * Paulo
-* Paulo Alvarado
 * Pavel Puchkin
 * pbgc
 * Pedro Gracia
@@ -185,6 +217,7 @@ Contributors (in alphabetical order):
 * pigletto
 * Piotr Kilczuk
 * poweredbypenguins
+* Pratik Vyas
 * Rebecca Breu
 * Remco Wendt
 * Restless Being
@@ -194,15 +227,19 @@ Contributors (in alphabetical order):
 * Robert Buchholz
 * Robert Clark
 * Robert Pogorzelski
+* Roberto Lopez
 * Robin Lewis
+* robint
 * Rodolfo Carvalho
 * rtpm
 * Samuel Lüscher
+* sbussetti
 * Scott Barnham
 * sealibora
 * Sean Bleier
 * Seth Buntin
 * Seyhun Akyurek
+* Shahar Or
 * Shatalov Vadim
 * shed
 * Shinya Okano
@@ -214,24 +251,30 @@ Contributors (in alphabetical order):
 * spookylukey
 * ssteinerX
 * Stavros Korokithakis
+* Stefano Crosta
 * Stephan Jaekel
 * Stephen Muss
 * Steve R. Jones
 * Steve Steiner
 * Tanel Külaots
 * Thomas Parslow
+* Thomas Woolford
 * timesong
+* Tim Anderegg
 * Tim Davies
+* Tim Graham
 * Tino de Bruijn
 * tiret
 * Tom de Simone
 * Ulrich Petri
 * Vasil Vangelovski
 * Viliam Segeda
+* Vitor Figueiro
 * wangJunjie
 * Wayne Moore
 * wid
 * wildermesser
+* Xavier Ordoquy
 * Yann Malet
 * yedpodtrzitko
 * yohanboniface

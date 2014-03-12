@@ -3,31 +3,37 @@ App Integration
 ###############
 
 It is pretty easy to integrate your own Django applications with django CMS.
-You have 5 ways of integrating your app:
+You have 7 ways of integrating your app:
 
-1. Menus
+1. :ref:`integration_menus`
 
     Statically extend the menu entries
 
-2. Attach Menus
+2. :ref:`integration_attach_menus`
 
     Attach your menu to a page.
 
-3. App-Hooks
+3. :ref:`integration_apphooks`
 
     Attach whole apps with optional menu to a page.
 
-4. Navigation Modifiers
+4. :ref:`integration_modifiers`
 
     Modify the whole menu tree
 
-5. Custom Plugins
+5. :ref:`integration_customplugins`
 
     Display your models / content in cms pages
 
-6. Toolbar
+6. :ref:`integration_toolbar`
 
     Add Entries to the toolbar to add/edit your models
+
+7. :ref:`integration_templates`
+
+    Templatetags and other CMS-provided utilities
+
+.. _integration_menus:
 
 *****
 Menus
@@ -60,39 +66,63 @@ The get_nodes function should return a list of
 :class:`NavigationNode <menus.base.NavigationNode>` instances. A
 :class:`NavigationNode` takes the following arguments:
 
-- title
+- ``title``
 
   What the menu entry should read as
 
-- url,
+- ``url``,
 
   Link if menu entry is clicked.
 
-- id
+- ``id``
 
   A unique id for this menu.
 
-- parent_id=None
+- ``parent_id=None``
 
   If this is a child of another node supply the the id of the parent here.
 
-- parent_namespace=None
+- ``parent_namespace=None``
 
   If the parent node is not from this menu you can give it the parent
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-- attr=None
+- ``attr=None``
 
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
-- visible=True
+- ``visible=True``
 
   Whether or not this menu item should be visible.
 
 Additionally, each :class:`NavigationNode` provides a number of methods which are
 detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
+
+Customize menus at runtime
+--------------------------
+
+To adapt your menus according to request dependent conditions (say: anonymous /
+logged in user), you can use `Navigation Modifiers`_  or you can leverage existing
+ones.
+
+For example it's possible to add ``{'visible_for_anonymous': False}`` /
+``{'visible_for_authenticated': False}`` attributes recognized by the
+django CMS core ``AuthVisibility`` modifier.
+
+Complete example::
+
+    class UserMenu(Menu):
+        def get_nodes(self, request):
+                return [
+                    NavigationNode(_("Profile"), reverse(profile), 1, attr={'visible_for_anonymous': False}),
+                    NavigationNode(_("Log in"), reverse(login), 3, attr={'visible_for_authenticated': False}),
+                    NavigationNode(_("Sign up"), reverse(logout), 4, attr={'visible_for_authenticated': False}),
+                    NavigationNode(_("Log out"), reverse(logout), 2, attr={'visible_for_anonymous': False}),
+                ]
+
+.. _integration_attach_menus:
 
 ************
 Attach Menus
@@ -134,25 +164,7 @@ that with the example from above::
 Now you can link this Menu to a page in the 'Advanced' tab of the page
 settings under attached menu.
 
-Each must have a :meth:`get_menu_title` method, a
-:meth:`~django.db.models.Model.get_absolute_url` method, and a ``childrens``
-list with all of its children inside (the 's' at the end of ``childrens`` is
-done on purpose because ``children`` is already taken by django-mptt).
-
-Be sure that :meth:`get_menu_title` and :meth:`get_absolute_url` don't trigger
-any queries when called in a template or you may have some serious performance
-and database problems with a lot of queries.
-
-It may be wise to cache the output of :meth:`~menu.base.Menu.get_nodes`. For
-this you may need to write a wrapper class because of dynamic content that the
-pickle module can't handle.
-
-If you want to display some static pages in the navigation ("login", for
-example) you can write your own "dummy" class that adheres to the conventions
-described above.
-
-A base class for this purpose can be found in ``cms/utils/navigation.py``
-
+.. _integration_apphooks:
 
 *********
 App-Hooks
@@ -181,10 +193,9 @@ under "Application". Save the page.
 
 .. warning::
 
-    If you are on a multi-threaded server (mostly all webservers,
-    except the dev-server): Restart the server because the URLs are cached by
-    Django and in a multi-threaded environment we don't know which caches are
-    cleared yet.
+    Whenever you add or remove an apphook, change the slug of a page containing
+    an apphook or the slug if a page which has a descendant with an apphook,
+    you have to restart your server to re-load the URL caches.
     
 .. note::
 
@@ -198,7 +209,7 @@ under "Application". Save the page.
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import *
 
     urlpatterns = patterns('sampleapp.views',
         url(r'^$', 'main_view', name='app_main'),
@@ -207,6 +218,14 @@ a urls.py that looks like this::
 
 The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the url ``/hello/world/sublevel/``.
+
+
+.. note::
+
+    CMS pages **below** the page to which the apphook is attached to, **can** be visible,
+    provided that the apphook urlconf regexps are not too greedy. From a URL resolution
+    perspective, attaching an apphook works in same way than inserting the apphook urlconf
+    in the root urlconf at the same path as the page is attached to.
 
 .. note::
 
@@ -292,9 +311,28 @@ If you add this menu now to your app-hook::
 You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 :class:`CategoryMenu` both attached to the same page.
 
+.. _multi_apphook:
 
-Application and instance namespaces
------------------------------------
+Attaching an Application multiple times
+---------------------------------------
+
+If you want to attach an application multiple times to different pages you have 2 possibilities.
+
+1. Give every application its own namespace in the advanced settings of a page.
+2. Define an ``app_name`` attribute on the CMSApp class.
+
+The problem is that if you only define a namespace you need to have multiple templates per attached app.
+
+For example::
+
+    {% url 'my_view' %}
+
+Will not work anymore when you namespace an app. You will need to do something like::
+
+    {% url 'my_namespace:my_view' %}
+
+The problem is now if you attach apps to multiple pages your namespace will change.
+The solution for this problem are application namespaces.
 
 If you'd like to use application namespaces to reverse the URLs related to
 your app, you can assign a value to the `app_name` attribute of your app
@@ -307,14 +345,31 @@ hook like this::
 
     apphook_pool.register(MyNamespacedApphook)
 
-As seen for Language Namespaces, you can reverse namespaced apps similarly:
+
+.. note::
+    If you do that you will need to give the app a unique namespace in the advanced settings of the page.
+    You can then either reverse for the namespace(to target different apps) or the app_name (to target links inside the
+    same app).
+
+If you use app namespace you will need to give all your view ``context`` a ``current_app``::
+
+  def my_view(request):
+      current_app = resolve(request.path).namespace
+      context = RequestContext(request, current_app=current_app)
+      return render_to_response("my_templace.html", context_instance=context)
+
+.. note::
+    You need to set the current_app explicitly in all your view contexts as django does not allow an other way of doing
+    this.
+
+You can reverse namespaced apps similarly and it "knows" in which app instance it is:
 
 .. code-block:: html+django
 
     {% url myapp_namespace:app_main %}
 
 If you want to access the same url but in a different language use the language
-templatetag:
+template tag:
 
 .. code-block:: html+django
 
@@ -323,15 +378,6 @@ templatetag:
         {% url myapp_namespace:app_main %}
     {% endlanguage %}
 
-What makes namespaced app hooks really interesting is the fact that you can
-hook them up to more than one page and reverse their URLs by using their
-instance namespace. Django CMS takes the value of the `reverse_id` field
-assigned to a page and uses it as instance namespace for the app hook.
-
-To reverse the URLs you now have two different ways: explicitly by defining
-the instance namespace, or implicitely by specifiyng the application namespace
-and letting the `url` templatetag resolving the correct application instance
-by looking at the currently set `current_app` value.
 
 .. note::
 
@@ -344,20 +390,48 @@ as an argument. You can do so by looking up the `current_app` attribute of
 the request instance::
 
     def myviews(request):
-        ...
+        current_app = resolve(request.path).namespace
+
         reversed_url = reverse('myapp_namespace:app_main',
-                current_app=request.current_app)
+                current_app=current_app)
         ...
 
 Or, if you are rendering a plugin, of the context instance::
 
     class MyPlugin(CMSPluginBase):
         def render(self, context, instance, placeholder):
-            ...
+            # ...
+            current_app = resolve(request.path).namespace
             reversed_url = reverse('myapp_namespace:app_main',
-                    current_app=context.current_app)
-            ...
+                    current_app=current_app)
+            # ...
 
+
+Automatically restart server on apphook changes
+-----------------------------------------------
+
+As mentioned above, whenever you add or remove an apphook, change the slug of a
+page containing an apphook or the slug if a page which has a descendant with an
+apphook, you have to restart your server to re-load the URL caches. To allow
+you to automate this process, the django CMS provides a signal
+:obj:`cms.signals.urls_need_reloading` which you can listen on to detect when
+your server needs restarting. When you run ``manage.py runserver`` a restart
+should not be needed.
+
+.. warning::
+
+    This signal does not actually do anything. To get automated server
+    restarting you need to implement logic in your project that gets
+    executed whenever this signal is fired. Because there are many ways of
+    deploying Django applications, there is no way we can provide a generic
+    solution for this problem that will always work.
+
+.. warning::
+
+    The signal is fired **after** a request. If you change something via API
+    you need a request for the signal to fire.
+
+.. _integration_modifiers:
 
 ********************
 Navigation Modifiers
@@ -477,6 +551,9 @@ Here is an example of a built-in modifier that marks all node levels::
     
     menu_pool.register_modifier(Level)
 
+
+.. _integration_customplugins:
+
 **************
 Custom Plugins
 **************
@@ -490,65 +567,81 @@ For a detailed explanation on how to write custom plugins please head over to
 the :doc:`custom_plugins` section.
 
 
+.. _integration_toolbar:
+
 *******
 Toolbar
 *******
 
-
-To add a toolbar items for you app create a `cms_toolbar.py` in your app.
-
-Example::
-
-    from cms.toolbar.items import List, Item
-    from cms.toolbar_base import CMSToolbar
-    from cms.toolbar_pool import toolbar_pool
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import ugettext_lazy as _
+Your app might also want to integrate in the :doc:`toolbar` to
+provide a more streamlined user experience for your admins.
 
 
-    class CategoryToolbar(CMSToolbar):
-        def insert_items(self, items, toolbar, request, is_app):
-            if request.user.is_staff:
-                items[0].items = [Item(reverse('admin:sampleapp_category_changelist'), _('Categories'),
-                                       load_side_frame=True)] + items[0].items
-                if is_app:
-                    cat_list = List(reverse('admin:sampleapp_category_changelist'), _('Category'))
-                    cat_list.items.append(Item(reverse('admin:sampleapp_category_add'), _("Add Category")))
-                    items.append(cat_list)
+.. _integration_templates:
+
+**********************
+Working with templates
+**********************
+
+Application can reuse cms templates by mixing cms templatetags and normal django
+templating language.
 
 
-    toolbar_pool.register(CategoryToolbar)
+static_placeholder
+------------------
+
+Plain :ttag:`placeholder` cannot be used in templates used by external applications,
+use :ttag:`static_placeholder` instead.
+
+.. _page_template:
+
+CMS_TEMPLATE
+------------
+.. versionadded:: 3.0
+
+``CMS_TEMPLATE`` is a context variable available in the context; it contains
+the template path for CMS pages and application using apphooks, and the default
+template (i.e.: the first template in :setting:`CMS_TEMPLATES`) for non-CMS
+managed urls.
+
+This is mostly useful to use it in the ``extends`` templatetag in the application
+templates to get the current page template.
+
+Example: cms template
+
+.. code-block:: html+django
+
+    {% load cms_tags %}
+    <html>
+        <body>
+        {% cms_toolbar %}
+        {% block main %}
+        {% placeholder "main" %}
+        {% endblock main %}
+        </body>
+    </html>
 
 
-You extend CMSToolbar and register it with the toolbar_pool.
-In the `insert_items()` function you receive some parameters:
+Example: application template
 
-- items
+.. code-block:: html+django
 
-    The current toolbar items. Add new items to this list that extend `cms.toolbar.items.BaseItem`. You can find most
-    used item types in `cms.toolbar.items`.
+    {% extends CMS_TEMPLATE %}
+    {% load cms_tags %}
+    {% block main %}
+    {% for item in object_list %}
+        {{ item }}
+    {% endfor %}
+    {% static_placeholder "sidebar" %}
+    {% endblock main %}
 
-- toolbar
-
-    The instance of the toolbar.
-
-- request
-
-    The current request
-
-- is_app
-
-    Is the current url mapped to this app? True if yes.
+``CMS_TEMPLATE`` memorizes the path of the cms template so the application
+template can dynamically import it.
 
 
-If you want to add items based on the current view you can do this in the view itself.
+render_model
+------------
+.. versionadded:: 3.0
 
-Example::
-
-    def category_view(request, id):
-        cat = Category.objects.get(pk=id)
-        if request.user.is_staff:
-            request.toolbar.items[1].items.append(
-                Item(reverse('admin:sampleapp_category_change', args=[cat.pk]), "Change Category"))
-        return render_to_response('sampleapp/category_view.html',
-                                  RequestContext(request, {'category': cat}))
+:ttag:`render_model` allows to edit the django models from the frontend by
+reusing the django CMS frontend editor.

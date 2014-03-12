@@ -1,5 +1,3 @@
-from classytags.arguments import Argument
-from classytags.core import Tag, Options
 from django import template
 
 register = template.Library()

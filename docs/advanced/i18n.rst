@@ -14,7 +14,7 @@ official django `documentation`_.
 Main `urls.py` example::
 
     from django.conf import settings
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls import patterns, include, url
     from django.contrib import admin
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -39,6 +39,8 @@ Main `urls.py` example::
 Language Cookie
 ***************
 
+If a user comes back to a previously visited page, the language will be same since his last visit.
+
 By default if someone visits a page at `http://www.mysite.fr/` django determines the language as follow:
 
 - language in url
@@ -46,6 +48,9 @@ By default if someone visits a page at `http://www.mysite.fr/` django determines
 - language in cookie
 - language in from browser
 - LANGUAGE_CODE from settings
+
+More in-depth documentation about this is available at
+https://docs.djangoproject.com/en/dev/topics/i18n/translation/#how-django-discovers-language-preference
 
 When visiting a page that is only English and French with a German browser, the language from LANGUAGE_CODE will be used.
 If this is English, but the visitor only speaks French, the visitor will have to switch the language.
@@ -85,10 +90,10 @@ Example:
 
 
 ******************
-hide_unstranslated
+hide_untranslated
 ******************
 
-If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_unstranslated` to ``False``
+If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_untranslated` to ``False``
 all pages will be displayed in all languages even if they are
 not translated yet.
 

@@ -1,13 +1,13 @@
-{% load i18n cms_tags menu_tags sekizai_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ LANGUAGE_CODE }}" lang="{{ LANGUAGE_CODE }}">
+{% load i18n cms_tags menu_tags sekizai_tags %}
+<!doctype html><html lang="{{ LANGUAGE_CODE }}">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta charset="utf-8" />
     <title>{% page_attribute page_title %}</title>
-	<meta name="description" content="{% page_attribute meta_description %}"/>
+	<meta name="description" content="{% page_attribute meta_description %}" />
 	<link href="{{ STATIC_URL }}css/style.css" media="all" rel="stylesheet" type="text/css" />
     {% render_block "css" %}
-	{% render_block "js" %}
-	<style>
+
+	<style type="text/css">
 	body { font:normal 16px/18px "Times New Roman", Times, serif; margin:0; background:#fcfcfc; }
 
 	#header { padding:15px 10px 15px; box-shadow:#eee 0px 2px 5px; background:#fff;
@@ -47,8 +47,7 @@
 	p { padding:0; margin:0 0 15px; }
 	img { max-width:100%; }
 	</style>
-
-</head>
+ </head>
 <body id="{% block tpl_id %}none{% endblock %}" class="{{ LANGUAGE_CODE }}">
 {% cms_toolbar %}
 <div id="page" class="container_16 ">
@@ -78,5 +77,6 @@
 		{% block content %}{% endblock content %}
 	</div>
 </div>
+	{% render_block "js" %}
 </body>
 </html> 

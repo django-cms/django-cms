@@ -1,85 +1,96 @@
 {% extends "admin/change_list.html" %}
-{% load admin_list i18n cms_admin cms_js_tags %}
-{% comment %}
-- This template is used within the pagetree as the main template
-{% endcomment %}
+{% load i18n admin_static admin_list cms_admin cms_js_tags %}
 
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
 {% if not is_popup %}{% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="../../">{% trans "Home" %}</a> &rsaquo;
-<a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+	<a href="../../">{% trans "Home" %}</a> &rsaquo;
+	<a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+    {% if request.REQUEST.q %}
+    &rsaquo; {% trans "Search" %}
+    {% endif %}
 </div>
 {% endblock %}{% endif %}
 
 {% block coltype %}flex{% endblock %}
 {% block extrastyle %}
 {{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/pages.css"/>
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/tree_component.css" />
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/cms.base.css" />
-{% if cl.is_filtered %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/jstree/themes/default/style.css" />{% endif %}
+<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />
+<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" />
+<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" />
+{% if cl.is_filtered %}
+<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" />
+{% endif %}
 {% endblock extrastyle %}
 
 {% block extrahead %}
 {{ block.super }}
-<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/class.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
+{% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}"></script>{% endblock jquery %}
 <!-- load jstree -->
-<script type="text/javascript" src="{{ STATIC_URL }}cms/jstree/_lib/_all.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/jstree/tree_component.js"></script>
-<!-- load jquery plugins -->
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.ui.custom.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.ui.checkbox.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.bind.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.functional.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.livequery.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/jquery.form.js"></script>
+<script src="{% static "cms/js/jstree/_lib/_all.js" %}"></script>
+<script src="{% static "cms/js/jstree/tree_component.js" %}"></script>
 <!-- load changelist -->
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.changelist.js"></script>
-<script type="text/javascript">
-	//<![CDATA[
-	(function namespacing($) {
-		$(document).ready(function() {
-			{% if not cl.is_filtered %}
-				initTree();
-			{% endif %}
+<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}"></script>
+<script src="{% static "cms/js/modules/cms.base.js" %}"></script>
+<script src="{% static "cms/js/modules/cms.changelist.js" %}"></script>
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+
+	// bind csrf token to the header
+	CMS.API.Helpers.csrf('{{ csrf_token }}');
+
+	{% if not cl.is_filtered %}
+		initTree();
+	{% endif %}
+
+	moveSuccess = function(node){
+        $.syncHeights();
+        $.syncCols();
+
+		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
+		var parent = window.parent;
+
+		node.after(msg);
+		node.parent().find('.col2').hide();
+		msg.fadeOut(1000, function () {
+			node.parent().find('.col2').show()
 		});
-
-		showchangelistfilter = function(){
-			$("#changelist-filter").toggle();
-		}
-		moveSuccess = function(node){
-			var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
-			node.append(msg);
-			msg.fadeOut(3000);
-		}
-		moveError = function(node,message){
-			if(message && message!="error") {
-				var msg = $({% javascript_string %}<span class="success">{% end_javascript_string %}+message+{% javascript_string %}</span>{% end_javascript_string %});
+		// check for reload changes
+		if(parent) {
+			// attach message
+			if(parent.CMS && parent.CMS.API.Toolbar) {
+				parent.CMS.API.Toolbar.openMessage('{% trans "Changes within the tree might require a refresh." %}', false, 0);
 			}
-			else {
-				var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
-			}
-			node.append(msg);
-		}
-		// some settings used by javascript functions
 
-		cmsSettings = {
-			cmsPermission: {{ CMS_PERMISSION|js }},
-			debug: {{ DEBUG|js }}
-		};
-	})(window.CMS.$);
-	//]]>
+			window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
+		}
+
+	};
+	moveError = function(node,message){
+		if(message && message!="error") {
+			var msg = $({% javascript_string %}<span class="success">{% end_javascript_string %}+message+{% javascript_string %}</span>{% end_javascript_string %});
+		}
+		else {
+			var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
+		}
+		node.parent().find('.col2').hide();
+		node.after(msg);
+	};
+	// some settings used by javascript functions
+	cmsSettings = {
+		cmsPermission: {{ CMS_PERMISSION|js }},
+		debug: {{ DEBUG|js }}
+	};
+});
+})(CMS.$);
 </script>
 {% endblock extrahead %}
 
 {% block content %}
-
 
 <div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
 
@@ -100,16 +111,21 @@
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
 {% block search %}
 
-
+<form action="." method="post">
 {% if cl.has_access_to_multiple_sites %}
 	<div id="site-selector">{% trans "Pages on:" %}
-		<select id="site-select">{% for site in cl.sites %}
-			<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>{% endfor %}
+		<select id="site-select" name="site__exact">
+			{% for site in cl.sites %}
+			<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>
+			{% endfor %}
 		</select>
+		<input type="hidden" id="site-copy" name="copy" />
+		{% csrf_token %}
 	</div>
 {% else %}
 	<input type="hidden" id="site-select" value="{{ cl.sites.0.pk }}">
 {% endif %}
+</form>
 
 {% search_form cl %}
 {% endblock %}
@@ -118,11 +134,11 @@
 {% block filters %}
 {% if cl.has_filters %}
 
-<a href="javascript:showchangelistfilter();" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
+<a href="#" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
 <div id="changelist-filter" style="display:none;">
 <h2>{% trans 'Filter' %}</h2>
 {% for spec in cl.filter_specs %}
-   {% clean_admin_list_filter cl spec %}
+	{% clean_admin_list_filter cl spec %}
 {% endfor %}
 </div>
 {% endif %}

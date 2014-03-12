@@ -7,7 +7,7 @@ from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import LanguageError
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_cms_setting, get_site_id
 
 
 @contextmanager
@@ -20,7 +20,7 @@ def force_language(new_lang):
 
 
 def get_languages(site_id=None):
-    site_id = get_site(site_id)
+    site_id = get_site_id(site_id)
     result = get_cms_setting('LANGUAGES').get(site_id)
     if not result:
         result = []
@@ -59,16 +59,6 @@ def get_current_language():
     """
     language_code = translation.get_language()
     return get_language_code(language_code)
-
-
-def get_site(site):
-    if site is None:
-        return settings.SITE_ID
-    else:
-        try:
-            return int(site)
-        except TypeError:
-            return site.pk
 
 
 def get_language_list(site_id=None):

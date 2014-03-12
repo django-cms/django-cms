@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
+
+from django.contrib.sites.models import Site
+from django.utils.translation import get_language
+
 from cms.apphook_pool import apphook_pool
-from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
-    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
+from cms.compat import user_related_name
+from cms.models.permissionmodels import ACCESS_DESCENDANTS
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS
+from cms.models.permissionmodels import ACCESS_CHILDREN
+from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
+from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.moderator import get_title_queryset
+from cms.utils.moderator import get_title_queryset, use_draft
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
-
-from django.contrib.sites.models import Site
-from django.db.models.query_utils import Q
-from django.utils.translation import get_language
 
 
 def get_visible_pages(request, pages, site=None):
@@ -33,10 +37,10 @@ def get_visible_pages(request, pages, site=None):
     is_auth_user = request.user.is_authenticated()
     visible_page_ids = []
     restricted_pages = defaultdict(list)
-    page_permissions = PagePermission.objects.filter(can_view=True).select_related('page', 'group__users')
+    page_permissions = PagePermission.objects.filter(can_view=True).select_related(
+            'page').prefetch_related('group__' + user_related_name)
 
     for perm in page_permissions:
-
         # collect the pages that are affected by permissions
         if site and perm.page.site_id != site.pk:
             continue
@@ -72,10 +76,8 @@ def get_visible_pages(request, pages, site=None):
 
     # authenticated user and global permission
     if is_auth_user:
-        global_page_perm_q = Q(
-            Q(user=request.user) | Q(group__user=request.user)
-        ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
-        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+        global_view_perms = GlobalPagePermission.objects.user_has_view_permission(
+            request.user, site.pk).exists()
 
         #no page perms edge case - all visible
         if ((is_setting_public_all or (
@@ -104,16 +106,17 @@ def get_visible_pages(request, pages, site=None):
         """
         user_pk = request.user.pk
         page_pk = page.pk
-        has_perm = False
         for perm in restricted_pages[page_pk]:
             if perm.user_id == user_pk:
-                has_perm = True
+                return True
             if not perm.group_id:
                 continue
-            group_user_ids = perm.group.user_set.values_list('pk', flat=True)
-            if user_pk in group_user_ids:
-                has_perm = True
-        return has_perm
+            user_set = getattr(perm.group, user_related_name)
+            # Optimization equivalent to
+            # if user_pk in user_set.values_list('pk', flat=True)
+            if any(user_pk == user.pk for user in user_set.all()):
+                return True
+        return False
 
     for page in pages:
         to_add = False
@@ -180,10 +183,7 @@ def page_to_node(page, home, cut):
     else:
         attr['visible_for_authenticated'] = page.limit_visibility_in_menu == 1
         attr['visible_for_anonymous'] = page.limit_visibility_in_menu == 2
-
-    if page.pk == home.pk:
-        attr['is_home'] = True
-
+    attr['is_home'] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
@@ -234,7 +234,9 @@ class CMSMenu(Menu):
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
 
-        pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
+        if not use_draft(request):
+            page_queryset = page_queryset.published(lang)
+        pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
         ids = {}
         nodes = []
         first = True
@@ -253,7 +255,6 @@ class CMSMenu(Menu):
                 continue
             if not home:
                 home = page
-            page.home_pk_cache = home.pk
             if first and page.pk != home.pk:
                 home_cut = True
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
@@ -402,7 +403,7 @@ class SoftRootCutter(Modifier):
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
-        if post_cut or not get_cms_setting('SOFTROOT'):
+        if post_cut:
             return nodes
         selected = None
         root_nodes = []

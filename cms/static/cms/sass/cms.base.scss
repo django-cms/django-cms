@@ -5,121 +5,62 @@
 
 //##################################################
 // #IMPORT SETTINGS#
-@import "partials/settings";
+@import "settings/default";
 
 //##################################################
-// #BASE#
-
-// used in: /cms/admin/pageadmin.py
-//          /cms/admin/placeholderadmin.py
-.frameBody { font-family:"Lucida Grande",Verdana,Arial,sans-serif;
-	font-size:11px; font-weight:normal; margin:0; padding:2px 3px; width:98%; height:98%; }
-.frameBody p { border-left:1px #bbb solid; padding-left:2px; }
-iframe.rte { width:100%; border:1px #ccc solid; }
-.rte-toolbar { overflow:hidden; width:100%; clear:both; }
-.rte-toolbar a, .rte-toolbar a img { border:0; }
-form .rte-toolbar p { float:left; margin:0; padding:0; padding-right:5px; }
-
+// #RESET#
+.cms_reset {
+	div, p, a, a:hover, a:active, a:focus, ul, li,
+	form, fieldset, label, input, textarea {
+		font:normal 13px/20px Helvetica,Arial,sans-serif;
+		color:#222; text-decoration:none; text-align:left; outline:none;
+		list-style-type:none; height:auto; padding:0; margin:0; border:none; background:none;
+	}
+}
 
 //##################################################
-// #TYNIMCE#
+// #TABS#
+// used in: /cms/admin/page/change_form
+#page_form_lang_tabs {
+	position:relative;
 
-// used in: /cms/plugins/text/widgets/tinymce_widget.py
-.mceToolbar span.plugin_edit_button { background:url('../images/icon_pluginedit.gif') no-repeat 3px 4px; }
+	input.language_button { background:#ccc; }
+	input.selected { color:black; text-shadow:none; background:white; }
+	input.notfilled { color:#bbb; background:none; }
 
+	.lang_tabs_line {
+		position:absolute; left:0; bottom:-5px;
+		width:100%; height:5px;
+		background:white;
+	}
+}
 
 //##################################################
-// #JQUERY/UI#
+// #DOALOG#
+// used in: /cms/admin/page/tree/copy_premissions
+.cms_dialog {
+	position:absolute; left:50%; top:50%; z-index:99999;
+	width:500px; height:200px; padding:25px; margin:-100px 0 0 -275px;
+	background:white; border:1px solid #ccc; @include border-radius(5px);
 
-// used in: /cms/plugins/text/widgets/wymeditor_widget.py
-//          /cms/plugins/text/widgets/tinymce_widget.py
-.ui-helper-hidden { display: none; }
-.ui-helper-hidden-accessible { position: absolute; left: -99999999px; }
-.ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
-.ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
-.ui-helper-clearfix { display: inline-block; }
-/* required comment for clearfix to work in Opera \*/
-* html .ui-helper-clearfix { height:1%; }
-.ui-helper-clearfix { display:block; }
-/* end clearfix */
-.ui-helper-zfix { width: 100%; height: 100%; top: 0; left: 0; position: absolute; opacity: 0; filter:Alpha(Opacity=0); }
-.ui-state-disabled { cursor: default !important; }
-.ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
-.ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+	h1 { padding:0; margin:0 0 15px; }
+	form { padding:15px 0; margin:15px 0; border-top:1px solid #f3f3f3; }
+}
 
-// Component containers
-.ui-widget { font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; font-size: 1.1em; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; font-size: 1em; }
-.ui-widget-content { border: 1px solid #dddddd; background: #f2f5f7 50% top repeat-x; color: #362b36; }
-.ui-widget-content a { color: #362b36; }
-.ui-widget-header { border: 1px solid #aed0ea; background: #deedf7 50% 50% repeat-x; color: #222222; font-weight: bold; }
-.ui-widget-header a { color: #222222; }
+//##################################################
+// #GLOBALS#
+.cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
+// removed as of: //github.com/divio/django-cms/issues/2476
+// #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
 
-// Interaction states
-.ui-state-default, .ui-widget-content .ui-state-default { border: 1px solid #aed0ea; background: #d7ebf9; font-weight: bold; color: #2779aa; outline: none; }
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: #2779aa; text-decoration: none; outline: none; }
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus { border: 1px solid #74b2e2; background: #e4f1fb; font-weight: bold; color: #0070a3; outline: none; }
-.ui-state-hover a, .ui-state-hover a:hover { color: #0070a3; text-decoration: none; outline: none; }
-.ui-state-active, .ui-widget-content .ui-state-active { border: 1px solid #2694e8; background: #3baae3; font-weight: bold; color: #ffffff; outline: none; }
-.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #ffffff; outline: none; text-decoration: none; }
-
-// Interaction Cues
-.ui-state-highlight, .ui-widget-content .ui-state-highlight {border: 1px solid #f9dd34; background: #ffef8f; color: #363636; }
-.ui-state-highlight a, .ui-widget-content .ui-state-highlight a { color: #363636; }
-.ui-state-error, .ui-widget-content .ui-state-error {border: 1px solid #cd0a0a; background: #cd0a0a; color: #ffffff; }
-.ui-state-error a, .ui-widget-content .ui-state-error a { color: #ffffff; }
-.ui-state-error-text, .ui-widget-content .ui-state-error-text { color: #ffffff; }
-.ui-state-disabled, .ui-widget-content .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
-.ui-priority-primary, .ui-widget-content .ui-priority-primary { font-weight: bold; }
-.ui-priority-secondary, .ui-widget-content .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
-
-.ui-corner-tl { -moz-border-radius-topleft: 6px; -webkit-border-top-left-radius: 6px; }
-.ui-corner-tr { -moz-border-radius-topright: 6px; -webkit-border-top-right-radius: 6px; }
-.ui-corner-bl { -moz-border-radius-bottomleft: 6px; -webkit-border-bottom-left-radius: 6px; }
-.ui-corner-br { -moz-border-radius-bottomright: 6px; -webkit-border-bottom-right-radius: 6px; }
-.ui-corner-top { -moz-border-radius-topleft: 6px; -webkit-border-top-left-radius: 6px; -moz-border-radius-topright: 6px; -webkit-border-top-right-radius: 6px; }
-.ui-corner-bottom { -moz-border-radius-bottomleft: 6px; -webkit-border-bottom-left-radius: 6px; -moz-border-radius-bottomright: 6px; -webkit-border-bottom-right-radius: 6px; }
-.ui-corner-right {  -moz-border-radius-topright: 6px; -webkit-border-top-right-radius: 6px; -moz-border-radius-bottomright: 6px; -webkit-border-bottom-right-radius: 6px; }
-.ui-corner-left { -moz-border-radius-topleft: 6px; -webkit-border-top-left-radius: 6px; -moz-border-radius-bottomleft: 6px; -webkit-border-bottom-left-radius: 6px; }
-.ui-corner-all { -moz-border-radius: 6px; -webkit-border-radius: 6px; }
-
-.ui-dialog { position: relative; padding: .2em; width: 300px; }
-.ui-dialog .ui-dialog-titlebar { padding: .5em .3em .3em 1em; position: relative;  }
-.ui-dialog .ui-dialog-title { float: left; margin: .1em 0 .2em; }
-.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
-.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
-.ui-dialog .ui-dialog-content { border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
-.ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
-.ui-dialog .ui-dialog-buttonpane button { float: right; margin: .5em .4em .5em 0; cursor: pointer; padding: .2em .6em .3em .6em; line-height: 1.4em; width:auto; overflow:visible; }
-.ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
-.ui-draggable .ui-dialog-titlebar { cursor: move; }
-
-// used in: /cms/admin/pageadmin.py
-//          /cms/admin/placeholderadmin.py
-//          /cms/templates/admin/cms/page/change_list.html
-.ui-dialog-overlay { background-color: black; filter:alpha(opacity=40); opacity:.4; }
-.ui-dialog, .ui-dialog { background-color: white; border: 1px solid #ccc; }
-.ui-dialog .ui-dialog-titlebar, .ui-dialog .ui-dialog-titlebar { border-bottom: 1px solid #ccc; background: #7CA0C7; padding: 0px; height: 28px; _height: 29px; }
-.ui-draggable .ui-dialog-titlebar, .ui-draggable .ui-dialog-titlebar { cursor: move; }
-.ui-draggable-disabled .ui-dialog-titlebar, .ui-draggable-disabled .ui-dialog-titlebar { cursor: default; }
-.ui-dialog .ui-dialog-titlebar-close, .ui-dialog .ui-dialog-titlebar-close { width: 18px; height: 18px; position:absolute; top: 5px; right: 7px; cursor: default; }
-.ui-dialog .ui-dialog-titlebar-close span, .ui-dialog .ui-dialog-titlebar-close span { display: none; }
-.ui-dialog .ui-dialog-title, .ui-dialog .ui-dialog-title { margin-left: 5px; color: white; font-weight: bold; position: relative; top: 7px; left: 4px; }
-.ui-dialog .ui-dialog-content, .ui-dialog .ui-dialog-content { margin: 1.2em; }
-.ui-dialog .ui-dialog-buttonpane,
-.ui-dialog .ui-dialog-buttonpane { position: absolute; bottom: 0px; width: 100%; text-align: right; background: white; border-top: 1px solid #ccc; }
-.ui-dialog .ui-dialog-buttonpane button,
-.ui-dialog .ui-dialog-buttonpane button { margin: 6px; background: white; border-color: #ddd #aaa #aaa #ddd; border-style: solid; border-width: 1px; color: black; padding: 3px; }
-.ui-dialog .ui-dialog-buttonpane button.default { background: #7CA0C7; border: 2px solid #5B80B2; font-weight: bold; color: white; }
-.ui-dialog .ui-resizable-n, .ui-dialog .ui-resizable-n { cursor: n-resize; height: 6px; width: 100%; top: 0px; left: 0px; }
-.ui-dialog .ui-resizable-s, .ui-dialog .ui-resizable-s { cursor: s-resize; height: 8px; width: 100%; bottom: 0px; left: 0px; }
-.ui-dialog .ui-resizable-e, .ui-dialog .ui-resizable-e { cursor: e-resize; width: 7px; right: 0px; top: 0px; height: 100%; }
-.ui-dialog .ui-resizable-w, .ui-dialog .ui-resizable-w { cursor: w-resize; width: 7px; left: 0px; top: 0px; height: 100%; }
-.ui-dialog .ui-resizable-se, .ui-dialog .ui-resizable-se { cursor: se-resize; width: 9px; height: 9px; right: 0px; bottom: 0px; }
-.ui-dialog .ui-resizable-sw, .ui-dialog .ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: 0px; bottom: 0px; }
-.ui-dialog .ui-resizable-nw,
-.ui-dialog .ui-resizable-nw { cursor: nw-resize; width: 9px; height: 29px; left: 0px; top: 0px; }
-.ui-dialog .ui-resizable-ne, .ui-dialog .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 29px; right: 0px; top: 0px; }
-.ui-dialog div.row { margin-bottom: 6px; }
-.ui-dialog div.row input.wide { width: 100%; }
+//##################################################
+// #TOOLBAR#
+@import "includes/common";
+@import "includes/content";
+@import "includes/toolbar";
+@import "includes/modal";
+@import "includes/sideframe";
+@import "includes/clipboard";
+@import "includes/structureboard";
+@import "includes/subnav";
+@import "includes/retina";

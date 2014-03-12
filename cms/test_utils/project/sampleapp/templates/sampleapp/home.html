@@ -9,16 +9,16 @@
 	{{ block.super }}
 	<ul>
 		<li>
-			<a href="{% url 'sample-root' %}">Sample app root reverse test</a>
+			<a href="{% if app %}{% url 'namespaced_app_ns:sample-root' %}{% else %}{% url 'sample-root' %}{% endif %}">Sample app root reverse test</a>
 		</li>
 		<li>
             {% language 'de' %}
-			<a href="{% url 'sample-account' %}">Sample app account reverse test german</a>
+			<a href="{% if app %}{% url 'namespaced_app_ns:sample-account' %}{% else %}{% url 'sample-account' %}{% endif %}">Sample app account reverse test german</a>
             {% endlanguage %}
 		</li>
 		<li>
             {% language 'en' %}
-			<a href="{% url 'sample-account' %}">Sample app account reverse test english</a>
+			<a href="{% if app %}{% url 'namespaced_app_ns:sample-account' %}{% else %}{% url 'sample-account' %}{% endif %}">Sample app account reverse test english</a>
             {% endlanguage %}
 		</li>
 	</ul>

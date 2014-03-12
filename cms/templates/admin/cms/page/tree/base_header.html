@@ -1,22 +1,15 @@
 {% load i18n cms_admin %}
-{% comment %}
-- This template is used within the pagetree as the table row header
-{% endcomment %}
 
-<div id="sitemap">
+<div id="sitemap" class="cms-tree">
 <ul class="header">
 	<li>
 		<div class="cont">
-			<div class="col1">{% trans "title" %}</div>
 			<div class="col2">
-				<div class="col-actions">{% trans "actions" %}</div>
-				<div class="col-navigation">{% trans "in navigation" %}</div>
-				<div class="col-published">{% trans "published" %}</div>
-				<div class="col-published">{% trans "start" %}</div>
-				{% if CMS_SHOW_END_DATE %}<div class="col-published">{% trans "end" %}</div>{% endif %}
-                <div class="col-view-perms">{% trans "restricted" %}</div>
-				<div class="col-lastchange">{% trans "last changes" %}</div>
-				<div class="col-creator">{% trans "changed by" %}</div>
+                {% for lang in site_languages %}
+                <div class="col-language">{{ lang|upper }}</div>{% endfor %}
+                <div class="col-navigation">{% trans "Menu" %}</div>
+				<div class="col-actions">{% trans "Actions" %}</div>
+                <div class="col-info">{% trans "Info" %}</div>
 			</div>
 		</div>
 	</li>
@@ -27,3 +20,8 @@
 	</ul>
 </div>
 </div>
+
+{% if not cl.get_items %}
+<br />
+<p class="sitemap-noentry">{% blocktrans %}<em>There is no page around yet.</em><br /><a href="add/" class="addlink">Add page</a> now.{% endblocktrans %}</p>
+{% endif %}

@@ -1,6 +1,0 @@
-{% load i18n %}
-{% for cls in plugin_classes %}
-{% if forloop.first %}<span>{% trans "Add Plugin" %}</span>{% endif %}
-<!-- TODO add correct url instead of only clas -->
-<a rel="custom" href="#{{ cls.0 }}">{{ cls.1 }}</a>
-{% endfor %}

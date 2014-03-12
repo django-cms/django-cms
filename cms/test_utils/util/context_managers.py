@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 from django.conf import settings
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.template import context
 from django.utils.translation import get_language, activate
 from shutil import rmtree as _rmtree
-from tempfile import template, mkdtemp, _exists
-import StringIO
+from tempfile import template, mkdtemp
 import sys
+from cms.utils.compat.string_io import StringIO
+from cms.compat import get_user_model
+
 
 class NULL:
     pass
+
 
 class SettingsOverride(object):
     """
@@ -50,7 +54,7 @@ class SettingsOverride(object):
 class StdOverride(object):
     def __init__(self, std='out', buffer=None):
         self.std = std
-        self.buffer = buffer or StringIO.StringIO()
+        self.buffer = buffer or StringIO()
         
     def __enter__(self):
         setattr(sys, 'std%s' % self.std, self.buffer)
@@ -105,8 +109,12 @@ class TemporaryDirectory:
         return self.name
 
     def cleanup(self):
-        if _exists(self.name):
-            _rmtree(self.name)
+        try:
+            from tempfile import _exists
+            if _exists(self.name):
+                _rmtree(self.name)
+        except ImportError:
+            pass
 
     def __exit__(self, exc, value, tb):
         self.cleanup()
@@ -118,8 +126,8 @@ class UserLoginContext(object):
         self.user = user
         
     def __enter__(self):
-        loginok = self.testcase.client.login(username=self.user.username, 
-                                             password=self.user.username)
+        loginok = self.testcase.client.login(username=getattr(self.user, get_user_model().USERNAME_FIELD), 
+                                             password=getattr(self.user, get_user_model().USERNAME_FIELD))
         self.old_user = getattr(self.testcase, 'user', None)
         self.testcase.user = self.user
         self.testcase.assertTrue(loginok)
@@ -186,3 +194,11 @@ class _AssertNumQueriesContext(object):
                 executed, self.num, queries
             )
         )
+
+
+@contextmanager
+def disable_logger(logger):
+    old = logger.disabled
+    logger.disabled = True
+    yield
+    logger.disabled = old

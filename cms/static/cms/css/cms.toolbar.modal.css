@@ -1,0 +1,3 @@
+@charset "utf-8";/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */#content h2:first-child{display:none}#content{margin:10px 10px 0}#content .module{padding:10px}#container{padding-top:0}#footer{display:none}#cke_id_body{border:1px solid #e6e6e6 !important}#cke_id_body .cke_top,#cke_id_body .cke_bottom{background:#fafafa !important;border-color:#e6e6e6 !important;-webkit-box-shadow:none !important;-moz-box-shadow:none !important;box-shadow:none !important}.errornote{margin:0 !important}

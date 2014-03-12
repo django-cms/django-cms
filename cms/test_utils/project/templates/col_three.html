@@ -4,7 +4,7 @@
 {% block tpl_id %}tpl_col_three{% endblock %}
 
 {% block content %}
-	<h1>{% show_editable_page_title %}</h1>
+	<h1>{% render_model request.current_page "page_title" %}</h1>
     <div id="col1" class="grid_3">
 		{% include "sidebar_submenu.html" %}
 		{% block col_sidebar %}

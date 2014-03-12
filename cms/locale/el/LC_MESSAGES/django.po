@@ -5,14 +5,15 @@
 # Translators:
 # George Petsagourakis <petsagouris@gmail.com>, 2013
 # Kostas Papadimitriou <vinilios@gmail.com>, 2011
+# xouskarle <xouskarle@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
-"Report-Msgid-Bugs-To: https://github.com/divio/django-cms/issues\n"
-"POT-Creation-Date: 2013-04-09 09:51+0200\n"
-"PO-Revision-Date: 2013-04-12 06:50+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-02-12 16:47+0100\n"
+"PO-Revision-Date: 2014-02-13 08:15+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: divio.ch <developers@divio.ch>\n"
+"Language-Team: Greek (http://www.transifex.com/projects/p/django-cms/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,1310 +23,941 @@ msgstr ""
 "X-Poedit-Language: English\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
+#: cms_plugins.py:9
+msgid "Placeholder"
+msgstr ""
+
 #: cms_toolbar.py:71
-msgid "Revert"
+msgid "Content"
 msgstr ""
 
-#: cms_toolbar.py:75
-msgid "Edit mode"
+#: cms_toolbar.py:73
+msgid "Structure"
 msgstr ""
 
-#: cms_toolbar.py:109
-msgid "django CMS"
+#: cms_toolbar.py:90
+msgid "Users"
 msgstr ""
 
-#: cms_toolbar.py:133 templates/admin/cms/page/menu_item.html:58
-#: templates/admin/cms/page/menu_item.html:71
-msgid "Publish"
+#: cms_toolbar.py:97
+msgid "Sites"
 msgstr ""
 
-#: cms_toolbar.py:154
+#: cms_toolbar.py:98
+msgid "Admin Sites"
+msgstr ""
+
+#: cms_toolbar.py:104
+msgid "Administration"
+msgstr ""
+
+#: cms_toolbar.py:107
+msgid "User settings"
+msgstr ""
+
+#: cms_toolbar.py:110
 msgid "Logout"
 msgstr ""
 
-#: cms_toolbar.py:171
-msgid "Template"
-msgstr ""
-
-#: cms_toolbar.py:179
-msgid "Move/add Pages"
-msgstr ""
-
-#: cms_toolbar.py:184
-msgid "Add child page"
-msgstr ""
-
-#: cms_toolbar.py:190
-msgid "Add sibling page"
-msgstr ""
-
-#: cms_toolbar.py:196
-msgid "Delete Page"
-msgstr ""
-
-#: cms_toolbar.py:199 templates/admin/cms/page/permissions.html:5
-msgid "Page"
-msgstr ""
-
-#: cms_toolbar.py:208
-msgid "Site Administration"
-msgstr ""
-
-#: cms_toolbar.py:214
-msgid "Page Settings"
-msgstr ""
-
-#: cms_toolbar.py:220
-msgid "View History"
-msgstr ""
-
-#: cms_toolbar.py:224
-msgid "Admin"
-msgstr ""
-
-#: plugin_base.py:72
-msgid "Advanced options"
-msgstr "Προχωρημένες επιλογές"
-
-#: admin/forms.py:61
-msgid "Title"
-msgstr "Τίτλος"
-
-#: admin/forms.py:62
-msgid "The default title"
-msgstr "Προεπιλεγμένος τίτλος"
-
-#: admin/forms.py:63
-msgid "Slug"
-msgstr "Slug"
-
-#: admin/forms.py:64
-msgid "The part of the title that is used in the URL"
-msgstr "Μέρος του τίτλου που χρησιμοποιείται στο URL"
-
-#: admin/forms.py:65
+#: cms_toolbar.py:113 admin/forms.py:72 admin/forms.py:156 admin/forms.py:186
+#: models/settingmodels.py:12
 msgid "Language"
 msgstr "Γλώσσα"
 
-#: admin/forms.py:66
-msgid "The current language of the content fields."
-msgstr "Η επιλεγμένη γλώσσα των πεδίων περιεχομένου"
+#: cms_toolbar.py:167
+msgid "Publish changes"
+msgstr ""
 
-#: admin/forms.py:113
-msgid "Another page with this slug already exists"
-msgstr "Υπάρχει ήδη σελίδα με αυτό το slug"
+#: cms_toolbar.py:169
+msgid "Publish page now"
+msgstr ""
 
-#: admin/forms.py:151
+#: cms_toolbar.py:217
+#, python-format
+msgid "Add %(language)s Translation"
+msgstr ""
+
+#: cms_toolbar.py:231
+#, python-format
+msgid "Delete %(language)s Translation"
+msgstr ""
+
+#: cms_toolbar.py:240
+#, python-format
+msgid "Are you sure you want copy all plugins from %s?"
+msgstr ""
+
+#: cms_toolbar.py:241
+#, python-format
+msgid "Copy all plugins from %s"
+msgstr ""
+
+#: cms_toolbar.py:248
+msgid "Pages"
+msgstr ""
+
+#: cms_toolbar.py:253 templates/admin/cms/page/permissions.html:5
+msgid "Page"
+msgstr "Σελίδα"
+
+#: cms_toolbar.py:254
+msgid "Edit this Page"
+msgstr ""
+
+#: cms_toolbar.py:259 templates/admin/cms/page/tree/menu_item.html:43
+msgid "Page settings"
+msgstr ""
+
+#: cms_toolbar.py:263
+msgid "Templates"
+msgstr ""
+
+#: cms_toolbar.py:273 admin/pageadmin.py:285
+msgid "Publishing dates"
+msgstr ""
+
+#: cms_toolbar.py:281 templates/admin/cms/page/tree/menu_item.html:44
+msgid "Advanced settings"
+msgstr ""
+
+#: cms_toolbar.py:288
+msgid "Permissions"
+msgstr ""
+
+#: cms_toolbar.py:294
+msgid "Hide in navigation"
+msgstr ""
+
+#: cms_toolbar.py:296
+msgid "Display in navigation"
+msgstr ""
+
+#: cms_toolbar.py:302
+msgid "Unpublish page"
+msgstr ""
+
+#: cms_toolbar.py:305
+msgid "Publish page"
+msgstr ""
+
+#: cms_toolbar.py:326
+msgid "Delete page"
+msgstr ""
+
+#: cms_toolbar.py:331 templates/admin/cms/page/history/revision_header.html:10
+msgid "History"
+msgstr "Ιστορικό"
+
+#: cms_toolbar.py:346
+msgid "Undo"
+msgstr ""
+
+#: cms_toolbar.py:347
+msgid "Redo"
+msgstr ""
+
+#: cms_toolbar.py:350
+msgid "Are you sure you want to revert to live?"
+msgstr ""
+
+#: cms_toolbar.py:351
+msgid "Revert to live"
+msgstr ""
+
+#: cms_toolbar.py:353
+msgid "View history"
+msgstr ""
+
+#: plugin_base.py:77
+msgid "Advanced options"
+msgstr "Προχωρημένες επιλογές"
+
+#: plugin_base.py:94
+msgid "Generic"
+msgstr ""
+
+#: plugin_base.py:259
+msgid "There are no further settings for this plugin. Please press save."
+msgstr ""
+
+#: admin/forms.py:59
+msgid "Title"
+msgstr "Τίτλος"
+
+#: admin/forms.py:60
+msgid "The default title"
+msgstr "Προεπιλεγμένος τίτλος"
+
+#: admin/forms.py:61
+msgid "Slug"
+msgstr "Slug"
+
+#: admin/forms.py:62
+msgid "The part of the title that is used in the URL"
+msgstr "Το μέρος του τίτλου που χρησιμοποιείται στο URL"
+
+#: admin/forms.py:63
 msgid "Menu Title"
 msgstr "Τίτλος Μενού"
 
-#: admin/forms.py:152
+#: admin/forms.py:64
 msgid "Overwrite what is displayed in the menu"
 msgstr "Αντικατάσταση στην εμφάνιση του μενού"
 
-#: admin/forms.py:153
+#: admin/forms.py:65
 msgid "Page Title"
 msgstr "Τίτλος Σελίδας"
 
-#: admin/forms.py:154
+#: admin/forms.py:66
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Αντικαθιστά αυτό που εμφανίζεται στο επάνω μέρος του browser σας ή στους σελιδοδείκτες"
+msgstr "Αντικαθιστά αυτό που εμφανίζεται στο επάνω μέρος του περιηγητή ιστού σας ή στους σελιδοδείκτες"
 
-#: admin/forms.py:155
+#: admin/forms.py:68
+msgid "Description meta tag"
+msgstr ""
+
+#: admin/forms.py:70
+msgid "A description of the page used by search engines."
+msgstr "Μια λίστα με \"λέξεις κλειδιά\" που χρησιμοποιούνται μερικές φορές από τις μηχανές αναζήτησης."
+
+#: admin/forms.py:73 admin/forms.py:157 admin/forms.py:187
+msgid "The current language of the content fields."
+msgstr "Η επιλεγμένη γλώσσα των πεδίων περιεχομένου"
+
+#: admin/forms.py:117
+msgid "Another page with this slug already exists"
+msgstr "Υπάρχει ήδη σελίδα με αυτό το slug"
+
+#: admin/forms.py:145
+msgid "Slug must not be empty."
+msgstr ""
+
+#: admin/forms.py:178
 msgid "Application"
 msgstr "Εφαρμογή"
 
-#: admin/forms.py:157
+#: admin/forms.py:180
 msgid "Hook application to this page."
 msgstr "Σύνδεση εφαρμογής σε αυτή τη σελίδα."
 
-#: admin/forms.py:158
+#: admin/forms.py:181
 msgid "Overwrite URL"
 msgstr "Αντικατάστησε το URL"
 
-#: admin/forms.py:159
+#: admin/forms.py:182
 msgid "Keep this field empty if standard path should be used."
 msgstr "Αφήστε αυτό το πεδίο κενό, για να χρησιμοποιηθεί το πρότυπο μονοπάτι (path)."
 
-#: admin/forms.py:161
+#: admin/forms.py:184
 msgid "Redirect"
 msgstr "Ανακατεύθυνση"
 
-#: admin/forms.py:162
+#: admin/forms.py:185
 msgid "Redirects to this URL."
 msgstr "Ανακατεύθυνση στο ακόλουθο URL."
 
-#: admin/forms.py:164
-msgid "A description of the page sometimes used by search engines."
-msgstr "Μια περιγραφή της σελίδας που μερικές φορές χρησιμοποιείται από τις μηχανές αναζήτησης."
-
-#: admin/forms.py:166
-msgid "A list of comma seperated keywords sometimes used by search engines."
-msgstr "Μια λίστα με \"λέξεις κλειδιά\" που χρησιμοποιούνται μερικές φορές από τις μηχανές αναζήτησης."
-
-#: admin/forms.py:182
+#: admin/forms.py:214
 msgid "A page with this reverse URL id exists already."
+msgstr "Υπάρχει ήδη σελίδα με το συγκεκριμένο αντίστροφο URL id."
+
+#: admin/forms.py:221
+msgid ""
+"You selected an apphook with an \"app_name\". You must enter a instance "
+"name."
 msgstr ""
 
-#: admin/forms.py:199 admin/forms.py:200 models/permissionmodels.py:39
+#: admin/forms.py:224
+msgid "If you enter an instance name you need an application url as well."
+msgstr ""
+
+#: admin/forms.py:230
+msgid "A instance name with this name already exists."
+msgstr ""
+
+#: admin/forms.py:260 models/permissionmodels.py:40
 msgid "user"
 msgstr "χρήστης"
 
-#: admin/forms.py:224
+#: admin/forms.py:324
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr ""
+msgstr "Το δικαίωμα προσθήκης σελίδας απαιτεί πρόσβαση στις υποσελίδες, αλλιώς η σελίδα που προστέθηκε δεν μπορεί να τροποποιηθεί από τον δημιουργό της."
 
-#: admin/forms.py:229
+#: admin/forms.py:329
 msgid "Add page permission also requires edit page permission."
-msgstr ""
+msgstr "Το δικαίωμα προσθήκης σελίδας απαιτεί άδεια επεξεργασίας σελίδας."
 
-#: admin/forms.py:256
+#: admin/forms.py:356
 msgid "can_view"
 msgstr ""
 
-#: admin/forms.py:268
+#: admin/forms.py:367
 msgid "Please select user or group first."
 msgstr "Παρακαλώ επιλέξτε πρώτα το χρήστη ή την ομάδα χρηστών."
 
-#: admin/forms.py:275 admin/forms.py:282 admin/forms.py:286
-#: templates/admin/cms/page/change_form.html:73
-#: templates/admin/cms/page/plugin_change_form.html:76
-#: templates/cms/toolbar/placeholder.html:26
+#: admin/forms.py:374 admin/forms.py:381 admin/forms.py:385
+#: templates/admin/cms/usersettings/change_form.html:8
+#: templatetags/cms_tags.py:656
 msgid "Add"
 msgstr "Προσθήκη"
 
-#: admin/forms.py:276 admin/forms.py:283 admin/forms.py:287
+#: admin/forms.py:375 admin/forms.py:382 admin/forms.py:386
+#: templates/cms/toolbar/toolbar.html:36
+#: templates/cms/toolbar/items/live_draft.html:7
 msgid "Change"
 msgstr "Αλλαγή"
 
-#: admin/forms.py:277 admin/forms.py:284 admin/forms.py:288
-#: templates/admin/page_submit_line.html:5
-#: templates/admin/cms/page/menu_item.html:44
+#: admin/forms.py:376 admin/forms.py:383 admin/forms.py:387
+#: templates/admin/cms/page/submit_row.html:8
+#: templates/admin/cms/page/plugin/delete_confirmation.html:9
+#: templates/admin/cms/page/tree/menu_item.html:58
+#: templates/cms/toolbar/dragitem.html:15
 msgid "Delete"
 msgstr "Διαγραφή"
 
-#: admin/forms.py:278
+#: admin/forms.py:377
 msgid "Recover (any) pages"
-msgstr ""
+msgstr "Ανάκτηση (τυχών) σελίδων"
 
-#: admin/forms.py:305
+#: admin/forms.py:405
 msgid "Notify user"
 msgstr "Ειδοποίησε το χρήστη"
 
-#: admin/forms.py:306
+#: admin/forms.py:407
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr ""
+msgstr "Αποστολή ειδοποίησης μέσω ηλεκτρονικού ταχυδρομείου στο χρήστη σχετικά με την αλλαγή ονόματος χρήστη ή κωδικού. Απαιτεί τη διεύθυνση ηλεκτρονικού ταχυδρομείου του χρήστη."
 
-#: admin/forms.py:326
+#: admin/forms.py:427
 msgid "New password"
 msgstr "Νέος κωδικός πρόσβασης"
 
-#: admin/forms.py:328
+#: admin/forms.py:429
 msgid "New password confirmation"
 msgstr "Επιβεβαίωση νέου κωδικού πρόσβασης"
 
-#: admin/forms.py:347
+#: admin/forms.py:448
 msgid "Email notification requires valid email address."
 msgstr "Η ειδοποίηση μέσω ηλεκτρονικού ταχυδρομείου απαιτεί έγκυρη διεύθυνση ηλεκτρονικού ταχυδρομείου."
 
-#: admin/forms.py:349
+#: admin/forms.py:450
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
-msgstr ""
+msgstr "Το δικαίωμα για προσθήκη σελίδων απαιτεί το δικαίωμα για τροποποίηση σελίδων."
 
-#: admin/forms.py:351
+#: admin/forms.py:452
 msgid ""
 "The permission to add new users requires the permission to change users!"
-msgstr ""
+msgstr "Το δικαίωμα για προσθήκη νέων χρηστών απαιτεί το δικαίωμα για τροποποίηση χρηστών!"
 
-#: admin/forms.py:353
+#: admin/forms.py:454
 msgid "To add permissions you also need to edit them!"
-msgstr ""
+msgstr "Για να προσθέσετε δικαιώματα πρέπει να τα επεξεργαστείτε!"
 
-#: admin/pageadmin.py:103
-msgid "Basic Settings"
-msgstr "Βασικές ρυθμίσεις."
-
-#: admin/pageadmin.py:106
-msgid "Note: This page reloads if you change the selection. Save it first."
-msgstr ""
-
-#: admin/pageadmin.py:108 admin/pageadmin.py:159
-msgid "Hidden"
-msgstr "Κρυφό"
-
-#: admin/pageadmin.py:112
+#: admin/pageadmin.py:282 templates/admin/cms/page/submit_row.html:10
 msgid "Advanced Settings"
 msgstr "Προχωρημένες Ρυθμίσεις"
 
-#: admin/pageadmin.py:119
-msgid "SEO Settings"
-msgstr "Ρυθμίσεις Βελτιστοποίησης Μηχανών Αναζήτησης (SEO)"
-
-#: admin/pageadmin.py:638
-msgid "You do not have permission to change pages."
+#: admin/pageadmin.py:291
+msgid "Change Permissions"
 msgstr ""
 
-#: admin/pageadmin.py:650
-msgid "Database error"
-msgstr "Σφάλμα στη βάση δεδομένων"
-
-#: admin/pageadmin.py:743
-msgid "You do not have permission to change the template"
-msgstr ""
-
-#: admin/pageadmin.py:747
-msgid "Template not valid"
-msgstr ""
-
-#: admin/pageadmin.py:752
-#, python-format
-msgid "Template changed to %s"
-msgstr ""
-
-#: admin/pageadmin.py:754
-msgid "The template was successfully changed"
-msgstr ""
-
-#: admin/pageadmin.py:776
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
-
-#: admin/pageadmin.py:780
-msgid "Page moved"
-msgstr ""
-
-#: admin/pageadmin.py:866 admin/pageadmin.py:1054
-msgid "You do not have permission to publish this page"
-msgstr "Δεν έχεις δικαίωμα δημοσίευσης αυτής της σελίδας"
-
-#: admin/pageadmin.py:868
-#, python-format
-msgid "The page \"%s\" was successfully published."
-msgstr ""
-
-#: admin/pageadmin.py:910 admin/pageadmin.py:946 admin/pageadmin.py:1178
-#: admin/pageadmin.py:1211 admin/pageadmin.py:1344 admin/pageadmin.py:1376
-msgid "You do not have permission to change this page"
-msgstr "Δεν έχεις δικαίωμα αλλαγής αυτής της σελίδας"
-
-#: admin/pageadmin.py:914
-#, python-format
-msgid "The page \"%s\" was successfully reverted."
-msgstr ""
-
-#: admin/pageadmin.py:950
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
-
-#: admin/pageadmin.py:956
-msgid "There only exists one translation for this page"
-msgstr ""
-
-#: admin/pageadmin.py:985
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
-
-#: admin/pageadmin.py:1007
-msgid "Are you sure?"
-msgstr "Είσαι σίγουρος?"
-
-#: admin/pageadmin.py:1063
-#, python-format
-msgid "The page \"%s\" was successfully unpublished"
-msgstr ""
-
-#: admin/pageadmin.py:1065
-#, python-format
-msgid "The page \"%s\" was successfully published"
-msgstr ""
-
-#: admin/pageadmin.py:1083
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Δεν έχεις δικαίωμα αλλαγής της κατάστασης in_navigation αυτής της σελίδας"
-
-#: admin/pageadmin.py:1108
-msgid "You do not have permission to add a plugin"
-msgstr ""
-
-#: admin/pageadmin.py:1149 admin/pageadmin.py:1180
-msgid "Language must be set to a supported language!"
-msgstr ""
-
-#: admin/pageadmin.py:1160
+#: admin/pageadmin.py:536
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
+msgstr "%(plugin_name)s πρόσθετο προστέθηκε στο %(placeholder)s"
 
-#: admin/pageadmin.py:1182
-msgid "Language must be different than the copied language!"
-msgstr ""
-
-#: admin/pageadmin.py:1188
-msgid "You do not have permission to add plugins"
-msgstr ""
-
-#: admin/pageadmin.py:1193
+#: admin/pageadmin.py:543
 #, python-format
-msgid "Copied %(language)s plugins to %(placeholder)s"
+msgid "Copied plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:1243
-msgid "This plugin is not saved in a revision"
-msgstr ""
-
-#: admin/pageadmin.py:1246 admin/pageadmin.py:1340
-msgid "You do not have permission to edit a plugin"
-msgstr ""
-
-#: admin/pageadmin.py:1306
+#: admin/pageadmin.py:553
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
+msgstr "το %(plugin_name)s πρόσθετο επεξεργάστηκε στη θέση %(position)s του %(placeholder)s"
 
-#: admin/pageadmin.py:1371
-msgid "You do not have permission to move a plugin"
-msgstr ""
-
-#: admin/pageadmin.py:1390
+#: admin/pageadmin.py:563
 msgid "Plugins were moved"
 msgstr ""
 
-#: admin/pageadmin.py:1403 admin/pageadmin.py:1412
-msgid "You do not have permission to remove a plugin"
-msgstr ""
-
-#: admin/pageadmin.py:1422 admin/placeholderadmin.py:348
+#: admin/pageadmin.py:570
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
+msgstr "%(plugin_name)s πρόσθετο στη θέση %(position)s του %(placeholder)s διαγράφηκε."
+
+#: admin/pageadmin.py:582
+#, python-format
+msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 msgstr ""
 
-#: admin/permissionadmin.py:75
+#: admin/pageadmin.py:600
+msgid "You do not have permission to change pages."
+msgstr ""
+
+#: admin/pageadmin.py:612
+msgid "Database error"
+msgstr "Σφάλμα στη βάση δεδομένων"
+
+#: admin/pageadmin.py:708 admin/pageadmin.py:749 admin/pageadmin.py:1033
+#: admin/pageadmin.py:1069
+msgid "You do not have permission to change this page"
+msgstr "Δεν έχετε δικαίωμα αλλαγής αυτής της σελίδας"
+
+#: admin/pageadmin.py:784
+msgid "You do not have permission to change the template"
+msgstr ""
+
+#: admin/pageadmin.py:788
+msgid "Template not valid"
+msgstr ""
+
+#: admin/pageadmin.py:793
+#, python-format
+msgid "Template changed to %s"
+msgstr ""
+
+#: admin/pageadmin.py:795
+msgid "The template was successfully changed"
+msgstr ""
+
+#: admin/pageadmin.py:817
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr ""
+
+#: admin/pageadmin.py:821
+msgid "Page moved"
+msgstr ""
+
+#: admin/pageadmin.py:867 admin/placeholderadmin.py:245
+#: admin/placeholderadmin.py:291
+msgid "Language must be set to a supported language!"
+msgstr "Η γλώσσα πρέπει τεθεί σε κάποια που υποστηρίζεται!"
+
+#: admin/pageadmin.py:872 admin/placeholderadmin.py:310
+msgid "You do not have permission to copy these plugins."
+msgstr ""
+
+#: admin/pageadmin.py:875
+#, python-format
+msgid "Copied plugins from %(source_language)s to %(target_language)s"
+msgstr ""
+
+#: admin/pageadmin.py:927
+msgid "You do not have permission to publish this page"
+msgstr "Δεν έχετε δικαίωμα δημοσίευσης αυτής της σελίδας"
+
+#: admin/pageadmin.py:942
+msgid "The content was successfully published."
+msgstr ""
+
+#: admin/pageadmin.py:951
+msgid "There was a problem publishing your content"
+msgstr ""
+
+#: admin/pageadmin.py:1002
+msgid "You do not have permission to unpublish this page"
+msgstr ""
+
+#: admin/pageadmin.py:1004
+msgid "This page was never published"
+msgstr ""
+
+#: admin/pageadmin.py:1007
+#, python-format
+msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+msgstr ""
+
+#: admin/pageadmin.py:1037
+#, python-format
+msgid "The page \"%s\" was successfully reverted."
+msgstr ""
+
+#: admin/pageadmin.py:1073
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s αντικείμενο με πρωτεύων κλειδί %(key)r δεν υφίσταται."
+
+#: admin/pageadmin.py:1079
+msgid "There only exists one translation for this page"
+msgstr "Υπάρχει μόνο μια μετάφραση για αυτή τη σελίδα."
+
+#: admin/pageadmin.py:1108
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "Τίτλοι και πρόσθετα με γλώσσα %(language)s διαγράφηκαν"
+
+#: admin/pageadmin.py:1130 admin/placeholderadmin.py:497
+#: admin/placeholderadmin.py:537
+msgid "Are you sure?"
+msgstr "Είστε σίγουρος?"
+
+#: admin/pageadmin.py:1173
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Δεν έχετε δικαίωμα αλλαγής της κατάστασης in_navigation αυτής της σελίδας"
+
+#: admin/pageadmin.py:1206
+msgid "You do not have permission to edit this page"
+msgstr ""
+
+#: admin/permissionadmin.py:84
 msgid "View restriction"
 msgstr ""
 
-#: admin/permissionadmin.py:76
+#: admin/permissionadmin.py:85
 msgid "View restrictions"
 msgstr ""
 
-#: admin/permissionadmin.py:130 models/permissionmodels.py:97
+#: admin/permissionadmin.py:140 models/permissionmodels.py:100
 msgid "Page permissions"
-msgstr "Άδειες σελίδας"
+msgstr "Δικαιώματα σελίδας"
 
-#: admin/permissionadmin.py:131
+#: admin/permissionadmin.py:141
 msgid "User & Group permissions"
-msgstr "Άδειες Χρηστών και Ομάδων"
+msgstr "Δικαιώματα Χρηστών και Ομάδων"
 
-#: admin/permissionadmin.py:132
+#: admin/permissionadmin.py:142
 msgid "Page permissions management"
+msgstr "Διαχείριση δικαιωμάτων σελίδας"
+
+#: admin/placeholderadmin.py:72
+#, python-format
+msgid "Fields %s not editabled in the frontend"
 msgstr ""
 
-#: admin/placeholderadmin.py:190 admin/placeholderadmin.py:216
-msgid "You don't have permission to add content here."
+#: admin/placeholderadmin.py:74
+msgid "You do not have permission to edit this item"
 msgstr ""
 
-#: admin/placeholderadmin.py:212
-msgid "You don't have permission to add plugins"
+#: admin/placeholderadmin.py:221
+msgid "You do not have permission to add a plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:344
-msgid "You don't have permission to delete a plugin"
+#: admin/placeholderadmin.py:247
+msgid "Parent plugin language must be same as language!"
 msgstr ""
 
-#: admin/useradmin.py:26
+#: admin/placeholderadmin.py:345
+msgid "You do not have permission to edit this plugin"
+msgstr ""
+
+#: admin/placeholderadmin.py:426
+msgid "You have no permission to move this plugin"
+msgstr ""
+
+#: admin/placeholderadmin.py:474 admin/placeholderadmin.py:485
+msgid "You do not have permission to delete this plugin"
+msgstr ""
+
+#: admin/placeholderadmin.py:489
+#, python-format
+msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#: admin/placeholderadmin.py:495 admin/placeholderadmin.py:535
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: admin/placeholderadmin.py:515 admin/placeholderadmin.py:526
+msgid "You do not have permission to clear this placeholder"
+msgstr ""
+
+#: admin/placeholderadmin.py:530
+#, python-format
+msgid "The placeholder \"%(obj)s\" was cleared successfully."
+msgstr ""
+
+#: admin/placeholderadmin.py:540
+msgid "placeholder"
+msgstr ""
+
+#: admin/useradmin.py:25
 msgid "User details"
 msgstr "Λεπτομέρειες Χρήστη"
 
-#: admin/useradmin.py:27
+#: admin/useradmin.py:26
 msgid "Groups"
 msgstr "Ομάδες"
 
-#: admin/useradmin.py:37 templates/cms/toolbar/items/login.html:7
+#: admin/useradmin.py:36 templates/cms/toolbar/items/login.html:5
 msgid "Password"
 msgstr "Κωδικός πρόσβασης"
 
 #: admin/dialog/forms.py:9
 msgid "Copy permissions"
-msgstr "Αντιγραφή αδειών"
+msgstr "Αντιγραφή δικαιωμάτων"
 
-#: forms/fields.py:19
+#: forms/fields.py:29
 msgid "Select a valid site"
 msgstr ""
 
-#: forms/fields.py:20
+#: forms/fields.py:30
 msgid "Select a valid page"
 msgstr ""
 
-#: forms/widgets.py:176
+#: forms/widgets.py:141
 msgid "Add Another"
 msgstr "Προσθήκη και άλλου"
 
-#: models/moderatormodels.py:24
-msgid "created"
-msgstr ""
-
-#: models/moderatormodels.py:25
-msgid "changed"
-msgstr ""
-
-#: models/moderatormodels.py:37
-msgid "Page moderator state"
-msgstr ""
-
-#: models/moderatormodels.py:38
-msgid "Page moderator states"
-msgstr ""
-
-#: models/pagemodel.py:34
+#: models/pagemodel.py:38
 msgid "for logged in users only"
 msgstr ""
 
-#: models/pagemodel.py:35
+#: models/pagemodel.py:39
 msgid "for anonymous users only"
 msgstr ""
 
-#: models/pagemodel.py:45
+#: models/pagemodel.py:44
 msgid "created by"
-msgstr ""
+msgstr "δημιουργημένο από"
 
-#: models/pagemodel.py:46 templates/admin/cms/page/change_list_tree.html:15
+#: models/pagemodel.py:45
 msgid "changed by"
-msgstr ""
+msgstr "τροποποιημένο από"
+
+#: models/pagemodel.py:50 templates/admin/cms/page/tree/menu_item.html:65
+msgid "publication date"
+msgstr "ημερομηνία δημοσίευσης"
 
 #: models/pagemodel.py:51
-msgid "publication date"
-msgstr ""
-
-#: models/pagemodel.py:52
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
+msgstr "Όταν η σελίδα πρέπει να δημοσιοποιηθεί. Η κατάσταση πρέπει να είναι \"Δημοσιοποιημένη\" ώστε η σελίδα να δημοσιοποιηθεί."
+
+#: models/pagemodel.py:52 templates/admin/cms/page/tree/menu_item.html:66
+msgid "publication end date"
+msgstr "ημερομηνία λήξης δημοσίευσης"
 
 #: models/pagemodel.py:53
-msgid "publication end date"
-msgstr ""
-
-#: models/pagemodel.py:54
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "Πότε να λήξει η σελίδα. Αφήστε κενό για να μην λήξει ποτέ."
 
-#: models/pagemodel.py:56 templates/admin/cms/page/change_list_tree.html:9
+#: models/pagemodel.py:55
 msgid "in navigation"
-msgstr ""
+msgstr "στην πλοήγηση"
+
+#: models/pagemodel.py:56
+msgid "soft root"
+msgstr "soft root"
 
 #: models/pagemodel.py:57
-msgid "soft root"
-msgstr ""
-
-#: models/pagemodel.py:58
 msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
-#: models/pagemodel.py:59
+#: models/pagemodel.py:58
 msgid "id"
 msgstr "id"
 
-#: models/pagemodel.py:60
+#: models/pagemodel.py:59
 msgid ""
-"An unique identifier that is used with the page_url templatetag for linking "
+"A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
 
-#: models/pagemodel.py:61
+#: models/pagemodel.py:60
 msgid "attached menu"
 msgstr ""
 
-#: models/pagemodel.py:62
-msgid "is published"
-msgstr ""
-
-#: models/pagemodel.py:64 plugins/snippet/models.py:14
+#: models/pagemodel.py:61 templates/admin/cms/page/tree/menu_item.html:69
 msgid "template"
-msgstr ""
+msgstr "περίγραμμα"
 
-#: models/pagemodel.py:65
+#: models/pagemodel.py:62
 msgid "The template used to render the content."
-msgstr ""
+msgstr "Το περίγραμμα που χρησιμοποιήθηκε για να προσφερθεί το περιεχόμενο."
 
-#: models/pagemodel.py:66
+#: models/pagemodel.py:64
 msgid "The site the page is accessible at."
-msgstr ""
+msgstr "Ο ιστότοπος στον οποίο είναι διαθέσιμη η σελίδα."
 
-#: models/pagemodel.py:66
+#: models/pagemodel.py:64
 msgid "site"
-msgstr ""
+msgstr "ιστότοπος"
+
+#: models/pagemodel.py:67
+msgid "login required"
+msgstr "απαιτείται σύνδεση"
 
 #: models/pagemodel.py:68
-msgid "login required"
-msgstr ""
-
-#: models/pagemodel.py:69
 msgid "menu visibility"
 msgstr ""
 
-#: models/pagemodel.py:71
+#: models/pagemodel.py:70
 msgid "limit when this page is visible in the menu"
 msgstr ""
 
-#: models/pagemodel.py:96 models/permissionmodels.py:91
-#: models/titlemodels.py:22 plugins/inherit/forms.py:9 plugins/link/forms.py:9
-#: plugins/link/models.py:12 plugins/picture/models.py:23
-#: plugins/teaser/models.py:13
+#: models/pagemodel.py:72
+msgid "application"
+msgstr "εφαρμογή"
+
+#: models/pagemodel.py:73
+msgid "application instance name"
+msgstr ""
+
+#: models/pagemodel.py:100 models/permissionmodels.py:94
+#: models/titlemodels.py:27
 msgid "page"
 msgstr "σελίδα"
 
-#: models/pagemodel.py:97
+#: models/pagemodel.py:101
 msgid "pages"
+msgstr "σελίδες"
+
+#: models/pagemodel.py:735
+msgid "Empty"
 msgstr ""
 
-#: models/pagemodel.py:304
-msgid "Page was copied."
-msgstr ""
-
-#: models/pagemodel.py:772
+#: models/pagemodel.py:849
 msgid "default"
-msgstr "Εξ' Ορισμού"
-
-#: models/permissionmodels.py:27
-msgid "Current page"
-msgstr ""
+msgstr "εξ' ορισμού"
 
 #: models/permissionmodels.py:28
-msgid "Page children (immediate)"
-msgstr ""
+msgid "Current page"
+msgstr "Τρέχουσα σελίδα"
 
 #: models/permissionmodels.py:29
-msgid "Page and children (immediate)"
-msgstr ""
+msgid "Page children (immediate)"
+msgstr "Υποσελίδες (άμεσες)"
 
 #: models/permissionmodels.py:30
-msgid "Page descendants"
-msgstr ""
+msgid "Page and children (immediate)"
+msgstr "Τρέχουσα σελίδα και υποσελίδες (άμεσες)"
 
 #: models/permissionmodels.py:31
+msgid "Page descendants"
+msgstr "Όλες οι υποσελίδες"
+
+#: models/permissionmodels.py:32
 msgid "Page and descendants"
-msgstr ""
+msgstr "Τρέχουσα σελίδα και όλες οι υποσελίδες"
 
-#: models/permissionmodels.py:40
+#: models/permissionmodels.py:41
 msgid "group"
-msgstr ""
-
-#: models/permissionmodels.py:43
-msgid "can edit"
-msgstr ""
+msgstr "ομάδα"
 
 #: models/permissionmodels.py:44
-msgid "can add"
-msgstr ""
+msgid "can edit"
+msgstr "μπορεί να επεξεργαστεί"
 
 #: models/permissionmodels.py:45
-msgid "can delete"
-msgstr ""
+msgid "can add"
+msgstr "μπορεί να προστεθεί"
 
 #: models/permissionmodels.py:46
-msgid "can change advanced settings"
-msgstr ""
+msgid "can delete"
+msgstr "μπορεί να διαγραφεί"
 
 #: models/permissionmodels.py:47
+msgid "can change advanced settings"
+msgstr "μπορεί να τροποποιήσει προχωρημένες ρυθμίσεις"
+
+#: models/permissionmodels.py:48
 msgid "can publish"
-msgstr ""
-
-#: models/permissionmodels.py:48
-msgid "can change permissions"
-msgstr ""
-
-#: models/permissionmodels.py:48
-msgid "on page level"
-msgstr ""
+msgstr "μπορεί να δημοσιεύσει"
 
 #: models/permissionmodels.py:49
-msgid "can move"
-msgstr ""
+msgid "can change permissions"
+msgstr "μπορεί να τροποποιήσει δικαιώματα"
+
+#: models/permissionmodels.py:49
+msgid "on page level"
+msgstr "σε επίπεδο σελίδας"
 
 #: models/permissionmodels.py:50
+msgid "can move"
+msgstr "μπορεί να μετακινήσει"
+
+#: models/permissionmodels.py:51
 msgid "view restricted"
 msgstr ""
 
-#: models/permissionmodels.py:50
+#: models/permissionmodels.py:51
 msgid "frontend view restriction"
 msgstr ""
 
-#: models/permissionmodels.py:73
+#: models/permissionmodels.py:75
 msgid "can recover pages"
-msgstr ""
+msgstr "μπορεί να ανακτήσει σελίδες"
 
-#: models/permissionmodels.py:73
+#: models/permissionmodels.py:75
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "μπορεί να ανακτήσει οποιαδήποτε διαγραμμένη σελίδα"
 
-#: models/permissionmodels.py:74
+#: models/permissionmodels.py:76
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
+msgstr "Αν κανένα δεν είναι επιλεγμένο, ο χρήστης έχει παραχωρημένα δικαιώματα σε όλους τους ιστότοπους."
 
-#: models/permissionmodels.py:74
+#: models/permissionmodels.py:76
 msgid "sites"
-msgstr ""
+msgstr "ιστότοποι"
 
-#: models/permissionmodels.py:79
+#: models/permissionmodels.py:81
 msgid "Page global permission"
-msgstr ""
+msgstr "Δικαίωμα σε όλη τη σελίδα"
 
-#: models/permissionmodels.py:80
+#: models/permissionmodels.py:82
 msgid "Pages global permissions"
-msgstr ""
+msgstr "Δικαιώματα σε όλες τις σελίδες"
 
-#: models/permissionmodels.py:90 templates/admin/cms/page/permissions.html:15
+#: models/permissionmodels.py:93 templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
-msgstr ""
+msgstr "Χορήγηση σε"
 
-#: models/permissionmodels.py:96
+#: models/permissionmodels.py:99
 msgid "Page permission"
-msgstr ""
+msgstr "Δικαίωμα σελίδας"
 
-#: models/permissionmodels.py:111
+#: models/permissionmodels.py:114
 msgid "User (page)"
-msgstr ""
+msgstr "Χρήστης (σελίδα)"
 
-#: models/permissionmodels.py:112
+#: models/permissionmodels.py:115
 msgid "Users (page)"
-msgstr ""
+msgstr "Χρήστες (σελίδα)"
 
-#: models/permissionmodels.py:122
+#: models/permissionmodels.py:125
 msgid "User group (page)"
-msgstr ""
+msgstr "Ομάδα χρηστών (σελίδα)"
 
-#: models/permissionmodels.py:123
+#: models/permissionmodels.py:126
 msgid "User groups (page)"
-msgstr ""
+msgstr "Ομάδες χρηστών (σελίδα)"
 
-#: models/placeholdermodel.py:12
+#: models/placeholdermodel.py:17
 msgid "slot"
-msgstr ""
+msgstr "σχισμή"
 
-#: models/placeholdermodel.py:13 plugins/flash/models.py:9
-#: plugins/googlemap/models.py:36 plugins/video/models.py:13
+#: models/placeholdermodel.py:18
 msgid "width"
 msgstr "πλάτος"
 
-#: models/pluginmodel.py:83
+#: models/pluginmodel.py:74
 msgid "position"
 msgstr "θέση"
 
-#: models/pluginmodel.py:84 models/titlemodels.py:11
-#: plugins/inherit/models.py:11
+#: models/pluginmodel.py:75 models/titlemodels.py:15
 msgid "language"
 msgstr "γλώσσα"
 
-#: models/pluginmodel.py:85
+#: models/pluginmodel.py:76
 msgid "plugin_name"
 msgstr ""
 
-#: models/pluginmodel.py:86 models/titlemodels.py:23
+#: models/pluginmodel.py:77 models/titlemodels.py:28
 msgid "creation date"
-msgstr ""
+msgstr "ημερομηνία δημιουργίας"
 
-#: models/pluginmodel.py:145
+#: models/pluginmodel.py:138
 msgid "<Empty>"
 msgstr ""
 
-#: models/titlemodels.py:12 models/titlemodels.py:13 models/titlemodels.py:21
-#: plugins/file/models.py:25 plugins/teaser/models.py:9
-#: plugins/twitter/models.py:6 plugins/twitter/models.py:15
-#: templates/admin/cms/page/change_list_tree.html:6
+#: models/settingmodels.py:13
+msgid "The language for the admin interface and toolbar"
+msgstr ""
+
+#: models/settingmodels.py:17
+msgid "user setting"
+msgstr ""
+
+#: models/settingmodels.py:18
+msgid "user settings"
+msgstr ""
+
+#: models/static_placeholder.py:26
+msgid "by template"
+msgstr ""
+
+#: models/static_placeholder.py:27
+msgid "by code"
+msgstr ""
+
+#: models/static_placeholder.py:30
+msgid "static placeholder name"
+msgstr ""
+
+#: models/static_placeholder.py:31
+msgid ""
+"Descriptive name to identify this static placeholder. Not displayed to "
+"users."
+msgstr ""
+
+#: models/static_placeholder.py:33
+msgid "placeholder code"
+msgstr ""
+
+#: models/static_placeholder.py:34
+msgid "To render the static placeholder in templates."
+msgstr ""
+
+#: models/static_placeholder.py:35
+msgid "placeholder content"
+msgstr ""
+
+#: models/static_placeholder.py:39
+msgid "creation_method"
+msgstr ""
+
+#: models/static_placeholder.py:44
+msgid "static placeholder"
+msgstr ""
+
+#: models/static_placeholder.py:45
+msgid "static placeholders"
+msgstr ""
+
+#: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
 msgid "title"
-msgstr ""
+msgstr "τίτλος"
 
-#: models/titlemodels.py:13
+#: models/titlemodels.py:18
+msgid "overwrite the title (html title tag)"
+msgstr "αντικατάσταση του τίτλου (html title tag)"
+
+#: models/titlemodels.py:20
 msgid "overwrite the title in the menu"
+msgstr "αντικατάσταση του τίτλου στο μενού"
+
+#: models/titlemodels.py:21
+msgid "description"
+msgstr "περιγραφή"
+
+#: models/titlemodels.py:22
+msgid "The text displayed in search engines."
 msgstr ""
 
-#: models/titlemodels.py:14
+#: models/titlemodels.py:23
 msgid "slug"
 msgstr "slug"
 
-#: models/titlemodels.py:15
+#: models/titlemodels.py:24
 msgid "Path"
-msgstr ""
+msgstr "Διαδρομή"
 
-#: models/titlemodels.py:16
+#: models/titlemodels.py:25
 msgid "has url overwrite"
 msgstr ""
 
-#: models/titlemodels.py:17
-msgid "application"
-msgstr ""
-
-#: models/titlemodels.py:18
+#: models/titlemodels.py:26
 msgid "redirect"
-msgstr ""
-
-#: models/titlemodels.py:19 plugins/teaser/models.py:20
-msgid "description"
-msgstr ""
-
-#: models/titlemodels.py:20
-msgid "keywords"
-msgstr ""
-
-#: models/titlemodels.py:21
-msgid "overwrite the title (html title tag)"
-msgstr ""
-
-#: plugins/utils.py:124
-#, python-format
-msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
-
-#: plugins/utils.py:134
-#, python-format
-msgid ""
-"This placeholder already has the maximum number (%(limit)s) of allowed "
-"%(plugin_name)s plugins."
-msgstr ""
-
-#: plugins/file/cms_plugins.py:9
-msgid "File"
-msgstr "Αρχείο"
-
-#: plugins/file/models.py:24 plugins/flash/models.py:8
-msgid "file"
-msgstr "αρχείο"
-
-#: plugins/file/templates/cms/plugins/file.html:6
-msgid "file missing!"
-msgstr ""
-
-#: plugins/flash/cms_plugins.py:9
-msgid "Flash"
-msgstr ""
-
-#: plugins/flash/models.py:8
-msgid "use swf file"
-msgstr ""
-
-#: plugins/flash/models.py:10 plugins/googlemap/models.py:38
-#: plugins/video/models.py:14
-msgid "height"
-msgstr "ύψος"
-
-#: plugins/flash/templates/cms/plugins/flash.html:40
-#: plugins/video/templates/cms/plugins/video.html:60
-msgid "Missing flash plugin. Please download the latest Adobe Flash Player: "
-msgstr ""
-
-#: plugins/flash/templates/cms/plugins/flash.html:42
-#: plugins/video/templates/cms/plugins/video.html:62
-msgid "Get Adobe Flash Player"
-msgstr ""
-
-#: plugins/googlemap/cms_plugins.py:10
-msgid "Google Map"
-msgstr "Χάρτης Google"
-
-#: plugins/googlemap/cms_plugins.py:19
-msgid "Advanced"
-msgstr ""
-
-#: plugins/googlemap/forms.py:23
-msgid "Must be a positive integer followed by “px” or “%”."
-msgstr ""
-
-#: plugins/googlemap/forms.py:26
-msgid "Must be a positive integer followed by “px”."
-msgstr ""
-
-#: plugins/googlemap/models.py:10
-msgid "map title"
-msgstr "τίτλος χάρτη"
-
-#: plugins/googlemap/models.py:13
-msgid "address"
-msgstr "διεύθυνση"
-
-#: plugins/googlemap/models.py:14
-msgid "zip code"
-msgstr "ταχυδρομικός κώδικας"
-
-#: plugins/googlemap/models.py:15
-msgid "city"
-msgstr "πόλη"
-
-#: plugins/googlemap/models.py:17
-msgid "additional content"
-msgstr ""
-
-#: plugins/googlemap/models.py:19
-msgid "Displayed under address in the bubble."
-msgstr ""
-
-#: plugins/googlemap/models.py:21
-msgid "zoom level"
-msgstr ""
-
-#: plugins/googlemap/models.py:24
-msgid "latitude"
-msgstr "γεωγραφικό πλάτος"
-
-#: plugins/googlemap/models.py:26
-msgid "Use latitude & longitude to fine tune the map position."
-msgstr ""
-
-#: plugins/googlemap/models.py:28
-msgid "longitude"
-msgstr "γεωγραφικό μήκος"
-
-#: plugins/googlemap/models.py:31
-msgid "route planer title"
-msgstr ""
-
-#: plugins/googlemap/models.py:33
-msgid "Calculate your fastest way to here"
-msgstr ""
-
-#: plugins/googlemap/models.py:34
-msgid "route planer"
-msgstr ""
-
-#: plugins/googlemap/models.py:37
-msgid "Plugin width (in pixels or percent)."
-msgstr ""
-
-#: plugins/googlemap/models.py:39
-msgid "Plugin height (in pixels)."
-msgstr ""
-
-#: plugins/googlemap/models.py:47
-msgid "Map"
-msgstr "Χάρτης"
-
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:72
-msgid "Your address: "
-msgstr ""
-
-#: plugins/googlemap/templates/cms/plugins/googlemap.html:74
-msgid "Calculate route"
-msgstr "Υπολογισμός διαδρομής"
-
-#: plugins/inherit/cms_plugins.py:17
-msgid "Inherit Plugins from Page"
-msgstr ""
-
-#: plugins/inherit/forms.py:23
-msgid "Language or Page must be filled out"
-msgstr ""
-
-#: plugins/inherit/models.py:10
-msgid ""
-"Choose a page to include its plugins into this placeholder, empty will "
-"choose current page"
-msgstr ""
-
-#: plugins/inherit/models.py:11
-msgid "Optional: the language of the plugins you want"
-msgstr ""
-
-#: plugins/link/cms_plugins.py:12
-msgid "Link"
-msgstr "Δεσμός"
-
-#: plugins/link/models.py:10 plugins/snippet/models.py:12
-msgid "name"
-msgstr "όνομα"
-
-#: plugins/link/models.py:11 plugins/picture/models.py:21
-#: plugins/teaser/models.py:19
-msgid "link"
-msgstr "σύνδεσμος"
-
-#: plugins/link/models.py:12
-msgid "A link to a page has priority over a text link."
-msgstr "Ένας σύνδεσμος σε σελίδα έχει προτεραιότητα έναντι ενός σύνδεσμου σε κειμένο."
-
-#: plugins/link/models.py:13
-msgid "mailto"
-msgstr "δεσμός αποστολής email"
-
-#: plugins/link/models.py:13
-msgid "An email adress has priority over a text link."
-msgstr "Μια διεύθυνση ηλεκτρονικής αλληλογραφίας έχει προτεραιότητα έναντι ενός συνδέσμου σε κείμενο"
-
-#: plugins/link/models.py:14
-msgid "target"
-msgstr "στόχος"
-
-#: plugins/link/models.py:15
-msgid "same window"
-msgstr "ίδιο παράθυρο"
-
-#: plugins/link/models.py:16
-msgid "new window"
-msgstr "νέο παράθυρο"
-
-#: plugins/link/models.py:17
-msgid "parent window"
-msgstr "αρχικό παράθυρο"
-
-#: plugins/link/models.py:18
-msgid "topmost frame"
-msgstr ""
-
-#: plugins/picture/cms_plugins.py:9
-msgid "Picture"
-msgstr "Εικόνα"
-
-#: plugins/picture/models.py:15
-msgid "left"
-msgstr "αριστερά"
-
-#: plugins/picture/models.py:16
-msgid "right"
-msgstr "δεξιά"
-
-#: plugins/picture/models.py:17
-msgid "center"
-msgstr ""
-
-#: plugins/picture/models.py:20 plugins/teaser/models.py:10
-#: plugins/video/models.py:11
-msgid "image"
-msgstr "εικόνα"
-
-#: plugins/picture/models.py:22
-msgid "If present, clicking on image will take user to link."
-msgstr ""
-
-#: plugins/picture/models.py:24
-msgid ""
-"If present, clicking on image will take user         to specified page."
-msgstr ""
-
-#: plugins/picture/models.py:26
-msgid "alternate text"
-msgstr ""
-
-#: plugins/picture/models.py:27
-msgid ""
-"Specifies an alternate text for an image, if         the image cannot be "
-"displayed.<br />Is also used by search engines to         classify the "
-"image."
-msgstr ""
-
-#: plugins/picture/models.py:30
-msgid "long description"
-msgstr ""
-
-#: plugins/picture/models.py:31
-msgid ""
-"When user hovers above picture,        this text will appear in a popup."
-msgstr ""
-
-#: plugins/picture/models.py:33
-msgid "side"
-msgstr ""
-
-#: plugins/picture/models.py:34
-msgid "Move image left, right or center."
-msgstr ""
-
-#: plugins/picture/models.py:51
-msgid "You can enter a Link or a Page, but not both."
-msgstr ""
-
-#: plugins/snippet/cms_plugins.py:12 plugins/snippet/models.py:24
-#: plugins/snippet/models.py:32
-msgid "Snippet"
-msgstr ""
-
-#: plugins/snippet/cms_plugins.py:30
-#, python-format
-msgid "Template %(template)s does not exist."
-msgstr ""
-
-#: plugins/snippet/models.py:13
-msgid "HTML"
-msgstr ""
-
-#: plugins/snippet/models.py:15
-msgid ""
-"Enter a template (i.e. \"snippets/plugin_xy.html\") which will be rendered. "
-msgstr ""
-
-#: plugins/snippet/models.py:25
-msgid "Snippets"
-msgstr ""
-
-#: plugins/teaser/cms_plugins.py:8
-msgid "Teaser"
-msgstr ""
-
-#: plugins/teaser/models.py:14
-msgid "If present image will be clickable"
-msgstr ""
-
-#: plugins/teaser/models.py:19
-msgid "If present image will be clickable."
-msgstr ""
-
-#: plugins/teaser/templates/cms/plugins/teaser.html:11
-#: templates/cms/toolbar/toolbar.html:68
-msgid "more"
-msgstr ""
-
-#: plugins/text/cms_plugins.py:15
-msgid "Text"
-msgstr ""
-
-#: plugins/text/models.py:14
-msgid "body"
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:30
-msgid "Plugins"
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:38
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:106
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:69
-msgid "Please select a plugin type."
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:54
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:112
-msgid "Edit selected plugin"
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:58
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:124
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:87
-msgid "Text editor does not support editing objects."
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:63
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:129
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:92
-msgid "No object selected."
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:112
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:75
-msgid "Text editor does not support inserting objects."
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/tinymce.html:133
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:96
-msgid "Not a plugin object"
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:108
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:4
-msgid "Available Plugins"
-msgstr ""
-
-#: plugins/text/templates/cms/plugins/widgets/wymeditor.html:111
-msgid "Insert plugin"
-msgstr ""
-
-#: plugins/twitter/cms_plugins.py:10
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:30
-msgid "Twitter"
-msgstr ""
-
-#: plugins/twitter/cms_plugins.py:23
-msgid "Twitter Search"
-msgstr ""
-
-#: plugins/twitter/models.py:7
-msgid "twitter user"
-msgstr ""
-
-#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
-msgid "count"
-msgstr ""
-
-#: plugins/twitter/models.py:8 plugins/twitter/models.py:17
-msgid "Number of entries to display"
-msgstr ""
-
-#: plugins/twitter/models.py:9
-msgid "link hint"
-msgstr ""
-
-#: plugins/twitter/models.py:9
-msgid "If given, the hint is displayed as link to your Twitter profile."
-msgstr ""
-
-#: plugins/twitter/models.py:16
-msgid "query"
-msgstr ""
-
-#: plugins/twitter/models.py:16
-msgid ""
-"Example: \"brains AND zombies AND from:umbrella AND to:nemesis\": tweets "
-"from the user \"umbrella\" to the user \"nemesis\" that contain the words "
-"\"brains\" and \"zombies\""
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:14
-msgid "we said,"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:15
-msgid "we"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:16
-msgid "we were"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:17
-msgid "we replied to"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:18
-msgid "we were checking out"
-msgstr ""
-
-#: plugins/twitter/templates/cms/plugins/twitter_recent_entries.html:19
-msgid "loading tweets..."
-msgstr ""
-
-#: plugins/video/cms_plugins.py:10
-msgid "Video"
-msgstr ""
-
-#: plugins/video/cms_plugins.py:42
-msgid "Color Settings"
-msgstr ""
-
-#: plugins/video/models.py:9
-msgid "movie file"
-msgstr ""
-
-#: plugins/video/models.py:9
-msgid "use .flv file or h264 encoded video file"
-msgstr ""
-
-#: plugins/video/models.py:10
-msgid "movie url"
-msgstr ""
-
-#: plugins/video/models.py:10
-msgid ""
-"vimeo or youtube video url. Example: "
-"http://www.youtube.com/watch?v=-iJ7bs4mTUY"
-msgstr ""
-
-#: plugins/video/models.py:11
-msgid "preview image file"
-msgstr ""
-
-#: plugins/video/models.py:16
-msgid "auto play"
-msgstr ""
-
-#: plugins/video/models.py:17
-msgid "auto hide"
-msgstr ""
-
-#: plugins/video/models.py:18
-msgid "fullscreen"
-msgstr "πλήρης οθόνη"
-
-#: plugins/video/models.py:19
-msgid "loop"
-msgstr ""
-
-#: plugins/video/models.py:22
-msgid "background color"
-msgstr ""
-
-#: plugins/video/models.py:22 plugins/video/models.py:23
-#: plugins/video/models.py:24 plugins/video/models.py:25
-#: plugins/video/models.py:26 plugins/video/models.py:27
-#: plugins/video/models.py:28 plugins/video/models.py:29
-msgid "Hexadecimal, eg ff00cc"
-msgstr ""
-
-#: plugins/video/models.py:23
-msgid "text color"
-msgstr ""
-
-#: plugins/video/models.py:24
-msgid "seekbar color"
-msgstr ""
-
-#: plugins/video/models.py:25
-msgid "seekbar bg color"
-msgstr ""
-
-#: plugins/video/models.py:26
-msgid "loadingbar color"
-msgstr ""
-
-#: plugins/video/models.py:27
-msgid "button out color"
-msgstr ""
-
-#: plugins/video/models.py:28
-msgid "button over color"
-msgstr ""
-
-#: plugins/video/models.py:29
-msgid "button highlight color"
-msgstr ""
-
-#: templates/admin/page_submit_line.html:3
-#: templates/admin/cms/page/change_form.html:161
-#: templates/admin/cms/page/plugin_change_form.html:119
-msgid "Save"
-msgstr "Αποθήκευση"
-
-#: templates/admin/page_submit_line.html:7
-#, python-format
-msgid "Delete %(language)s translation"
-msgstr ""
-
-#: templates/admin/page_submit_line.html:11
-msgid "Save as new"
-msgstr "Αποθήκευση ως νέο"
-
-#: templates/admin/page_submit_line.html:12
-msgid "Save and add another"
-msgstr "Αποθήκευση και προσθήκη νέου"
-
-#: templates/admin/page_submit_line.html:13
-#: templates/admin/cms/page/change_form.html:162
-msgid "Save and continue editing"
-msgstr "Αποθήκευση και παραμονή σε κατάσταση επεξεργασίας"
-
-#: templates/admin/cms/mail/approvement_required.html:5
-#: templates/admin/cms/mail/approvement_required.txt:5
-#, python-format
-msgid ""
-"Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-msgstr ""
-
-#: templates/admin/cms/mail/approvement_required.html:8
-#: templates/admin/cms/mail/approvement_required.txt:7
-msgid "Last changes"
-msgstr "Τελευταίες αλλαγές"
+msgstr "ανακατεύθυνση"
+
+#: models/titlemodels.py:31
+msgid "is published"
+msgstr "είναι δημοσιευμένο"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Συνδεθείτε ως διαχειριστής <a href=\"%(login_url)s\">εδώ</a>."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
@@ -1342,226 +974,42 @@ msgstr "Όνομα χρήστη:"
 msgid "Password:"
 msgstr "Κωδικός πρόσβασης:"
 
-#: templates/admin/cms/page/change_form.html:4
-#: templates/admin/cms/page/plugin_forms_history.html:3
-#: templates/admin/cms/page/plugin_forms_ok.html:4
+#: templates/admin/cms/page/change_form.html:5
+#: templates/admin/cms/page/close_frame.html:4
 msgid "Change a page"
-msgstr ""
+msgstr "Τροποποιήστε μια σελίδα"
 
-#: templates/admin/cms/page/change_form.html:70
-#: templates/admin/cms/page/change_list.html:8
-#: templates/admin/cms/page/plugin_change_form.html:73
-#: templates/admin/cms/page/recover_form.html:14
-#: templates/admin/cms/page/revision_form.html:6
-msgid "Home"
-msgstr "Αρχική σελίδα"
-
-#: templates/admin/cms/page/change_form.html:83
-msgid "Publish draft"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:84
-msgid "Preview draft"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:86
-msgid "Revert to public"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:87
-#: templates/admin/cms/page/revision_form.html:10
-msgid "History"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:88
-msgid "View on site"
-msgstr ""
-
-#: templates/admin/cms/page/change_form.html:118
-#: templates/admin/cms/page/plugin_change_form.html:90
+#: templates/admin/cms/page/change_form.html:49
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Παρακαλώ διορθώστε το παρακάτω λάθος."
+msgstr[1] "Παρακαλώ διορθώστε τα παρακάτω λάθη."
 
-#: templates/admin/cms/page/change_form.html:138
+#: templates/admin/cms/page/change_form.html:67
 msgid "All permissions"
-msgstr ""
+msgstr "Όλα τα δικαιώματα"
 
-#: templates/admin/cms/page/change_form.html:139
-#: templates/admin/cms/page/change_form.html:150
-#: templates/admin/cms/page/loading.html:2
+#: templates/admin/cms/page/change_form.html:68
+#: templates/admin/cms/page/tree/base.html:91
 msgid "Loading..."
-msgstr ""
+msgstr "Φόρτωμα..."
 
-#: templates/admin/cms/page/change_form.html:149
-msgid "Page states"
-msgstr ""
+#: templates/admin/cms/page/change_form.html:79
+#: templates/admin/cms/page/submit_row.html:5
+#: templates/admin/cms/page/tree/copy_premissions.html:19
+#: templates/admin/cms/usersettings/change_form.html:16
+#: templates/admin/stacks/insert_stack.html:46
+msgid "Save"
+msgstr "Αποθήκευση"
 
-#: templates/admin/cms/page/change_list.html:3
-msgid "List of pages"
-msgstr ""
+#: templates/admin/cms/page/change_form.html:80
+#: templates/admin/cms/page/submit_row.html:15
+msgid "Save and continue editing"
+msgstr "Αποθήκευση και παραμονή σε κατάσταση επεξεργασίας"
 
-#: templates/admin/cms/page/change_list.html:59
-msgid "Successfully moved"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:68
-msgid "An error occured. Please reload the page"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:89
-#, python-format
-msgid "Recover deleted %(name)s"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:92
-#, python-format
-msgid "Add %(name)s"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:104
-msgid "Pages on:"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:121
-msgid "Filter:"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:121
-msgid "on"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:121
-msgid "off"
-msgstr ""
-
-#: templates/admin/cms/page/change_list.html:123
-msgid "Filter"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:8
-msgid "actions"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:10
-msgid "published"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:11
-msgid "start"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:12
-msgid "end"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:13
-msgid "restricted"
-msgstr ""
-
-#: templates/admin/cms/page/change_list_tree.html:14
-msgid "last changes"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:5
-msgid "select this page"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:5
-#: templates/admin/cms/page/menu_item.html:6
-msgid "edit this page"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:6
-#: templates/cms/toolbar/toolbar.html:63
-msgid "edit"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:16
-msgid "insert above"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:17
-msgid "insert below"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:19
-msgid "insert inside"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:23
-msgid "softroot"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:23
-msgid "home"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:26
-#, python-format
-msgid "Edit this page in %(language)s "
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:33
-msgid "Cut"
-msgstr "Αποκοπή"
-
-#: templates/admin/cms/page/menu_item.html:33
-msgid "cut"
-msgstr "αποκοπή"
-
-#: templates/admin/cms/page/menu_item.html:34
-msgid "Copy"
-msgstr "Αντιγραφή"
-
-#: templates/admin/cms/page/menu_item.html:34
-msgid "copy"
-msgstr "αντιγραφή"
-
-#: templates/admin/cms/page/menu_item.html:37
-#: templates/admin/cms/page/menu_item.html:41
-msgid "Add Child"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:37
-#: templates/admin/cms/page/menu_item.html:41
-msgid "add"
-msgstr "προσθήκη"
-
-#: templates/admin/cms/page/menu_item.html:44
-#: templates/cms/toolbar/toolbar.html:66
-msgid "delete"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:57
-msgid "Unpublish"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:62
-msgid "View on page"
-msgstr ""
-
-#: templates/admin/cms/page/menu_item.html:62
-msgid "view"
-msgstr ""
-
-#: templates/admin/cms/page/moderation_messages.html:4
-msgid "Action"
-msgstr ""
-
-#: templates/admin/cms/page/moderation_messages.html:5
-msgid "Created"
-msgstr ""
-
-#: templates/admin/cms/page/moderation_messages.html:6
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
-msgstr ""
-
-#: templates/admin/cms/page/moderation_messages.html:7
-msgid "Message"
-msgstr "Μήνυμα"
+msgstr "Χρήστης"
 
 #: templates/admin/cms/page/permissions.html:7
 msgid "Group"
@@ -1569,221 +1017,452 @@ msgstr "Ομάδα"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr ""
+msgstr "Μπορεί να επεξεργαστεί"
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
-msgstr ""
+msgstr "Μπορεί να προσθέσει"
 
 #: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr ""
+msgstr "Μπορεί να διαγράψει"
 
 #: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
-msgstr ""
+msgstr "Μπορεί να δημοσιεύσει"
 
 #: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
-msgstr ""
+msgstr "Μπορεί να αλλάξει δικαιώματα"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "Μπορεί να μετακινήσει"
 
 #: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
 msgstr ""
 
-#: templates/admin/cms/page/permissions.html:21
 #: templates/admin/cms/page/permissions.html:22
+#: templates/admin/cms/page/permissions.html:23
 msgid "(global)"
-msgstr ""
+msgstr "(καθολικό)"
 
-#: templates/admin/cms/page/permissions.html:26
+#: templates/admin/cms/page/permissions.html:27
 msgid "(current)"
-msgstr ""
+msgstr "(τρέχων)"
 
-#: templates/admin/cms/page/permissions.html:43
+#: templates/admin/cms/page/permissions.html:44
 msgid "All"
 msgstr "Όλα"
 
-#: templates/admin/cms/page/permissions.html:51
+#: templates/admin/cms/page/permissions.html:52
 msgid "Page doesn't inherit any permissions."
+msgstr "Η σελίδα δεν κληρονομεί δικαιώματα."
+
+#: templates/admin/cms/page/submit_row.html:9
+msgid "Basic Infos"
 msgstr ""
 
-#: templates/admin/cms/page/plugin_change_form.html:120
-#: templates/cms/toolbar/toolbar.html:29
-msgid "Cancel"
-msgstr ""
+#: templates/admin/cms/page/submit_row.html:13
+msgid "Save as new"
+msgstr "Αποθήκευση ως νέο"
 
-#: templates/admin/cms/page/plugin_forms_history.html:9
-msgid "An old revision of a plugin can not be saved!"
-msgstr ""
+#: templates/admin/cms/page/submit_row.html:14
+msgid "Save and add another"
+msgstr "Αποθήκευση και προσθήκη νέου"
 
-#: templates/admin/cms/page/plugin_forms_ok.html:26
-msgid "Your changes to this plugin have not been saved."
-msgstr ""
+#: templates/admin/cms/page/history/recover_header.html:13
+#: templates/admin/cms/page/history/revision_header.html:6
+#: templates/admin/cms/page/plugin/delete_confirmation.html:7
+#: templates/admin/cms/page/tree/base.html:9
+#: templates/admin/cms/usersettings/change_form.html:5
+msgid "Home"
+msgstr "Αρχική"
 
-#: templates/admin/cms/page/plugin_forms_ok.html:26
-msgid "Plugin saved successfully."
-msgstr ""
-
-#: templates/admin/cms/page/recover_form.html:17
+#: templates/admin/cms/page/history/recover_header.html:16
 #, python-format
 msgid "Recover deleted %(verbose_name)s"
-msgstr ""
+msgstr "Ανάκτηση διεγραμμένων %(verbose_name)s"
 
-#: templates/admin/cms/page/recover_form.html:24
+#: templates/admin/cms/page/history/recover_header.html:22
 msgid "Press the save button below to recover this version of the object."
-msgstr ""
+msgstr "Πατήστε το κουμπί αποθήκευσης πιο κάτω για να ανακτήσετε αυτήν την έκδοση του στοιχείου."
 
-#: templates/admin/cms/page/revision_form.html:11
+#: templates/admin/cms/page/history/revision_header.html:11
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr ""
+msgstr "Επαναφορά %(verbose_name)s"
 
-#: templates/admin/cms/page/revision_form.html:24
+#: templates/admin/cms/page/history/revision_header.html:20
 msgid "Press the save button below to revert to this version of the object."
+msgstr "Πατήστε το κουμπί αποθήκευσης πιο κάτω για να επαναφέρετε αυτήν την έκδοση του στοιχείου."
+
+#: templates/admin/cms/page/tree/base.html:4
+msgid "List of pages"
+msgstr "Λίστα σελίδων"
+
+#: templates/admin/cms/page/tree/base.html:12
+msgid "Search"
 msgstr ""
 
-#: templates/admin/cms/page/dialog/copy.html:4
+#: templates/admin/cms/page/tree/base.html:53
+msgid "Successfully moved"
+msgstr "Επιτυχής μετακίνηση"
+
+#: templates/admin/cms/page/tree/base.html:62
+msgid "An error occured. Please reload the page"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base.html:84
+#, python-format
+msgid "Recover deleted %(name)s"
+msgstr "Ανάκτηση διεγραμμένων %(name)s"
+
+#: templates/admin/cms/page/tree/base.html:87
+#, python-format
+msgid "Add %(name)s"
+msgstr "Προσθήκη %(name)s"
+
+#: templates/admin/cms/page/tree/base.html:99
+msgid "Pages on:"
+msgstr "Σελίδες:"
+
+#: templates/admin/cms/page/tree/base.html:120
+msgid "Filter:"
+msgstr "Φίλτρο:"
+
+#: templates/admin/cms/page/tree/base.html:120
+msgid "on"
+msgstr "on"
+
+#: templates/admin/cms/page/tree/base.html:120
+msgid "off"
+msgstr "off"
+
+#: templates/admin/cms/page/tree/base.html:122
+msgid "Filter"
+msgstr "Φίλτρο"
+
+#: templates/admin/cms/page/tree/base_header.html:10
+msgid "in menu"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base_header.html:11
+msgid "actions"
+msgstr "ενέργειες"
+
+#: templates/admin/cms/page/tree/base_header.html:12
+#: templates/admin/cms/page/tree/menu_item.html:63
+msgid "info"
+msgstr "πληροφορίες"
+
+#: templates/admin/cms/page/tree/base_header.html:26
+msgid ""
+"<em>There is no page around yet.</em><br /><a href=\"add/\" "
+"class=\"addlink\">Add page</a> now."
+msgstr ""
+
+#: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Copy options"
-msgstr ""
+msgstr "Ρυθμίσεις αντιγραφής"
 
-#: templates/admin/cms/page/dialog/copy.html:6
+#: templates/admin/cms/page/tree/copy_premissions.html:6
 msgid "Choose copy options"
+msgstr "Επιλογή των ρυθμησεων αντιγραφής"
+
+#: templates/admin/cms/page/tree/copy_premissions.html:20
+msgid "Close"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:7
-msgid "Generic"
+#: templates/admin/cms/page/tree/menu_item.html:6
+msgid "select this page"
+msgstr "επιλογή αυτής της σελίδας"
+
+#: templates/admin/cms/page/tree/menu_item.html:6
+msgid "edit this page"
+msgstr "τροποποίηση αυτής της σελίδας"
+
+#: templates/admin/cms/page/tree/menu_item.html:16
+msgid "insert above"
+msgstr "εισαγωγή από πάνω"
+
+#: templates/admin/cms/page/tree/menu_item.html:17
+msgid "insert below"
+msgstr "εισαγωγή από κάτω"
+
+#: templates/admin/cms/page/tree/menu_item.html:19
+msgid "insert inside"
+msgstr "εισαγωγή μέσα"
+
+#: templates/admin/cms/page/tree/menu_item.html:23
+msgid "softroot"
+msgstr "softroot"
+
+#: templates/admin/cms/page/tree/menu_item.html:23
+msgid "home"
+msgstr "αρχική"
+
+#: templates/admin/cms/page/tree/menu_item.html:24
+#, python-format
+msgid "Application: %(apphook)s"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:15
-msgid "Add Plugin"
+#: templates/admin/cms/page/tree/menu_item.html:28
+#, python-format
+msgid "Edit this page in %(language)s "
+msgstr "Επεξεργαστείτε αυτή τη σελίδα στα %(language)s"
+
+#: templates/admin/cms/page/tree/menu_item.html:43
+msgid "page settings"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:18
-msgid "From Language"
+#: templates/admin/cms/page/tree/menu_item.html:45
+#: templates/cms/toolbar/dragitem.html:12
+msgid "Copy"
+msgstr "Αντιγραφή"
+
+#: templates/admin/cms/page/tree/menu_item.html:45
+msgid "copy"
+msgstr "αντιγραφή"
+
+#: templates/admin/cms/page/tree/menu_item.html:48
+#: templates/admin/cms/page/tree/menu_item.html:52
+msgid "Add Child"
+msgstr "Προσθήκη παιδιού"
+
+#: templates/admin/cms/page/tree/menu_item.html:48
+#: templates/admin/cms/page/tree/menu_item.html:52
+msgid "add"
+msgstr "προσθήκη"
+
+#: templates/admin/cms/page/tree/menu_item.html:56
+#: templates/cms/toolbar/dragitem.html:13
+msgid "Cut"
+msgstr "Αποκοπή"
+
+#: templates/admin/cms/page/tree/menu_item.html:56
+msgid "cut"
+msgstr "αποκοπή"
+
+#: templates/admin/cms/page/tree/menu_item.html:58
+msgid "delete"
+msgstr "διαγραφή"
+
+#: templates/admin/cms/page/tree/menu_item.html:67
+msgid "is restricted"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/installed_plugins_inc.html:25
-msgid "Copy Plugins"
+#: templates/admin/cms/page/tree/menu_item.html:68
+msgid "last change by"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:12
-msgid "You must save the page first to add plugins."
+#: templates/admin/stacks/insert_stack.html:4
+#: templates/admin/stacks/insert_stack.html:24
+msgid "Insert Stack"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:15
-msgid "No Plugin selected. Selected one on the left side"
+#: templates/cms/toolbar/clipboard.html:24
+msgid "Empty Clipboard"
 msgstr ""
 
-#: templates/admin/cms/page/widgets/plugin_editor.html:17
-msgid "No Plugins present. Add a plugin to this placeholder-slot."
+#: templates/cms/toolbar/dragbar.html:7 templates/cms/toolbar/dragitem.html:9
+msgid "Quicksearch"
 msgstr ""
 
-#: templates/cms/toolbar/placeholder.html:33
+#: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:11
+msgid "Settings"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:10
+msgid "Copy all"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:12
+msgid "Copy from"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:14
+msgid "Empty all"
+msgstr ""
+
+#: templates/cms/toolbar/dragbar.html:24
+msgid "Drop a plugin here"
+msgstr ""
+
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:651
+#: templatetags/cms_tags.py:654
+msgid "Edit"
+msgstr ""
+
+#: templates/cms/toolbar/dragitem_menu.html:5
 msgid "Available plugins"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:27
-msgid "The selected element can not be moved to the desired location."
+#: templates/cms/toolbar/toolbar.html:8
+msgid "Double-click to edit"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:28
+#: templates/cms/toolbar/toolbar.html:33
+#: templates/cms/toolbar/items/live_draft.html:4
+msgid "Live"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:34
+#: templates/cms/toolbar/items/live_draft.html:5
+msgid "Draft"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:41
+msgid "Toggle toolbar"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:83
+msgid "Start"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:34
+#, python-format
+msgid "Development version using django CMS %(cms_version)s"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:35
+msgid "Cancel"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:36
+msgid "The following error occured:"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:37
+msgid "Action successfull... reloading."
+msgstr ""
+
+#: templates/cms/toolbar/toolbar_javascript.html:38
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Είσαι σίγουρος πως θέλεις να διαγράψεις αυτό το πρόσθετο?"
 
-#: templates/cms/toolbar/toolbar.html:64
-msgid "up"
+#: templates/cms/toolbar/toolbar_javascript.html:56
+msgid ""
+"<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:65
-msgid "down"
+#: templates/cms/toolbar/toolbar_javascript.html:57
+msgid "This page has unpublished changes."
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:70
-msgid "Add child plugin"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:73
-msgid "Move to placeholder"
-msgstr ""
-
-#: templates/cms/toolbar/items/login.html:5
+#: templates/cms/toolbar/items/login.html:4 toolbar/toolbar.py:20
 msgid "Username"
+msgstr "Όνομα χρήστη"
+
+#: templates/cms/toolbar/items/logo.html:2
+msgid "django CMS"
 msgstr ""
 
-#: templates/cms/toolbar/items/login.html:10
-#: templates/cms/toolbar/items/login.html:12
-msgid "Login"
+#: templatetags/cms_admin.py:74
+msgid "unpublished changes"
 msgstr ""
 
-#: templates/cms/toolbar/items/switcher.html:4
-msgid "Switch on/off"
+#: templatetags/cms_admin.py:77
+msgid "published"
+msgstr "δημοσιευμένο"
+
+#: templatetags/cms_admin.py:84
+msgid "unpublished parent"
 msgstr ""
 
-#: templatetags/cms_admin.py:129 templatetags/cms_admin.py:136
+#: templatetags/cms_admin.py:87
+msgid "unpublished"
+msgstr ""
+
+#: templatetags/cms_admin.py:90
+msgid "no content"
+msgstr ""
+
+#: templatetags/cms_admin.py:175 templatetags/cms_admin.py:181
 #, python-format
-msgid "<span title=\"Restrictions: %(title)s\">%(icon)s</span>"
+msgid "<span>%(icon)s</span>"
 msgstr ""
 
-#: templatetags/cms_tags.py:85
+#: templatetags/cms_tags.py:103
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:86
+#: templatetags/cms_tags.py:104
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:106 test_utils/cli.py:116
+#: test_utils/cli.py:121 test_utils/cli.py:132
 msgid "English"
 msgstr "Αγγλικά"
 
-#: test_utils/cli.py:107 test_utils/cli.py:128 test_utils/cli.py:146
+#: test_utils/cli.py:122 test_utils/cli.py:144 test_utils/cli.py:167
 msgid "French"
 msgstr "Γαλλικά"
 
-#: test_utils/cli.py:108 test_utils/cli.py:122 test_utils/cli.py:140
-#: test_utils/cli.py:159
+#: test_utils/cli.py:123 test_utils/cli.py:138 test_utils/cli.py:161
+#: test_utils/cli.py:180
 msgid "German"
 msgstr "Γερμανικά"
 
-#: test_utils/cli.py:109 test_utils/cli.py:133
+#: test_utils/cli.py:124 test_utils/cli.py:149
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:110 test_utils/cli.py:153
+#: test_utils/cli.py:125 test_utils/cli.py:174
 msgid "Dutch"
 msgstr ""
 
-#: test_utils/cli.py:169
+#: test_utils/cli.py:190
 msgid "two columns"
 msgstr "δύο στήλες"
 
-#: test_utils/cli.py:170
+#: test_utils/cli.py:191
 msgid "three columns"
 msgstr "τρεις στήλες"
 
-#: test_utils/cli.py:171
+#: test_utils/cli.py:192
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:177
+#: test_utils/cli.py:200
 msgid "sidebar column"
-msgstr ""
+msgstr "χρώμα φόντου"
 
-#: test_utils/cli.py:183
+#: test_utils/cli.py:206
 msgid "left column"
+msgstr "χρώμα φόντου"
+
+#: test_utils/cli.py:211
+msgid "Add a link"
 msgstr ""
 
-#: test_utils/cli.py:189
+#: test_utils/cli.py:218
 msgid "right column"
+msgstr "χρώμα φόντου"
+
+#: test_utils/project/extensionapp/cms_toolbar.py:46
+msgid "Page Extension"
+msgstr ""
+
+#: test_utils/project/extensionapp/cms_toolbar.py:82
+msgid "Title Extension"
+msgstr ""
+
+#: test_utils/project/objectpermissionsapp/models.py:47
+msgid "object ID"
+msgstr ""
+
+#: test_utils/project/placeholderapp/cms_app.py:7
+msgid "Example1 App"
+msgstr ""
+
+#: test_utils/project/placeholderapp/cms_app.py:13
+msgid "MultilingualExample1 App"
 msgstr ""
 
 #: test_utils/project/placeholderapp/cms_plugins.py:7
@@ -1794,7 +1473,7 @@ msgstr ""
 msgid "Extra Context"
 msgstr ""
 
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:13
+#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:11
 msgid "Articles"
 msgstr ""
 
@@ -1808,6 +1487,19 @@ msgstr ""
 
 #: test_utils/project/sampleapp/cms_app.py:22
 msgid "Namespaced App"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_toolbar.py:17
+#: test_utils/project/sampleapp/views.py:21
+msgid "Category"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_toolbar.py:18
+msgid "Categories"
+msgstr ""
+
+#: test_utils/project/sampleapp/cms_toolbar.py:19
+msgid "Add Category"
 msgstr ""
 
 #: test_utils/project/sampleapp/menu.py:16
@@ -1838,7 +1530,11 @@ msgstr ""
 msgid "^account/$"
 msgstr ""
 
-#: utils/conf.py:81
+#: test_utils/project/sampleapp/views.py:23
+msgid "Change Category"
+msgstr ""
+
+#: utils/conf.py:78
 msgid "Inherit the template of the nearest ancestor"
 msgstr ""
 
@@ -1850,11 +1546,11 @@ msgstr ""
 msgid "CMS - your user account was changed."
 msgstr ""
 
-#: utils/page_resolver.py:165
+#: utils/page_resolver.py:153
 msgid "Invalid URL, use /my/url format."
 msgstr "Λάθος μορφή URL. Χρησιμοποιήστε τη μορφή /my/url."
 
-#: utils/page_resolver.py:197
+#: utils/page_resolver.py:185
 #, python-format
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
@@ -1864,17 +1560,39 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#~ msgid "delete req."
-#~ msgstr "deletion request"
+#: utils/plugins.py:362
+#, python-format
+msgid "This placeholder already has the maximum number of plugins (%s)."
+msgstr ""
+
+#: utils/plugins.py:372
+#, python-format
+msgid ""
+"This placeholder already has the maximum number (%(limit)s) of allowed "
+"%(plugin_name)s plugins."
+msgstr ""
+
+#~ msgid "Use latitude & longitude to fine tune the map position."
+#~ msgstr "Use latitude & longitude to fine tune the map position."
+
+#~ msgid "mailto"
+#~ msgstr "email address"
+
+#~ msgid "An email adress has priority over a text link."
+#~ msgstr "An email address has priority over a text link."
+
+#~ msgid ""
+#~ "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
+#~ msgstr "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approval by you."
+
+#~ msgid "No Plugin selected. Selected one on the left side"
+#~ msgstr "No Plugin selected. Select one on the left side"
 
 #~ msgid "move req."
 #~ msgstr "move request"
 
 #~ msgid "url overwrite"
 #~ msgstr "URL overwrite"
-
-#~ msgid "unpublish req."
-#~ msgstr "unpublish request"
 
 #~ msgid "req. app."
 #~ msgstr "approval required"

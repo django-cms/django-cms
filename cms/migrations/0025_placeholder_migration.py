@@ -5,6 +5,17 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
+
+user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
+user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
+user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
@@ -42,8 +53,8 @@ class Migration(SchemaMigration):
                 'django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
+        user_model_label: {
+            'Meta': {'object_name': User.__name__, 'db_table': "'%s'" % User._meta.db_table},
             'date_joined': ('django.db.models.fields.DateTimeField', [],
                             {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [],
@@ -132,7 +143,7 @@ class Migration(SchemaMigration):
                       {'symmetrical': 'False', 'to': "orm['sites.Site']",
                        'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [],
-                     {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
+                     {'to': "orm['%s']" % user_orm_label, 'null': 'True', 'blank': 'True'})
         },
         'cms.page': {
             'Meta': {'ordering': "('site', 'tree_id', 'lft')",
@@ -213,7 +224,7 @@ class Migration(SchemaMigration):
             'page': ('django.db.models.fields.related.ForeignKey', [],
                      {'to': "orm['cms.Page']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [],
-                     {'to': "orm['auth.User']"})
+                     {'to': "orm['%s']" % user_orm_label})
         },
         'cms.pagemoderatorstate': {
             'Meta': {'ordering': "('page', 'action', '-created')",
@@ -229,7 +240,7 @@ class Migration(SchemaMigration):
             'page': ('django.db.models.fields.related.ForeignKey', [],
                      {'to': "orm['cms.Page']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [],
-                     {'to': "orm['auth.User']", 'null': 'True'})
+                     {'to': "orm['%s']" % user_orm_label, 'null': 'True'})
         },
         'cms.pagepermission': {
             'Meta': {'object_name': 'PagePermission'},
@@ -260,22 +271,22 @@ class Migration(SchemaMigration):
             'page': ('django.db.models.fields.related.ForeignKey', [],
                      {'to': "orm['cms.Page']", 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [],
-                     {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
+                     {'to': "orm['%s']" % user_orm_label, 'null': 'True', 'blank': 'True'})
         },
         'cms.pageuser': {
-            'Meta': {'object_name': 'PageUser', '_ormbases': ['auth.User']},
+            'Meta': {'object_name': 'PageUser', '_ormbases': [user_orm_label]},
             'created_by': ('django.db.models.fields.related.ForeignKey', [],
                            {'related_name': "'created_users'",
-                            'to': "orm['auth.User']"}),
+                            'to': "orm['%s']" % user_orm_label}),
             'user_ptr': ('django.db.models.fields.related.OneToOneField', [],
-                         {'to': "orm['auth.User']", 'unique': 'True',
+                         {'to': "orm['%s']" % user_orm_label, 'unique': 'True',
                           'primary_key': 'True'})
         },
         'cms.pageusergroup': {
             'Meta': {'object_name': 'PageUserGroup', '_ormbases': ['auth.Group']},
             'created_by': ('django.db.models.fields.related.ForeignKey', [],
                            {'related_name': "'created_usergroups'",
-                            'to': "orm['auth.User']"}),
+                            'to': "orm['%s']" % user_orm_label}),
             'group_ptr': ('django.db.models.fields.related.OneToOneField', [],
                           {'to': "orm['auth.Group']", 'unique': 'True',
                            'primary_key': 'True'})

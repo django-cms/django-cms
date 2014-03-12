@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
-
 from classytags.core import Tag, Options
-import django
+from cms.utils.compat import DJANGO_1_4
 from django import template
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.text import javascript_quote
-
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
-
 if DJANGO_1_4:
     from django.utils import simplejson as json
 else:
     import json
-
 register = template.Library()
+
 
 @register.filter
 def js(value):
     return json.dumps(value, cls=DjangoJSONEncoder)
+
 
 @register.filter
 def bool(value):

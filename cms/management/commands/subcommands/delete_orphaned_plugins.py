@@ -1,6 +1,6 @@
-from cms.models import Page, CMSPlugin
 from django.core.management.base import NoArgsCommand
 from cms.management.commands.subcommands.list import plugin_report
+from cms.utils.compat.input import raw_input
 
 
 class DeleteOrphanedPluginsCommand(NoArgsCommand):
@@ -15,24 +15,36 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
         instances (as will happen if a plugin is inserted into a placeholder,
         but not saved).
         """
-        self.stdout.write("Obtaining plugin report\n")
-        report = plugin_report()
+        self.stdout.write(u"Obtaining plugin report\n")
         uninstalled_instances = []
         unsaved_instances = []
 
-        # delete items whose plugin is uninstalled and items with unsaved instances
-        self.stdout.write("... deleting any instances of uninstalled plugins and unsaved plugin instances\n")        
-        
-        for plugin in report:
+        for plugin in plugin_report():
             if not plugin["model"]:
                 for instance in plugin["instances"]:
                     uninstalled_instances.append(instance)
-                    instance.delete()
-                    
+
             for instance in plugin["unsaved_instances"]:
                 unsaved_instances.append(instance)
+
+        if options.get('interactive'):
+            confirm = raw_input("""
+You have requested to delete any instances of uninstalled plugins and unsaved plugin instances.
+There are %d uninstalled plugins and %d unsaved_plugins.
+Are you sure you want to do this?
+Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), len(unsaved_instances)))
+        else:
+            confirm = 'yes'
+
+        if confirm == 'yes':
+            # delete items whose plugin is uninstalled and items with unsaved instances
+            self.stdout.write(u"... deleting any instances of uninstalled plugins and unsaved plugin instances\n")
+
+            for instance in uninstalled_instances:
                 instance.delete()
 
-        self.stdout.write("Deleted instances of: \n    %s uninstalled plugins  \n    %s plugins with unsaved instances\n" % (len(uninstalled_instances), len(unsaved_instances)))
-        self.stdout.write("all done\n")
-                                    
+            for instance in unsaved_instances:
+                instance.delete()
+
+            self.stdout.write(u"Deleted instances of: \n    %s uninstalled plugins  \n    %s plugins with unsaved instances\n" % (len(uninstalled_instances), len(unsaved_instances)))
+            self.stdout.write(u"all done\n")

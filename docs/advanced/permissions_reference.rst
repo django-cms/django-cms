@@ -2,7 +2,7 @@
 Permissions
 ###########
 
-In django-cms you can set two types of permissions:
+In django CMS you can set two types of permissions:
 
 1. View restrictions for restricting front-end view access to users
 2. Page permissions for allowing staff users to only have rights on certain sections of certain sites
@@ -35,13 +35,25 @@ After setting ``CMS_PERMISSION = True`` you will have three new models in the ad
 2. User groups (page)
 3. Pages global permissions
 
-Using *Users (page)* you can easily add users with permissions over cms pages.
+.. _users-page-permissions:
 
-You would be able to create an user with the same set of permissions using the usual *Auth.User* model, but using *Users (page)* is more convenient.
+Users (page) / User groups (page)
+=================================
+
+Using *Users (page)* you can easily add users with permissions over CMS pages.
+
+You would be able to create a user with the same set of permissions using the usual *Auth.User* model, but using *Users (page)* is more convenient.
 
 A new user created using *Users (page)* with given page add/edit/delete rights will not be able to make any changes to pages straight away.
 The user must first be assigned to a set of pages over which he may exercise these rights.
-This is done using the *Page permissions* formset on any page or by using *Pages global Permissions*.
+This is done using the :ref:`page-permissions`. formset on any page or by using :ref:`pages-global-permissions`.
+
+*User groups (page)* manages the same feature on the group level.
+
+.. _page-permissions:
+
+Page permissions
+================
 
 The *Page permission* formset has multiple checkboxes defining different permissions: can edit, can add, can delete, can change advanced settings, can publish, can move and can change permission.
 These define what kind of actions the user/group can do on the pages on which the permissions are being granted through the *Grant on* drop-down.
@@ -56,5 +68,18 @@ These define what kind of actions the user/group can do on the pages on which th
 In order to be able to add/change/delete plugins on any page, you will need to go through the usual *Auth.User* model and give the new user permissions to each plugin you want him to have access to.
 Example: if you want the new user to be able to use the text plugin, you will need to give him the following rights: ``text | text | Can add text``, ``text | text | Can change text``, ``text | text | Can delete text``.
 
+.. _pages-global-permissions:
+
+Pages global permissions
+========================
+
 Using the *Pages global permissions* model you can give a set of permissions to all pages in a set of sites.
 
+.. note:: You always **must** set the sites managed py the global permissions, even if you only have one site.
+
+
+File Permissions
+================
+
+django CMS does not take care of and no responsibility for controlling access to files. Please make sure to use either
+a prebuilt solution (like `django-filer <https://github.com/stefanfoulis/django-filer>`_) or to roll your own.

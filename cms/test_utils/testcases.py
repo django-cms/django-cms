@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from cms.compat import get_user_model
 from cms.models import Page
 from cms.test_utils.util.context_managers import (UserLoginContext,
     SettingsOverride)
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template.context import Context
@@ -12,17 +14,21 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
-from urlparse import urljoin
+from cms.utils.compat.urls import urljoin, unquote
 import sys
-import urllib
 import warnings
+import json
 from cms.utils.permissions import set_current_user
 
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
 URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
+URL_CMS_PAGE_ADVANCED_CHANGE = urljoin(URL_CMS_PAGE, "%d/advanced-settings/")
+URL_CMS_PAGE_PERMISSION_CHANGE = urljoin(URL_CMS_PAGE, "%d/permission-settings/")
 URL_CMS_PAGE_CHANGE_LANGUAGE = URL_CMS_PAGE_CHANGE + "?language=%s"
+URL_CMS_PAGE_CHANGE_TEMPLATE = URL_CMS_PAGE_CHANGE + "change_template/"
+URL_CMS_PAGE_PUBLISH = URL_CMS_PAGE_CHANGE + "%s/publish/"
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
 URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE, "edit-plugin/")
@@ -51,7 +57,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     # Disable the per-module cache for every module otherwise if the warning
     # which the caller is expecting us to collect was already emitted it won't
     # be re-emitted by the call to f which happens below.
-    for v in sys.modules.itervalues():
+    for v in sys.modules.values():
         if v is not None:
             try:
                 v.__warningregistry__ = None
@@ -73,11 +79,11 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class CMSTestCase(testcases.TestCase):
+class BaseCMSTestCase(object):
     counter = 1
 
     def _fixture_setup(self):
-        super(CMSTestCase, self)._fixture_setup()
+        super(BaseCMSTestCase, self)._fixture_setup()
         self.create_fixtures()
         activate("en")
 
@@ -88,28 +94,79 @@ class CMSTestCase(testcases.TestCase):
     def _post_teardown(self):
         # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
-        super(CMSTestCase, self)._post_teardown()
+        cache.clear()
+        super(BaseCMSTestCase, self)._post_teardown()
         set_current_user(None)
 
     def login_user_context(self, user):
         return UserLoginContext(self, user)
 
+    def _create_user(self, username, is_staff=False, is_superuser=False,
+                     is_active=True, add_default_permissions=False, permissions=None):
+        """
+        Use this method to create users.
+
+        Default permissions on page and text plugin are added if creating a
+        non-superuser and `add_default_permissions` is set.
+
+        Set `permissions` parameter to an iterable of permission codes to add
+        custom permissios.
+        """
+        User = get_user_model()
+
+        fields = dict(email=username+'@django-cms.org',
+            is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
+        )
+
+        # Check for special case where email is used as username
+        if(get_user_model().USERNAME_FIELD != 'email'):
+            fields[get_user_model().USERNAME_FIELD] = username
+
+        user = User(**fields)
+        
+        user.set_password(getattr(user, get_user_model().USERNAME_FIELD))
+        user.save()
+        if is_staff and not is_superuser and add_default_permissions:
+            user.user_permissions.add(Permission.objects.get(codename='add_text'))
+            user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+            user.user_permissions.add(Permission.objects.get(codename='change_text'))
+            user.user_permissions.add(Permission.objects.get(codename='publish_page'))
+
+            user.user_permissions.add(Permission.objects.get(codename='add_page'))
+            user.user_permissions.add(Permission.objects.get(codename='change_page'))
+            user.user_permissions.add(Permission.objects.get(codename='delete_page'))
+        if is_staff and not is_superuser and permissions:
+            for permission in permissions:
+                user.user_permissions.add(Permission.objects.get(codename=permission))
+        return user
+
     def get_superuser(self):
         try:
-            admin = User.objects.get(username="admin")
-        except User.DoesNotExist:
-            admin = User(username="admin", is_staff=True, is_active=True, is_superuser=True)
-            admin.set_password("admin")
-            admin.save()
+            query = dict()
+
+            if get_user_model().USERNAME_FIELD != "email":
+                query[get_user_model().USERNAME_FIELD]="admin"
+            else:
+                query[get_user_model().USERNAME_FIELD]="admin@django-cms.org"
+            
+            admin = get_user_model().objects.get(**query)
+        except get_user_model().DoesNotExist:
+            admin = self._create_user("admin", is_staff=True, is_superuser=True)
         return admin
 
     def get_staff_user_with_no_permissions(self):
         """
         Used in security tests
         """
-        staff = User(username="staff", is_staff=True, is_active=True)
-        staff.set_password("staff")
-        staff.save()
+        staff = self._create_user("staff", is_staff=True, is_superuser=False)
+        return staff
+
+    def get_staff_user_with_std_permissions(self):
+        """
+        This is a non superuser staff
+        """
+        staff = self._create_user("staff", is_staff=True, is_superuser=False,
+                                  add_permissions=True)
         return staff
 
     def get_new_page_data(self, parent_id=''):
@@ -120,15 +177,15 @@ class CMSTestCase(testcases.TestCase):
             'template': 'nav_playground.html',
             'parent': parent_id,
             'site': 1,
+            'pagepermission_set-TOTAL_FORMS': 0,
+            'pagepermission_set-INITIAL_FORMS': 0,
+            'pagepermission_set-MAX_NUM_FORMS': 0,
+            'pagepermission_set-2-TOTAL_FORMS': 0,
+            'pagepermission_set-2-INITIAL_FORMS': 0,
+            'pagepermission_set-2-MAX_NUM_FORMS': 0
         }
         # required only if user haves can_change_permission
-        page_data['pagepermission_set-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
-        self.counter = self.counter + 1
+        self.counter += 1
         return page_data
 
     
@@ -168,8 +225,8 @@ class CMSTestCase(testcases.TestCase):
         """
         for page in qs.order_by('tree_id', 'lft'):
             ident = "  " * page.level
-            print "%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-                                    page.pk, page.lft, page.rght, page.tree_id)
+            print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
+                                    page.pk, page.lft, page.rght, page.tree_id))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -177,7 +234,7 @@ class CMSTestCase(testcases.TestCase):
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print "%s%s: %s" % (ident, node.title, attrs)
+                print(u"%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
         _rec(nodes)
 
@@ -186,14 +243,14 @@ class CMSTestCase(testcases.TestCase):
             return qs.get(**filter)
         except ObjectDoesNotExist:
             pass
-        raise self.failureException, "ObjectDoesNotExist raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist raised for filter %s" % filter)
 
     def assertObjectDoesNotExist(self, qs, **filter):
         try:
             qs.get(**filter)
         except ObjectDoesNotExist:
             return
-        raise self.failureException, "ObjectDoesNotExist not raised for filter %s" % filter
+        raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
     def copy_page(self, page, target_page):
         from cms.utils.page import get_available_slug
@@ -207,9 +264,10 @@ class CMSTestCase(testcases.TestCase):
         }
 
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # Altered to reflect the new django-js jsonified response messages
-        self.assertEquals(response.content, '{"status": 200, "content": "ok"}')
+        expected = {"status": 200, "content": "ok"}
+        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
@@ -231,17 +289,17 @@ class CMSTestCase(testcases.TestCase):
         return obj.__class__.objects.get(pk=obj.pk)
 
     def get_pages_root(self):
-        return urllib.unquote(reverse("pages-root"))
+        return unquote(reverse("pages-root"))
 
-    def get_context(self, path=None):
+    def get_context(self, path=None, page=None):
         if not path:
             path = self.get_pages_root()
         context = {}
-        request = self.get_request(path)
+        request = self.get_request(path, page=page)
         context['request'] = request
         return Context(context)
 
-    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None):
         factory = RequestFactory()
 
         if not path:
@@ -261,6 +319,10 @@ class CMSTestCase(testcases.TestCase):
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
+        if page:
+            request.current_page = page
+        else:
+            request.current_page = None
 
         class MockStorage(object):
 
@@ -318,6 +380,14 @@ class CMSTestCase(testcases.TestCase):
 
         return result
     assertWarns = failUnlessWarns
+
+
+class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
+    pass
+
+
+class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
+    pass
 
 
 class SettingsOverrideTestCase(CMSTestCase):

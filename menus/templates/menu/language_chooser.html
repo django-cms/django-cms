@@ -1,7 +1,10 @@
 {% load i18n menu_tags %}
+
 {% get_available_languages as languages %}
+{% if languages|length > 1 %}
 {% for language in languages %}
-    {% language language.0 %}
-        <a href="{% page_language_url language.0 %}"{% ifequal current_language language.0 %} class="current"{% endifequal %}>{{ language.1 }}</a>
-    {% endlanguage %}
+<li class="lang{% ifequal current_language language.0 %} active{% endifequal %}">
+	<a href="{% page_language_url language.0 %}" title="{% trans "Change to language:" %} {{ language.1 }}">{{ language.0 }}</a>
+</li>
 {% endfor %}
+{% endif %}

@@ -1,27 +1,36 @@
-{% load i18n sekizai_tags cms_tags %}{% load url from future %}
+{% spaceless %}
+{% load i18n l10n sekizai_tags static %}
+{% load url from future %}
+
+<div class="cms_plugin cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}{% if render_model_icon %} cms_render_model_icon{% elif render_model %} cms_render_model{% elif render_model_block %} cms_render_model cms_render_model_block{% elif render_model_add %} cms_render_model_add{% endif %}">{% if render_model_icon %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% elif render_model_add %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% else %}{{ rendered_content }}{% endif %}</div>
+
 {% addtoblock "js" %}
-<script type="text/javascript">
-CMS.$(document).ready(function () {
-	new CMS.PlaceholderItem('#cms_plugin-{{ instance.pk }}', {
-		'type': 'plugin',
-		'placeholder_id': '{{ instance.placeholder.id }}',
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+	new CMS.Plugin('cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}', {
+		'type': {% if generic %}'generic'{% else %}'plugin'{% endif %},
+		'page_language': '{{ LANGUAGE_CODE }}',
+		'placeholder_id': '{{ instance.placeholder_id|unlocalize }}',
+		'plugin_name': '{{ instance.get_plugin_name|default:"" }}',
 		'plugin_type': '{{ instance.plugin_type }}',
-		'plugin_name': '{{ instance.get_plugin_name }}',
-		'plugin_id': '{{ instance.pk }}',
-		'plugin_language': '{{ instance.language }}',
-		'plugin_parent': '{{ instance.parent_id }}',
-		'plugin_order': '{{ instance.plugin_order }}',
-		'plugin_breadcrumb': {{ instance.get_breadcrumb_json }},
-		// TODO this is hardcoded for testing only
-		'plugin_restriction': ['TextPlugin', 'MultiColumnPlugin', 'ColumnPlugin'], // only for nested plugins, see placeholder_toolbar.html
+		'plugin_id': '{{ instance.pk|unlocalize }}',
+		'plugin_language': '{{ instance.language|default:"" }}',
+		'plugin_parent': '{{ instance.parent_id|unlocalize }}',
+		'plugin_order': '{{ instance.plugin_order }}',{% language request.toolbar.toolbar_language %}
+		'plugin_breadcrumb': {{ instance.get_breadcrumb_json|default:"[]" }},
+		'plugin_restriction': [{% for cls in allowed_child_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+		'onClose': {% if refresh_page %}'REFRESH_PAGE'{% else %}{% if redirect_on_close %}'{{ redirect_on_close }}'{% else %}false{% endif %}{% endif %},
 		'urls': {
-			'add_plugin': '{% url "admin:cms_page_add_plugin" %}',
-			'edit_plugin': '{% url "admin:cms_page_edit_plugin" instance.pk %}',
-			'move_plugin': '{% url "admin:cms_page_move_plugin" %}'
-		}
+			'add_plugin': '{% if add_url %}{{ add_url }}{% else %}{% url "admin:cms_page_add_plugin" %}}{% endif %}',
+			'edit_plugin': '{% if edit_url %}{{ edit_url }}{% else %}{% url "admin:cms_page_edit_plugin" instance.pk %}{% endif %}',
+			'move_plugin': '{% if move_url %}{{ move_url }}{% else %}{% url "admin:cms_page_move_plugin" %}{% endif %}',
+			'delete_plugin': '{% if delete_url %}{{ delete_url }}{% else %}{% url "admin:cms_page_delete_plugin" instance.pk %}{% endif %}',
+			'copy_plugin': '{% url "admin:cms_page_copy_plugins" %}'
+		} {% endlanguage %}
 	});
 });
-</script>
-{% endaddtoblock %}
-
-<div id="cms_plugin-{{ instance.pk }}" class="cms_plugin">{{ rendered_content }}</div>
+})(CMS.$);
+</script>{% endaddtoblock %}
+{% endspaceless %}

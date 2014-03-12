@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
-import copy
 
 from django.contrib.sites.models import Site
-from django.forms.widgets import Select, MultiWidget, Widget
-from django.template.context import RequestContext
-from django.template.loader import render_to_string
-from django.utils.encoding import force_unicode
+from django.forms.widgets import Select, MultiWidget
+from cms.utils.compat.dj import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from cms.forms.utils import get_site_choices, get_page_choices
-from cms.models import Page, PageUser, Placeholder
-from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request, cms_static_url
+from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 
 
@@ -25,16 +20,9 @@ class PageSelectWidget(MultiWidget):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
-        if site_choices is None or page_choices is None:
-            site_choices, page_choices = get_site_choices(), get_page_choices()
-        self.site_choices = site_choices
-        self.choices = page_choices
-        widgets = (Select(choices=site_choices ),
-                   Select(choices=[('', '----')]),
-                   Select(choices=self.choices, attrs={'style': "display:none;"} ),
-        )
-        super(PageSelectWidget, self).__init__(widgets, attrs)
-    
+        self.choices = []
+        super(PageSelectWidget, self).__init__((Select, Select, Select), attrs)
+
     def decompress(self, value):
         """
         receives a page_id in value and returns the site_id and page_id
@@ -75,6 +63,16 @@ class PageSelectWidget(MultiWidget):
         
         # value is a list of values, each corresponding to a widget
         # in self.widgets.
+
+        site_choices = get_site_choices()
+        page_choices = get_page_choices()
+        self.site_choices = site_choices
+        self.choices = page_choices
+        self.widgets = (Select(choices=site_choices ),
+                   Select(choices=[('', '----')]),
+                   Select(choices=self.choices, attrs={'style': "display:none;"} ),
+        )
+
         if not isinstance(value, list):
             value = self.decompress(value)
         output = []

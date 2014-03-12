@@ -45,7 +45,7 @@ class ApphookPool(object):
                           "but the 'menus' attribute is empty, did you make a typo?")
         name = app.__name__
         if name in self.apps.keys():
-            raise AppAlreadyRegistered, "[%s] a cms app with this name is already registered" % name
+            raise AppAlreadyRegistered("[%s] a cms app with this name is already registered" % name)
         self.apps[name] = app
 
     def get_apphooks(self):

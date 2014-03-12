@@ -1,0 +1,27 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//##################################################
+// #IMPORT SETTINGS#
+@import "settings/default";
+
+//##################################################
+// #MODAL#
+#content h2:first-child { display:none; }
+#content { margin:10px 10px 0; }
+#content .module { padding:10px; }
+
+#container { padding-top:0; }
+
+#footer { display:none; }
+
+#cke_id_body {
+	border:1px solid $color-grey-10 !important;
+
+	.cke_top, .cke_bottom { background:$color-grey-5 !important; border-color:$color-grey-10 !important;
+		@include box-shadow(none !important); }
+}
+
+.errornote { margin:0 !important; }

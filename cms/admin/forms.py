@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from cms import constants
+import sys
 from cms.apphook_pool import apphook_pool
+from cms.compat import get_user_model
+from cms.compat_forms import UserCreationForm
+from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels, Title
 from cms.utils.conf import get_cms_setting
@@ -11,8 +14,7 @@ from cms.utils.page_resolver import is_valid_url
 from cms.utils.permissions import get_current_user, get_subordinate_users, get_subordinate_groups, \
     get_user_permission_level
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -25,6 +27,8 @@ from menus.menu_pool import menu_pool
 
 
 def get_permission_acessor(obj):
+    User = get_user_model()
+    
     if isinstance(obj, (PageUser, User,)):
         rel_name = 'user_permissions'
     else:
@@ -55,22 +59,34 @@ def save_permissions(data, obj):
                 permission_acessor.remove(permission)
 
 
-class PageAddForm(forms.ModelForm):
+class PageForm(forms.ModelForm):
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
                             help_text=_('The default title'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
                            help_text=_('The part of the title that is used in the URL'))
+    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
+                                 help_text=_('Overwrite what is displayed in the menu'), required=False)
+    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
+                                 help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
+                                 required=False)
+    meta_description = forms.CharField(label=_('Description meta tag'), required=False,
+                                       widget=forms.Textarea(attrs={'maxlength': '155', 'rows': '4'}),
+                                       help_text=_('A description of the page used by search engines.'),
+                                       max_length=155)
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
+    page_type = forms.ChoiceField(label=_("Page type"), required=False)
 
     class Meta:
         model = Page
-        exclude = ["created_by", "changed_by", "placeholders"]
+        fields = ["parent", "site", 'template']
 
     def __init__(self, *args, **kwargs):
-        super(PageAddForm, self).__init__(*args, **kwargs)
+        super(PageForm, self).__init__(*args, **kwargs)
         self.fields['parent'].widget = HiddenInput()
         self.fields['site'].widget = HiddenInput()
+        self.fields['template'].widget = HiddenInput()
+        self.fields['language'].widget = HiddenInput()
         if not self.fields['site'].initial:
             self.fields['site'].initial = Site.objects.get_current().pk
         site_id = self.fields['site'].initial
@@ -78,16 +94,24 @@ class PageAddForm(forms.ModelForm):
         self.fields['language'].choices = languages
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
-        if (self.fields['parent'].initial and
-                get_cms_setting('TEMPLATE_INHERITANCE') in
-                [name for name, value in get_cms_setting('TEMPLATES')]):
-            # non-root pages default to inheriting their template
-            self.fields['template'].initial = constants.TEMPLATE_INHERITANCE_MAGIC
+        if 'page_type' in self.fields:
+            try:
+                type_root = Page.objects.get(publisher_is_draft=True, reverse_id=PAGE_TYPES_ID)
+            except Page.DoesNotExist:
+                type_root = None
+            if type_root:
+                language = self.fields['language'].initial
+                type_ids = type_root.get_descendants().values_list('pk', flat=True)
+                titles = Title.objects.filter(page__in=type_ids, language=language)
+                choices = [('', '----')]
+                for title in titles:
+                    choices.append((title.page_id, title.title))
+                self.fields['page_type'].choices = choices
 
     def clean(self):
         cleaned_data = self.cleaned_data
         slug = cleaned_data.get('slug', '')
-
+        
         page = self.instance
         lang = cleaned_data.get('language', None)
         # No language, can not go further, but validation failed already
@@ -101,7 +125,6 @@ class PageAddForm(forms.ModelForm):
         try:
             site = self.cleaned_data.get('site', Site.objects.get_current())
         except Site.DoesNotExist:
-            site = None
             raise ValidationError("No site found for current settings.")
 
         if parent and parent.site != site:
@@ -110,7 +133,7 @@ class PageAddForm(forms.ModelForm):
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
-        if self.cleaned_data.get('published') and page.title_set.count():
+        if self.instance and page.title_set.count():
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
@@ -124,18 +147,19 @@ class PageAddForm(forms.ModelForm):
                 title.save()
                 try:
                     is_valid_url(title.path, page)
-                except ValidationError, e:
+                except ValidationError:
+                    exc = sys.exc_info()[0]
                     title.slug = oldslug
                     title.save()
                     if 'slug' in cleaned_data:
                         del cleaned_data['slug']
-                    self._errors['slug'] = ErrorList(e.messages)
+                    self._errors['slug'] = ErrorList(exc.messages)
         return cleaned_data
 
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
         if not slug:
-            raise ValidationError("Slug must not be empty.")
+            raise ValidationError(_("Slug must not be empty."))
         return slug
 
     def clean_language(self):
@@ -145,27 +169,57 @@ class PageAddForm(forms.ModelForm):
         return language
 
 
-class PageForm(PageAddForm):
-    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
-                                 help_text=_('Overwrite what is displayed in the menu'), required=False)
-    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
-                                 help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
-                                 required=False)
+class PublicationDatesForm(forms.ModelForm):
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
+                                 help_text=_('The current language of the content fields.'))
+
+    def __init__(self, *args, **kwargs):
+        # Dates are not language dependent, so let's just fake the language to
+        # make the ModelAdmin happy
+        super(PublicationDatesForm, self).__init__(*args, **kwargs)
+        self.fields['language'].widget = HiddenInput()
+        self.fields['site'].widget = HiddenInput()
+        site_id = self.fields['site'].initial
+
+        languages = get_language_tuple(site_id)
+        self.fields['language'].choices = languages
+        if not self.fields['language'].initial:
+            self.fields['language'].initial = get_language()
+
+    class Meta:
+        model = Page
+        fields = ['site', 'publication_date', 'publication_end_date']
+
+
+class AdvancedSettingsForm(forms.ModelForm):
     application_urls = forms.ChoiceField(label=_('Application'),
                                          choices=(), required=False,
                                          help_text=_('Hook application to this page.'))
     overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
                                     help_text=_('Keep this field empty if standard path should be used.'))
 
+    xframe_options = forms.ChoiceField(
+        choices=Page._meta.get_field('xframe_options').choices,
+        label=_('X Frame Options'),
+        help_text=_('Whether this page can be embedded in other pages or websites'),
+        initial=Page._meta.get_field('xframe_options').default,
+        required=False
+    )
     redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
                                help_text=_('Redirects to this URL.'))
-    meta_description = forms.CharField(label='Description meta tag', required=False,
-                                       widget=forms.Textarea(attrs={'maxlength': '155', 'rows': '4'}),
-                                       help_text=_('A description of the page used by search engines.'),
-                                       max_length=155)
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
+                                 help_text=_('The current language of the content fields.'))
 
     def __init__(self, *args, **kwargs):
-        super(PageForm, self).__init__(*args, **kwargs)
+        super(AdvancedSettingsForm, self).__init__(*args, **kwargs)
+        self.fields['language'].widget = HiddenInput()
+        self.fields['site'].widget = HiddenInput()
+        site_id = self.fields['site'].initial
+
+        languages = get_language_tuple(site_id)
+        self.fields['language'].choices = languages
+        if not self.fields['language'].initial:
+            self.fields['language'].initial = get_language()
         if 'navigation_extenders' in self.fields:
             self.fields['navigation_extenders'].widget = forms.Select({},
                 [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
@@ -173,7 +227,7 @@ class PageForm(PageAddForm):
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
 
     def clean(self):
-        cleaned_data = super(PageForm, self).clean()
+        cleaned_data = super(AdvancedSettingsForm, self).clean()
         if 'reverse_id' in self.fields:
             id = cleaned_data['reverse_id']
             site_id = cleaned_data['site']
@@ -182,14 +236,52 @@ class PageForm(PageAddForm):
                         pk=self.instance.pk).count():
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
+        apphook = cleaned_data.get('application_urls', None)
+        namespace = cleaned_data.get('application_namespace', None)
+        if apphook:
+            apphook_pool.discover_apps()
+            if apphook_pool.apps[apphook].app_name and not namespace:
+                self._errors['application_urls'] = ErrorList(
+                    [_('You selected an apphook with an "app_name". You must enter a instance name.')])
+        if namespace and not apphook:
+            self._errors['application_namespace'] = ErrorList(
+                [_("If you enter an instance name you need an application url as well.")])
         return cleaned_data
+
+    def clean_application_namespace(self):
+        namespace = self.cleaned_data['application_namespace']
+        if namespace and Page.objects.filter(publisher_is_draft=True, application_namespace=namespace).exclude(pk=self.instance.pk).count():
+            raise ValidationError(_('A instance name with this name already exists.'))
+        return namespace
+
+    def clean_xframe_options(self):
+        if 'xframe_options' not in self.fields:
+            return # nothing to do, field isn't present
+
+        xframe_options = self.cleaned_data['xframe_options']
+        if xframe_options == '':
+            return Page._meta.get_field('xframe_options').default
+
+        return xframe_options
 
     def clean_overwrite_url(self):
         if 'overwrite_url' in self.fields:
             url = self.cleaned_data['overwrite_url']
             is_valid_url(url, self.instance)
-            # TODO: Check what happens if 'overwrite_url' is NOT in self.fields
             return url
+
+    class Meta:
+        model = Page
+        fields = [
+            'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'application_urls', 'application_namespace', "xframe_options",
+        ]
+
+
+class PagePermissionForm(forms.ModelForm):
+    class Meta:
+        model = Page
+        fields = ['login_required', 'limit_visibility_in_menu']
 
 
 class PagePermissionInlineAdminForm(forms.ModelForm):
@@ -272,8 +364,8 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             # TODO: finish this, but is it really required? might be nice to have
 
         # check if permissions assigned in cms are correct, and display
-        # a message if not - correctness mean: if user has add permisson to
-        # page, but he does'nt have auth permissions to add page object,
+        # a message if not - correctness mean: if user has add permission to
+        # page, but he doesn't have auth permissions to add page object,
         # display warning
         return self.cleaned_data
 
@@ -377,6 +469,12 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
             return self.cleaned_data['username']
         return super(PageUserForm, self).clean_username()
 
+    # required if the User model's USERNAME_FIELD is the email field
+    def clean_email(self):
+        if self.instance:
+            return self.cleaned_data['email']
+        return super(PageUserForm, self).clean_email()
+
     def clean_password2(self):
         if self.instance and self.cleaned_data['password1'] == '' and self.cleaned_data['password2'] == '':
             self._password_change = False
@@ -447,9 +545,3 @@ class PageUserGroupForm(GenericCmsPermissionForm):
         save_permissions(self.cleaned_data, group)
 
         return group
-
-
-class PageTitleForm(forms.ModelForm):
-    class Meta:
-        model = Title
-        fields = ('title', )

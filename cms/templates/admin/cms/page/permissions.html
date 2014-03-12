@@ -1,36 +1,38 @@
 {% load i18n cms_admin %}
+{% load url from future %}
 {% if permission_set %}
 	<table>
 		<thead><tr>
-			<th>{% trans 'Page' %}</th>
-			<th>{% trans 'User' %}</th>
-			<th>{% trans 'Group' %}</th>
-			<th>{% trans 'Can edit' %}</th>
-			<th>{% trans 'Can add' %}</th>
-			<th>{% trans 'Can delete' %}</th>
-			<th>{% trans 'Can publish' %}</th>
-			<th>{% trans 'Can change permissions' %}</th>
-			<th>{% trans 'Can move' %}</th>
-			<th>{% trans 'Can view' %}</th>
-			<th>{% trans 'Grant on' %}</th>
+			<th>{% trans "Page" %}</th>
+			<th>{% trans "User" %}</th>
+			<th>{% trans "Group" %}</th>
+			<th>{% trans "Can edit" %}</th>
+			<th>{% trans "Can add" %}</th>
+			<th>{% trans "Can delete" %}</th>
+			<th>{% trans "Can publish" %}</th>
+			<th>{% trans "Can change permissions" %}</th>
+			<th>{% trans "Can move" %}</th>
+			<th>{% trans "Can view" %}</th>
+			<th>{% trans "Grant on" %}</th>
 		</tr></thead>
 		<tbody>
-			{% for meta, permission in permission_set %}<tr class="{% cycle 'row1' 'row2' %}">
+			{% for meta, permission in permission_set %}
+				<tr class="{% cycle 'row1' 'row2' %}">
 					<td class="page">
 						{% if meta.0 %}
-							{% if meta.1 %}<a href= "/admin/cms/globalpagepermission/{{ permission.id }}/">{% trans '(global)' %}</a>
-							{% else %}{% trans '(global)' %}
+							{% if meta.1 %}<a href="{% url 'admin:cms_globalpagepermission_change' permission.id %}">{% trans "(global)" %}</a>
+							{% else %}{% trans "(global)" %}
 							{% endif %}
 						{% else %}
 							{% ifequal permission.page_id page.id %}
-								{% trans '(current)' %}
+								{% trans "(current)" %}
 							{% else %}
-								{% if meta.1 %}<a href= "/admin/cms/page/{{ permission.page.id }}/">{{ permission.page }}</a>
+								{% if meta.1 %}<a href="{% url 'admin:cms_page_change' permission.page.id %}">{{ permission.page }}</a>
 								{% else %}{{ permission.page }}
 								{% endif %}
 							{% endifequal %}
 						{% endif %}
-					</td>			
+					</td>
 					<td class="user">{{ permission.user|default_if_none:"-" }}</td>
 					<td class="group">{{ permission.group|default_if_none:"-" }}</td>
 					<td class="can_change">{{ permission.can_change|boolean_icon }}</td>
@@ -40,9 +42,9 @@
 					<td class="can_change_permissions">{{ permission.can_change_permissions|boolean_icon }}</td>
 					<td class="can_move_page">{{ permission.can_move_page|boolean_icon }}</td>
 					<td class="can_view">{{ permission.can_view|boolean_icon }}</td>
-					<td class="grant_on">{% if meta.0 %}{% trans 'All' %}
+					<td class="grant_on">{% if meta.0 %}{% trans "All" %}
 						{% else %}{{ permission.get_grant_on_display }}
-					{% endif%}</td>			
+					{% endif%}</td>
 				</tr>
 			{% endfor %}
 		</tbody>

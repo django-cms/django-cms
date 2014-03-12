@@ -1,42 +1,50 @@
 {% load i18n %}
-{% comment %}
-- This template is used within the pagetree when a page is copied to show which permissions should be transfered
-{% endcomment %}
 
-<div id="{{ dialog_id }}" title="{% block title %}{% trans "Copy options" %}{% endblock %}">
-	{% block content %}
-		{% block header %}<p>{% blocktrans %}Choose copy options{% endblocktrans %}</p>{% endblock %}
+<div id="{{ dialog_id }}" class="cms_dialog">
+{% block content %}
+	{% block title %}<h1>{% trans "Copy options" %}</h1>{% endblock %}
+	{% block header %}<p>{% blocktrans %}Choose copy options{% endblocktrans %}</p>{% endblock %}
 
-		{% block form %}{% if form %}<form id="{{ dialog_id }}-form">{% csrf_token %}{{ form.as_p }}</form>{% endif %}{% endblock %}
+	{% block form %}
+	{% if form %}
+	<form action="." method="post">
+		{% csrf_token %}
+		{{ form.as_p }}
+	</form>
+	{% endif %}
 	{% endblock %}
+
+	{% block submit_row %}
+	<div class="submit-row">
+		<input type="submit" value="{% trans 'Save' %}" class="default submit" />
+		<input type="submit" value="{% trans 'Close' %}" class="cancel" />
+	</div>
+	{% endblock %}
+{% endblock %}
 </div>
 
 {% block script %}
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-	// change submit states, open dialog
-	var dialog = '#{{ dialog_id }}';
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
 
-	$(dialog).dialog({
-		'bgiframe': true,
-		'autoOpen': true,
-		'height': 200,
-		'width': 400,
-		'modal': true,
-		'buttons': {
-			'Cancel': function() {
-				$(this).dialog('close');
-			},
-			'OK': function() {
-				formData = {};
-				$.each($('#{{ dialog_id }}-form').formToArray(), function(i, item){
-					formData[item.name] = item.value;
-				});
-				$.callbackCall("{{ callback }}", formData);
-				$(this).dialog('close');
-			}
-		}
+	// get the modals id
+	var dialog = $('#{{ dialog_id }}');
+
+	// function when closing the modal
+	dialog.find('.cancel').bind('click', function (e) {
+		e.preventDefault();
+		dialog.remove();
 	});
+
+	// function when submitting the modal
+	dialog.find('.submit').bind('click', function (e) {
+		e.preventDefault();
+		$.callbackCall('{{ callback }}', dialog.find('form').serialize());
+	});
+
 });
+})(CMS.$);
 </script>
 {% endblock %}

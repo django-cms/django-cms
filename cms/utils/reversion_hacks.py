@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.db import models
 import reversion
 from reversion.revisions import RegistrationError, VersionAdapter
 

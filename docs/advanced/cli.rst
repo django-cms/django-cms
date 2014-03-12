@@ -88,9 +88,34 @@ It has two subcommands:
 
     The uninstall commands **permanently delete** data from your database.
     You should make a backup of your database before using them!
-    
 
+.. _cms-copy-lang-command:
 
+``cms copy-lang``
+=================
+
+The ``copy-lang`` subcommand can be used to copy content (titles and plugins)
+from one language to another.
+By default the subcommand copy content from the current site
+(e.g. the value of ``SITE_ID``) and only if the target
+placeholder has no content for the specified language; using the defined
+options you can change this.
+
+You must provide two arguments:
+
+* ``from_language``: the language to copy the content from;
+* ``to_language``: the language to copy the content to.
+
+It accepts the following options
+
+* ``force-copy``: set to copy content even if a placeholder already has content;
+  if set, copied content will be appended to the original one;
+* ``site``: specifiy a SITE_ID to operate on sites different from the current one;
+* ``verbose``: set for more verbose output.
+
+Example::
+
+    cms copy-lang en de force-copy site=2 verbose
 
 *******************
 Moderation commands
@@ -116,7 +141,7 @@ used moderation in the past.
 MPTT repair command
 *******************
 
-``cms mptt-repair``
+``cms fix-mptt``
 ===================
 
 Occasionally, the MPTT structure in which pages and plugins are held can

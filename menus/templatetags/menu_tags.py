@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-import urllib
 
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.utils.i18n import force_language, get_language_objects
+from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.urls import unquote
 from django import template
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -190,12 +191,16 @@ class ShowSubMenu(InclusionTag):
 
     options = Options(
         IntegerArgument('levels', default=100, required=False),
-        IntegerArgument('root_level', default=None, required=False),
+        Argument('root_level', default=None, required=False),
         IntegerArgument('nephews', default=100, required=False),
         Argument('template', default='menu/sub_menu.html', required=False),
     )
 
     def get_context(self, context, levels, root_level, nephews, template):
+        # Django 1.4 doesn't accept 'None' as a tag value and resolve to ''
+        # So we need to force it to None again
+        if not root_level and root_level != 0:
+            root_level = None
         try:
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']
@@ -205,9 +210,9 @@ class ShowSubMenu(InclusionTag):
         children = []
         # adjust root_level so we cut before the specified level, not after
         include_root = False
-        if root_level > 0:
+        if root_level is not None and root_level > 0:
             root_level -= 1
-        elif root_level == 0:
+        elif root_level is not None and root_level == 0:
             include_root = True
         for node in nodes:
             if root_level is None:
@@ -222,7 +227,6 @@ class ShowSubMenu(InclusionTag):
                 cut_after(node, levels, [])
                 children = node.children
                 for child in children:
-                    child.parent = None
                     if child.sibling:
                         cut_after(child, nephews, [])
                         # if root_level was 0 we need to give the menu the entire tree
@@ -282,7 +286,7 @@ class ShowBreadcrumb(InclusionTag):
         for node in nodes:
             if node.selected:
                 selected = node
-            if node.get_absolute_url() == urllib.unquote(reverse("pages-root")):
+            if node.get_absolute_url() == unquote(reverse("pages-root")):
                 home = node
         if selected and selected != home:
             node = selected
@@ -311,11 +315,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return unicode(ugettext(language))
+        return force_unicode(ugettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return unicode(ugettext(language))
+    return force_unicode(ugettext(language))
 
 
 def _short_language_marker(language, lang_code):

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from manager import PublisherManager
+from .manager import PublisherManager  # nopyflakes
 
 __all__ = ('PublisherManager', 'VERSION')
 

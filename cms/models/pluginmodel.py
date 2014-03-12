@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-
-from django.core.urlresolvers import reverse
-from django.utils.safestring import mark_safe
+import json
 import os
 import warnings
+from cms.exceptions import DontUsePageAttributeWarning
+from cms.models.placeholdermodel import Placeholder
+from cms.plugin_rendering import PluginContext, render_plugin
+from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_5
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.utils.compat.metaclasses import with_metaclass
+from cms.utils.helpers import reversion_register
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
 from django.db.models.query_utils import DeferredAttribute
-from django.utils import timezone, simplejson
+from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from cms.exceptions import DontUsePageAttributeWarning
-from cms.models.placeholdermodel import Placeholder
-from cms.plugin_rendering import PluginContext, render_plugin
-from cms.utils.helpers import reversion_register
-from cms.utils import get_cms_setting
+from django.db.models import signals
 from mptt.models import MPTTModel, MPTTModelBase
 
 
@@ -49,22 +53,11 @@ class PluginModelBase(MPTTModelBase):
         # set a new BoundRenderMeta to prevent leaking of state
         new_class._render_meta = BoundRenderMeta(meta)
 
-        # turn 'myapp_mymodel' into 'cmsplugin_mymodel' by removing the
-        # 'myapp_' bit from the db_table name.
-        if [base for base in bases if isinstance(base, PluginModelBase)]:
-            splitter = '%s_' % new_class._meta.app_label
-
-            if splitter in new_class._meta.db_table:
-                splitted = new_class._meta.db_table.split(splitter, 1)
-                table_name = 'cmsplugin_%s' % splitted[1]
-            else:
-                table_name = new_class._meta.db_table
-            new_class._meta.db_table = table_name
-
         return new_class
 
 
-class CMSPlugin(MPTTModel):
+@python_2_unicode_compatible
+class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -76,8 +69,6 @@ class CMSPlugin(MPTTModel):
     2. Subclasses of CMSPlugin cannot define a "text" field.
 
     '''
-    __metaclass__ = PluginModelBase
-
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
@@ -90,6 +81,7 @@ class CMSPlugin(MPTTModel):
     rght = models.PositiveIntegerField(db_index=True, editable=False)
     tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     child_plugin_instances = None
+    translatable_content_excluded_fields = []
 
     class Meta:
         app_label = 'cms'
@@ -131,8 +123,8 @@ class CMSPlugin(MPTTModel):
             factory = lambda x, y: x
         return (model_unpickle, (model, defers, factory), data)
 
-    def __unicode__(self):
-        return unicode(self.id)
+    def __str__(self):
+        return force_unicode(self.id)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -142,7 +134,7 @@ class CMSPlugin(MPTTModel):
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
         if instance is not None:
-            return unicode(instance)
+            return force_unicode(instance)
         return _("<Empty>")
 
     def get_plugin_class(self):
@@ -150,30 +142,41 @@ class CMSPlugin(MPTTModel):
 
         return plugin_pool.get_plugin(self.plugin_type)
 
-    def get_plugin_instance(self, admin=None):
+    def get_plugin_class_instance(self, admin=None):
         plugin_class = self.get_plugin_class()
-        plugin = plugin_class(plugin_class.model,
-                              admin) # needed so we have the same signature as the original ModelAdmin
+        # needed so we have the same signature as the original ModelAdmin
+        return plugin_class(plugin_class.model, admin)
+
+    def get_plugin_instance(self, admin=None):
+        plugin = self.get_plugin_class_instance(admin)
+        if hasattr(self, "_inst"):
+            return self._inst, plugin
         if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
-                instance = plugin_class.model.objects.get(cmsplugin_ptr=self)
+                instance = plugin.model.objects.get(cmsplugin_ptr=self)
                 instance._render_meta = self._render_meta
             except (AttributeError, ObjectDoesNotExist):
                 instance = None
         else:
             instance = self
-        return instance, plugin
+        self._inst = instance
+        return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
         if instance and not (admin and not plugin.admin_preview):
-            if not isinstance(placeholder, Placeholder):
+            if not placeholder or not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
             current_app = context.current_app if context else None
             context = PluginContext(context, instance, placeholder, current_app=current_app)
             context = plugin.render(context, instance, placeholder_slot)
+            request = context.get('request', None)
+            page = None
+            if request:
+                page = request.current_page
+            context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
             if plugin.render_plugin:
                 template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
                 if not template:
@@ -181,6 +184,16 @@ class CMSPlugin(MPTTModel):
             else:
                 template = None
             return render_plugin(context, instance, placeholder, template, processors, context.current_app)
+        else:
+            from cms.middleware.toolbar import toolbar_plugin_processor
+
+            if processors and toolbar_plugin_processor in processors:
+                if not placeholder:
+                    placeholder = self.placeholder
+                current_app = context.current_app if context else None
+                context = PluginContext(context, self, placeholder, current_app=current_app)
+                template = None
+                return render_plugin(context, self, placeholder, template, processors, context.current_app)
         return ""
 
     def get_media_path(self, filename):
@@ -216,13 +229,16 @@ class CMSPlugin(MPTTModel):
         """
         instance, plugin = self.get_plugin_instance()
         if instance:
-            return unicode(plugin.icon_alt(instance))
+            return force_unicode(plugin.icon_alt(instance))
         else:
             return u''
 
     def save(self, no_signals=False, *args, **kwargs):
         if no_signals:  # ugly hack because of mptt
-            super(CMSPlugin, self).save_base(cls=self.__class__)
+            if DJANGO_1_5:
+                super(CMSPlugin, self).save_base(cls=self.__class__)
+            else:
+                super(CMSPlugin, self).save_base()
         else:
             super(CMSPlugin, self).save()
 
@@ -231,7 +247,7 @@ class CMSPlugin(MPTTModel):
             'position', 'tree_id']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, plugin_trail):
+    def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
         """
         Copy this plugin and return the new plugin.
         """
@@ -247,38 +263,26 @@ class CMSPlugin(MPTTModel):
         new_plugin.lft = None
         new_plugin.rght = None
         new_plugin.level = None
-
-        # In the block below, we use plugin_trail as a kind of breadcrumb trail 
-        # through the tree. 
-        #
         # we assign a parent to our new plugin
-        if not self.parent:
-            # We're lucky; we don't need to find a parent. We'll just put 
-            # new_plugin into the plugin_trail for potential children to use,
-            # and move on.
-            plugin_trail[:] = [new_plugin]
-        else:
-            # We will need to find a parent for our new_plugin.
-            marker = plugin_trail.pop()
-            # are we going up or down?
-            level_difference = self.level - marker.level
-            if level_difference == 1:
-            # going up; put the marker back
-                plugin_trail.append(marker)
-            else:
-                # going down; remove more items from plugin_trail
-                if level_difference < 0:
-                    plugin_trail[:] = plugin_trail[:level_difference]
-                # assign new_plugin.parent
-            new_plugin.parent = plugin_trail[-1]
-            # new_plugin becomes the last item in the tree for the next round
-            plugin_trail.append(new_plugin)
+        parent_cache[self.pk] = new_plugin
+        if self.parent:
+            parent = parent_cache[self.parent_id]
+            parent = CMSPlugin.objects.get(pk=parent.pk)
+            new_plugin.parent = parent
         new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
         new_plugin.position = self.position
+        if no_signals:
+            from cms.signals import pre_save_plugins
+            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
+            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin)
+            new_plugin._no_reorder = True
         new_plugin.save()
         if plugin_instance:
+            if plugin_instance.__class__ == CMSPlugin:
+                #get a new instance so references do not get mixed up
+                plugin_instance = CMSPlugin.objects.get(pk=plugin_instance.pk)
             plugin_instance.pk = new_plugin.pk
             plugin_instance.id = new_plugin.pk
             plugin_instance.placeholder = target_placeholder
@@ -289,10 +293,14 @@ class CMSPlugin(MPTTModel):
             plugin_instance.cmsplugin_ptr = new_plugin
             plugin_instance.language = target_language
             plugin_instance.parent = new_plugin.parent
-            plugin_instance.position = new_plugin.position  # added to retain the position when creating a public copy of a plugin
+            # added to retain the position when creating a public copy of a plugin
+            plugin_instance.position = new_plugin.position
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
+        if no_signals:
+
+            signals.pre_save.connect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
 
         return new_plugin
 
@@ -309,25 +317,6 @@ class CMSPlugin(MPTTModel):
         have to do this themselves!
         """
         pass
-
-    def delete_with_public(self):
-        """
-            Delete the public copy of this plugin if it exists,
-            then delete the draft
-        """
-        position = self.position
-        slot = self.placeholder.slot
-        page = self.placeholder.page
-        if page and getattr(page, 'publisher_public'):
-            try:
-                placeholder = Placeholder.objects.get(page=page.publisher_public, slot=slot)
-            except Placeholder.DoesNotExist:
-                pass
-            else:
-                public_plugin = CMSPlugin.objects.filter(placeholder=placeholder, position=position)
-                public_plugin.delete()
-        self.placeholder = None
-        self.delete()
 
     def has_change_permission(self, request):
         page = self.placeholder.page if self.placeholder else None
@@ -355,24 +344,90 @@ class CMSPlugin(MPTTModel):
         return self.position + 1
 
     def get_breadcrumb(self):
+        from cms.models import Page
+
+        model = self.placeholder._get_attached_model()
+        if not model:
+            model = Page
         breadcrumb = []
         if not self.parent_id:
-            breadcrumb.append({'title': unicode(self.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[self.pk]))})
+            try:
+                url = force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                            args=[self.pk]))
+            except NoReverseMatch:
+                url = force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                            args=[self.pk]))
+            breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
-            breadcrumb.append({'title': unicode(parent.get_plugin_name()),
-            'url': unicode(reverse("admin:cms_page_edit_plugin", args=[parent.pk]))})
+            try:
+                url = force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                            args=[parent.pk]))
+            except NoReverseMatch:
+                url = force_unicode(
+                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                            args=[parent.pk]))
+            breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):
-        result = simplejson.dumps(self.get_breadcrumb())
+        result = json.dumps(self.get_breadcrumb())
         result = mark_safe(result)
         return result
 
     def num_children(self):
         if self.child_plugin_instances:
             return len(self.child_plugin_instances)
+
+    def notify_on_autoadd(self, request, conf):
+        """
+        Method called when we auto add this plugin via default_plugins in 
+        CMS_PLACEHOLDER_CONF.
+        Some specific plugins may have some special stuff to do when they are
+        auto added.
+        """
+        pass
+
+    def notify_on_autoadd_children(self, request, conf, children):
+        """
+        Method called when we auto add children to this plugin via 
+        default_plugins/<plugin>/children in CMS_PLACEHOLDER_CONF.
+        Some specific plugins may have some special stuff to do when we add
+        children to them. ie : TextPlugin must update its content to add HTML 
+        tags to be able to see his children in WYSIWYG.
+        """
+        pass
+
+    def get_translatable_content(self):
+        fields = []
+        for field in self._meta.fields:
+            if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices and
+                field.editable and field.name not in self.translatable_content_excluded_fields and field):
+                fields.append(field)
+
+        translatable_fields = {}
+        for field in fields:
+            content = getattr(self, field.name)
+            if content:
+                translatable_fields[field.name] = content
+
+        return translatable_fields
+
+    def set_translatable_content(self, fields):
+        for field, value in fields.items():
+            setattr(self, field, value)
+
+        self.save()
+
+        # verify that all fields have been set
+        for field, value in fields.items():
+            if getattr(self, field) != value:
+                return False
+
+        return True
 
 
 reversion_register(CMSPlugin)

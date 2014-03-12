@@ -21,6 +21,9 @@ class AppAlreadyRegistered(Exception):
 class ToolbarAlreadyRegistered(Exception):
     pass
 
+class ToolbarNotRegistered(Exception):
+    pass
+
 
 class NotImplemented(Exception):
     pass
@@ -54,6 +57,11 @@ class PublicIsUnmodifiable(Exception):
     pass
 
 
+class PublicVersionNeeded(Exception):
+    """A Public version of this page is needed"""
+    pass
+
+
 class Deprecated(Exception): pass
 
 
@@ -67,3 +75,10 @@ class CMSDeprecationWarning(Warning): pass
 
 
 class LanguageError(Exception): pass
+
+
+class PluginConsistencyError(Exception): pass
+
+
+class PlaceholderNotFound(Exception): pass
+

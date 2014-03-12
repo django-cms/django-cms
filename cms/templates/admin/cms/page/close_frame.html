@@ -1,20 +1,32 @@
-{% load i18n admin_modify cms_js_tags cms_admin %}
-{% comment %}
-- This template is used when an iframe is closed to refresh the page
-{% endcomment %}
+{% extends "admin/change_form.html" %}
+{% load i18n l10n admin_static %}
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<title>{% trans "Successfully saved." %}</title>
-		<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>
-		<script type="text/javascript">
-		jQuery().ready(function ($) {
-			window.parent.CMS.API.Helpers.reloadBrowser();
-		});
-		</script>
-	</head>
-	<body>
-		{% trans "Successfully saved." %}
-	</body>
-</html>
+{% block title %}{% trans "Change a page" %}{% endblock %}
+
+{% block content %}
+<script>
+window.CMS || window.parent.CMS || document.write(
+	'<script src="{% static "cms/js/libs/jquery.min.js" %}"><\/script>' +
+	'<script src="{% static "cms/js/modules/cms.base.js" %}"><\/script>'
+);
+</script>
+<script>
+(function(Window) {
+// CMS.$ will be passed for $
+Window.CMS.$(document).ready(function () {
+	// the dataBridge is used to access plugin information from different ressources
+	Window.CMS.API.Helpers.dataBridge = {
+		'plugin_id': '{{ plugin_id|unlocalize }}',
+		'plugin_type': '{{ type }}',
+		'plugin_name': '{{ name }}',
+		'plugin_icon': '{{ icon }}',
+		'plugin_desc': '{{ alt }}'
+	};
+	// save current plugin
+	Window.CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:500 }});
+});
+// we have a special case here cause the CMS namespace
+// can be either inside the current window or the parent
+})(window.parent || window);
+</script>
+{% endblock %}
