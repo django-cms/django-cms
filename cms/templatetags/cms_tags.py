@@ -18,7 +18,7 @@ from cms.utils.compat.type_checks import string_types, int_types
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct
+from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -31,7 +31,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 import re
-from sekizai.helpers import Watcher, get_varname
+from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 register = template.Library()
@@ -184,9 +184,10 @@ def _get_placeholder(current_page, page, context, name):
     else:
         for placeholder in placeholders:
             cache_key = placeholder.get_cache_key(get_language())
-            content = cache.get(cache_key)
-            if not content is None:
-                placeholder.content_cache = content
+            cached_value = cache.get(cache_key)
+            if not cached_value is None:
+                restore_sekizai_context(context, cached_value['sekizai'])
+                placeholder.content_cache = cached_value['content']
             else:
                 fetch_placeholders.append(placeholder)
             placeholder.cache_checked = True
@@ -223,7 +224,8 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
                 cache_key = placeholder.get_cache_key(get_language())
                 cached_value = cache.get(cache_key)
                 if not cached_value is None:
-                    return mark_safe(cached_value)
+                    restore_sekizai_context(context, cached_value['sekizai'])
+                    return mark_safe(cached_value['content'])
         if not get_plugins(request, placeholder, page.get_template()):
             continue
         content = render_placeholder(placeholder, context, name)
@@ -487,15 +489,6 @@ class CleanAdminListFilter(InclusionTag):
         return {'title': spec.title(), 'choices': unique_choices}
 
 
-def _restore_sekizai(context, changes):
-    varname = get_varname()
-    sekizai_container = context[varname]
-    for key, values in changes.items():
-        sekizai_namespace = sekizai_container[key]
-        for value in values:
-            sekizai_namespace.append(value)
-
-
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
                                site=None, cache_result=True):
     """
@@ -522,12 +515,9 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
         cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
         cached_value = cache.get(cache_key)
-        if isinstance(cached_value, dict): # new style
-            _restore_sekizai(context, cached_value['sekizai'])
+        if cached_value:
+            restore_sekizai_context(context, cached_value['sekizai'])
             return {'content': mark_safe(cached_value['content'])}
-        elif isinstance(cached_value, string_types): # old style
-            return {'content': mark_safe(cached_value)}
-
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
     if not page:
         return {'content': ''}

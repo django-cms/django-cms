@@ -1,0 +1,8 @@
+{% load sekizai_tags %}
+$$${{ now }}$$$
+
+{% addtoblock "js" %}
+<script>
+    alert('{{ now }}');
+</script>
+{% endaddtoblock %}

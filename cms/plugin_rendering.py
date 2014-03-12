@@ -5,13 +5,15 @@ from cms.utils import get_language_from_request
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
-from cms.utils.placeholder import get_placeholder_conf
+from cms.utils.placeholder import get_placeholder_conf, restore_sekizai_context
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 
 # these are always called before all other plugin context processors
+from sekizai.helpers import Watcher
+
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
     plugin_meta_context_processor,
 )
@@ -127,7 +129,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
             cached_value = cache.get(cache_key)
             if not cached_value is None:
-                return mark_safe(cached_value)
+                restore_sekizai_context(context, cached_value['sekizai'])
+                return mark_safe(cached_value['content'])
     if page:
         template = page.template
     else:
@@ -148,7 +151,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
             context[key] = value
 
     content = []
-
+    watcher = Watcher(context)
     content.extend(render_plugins(plugins, context, placeholder, processors))
     toolbar_content = ''
 
@@ -170,9 +173,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['placeholder'] = toolbar_content
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)
-
+    changes = watcher.get_changes()
     if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
-        cache.set(cache_key, result, get_cms_setting('CACHE_DURATIONS')['content'])
+        cache.set(cache_key, {'content': result, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
     context.pop()
     return result
 

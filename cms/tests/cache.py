@@ -2,7 +2,7 @@
 from cms.api import add_plugin, create_page
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin
+from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin, SekizaiPlugin
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -203,3 +203,18 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(FuzzyInt(1, 20)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
+
+    def test_sekizai_plugin(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        placeholder1 = page1.placeholders.filter(slot="body")[0]
+        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        plugin_pool.register_plugin(SekizaiPlugin)
+        add_plugin(placeholder1, "SekizaiPlugin", 'en')
+        add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
+        page1.publish('en')
+        response = self.client.get('/en/')
+        self.assertContains(response, 'alert(')
+        response = self.client.get('/en/')
+        self.assertContains(response, 'alert(')
