@@ -1021,7 +1021,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
         referrer = request.META.get('HTTP_REFERER', '')
+
         path = reverse("admin:cms_page_changelist")
+        if request.GET.get('redirect_language'):
+            path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
         if 'admin' not in referrer:
             if all_published:
                 if page:
@@ -1067,7 +1070,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         except ValidationError:
             exc = sys.exc_info()[1]
             messages.error(request, exc.message)
-        return HttpResponseRedirect(reverse("admin:cms_page_changelist"))
+        path = reverse("admin:cms_page_changelist")
+        if request.GET.get('redirect_language'):
+            path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
+        return HttpResponseRedirect(path)
 
     @transaction.commit_on_success
     def revert_page(self, request, page_id, language):
