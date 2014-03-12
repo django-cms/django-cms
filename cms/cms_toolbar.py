@@ -194,7 +194,7 @@ class PageToolbar(CMSToolbar):
                 classes = ["cms_btn-action", "cms_btn-publish"]
 
                 dirty = bool(self.page and self.page.is_dirty(self.current_lang)) or len(dirty_statics) > 0
-                dirty = bool(dirty or (self.page.publisher_public_id and self.page.publisher_public.get_publisher_state(
+                dirty = bool(dirty or (self.page and self.page.publisher_public_id and self.page.publisher_public.get_publisher_state(
                     self.current_lang) == PUBLISHER_STATE_PENDING))
                 if dirty:
                     classes.append("cms_btn-publish-active")
