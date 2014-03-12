@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-
+from cms.tests.static_analysis import StaticAnalysisTest  # nopyflakes
 from cms.tests.admin import *  # nopyflakes
 from cms.tests.api import *  # nopyflakes
 from cms.tests.apphooks import *  # nopyflakes
@@ -44,4 +44,4 @@ from cms.tests.frontend import *  # nopyflakes
 from cms.tests.signals import *  # nopyflakes
 from cms.tests.no_i18n import *  # nopyflakes
 from cms.tests.cache import *  # nopyflakes
-from cms.tests.static_analysis import StaticAnalysisTest  # nopyflakes
+

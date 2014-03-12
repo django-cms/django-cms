@@ -31,7 +31,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 import re
-from sekizai.helpers import Watcher, get_varname
+from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 register = template.Library()
@@ -515,12 +515,9 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
         cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
         cached_value = cache.get(cache_key)
-        if isinstance(cached_value, dict): # new style
+        if cached_value:
             restore_sekizai_context(context, cached_value['sekizai'])
             return {'content': mark_safe(cached_value['content'])}
-        elif isinstance(cached_value, string_types): # old style
-            return {'content': mark_safe(cached_value)}
-
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
     if not page:
         return {'content': ''}

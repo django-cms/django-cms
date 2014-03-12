@@ -141,7 +141,7 @@ class MLNGPlaceholderActions(PlaceholderNoAction):
 
 def restore_sekizai_context(context, changes):
     varname = get_varname()
-    sekizai_container = context[varname]
+    sekizai_container = context.get(varname)
     for key, values in changes.items():
         sekizai_namespace = sekizai_container[key]
         for value in values:
