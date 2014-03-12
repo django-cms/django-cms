@@ -275,6 +275,7 @@ class TestLanguageCodesEnGB(SettingsOverrideTestCase):
             self.assertEqual(lang['public'], True)
             self.assertEqual(lang['hide_untranslated'], False)
 
+
 class TestLanguagesNotInCMSLanguages(SettingsOverrideTestCase):
     settings_overrides = {
         'LANGUAGE_CODE': 'en',
@@ -316,19 +317,13 @@ class TestLanguageFallbacks(SettingsOverrideTestCase):
                       ('en', 'English'),
                       ('de', 'German'),
                       ('es', 'Spanish')),
-        ],
         'CMS_LANGUAGES': {
             1: [ {'code' : 'en',
-                {
-                    'code': 'de',
                   'name': 'English',
                   'public': False},
-                },
                  {'code': 'fr',
-                    'code': 'fr',
                   'name': 'French',
                   'public': True},
-                }
             ],
             'default': {
                 'fallbacks': ['en', 'fr'],
