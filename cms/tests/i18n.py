@@ -3,6 +3,7 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import i18n
 from django.utils.importlib import import_module
+from cms.utils.i18n import get_fallback_languages
 
 
 class TestLanguages(SettingsOverrideTestCase):
@@ -273,6 +274,39 @@ class TestLanguageCodesEnGB(SettingsOverrideTestCase):
         for lang in result:
             self.assertEqual(lang['public'], True)
             self.assertEqual(lang['hide_untranslated'], False)
+
+
+class TestLanguagesNotInCMSLanguages(SettingsOverrideTestCase):
+    settings_overrides = {
+        'LANGUAGE_CODE': 'en',
+        'LANGUAGES': [
+            ('en', 'English'),
+            ('de', 'German'),
+            ('fr', 'French')
+        ],
+        'CMS_LANGUAGES': {
+            1: [
+                {
+                    'code': 'de',
+                    'name': 'German',
+                    'public': True,
+                },
+                {
+                    'code': 'fr',
+                    'name': 'French',
+                    'public': True
+                }
+            ],
+            'default': {
+                'fallbacks': ['de', 'fr'],
+            }
+        },
+        'SITE_ID': 1,
+    }
+
+    def test_get_fallback_languages(self):
+        languages = get_fallback_languages('en', 1)
+        self.assertEqual(languages, ['de', 'fr'])
 
 
 class TestLanguageFallbacks(SettingsOverrideTestCase):
