@@ -91,7 +91,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 
 //##################################################################################################################
 // #TOOLBAR/dialog#
-.cms_messages { display:none; position:fixed; z-index:99999; top:30px;
+.cms_messages { display:none; position:fixed; z-index:999999; top:30px;
 	width:300px; min-height:14px; margin:0; padding:6px 10px 8px; background:rgba(black, 0.74);
 	@include border-radius(0 0 3px 3px);
 	color:white; font-size:12px; line-height:16px; font-weight:200;
