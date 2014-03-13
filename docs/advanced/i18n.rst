@@ -76,6 +76,31 @@ Example:
     {% language_chooser "myapp/language_chooser.html" %}
 
 
+
+If you are in an apphook and have a detail view of an object you can
+set an object to the toolbar in your view. The cms will call ``get_absolute_url`` in
+the corresponding language for the language chooser:
+
+Example:
+
+.. code-block:: html+django
+
+    class AnswerView(DetailView):
+        def get(self, *args, **kwargs):
+            self.object = self.get_object()
+            if hasattr(self.request, 'toolbar'):
+                self.request.toolbar.set_object(self.object)
+            response = super(AnswerView, self).get(*args, **kwargs)
+            return response
+
+
+With this you can more easily control what url will be returned on the language chooser.
+
+.. note::
+
+    If you have a multilingual objects be sure that you return the right url if you don't have
+    a translation for this language in ``get_absolute_url``
+
 *****************
 page_language_url
 *****************
