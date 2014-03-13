@@ -20,7 +20,7 @@ from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
-from cms.api import create_page, create_title, add_plugin, assign_user_to_page
+from cms.api import create_page, create_title, add_plugin, assign_user_to_page, publish_page
 from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import UserSettings, StaticPlaceholder
@@ -1402,6 +1402,7 @@ class AdminFormsTests(AdminTestsBase):
             title.save()
 
             multi_title_page.save()
+            publish_page(multi_title_page, admin, 'en')
 
             # Non ajax call should return a 403 as this page shouldn't be accessed by anything else but ajax queries
             self.assertEqual(403, self.client.get(page_url).status_code)
@@ -1420,7 +1421,6 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'overwritten_url'},
                                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
 
-            # this one fail ? Should I use a special method to actually publish my changes on the title object above?
             self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'page_title'},
                                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
 

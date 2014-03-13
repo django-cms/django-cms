@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import six
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.forms.fields import EMPTY_VALUES
@@ -64,5 +65,5 @@ class PageSmartLinkField(forms.CharField):
 
     def widget_attrs(self, widget):
         attrs = super(PageSmartLinkField, self).widget_attrs(widget)
-        attrs.update({'placeholder_text': unicode(self.placeholder_text)})
+        attrs.update({'placeholder_text': six.text_type(self.placeholder_text)})
         return attrs
