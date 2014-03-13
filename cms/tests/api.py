@@ -7,6 +7,7 @@ from cms.compat import get_user_model
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
 from django.core.exceptions import FieldError
+from django.template import TemplateDoesNotExist
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -69,6 +70,12 @@ class PythonAPITests(TestCase):
     def test_invalid_apphook_type(self):
         self.assertRaises(TypeError, create_page, apphook=1,
                           **self._get_default_create_page_arguments())
+
+    def test_invalid_template(self):
+        kwargs = self._get_default_create_page_arguments()
+        kwargs['template'] = "not_valid.htm"
+        with SettingsOverride(CMS_TEMPLATES=(("not_valid.htm", "notvalid"),)):
+            self.assertRaises(TemplateDoesNotExist, create_page, **kwargs)
 
     def test_apphook_by_class(self):
         if APP_MODULE in sys.modules:
@@ -144,7 +151,7 @@ class PythonAPITests(TestCase):
     def test_assign_user_to_page_nothing(self):
         page = create_page(**self._get_default_create_page_arguments())
         user = get_user_model().objects.create_user(username='user', email='user@django-cms.org',
-                                   password='user')
+                                                    password='user')
         user.is_staff = True
         request = AttributeObject(user=user)
         self.assertFalse(page.has_change_permission(request))
@@ -152,8 +159,8 @@ class PythonAPITests(TestCase):
     def test_assign_user_to_page_single(self):
         page = create_page(**self._get_default_create_page_arguments())
         user = get_user_model().objects.create_user(username='user', email='user@django-cms.org',
-                                   password='user')
-        user.is_staff=True
+                                                    password='user')
+        user.is_staff = True
         user.save()
         request = AttributeObject(user=user)
         assign_user_to_page(page, user, can_change=True)
@@ -169,8 +176,8 @@ class PythonAPITests(TestCase):
     def test_assign_user_to_page_all(self):
         page = create_page(**self._get_default_create_page_arguments())
         user = get_user_model().objects.create_user(username='user', email='user@django-cms.org',
-                                   password='user')
-        user.is_staff=True
+                                                    password='user')
+        user.is_staff = True
         user.save()
         request = AttributeObject(user=user)
         assign_user_to_page(page, user, grant_all=True)
