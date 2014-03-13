@@ -1366,7 +1366,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 'id',
                 'title_set__path',
                 'title_set__title',
-            ))))
+            ))), content_type='application/json')
 
         return HttpResponseForbidden()
 
