@@ -1413,16 +1413,16 @@ class AdminFormsTests(AdminTestsBase):
 
             # Test that the query param is working as expected.
             self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'main_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
 
             self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'menu_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
 
             self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'overwritten_url'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
 
             self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'page_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content)))
+                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
