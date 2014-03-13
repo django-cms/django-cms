@@ -406,7 +406,6 @@ class PageLanguageUrl(InclusionTag):
                 with force_language(lang):
                     url = request.toolbar.obj.get_absolute_url()
             except:
-                raise
                 url = DefaultLanguageChanger(request)(lang)
         else:
             # use the default language changer
