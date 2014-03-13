@@ -136,10 +136,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate template
     assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
-    try:
-        get_template(template)
-    except:
-        raise
+    get_template(template)
+
     # validate site
     if not site:
         site = Site.objects.get_current()
