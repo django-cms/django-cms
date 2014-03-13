@@ -117,9 +117,6 @@ def configure(db_url, **extra):
             'reversion',
             'sekizai',
             'hvad',
-            'aldryn_faq',
-            'adminsortable'
-
         ],
         DEBUG_TOOLBAR_PATCH_SETTINGS = False,
         INTERNAL_IPS = ['127.0.0.1'],
