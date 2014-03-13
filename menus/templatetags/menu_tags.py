@@ -401,12 +401,6 @@ class PageLanguageUrl(InclusionTag):
             return {'template': 'cms/content.html'}
         if hasattr(request, "_language_changer"):
             url = request._language_changer(lang)
-        elif hasattr(request, 'toolbar') and request.toolbar.obj:
-            try:
-                with force_language(lang):
-                    url = request.toolbar.obj.get_absolute_url()
-            except:
-                url = DefaultLanguageChanger(request)(lang)
         else:
             # use the default language changer
             url = DefaultLanguageChanger(request)(lang)
