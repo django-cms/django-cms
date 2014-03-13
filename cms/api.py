@@ -7,6 +7,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
@@ -135,8 +136,9 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
 
     # validate template
-    assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
-    get_template(template)
+    if not template == TEMPLATE_INHERITANCE_MAGIC:
+        assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+        get_template(template)
 
     # validate site
     if not site:

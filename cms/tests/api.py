@@ -4,6 +4,7 @@ import sys
 from cms.api import _generate_valid_slug, create_page, _verify_plugin_type, assign_user_to_page
 from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
 from django.core.exceptions import FieldError
@@ -76,6 +77,8 @@ class PythonAPITests(TestCase):
         kwargs['template'] = "not_valid.htm"
         with SettingsOverride(CMS_TEMPLATES=(("not_valid.htm", "notvalid"),)):
             self.assertRaises(TemplateDoesNotExist, create_page, **kwargs)
+            kwargs['template'] = TEMPLATE_INHERITANCE_MAGIC
+        create_page(**kwargs)
 
     def test_apphook_by_class(self):
         if APP_MODULE in sys.modules:
