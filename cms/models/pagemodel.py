@@ -246,7 +246,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         plugin_pool.set_plugin_meta()
         for plugin in CMSPlugin.objects.filter(placeholder__page=target, language=language).order_by('-level'):
             inst, cls = plugin.get_plugin_instance()
-            if inst and getattr(inst, 'cms_plugin_ptr', False):
+            if inst and getattr(inst, 'cmsplugin_ptr', False):
                 inst.cmsplugin_ptr._no_reorder = True
                 inst.delete()
             else:
