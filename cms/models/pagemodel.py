@@ -466,14 +466,16 @@ class Page(MPTTModel):
         publish_set = self.get_descendants().filter(published=True).select_related('publisher_public')
         for page in publish_set:
             if page.publisher_public:
-                if page.publisher_public.parent.published:
-                    if not page.publisher_public.published:
-                        page.publisher_public.published = True
-                        page.publisher_public.save()
-                    if page.publisher_state == Page.PUBLISHER_STATE_PENDING:
-                        page.publisher_state = Page.PUBLISHER_STATE_DEFAULT
-                        page._publisher_keep_state = True
-                        page.save()
+                # ensure that parent exists
+                if page.publisher_public.parent:
+                    if page.publisher_public.parent.published:
+                        if not page.publisher_public.published:
+                            page.publisher_public.published = True
+                            page.publisher_public.save()
+                        if page.publisher_state == Page.PUBLISHER_STATE_PENDING:
+                            page.publisher_state = Page.PUBLISHER_STATE_DEFAULT
+                            page._publisher_keep_state = True
+                            page.save()
             elif page.publisher_state == Page.PUBLISHER_STATE_PENDING:
                 page.publish()
 
