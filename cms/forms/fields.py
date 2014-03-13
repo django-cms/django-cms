@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import six
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.forms.fields import EMPTY_VALUES
 from cms.models.pagemodel import Page
-from cms.forms.widgets import PageSelectWidget
+from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.forms.utils import get_site_choices, get_page_choices
 
 
@@ -54,3 +55,15 @@ class PageSelectFormField(forms.MultiValueField):
                 raise forms.ValidationError(self.error_messages['invalid_page'])
             return Page.objects.get(pk=page_id)
         return None
+
+class PageSmartLinkField(forms.CharField):
+    widget = PageSmartLinkWidget
+
+    def __init__(self, max_length=None, min_length=None, placeholder_text=None, *args, **kwargs):
+        self.placeholder_text = placeholder_text
+        super(PageSmartLinkField, self).__init__(max_length, min_length, *args, **kwargs)
+
+    def widget_attrs(self, widget):
+        attrs = super(PageSmartLinkField, self).widget_attrs(widget)
+        attrs.update({'placeholder_text': six.text_type(self.placeholder_text)})
+        return attrs

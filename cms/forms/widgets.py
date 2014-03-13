@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.sites.models import Site
-from django.forms.widgets import Select, MultiWidget
+from django.forms.widgets import Select, MultiWidget, TextInput
 from cms.utils.compat.dj import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -120,6 +120,69 @@ class PageSelectWidget(MultiWidget):
     
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
+
+class PageSmartLinkWidget(TextInput):
+
+
+
+    def render(self, name=None, value=None, attrs=None):
+        final_attrs = self.build_attrs(attrs)
+        id_ = final_attrs.get('id', None)
+
+        output = [r'''<script type="text/javascript">
+(function($){
+    $(function(){
+        $("#%(element_id)s").select2({
+            placeholder: "%(placeholder_text)s",
+            minimumInputLength: 3,
+            ajax: {
+                url: "/%(language_code)s/admin/cms/page/published-pages/",
+                dataType: 'json',
+                data: function (term, page) {
+                    return {
+                        q: term, // search term
+                        language_code: '%(language_code)s'
+                    };
+                },
+                results: function (data, page) {
+                    return {
+                        more: false,
+                        results: $.map(data, function(item, i){
+                            return {
+                                'id':item.title_set__path,
+                                'text': item.title_set__title + ' (/' + item.title_set__path + ')'}
+                            }
+                        )
+                    };
+                }
+            },
+            // Allow creation of new entries
+            createSearchChoice:function(term, data) { if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0) {return {id:term, text:term};} },
+            multiple: false,
+            initSelection : function (element, callback) {
+                var initialValue = element.val()
+                callback({id:initialValue, text: initialValue});
+            }
+        });
+    })
+})(django.jQuery);
+</script>''' % {
+            'element_id': id_,
+            'placeholder_text': final_attrs.get('placeholder_text', ''),
+            'language_code': self.language
+        }]
+
+        output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
+        return mark_safe(u''.join(output))
+
+
+    class Media:
+        css = {
+            'all': ('cms/js/select2/select2.css',
+                    'cms/js/select2/select2-bootstrap.css',)
+        }
+        js = (#'cms/js/libs/jquery.min.js',
+              'cms/js/select2/select2.js',)
 
 
 class UserSelectAdminWidget(Select):
