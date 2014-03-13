@@ -56,7 +56,7 @@ def _get_cache_key(name, page_lookup, lang, site_id):
     else:
         page_key = str(page_lookup)
     page_key = _clean_key(page_key)
-    return name + '__page_lookup:' + page_key + '_site:' + str(site_id) + '_lang:' + str(lang)
+    return get_cms_setting('CACHE_PREFIX') + name + '__page_lookup:' + page_key + '_site:' + str(site_id) + '_lang:' + str(lang)
 
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
