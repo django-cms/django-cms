@@ -978,23 +978,24 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 published = static_placeholder.publish(request, language)
                 if not published:
                     all_published = False
-        if page and all_published:
-            if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
-                messages.warning(request, _("Page not published! A parent page is not published yet."))
+        if page:
+            if all_published:
+                if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+                    messages.warning(request, _("Page not published! A parent page is not published yet."))
+                else:
+                    messages.info(request, _('The content was successfully published.'))
+                LogEntry.objects.log_action(
+                    user_id=request.user.id,
+                    content_type_id=ContentType.objects.get_for_model(Page).pk,
+                    object_id=page_id,
+                    object_repr=page.get_title(language),
+                    action_flag=CHANGE,
+                )
             else:
-                messages.info(request, _('The content was successfully published.'))
-            LogEntry.objects.log_action(
-                user_id=request.user.id,
-                content_type_id=ContentType.objects.get_for_model(Page).pk,
-                object_id=page_id,
-                object_repr=page.get_title(language),
-                action_flag=CHANGE,
-            )
-        else:
-            if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
-                messages.warning(request, _("Page not published! A parent page is not published yet."))
-            else:
-                messages.warning(request, _("There was a problem publishing your content"))
+                if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+                    messages.warning(request, _("Page not published! A parent page is not published yet."))
+                else:
+                    messages.warning(request, _("There was a problem publishing your content"))
         if "reversion" in settings.INSTALLED_APPS and page:
             # delete revisions that are not publish revisions
             from reversion.models import Version
