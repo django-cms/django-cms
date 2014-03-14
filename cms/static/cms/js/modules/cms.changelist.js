@@ -249,7 +249,11 @@ $(document).ready(function () {
 			});
 
 			// set correct active entry
+			if(window.parent && window.parent.CMS && window.parent.CMS.config) {
+				var page_id = window.parent.CMS.config.request.page_id;
 
+				$('div[data-page_id="'+page_id+'"]').addClass('cont-active');
+			}
 		},
 
 		setupGlobals: function () {
@@ -270,7 +274,7 @@ $(document).ready(function () {
 					node.parent().find('.col2').show()
 				});
 				// check for reload changes
-				if(parent) {
+				if(window.parent && window.parent.CMS && window.parent.CMS.request) {
 					// attach message
 					if(parent.CMS && parent.CMS.API.Toolbar) {
 						parent.CMS.API.Toolbar.openMessage(that.options.lang.changes, false, 0);
@@ -278,7 +282,6 @@ $(document).ready(function () {
 
 					window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
 				}
-
 			};
 
 			window.moveError = function(node,message){
