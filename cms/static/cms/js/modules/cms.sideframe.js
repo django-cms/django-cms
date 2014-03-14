@@ -111,13 +111,6 @@ $(document).ready(function () {
 				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 				// than show
 				iframe.show();
-				// if a message is triggerd, refresh
-				var messages = iframe.contents().find('.messagelist li');
-				if(messages.length || that.enforceReload) {
-					that.enforceReload = true;
-				} else {
-					that.enforceReload = false;
-				}
 
 				// add debug infos
 				if(that.config.debug) iframe.contents().find('body').addClass('cms_debug');
@@ -177,7 +170,7 @@ $(document).ready(function () {
 			this.settings = this.setSettings(this.settings);
 
 			// handle refresh option
-			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
+			this.reloadBrowser(this.options.onClose, false, true);
 		},
 
 		// private methods
@@ -231,9 +224,6 @@ $(document).ready(function () {
 			});
 			this.body.animate({ 'margin-left': 0 }, duration);
 			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
-
-			// should we reload
-			if(this.enforceReload) this.reloadBrowser();
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
