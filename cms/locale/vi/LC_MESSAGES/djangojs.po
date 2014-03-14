@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-12 14:48+0100\n"
+"POT-Creation-Date: 2014-03-06 13:45+0100\n"
 "PO-Revision-Date: 2013-12-12 08:53+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django-cms/language/vi/)\n"
@@ -17,6 +17,6 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: static/cms/js/plugins/cms.changeform.js:60
+#: static/cms/js/modules/cms.changeform.js:60
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr ""

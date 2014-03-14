@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-12 14:48+0100\n"
+"POT-Creation-Date: 2014-03-06 13:45+0100\n"
 "PO-Revision-Date: 2014-01-24 14:30+0000\n"
 "Last-Translator: ooskar <oskar@1px.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django-cms/language/sv/)\n"
@@ -19,6 +19,6 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/cms/js/plugins/cms.changeform.js:60
+#: static/cms/js/modules/cms.changeform.js:60
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Är du säker på att du vill ändra flikarna utan att spara sidan först?"
