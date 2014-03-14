@@ -1,15 +1,14 @@
 from __future__ import with_statement
 import sys
-import re
 from copy import copy
 
+import re
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
 from django.template import Variable
-
 from cms.api import create_page
 from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission
@@ -19,7 +18,6 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.views import _handle_no_page, details
-from cms.compat import get_user_model
 from menus.menu_pool import menu_pool
 
 
@@ -122,7 +120,7 @@ class ViewTests(SettingsOverrideTestCase):
 
     def test_redirect_with_toolbar(self):
         create_page("one", "nav_playground.html", "en", published=True,
-                          redirect='/en/page2')
+                    redirect='/en/page2')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get('/en/?edit')
@@ -133,13 +131,13 @@ class ViewTests(SettingsOverrideTestCase):
                     login_required=True)
         plain_url = '/accounts/'
         login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
-        with SettingsOverride(LOGIN_URL=plain_url+'?signin'):
+        with SettingsOverride(LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/en/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(login_rx.search(response['Location']))
         login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
-        with SettingsOverride(USE_I18N=False, LOGIN_URL=plain_url+'?signin'):
+        with SettingsOverride(USE_I18N=False, LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
@@ -147,30 +145,27 @@ class ViewTests(SettingsOverrideTestCase):
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
-
         # Anon user
         response = self.client.get("/en/?edit")
         self.assertNotContains(response, "cms_toolbar-item_switch", 200)
 
         # Superuser
         user = self.get_superuser()
-        self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
-                          password=getattr(user, get_user_model().USERNAME_FIELD))
-        response = self.client.get("/en/?edit")
+        with self.login_user_context(user):
+            response = self.client.get("/en/?edit")
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
         # Admin but with no permission
         user = self.get_staff_user_with_no_permissions()
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
-        self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
-                          password=getattr(user, get_user_model().USERNAME_FIELD))
-
-        response = self.client.get("/en/?edit")
+        with self.login_user_context(user):
+            response = self.client.get("/en/?edit")
         self.assertNotContains(response, "cms_toolbar-item_switch", 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
-        response = self.client.get("/en/?edit")
+        with self.login_user_context(user):
+            response = self.client.get("/en/?edit")
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
 
@@ -183,6 +178,7 @@ class ContextTests(SettingsOverrideTestCase):
         `cms.context_processors.cms_settings` and `cms.middleware.page`
         """
         from django.template import context
+
         page_template = "nav_playground.html"
         original_context = settings.TEMPLATE_CONTEXT_PROCESSORS
         new_context = copy(original_context)

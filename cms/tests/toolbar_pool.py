@@ -2,7 +2,6 @@ from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
 from django.utils.datastructures import SortedDict
 
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
@@ -51,14 +50,14 @@ class ToolbarPoolTests(CMSTestCase):
                           self.pool.unregister, TestToolbar)
 
     def test_settings(self):
-        toolbar_pool.toolbars = SortedDict()
-        toolbar_pool.discovered = False
+        toolbars = toolbar_pool.toolbars
+        toolbar_pool.clear()
         with SettingsOverride(CMS_TOOLBARS=['cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar']):
             toolbar_pool.register(TestToolbar)
-            self.assertEqual(len(self.pool.get_toolbars().keys()), 2)
+            self.assertEqual(len(list(self.pool.get_toolbars().keys())), 2)
             api.create_page("home", "simple.html", "en", published=True)
             with self.login_user_context(self.get_superuser()):
                 response = self.client.get("/en/?edit")
                 self.assertEqual(response.status_code, 200)
-        toolbar_pool.toolbars = SortedDict()
-        toolbar_pool.discovered = False
+        toolbar_pool.toolbars = toolbars
+

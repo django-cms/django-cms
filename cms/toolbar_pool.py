@@ -9,12 +9,11 @@ from django.utils.datastructures import SortedDict
 class ToolbarPool(object):
     def __init__(self):
         self.toolbars = SortedDict()
-        self.reverse = {}
-        self.discovered = False
+        self._discovered = False
         self.force_register = False
 
     def discover_toolbars(self):
-        if self.discovered:
+        if self._discovered:
             return
             #import all the modules
         toolbars = get_cms_setting('TOOLBARS')
@@ -25,11 +24,11 @@ class ToolbarPool(object):
                 self.force_register = False
         else:
             load('cms_toolbar')
-        self.discovered = True
+        self._discovered = True
 
     def clear(self):
-        self.apps = {}
-        self.discovered = False
+        self.toolbars = SortedDict()
+        self._discovered = False
 
     def register(self, toolbar):
         if not self.force_register and get_cms_setting('TOOLBARS'):
