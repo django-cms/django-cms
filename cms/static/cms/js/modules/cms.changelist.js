@@ -697,6 +697,7 @@ $(document).ready(function () {
 				}
 			});
 
+			var offset = 50;
 			var w = 0;
 			var hidden_count = 0;
 			var max_reached = false;
@@ -706,7 +707,7 @@ $(document).ready(function () {
 						w += $(this).outerWidth(true);
 					}
 
-					if(max_reached || w > min_width){
+					if(max_reached || w > (min_width - offset)){
 						hidden_count = hidden_count + 1;
 						max_reached = true
 					}
