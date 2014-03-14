@@ -213,6 +213,7 @@ $(document).ready(function () {
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
 				CMS.API.Toolbar._lock(true);
+				CMS.API.Toolbar._showToolbar(true);
 			}, 100);
 		},
 
