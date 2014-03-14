@@ -309,10 +309,6 @@ $(document).ready(function () {
 		},
 
 		openAjax: function (url, post, text, callback, onSuccess) {
-			// cancel request if already in progress
-			if(CMS.API.locked) return false;
-			CMS.API.locked = true;
-
 			var that = this;
 
 			// check if we have a confirmation text
