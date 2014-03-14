@@ -36,6 +36,7 @@ $(document).ready(function () {
 
 			// if there is an ajax reload, prioritize
 			if(ajax) {
+				CMS.API.locked = true;
 				// check if the url has changed, if true redirect to the new path
 				// this requires an ajax request
 				$.ajax({
@@ -47,6 +48,8 @@ $(document).ready(function () {
 						'pk': CMS.config.request.pk
 					},
 					'success': function (response) {
+						CMS.API.locked = false;
+
 						if(response === '' && !url) {
 							// cancel if response is empty
 							return false;
@@ -152,6 +155,8 @@ $(document).ready(function () {
 				if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 			} else {
 				// save within session
+				CMS.API.locked = true;
+
 				$.ajax({
 					'async': false,
 					'type': 'POST',
@@ -161,6 +166,7 @@ $(document).ready(function () {
 						'settings': settings
 					},
 					'success': function (data) {
+						CMS.API.locked = false;
 						// determine if logged in or not
 						settings = (data) ? JSON.parse(data) : CMS.config.settings;
 						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
@@ -190,12 +196,14 @@ $(document).ready(function () {
 				settings = JSON.parse(localStorage.getItem('cms_cookie'));
 				if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
 			} else {
+				CMS.API.locked = true;
 				// get from session
 				$.ajax({
 					'async': false,
 					'type': 'GET',
 					'url': CMS.config.urls.settings,
 					'success': function (data) {
+						CMS.API.locked = false;
 						// determine if logged in or not
 						settings = (data) ? JSON.parse(data) : CMS.config.settings;
 						if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);

@@ -223,6 +223,10 @@ $(document).ready(function () {
 
 		// public methods
 		addPlugin: function (type, name, parent) {
+			// cancel request if already in progress
+			if(CMS.API.locked) return false;
+			CMS.API.locked = true;
+
 			var that = this;
 			var data = {
 				'placeholder_id': this.options.placeholder_id,
@@ -237,10 +241,12 @@ $(document).ready(function () {
 				'url': this.options.urls.add_plugin,
 				'data': data,
 				'success': function (data) {
+					CMS.API.locked = false;
 					that.newPlugin = data;
 					that.editPlugin(data.url, name, data.breadcrumb);
 				},
 				'error': function (jqXHR) {
+					CMS.API.locked = false;
 					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
@@ -259,6 +265,10 @@ $(document).ready(function () {
 		},
 
 		copyPlugin: function (options, source_language) {
+			// cancel request if already in progress
+			if(CMS.API.locked) return false;
+			CMS.API.locked = true;
+
 			var that = this;
 			var move = (options || source_language) ? true : false;
 			// set correct options
@@ -291,6 +301,7 @@ $(document).ready(function () {
 					CMS.API.Helpers.reloadBrowser();
 				},
 				'error': function (jqXHR) {
+					CMS.API.locked = false;
 					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
@@ -324,6 +335,10 @@ $(document).ready(function () {
 
 			// ensure clipboard is cleaned
 			CMS.API.Clipboard.clear(function () {
+				// cancel request if already in progress
+				if(CMS.API.locked) return false;
+				CMS.API.locked = true;
+
 				// move plugin
 				$.ajax({
 					'type': 'POST',
@@ -335,6 +350,7 @@ $(document).ready(function () {
 						CMS.API.Helpers.reloadBrowser();
 					},
 					'error': function (jqXHR) {
+						CMS.API.locked = false;
 						var msg = CMS.config.lang.error;
 						// trigger error
 						that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
@@ -344,6 +360,10 @@ $(document).ready(function () {
 		},
 
 		movePlugin: function (options) {
+			// cancel request if already in progress
+			if(CMS.API.locked) return false;
+			CMS.API.locked = true;
+
 			var that = this;
 			// set correct options
 			options = options || this.options;
@@ -381,10 +401,14 @@ $(document).ready(function () {
 					// if response is reload
 					if(response.reload) CMS.API.Helpers.reloadBrowser();
 
+					// enable actions again
+					CMS.API.locked = false;
+
 					// TODO: show only if(response.status)
 					that._showSuccess(dragitem);
 				},
 				'error': function (jqXHR) {
+					CMS.API.locked = false;
 					var msg = CMS.config.lang.error;
 					// trigger error
 					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);

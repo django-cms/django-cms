@@ -296,3 +296,14 @@ After you add this every change to an instance of ``Poll`` via sideframe or moda
 the ``get_absolute_url()`` of the poll instance that was edited.
 
 
+********
+Frontend
+********
+
+The toolbar adds a class ``cms-ready`` to the **html** tag when ready. Additionally we add ``cms-toolbar-expanded`` when
+the toolbar is visible (expanded).
+
+The toolbar also fires a JavaScript event called **cms-ready** on the document.
+You can listen to this event using jQuery:
+
+``CMS.$(document).on('cms-ready', function () { ... });``

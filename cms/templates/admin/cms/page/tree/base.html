@@ -28,6 +28,7 @@
 {% block extrahead %}
 {{ block.super }}
 {% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}"></script>{% endblock jquery %}
+<script src="{% static "cms/js/libs/class.min.js" %}"></script>
 <!-- load jstree -->
 <script src="{% static "cms/js/jstree/_lib/_all.js" %}"></script>
 <script src="{% static "cms/js/jstree/tree_component.js" %}"></script>
@@ -39,52 +40,23 @@
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-
 	// bind csrf token to the header
 	CMS.API.Helpers.csrf('{{ csrf_token }}');
 
+	// initialize tree
 	{% if not cl.is_filtered %}
-		initTree();
+	new CMS.TreeManager({
+		'settings': {
+			'permission': {{ CMS_PERMISSION|js }},
+			'debug': {{ DEBUG|js }}
+		},
+		'lang': {
+			'success': '{% trans "Successfully moved" %}',
+			'changes': '{% trans "Changes within the tree might require a refresh." %}',
+			'error': '{% trans "An error occured. Please reload the page" %}'
+		}
+	});
 	{% endif %}
-
-	moveSuccess = function(node){
-        $.syncHeights();
-        $.syncCols();
-
-		var msg = $({% javascript_string %}<span class="success">{% trans "Successfully moved" %}</span>{% end_javascript_string %});
-		var parent = window.parent;
-
-		node.after(msg);
-		node.parent().find('.col2').hide();
-		msg.fadeOut(1000, function () {
-			node.parent().find('.col2').show()
-		});
-		// check for reload changes
-		if(parent) {
-			// attach message
-			if(parent.CMS && parent.CMS.API.Toolbar) {
-				parent.CMS.API.Toolbar.openMessage('{% trans "Changes within the tree might require a refresh." %}', false, 0);
-			}
-
-			window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
-		}
-
-	};
-	moveError = function(node,message){
-		if(message && message!="error") {
-			var msg = $({% javascript_string %}<span class="success">{% end_javascript_string %}+message+{% javascript_string %}</span>{% end_javascript_string %});
-		}
-		else {
-			var msg = $({% javascript_string %}<span class="success">{% trans "An error occured. Please reload the page" %}</span>{% end_javascript_string %});
-		}
-		node.parent().find('.col2').hide();
-		node.after(msg);
-	};
-	// some settings used by javascript functions
-	cmsSettings = {
-		cmsPermission: {{ CMS_PERMISSION|js }},
-		debug: {{ DEBUG|js }}
-	};
 });
 })(CMS.$);
 </script>

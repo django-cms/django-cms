@@ -316,13 +316,19 @@ $(document).ready(function () {
 			// cancel if question has been denied
 			if(!question) return false;
 
+			// set loader
+			this._loader(true);
+
 			$.ajax({
 				'type': 'POST',
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
 				'success': function () {
+					CMS.API.locked = false;
+
 					if(callback) {
 						callback(that);
+						that._loader(false);
 					} else if(onSuccess) {
 						CMS.API.Helpers.reloadBrowser(onSuccess);
 					} else {
@@ -331,6 +337,7 @@ $(document).ready(function () {
 					}
 				},
 				'error': function (jqXHR) {
+					CMS.API.locked = false;
 					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			});
