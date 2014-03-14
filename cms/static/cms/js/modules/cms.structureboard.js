@@ -416,6 +416,8 @@ $(document).ready(function () {
 					});
 				},
 				'isAllowed': function(placeholder, placeholderParent, originalItem) {
+					// cancel if action is excecuted
+					if(CMS.API.locked) return false;
 					// getting restriction array
 					var bounds = [];
 					// save original state events

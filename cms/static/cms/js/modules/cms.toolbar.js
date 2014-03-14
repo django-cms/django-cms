@@ -309,6 +309,10 @@ $(document).ready(function () {
 		},
 
 		openAjax: function (url, post, text, callback, onSuccess) {
+			// cancel request if already in progress
+			if(CMS.API.locked) return false;
+			CMS.API.locked = true;
+
 			var that = this;
 
 			// check if we have a confirmation text
@@ -321,6 +325,8 @@ $(document).ready(function () {
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
 				'success': function () {
+					CMS.API.locked = false;
+
 					if(callback) {
 						callback(that);
 					} else if(onSuccess) {
@@ -331,6 +337,7 @@ $(document).ready(function () {
 					}
 				},
 				'error': function (jqXHR) {
+					CMS.API.locked = false;
 					that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			});
