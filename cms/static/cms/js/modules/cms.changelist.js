@@ -217,13 +217,8 @@ $(document).ready(function () {
 					node.parent().find('.col2').show()
 				});
 				// check for reload changes
-				if(window.parent && window.parent.CMS && window.parent.CMS.request) {
-					// attach message
-					if(parent.CMS && parent.CMS.API.Toolbar) {
-						parent.CMS.API.Toolbar.openMessage(that.options.lang.changes, false, 0);
-					}
-
-					window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
+				if(window.self !== window.top) {
+					window.parent.CMS.API.Toolbar.openMessage(that.options.lang.changes, false, 0);
 				}
 			};
 
