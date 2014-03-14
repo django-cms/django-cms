@@ -109,6 +109,7 @@ $(document).ready(function () {
 
 		setupTreePublishing: function () {
 			// ADD DIRECT PUBLISHING
+			var that = this;
 			var tree = $('.tree');
 			var langTrigger = '.col-language .trigger-tooltip span';
 			var langTooltips = '.language-tooltip';
@@ -170,7 +171,7 @@ $(document).ready(function () {
 				e.preventDefault();
 
 				// cancel if not confirmed
-				if(!confirm('Are you sure you want to publish this page?')) return false;
+				if(!confirm(that.options.lang.publish.replace('%s', $(this).text().toLowerCase()))) return false;
 
 				// publish page and update
 				window.location.href = $(this).attr('href');
