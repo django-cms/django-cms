@@ -218,6 +218,7 @@ $(document).ready(function () {
 				});
 				// check for reload changes
 				if(window.self !== window.top) {
+					window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
 					window.parent.CMS.API.Toolbar.openMessage(that.options.lang.changes, false, 0);
 				}
 			};
