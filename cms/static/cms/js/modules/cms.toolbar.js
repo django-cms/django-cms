@@ -316,6 +316,9 @@ $(document).ready(function () {
 			// cancel if question has been denied
 			if(!question) return false;
 
+			// set loader
+			this._loader(true);
+
 			$.ajax({
 				'type': 'POST',
 				'url': url,
@@ -325,6 +328,7 @@ $(document).ready(function () {
 
 					if(callback) {
 						callback(that);
+						that._loader(false);
 					} else if(onSuccess) {
 						CMS.API.Helpers.reloadBrowser(onSuccess);
 					} else {
