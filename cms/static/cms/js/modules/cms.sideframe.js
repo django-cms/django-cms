@@ -97,6 +97,7 @@ $(document).ready(function () {
 			// push required params if defined
 			var params = [];
 			if(CMS.config.request.language) params.push(language);
+			if(CMS.config.request.page_id) params.push(page_id);
 
 			var iframe = $('<iframe src="'+this._url(url, params)+'" class="" frameborder="0" />');
 				iframe.hide();
@@ -213,6 +214,7 @@ $(document).ready(function () {
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
 				CMS.API.Toolbar._lock(true);
+				CMS.API.Toolbar._showToolbar(true);
 			}, 100);
 		},
 

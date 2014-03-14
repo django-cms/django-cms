@@ -1,6 +1,6 @@
 {% load cms_admin i18n %}
 
-<div class="cont {{ css_class }}" data-page_id="{{ page.id }}">
+<div class="cont {{ css_class }}{% if page.reverse_id == "page_types" %} cont-pagetype{% endif %}" data-page_id="{{ page.id }}">
 	<div class="col1">
 		{% if has_change_permission %}
 			{% language preview_language %}
