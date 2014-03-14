@@ -465,7 +465,7 @@ $(document).ready(function () {
  							// reset onClose when delete is triggered
 							if(item.hasClass('deletelink')) that.options.onClose = null;
 							// hide iframe
-							that.modal.find('.cms_modal-frame iframe').css('visibility', 'hidden');
+							that.modal.find('.cms_modal-frame iframe').hide();
 							// page has been saved or deleted, run checkup
 							that.saved = true;
 						}
@@ -533,6 +533,7 @@ $(document).ready(function () {
 					iframe.hide();
 					that.reloadBrowser(window.location.href, false, true);
 				} else {
+					iframe.show();
 					// set title of not provided
 					var innerTitle = iframe.contents().find('#content h1:eq(0)');
 					if(name === undefined) title.html(innerTitle.text());
