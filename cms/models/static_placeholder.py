@@ -60,7 +60,7 @@ class StaticPlaceholder(models.Model):
         if force or self.has_publish_permission(request):
             for plugin in CMSPlugin.objects.filter(placeholder=self.public, language=language).order_by('-level'):
                 inst, cls = plugin.get_plugin_instance()
-                if inst:
+                if inst and getattr(inst, 'cmsplugin_ptr', False):
                     inst.cmsplugin_ptr._no_reorder = True
                     inst.delete()
                 else:

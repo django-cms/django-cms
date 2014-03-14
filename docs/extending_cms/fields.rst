@@ -30,3 +30,14 @@ Form fields
     indents the page names based on what level they're on, so that the page
     select dropdown is easier to use. This takes the same arguments as 
     :class:`django.forms.models.ModelChoiceField`.
+
+.. py:class:: cms.forms.fields.PageSmartLinkField
+
+    A field making use of :class:`cms.forms.widgets.PageSmartLinkWidget`.
+    This field will offer you a list of matching internal pages as you type.
+    You can either pick one or enter an arbitrary url to create a non existing entry.
+    Takes a `placeholder_text` argument to define the text displayed inside the
+    input before you type.
+    The widget uses an ajax request to try to find pages match. It will try to find
+    case insensitive matches amongst public and published pages on the `title`, `path`,
+    `page_title`, `menu_title` fields.

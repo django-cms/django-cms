@@ -90,6 +90,12 @@ class DefaultLanguageChanger(object):
         return self._app_path
 
     def __call__(self, lang):
+        if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
+            try:
+                with force_language(lang):
+                    return self.request.toolbar.obj.get_absolute_url()
+            except:
+                pass
         return '%s%s' % (self.get_page_path(lang), self.app_path)
 
     def get_page_path(self, lang):

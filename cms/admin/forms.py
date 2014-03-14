@@ -192,6 +192,7 @@ class PublicationDatesForm(forms.ModelForm):
 
 
 class AdvancedSettingsForm(forms.ModelForm):
+    from cms.forms.fields import PageSmartLinkField
     application_urls = forms.ChoiceField(label=_('Application'),
                                          choices=(), required=False,
                                          help_text=_('Hook application to this page.'))
@@ -205,8 +206,10 @@ class AdvancedSettingsForm(forms.ModelForm):
         initial=Page._meta.get_field('xframe_options').default,
         required=False
     )
-    redirect = forms.CharField(label=_('Redirect'), max_length=255, required=False,
-                               help_text=_('Redirects to this URL.'))
+
+    redirect = PageSmartLinkField(label=_('Redirect'), required=False,
+                               help_text=_('Redirects to this URL.'), placeholder_text=_('Start typing...'))
+
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
 
@@ -225,6 +228,9 @@ class AdvancedSettingsForm(forms.ModelForm):
                 [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
+
+        if 'redirect' in self.fields:
+            self.fields['redirect'].widget.language = self.fields['language'].initial
 
     def clean(self):
         cleaned_data = super(AdvancedSettingsForm, self).clean()

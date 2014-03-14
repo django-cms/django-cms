@@ -233,7 +233,7 @@ class ContextTests(SettingsOverrideTestCase):
         # Number of queries when context processors is not enabled
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
             # Baseline number of queries
-            with self.assertNumQueries(FuzzyInt(17, 21)) as context:
+            with self.assertNumQueries(FuzzyInt(15, 19)) as context:
                 response = self.client.get("/en/page-2/")
                 if DJANGO_1_5:
                     num_queries_page = len(context.connection.queries) - context.starting_queries

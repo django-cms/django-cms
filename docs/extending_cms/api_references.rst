@@ -158,7 +158,7 @@ Functions and constants
     :param bool grant_all: Grant all permissions to the user
     
 
-.. function:: publish_page(page, user)
+.. function:: publish_page(page, user, language)
 
     Publishes a page.
     
@@ -166,6 +166,7 @@ Functions and constants
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
+    :param string language: The target language to publish to
 
 .. function:: get_page_draft(page):
 
