@@ -170,7 +170,7 @@ $(document).ready(function () {
 				e.preventDefault();
 
 				// cancel if not confirmed
-				if(!confirm('Are you sure?')) return false;
+				if(!confirm('Are you sure you want to publish this page?')) return false;
 
 				// publish page and update
 				window.location.href = $(this).attr('href');
