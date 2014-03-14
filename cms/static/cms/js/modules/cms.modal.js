@@ -74,6 +74,7 @@ $(document).ready(function () {
 				that._changeContent($(this));
 			});
 			this.modal.find('.cms_modal-close, .cms_modal-cancel').bind(this.click, function (e) {
+				that.options.onClose = null;
 				e.preventDefault();
 				that.close();
 			});
@@ -477,6 +478,7 @@ $(document).ready(function () {
 			// manually add cancel button at the end
 			var cancel = $('<div class="cms_btn">'+that.config.lang.cancel+'</div>');
 				cancel.bind(that.click, function () {
+					that.options.onClose = false;
 					that.close();
 				});
 			render.append(cancel);
