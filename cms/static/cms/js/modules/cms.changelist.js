@@ -179,7 +179,7 @@ $(document).ready(function () {
 
 		setupUIHacks: function () {
 			// enables tab click on title entry to open in new window
-			$('.tree .col1 .title').bind('click', function (e) {
+			$('.tree').delegate('.col1 .title', 'click', function (e) {
 				if(!e.metaKey) {
 					window.top.location.href = $(this).attr('href');
 				} else {
