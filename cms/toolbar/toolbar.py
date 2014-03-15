@@ -8,7 +8,7 @@ from cms.utils.i18n import force_language
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
@@ -247,7 +247,13 @@ class CMSToolbar(ToolbarAPIMixin):
             self.login_form = CMSToolbarLoginForm(request=self.request, data=self.request.POST)
             if self.login_form.is_valid():
                 login(self.request, self.login_form.user_cache)
-                return HttpResponseRedirect(self.request.path)
+                if REDIRECT_FIELD_NAME in self.request.GET:
+                    return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME])
+                else:
+                    return HttpResponseRedirect(self.request.path)
+            else:
+                if REDIRECT_FIELD_NAME in self.request.GET:
+                    return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME]+"?cms-toolbar-login-error=1")
 
     def _call_toolbar(self, func_name):
         with force_language(self.toolbar_language):
