@@ -92,11 +92,12 @@ $(document).ready(function () {
 			var language = 'language=' + CMS.config.request.language;
 			var page_id = 'page_id=' + CMS.config.request.page_id;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
-			var initialized = false;
+			// var initialized = false;
 
 			// push required params if defined
 			var params = [];
 			if(CMS.config.request.language) params.push(language);
+			if(CMS.config.request.page_id) params.push(page_id);
 
 			var iframe = $('<iframe src="'+this._url(url, params)+'" class="" frameborder="0" />');
 				iframe.hide();
@@ -110,13 +111,6 @@ $(document).ready(function () {
 				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 				// than show
 				iframe.show();
-				// if a message is triggerd, refresh
-				var messages = iframe.contents().find('.messagelist li');
-				if(messages.length || that.enforceReload) {
-					that.enforceReload = true;
-				} else {
-					that.enforceReload = false;
-				}
 
 				// add debug infos
 				if(that.config.debug) iframe.contents().find('body').addClass('cms_debug');
@@ -131,8 +125,8 @@ $(document).ready(function () {
 				});
 
 				// attach reload event
-				if(initialized) that.reloadBrowser(false, false, true);
-				initialized = true;
+				// if(initialized) that.reloadBrowser(false, false, true);
+				// initialized = true;
 			});
 
 			// cancel animation if sideframe is already shown
@@ -176,7 +170,7 @@ $(document).ready(function () {
 			this.settings = this.setSettings(this.settings);
 
 			// handle refresh option
-			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
+			this.reloadBrowser(this.options.onClose, false, true);
 		},
 
 		// private methods
@@ -213,6 +207,7 @@ $(document).ready(function () {
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
 				CMS.API.Toolbar._lock(true);
+				CMS.API.Toolbar._showToolbar(true);
 			}, 100);
 		},
 
@@ -229,9 +224,6 @@ $(document).ready(function () {
 			});
 			this.body.animate({ 'margin-left': 0 }, duration);
 			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
-
-			// should we reload
-			if(this.enforceReload) this.reloadBrowser();
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {

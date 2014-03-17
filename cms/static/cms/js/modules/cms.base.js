@@ -36,19 +36,19 @@ $(document).ready(function () {
 
 			// if there is an ajax reload, prioritize
 			if(ajax) {
-				CMS.API.locked = true;
+				parent.CMS.API.locked = true;
 				// check if the url has changed, if true redirect to the new path
 				// this requires an ajax request
 				$.ajax({
 					'async': false,
 					'type': 'GET',
-					'url': CMS.config.request.url,
+					'url': parent.CMS.config.request.url,
 					'data': {
-						'model': CMS.config.request.model,
-						'pk': CMS.config.request.pk
+						'model': parent.CMS.config.request.model,
+						'pk': parent.CMS.config.request.pk
 					},
 					'success': function (response) {
-						CMS.API.locked = false;
+						parent.CMS.API.locked = false;
 
 						if(response === '' && !url) {
 							// cancel if response is empty
