@@ -649,9 +649,6 @@ $(document).ready(function () {
 				return false;
 			}
 
-			// hide scrollHint
-			nav.find('.cms_submenu-scroll-hint').hide();
-
 			// loop through items and figure out if we need to hide items
 			items.find('a, span').each(function (index, item) {
 				item = $(item);
@@ -681,6 +678,9 @@ $(document).ready(function () {
 			if(items.add(titles).filter(':visible').length <= 0) {
 				nav.find('.cms_submenu-dropdown').hide();
 			}
+
+			// hide scrollHint
+			nav.find('.cms_submenu-scroll-hint').hide();
 		},
 
 		_collapsables: function () {
