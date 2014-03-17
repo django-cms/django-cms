@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-14 14:48+0100\n"
+"POT-Creation-Date: 2014-03-17 18:58+0100\n"
 "PO-Revision-Date: 2009-11-10 22:37+0100\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -62,134 +62,134 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: cms_toolbar.py:202
+#: cms_toolbar.py:205
 #, fuzzy
 msgid "Publish changes"
 msgstr "publish request"
 
-#: cms_toolbar.py:204
+#: cms_toolbar.py:207
 #, fuzzy
 msgid "Publish page now"
 msgstr "publish request"
 
-#: cms_toolbar.py:256
+#: cms_toolbar.py:259
 #, python-format
 msgid "Add %(language)s Translation"
 msgstr ""
 
-#: cms_toolbar.py:270
+#: cms_toolbar.py:273
 #, python-format
 msgid "Delete %(language)s Translation"
 msgstr ""
 
-#: cms_toolbar.py:279
+#: cms_toolbar.py:282
 #, python-format
 msgid "Are you sure you want copy all plugins from %s?"
 msgstr ""
 
-#: cms_toolbar.py:280
+#: cms_toolbar.py:283
 #, python-format
 msgid "Copy all plugins from %s"
 msgstr ""
 
-#: cms_toolbar.py:290
+#: cms_toolbar.py:293
 msgid "Pages"
 msgstr ""
 
-#: cms_toolbar.py:295 templates/admin/cms/page/permissions.html:6
+#: cms_toolbar.py:298 templates/admin/cms/page/permissions.html:6
 msgid "Page"
 msgstr ""
 
-#: cms_toolbar.py:297
+#: cms_toolbar.py:300
 msgid "Add Page"
 msgstr ""
 
-#: cms_toolbar.py:299
+#: cms_toolbar.py:302
 msgid "New Page"
 msgstr ""
 
-#: cms_toolbar.py:307
+#: cms_toolbar.py:310
 msgid "New Sub Page"
 msgstr ""
 
-#: cms_toolbar.py:315
+#: cms_toolbar.py:318
 msgid "Duplicate this Page"
 msgstr ""
 
-#: cms_toolbar.py:323
+#: cms_toolbar.py:326
 msgid "Edit this Page"
 msgstr ""
 
-#: cms_toolbar.py:328 cms_toolbar.py:400
+#: cms_toolbar.py:331 cms_toolbar.py:403
 #: templates/admin/cms/page/tree/menu_item.html:51
 msgid "Page settings"
 msgstr ""
 
-#: cms_toolbar.py:332
+#: cms_toolbar.py:335
 msgid "Templates"
 msgstr ""
 
-#: cms_toolbar.py:347 templates/admin/cms/page/tree/menu_item.html:52
+#: cms_toolbar.py:350 templates/admin/cms/page/tree/menu_item.html:52
 msgid "Advanced settings"
 msgstr ""
 
-#: cms_toolbar.py:353
+#: cms_toolbar.py:356
 msgid "Permissions"
 msgstr ""
 
-#: cms_toolbar.py:357 admin/pageadmin.py:313
+#: cms_toolbar.py:360 admin/pageadmin.py:313
 #, fuzzy
 msgid "Publishing dates"
 msgstr "publish request"
 
-#: cms_toolbar.py:362
+#: cms_toolbar.py:365
 msgid "Hide in navigation"
 msgstr ""
 
-#: cms_toolbar.py:364
+#: cms_toolbar.py:367
 msgid "Display in navigation"
 msgstr ""
 
-#: cms_toolbar.py:370
+#: cms_toolbar.py:373
 #, fuzzy
 msgid "Unpublish page"
 msgstr "unpublish request"
 
-#: cms_toolbar.py:373
+#: cms_toolbar.py:376
 #, fuzzy
 msgid "Publish page"
 msgstr "publish request"
 
-#: cms_toolbar.py:395
+#: cms_toolbar.py:398
 #, fuzzy
 msgid "Delete page"
 msgstr "deletion request"
 
-#: cms_toolbar.py:407
+#: cms_toolbar.py:410
 msgid "Save as Page Type"
 msgstr ""
 
-#: cms_toolbar.py:418 templates/admin/cms/page/history/revision_header.html:10
+#: cms_toolbar.py:421 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
 msgstr ""
 
-#: cms_toolbar.py:433
+#: cms_toolbar.py:436
 msgid "Undo"
 msgstr ""
 
-#: cms_toolbar.py:434
+#: cms_toolbar.py:437
 msgid "Redo"
 msgstr ""
 
-#: cms_toolbar.py:437
+#: cms_toolbar.py:440
 msgid "Are you sure you want to revert to live?"
 msgstr ""
 
-#: cms_toolbar.py:438
+#: cms_toolbar.py:441
 msgid "Revert to live"
 msgstr ""
 
-#: cms_toolbar.py:440
+#: cms_toolbar.py:443
 msgid "View history"
 msgstr ""
 
@@ -418,148 +418,148 @@ msgstr ""
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:580
+#: admin/pageadmin.py:581
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:590
+#: admin/pageadmin.py:592
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr ""
 
-#: admin/pageadmin.py:600
+#: admin/pageadmin.py:604
 msgid "Plugins were moved"
 msgstr ""
 
-#: admin/pageadmin.py:607
+#: admin/pageadmin.py:611
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr ""
 
-#: admin/pageadmin.py:619
+#: admin/pageadmin.py:624
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 msgstr ""
 
-#: admin/pageadmin.py:637
+#: admin/pageadmin.py:643
 msgid "You do not have permission to change pages."
 msgstr ""
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:655
 msgid "Database error"
 msgstr ""
 
-#: admin/pageadmin.py:750 admin/pageadmin.py:791 admin/pageadmin.py:1087
-#: admin/pageadmin.py:1123
+#: admin/pageadmin.py:756 admin/pageadmin.py:797 admin/pageadmin.py:1103
+#: admin/pageadmin.py:1139
 msgid "You do not have permission to change this page"
 msgstr ""
 
-#: admin/pageadmin.py:826
+#: admin/pageadmin.py:832
 msgid "You do not have permission to change the template"
 msgstr ""
 
-#: admin/pageadmin.py:830
+#: admin/pageadmin.py:836
 msgid "Template not valid"
 msgstr ""
 
-#: admin/pageadmin.py:835
+#: admin/pageadmin.py:841
 #, python-format
 msgid "Template changed to %s"
 msgstr ""
 
-#: admin/pageadmin.py:837
+#: admin/pageadmin.py:844
 msgid "The template was successfully changed"
 msgstr ""
 
-#: admin/pageadmin.py:859
+#: admin/pageadmin.py:866
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr ""
 
-#: admin/pageadmin.py:863
+#: admin/pageadmin.py:871
 msgid "Page moved"
 msgstr ""
 
-#: admin/pageadmin.py:909 admin/placeholderadmin.py:253
+#: admin/pageadmin.py:917 admin/placeholderadmin.py:253
 #: admin/placeholderadmin.py:299
 msgid "Language must be set to a supported language!"
 msgstr ""
 
-#: admin/pageadmin.py:914 admin/placeholderadmin.py:318
+#: admin/pageadmin.py:922 admin/placeholderadmin.py:318
 msgid "You do not have permission to copy these plugins."
 msgstr ""
 
-#: admin/pageadmin.py:917
+#: admin/pageadmin.py:925
 #, python-format
 msgid "Copied plugins from %(source_language)s to %(target_language)s"
 msgstr ""
 
-#: admin/pageadmin.py:967
+#: admin/pageadmin.py:976
 msgid "You do not have permission to publish this page"
 msgstr ""
 
-#: admin/pageadmin.py:984 admin/pageadmin.py:996
+#: admin/pageadmin.py:993 admin/pageadmin.py:1005
 msgid "Page not published! A parent page is not published yet."
 msgstr ""
 
-#: admin/pageadmin.py:986
+#: admin/pageadmin.py:995
 msgid "The content was successfully published."
 msgstr ""
 
-#: admin/pageadmin.py:998
+#: admin/pageadmin.py:1007
 msgid "There was a problem publishing your content"
 msgstr ""
 
-#: admin/pageadmin.py:1055
+#: admin/pageadmin.py:1071
 msgid "You do not have permission to unpublish this page"
 msgstr ""
 
-#: admin/pageadmin.py:1057
+#: admin/pageadmin.py:1073
 msgid "This page was never published"
 msgstr ""
 
-#: admin/pageadmin.py:1060
+#: admin/pageadmin.py:1076
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr ""
 
-#: admin/pageadmin.py:1091
+#: admin/pageadmin.py:1107
 #, python-format
 msgid "The page \"%s\" was successfully reverted."
 msgstr ""
 
-#: admin/pageadmin.py:1127
+#: admin/pageadmin.py:1143
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: admin/pageadmin.py:1133
+#: admin/pageadmin.py:1149
 msgid "There only exists one translation for this page"
 msgstr ""
 
-#: admin/pageadmin.py:1162
+#: admin/pageadmin.py:1178
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
 
-#: admin/pageadmin.py:1184 admin/placeholderadmin.py:505
+#: admin/pageadmin.py:1201 admin/placeholderadmin.py:505
 #: admin/placeholderadmin.py:545
 msgid "Are you sure?"
 msgstr ""
 
-#: admin/pageadmin.py:1224
+#: admin/pageadmin.py:1241
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 
-#: admin/pageadmin.py:1248
+#: admin/pageadmin.py:1265
 msgid "Page Types"
 msgstr ""
 
-#: admin/pageadmin.py:1304
+#: admin/pageadmin.py:1321
 msgid "You do not have permission to edit this page"
 msgstr ""
 
@@ -659,7 +659,7 @@ msgstr ""
 msgid "Select a valid page"
 msgstr ""
 
-#: forms/widgets.py:204
+#: forms/widgets.py:206
 msgid "Add Another"
 msgstr ""
 
@@ -1061,7 +1061,7 @@ msgid "All permissions"
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:69
-#: templates/admin/cms/page/tree/base.html:80
+#: templates/admin/cms/page/tree/base.html:81
 msgid "Loading..."
 msgstr ""
 
@@ -1192,33 +1192,38 @@ msgstr ""
 msgid "An error occured. Please reload the page"
 msgstr "An error occurred. Please reload the page"
 
-#: templates/admin/cms/page/tree/base.html:73
+#: templates/admin/cms/page/tree/base.html:57
+#, python-format
+msgid "Are you sure you want to %%s this page?"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base.html:74
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:76
+#: templates/admin/cms/page/tree/base.html:77
 #, python-format
 msgid "Add %(name)s"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:88
+#: templates/admin/cms/page/tree/base.html:89
 msgid "Pages on:"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:109
+#: templates/admin/cms/page/tree/base.html:110
 msgid "Filter:"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:109
+#: templates/admin/cms/page/tree/base.html:110
 msgid "on"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:109
+#: templates/admin/cms/page/tree/base.html:110
 msgid "off"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:111
+#: templates/admin/cms/page/tree/base.html:112
 msgid "Filter"
 msgstr ""
 
@@ -1650,7 +1655,7 @@ msgstr ""
 msgid "Change Category"
 msgstr ""
 
-#: utils/conf.py:82
+#: utils/conf.py:83
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Inherit from the parent page"
 
