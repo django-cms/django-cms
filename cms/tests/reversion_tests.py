@@ -205,19 +205,9 @@ class ReversionTestCase(TransactionCMSTestCase):
             # test that CMSPlugin subclasses are recovered
             self.assertEqual(Text.objects.all().count(), 1)
 
-    def test_publish(self):
+    def test_publish_limits(self):
         with self.login_user_context(self.user):
-            page = Page.objects.all()[0]
-            page_pk = page.pk
-            self.assertEqual(Revision.objects.all().count(), 5)
-            publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
-            response = self.client.get(publish_url)
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(Revision.objects.all().count(), 2)
-
-    def test_publish_limit(self):
-        with self.login_user_context(self.user):
-            with SettingsOverride(CMS_MAX_PAGE_PUBLISH_REVERSIONS=5):
+            with SettingsOverride(CMS_MAX_PAGE_PUBLISH_REVERSIONS=2, CMS_MAX_PAGE_HISTORY_REVERSIONS=2):
                 page = Page.objects.all()[0]
                 page_pk = page.pk
                 self.assertEqual(Revision.objects.all().count(), 5)
@@ -225,7 +215,7 @@ class ReversionTestCase(TransactionCMSTestCase):
                     publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
                     response = self.client.get(publish_url)
                     self.assertEqual(response.status_code, 302)
-                self.assertEqual(Revision.objects.all().count(), 6)
+                self.assertEqual(Revision.objects.all().count(), 4)
 
 
 class ReversionFileFieldTests(CMSTestCase):

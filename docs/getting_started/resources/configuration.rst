@@ -729,20 +729,33 @@ Default value of the ``cache`` attribute of plugins. Should plugins be cached by
 
 .. setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
+CMS_MAX_PAGE_HISTORY_REVERSIONS
+===============================
+
+Default: ``15``
+
+Configures how many undo steps are saved in the db excluding publish steps.
+In the page admin there is a ``History`` button to revert to previous version
+of a page. In the past, databases using django-reversion could grow huge. To
+help address this issue, only a limited number of *edit* revisions will now be saved.
+
+This setting declares how many edit revisions are saved in the database.
+By default the newest 15 edit revisions are kept.
+
 CMS_MAX_PAGE_PUBLISH_REVERSIONS
 ===============================
 
-Default: ``25``
+Default: ``10``
 
 If `django-reversion`_ is installed everything you do with a page and all
 plugin changes will be saved in a revision.
 
 In the page admin there is a ``History`` button to revert to previous version
 of a page. In the past, databases using django-reversion could grow huge. To
-help address this issue, only *published* revisions will now be saved.
+help address this issue, only a limited number of *published* revisions will now be saved.
 
 This setting declares how many published revisions are saved in the database.
-By default the newest 25 published revisions are kept; all others are deleted
+By default the newest 10 published revisions are kept; all others are deleted
 when you publish a page.
 
 If set to *0* all published revisions are kept, but you will need to ensure
