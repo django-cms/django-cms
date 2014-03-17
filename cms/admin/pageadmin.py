@@ -1017,7 +1017,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         path = reverse("admin:cms_page_changelist")
         if request.GET.get('redirect_language'):
             path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
-        if 'admin' not in referrer:
+        if reverse('admin:index') not in referrer:
             if all_published:
                 if page:
                     if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
