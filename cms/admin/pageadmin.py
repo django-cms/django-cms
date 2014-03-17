@@ -134,7 +134,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/revert/$', self.revert_page),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
             pat(r'^add-page-type/$', self.add_page_type),
-            url(r'^published-pages/$', self.get_published_pagelist),
+            pat(r'^published-pages/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
         )
 
@@ -572,12 +572,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
             message = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
                 'plugin_name': plugin_name, 'placeholder': placeholder}
+            self.cleanup_history(placeholder.page)
             helpers.make_revision_with_plugins(placeholder.page, request.user, message)
 
     def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
         page = target_placeholder.page
         if page and "reversion" in settings.INSTALLED_APPS:
             message = _(u"Copied plugins to %(placeholder)s") % {'placeholder': target_placeholder}
+            self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
 
     def post_edit_plugin(self, request, plugin):
@@ -588,15 +590,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
                 message = _(
                     u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {
-                              'plugin_name': plugin_name,
-                              'position': plugin.position,
-                              'placeholder': plugin.placeholder.slot
-                          }
+                        'plugin_name': plugin_name,
+                        'position': plugin.position,
+                        'placeholder': plugin.placeholder.slot
+                    }
+                self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, message)
 
     def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
         page = target_placeholder.page
         if page and 'reversion' in settings.INSTALLED_APPS:
+            self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
 
     def post_delete_plugin(self, request, plugin):
@@ -610,6 +614,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 'placeholder': plugin.placeholder,
             }
             if 'reversion' in settings.INSTALLED_APPS:
+                self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
     def post_clear_placeholder(self, request, placeholder):
@@ -620,6 +625,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 'name': force_unicode(placeholder)
             }
             if 'reversion' in settings.INSTALLED_APPS:
+                self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
     def get_placeholder_template(self, request, placeholder):
@@ -833,6 +839,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         page.save()
         if "reversion" in settings.INSTALLED_APPS:
             message = _("Template changed to %s") % dict(get_cms_setting('TEMPLATES'))[to_template]
+            self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(force_unicode(_("The template was successfully changed")))
 
@@ -860,6 +867,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # move page
         page.move_page(target, position)
         if "reversion" in settings.INSTALLED_APPS:
+            self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, _("Page moved"))
 
         return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
@@ -916,6 +924,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             if page and "reversion" in settings.INSTALLED_APPS:
                 message = _(u"Copied plugins from %(source_language)s to %(target_language)s") % {
                     'source_language': source_language, 'target_language': target_language}
+                self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, message)
             return HttpResponse("ok")
 
@@ -997,28 +1006,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 else:
                     messages.warning(request, _("There was a problem publishing your content"))
         if "reversion" in settings.INSTALLED_APPS and page:
-            # delete revisions that are not publish revisions
-            from reversion.models import Version
-
-            content_type = ContentType.objects.get_for_model(Page)
-            # reversion 1.8+ removes type field, revision filtering must be based on comments
-            versions_qs = Version.objects.filter(content_type=content_type, object_id_int=page.pk)
-            deleted = []
-            for version in versions_qs.exclude(revision__comment__in=(INITIAL_COMMENT,  PUBLISH_COMMENT)):
-                if not version.revision_id in deleted:
-                    revision = version.revision
-                    revision.delete()
-                    deleted.append(revision.pk)
-                    # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
-            limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
-            if limit:
-                deleted = []
-                for version in versions_qs.filter(revision__comment__exact=PUBLISH_COMMENT).order_by(
-                        '-revision__pk')[limit - 1:]:
-                    if not version.revision_id in deleted:
-                        revision = version.revision
-                        revision.delete()
-                        deleted.append(revision.pk)
+            self.cleanup_history(page, publish=True)
             helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
             # create a new publish reversion
         if 'node' in request.REQUEST:
@@ -1043,6 +1031,34 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 path = '/?edit_off'
 
         return HttpResponseRedirect(path)
+
+    def cleanup_history(self, page, publish=False):
+        if "reversion" in settings.INSTALLED_APPS and page:
+            # delete revisions that are not publish revisions
+            from reversion.models import Version
+
+            content_type = ContentType.objects.get_for_model(Page)
+            # reversion 1.8+ removes type field, revision filtering must be based on comments
+            versions_qs = Version.objects.filter(content_type=content_type, object_id_int=page.pk)
+            history_limit = get_cms_setting("MAX_PAGE_HISTORY_REVERSIONS")
+            deleted = []
+            for version in versions_qs.exclude(revision__comment__in=(INITIAL_COMMENT,  PUBLISH_COMMENT)).order_by(
+                        '-revision__pk')[history_limit - 1:]:
+                if not version.revision_id in deleted:
+                    revision = version.revision
+                    revision.delete()
+                    deleted.append(revision.pk)
+                    # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
+            publish_limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
+            if publish_limit and publish:
+                deleted = []
+                for version in versions_qs.filter(revision__comment__exact=PUBLISH_COMMENT).order_by(
+                        '-revision__pk')[publish_limit - 1:]:
+                    if not version.revision_id in deleted:
+                        revision = version.revision
+                        revision.delete()
+                        deleted.append(revision.pk)
+
 
     @transaction.commit_on_success
     def unpublish(self, request, page_id, language):
@@ -1174,6 +1190,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 public.save()
 
             if "reversion" in settings.INSTALLED_APPS:
+                self.cleanup_history(obj)
                 helpers.make_revision_with_plugins(obj, request.user, message)
 
             if not self.has_change_permission(request, None):
@@ -1356,20 +1373,27 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             query_term = request.GET.get('q','').strip('/')
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
-            published_pages = Page.objects.published().public().filter(
+            matching_published_pages = Page.objects.published().public().filter(
                 Q(title_set__title__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__path__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
             ).distinct()
 
-            return HttpResponse(json.dumps(list(published_pages.values(
-                'id',
-                'title_set__path',
-                'title_set__title',
-            ))), content_type='application/json')
+            results = []
+            for page in matching_published_pages:
+                results.append(
+                    {
+                        'path': page.get_path(language=language_code),
+                        'title': page.get_title(language=language_code),
+                        'redirect_url': page.get_absolute_url(language=language_code)
+                    }
+                )
 
-        return HttpResponseForbidden()
+            return HttpResponse(json.dumps(results), content_type='application/json')
+
+        else:
+            return HttpResponseForbidden()
 
     def add_plugin(self, *args, **kwargs):
         with create_revision():

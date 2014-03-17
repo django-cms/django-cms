@@ -9,7 +9,7 @@ from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.urls import unquote
 from django import template
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
@@ -400,7 +400,10 @@ class PageLanguageUrl(InclusionTag):
         except KeyError:
             return {'template': 'cms/content.html'}
         if hasattr(request, "_language_changer"):
-            url = request._language_changer(lang)
+            try:
+                url = request._language_changer(lang)
+            except NoReverseMatch:
+                url = DefaultLanguageChanger(request)(lang)
         else:
             # use the default language changer
             url = DefaultLanguageChanger(request)(lang)

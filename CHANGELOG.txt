@@ -218,3 +218,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Detect admin object creation and changes via toolbar and redirect to them.
 - Added support for custom user models
 - Added PageTypes
+- Added CMS_MAX_PAGE_HISTORY_REVERSIONS and changed default of CMS_MAX_PAGE_PUBLISH_REVERSIONS

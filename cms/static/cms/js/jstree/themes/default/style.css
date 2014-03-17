@@ -8,7 +8,6 @@
 }
 .tree .tree-default li.last {
 	background-image:url("lastli.gif");
-	background-color:white !important;
 }
 
 /* OPEN or CLOSED */

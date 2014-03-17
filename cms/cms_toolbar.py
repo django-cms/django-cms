@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser
@@ -144,7 +144,10 @@ class BasicToolbar(CMSToolbar):
         language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
         language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
         for language in get_language_objects(self.current_site.pk):
-            url = language_changer(language['code'])
+            try:
+                url = language_changer(language['code'])
+            except NoReverseMatch:
+                url = DefaultLanguageChanger(self.request)(language['code'])
             language_menu.add_link_item(language['name'], url=url, active=self.current_lang == language['code'])
 
 

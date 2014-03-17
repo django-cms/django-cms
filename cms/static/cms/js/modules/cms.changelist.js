@@ -109,6 +109,7 @@ $(document).ready(function () {
 
 		setupTreePublishing: function () {
 			// ADD DIRECT PUBLISHING
+			var that = this;
 			var tree = $('.tree');
 			var langTrigger = '.col-language .trigger-tooltip span';
 			var langTooltips = '.language-tooltip';
@@ -170,7 +171,7 @@ $(document).ready(function () {
 				e.preventDefault();
 
 				// cancel if not confirmed
-				if(!confirm('Are you sure?')) return false;
+				if(!confirm(that.options.lang.publish.replace('%s', $(this).text().toLowerCase()))) return false;
 
 				// publish page and update
 				window.location.href = $(this).attr('href');
@@ -217,13 +218,9 @@ $(document).ready(function () {
 					node.parent().find('.col2').show()
 				});
 				// check for reload changes
-				if(window.parent && window.parent.CMS && window.parent.CMS.request) {
-					// attach message
-					if(parent.CMS && parent.CMS.API.Toolbar) {
-						parent.CMS.API.Toolbar.openMessage(that.options.lang.changes, false, 0);
-					}
-
+				if(window.self !== window.top) {
 					window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
+					window.parent.CMS.API.Toolbar.openMessage(that.options.lang.changes, false, 0);
 				}
 			};
 
@@ -702,6 +699,7 @@ $(document).ready(function () {
 				}
 			});
 
+			var offset = 50;
 			var w = 0;
 			var hidden_count = 0;
 			var max_reached = false;
@@ -711,7 +709,7 @@ $(document).ready(function () {
 						w += $(this).outerWidth(true);
 					}
 
-					if(max_reached || w > min_width){
+					if(max_reached || w > (min_width - offset)){
 						hidden_count = hidden_count + 1;
 						max_reached = true
 					}

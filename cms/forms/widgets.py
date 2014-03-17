@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 from django.forms.widgets import Select, MultiWidget, TextInput
 from cms.utils.compat.dj import force_unicode
 from django.utils.safestring import mark_safe
@@ -136,7 +137,7 @@ class PageSmartLinkWidget(TextInput):
             placeholder: "%(placeholder_text)s",
             minimumInputLength: 3,
             ajax: {
-                url: "/%(language_code)s/admin/cms/page/published-pages/",
+                url: "%(ajax_url)s",
                 dataType: 'json',
                 data: function (term, page) {
                     return {
@@ -149,8 +150,8 @@ class PageSmartLinkWidget(TextInput):
                         more: false,
                         results: $.map(data, function(item, i){
                             return {
-                                'id':item.title_set__path,
-                                'text': item.title_set__title + ' (/' + item.title_set__path + ')'}
+                                'id':item.redirect_url,
+                                'text': item.title + ' (/' + item.path + ')'}
                             }
                         )
                     };
@@ -169,7 +170,8 @@ class PageSmartLinkWidget(TextInput):
 </script>''' % {
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
-            'language_code': self.language
+            'language_code': self.language,
+            'ajax_url': reverse("admin:cms_page_get_published_pagelist")
         }]
 
         output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
