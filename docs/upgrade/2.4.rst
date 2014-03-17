@@ -31,11 +31,11 @@ Django 1.4 and Python 2.6 are now the minimum required versions.
 
 Migrations overhaul
 ===================
-In version 2.4, migrations have been completely rewritten to address issues with
-newer South releases.
+In version 2.4, migrations have been completely rewritten to address issues
+with newer South releases.
 
-To ease the upgrading process, all the migrations for the `cms` application have
-been consolidated into a single migration file, `0001_initial.py`.
+To ease the upgrading process, all the migrations for the `cms` application
+have been consolidated into a single migration file, `0001_initial.py`.
 
 *   migration 0001 is a *real* migration, that gets you to the same point migrations 0001-0036 used to 
 *   the migrations 0002 to 0036 inclusive still exist, but are now all *dummy*
@@ -113,8 +113,8 @@ can publish changes to the public site.
     this topic.
 
 
-Added Fix MPTTT Management command
-==================================
+Added Fix MPTT Management command
+=================================
 
 Added a management command for fixing MPTT tree data.
 
@@ -126,8 +126,9 @@ The command can be run with::
 Removed the MultilingualMiddleware
 ==================================
 
-We removed the MultilingualMiddleware. This removed the very ugly monkey patching of the
-reverse() function as well. As a benefit we now support localization of urls and Apphook urls with standard django helpers.
+We removed the MultilingualMiddleware. This removed rather some unattractive
+monkey-patching of the ``reverse()`` function as well. As a benefit we now
+support localization of urls and Apphook urls with standard Django helpers.
 
 
 For django 1.4 more infos can be found here:
@@ -148,7 +149,7 @@ What you need to do:
   and that it comes after the SessionMiddleware.
 - Be sure that the ``cms.urls`` is included in a ``i18n_patterns``::
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import *
         from django.conf.urls.i18n import i18n_patterns
         from django.contrib import admin
         from django.conf import settings

@@ -1,53 +1,54 @@
 # -*- coding: utf-8 -*-
-from cms.forms.fields import PageSelectFormField, PlaceholderFormField
-from cms.forms.widgets import PlaceholderPluginEditorWidget
+from cms.forms.fields import PageSelectFormField
 from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 from django.db import models
-from django.utils.text import capfirst
 
 
 class PlaceholderField(models.ForeignKey):
+
     def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
-        validate_placeholder_name(slotname)
         if kwargs.get('related_name', None) == '+':
             raise ValueError("PlaceholderField does not support disabling of related names via '+'.")
+        if not callable(slotname):
+            validate_placeholder_name(slotname)
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()
         kwargs.update({'null': True})  # always allow Null
+        kwargs.update({'editable': False}) # never allow edits in admin
         super(PlaceholderField, self).__init__(Placeholder, **kwargs)
 
-    def formfield(self, **kwargs):
-        """
-        Returns a django.forms.Field instance for this database Field.
-        """
-        return self.formfield_for_admin(None, lambda qs: qs, **kwargs)
+    def _get_new_placeholder(self, instance):
+        return Placeholder.objects.create(slot=self._get_placeholder_slot(instance), default_width=self.default_width)
 
-    def formfield_for_admin(self, request, filter_func, **kwargs):
-        defaults = {'label': capfirst(self.verbose_name), 'help_text': self.help_text}
-        defaults.update(kwargs)
-        widget = PlaceholderPluginEditorWidget(request, filter_func)
-        widget.choices = []
-        return PlaceholderFormField(required=False, widget=widget, **defaults)
-
-    def _get_new_placeholder(self):
-        return Placeholder.objects.create(slot=self.slotname,
-            default_width=self.default_width)
+    def _get_placeholder_slot(self, model_instance):
+        if callable(self.slotname):
+            slotname = self.slotname(model_instance)
+            validate_placeholder_name(slotname)
+        else:
+            slotname = self.slotname
+        return slotname
 
     def pre_save(self, model_instance, add):
         if not model_instance.pk:
-            setattr(model_instance, self.name, self._get_new_placeholder())
+            setattr(model_instance, self.name, self._get_new_placeholder(model_instance))
+        else:
+            slot = self._get_placeholder_slot(model_instance)
+            placeholder = getattr(model_instance, self.name)
+            if not placeholder:
+                setattr(model_instance, self.name, self._get_new_placeholder(model_instance))
+                placeholder = getattr(model_instance, self.name)
+            if placeholder.slot != slot:
+                placeholder.slot = slot
+                placeholder.save()
         return super(PlaceholderField, self).pre_save(model_instance, add)
 
     def save_form_data(self, instance, data):
-        if not instance.pk:
-            data = self._get_new_placeholder()
-        else:
-            data = getattr(instance, self.name)
-            if not isinstance(data, Placeholder):
-                data = self._get_new_placeholder()
+        data = getattr(instance, self.name, '')
+        if not isinstance(data, Placeholder):
+            data = self._get_new_placeholder(instance)
         super(PlaceholderField, self).save_form_data(instance, data)
 
     def south_field_triple(self):

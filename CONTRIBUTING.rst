@@ -90,6 +90,9 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
   is "it should look good in a terminal-base editor" (eg vim), but we try not be
   [Godwin's law] about it.
 
+It is worth to mention that we use **tabs** within HTML, SASS/SCSS and JavaScript.
+Please refrain from using spaces anywhere except if it helps code readability.
+
 
 Process
 =======
@@ -145,8 +148,12 @@ Also, contributing to the documentation will earn you great respect from the
 core developers. You get good karma just like a test contributor, but you get
 double cookie points. Seriously. You rock.
 
-Section style
-=============
+Documentation markup
+====================
+
+
+Sections
+--------
 
 We use Python documentation conventions for section marking:
 
@@ -156,12 +163,21 @@ We use Python documentation conventions for section marking:
 * ``-``, for subsections
 * ``^``, for subsubsections
 * ``"``, for paragraphs
-
+ 
+Inline markup
+-------------
+              
+* use backticks - ````settings.py```` - for:
+    * literals
+    * filenames
+    * names of fields and other items in the Admin interface: 
+* use emphasis - ``*Home*`` around:
+    * the names of available options in the Admin
+    * values in or of fields 
 
 ************
 Translations
 ************
-
 
 For translators we have a `Transifex account
 <https://www.transifex.com/projects/p/django-cms/>`_ where you can translate
@@ -175,6 +191,18 @@ contribute. All changes there will be automatically sent to the project.
 
         <img border="0" src="https://www.transifex.com/projects/p/django-cms/resource/core/chart/image_png"/>
 
+
+********
+Frontend
+********
+
+
+We are using `SASS/Compass <compass-style.org>`_ for our styles. The files
+are located within ``cms/static/cms/sass`` and can be compiled using the compass
+command ``compass watch cms/static/cms/`` from within the django-cms root.
+
+This will invoke the **config.rb** within ``cms/static/cms/`` using the predefined
+settings.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org

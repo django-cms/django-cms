@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import get_language
 from django.utils.encoding import smart_str
 
 
@@ -49,7 +48,7 @@ class NavigationNode(object):
         return self.url
     
     def get_attribute(self, name):
-        return self.attr[name]
+        return self.attr.get(name, None)
     
     def get_descendants(self):
         nodes = []

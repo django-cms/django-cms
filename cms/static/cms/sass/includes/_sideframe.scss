@@ -1,0 +1,45 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+#cms_toolbar {
+//##################################################################################################################
+// #SIDEFRAME#
+.cms_sideframe {
+	display:none; position:fixed; left:0; top:0; z-index:99999; width:0; height:100%; overflow:visible !important;
+
+	.cms_sideframe-frame { position:relative; z-index:10; width:100%; height:100%; overflow:hidden; background:white; }
+	iframe { height:100%; width:100%; border:none; background:white; overflow:auto; }
+
+	.cms_sideframe-resize { position:absolute; right:-2px; top:0; z-index:30; width:2px; height:100%; cursor:col-resize;
+		background:$color-grey-70; }
+		.cms_sideframe-shim { position:absolute; left:0; top:0; z-index:1; width:100%; height:100%;
+		background:transparent; }
+	.cms_sideframe-knob { width:6px; height:50px;
+		position:absolute; right:-2px; top:50%; margin-top:-15px; @include border-radius(3px);
+		background:$color-grey-70; }
+
+	.cms_sideframe-btn { position:absolute; right:-20px; top:50px; z-index:40; }
+	.cms_sideframe-btn {
+		div { cursor:pointer; width:20px; height:20px; margin-bottom:2px; @include border-radius(0 3px 3px 0);
+			background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat; }
+		div:hover { background-color:$color-grey-90; }
+
+		.cms_sideframe-close { background-position:-80px -90px; }
+		.cms_sideframe-close:hover { background-position:-100px -90px; }
+		.cms_sideframe-hide { background-position:-101px -150px; }
+		.cms_sideframe-hide:hover { background-position:-121px -150px; }
+		.cms_sideframe-hidden { background-position:-60px -150px; }
+		.cms_sideframe-hidden:hover { background-position:-80px -150px; }
+		.cms_sideframe-maximize { background-position:-40px -91px; }
+		.cms_sideframe-maximize:hover { background-position:-60px -91px; }
+		.cms_sideframe-minimize { background-position:-61px -111px; }
+		.cms_sideframe-minimize:hover { background-position:-61px -91px; }
+
+		.cms_sideframe-hide { border:5px solid $color-grey-70; border-left:none; border-right:none; }
+	}
+}
+
+// end of toolbar
+}

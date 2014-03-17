@@ -1,247 +1,456 @@
-# -*- coding: utf-8 -*-
-from cms.toolbar.base import BaseItem, Serializable
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.middleware.csrf import get_token
-from django.template.context import RequestContext, Context
+import abc
+import json
+from collections import defaultdict
+from cms.utils.compat.dj import force_unicode
+from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 from django.template.loader import render_to_string
-from django.utils.html import strip_spaces_between_tags
+from django.utils.functional import Promise
 
 
-class Switcher(BaseItem):
-    """
-    A 'switcher' button, state is defined using GET (and optionally a session
-    entry).
-    """
-    item_type = 'switcher'
-    extra_attributes = [
-        ('add_parameter', 'addParameter'),
-        ('remove_parameter', 'removeParameter'),
-        ('title', 'title'),
-    ]
+class ItemSearchResult(object):
+    def __init__(self, item, index):
+        self.item = item
+        self.index = index
+
+    def __add__(self, other):
+        return ItemSearchResult(self.item, self.index + other)
+
+    def __sub__(self, other):
+        return ItemSearchResult(self.item, self.index - other)
+
+    def __int__(self):
+        return self.index
+
+
+def may_be_lazy(thing):
+    if isinstance(thing, Promise):
+        return thing._proxy____args[0]
+    else:
+        return thing
+
+
+class ToolbarAPIMixin(object):
+    __metaclass__ = abc.ABCMeta
+    REFRESH_PAGE = REFRESH_PAGE
+    URL_CHANGE = URL_CHANGE
+    LEFT = LEFT
+    RIGHT = RIGHT
     
-    def __init__(self, alignment, css_class_suffix, add_parameter,
-                 remove_parameter, title, session_key=None):
-        """
-        add_parameter: parameter which indicates the True state
-        remove_parameter: parameter which indicates the False state
-        title: name of the switcher
-        session_key: key in the session which has a boolean value to indicate
-            the state of this switcher.
-        """
-        super(Switcher, self).__init__(alignment, css_class_suffix)
-        self.add_parameter = add_parameter
-        self.remove_parameter = remove_parameter
-        self.title = title
-        self.session_key = session_key
-        
-    def get_state(self, request):
-        state = self.add_parameter in request.GET
-        if self.session_key and request.session.get(self.session_key, False):
-            return True
-        return state
-        
-        
-    def get_extra_data(self, context, toolbar, **kwargs):
+    def __init__(self):
+        self.items = []
+        self.menus = {}
+        self._memo = defaultdict(list)
+
+    def _memoize(self, item):
+        self._memo[item.__class__].append(item)
+
+    def _unmemoize(self, item):
+        self._memo[item.__class__].remove(item)
+
+    def _item_position(self, item):
+        return self.items.index(item)
+
+    def _add_item(self, item, position):
+        if position is not None:
+            self.items.insert(position, item)
+        else:
+            self.items.append(item)
+
+    def _remove_item(self, item):
+        if item in self.items:
+            self.items.remove(item)
+        else:
+            raise KeyError("Item %r not found" % item)
+
+    def get_item_count(self):
+        return len(self.items)
+
+    def add_item(self, item, position=None):
+        if not isinstance(item, BaseItem):
+            raise ValueError("Items must be subclasses of cms.toolbar.items.BaseItem, %r isn't" % item)
+        if isinstance(position, ItemSearchResult):
+            position = position.index
+        elif isinstance(position, BaseItem):
+            position = self._item_position(position)
+        elif not (position is None or isinstance(position, (int,))):
+            raise ValueError("Position must be None, an integer, an item or an ItemSearchResult, got %r instead" % position)
+        self._add_item(item, position)
+        self._memoize(item)
+        return item
+
+    def find_items(self, item_type, **attributes):
+        results = []
+        attr_items = attributes.items()
+        notfound = object()
+        for candidate in self._memo[item_type]:
+            if all(may_be_lazy(getattr(candidate, key, notfound)) == value for key, value in attr_items):
+                results.append(ItemSearchResult(candidate, self._item_position(candidate)))
+        return results
+
+    def find_first(self, item_type, **attributes):
+        try:
+            return self.find_items(item_type, **attributes)[0]
+        except IndexError:
+            return None
+
+    #
+    # This will only work if it is used to determine the insert position for
+    # all items in the same menu.
+    #
+    def get_alphabetical_insert_position(self, new_menu_name, item_type,
+                                         default=0):
+        results = self.find_items(item_type)
+
+        # No items yet? Use the default value provided
+        if not len(results):
+            return default
+
+        last_position = 0
+
+        for result in sorted(results, key=lambda x: x.item.name):
+            if result.item.name > new_menu_name:
+                return result.index
+
+            if result.index > last_position:
+                last_position = result.index
+        else:
+            return last_position + 1
+
+    def remove_item(self, item):
+        self._remove_item(item)
+        self._unmemoize(item)
+
+    def add_sideframe_item(self, name, url, active=False, disabled=False,
+                           extra_classes=None, on_close=None, side=LEFT, position=None):
+        item = SideframeItem(name, url,
+                             active=active,
+                             disabled=disabled,
+                             extra_classes=extra_classes,
+                             on_close=on_close,
+                             side=side,
+        )
+        self.add_item(item, position=position)
+        return item
+
+    def add_modal_item(self, name, url, active=False, disabled=False,
+                       extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None):
+        item = ModalItem(name, url,
+                         active=active,
+                         disabled=disabled,
+                         extra_classes=extra_classes,
+                         on_close=on_close,
+                         side=side,
+        )
+        self.add_item(item, position=position)
+        return item
+
+    def add_link_item(self, name, url, active=False, disabled=False,
+                      extra_classes=None, side=LEFT, position=None):
+        item = LinkItem(name, url,
+                        active=active,
+                        disabled=disabled,
+                        extra_classes=extra_classes,
+                        side=side
+        )
+        self.add_item(item, position=position)
+        return item
+
+    def add_ajax_item(self, name, action, active=False, disabled=False,
+                      extra_classes=None, data=None, question=None,
+                      side=LEFT, position=None, on_success=None):
+        item = AjaxItem(name, action, self.csrf_token,
+                        active=active,
+                        disabled=disabled,
+                        extra_classes=extra_classes,
+                        data=data,
+                        question=question,
+                        side=side,
+                        on_success=on_success,
+        )
+        self.add_item(item, position=position)
+        return item
+
+
+class BaseItem(object):
+    __metaclass__ = abc.ABCMeta
+    template = None
+
+    def __init__(self, side=LEFT):
+        self.side = side
+
+    @property
+    def right(self):
+        return self.side is RIGHT
+
+    def render(self):
+        return render_to_string(self.template, self.get_context())
+
+    def get_context(self):
+        return {}
+
+
+class TemplateItem(BaseItem):
+    def __init__(self, template, extra_context=None, side=LEFT):
+        super(TemplateItem, self).__init__(side)
+        self.template = template
+        self.extra_context = extra_context
+
+    def get_context(self):
+        if self.extra_context:
+            return self.extra_context
+        return {}
+
+
+class SubMenu(ToolbarAPIMixin, BaseItem):
+    template = "cms/toolbar/items/menu.html"
+    sub_level = True
+
+    def __init__(self, name, csrf_token, side=LEFT):
+        ToolbarAPIMixin.__init__(self)
+        BaseItem.__init__(self, side)
+        self.name = name
+        self.csrf_token = csrf_token
+
+    def __repr__(self):
+        return '<Menu:%s>' % force_unicode(self.name)
+
+    def add_break(self, identifier=None, position=None):
+        item = Break(identifier)
+        self.add_item(item, position=position)
+        return item
+
+    def get_items(self):
+        return self.items
+
+    def get_context(self):
         return {
-            'state': self.get_state(toolbar.request)
+            'items': self.get_items(),
+            'title': self.name,
+            'sub_level': self.sub_level
         }
 
 
-class Anchor(BaseItem):
-    """
-    A link.
-    """
-    item_type = 'anchor'
-    extra_attributes = [
-        ('url', 'url'),
-        ('title', 'title'),
-    ]
-    
-    def __init__(self, alignment, css_class_suffix, title, url):
-        """
-        title: Name of the link
-        url: Target of the link
-        """
-        super(Anchor, self).__init__(alignment, css_class_suffix)
-        self.title = title
-        if callable(url):
-            self.serialize_url = url
-        else:
-            self.url = url
+class Menu(SubMenu):
+    sub_level = False
+
+    def get_or_create_menu(self, key, verbose_name, side=LEFT, position=None):
+        if key in self.menus:
+            return self.menus[key]
+        menu = SubMenu(verbose_name, self.csrf_token, side=side)
+        self.menus[key] = menu
+        self.add_item(menu, position=position)
+        return menu
 
 
-class HTML(BaseItem):
-    """
-    HTML item, can do whatever it want
-    """
-    item_type = 'html'
-    extra_attributes = [
-        ('html', 'html'),
-    ]
-    
-    def __init__(self, alignment, css_class_suffix, html):
-        """
-        html: The HTML to render.
-        """
-        super(HTML, self).__init__(alignment, css_class_suffix)
-        self.html = html
+class LinkItem(BaseItem):
+    template = "cms/toolbar/items/item_link.html"
 
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, side=LEFT):
+        super(LinkItem, self).__init__(side)
+        self.name = name
+        self.url = url
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
 
-class TemplateHTML(BaseItem):
-    """
-    Same as HTML, but renders a template to generate the HTML. 
-    """
-    item_type = 'html'
-    
-    def __init__(self, alignment, css_class_suffix, template):
-        """
-        template: the template to render
-        """
-        super(TemplateHTML, self).__init__(alignment, css_class_suffix)
-        self.template =  template
-        
-    def get_extra_data(self, context, toolbar, **kwargs):
-        new_context = RequestContext(toolbar.request)
-        rendered = render_to_string(self.template, new_context)
-        stripped = strip_spaces_between_tags(rendered.strip())
+    def __repr__(self):
+        return '<LinkItem:%s>' % force_unicode(self.name)
+
+    def get_context(self):
         return {
-            'html': stripped,
+            'url': self.url,
+            'name': self.name,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
         }
 
 
-class GetButton(BaseItem):
-    """
-    A button which triggers a GET request
-    """
-    item_type = 'button'
-    extra_attributes = [
-        ('title', 'title'),
-        ('icon', 'icon'),
-        ('url', 'redirect'),
-    ]
-    
-    def __init__(self, alignment, css_class_suffix, title, url, icon=None, enable=None):
-        """
-        title: name of the button
-        icon: icon of the button, relative to STATIC_URL
-        url: target of the GET request
-        """
-        super(GetButton, self).__init__(alignment, css_class_suffix, enable)
-        self.icon = icon
-        self.title = title
-        if callable(url):
-            self.serialize_url = url
-        else:
-            self.url = url
+class SideframeItem(BaseItem):
+    template = "cms/toolbar/items/item_sideframe.html"
+
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT):
+        super(SideframeItem, self).__init__(side)
+        self.name = "%s ..." % force_unicode(name)
+        self.url = url
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
+        self.on_close = on_close
+
+    def __repr__(self):
+        return '<SideframeItem:%s>' % force_unicode(self.name)
+
+    def get_context(self):
+        return {
+            'url': self.url,
+            'name': self.name,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
+            'on_close': self.on_close,
+        }
 
 
-class PostButton(BaseItem):
-    """
-    A button which triggers a POST request
-    """
-    item_type = 'button'
-    extra_attributes = [
-        ('title', 'title'),
-        ('icon', 'icon'),
-        ('action', 'action'),
-    ]
-    
-    def __init__(self, alignment, css_class_suffix, title, icon, action, *args, **kwargs):
-        """
-        title: name of the button
-        icon: icon of the button, relative to STATIC_URL
-        action: target of the request
-        *args, **kwargs: data to POST
-        
-        A csrfmiddlewaretoken is always injected into the request.
-        """
-        super(PostButton, self).__init__(alignment, css_class_suffix)
-        self.title = title
-        self.icon = icon
+class ModalItem(SideframeItem):
+    template = "cms/toolbar/items/item_modal.html"
+
+    def __repr__(self):
+        return '<ModalItem:%s>' % force_unicode(self.name)
+
+
+class AjaxItem(BaseItem):
+    template = "cms/toolbar/items/item_ajax.html"
+
+    def __init__(self, name, action, csrf_token, data=None, active=False,
+                 disabled=False, extra_classes=None,
+                 question=None, side=LEFT, on_success=None):
+        super(AjaxItem, self).__init__(side)
+        self.name = name
         self.action = action
-        self.args = args
-        self.kwargs = kwargs
-        
-    def get_extra_data(self, context, toolbar, **kwargs):
-        double = self.kwargs.copy()
-        double['csrfmiddlewaretoken'] = get_token(toolbar.request)
-        hidden = render_to_string('cms/toolbar/items/_post_button_hidden.html',
-                                  Context({'single': self.args,
-                                           'double': double}))
+        self.active = active
+        self.disabled = disabled
+        self.csrf_token = csrf_token
+        self.data = data or {}
+        self.extra_classes = extra_classes or []
+        self.question = question
+        self.on_success = on_success
+
+    def __repr__(self):
+        return '<AjaxItem:%s>' % force_unicode(self.name)
+
+    def get_context(self):
+        data = {}
+        data.update(self.data)
+        data['csrfmiddlewaretoken'] = self.csrf_token
+        data = json.dumps(data)
         return {
-            'hidden': hidden,
+            'action': self.action,
+            'name': self.name,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
+            'data': data,
+            'question': self.question,
+            'on_success': self.on_success
         }
 
 
-class ListItem(Serializable):
-    """
-    A item in a dropdown list (List).
-    """
-    base_attributes = [
-        ('css_class', 'cls'),
-        ('title', 'title'),
-        ('url', 'url'),
-        ('icon', 'icon'),
-        ('method', 'method'),
-    ]
-    extra_attributes = []
-    
-    def __init__(self, css_class_suffix, title, url, method='GET', icon=None):
-        """
-        title: name of the list
-        url: target of the item
-        icon: icon of the item, relative to STATIC_URL
-        """
-        self.css_class_suffix = css_class_suffix
-        self.css_class = 'cms_toolbar-item_%s' % self.css_class_suffix
-        self.title = title
-        self.method = method
-        self.icon = icon
-        if callable(url):
-            self.serialize_url = url
-        else:
-            self.url = url
+
+
+class Break(BaseItem):
+    template = "cms/toolbar/items/break.html"
+
+    def __init__(self, identifier=None):
+        self.identifier = identifier
+
+
+class BaseButton(object):
+    __metaclass__ = abc.ABCMeta
+    template = None
+
+    def render(self):
+        return render_to_string(self.template, self.get_context())
+
+    def get_context(self):
+        return {}
+
+
+class Button(BaseButton):
+    template = "cms/toolbar/items/button.html"
+
+    def __init__(self, name, url, active=False, disabled=False,
+                 extra_classes=None):
+        self.name = name
+        self.url = url
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return u'<ListItem: %s>' % unicode(self.title)
+        return '<Button:%s>' % force_unicode(self.name)
 
-class List(BaseItem):
-    """
-    A dropdown list
-    """
-    item_type = 'list'
-    extra_attributes = [
-        ('title', 'title'),
-        ('icon', 'icon'),
-    ]
-    
-    def __init__(self, alignment, css_class_suffix, title, icon, items):
-        """
-        title: name of the item
-        icon: icon of the item, relative to STATIC_URL
-        items: an iterable of ListItem instances.
-        """
-        super(List, self).__init__(alignment, css_class_suffix)
-        self.title = title
-        self.icon = icon
-        self.validate_items(items)
-        self.raw_items = items
-        
-    def validate_items(self, items):
-        for item in items:
-            if not isinstance(item, ListItem):
-                raise ImproperlyConfigured(
-                    'Only ListItem instances are allowed to be used inside of '
-                    'List instances'
-                )
-    
-    def get_extra_data(self, context, **kwargs):
-        items = [item.serialize(context, **kwargs)
-                 for item in self.raw_items]
+    def get_context(self):
         return {
-            'items': items
+            'name': self.name,
+            'url': self.url,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
         }
 
+
+class ModalButton(Button):
+    template = "cms/toolbar/items/button_modal.html"
+
+    def __init__(self, name, url, active=False, disabled=False,  extra_classes=None, on_close=None):
+        self.name = name
+        self.url = url
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
+        self.on_close = on_close
+
     def __repr__(self):
-        return u'<List %s: %r>' % (unicode(self.title), self.raw_items)
+        return '<ModalButton:%s>' % force_unicode(self.name)
+
+    def get_context(self):
+        return {
+            'name': self.name,
+            'url': self.url,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
+            'on_close': self.on_close,
+        }
+
+
+class SideframeButton(ModalButton):
+    template = "cms/toolbar/items/button_sideframe.html"
+
+    def __repr__(self):
+        return '<SideframeButton:%s>' % force_unicode(self.name)
+
+
+class ButtonList(BaseItem):
+    template = "cms/toolbar/items/button_list.html"
+
+    def __init__(self, identifier=None, extra_classes=None, side=LEFT):
+        super(ButtonList, self).__init__(side)
+        self.extra_classes = extra_classes or []
+        self.buttons = []
+        self.identifier = identifier
+
+    def __repr__(self):
+        return '<ButtonList:%s>' % self.identifier
+
+    def add_item(self, item):
+        if not isinstance(item, Button):
+            raise ValueError("Expected instance of cms.toolbar.items.Button, got %r instead" % item)
+        self.buttons.append(item)
+
+    def add_button(self, name, url, active=False, disabled=False,
+                   extra_classes=None):
+        item = Button(name, url,
+                      active=active,
+                      disabled=disabled,
+                      extra_classes=extra_classes
+        )
+        self.buttons.append(item)
+        return item
+
+    def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE):
+        item = ModalButton(name, url,
+                      active=active,
+                      disabled=disabled,
+                      extra_classes=extra_classes,
+                      on_close=on_close,
+        )
+        self.buttons.append(item)
+        return item
+
+    def get_context(self):
+        return {
+            'buttons': self.buttons,
+            'extra_classes': self.extra_classes
+        }

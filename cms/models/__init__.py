@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings as d_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import get_resolver, get_script_prefix, \
-    NoReverseMatch
-from django.utils.encoding import iri_to_uri
-from moderatormodels import *
-from pagemodel import *
-from permissionmodels import *
-from placeholdermodel import *
-from pluginmodel import *
-from titlemodels import *
-import django.core.urlresolvers
+from .settingmodels import *  # nopyflakes
+from .pagemodel import *  # nopyflakes
+from .permissionmodels import *  # nopyflakes
+from .placeholdermodel import *  # nopyflakes
+from .pluginmodel import *  # nopyflakes
+from .titlemodels import *  # nopyflakes
+from .placeholderpluginmodel import *  # nopyflakes
+from .static_placeholder import *  # nopyflakes
+
 # must be last
-from cms import signals as s_import
+from cms import signals as s_import  # nopyflakes
 
 
 def validate_settings():

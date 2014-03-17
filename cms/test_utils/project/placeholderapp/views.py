@@ -1,9 +1,53 @@
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.template.base import Template
 from django.template.context import RequestContext
-from cms.test_utils.project.placeholderapp.models import Example1
+from cms.test_utils.project.placeholderapp.models import (Example1,
+                                                          MultilingualExample1)
+from cms.utils import get_language_from_request
 
 
 def example_view(request):
     context = RequestContext(request)
     context['examples'] = Example1.objects.all()
     return render_to_response('placeholderapp.html', context)
+
+
+def _base_detail(request, instance, template_name='detail.html',
+                 item_name="char_1", template_string='',):
+    context = RequestContext(request)
+    context['instance'] = instance
+    context['item_name'] = item_name
+    if template_string:
+        template = Template(template_string)
+        return HttpResponse(template.render(context))
+    else:
+        return render_to_response(template_name, context)
+
+
+def list_view_multi(request):
+    context = RequestContext(request)
+    context['examples'] = MultilingualExample1.objects.language(
+        get_language_from_request(request)).all()
+    return render_to_response('list.html', context)
+
+
+def detail_view_multi(request, pk, template_name='detail_multi.html',
+                      item_name="char_1", template_string='',):
+    instance = MultilingualExample1.objects.language(
+        get_language_from_request(request)).get(pk=pk)
+    return _base_detail(request, instance, template_name, item_name,
+                        template_string)
+
+
+def list_view(request):
+    context = RequestContext(request)
+    context['examples'] = Example1.objects.all()
+    return render_to_response('list.html', context)
+
+
+def detail_view(request, pk, template_name='detail.html', item_name="char_1",
+                template_string='',):
+    instance = Example1.objects.get(pk=pk)
+    return _base_detail(request, instance, template_name, item_name,
+                        template_string)

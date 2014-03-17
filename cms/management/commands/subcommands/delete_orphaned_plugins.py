@@ -1,5 +1,6 @@
 from django.core.management.base import NoArgsCommand
 from cms.management.commands.subcommands.list import plugin_report
+from cms.utils.compat.input import raw_input
 
 
 class DeleteOrphanedPluginsCommand(NoArgsCommand):
@@ -14,7 +15,7 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
         instances (as will happen if a plugin is inserted into a placeholder,
         but not saved).
         """
-        self.stdout.write("Obtaining plugin report\n")
+        self.stdout.write(u"Obtaining plugin report\n")
         uninstalled_instances = []
         unsaved_instances = []
 
@@ -37,7 +38,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), le
 
         if confirm == 'yes':
             # delete items whose plugin is uninstalled and items with unsaved instances
-            self.stdout.write("... deleting any instances of uninstalled plugins and unsaved plugin instances\n")
+            self.stdout.write(u"... deleting any instances of uninstalled plugins and unsaved plugin instances\n")
 
             for instance in uninstalled_instances:
                 instance.delete()
@@ -45,5 +46,5 @@ Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), le
             for instance in unsaved_instances:
                 instance.delete()
 
-            self.stdout.write("Deleted instances of: \n    %s uninstalled plugins  \n    %s plugins with unsaved instances\n" % (len(uninstalled_instances), len(unsaved_instances)))
-            self.stdout.write("all done\n")
+            self.stdout.write(u"Deleted instances of: \n    %s uninstalled plugins  \n    %s plugins with unsaved instances\n" % (len(uninstalled_instances), len(unsaved_instances)))
+            self.stdout.write(u"all done\n")

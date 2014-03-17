@@ -158,3 +158,64 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - added Testing docs
 - fixed more issues with only one language
 - locales updated
+
+==== 3.0.0 (XXXXX) ===
+
+- Plugins are only editable in frontend
+- PluginEditor has been removed in backend
+- New frontend editing
+- New Toolbar
+- Plugin API for creating new plugins and moving has changed
+- render_to_response replaced with TemplateResponse in cms.views
+- CMS_SEO_FIELDS removed and seo fields better integrated
+- meta_keywords field removed as not relevant anymore
+- CMS_MENU_TITLE_OVERWRITE default changed to True
+- Toolbar has language switcher built in
+- User settings module added for saving the language of the user so when he switches languages the toolbar/interface
+  keeps the language.
+- language_chooser templatetag now only displays public languages, even when you are logged in as staff.
+- undo and redo functionality added in toolbar if django-reversion is installed.
+- page admin split in 3 different for basic, advanced and permissions
+- New show_editable_page_title templatetag to edit page title from the frontend
+- Removed PLACEHOLDER_FRONTEND_EDITING setting
+- Removed CMS_URL_OVERWRITE setting. Always enabled.
+- Removed CMS_MENU_TITLE_OVERWRITE settings. Always enabled.
+- Removed CMS_REDIRECTS. Always enabled.
+- Removed CMS_SOFTROOT. Always enabled.
+- Removed CMS_SHOW_START_DATE. Always enabled.
+- Removed CMS_SHOW_END_DATE. Always enabled.
+- Added (optional) language fallback for placeholders.
+- moved apphooks from title to page model so we need to add them only once.
+- request.current_app has been removed.
+- added a namespace field, reverse_id is not used anymore for apphook namespaces.
+- PlaceholderAdmin is deprecated and available as mixin class renamed to PlaceholderAdminMixin.
+- PlaceholderAdmin does not have LanguageTabs anymore. It only has a PluginAPI now.
+- PageAdmin uses the same Plugin API as PlaceholderAdmin
+- Toolbar API for your own apps added
+- twitter plugin removed
+- file plugin removed
+- flash plugin removed
+- googlemap plugin removed
+- inherit plugin removed
+- picture plugin removed
+- teaser plugin removed
+- video plugin removed
+- link plugin removed
+- snippet plugin removed
+- Object level permission support for Placeholder
+- Configuration for plugin custom modules and labels in the toolbar UI
+- Added copy-lang subcommand to copy content between languages
+- Added static_placeholder templatetag
+- Moved render_placeholder from placeholder_tags to cms_tags
+- django 1.6 support added
+- Frontedit editor for Django models
+- Extending the page & title model API
+- Placeholders can be configured to have plugins automatically added.
+- Publishing is now language independent and the tree-view has been updated to reflect this
+- Removed the plugin DB-name magic and added a compatibility layer
+- urls_need_reloading signal added when an apphook change is detected.
+- CMS_PAGE_CACHE, CMS_PLACEHOLDER_CACHE and CMS_PLUGIN_CACHE settings and functionality added. Default is True
+- Detect admin object creation and changes via toolbar and redirect to them.
+- Added support for custom user models
+- Added PageTypes
+- Added CMS_MAX_PAGE_HISTORY_REVERSIONS and changed default of CMS_MAX_PAGE_PUBLISH_REVERSIONS

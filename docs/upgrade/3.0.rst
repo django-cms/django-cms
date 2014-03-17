@@ -1,0 +1,487 @@
+.. _upgrade-to-3.0:
+
+#################
+3.0 release notes
+#################
+
+*****************
+What's new in 3.0
+*****************
+
+.. warning:: Upgrading from previous versions
+
+    3.0 introduces some changes that **require** action if you are upgrading
+    from a previous version.
+
+.. note:: :ref:`Click here to see the quick upgrade guide <upgrading-from-2.4>`
+
+New Frontend Editing
+====================
+
+django CMS 3.0 introduces a new frontend editing system as well as a
+customizable Django admin skin (`djangocms_admin_style`_).
+
+In the new system, ``Placeholders`` and their plugins are no longer managed in
+the admin site, but only from the frontend.
+
+In addition, the system now offer two editing views:
+
+* **content** view, for editing the configuration and content of plugins.
+* **structure** view, in which plugins can be added and rearranged.
+
+Page titles can also be modified directly from the frontend.
+
+.. _djangocms_admin_style: https://github.com/divio/djangocms-admin-style
+
+New Toolbar
+===========
+
+The toolbar's code has been simplified and its appearance refreshed. The
+toolbar is now a more consistent management tool for adding and changing
+objects. See :doc:`../extending_cms/toolbar`.
+
+.. warning:: Upgrading from previous versions
+
+    3.0 now requires the ``django.contrib.messages`` application for the
+    toolbar to work. See :ref:`Enable messages <enable-messages>` for how to
+    enable it.
+
+New Page Types
+==============
+
+You can now save pages as page types. If you then create a new page you may
+select a page type and all plugins and contents will be pre-filled.
+
+
+Experimental Python 3.3 support
+===============================
+
+We've added experimental support for Python 3.3. Support for Python 2.5 has
+been dropped.
+
+Better multilingual editing
+===========================
+
+Improvements in the django CMS environment for managing a multi-lingual site
+include:
+
+* a built-in language chooser for languages that are not yet public.
+* configurable behaviour of the admin site's language when switching between
+  languages of edited content.
+
+CMS_SEO_FIELDS
+==============
+
+The setting has been **removed**, along with the SEO fieldset in admin.
+
+* ``meta_description`` field's max_length is now 155 for optimal Google
+  integration.
+* ``page_title`` is default on top.
+* ``meta_keywords`` field has been removed, as it no longer serves any purpose.
+
+CMS_MENU_TITLE_OVERWRITE
+========================
+
+New default for this setting is ``True``.
+
+Plugin fallback languages
+=========================
+
+It's now possible to specify fallback languages for a placeholder if the placeholder
+is empty for the current language. This must be activated in
+:setting:`CMS_PLACEHOLDER_CONF` per placeholder. It defaults to ``False`` to
+maintain pre-3.0 behavior.
+
+language_chooser
+================
+
+The ``language_chooser`` template tag now only displays languages that are
+public. Use the toolbar language chooser to change the language to non-public
+languages.
+
+Undo and Redo
+=============
+
+If you have ``django-reversion`` installed you now have **undo** and **redo**
+options available directly in the toolbar. These can now revert *plugin*
+content as well as *page* content.
+
+.. _ex-core-plugins:
+
+Plugins removed
+===============
+
+We have removed plugins from the core. This is not because you are not
+expected to use them, but because django CMS should not impose unnecessary
+choices about what to install upon its adopters.
+
+The most significant of these removals is ``cms.plugins.text``.
+
+We provide ``djangocms-text-ckeditor``, a CKEditor-based Text Plugin. It's
+available from https://github.com/divio/djangocms-text-ckeditor. You may of
+course use your preferred editor; others are available.
+
+Furthermore, we removed the following plugins from the core and moved them into
+seperate repositories.
+
+.. note::
+    In order to update from the old ``cms.plugins.X`` to the new
+    ``djangocms_X`` plugins, simply install the new plugin, remove the old
+    ``cms.plugins.X`` from ``settings.INSTALLED_APPS`` and add the new one
+    to it. Then run the migrations (``python manage.py migrate djangocms_X``).
+    
+
+File Plugin
+-----------
+
+We removed the file plugin (``cms.plugins.file``). Its new location is at:
+
+* https://github.com/divio/djangocms-file
+
+As an alternative, you could also use the following (yet you will not be able 
+to keep your existing files from the old ``cms.plugins.file``!)
+
+* https://github.com/stefanfoulis/django-filer
+
+
+Flash Plugin
+------------
+
+We removed the flash plugin (``cms.plugins.flash``). Its new location is at:
+
+* https://github.com/divio/djangocms-flash
+
+
+Googlemap Plugin
+----------------
+
+We removed the googlemap plugin (``cms.plugins.googlemap``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-googlemap
+
+
+Inherit Plugin
+--------------
+
+We removed the inherit plugin (``cms.plugins.inherit``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-inherit
+
+
+Picture Plugin
+--------------
+
+We removed the picture plugin (``cms.plugins.picture``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-picture
+
+
+Teaser Plugin
+-------------
+
+We removed the teaser plugin (``cms.plugins.teaser``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-teaser
+
+
+Video Plugin
+------------
+
+We removed the video plugin (``cms.plugins.video``). Its new location is at:
+
+* https://github.com/divio/djangocms-video
+
+
+Link Plugin
+-----------
+
+We removed the link plugin (``cms.plugins.link``). Its new location is at:
+
+* https://github.com/divio/djangocms-link
+
+
+Snippet Plugin
+--------------
+
+We removed the snippet plugin (``cms.plugins.snippet``).
+Its new location is at:
+
+* https://github.com/divio/djangocms-link
+
+As an alternative, you could also use the following (yet you will not be able
+to keep your existing files from the old ``cms.plugins.snippet``!)
+
+* https://github.com/pbs/django-cms-smartsnippets
+
+.. _cmsplugin-twitter-removed:
+
+Twitter Plugin
+--------------
+
+Twitter disabled V1 of their API, thus we've removed the twitter plugin
+(``cms.plugins.twitter``) completely.
+
+For alternatives have a look at these plugins:
+
+* https://github.com/nephila/djangocms_twitter
+* https://github.com/changer/cmsplugin-twitter
+
+
+Plugin Context Processors take a new argument
+=============================================
+
+:ref:`plugin-context-processors` have had an argument added so that the rest
+of the context is available to them. If you have existing plugin context
+processors you will need to change their function signature to add the extra
+argument.
+
+Apphooks
+========
+
+Apphooks have moved from the title to the page model. This means you can no
+longer have separate apphooks for each language. A new ``namespace`` field has
+been added.
+
+.. note::
+    The reverse id is not used for the namespace anymore. If you used
+    namespaced apphooks before, be sure to update your pages and fill out the
+    namespace fields.
+
+If you use apphook apps with ``app_name`` for app namespaces, be sure to fill
+out the namespace field as it's now required to have a namespace defined if you
+use app namespaces.
+
+``request.current_app`` has been removed. If you relied on this, use the
+following code instead in your views::
+
+    def my_view(request):
+      current_app = resolve(request.path).namespace
+      context = RequestContext(request, current_app=current_app)
+      return render_to_response("my_templace.html", context_instance=context)
+
+Details can be found in :ref:`multi_apphook`.
+
+``PlaceholderAdmin``
+====================
+
+``PlaceholderAdmin`` now is deprecated. Instead of deriving from ``admin.ModelAdmin``, a new mixin
+class ``PlaceholderAdminMixin`` has been introduced which shall be used together with ``admin.ModelAdmin``.
+Therefore when defining a model admin class containing a placeholder, now add ``PlaceholderAdminMixin``
+to the list of parent classes, together with ``admin.ModelAdmin``.
+
+``PlaceholderAdmin`` doesn't have language tabs anymore and the plugin editor is gone.
+The plugin API has changed and is now more consistent. ``PageAdmin`` uses the
+same API as ``PlaceholderAdmin`` now. If your app talked with the Plugin API
+directly be sure to read the code and the changed parameters. If you use
+``PlaceholderFields`` you still need the ``PlaceholderAdmin`` as it delivers
+the API for editing the plugins and the placeholders.
+
+The workflow in the future should look like this:
+
+1. Create new model instances via a toolbar entry or via the admin.
+2. Go to the view that represents the model instance and add content via
+   frontend editing.
+
+
+Placeholder object permissions
+==============================
+
+In addition to model level permissions, ``Placeholder`` now checks if a user
+has permissions on a specific object of that model. Details can be found here
+in :ref:`placeholder_object_permissions`.
+
+Placeholder are prefillable with default plugins
+================================================
+
+In CMS_PLACEHOLDER_CONF, for each placeholder configuration, you can specify
+via 'default_plugins' a list of plugins to automagically add to the 
+placeholder if empty. See 
+:ref:`default_plugins in CMS_PLACEHOLDER_CONF <placeholder_default_plugins>`.
+
+Custom modules and plugin labels in the toolbar UI
+==================================================
+
+It's now possible to configure module and plugins labels to show in the toolbar
+UI. See :setting:`CMS_PLACEHOLDER_CONF` for details.
+
+New ``copy-lang`` subcommand
+============================
+
+Added a management command to copy content (titles and plugins) from one
+language to another.
+
+The command can be run with::
+
+    manage.py cms copy_lang from_lang to_lang
+
+Please read :ref:`cms-copy-lang-command` before using.
+
+Frontedit editor for Django models
+==================================
+
+Frontend editor is available for any Django model; see
+:ref:`documentation<frontend-editable-fields>` for details.
+
+New ``Page related_name`` to ``Site``
+=====================================
+
+The ``Page`` object used to have the default ``related_name`` (``page``) to the
+``Site`` model which may cause clashing with other Django apps; the
+``related_name`` is now ``djangocms_pages``.
+
+.. warning:: Potential backward incompatibility
+
+    This change may cause you code to break, if you relied on ``Site.page_set``
+    to access cms pages from a ``Site`` model instance: update it to use
+    ``Site.djangocms_pages``
+
+Moved all templatetags to cms_tags
+==================================
+
+All template tags are now in the ``cms_tags`` namespace so to use any cms
+template tags you can just do:
+
+.. code-block:: html+django
+
+    {% load cms_tags %}
+
+Getter and setter for translatable plugin content
+=================================================
+
+A plugin's translatable content can now be read and set through :meth:`get_translatable_content`
+and :meth:`set_translatable_content`. See :ref:`Custom Plugins <custom-plugins>` for more info.
+
+No more DB tablename magic for plugins
+======================================
+
+Since django CMS 2.0 plugins had their table names start with `cmsplugin_`. We removed this behavior
+in 3.0 and will display a deprecation warning with the old and new table name. If your plugin uses
+south for migrations create a new empty schemamigration and rename the table by hand.
+
+.. warning:: When working in the django shell or coding at low level, you **must**
+             trigger the backward compatible behavior (a.k.a. magical rename
+             checking), otherwise non migrated plugins will fail.
+             To do this execute the following code::
+
+             >>> from cms.plugin_pool import plugin_pool
+             >>> plugin_pool.set_plugin_meta()
+
+             This code can be executed both in the shell or in your python
+             modules.
+
+Added support for custom user models
+====================================
+
+Since Django 1.5 it has been possible to swap out the default User model for a custom user model.  This is now fully supported by DjangoCMS, and in addition a new option has been added to the test runner to allow specifying the user model to use for tests (e.g. --user=customuserapp.User)
+
+Page caching
+============
+
+Pages are now cached by default.
+You can disable this behavior with :setting:`CMS_PAGE_CACHE`
+
+Placeholder caching
+===================
+
+Plugins have a new default property: `cache=True`. If all plugins in a placeholder have set this to
+``True`` the whole placeholder will be cached if the toolbar is not in edit mode.
+
+.. warning:: If your plugin is dynamic and processes current user or request data be sure to set ``cache=False``
+
+Plugin caching
+==============
+
+Plugins have a new attribute: ``cache=True``. Its default value can be configured with :setting:`CMS_PLUGIN_CACHE`.
+
+Per-page Clickjacking protection
+================================
+
+An advanced option has been added which controls, on a per-page basis, the
+``X-Frame-Options`` header. The default setting is to inherit from the parent
+page. If no ancestor specifies a value, no header will be set, allowing Django's
+own middleware to handle it (if enabled).
+
+CMS_TEMPLATE context variable
+=============================
+
+A new ``CMS_TEMPLATE`` variable is now available in the context: it contains the path to the
+current page template.
+See :ref:`CMS_TEMPLATE reference <page_template>` for details.
+
+
+.. _upgrading-from-2.4:
+
+******************
+Upgrading from 2.4
+******************
+
+If you want to upgrade from version 2.4 to 3.0, there's a few things you need to do.
+Start of by updating the cms' package::
+
+    pip install django-cms==3.0
+
+
+Next, you need to make the following changes in your ``settings.py``
+
+* settings.INSTALLED_APPS
+
+    * Remove ``cms.plugin.twitter``. This package has been deprecated, see :ref:`cmsplugin-twitter-removed`.
+    * Rename all the other ``cms.plugins.X`` to ``djangocms_X``, see :ref:`ex-core-plugins`.
+
+* settings.CONTEXT_PROCESSORS
+
+    * Replace ``cms.context_processors.media`` with ``cms.context_processors.cms_settings``
+
+Afterwards, install all your previously renamed ex-core plugins (djangocms-X). Here's a full list, but you probably
+don't need all of them::
+
+    pip install djangocms-file
+    pip install djangocms-flash
+    pip install djangocms-googlemap
+    pip install djangocms-inherit
+    pip install djangocms-picture
+    pip install djangocms-teaser
+    pip install djangocms-video
+    pip install djangocms-link
+    pip install djangocms-snippet
+
+
+Also, please check your templates to make sure that you haven't put the ``{% cms_toolbar %}`` tag into a ``{% block %}``
+tag. This is not allowed in 3.0 anymore.
+
+To finish up, please update your database::
+
+    python manage.py syncdb
+    python manage.py migrate  (answer yes if your prompted to delete stale content types)
+
+That's it!
+
+********************
+Pending deprecations
+********************
+
+placeholder_tags
+================
+
+``placeholder_tags`` is now deprecated, the ``render_placeholder`` template
+tag can now be loaded from the ``cms_tags`` template tag library.
+
+Using ``placeholder_tags`` will cause a ``DeprecationWarning`` to occur.
+
+``placeholder_tags`` will be removed in version 3.1.
+
+
+cms.context_processors.media
+============================
+
+``cms.context_processors.media`` is now deprecated, please use
+``cms.context_processors.cms_settings`` by updating ``TEMPLATE_CONTEXT_PROCESSORS``
+in the settings
+
+Using ``cms.context_processors.media`` will cause a ``DeprecationWarning`` to occur.
+
+``cms.context_processors.media`` will be removed in version 3.1.

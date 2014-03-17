@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-import urllib
 
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.utils.i18n import force_language, get_language_objects
+from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.urls import unquote
 from django import template
-from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.cache import cache
-from django.core.urlresolvers import reverse, resolve
-from django.utils.translation import activate, get_language, ugettext
+from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils.translation import get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -192,12 +191,16 @@ class ShowSubMenu(InclusionTag):
 
     options = Options(
         IntegerArgument('levels', default=100, required=False),
-        IntegerArgument('root_level', default=None, required=False),
+        Argument('root_level', default=None, required=False),
         IntegerArgument('nephews', default=100, required=False),
         Argument('template', default='menu/sub_menu.html', required=False),
     )
 
     def get_context(self, context, levels, root_level, nephews, template):
+        # Django 1.4 doesn't accept 'None' as a tag value and resolve to ''
+        # So we need to force it to None again
+        if not root_level and root_level != 0:
+            root_level = None
         try:
             # If there's an exception (500), default context_processors may not be called.
             request = context['request']
@@ -207,16 +210,16 @@ class ShowSubMenu(InclusionTag):
         children = []
         # adjust root_level so we cut before the specified level, not after
         include_root = False
-        if root_level > 0:
+        if root_level is not None and root_level > 0:
             root_level -= 1
-        elif root_level == 0:
+        elif root_level is not None and root_level == 0:
             include_root = True
         for node in nodes:
             if root_level is None:
                 if node.selected:
                     # if no root_level specified, set it to the selected nodes level
                     root_level = node.level
-                # is this the ancestor of current selected node at the root level?
+                    # is this the ancestor of current selected node at the root level?
             is_root_ancestor = (node.ancestor and node.level == root_level)
             # is a node selected on the root_level specified
             root_selected = (node.selected and node.level == root_level)
@@ -224,11 +227,10 @@ class ShowSubMenu(InclusionTag):
                 cut_after(node, levels, [])
                 children = node.children
                 for child in children:
-                    child.parent = None
                     if child.sibling:
                         cut_after(child, nephews, [])
-                    # if root_level was 0 we need to give the menu the entire tree
-                # not just the children
+                        # if root_level was 0 we need to give the menu the entire tree
+                    # not just the children
                 if include_root:
                     children = menu_pool.apply_modifiers([node], request, post_cut=True)
                 else:
@@ -284,7 +286,7 @@ class ShowBreadcrumb(InclusionTag):
         for node in nodes:
             if node.selected:
                 selected = node
-            if node.get_absolute_url() == urllib.unquote(reverse("pages-root")):
+            if node.get_absolute_url() == unquote(reverse("pages-root")):
                 home = node
         if selected and selected != home:
             node = selected
@@ -313,11 +315,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return unicode(ugettext(language))
+        return force_unicode(ugettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return unicode(ugettext(language))
+    return force_unicode(ugettext(language))
 
 
 def _short_language_marker(language, lang_code):
@@ -363,10 +365,9 @@ class LanguageChooser(InclusionTag):
         marker = MARKERS[i18n_mode]
         current_lang = get_language()
         site = Site.objects.get_current()
-        user_is_staff = context['request'].user.is_staff
         languages = []
         for lang in get_language_objects(site.pk):
-            if user_is_staff or lang.get('public', True):
+            if lang.get('public', True):
                 languages.append((lang['code'], marker(lang['name'], lang['code'])))
         context.update({
             'languages': languages,
@@ -399,7 +400,10 @@ class PageLanguageUrl(InclusionTag):
         except KeyError:
             return {'template': 'cms/content.html'}
         if hasattr(request, "_language_changer"):
-            url = request._language_changer(lang)
+            try:
+                url = request._language_changer(lang)
+            except NoReverseMatch:
+                url = DefaultLanguageChanger(request)(lang)
         else:
             # use the default language changer
             url = DefaultLanguageChanger(request)(lang)

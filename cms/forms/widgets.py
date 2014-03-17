@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-import copy
 
 from django.contrib.sites.models import Site
-from django.forms.widgets import Select, MultiWidget, Widget
-from django.template.context import RequestContext
-from django.template.loader import render_to_string
-from django.utils.encoding import force_unicode
+from django.core.urlresolvers import reverse
+from django.forms.widgets import Select, MultiWidget, TextInput
+from cms.utils.compat.dj import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from cms.forms.utils import get_site_choices, get_page_choices
-from cms.models import Page, PageUser, Placeholder
-from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request, cms_static_url
+from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 
 
@@ -25,16 +21,9 @@ class PageSelectWidget(MultiWidget):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
-        if site_choices is None or page_choices is None:
-            site_choices, page_choices = get_site_choices(), get_page_choices()
-        self.site_choices = site_choices
-        self.choices = page_choices
-        widgets = (Select(choices=site_choices ),
-                   Select(choices=[('', '----')]),
-                   Select(choices=self.choices, attrs={'style': "display:none;"} ),
-        )
-        super(PageSelectWidget, self).__init__(widgets, attrs)
-    
+        self.choices = []
+        super(PageSelectWidget, self).__init__((Select, Select, Select), attrs)
+
     def decompress(self, value):
         """
         receives a page_id in value and returns the site_id and page_id
@@ -75,6 +64,16 @@ class PageSelectWidget(MultiWidget):
         
         # value is a list of values, each corresponding to a widget
         # in self.widgets.
+
+        site_choices = get_site_choices()
+        page_choices = get_page_choices()
+        self.site_choices = site_choices
+        self.choices = page_choices
+        self.widgets = (Select(choices=site_choices ),
+                   Select(choices=[('', '----')]),
+                   Select(choices=self.choices, attrs={'style': "display:none;"} ),
+        )
+
         if not isinstance(value, list):
             value = self.decompress(value)
         output = []
@@ -122,39 +121,70 @@ class PageSelectWidget(MultiWidget):
     
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
-    
-    
-class PluginEditor(Widget):
-    def __init__(self, attrs=None):
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
-        
-    class Media:
-        js = [cms_static_url(path) for path in (
-            'js/libs/jquery.ui.core.js',
-            'js/libs/jquery.ui.sortable.js',
-            'js/plugin_editor.js',
-        )]
-        css = {
-            'all': [cms_static_url(path) for path in (
-                'css/plugin_editor.css',
-            )]
-        }
 
-    def render(self, name, value, attrs=None):
-        
-        context = {
-            'plugin_list': self.attrs['list'],
-            'installed_plugins': self.attrs['installed'],
-            'copy_languages': self.attrs['copy_languages'],
-            'language': self.attrs['language'],
-            'show_copy': self.attrs['show_copy'],
-            'placeholder': self.attrs['placeholder'],
+class PageSmartLinkWidget(TextInput):
+
+
+
+    def render(self, name=None, value=None, attrs=None):
+        final_attrs = self.build_attrs(attrs)
+        id_ = final_attrs.get('id', None)
+
+        output = [r'''<script type="text/javascript">
+(function($){
+    $(function(){
+        $("#%(element_id)s").select2({
+            placeholder: "%(placeholder_text)s",
+            minimumInputLength: 3,
+            ajax: {
+                url: "%(ajax_url)s",
+                dataType: 'json',
+                data: function (term, page) {
+                    return {
+                        q: term, // search term
+                        language_code: '%(language_code)s'
+                    };
+                },
+                results: function (data, page) {
+                    return {
+                        more: false,
+                        results: $.map(data, function(item, i){
+                            return {
+                                'id':item.redirect_url,
+                                'text': item.title + ' (/' + item.path + ')'}
+                            }
+                        )
+                    };
+                }
+            },
+            // Allow creation of new entries
+            createSearchChoice:function(term, data) { if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0) {return {id:term, text:term};} },
+            multiple: false,
+            initSelection : function (element, callback) {
+                var initialValue = element.val()
+                callback({id:initialValue, text: initialValue});
+            }
+        });
+    })
+})(django.jQuery);
+</script>''' % {
+            'element_id': id_,
+            'placeholder_text': final_attrs.get('placeholder_text', ''),
+            'language_code': self.language,
+            'ajax_url': reverse("admin:cms_page_get_published_pagelist")
+        }]
+
+        output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
+        return mark_safe(u''.join(output))
+
+
+    class Media:
+        css = {
+            'all': ('cms/js/select2/select2.css',
+                    'cms/js/select2/select2-bootstrap.css',)
         }
-        return mark_safe(render_to_string(
-            'admin/cms/page/widgets/plugin_editor.html', context))
+        js = (#'cms/js/libs/jquery.min.js',
+              'cms/js/select2/select2.js',)
 
 
 class UserSelectAdminWidget(Select):
@@ -176,47 +206,3 @@ class UserSelectAdminWidget(Select):
             output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
     
-    
-class PlaceholderPluginEditorWidget(PluginEditor):
-    attrs = {}
-    def __init__(self, request, filter_func):
-        self.request = request
-        self.filter_func = filter_func
-            
-    def __deepcopy__(self, memo):
-        obj = copy.copy(self)
-        obj.request = copy.copy(self.request)
-        obj.filter_func = self.filter_func
-        memo[id(self)] = obj
-        return obj
-        
-    def render(self, name, value, attrs=None):
-        try:
-            ph = Placeholder.objects.get(pk=value)
-        except Placeholder.DoesNotExist:
-            ph = None
-            context = {'add':True}
-        if ph:
-            plugin_list = ph.cmsplugin_set.filter(parent=None).order_by('position')
-            plugin_list = self.filter_func(self.request, plugin_list)
-            language = get_language_from_request(self.request)
-            copy_languages = []
-            if ph.actions.can_copy:
-                copy_languages = ph.actions.get_copy_languages(
-                    placeholder=ph,
-                    model=ph._get_attached_model(),
-                    fieldname=ph._get_attached_field_name()
-                )
-            context = {
-                'plugin_list': plugin_list,
-                'installed_plugins': plugin_pool.get_all_plugins(ph.slot, include_page_only=False),
-                'copy_languages': copy_languages, 
-                'language': language,
-                'show_copy': bool(copy_languages) and ph.actions.can_copy,
-                'urloverride': True,
-                'placeholder': ph,
-            }
-        #return mark_safe(render_to_string(
-        #    'admin/cms/page/widgets/plugin_editor.html', context))
-        return mark_safe(render_to_string(
-            'admin/cms/page/widgets/placeholder_editor.html', context, RequestContext(self.request)))

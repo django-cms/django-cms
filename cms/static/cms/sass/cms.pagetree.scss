@@ -1,0 +1,210 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//######################################################################################################################
+// #IMPORT SETTINGS#
+@import "settings/default";
+
+//######################################################################################################################
+// #PAGETREE#
+
+// colors
+$color-font: #666;
+
+$color-border: #dededc;
+$color-border-light: #fafafa;
+$color-border-medium: #ddd;
+
+$color-background-light: #fefefe;
+$color-background-light-hover: #f5f5f5;
+
+$color-background-blue: #f3fbfe;
+$color-background-blue-hover: #e6f6fd;
+
+// pagetree
+#sitemap {
+	padding:0; margin:0; margin:0; background:$color-background-light;
+
+	a { text-decoration:none; outline:none; border:none; }
+	a:hover { text-decoration:underline; }
+
+	li, ul { list-style-type:none; }
+	li input.hidden { position: absolute; left: -9999em; }
+
+	// icons
+	li a.icon, li span.icon, li a.move, li a.copy, li a.edit, li a.advanced-settings, li span.info {
+		display: inline-block; width: 18px; height: 18px; margin-top:5px;
+		background: url('../img/pagetree/sprite.png') no-repeat 0 0; }
+	li a.move { background-position:-20px -20px; margin-top:0; }
+	li a.copy { background-position:-40px -60px;  margin-top:0; }
+	li a.edit { background-position:-40px -20px;  margin-top:0; }
+	li a.advanced-settings { background-position:-60px -60px; margin-top:0; }
+	li span.info { background-position:-81px -20px; margin-top:-1px; cursor:pointer; }
+
+	li a.selector-add { background-position:-20px 0; margin-left:4px; margin-top:-1px; }
+
+	li a.addlink,
+	li a.deletelink { display:inline-block; width:10px; height:10px; padding:0; margin:0 0 0 4px; background-position:0 0; }
+	li .col-softroot span.icon { background-position:-80px 0; margin-top:0; }
+	li .col-apphook span.icon { background-position:-40px -80px; margin-top:0; }
+
+	li a.move span, li a.copy span, li a.selector-add span,
+	li a.addlink span, li a.deletelink span, li a.edit span, li a.advanced-settings span, li span.info span,
+	.col-navigation input, .col-published input { display:none; }
+
+	// header
+	ul.header { position:relative; top:1px; }
+	ul.header, ul.header li { padding:0; margin:0; border:none; background:none; }
+	ul.header li { color:$color-font; font-size:11px; font-weight:400; height:16px; padding:5px 0 4px 5px;
+		border-bottom:1px solid $color-border; background:$color-background-light; }
+	ul.header li .cont { height:15px; border:none !important; background:none !important; }
+	ul.header li .col1 { font-size:10px; }
+	ul.header li .col2 > div { font-size:10px; line-height:14px; border:none; background:none; }
+
+	// row
+	li .cont { display:block; border-top:1px solid $color-border !important; }
+	li.open > .cont { border-bottom:1px solid $color-border !important; }
+	li.open ul .cont { border-top:none !important; border-bottom:1px solid $color-border !important; }
+	li.moveable > div { border-bottom:none !important; }
+	li.last.leaf .cont, li.last.closed .cont { border-bottom:none !important; }
+	.tree-default .col-navigation, .tree-default .col-published { line-height:30px; }
+	// add additional border to separate categories
+	li.open ul { margin-left:0; border-bottom:1px solid $color-border !important; }
+	li.open.last ul { border-bottom:none !important; }
+	li.open ul.last { border-bottom:none !important; }
+§
+	li .col1 > div { text-align:center; }
+	li .col1 .title { background:none; }
+	li .col1 .success { color:$color-font; padding-left:10px; }
+	li .col1 a.changelink { display:none; line-height:27px; margin:6px 0 0 10px !important; }
+	li .col1 .title, li .col1 .success { float:left; line-height:29px; height:28px; padding-left:20px; }
+
+	li .move-target-container { display:none; float:left;
+		font-size: 14px; line-height:27px; margin-right:10px; }
+	li .move-target-container a:hover { text-decoration: none; }
+	li .move-target { display:inline-block; padding: 2px 8px; border-left: 1px solid $color-border-medium; }
+	li .move-target:first-child { border-left:none; }
+
+	li .col2 > div {
+		float:left; line-height:28px; white-space:nowrap; text-align:center;
+		width:auto; height:28px; padding:0 5px; border-left:1px solid $color-border-medium;
+	}
+	li .col2 > div a, li .col2 > div span { vertical-align:middle; }
+	// hide items
+	.cont { position:relative; }
+	.col1, .col2 { position:relative; z-index:10; }
+	.col2 { position:absolute; top:0; right:0; z-index:100; }
+	.moveable { position:relative; z-index:100; }
+	.moveable:hover { z-index:1000; }
+	.moveable:hover .cont { position:relative; z-index:1000; }
+	.success { float:right !important; padding:5px 10px !important; position:absolute; right:0; }
+
+	// row hover states
+	li .cont:hover { background:$color-border-light; }
+
+	// custom col asignments
+	li.moveable .col1 .title { background:url('../img/pagetree/tree-li-drag.gif') no-repeat 0 0; }
+	li .col-language a { text-transform:uppercase; }
+
+	// edit button
+	.cont:hover .col1 a.changelink { display:block; }
+
+	// active state
+	.cont-active { background:#f7f7f7; }
+	.cont-pagetype { background:white; }
+
+	// drag modus
+	li#dragged { min-width:500px; }
+	li#dragged .col2 { display:none; }
+
+	// info handling
+	.info-details { display:none; }
+	li .info:hover { position:relative;
+		.info-details { display:block; }
+	}
+	.info-details { cursor:default;
+		position:absolute; right:-6px; top:-6px; z-index:100;
+		text-align:left; line-height:18px; padding:5px 10px;
+		background:white; border:1px solid #ccc; @include border-radius(3px 0 3px 3px);
+		mark { font-weight:bold; background:none; font-style:normal;
+			@include inline-block(); min-width:100px; }
+		span { display:inline !important; }
+	}
+}
+
+// filter button on top right
+#changelist-filter-button { line-height:30px;
+	display:block; position:absolute; right:0; top:0; z-index:1000;
+	width:150px; height:auto; padding:0 0 0 10px; margin:0;
+	border:1px solid $color-border-medium; border-right:none; border-top:none; background:$color-border-light;
+}
+#changelist-filter { top:30px;
+	h2 { display:none; }
+}
+// remove background assigned from django
+.change-list .filtered { min-height:auto; background:white !important; }
+
+// only visible on multiple sites
+#site-selector { float:left; margin:9px 18px 0 8px; }
+
+// loader on top right
+#loader-message { position:fixed; top:0; right:0; padding:4px 8px; background:white; display:none; }
+
+/* TODO this should be defined inside djangocms-admin.css instead (3.1) */
+#sitemap {
+	border:1px solid $color-border;
+	ul.header li .col2 > div { padding:0 5.5px; }
+	li .col-softroot span.icon {
+		width: 18px !important; height: 18px !important; margin:0 !important;
+		background: url('../img/pagetree/sprite.png') -80px 0 no-repeat !important; }
+	li .col-apphook span.icon {
+		width: 18px !important; height: 18px !important; margin:0 !important;
+		background: url('../img/pagetree/sprite.png') -40px -80px no-repeat !important; }
+	li .col-language span {
+		border: 1px solid transparent;
+		width:12px !important; height:12px !important; margin:-3px 0 0 !important;
+		@include inline-block();
+		@include border-radius(7px);
+		color: transparent;
+		// colors used within the tree
+		&.dirty { background-color:#6ba6ff;
+			-webkit-animation:pulsate 2.5s ease-out infinite;
+			-moz-animation:pulsate 2.5s ease-out infinite;
+			animation:pulsate 2.5s ease-out infinite;
+		}
+		&.empty { border: 1px solid #b3b3b3; background-color:transparent; }
+		&.unpublished { background-color:#b3b3b3; }
+		&.unpublishedparent { background-color:#b3b3b3; }
+		&.published { background-color:#65b417; }
+	 }
+	 li .cont { overflow:visible !important; }
+}
+
+// dropdown for language change
+.col-language { position:relative; }
+#sitemap .tree li .col-language
+.language-tooltip { display:none; position:absolute; right:20px; top:4px; z-index:9999;
+	line-height:1; padding:4px 6px; font-size:11px; color:#ccc;
+	background-color:black; background:rgba(black, 0.8); border:none;
+	@include border-radius(3px);
+	a { color:#ddd; }
+	a:hover { color:white; text-decoration:none; }
+	&:before { display:block; width:0; height:0;
+		position:absolute; top:50%; right:-5px; margin-top:-4px; content:" ";
+		border-top: 4px solid transparent;
+		border-bottom: 4px solid transparent;
+		border-left: 5px solid rgba(black, 0.8);
+	}
+	&.language-tooltip-multiple a:first-child:after { content:" - "; }
+}
+
+#marker { margin-top:1px; }
+
+// animation for publishing
+@-webkit-keyframes pulsate {
+	0% { opacity:0.5; }
+	50% { opacity:1; }
+	100% { opacity:0.5; }
+}

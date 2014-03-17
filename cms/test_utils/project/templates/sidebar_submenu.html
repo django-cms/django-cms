@@ -1,3 +1,5 @@
 {% load i18n cms_tags menu_tags %}
-
-{% show_menu 1 100 0 1 "sidebar_submenu_root.html" %}
+{% render_model_block request.current_page "changelist" %}
+        <h3>Menu</h3>
+        {% show_menu 1 100 0 1 "sidebar_submenu_root.html" %}
+{% endrender_model_block %}

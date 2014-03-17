@@ -1,0 +1,11 @@
+{% load i18n %}
+{% language request.toolbar.toolbar_language %}
+{% regroup plugin_classes by module as module_list %}
+{% for module in module_list %}
+	<div class="cms_submenu-item cms_submenu-item-title"><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></div>
+	{% for p in module.list %}
+		<div class="cms_submenu-item"><a data-rel="add" href="{{ p.value }}">{{ p.name }}</a></div>
+	{% endfor %}
+{% endfor %}
+<div class="cms_submenu-scroll-hint">{% trans "Scroll for more" %}</div>
+{% endlanguage %}

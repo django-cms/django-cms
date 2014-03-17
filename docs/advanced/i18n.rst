@@ -14,7 +14,7 @@ official django `documentation`_.
 Main `urls.py` example::
 
     from django.conf import settings
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls import patterns, include, url
     from django.contrib import admin
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -39,6 +39,8 @@ Main `urls.py` example::
 Language Cookie
 ***************
 
+If a user comes back to a previously visited page, the language will be same since his last visit.
+
 By default if someone visits a page at `http://www.mysite.fr/` django determines the language as follow:
 
 - language in url
@@ -47,14 +49,16 @@ By default if someone visits a page at `http://www.mysite.fr/` django determines
 - language in from browser
 - LANGUAGE_CODE from settings
 
-No if i have a German browser and visit a page that is only English and French, it will choose the language that is
-in LANGUAGE_CODE. If this is English but i only speak French i have to switch the language. No if after sometime
-i visit the page again. The page will display in English again and I have to switch again. The same is for every
-link that points to `/` will switch to English again. To fix this behavior the cms ships with a middleware:
+More in-depth documentation about this is available at
+https://docs.djangoproject.com/en/dev/topics/i18n/translation/#how-django-discovers-language-preference
+
+When visiting a page that is only English and French with a German browser, the language from LANGUAGE_CODE will be used.
+If this is English, but the visitor only speaks French, the visitor will have to switch the language.
+Visiting the same page now again after some time, will show it in English again, because the browser session which was
+used to store the language selection doesn't exist anymore. To prevent this issue, a middleware exists which stores the
+language selection in a cookie. Add the following middleware to `MIDDLEWARE_CLASSES`:
 
     `cms.middleware.language.LanguageCookieMiddleware`
-
-add this to you middleware settings fix this.
 
 ****************
 Language Chooser
@@ -72,6 +76,31 @@ Example:
     {% language_chooser "myapp/language_chooser.html" %}
 
 
+
+If you are in an apphook and have a detail view of an object you can
+set an object to the toolbar in your view. The cms will call ``get_absolute_url`` in
+the corresponding language for the language chooser:
+
+Example:
+
+.. code-block:: html+django
+
+    class AnswerView(DetailView):
+        def get(self, *args, **kwargs):
+            self.object = self.get_object()
+            if hasattr(self.request, 'toolbar'):
+                self.request.toolbar.set_object(self.object)
+            response = super(AnswerView, self).get(*args, **kwargs)
+            return response
+
+
+With this you can more easily control what url will be returned on the language chooser.
+
+.. note::
+
+    If you have a multilingual objects be sure that you return the right url if you don't have
+    a translation for this language in ``get_absolute_url``
+
 *****************
 page_language_url
 *****************
@@ -86,10 +115,10 @@ Example:
 
 
 ******************
-hide_unstranslated
+hide_untranslated
 ******************
 
-If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_unstranslated` to ``False``
+If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_untranslated` to ``False``
 all pages will be displayed in all languages even if they are
 not translated yet.
 

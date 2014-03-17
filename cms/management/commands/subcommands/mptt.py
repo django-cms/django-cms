@@ -9,8 +9,8 @@ class FixMPTTCommand(NoArgsCommand):
         """
         Repairs the MPTT tree
         """
-        self.stdout.write("fixing mptt page tree")
+        self.stdout.write(u"fixing mptt page tree")
         Page._tree_manager.rebuild()
-        self.stdout.write("fixing mptt plugin tree")
+        self.stdout.write(u"fixing mptt plugin tree")
         CMSPlugin.objects.rebuild()
-        self.stdout.write("all done")
+        self.stdout.write(u"all done")

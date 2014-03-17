@@ -2,9 +2,9 @@
 from cms.exceptions import AppAlreadyRegistered
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import warnings
+
 
 class ApphookPool(object):
     def __init__(self):
@@ -15,7 +15,7 @@ class ApphookPool(object):
     def discover_apps(self):
         if self.discovered:
             return
-        #import all the modules
+            #import all the modules
         apphooks = get_cms_setting('APPHOOKS')
         if apphooks:
             self.block_register = True
@@ -42,10 +42,10 @@ class ApphookPool(object):
                                        'cms.app_base.CMSApp, %r does not' % app)
         if hasattr(app, 'menu') and not app.menus:
             warnings.warn("You define a 'menu' attribute on your CMS App %r, "
-                "but the 'menus' attribute is empty, did you make a typo?")
+                          "but the 'menus' attribute is empty, did you make a typo?")
         name = app.__name__
         if name in self.apps.keys():
-            raise AppAlreadyRegistered, "[%s] a cms app with this name is already registered" % name
+            raise AppAlreadyRegistered("[%s] a cms app with this name is already registered" % name)
         self.apps[name] = app
 
     def get_apphooks(self):
@@ -53,8 +53,9 @@ class ApphookPool(object):
         hooks = []
         for app_name in self.apps.keys():
             app = self.apps[app_name]
-            hooks.append((app_name, app.name))
-        # Unfortunately, we loose the ordering since we now have a list of tuples. Let's reorder by app_name:
+            if app.urls:
+                hooks.append((app_name, app.name))
+            # Unfortunately, we loose the ordering since we now have a list of tuples. Let's reorder by app_name:
         hooks = sorted(hooks, key=lambda hook: hook[1])
         return hooks
 
@@ -68,5 +69,6 @@ class ApphookPool(object):
                 if app_name in app.urls:
                     return app
         raise ImproperlyConfigured('No registered apphook `%s` found.' % app_name)
+
 
 apphook_pool = ApphookPool()

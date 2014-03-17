@@ -1,0 +1,8 @@
+{% if messages and not page.children.count %}
+<ul class="messagelist">
+	{% for message in messages %}
+	<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% include "admin/cms/page/tree/menu_item.html" %}
