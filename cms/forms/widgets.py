@@ -149,8 +149,8 @@ class PageSmartLinkWidget(TextInput):
                         more: false,
                         results: $.map(data, function(item, i){
                             return {
-                                'id':item.title_set__path,
-                                'text': item.title_set__title + ' (/' + item.title_set__path + ')'}
+                                'id':item.redirect_url,
+                                'text': item.title + ' (/' + item.path + ')'}
                             }
                         )
                     };

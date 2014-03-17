@@ -1356,20 +1356,27 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             query_term = request.GET.get('q','').strip('/')
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
-            published_pages = Page.objects.published().public().filter(
+            matching_published_pages = Page.objects.published().public().filter(
                 Q(title_set__title__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__path__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
             ).distinct()
 
-            return HttpResponse(json.dumps(list(published_pages.values(
-                'id',
-                'title_set__path',
-                'title_set__title',
-            ))), content_type='application/json')
+            results = []
+            for page in matching_published_pages:
+                results.append(
+                    {
+                        'path': page.get_path(language=language_code),
+                        'title': page.get_title(language=language_code),
+                        'redirect_url': page.get_absolute_url(language=language_code)
+                    }
+                )
 
-        return HttpResponseForbidden()
+            return HttpResponse(json.dumps(results), content_type='application/json')
+
+        else:
+            return HttpResponseForbidden()
 
     def add_plugin(self, *args, **kwargs):
         with create_revision():
