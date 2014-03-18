@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.base import Template
 from django.template.context import RequestContext
+from django.views.generic import DetailView
 from cms.test_utils.project.placeholderapp.models import (Example1,
                                                           MultilingualExample1)
 from cms.utils import get_language_from_request
@@ -51,3 +52,8 @@ def detail_view(request, pk, template_name='detail.html', item_name="char_1",
     instance = Example1.objects.get(pk=pk)
     return _base_detail(request, instance, template_name, item_name,
                         template_string)
+
+
+class ClassDetail(DetailView):
+    model = Example1
+    template_name = "detail.html"
