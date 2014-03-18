@@ -1112,7 +1112,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
-        # TODO: use admin base here!
         if reverse('admin:index') not in referer:
             path = '%s?edit_off' % referer.split('?')[0]
         return HttpResponseRedirect(path)
