@@ -33,6 +33,7 @@ Usage:
     develop.py compilemessages
     develop.py makemessages
     develop.py pyflakes
+    develop.py authors
 
 Options:
     -h --help                   Show this screen.
@@ -169,6 +170,33 @@ def makemessages():
 def shell():
     from django.core.management import call_command
     call_command('shell')
+    
+def generate_authors():
+    print("Generating AUTHORS")
+
+    # Get our list of authors
+    print("Collecting author names")
+    r = subprocess.Popen(["git", "log", "--use-mailmap", "--format=%aN"], stdout=subprocess.PIPE)
+    seen_authors = []
+    authors = []
+    with open('AUTHORS', 'r') as f:
+        for line in f.readlines():
+            if line.startswith("*"):
+                author = line.decode('utf-8').strip("* \n")
+                if author.lower() not in seen_authors:
+                    seen_authors.append(author.lower())
+                    authors.append(author)
+    for author in r.stdout.readlines():
+        author = author.decode('utf-8').strip()
+        if author.lower() not in seen_authors:
+            seen_authors.append(author.lower())
+            authors.append(author)
+
+    # Sort our list of Authors by their case insensitive name
+    authors = sorted(authors, key=lambda x: x.lower())
+
+    # Write our authors to the AUTHORS file
+    print(u"Authors (%s):\n\n\n* %s" % (len(authors), u"\n* ".join(authors)))
 
 
 def main():
@@ -176,6 +204,9 @@ def main():
 
     if args['pyflakes']:
         return static_analysis.pyflakes()
+    
+    if args['authors']:
+        return generate_authors()
 
     # configure django
     warnings.filterwarnings(
