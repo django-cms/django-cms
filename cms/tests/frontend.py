@@ -2,7 +2,7 @@
 import sys
 import datetime
 from cms.test_utils.project.placeholderapp.models import Example1
-from django.core.urlresolvers import clear_url_caches, resolve
+from django.core.urlresolvers import clear_url_caches
 from cms.appresolver import clear_app_resolvers
 from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from django.core.cache import cache
@@ -179,8 +179,8 @@ class ToolbarBasicTests(CMSLiveTests):
             char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
             date_field=datetime.datetime.now()
         )
-        apphook = create_page('apphook', 'simple.html', 'en', published=True,
-                              apphook=Example1App)
+        create_page('apphook', 'simple.html', 'en', published=True,
+                    apphook=Example1App)
         self.reload_urls()
 
         url = '%s/%s/?edit' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk)
@@ -200,8 +200,8 @@ class ToolbarBasicTests(CMSLiveTests):
             char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
             date_field=datetime.datetime.now()
         )
-        apphook = create_page('apphook', 'simple.html', 'en', published=True,
-                              apphook=Example1App)
+        create_page('apphook', 'simple.html', 'en', published=True,
+                    apphook=Example1App)
         self.reload_urls()
 
         url = '%s/%s/?edit' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk)
