@@ -300,7 +300,7 @@ the ``get_absolute_url()`` of the poll instance that was edited.
 Frontend
 ********
 
-The toolbar adds a class ``cms-ready`` to the **html** tag when ready. Additionally we add ``cms-toolbar-expanded`` when
+The toolbar adds a class ``cms-ready`` to the **html** tag when ready. Additionally we add ``cms_toolbar-expanded`` when
 the toolbar is visible (expanded).
 
 The toolbar also fires a JavaScript event called **cms-ready** on the document.
