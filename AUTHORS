@@ -19,7 +19,7 @@ Current and previous core designers:
 
 * Christian Bertschy
 
-Contributors (in alphabetical order):
+Contributors (based on gitlog) (388):
 
 * A. Bram Neijt
 * aaloy
@@ -27,35 +27,47 @@ Contributors (in alphabetical order):
 * Aaron Renner
 * aball
 * Adi Sieker
+* Admin Adminaras
 * Adrián Ribao
+* Adrián Ribao Martínez
 * Alberto Paro
-* Alessandro Ronchi
+* Ales Kocjancic
 * Ales Zabala Alava (Shagi)
-* Aleš Kocjančič
+* Alessandro Ronchi
 * Alex Cucu
+* Alex Marandon
 * Alexandre Leray
 * Alexey Subbotin
+* Aleš Kocjančič
 * Alvin Mites
+* Andi Albrecht
 * Andre Bossard
 * Andrei Avram
 * Andrei Fokau
 * Andrew Cassidy
 * Andrew Schoen
+* Angelo Dini
 * angular_circle
+* Antoine Catton
 * Anton Parkhomenko
 * Antoni Aloy López
 * Arne Gellhaus
 * Arne Schauf
 * Artem Skoretskiy
-* Artis Avotins
 * Arthur Debert
+* Artis Avotins
 * Aymeric Augustin
 * Bashar Al-Abdulhadi
 * Batiste Bieler
 * behrooz
 * Behrooz Nobakht
+* Belegnar
+* Beni Wohlwend
+* Benjamin
+* Benjamin Liles
 * Benjamin Wohlwend
 * benjaoming
+* Bernardo Cabezas Serra
 * Bernd Zeimetz
 * Bertrand Bordage
 * beshrkayali
@@ -65,88 +77,140 @@ Contributors (in alphabetical order):
 * Braden MacDonald
 * brightwhitefox
 * Calvin Cheng
+* Catalin Dragomirescu
+* centralniak
 * Chanita Siridechkun
 * Charlie Denton
 * Charpentier Johan
 * Cheng-Chia Tseng
 * Chris Adams
 * Chris Franklin
+* Chris Glass
 * Chris Hughes
 * Chris Jones
 * Chris Wesseling
+* Christian Bertschy
 * Christof Hagedorn
 * Christos Kopanos
+* cip
+* Conrado Buhrer
 * Conrado Bührer
 * Craig de Stigter
 * Damir Arbula
-* DaNmarner
+* DamirArbula
 * Daniel Barden
+* daniele
+* Daniele Procida
 * Danilo Bargen
+* DaNmarner
+* darbula
+* Darii Denis
+* Darii Denis Home
+* Darren Pearce
 * Darryl Woods
+* David Grant
 * David Jean Louis
+* David Lam
+* David Lee
 * David Thompson
 * deshack
+* digi604
+* divio
 * Diógenes Augusto Fernandes Hermínio
+* dlamotte
+* Dmitry Akinin
 * dstufft
+* Dylann CORDEL
+* DylannCordel
 * DZ
 * eged
 * Egor V. Nazarkin
 * Ekrem Seren
-* Erlend Dalen
+* Elias Probst
+* Eric Amador
 * Eric Eldredge
+* Eric Robitaille
+* ericr
 * Erik Allik
+* Erlend Dalen
 * Eugen MechanisM
+* Eugene MechanisM
 * Evandro Miquelito
 * Evgeny Demchenko
+* evildmp
 * F. Gabriel Gosselin
 * f4nt
 * fcurella
 * Filip Kazimierczak
+* FinalAngel
+* fivethreeo
+* fj
+* floppya
 * Frank Bieniek
+* FrankBie
 * Gabe Jackson
 * Gabriel Hurley
 * GaretJax
+* gentleShark
 * Geoffrey Hing
 * George Marshall
 * Gerard Świdersk
+* Gerard Świderski
+* Germano Gabbianelli
 * Germano Gabbianellii
 * Gilles Lenfant
+* Gleb Chipiga
+* Gregory Klupar
 * guandalino
 * Hamish Downer
-* Henning Spran
 * hedberg
+* henning
+* Henning Spran
+* Henning Sprang
 * Herbert Poul
 * hjkelly
 * homebrew79
+* Horst Gutmann
 * hysia
+* Iacopo Spalletti
 * Ian Lewis
 * indexofire
 * Ionel Cristian Maries
-* Iván Raskovsky
+* Ionel Maries Cristian
 * Ivan Vershigora
+* Iván Raskovsky
 * izi
 * J. Cliff Dyer
 * Jacob Rief
 * Jakob Hedman
+* jalaziz
 * Jameel Al-Aziz
 * James Richards
+* James Rutherford
 * Jannis Leidel
 * Janusz Harkot
 * Jason Brown
 * Jason Davies
 * Jason Jenkins
+* Jason Robinson
 * Jason Zylks
 * Javi Nievas
+* Jessica Tallon
 * Johannes Bornhold
 * John-Scott Atlakson
 * Jon Prindiville
+* Jonas Obrist
+* Jonathan Liuti
 * Jonathan Stoppani
 * jordanjambazov
+* Jorge Vargas
 * Jorge Vargas (elpargo)
 * Joseph Bergantine
 * kar1m
+* kblomqvist
 * Kegan Holtzhausen
 * Keryn Knight
+* Kevin Richardson
 * Kim Blomqvist
 * Kim Thoenen
 * kochin
@@ -159,21 +223,28 @@ Contributors (in alphabetical order):
 * littlepea
 * Lucas Vogelsang
 * Lucio Asnaghi
+* lug
 * Luke Crooks
 * Luke Plant
 * m000
 * Maik Lustenberger
+* maiklust
 * Manolis Stamatogiannakis
 * Manuel Schmidt
 * Marc-Olivier Titeux
 * Marco Bonetti
 * Marco Paolini
 * Marco Rimoldi
+* marcor
 * Mark Rogers
 * Markus Holtermann
+* Markus Zapke-Gründemann
+* Martin
 * Martin Bommeli
 * Martin Brochhaus
+* Martin Koistinen
 * Martin Kosír
+* Martin Pajuste
 * martinkosir
 * mathijs
 * Matt Chisholm
@@ -181,43 +252,64 @@ Contributors (in alphabetical order):
 * Maxime Haineault
 * mbouchar
 * mcosta
-* Mel Collins
 * meers
+* Mel Collins
 * MerLex
 * Michael P. Jung
 * Michael Thornhill
 * Mike Dory
 * Mike Johnson
+* Milo Price
 * Mitar
 * Mokys
+* Motiejus Jakštys
 * mrlundis
+* mvaerle
 * MW
 * neoprolog
+* Nick Jones
 * Nickolay V. Shmyrev
+* nsh
+* o-zander
+* ojii
 * Oliver Zander
 * Olivier Le Brouster
 * Orne Brocaar
+* Oyvind Saltvik
 * padelt
 * Paolo
 * Pascal Mouret
+* Patrick Arminio
+* Patrick Lauber
 * Patrick Toal
+* patricklauber
 * Patryk Zawadzki
+* paul
 * Paul van der Linden
 * Paulo
+* Paulo Alvarado
 * Pavel Puchkin
 * pbgc
+* pcicman
 * Pedro Gracia
 * Pete Loggie
+* Peter Ciciman
+* Peter Landry
 * Peter-Paul van Gemerden
 * Petteri
 * Philipp Bosch
 * philomat
 * phuihock
 * Pigletto
-* pigletto
 * Piotr Kilczuk
+* piquadrat
 * poweredbypenguins
 * Pratik Vyas
+* pumalo
+* raidsan
+* Rainer Koirikivi
+* Rajesh
+* Rajesh K.
 * Rebecca Breu
 * Remco Wendt
 * Restless Being
@@ -226,15 +318,21 @@ Contributors (in alphabetical order):
 * Robert Barsch
 * Robert Buchholz
 * Robert Clark
+* Robert Feldbinder
 * Robert Pogorzelski
+* Roberto
 * Roberto Lopez
 * Robin Lewis
 * robint
 * Rodolfo Carvalho
+* Roman Kozlovskiy
+* root
 * rtpm
 * Samuel Lüscher
 * sbussetti
+* Schoen
 * Scott Barnham
+* scottbarnham
 * sealibora
 * Sean Bleier
 * Seth Buntin
@@ -244,41 +342,69 @@ Contributors (in alphabetical order):
 * shed
 * Shinya Okano
 * shulcsm
+* Simon Charette
 * Simon Hedberg
 * Simon Meers
-* Simon Charette
 * sleytr
 * spookylukey
+* srj55
 * ssteinerX
 * Stavros Korokithakis
+* Stefan Foulis
+* Stefan T. Oertel
+* stefanfoulis
+* Stefano Brentegani
 * Stefano Crosta
+* Stefano Morandi
+* Stephan
 * Stephan Jaekel
 * Stephen Muss
+* Stephen Watkin
 * Steve R. Jones
 * Steve Steiner
 * Tanel Külaots
+* tdelam
+* tehfink
 * Thomas Parslow
+* Thomas Remmert
 * Thomas Woolford
-* timesong
+* Tibor Balogh
 * Tim Anderegg
 * Tim Davies
 * Tim Graham
+* timesong
 * Tino de Bruijn
 * tiret
+* Tobias von Klipstein
+* Tom
 * Tom de Simone
+* Tom S
+* Tom V
 * Ulrich Petri
+* User
 * Vasil Vangelovski
+* Viktor Nagy
 * Viliam Segeda
+* Vinit (Vermicelli on IRC)
+* vinit kumar
 * Vitor Figueiro
+* Vladyslav
+* vvangelovski
 * wangJunjie
 * Wayne Moore
 * wid
 * wildermesser
 * Xavier Ordoquy
+* xray7224
 * Yann Malet
+* yann.malet@gmail.com
+* ychouinard
 * yedpodtrzitko
 * yohanboniface
 * Yosuke Ikeda
 * Yuri van der Meer
+* zandeez
 * zundoya
+* Óscar M. Lage
+* Øyvind Saltvik
 * Антон Евжаков
