@@ -210,7 +210,7 @@ Snippet Plugin
 We removed the snippet plugin (``cms.plugins.snippet``).
 Its new location is at:
 
-* https://github.com/divio/djangocms-link
+* https://github.com/divio/djangocms-snippet
 
 As an alternative, you could also use the following (yet you will not be able
 to keep your existing files from the old ``cms.plugins.snippet``!)
