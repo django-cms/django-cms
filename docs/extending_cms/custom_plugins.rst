@@ -621,6 +621,10 @@ You can nest CMS Plugins in themselves. There's a few things required to achieve
     </div>
 
 
+***************************************
+Plugin Attributes and Methods Reference
+***************************************
+
 Plugin Attribute Reference
 ==========================
 
@@ -835,7 +839,13 @@ result in no icon rendered at all, which would render the plugin uneditable
 inside its parent text plugin.
 
 This function accepts the `instance` parameter and should return the path to
-an icon to display in the text of the text plugin. Example::
+an icon to display in the text of the text plugin.
+
+icon_src takes 1 argument:
+
+* ``instance``: The instance of the plugin model
+
+Example::
 
     def icon_src(self, instance):
         return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
@@ -859,6 +869,10 @@ related tooltip will help the operator distinguish one from the others.
 By default `icon_alt()` will return a string of the form: "[plugin type] -
 [instance]", but can be modified to return anything you like.
 
+icon_alt takes 1 argument:
+
+* ``instance``: The instance of the plugin model
+
 The default implementation is as follows::
 
     def icon_alt(self, instance):
@@ -876,6 +890,11 @@ successfully, and False otherwise.
 
 .. note:: This method not be used on the plugin but rather on the plugin's
           instance.
+
+set_translatable_content takes 1 argument:
+
+* ``fields``: A dictionary containing the field names and translated content
+              for each.
 
 Example::
 
