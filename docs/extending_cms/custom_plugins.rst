@@ -624,92 +624,22 @@ You can nest CMS Plugins in themselves. There's a few things required to achieve
 Plugin Attribute Reference
 ==========================
 
-A list of all attributes a plugin has and that can be overwritten:
-
-
-change_form_template
---------------------
-
-The template used to render the form when you edit the plugin.
-
-Default:
-
-`admin/cms/page/plugin_change_form.html`
-
-Example::
-
-    class MyPlugin(CMSPluginBase):
-        model = MyModel
-        name = _("My Plugin")
-        render_template = "cms/plugins/my_plugin.html"
-        change_form_template = "admin/cms/page/plugin_change_form.html"
-
-frontend_edit_template
-----------------------
-
-The template used for wrapping the plugin in frontend editing.
-
-Default:
-
-`cms/toolbar/placeholder_wrapper.html`
+A list of all attributes a plugin has and that can (or should) be overwritten:
 
 
 admin_preview
 -------------
 
+Default: `False`
+
 Should the plugin be previewed in admin when you click on the plugin or save it?
 
-Default: False
 
-
-render_template
----------------
-
-The path to the template used to render the template.
-Is required.
-
-
-render_plugin
--------------
-
-Should the plugin be rendered at all, or doesn't it have any output?
-
-Default: True
-
-model
------
-
-The Model of the Plugin.
-Required.
-
-text_enabled
-------------
-
-Default: False
-Can the plugin be inserted inside the text plugin?
-
-If this is enabled the following function need to be overwritten as well:
-
-**icon_src()**
-
-Should return the path to an icon displayed in the text.
-
-**icon_alt()**
-
-Should return the alt text for the icon.
-
-page_only
----------
-
-Default: False
-
-Can this plugin only be attached to a placeholder that is attached to a page?
-Set this to true if you always need a page for this plugin.
 
 allow_children
 --------------
 
-Default: False
+Default: `False`
 
 Can this plugin have child plugins? Or can other plugins be placed inside this plugin?
 If set to True you are responsible to render the children in your plugin template.
@@ -725,15 +655,85 @@ Please use something like this or something similar::
     </div>
 
 
-Be sure to access ``instance.child_plugin_instances`` to get all children. They are pre-filled
-and ready to use. To finally render your child plugins use the ``{% render_plugin %}`` templatetag.
+Be sure to access ``instance.child_plugin_instances`` to get all children.
+They are pre-filled and ready to use. To finally render your child plugins use
+the ``{% render_plugin %}`` templatetag.
+
+See also: `child_classes`_, `parent_classes`_, `require_parent`_
+
+
+cache
+-----
+
+Default: :setting:`CMS_PLUGIN_CACHE`
+
+Is this plugin cacheable? If your plugin displays content based on the user or
+request or other dynamic properties set this to False.
+
+
+change_form_template
+--------------------
+
+Default: `admin/cms/page/plugin_change_form.html`
+
+The template used to render the form when you edit the plugin.
+
+Example::
+
+    class MyPlugin(CMSPluginBase):
+        model = MyModel
+        name = _("My Plugin")
+        render_template = "cms/plugins/my_plugin.html"
+        change_form_template = "admin/cms/page/plugin_change_form.html"
+
+See also: `frontend_edit_template`_
 
 
 child_classes
 -------------
 
-Default: None
+Default: `None`
+
 A List of Plugin Class Names. If this is set, only plugins listed here can be added to this plugin.
+
+See also: `parent_classes`_
+
+
+disable_child_plugin
+--------------------
+
+Default: `False`
+
+Disables dragging of child plugins in structure mode.
+
+
+frontend_edit_template
+----------------------
+
+Default: `cms/toolbar/placeholder_wrapper.html`
+
+The template used for wrapping the plugin in frontend editing.
+
+See also: `change_form_template`_
+
+
+model
+-----
+
+This is required. The model of the Plugin. The defined model must extend
+:class:CMSPlugin. If your plugin does not require any per-instance settings,
+then this setting can be set to `CMSPlugin`.
+
+
+page_only
+---------
+
+Default: False
+
+Can this plugin only be attached to a placeholder that is attached to a page?
+Set this to true if you always need a page for this plugin.
+
+See also: `child_classes`_, `parent_classes`_, `require_parent`_,
 
 
 parent_classes
@@ -741,7 +741,30 @@ parent_classes
 
 Default: None
 
-A list of Plugin Class Names.  If this is set, this plugin may only be added to plugins listed here.
+A list of Plugin Class Names. If this is set, this plugin may only be added
+to plugins listed here.
+
+See also: `child_classes`_, `require_parent`_
+
+
+render_plugin
+-------------
+
+Default: True
+
+Should the plugin be rendered at all, or doesn't it have any output?  If
+`render_plugin` is true, then you must also define `render_template`
+
+See also: `render_template`_
+
+
+render_template
+_______________
+
+The path to the template used to render the template. This is required if
+`render_plugin` is true.
+
+See also: `render_plugin`_
 
 
 require_parent
@@ -749,23 +772,48 @@ require_parent
 
 Default: False
 
-Is it required that this plugin is a child of another plugin? Or can it be added to any placeholder, even one attached to a page.
+Is it required that this plugin is a child of another plugin? Or can it be
+added to any placeholder, even one attached to a page.
+
+See also: `child_classes`_, `parent_classes`_
 
 
-disable_child_plugin
---------------------
+text_enabled
+------------
 
 Default: False
 
-Disables dragging of child plugins in structure mode.
+Can the plugin be inserted inside the text plugin?  If this is enabled then
+`icon_src` must be overriden.
+
+See also: `icon_src`_, `icon_alt`_
+
+
+translatable_content_excluded_fields
+------------------------------------
+
+Default: [ ]
+
+A list of plugin fields which will not be exported while using
+:meth:`get_translatable_content`.
+
+See also: `get_translatable_content`_, `set_translatable_content`_
+
+
+Plugin Method Reference
+=======================
+
+A list of all methods a plugin has and that can (or should) be overwritten:
 
 
 get_translatable_content
 ------------------------
 
-Get a dictionary of all content fields (field name / field value pairs) from the plugin.
+Get a dictionary of all content fields (field name / field value pairs) from
+the plugin.
 
-.. note:: This method and the one below should not be used on the plugin but rather on the plugin's instance.
+.. note:: This method not be used on the plugin but rather on the plugin's
+          instance.
 
 Example::
 
@@ -775,11 +823,59 @@ Example::
     plugin.get_translatable_content()
     # returns {'body': u'<p>I am text!</p>\n'}
 
+
+See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
+
+
+icon_src
+--------
+
+By default, this returns an empty string, which, if left unoverridden would
+result in no icon rendered at all, which would render the plugin uneditable
+inside its parent text plugin.
+
+This function accepts the `instance` parameter and should return the path to
+an icon to display in the text of the text plugin. Example::
+
+    def icon_src(self, instance):
+        return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
+
+See also: `text_enabled`_, `icon_alt`_
+
+
+icon_alt
+--------
+
+Although it is optional, authors of `text_enabled` plugins should consider
+overriding this function as well.
+
+This function accepts the `instance` as a parameter and returns a string to be
+used as the alt text for the plugin's icon which will appear as a tooltip in
+most browsers.  This is useful, because if the same plugin is used multiple
+times within the same text plugin, they will typically all render with the
+same icon rendering them visually identical to one another. This alt text and
+related tooltip will help the operator distinguish one from the others.
+
+By default `icon_alt()` will return a string of the form: "[plugin type] -
+[instance]", but can be modified to return anything you like.
+
+The default implementation is as follows::
+
+    def icon_alt(self, instance):
+        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+
+See also: `text_enabled`_, `icon_src`_
+
+
 set_translatable_content
 ------------------------
 
-Takes a dictionary of plugin fields (field name / field value pairs) and overwrites the plugin's fields. Returns True if all fields
-have been written successfully, and False otherwise.
+Takes a dictionary of plugin fields (field name / field value pairs) and
+overwrites the plugin's fields. Returns True if all fields have been written
+successfully, and False otherwise.
+
+.. note:: This method not be used on the plugin but rather on the plugin's
+          instance.
 
 Example::
 
@@ -789,18 +885,4 @@ Example::
     plugin.set_translatable_content({'body': u'<p>This is a different text!</p>\n'})
     # returns True
 
-translatable_content_excluded_fields
-------------------------------------
-
-Default: [ ]
-
-A list of plugin fields which will not be exported while using :meth:`get_translatable_content`
-
-
-cache
------
-
-Default: :setting:`CMS_PLUGIN_CACHE`
-
-Is this plugin cacheable? If your plugin displays content based on the user or request or other
-dynamic properties set this to False.
+See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
