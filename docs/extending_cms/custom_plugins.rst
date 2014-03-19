@@ -629,15 +629,15 @@ achieve this functionality:
     </div>
 
 
-***************************************
-Plugin Attributes and Methods Reference
-***************************************
+**********************************************
+CMSPluginBase Attributes and Methods Reference
+**********************************************
 
-Plugin Attribute Reference
-==========================
+These are a list of attrbibutes and methods that can (or should) be overridden
+on your Plugin definition.
 
-A list of all attributes a plugin has and that can (or should) be overwritten:
-
+Attributes
+==========
 
 admin_preview
 -------------
@@ -645,7 +645,6 @@ admin_preview
 Default: ``False``
 
 Should the plugin be previewed in admin when you click on the plugin or save it?
-
 
 
 allow_children
@@ -739,6 +738,8 @@ Default: ``CMSPlugin``
 If the plugin requires per-instance settings, then this setting must be set to
 a model that inherits from :class:`CMSPlugin`.
 
+See also: `Storing Configuration`_
+
 
 page_only
 ---------
@@ -768,7 +769,7 @@ render_plugin
 Default: ``True``
 
 Should the plugin be rendered at all, or doesn't it have any output?  If
-`render_plugin` is ``True``, then you must also define `render_template`
+`render_plugin` is ``True``, then you must also define :meth:`render_template`
 
 See also: `render_template`_
 
@@ -806,43 +807,8 @@ Can the plugin be inserted inside the text plugin?  If this is ``True`` then
 See also: `icon_src`_, `icon_alt`_
 
 
-translatable_content_excluded_fields
-------------------------------------
-
-Default: ``[]``
-
-A list of plugin fields which will not be exported while using
-:meth:`get_translatable_content`.
-
-See also: `get_translatable_content`_, `set_translatable_content`_
-
-
-Plugin Method Reference
-=======================
-
-A list of all methods a plugin has and that can (or should) be overwritten:
-
-
-get_translatable_content
-------------------------
-
-Get a dictionary of all content fields (field name / field value pairs) from
-the plugin.
-
-.. note:: This method not be used on the plugin but rather on the plugin's
-          instance.
-
-Example::
-
-    from djangocms_text_ckeditor.models import Text
-
-    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
-    plugin.get_translatable_content()
-    # returns {'body': u'<p>I am text!</p>\n'}
-
-
-See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
-
+Methods
+=======
 
 icon_src
 --------
@@ -895,6 +861,80 @@ The default implementation is as follows::
 See also: `text_enabled`_, `icon_src`_
 
 
+******************************************
+CMSPlugin Attributes and Methods Reference
+******************************************
+
+These are a list of attrbibutes and methods that can (or should) be overridden
+on your plugin's `model` definition.
+
+See also: `Storing Configuration`_
+
+
+Attributes
+==========
+
+
+translatable_content_excluded_fields
+------------------------------------
+
+Default: ``[]``
+
+A list of plugin fields which will not be exported while using
+:meth:`get_translatable_content`.
+
+See also: `get_translatable_content`_, `set_translatable_content`_
+
+
+Methods
+=======
+
+
+copy_relations
+--------------
+
+Handle copying of any relations attached to this plugin. Custom plugins have
+to do this themselves.
+
+``copy_relations`` takes 1 argument:
+
+* ``old_instance``: The source plugin instance
+
+See also: `Handling Relations`_, `post_copy`_
+
+
+get_translatable_content
+------------------------
+
+Get a dictionary of all content fields (field name / field value pairs) from
+the plugin.
+
+Example::
+
+    from djangocms_text_ckeditor.models import Text
+
+    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+    plugin.get_translatable_content()
+    # returns {'body': u'<p>I am text!</p>\n'}
+
+
+See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
+
+
+post_copy
+---------
+
+Can be overriden to handle more advanced cases (eg Text Plugins) after the
+original has been copied.
+
+``post_copy`` takes 2 arguments:
+
+* ``old_instance``: The old plugin instance instance
+* ``new_old_ziplist``: [unclear at time of this edit]
+
+See also: `Handling Relations`_, `copy_relations`_
+
+
 set_translatable_content
 ------------------------
 
@@ -902,12 +942,10 @@ Takes a dictionary of plugin fields (field name / field value pairs) and
 overwrites the plugin's fields. Returns ``True`` if all fields have been
 written successfully, and ``False`` otherwise.
 
-.. note:: This method not be used on the plugin but rather on the plugin's
-          instance.
-
 set_translatable_content takes 1 argument:
 
-* ``fields``: A dictionary containing the field names and translated content for each.
+* ``fields``: A dictionary containing the field names and translated content
+              for each.
 
 Example::
 
