@@ -16,14 +16,18 @@ from cms.views import details
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.compat import is_user_swapped
-from cms.toolbar.items import ToolbarAPIMixin, LinkItem, ItemSearchResult, Break, SubMenu, \
-    AjaxItem
+from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
+                               Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE
+from cms.test_utils.testcases import (SettingsOverrideTestCase,
+                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.test_utils.project.placeholderapp.models import (Example1, MultilingualExample1)
-from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_multi
+from cms.test_utils.project.placeholderapp.models import (Example1,
+                                                          MultilingualExample1)
+from cms.test_utils.project.placeholderapp.views import (detail_view,
+                                                         detail_view_multi,
+                                                         detail_view_multi_unfiltered)
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
@@ -971,6 +975,37 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">un</div></h1>' % (
                     'placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
             self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/" % exm.pk)
+            self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
+
+    def test_multi_edit_no500(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        title = create_title("fr", "test", page)
+
+        exm = MultilingualExample1()
+        exm.translate("fr")
+        exm.char_1 = "un"
+        exm.char_2 = "deux"
+        exm.save()
+
+        with SettingsOverride(LANGUAGE_CODE="fr"):
+            request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
+            response = detail_view_multi_unfiltered(request, exm.pk)
+            self.assertContains(
+                response,
+                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">un</div></h1>' % (
+                    'placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
+            self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/" % exm.pk)
+            self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
+
+        with SettingsOverride(LANGUAGE_CODE="de"):
+            request = self.get_page_request(title.page, user, edit=True, lang_code="de")
+            response = detail_view_multi_unfiltered(request, exm.pk)
+            self.assertContains(
+                response,
+                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">un</div></h1>' % (
+                    'placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
+            self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/de/" % exm.pk)
             self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
 
     def test_edit_field_multilingual(self):
