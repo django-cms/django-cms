@@ -924,13 +924,14 @@ See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
 post_copy
 ---------
 
-Can be overriden to handle more advanced cases (eg Text Plugins) after the
-original has been copied.
+Can (should) be overriden to handle the copying of plugins which contain
+children plugins after the original parent has been copied.
 
 ``post_copy`` takes 2 arguments:
 
 * ``old_instance``: The old plugin instance instance
-* ``new_old_ziplist``: [unclear at time of this edit]
+* ``new_old_ziplist``: A list of tuples containing new copies and the old
+                       existing child plugins.
 
 See also: `Handling Relations`_, `copy_relations`_
 
