@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
 import datetime
+from cms.apphook_pool import apphook_pool
+from cms.exceptions import AppAlreadyRegistered
 from cms.test_utils.project.placeholderapp.models import Example1
 from django.core.urlresolvers import clear_url_caches
 from cms.appresolver import clear_app_resolvers
@@ -179,9 +181,14 @@ class ToolbarBasicTests(CMSLiveTests):
             char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
             date_field=datetime.datetime.now()
         )
+        try:
+            apphook_pool.register(Example1App)
+        except AppAlreadyRegistered:
+            pass
+        self.reload_urls()
         create_page('apphook', 'simple.html', 'en', published=True,
                     apphook=Example1App)
-        self.reload_urls()
+
 
         url = '%s/%s/?edit' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk)
         self.driver.get(url)
@@ -195,6 +202,11 @@ class ToolbarBasicTests(CMSLiveTests):
 
     def test_toolbar_login_cbv(self):
         User = get_user_model()
+        try:
+            apphook_pool.register(Example1App)
+        except AppAlreadyRegistered:
+            pass
+        self.reload_urls()
         create_page('Home', 'simple.html', 'en', published=True)
         ex1 = Example1.objects.create(
             char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
@@ -202,8 +214,6 @@ class ToolbarBasicTests(CMSLiveTests):
         )
         create_page('apphook', 'simple.html', 'en', published=True,
                     apphook=Example1App)
-        self.reload_urls()
-
         url = '%s/%s/?edit' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk)
         self.driver.get(url)
         username_input = self.driver.find_element_by_id("id_cms-username")

@@ -307,10 +307,17 @@ class Placeholder(Tag):
         if not page or page == 'dummy':
             if nodelist:
                 return nodelist.render(context)
-
             return ''
-
-        content = get_placeholder_content(context, request, page, name, inherit, nodelist)
+        try:
+            content = get_placeholder_content(context, request, page, name, inherit, nodelist)
+        except PlaceholderNotFound:
+            if nodelist:
+                return nodelist.render(context)
+            raise
+        if not content:
+            if nodelist:
+                return nodelist.render(context)
+            return ''
         return content
 
     def get_name(self):
