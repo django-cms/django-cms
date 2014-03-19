@@ -15,9 +15,9 @@ up-to-date at all times.
 It's like magic, but quicker.
 
 Unless you're lucky enough to discover that your needs can be met by the
-built-in plugins, or by the many available 3rd-party plugins, you'll have
-to write your own custom CMS Plugin. Don't worry though -
-writing a CMS Plugin is rather simple.
+built-in plugins, or by the many available 3rd-party plugins, you'll have to
+write your own custom CMS Plugin. Don't worry though - writing a CMS Plugin is
+rather simple.
 
 *************************************
 Why would you need to write a plugin?
@@ -148,7 +148,7 @@ In addition to those three attributes, you can also define a
 :meth:`render` method on your subclasses. It is specifically this `render`
 method that is the **view** for your plugin.
 
-The `render` method takes three arguments:
+The :meth:`render` method takes three arguments:
 
 * ``context``: The context with which the page is rendered.
 * ``instance``: The instance of your plugin that is rendered.
@@ -642,7 +642,7 @@ A list of all attributes a plugin has and that can (or should) be overwritten:
 admin_preview
 -------------
 
-Default: `False`
+Default: ``False``
 
 Should the plugin be previewed in admin when you click on the plugin or save it?
 
@@ -651,10 +651,10 @@ Should the plugin be previewed in admin when you click on the plugin or save it?
 allow_children
 --------------
 
-Default: `False`
+Default: ``False``
 
 Can this plugin have child plugins? Or can other plugins be placed inside this
-plugin? If set to True you are responsible to render the children in your
+plugin? If set to ``True`` you are responsible to render the children in your
 plugin template.
 
 Please use something like this or something similar::
@@ -687,7 +687,7 @@ request or other dynamic properties set this to False.
 change_form_template
 --------------------
 
-Default: `admin/cms/page/plugin_change_form.html`
+Default: ``admin/cms/page/plugin_change_form.html``
 
 The template used to render the form when you edit the plugin.
 
@@ -705,7 +705,7 @@ See also: `frontend_edit_template`_
 child_classes
 -------------
 
-Default: `None`
+Default: ``None``
 
 A List of Plugin Class Names. If this is set, only plugins listed here can be
 added to this plugin.
@@ -716,7 +716,7 @@ See also: `parent_classes`_
 disable_child_plugin
 --------------------
 
-Default: `False`
+Default: ``False``
 
 Disables dragging of child plugins in structure mode.
 
@@ -724,7 +724,7 @@ Disables dragging of child plugins in structure mode.
 frontend_edit_template
 ----------------------
 
-Default: `cms/toolbar/placeholder_wrapper.html`
+Default: ``cms/toolbar/placeholder_wrapper.html``
 
 The template used for wrapping the plugin in frontend editing.
 
@@ -734,18 +734,19 @@ See also: `change_form_template`_
 model
 -----
 
-This is required. The model of the Plugin. The defined model must extend
-:class:CMSPlugin. If your plugin does not require any per-instance settings,
-then this setting can be set to `CMSPlugin`.
+Default: ``CMSPlugin``
+
+If the plugin requires per-instance settings, then this setting must be set to
+a model that inherits from :class:`CMSPlugin`.
 
 
 page_only
 ---------
 
-Default: False
+Default: ``False``
 
 Can this plugin only be attached to a placeholder that is attached to a page?
-Set this to true if you always need a page for this plugin.
+Set this to ``True`` if you always need a page for this plugin.
 
 See also: `child_classes`_, `parent_classes`_, `require_parent`_,
 
@@ -753,7 +754,7 @@ See also: `child_classes`_, `parent_classes`_, `require_parent`_,
 parent_classes
 --------------
 
-Default: None
+Default: ``None``
 
 A list of Plugin Class Names. If this is set, this plugin may only be added
 to plugins listed here.
@@ -764,10 +765,10 @@ See also: `child_classes`_, `require_parent`_
 render_plugin
 -------------
 
-Default: True
+Default: ``True``
 
 Should the plugin be rendered at all, or doesn't it have any output?  If
-`render_plugin` is true, then you must also define `render_template`
+`render_plugin` is ``True``, then you must also define `render_template`
 
 See also: `render_template`_
 
@@ -775,8 +776,10 @@ See also: `render_template`_
 render_template
 _______________
 
+Default: ``None``
+
 The path to the template used to render the template. This is required if
-`render_plugin` is true.
+`render_plugin` is ``True``.
 
 See also: `render_plugin`_
 
@@ -784,7 +787,7 @@ See also: `render_plugin`_
 require_parent
 --------------
 
-Default: False
+Default: ``False``
 
 Is it required that this plugin is a child of another plugin? Or can it be
 added to any placeholder, even one attached to a page.
@@ -795,10 +798,10 @@ See also: `child_classes`_, `parent_classes`_
 text_enabled
 ------------
 
-Default: False
+Default: ``False``
 
-Can the plugin be inserted inside the text plugin?  If this is enabled then
-`icon_src` must be overriden.
+Can the plugin be inserted inside the text plugin?  If this is ``True`` then
+:meth:`icon_src` must be overriden.
 
 See also: `icon_src`_, `icon_alt`_
 
@@ -806,7 +809,7 @@ See also: `icon_src`_, `icon_alt`_
 translatable_content_excluded_fields
 ------------------------------------
 
-Default: [ ]
+Default: ``[]``
 
 A list of plugin fields which will not be exported while using
 :meth:`get_translatable_content`.
@@ -845,11 +848,12 @@ icon_src
 --------
 
 By default, this returns an empty string, which, if left unoverridden would
-result in no icon rendered at all, which would render the plugin uneditable
-inside its parent text plugin.
+result in no icon rendered at all, which, in turn, would render the plugin
+uneditable by the operator inside a parent text plugin.
 
-This function accepts the `instance` parameter and should return the path to
-an icon to display in the text of the text plugin.
+Therefore, this should be overridden when the plugin has ``text_enabled`` set to
+``True`` to return the path to an icon to display in the text of the text
+plugin.
 
 icon_src takes 1 argument:
 
@@ -866,20 +870,20 @@ See also: `text_enabled`_, `icon_alt`_
 icon_alt
 --------
 
-Although it is optional, authors of `text_enabled` plugins should consider
+Although it is optional, authors of "text enabled" plugins should consider
 overriding this function as well.
 
-This function accepts the `instance` as a parameter and returns a string to be
+This function accepts the ``instance`` as a parameter and returns a string to be
 used as the alt text for the plugin's icon which will appear as a tooltip in
 most browsers.  This is useful, because if the same plugin is used multiple
 times within the same text plugin, they will typically all render with the
 same icon rendering them visually identical to one another. This alt text and
 related tooltip will help the operator distinguish one from the others.
 
-By default `icon_alt()` will return a string of the form: "[plugin type] -
+By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
 [instance]", but can be modified to return anything you like.
 
-icon_alt takes 1 argument:
+:meth:`icon_alt` takes 1 argument:
 
 * ``instance``: The instance of the plugin model
 
@@ -895,8 +899,8 @@ set_translatable_content
 ------------------------
 
 Takes a dictionary of plugin fields (field name / field value pairs) and
-overwrites the plugin's fields. Returns True if all fields have been written
-successfully, and False otherwise.
+overwrites the plugin's fields. Returns ``True`` if all fields have been
+written successfully, and ``False`` otherwise.
 
 .. note:: This method not be used on the plugin but rather on the plugin's
           instance.
