@@ -6,7 +6,8 @@ Custom Plugins
 
 CMS Plugins are reusable content publishers that can be inserted into django
 CMS pages (or indeed into any content that uses django CMS placeholders). They
-enable the publishing of information automatically, without further intervention.
+enable the publishing of information automatically, without further
+intervention.
 
 This means that your published web content, whatever it is, is kept
 up-to-date at all times.
@@ -239,11 +240,15 @@ new configuration:
 
 .. code-block:: html+django
 
-    <h1>Hello {% if request.user.is_authenticated %}{{ request.user.first_name }} {{ request.user.last_name}}{% else %}{{ instance.guest_name }}{% endif %}</h1>
+    <h1>Hello {% if request.user.is_authenticated %}
+      {{ request.user.first_name }} {{ request.user.last_name}}
+    {% else %}
+      {{ instance.guest_name }}
+    {% endif %}</h1>
 
-The only thing we changed there is that we use the template variable
-``{{ instance.guest_name }}`` instead of the hardcoded ``Guest`` string in the
-else clause.
+The only thing we changed there is that we use the template variable ``{{
+instance.guest_name }}`` instead of the hardcoded ``Guest`` string in the else
+clause.
 
 .. warning::
 
@@ -253,10 +258,10 @@ else clause.
 
 .. warning::
 
-    You cannot name your model fields the same as any installed plugins
-    lower-cased model name, due to the implicit one-to-one relation Django uses
-    for subclassed models. If you use all core plugins, this includes:
-    ``file``, ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
+    You cannot name your model fields the same as any installed plugins lower-
+    cased model name, due to the implicit one-to-one relation Django uses for
+    subclassed models. If you use all core plugins, this includes: ``file``,
+    ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
     ``teaser``, ``twittersearch``, ``twitterrecententries`` and ``video``.
 
     Additionally, it is *recommended* that you avoid using ``page`` as a model
@@ -284,8 +289,8 @@ the **old** instance of the plugin as an argument.
 
 You may however decide that the related objects shouldn't be copied - you may
 want to leave them alone, for example. Or, you might even want to choose some
-altogether different relations for it, or to create new ones when it's copied...
-it depends on your plugin and the way you want it to work.
+altogether different relations for it, or to create new ones when it's
+copied... it depends on your plugin and the way you want it to work.
 
 If you do want to copy related objects, you'll need to do this in two slightly
 different ways, depending on whether your plugin has relations *to* or *from*
@@ -294,9 +299,9 @@ other objects that need to be copied too:
 For foreign key relations *from* other objects
 ----------------------------------------------
 
-Your plugin may have items with foreign keys to it, which will typically be the
-case if you set it up so that they are inlines in its admin. So you might have a
-two models, one for the plugin and one for those items::
+Your plugin may have items with foreign keys to it, which will typically be
+the case if you set it up so that they are inlines in its admin. So you might
+have a two models, one for the plugin and one for those items::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
@@ -341,8 +346,8 @@ it becomes::
         def copy_relations(self, oldinstance):
             self.sections = oldinstance.sections.all()
 
-If your plugins have relational fields of both kinds, you may of course need to
-use *both* the copying techniques described above.
+If your plugins have relational fields of both kinds, you may of course need
+to use *both* the copying techniques described above.
 
 ********
 Advanced
@@ -362,8 +367,10 @@ change this.
 
 If you want to customise this the best way to do it is:
 
-* create a template of your own that extends ``cms/templates/admin/cms/page/plugin_change_form.html`` to provide the functionality you require
-* provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a ``change_form_template`` attribute pointing at your new template
+* create a template of your own that extends ``cms/templates/admin/cms/page/plugin_change_form.html``
+  to provide the functionality you require;
+* provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a
+  ``change_form_template`` attribute pointing at your new template.
 
 Extending ``admin/cms/page/plugin_change_form.html`` ensures that you'll keep
 a unified look and functionality across your plugins.
@@ -373,7 +380,6 @@ might have a snippet of JavaScript that needs to refer to a template
 variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
 block.super }}`` to inherit the existing items that were in the parent
 template.
-
 
 Or: ``cms/templates/admin/cms/page/plugin_change_form.html`` extends Django's
 own ``admin/base_site.html``, which loads a rather elderly version of jQuery,
@@ -457,7 +463,8 @@ A **bad** example:
 Plugin Context
 ==============
 
-The plugin has access to the django template context. You can override variables using the ``with`` tag.
+The plugin has access to the django template context. You can override
+variables using the ``with`` tag.
 
 Example::
 
@@ -516,8 +523,8 @@ A plugin processor takes 4 arguments:
 Example
 -------
 
-Suppose you want to wrap each plugin in the main placeholder in a colored
-box but it would be too complicated to edit each individual plugin's template:
+Suppose you want to wrap each plugin in the main placeholder in a colored box
+but it would be too complicated to edit each individual plugin's template:
 
 In your ``settings.py``::
 
@@ -559,7 +566,8 @@ In your ``yourapp.cms_plugin_processors.py``::
 Nested Plugins
 ==============
 
-You can nest CMS Plugins in themselves. There's a few things required to achieve this functionality:
+You can nest CMS Plugins in themselves. There's a few things required to
+achieve this functionality:
 
 `models.py`::
 
@@ -645,8 +653,9 @@ allow_children
 
 Default: `False`
 
-Can this plugin have child plugins? Or can other plugins be placed inside this plugin?
-If set to True you are responsible to render the children in your plugin template.
+Can this plugin have child plugins? Or can other plugins be placed inside this
+plugin? If set to True you are responsible to render the children in your
+plugin template.
 
 Please use something like this or something similar::
 
@@ -698,7 +707,8 @@ child_classes
 
 Default: `None`
 
-A List of Plugin Class Names. If this is set, only plugins listed here can be added to this plugin.
+A List of Plugin Class Names. If this is set, only plugins listed here can be
+added to this plugin.
 
 See also: `parent_classes`_
 
@@ -893,8 +903,7 @@ successfully, and False otherwise.
 
 set_translatable_content takes 1 argument:
 
-* ``fields``: A dictionary containing the field names and translated content
-              for each.
+* ``fields``: A dictionary containing the field names and translated content for each.
 
 Example::
 
