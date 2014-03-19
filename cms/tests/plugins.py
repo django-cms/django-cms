@@ -606,8 +606,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.client.logout()
         response = self.client.get(page.get_absolute_url())
         self.assertTrue(
-            'https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true' in response.content.decode('utf8'),
-            response.content)
+            'https://maps-api-ssl.google.com/maps/api/js?v=3&amp;sensor=true' in response.content.decode('utf8'))
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = api.create_page('page to inherit from',
