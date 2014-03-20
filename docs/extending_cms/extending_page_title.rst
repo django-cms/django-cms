@@ -13,17 +13,18 @@ respectively.
 How To
 ******
 
-To add a field to the page model, subclass a class that inherits from
-``cms.extensions.PageExtension``. Make sure to import the ``PageExtension``
-model from the given path. It isn't importable from ``cms.models``. Your class
-should live in one of your apps' ``models.py``. You are free to add any field
-you want but make sure you don't use a unique constraint on any of your added
-fields because uniqueness prevents the copy mechanism of the extension from
-working correctly. This means that you can't use one-to-one relations on the
-extension model. Finally, you'll need to register the model with the
-``extension_pool``.
+To add a field to the page model, create a class that inherits from
+``cms.extensions.PageExtension``. Make sure to import the
+``cms.extensions.PageExtension`` model. Your class should live in one of your
+apps' ``models.py`` (or module). Since ``PageExtension`` (and
+``TitleExtension``) inherit from ``django.db.models.Model``, you are free to
+add any field you want but make sure you don't use a unique constraint on any
+of your added fields because uniqueness prevents the copy mechanism of the
+extension from working correctly. This means that you can't use one-to-one
+relations on the extension model. Finally, you'll need to register the model
+with using ``extension_pool``.
 
-Here's an example::
+Here's a simple example which adds an ``icon`` field to the page::
 
     from django.db import models
 
@@ -40,7 +41,7 @@ Here's an example::
 Hooking the extension to the admin site
 =======================================
 
-To make your extension editable, you must first create an admin that
+To make your extension editable, you must first create an admin class that
 subclasses ``cms.extensions.PageExtensionAdmin``. This admin handles page
 permissions. If you want to use your own admin class, make sure to exclude the
 live versions of the extensions by using
@@ -71,7 +72,8 @@ level admin list.
 Note that the field that holds the relationship between the extension and a
 CMS Page is non-editable, so it will not appear in the admin views. This,
 unfortunately, leaves the operator without a means of "attaching" the page
-extention to the correct pages. The way address this is to use a CMSToolbar.
+extention to the correct pages. The way to address this is to use a
+CMSToolbar.
 
 
 Adding a Toolbar Menu Item for your Page extension
@@ -130,7 +132,7 @@ a menu entry for the extension on each page::
 
 
 Now when the operator invokes "Edit this page..." from the toolbar, there will
-be an additional menu item ``Page Icon...`` (in this case), which can be used
+be an additional menu item ``Page Icon ...`` (in this case), which can be used
 to open a modal dialog where the operator can affect the new ``icon`` field.
 
 Note that when the extension is saved, the corresponding page is marked as
@@ -156,10 +158,13 @@ Using extensions in templates
 =============================
 
 To access a page extension in page templates you can simply access the
-related_name property that is now available on the Page object.
+approriate related_name field that is now available on the Page object.
 
-Assuming your Page Extension model class is named like the examples above
-(``IconExtension``)you can use something like::
+As per normal Django defaul related_name naming mechanism, the appropriate
+field to access is the same as your PageExtension model name, but lowercased.
+Assuming your Page Extension model class is ``IconExtension``, the
+relationship to the page extension will be available on
+``page.iconextension``, so you can use something like::
 
     {% load staticfiles %}
 
@@ -168,6 +173,9 @@ Assuming your Page Extension model class is named like the examples above
     {% if request.current_page.iconextension %}
         <img src="{% static request.current_page.iconextension.url %}">
     {% endif %}
+
+Where ``request.current_page`` is the way to access the current page that is
+rendering the template.
 
 It is important to remember that unless the operator has already assigned a
 page extension to every page, a page may not have the iconextension
