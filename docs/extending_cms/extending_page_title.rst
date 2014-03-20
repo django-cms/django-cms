@@ -23,7 +23,7 @@ working correctly. This means that you can't use one-to-one relations on the
 extension model. Finally, you'll need to register the model with the
 ``extension_pool``.
 
-Here's a complete example::
+Here's an example::
 
     from django.db import models
 
@@ -36,18 +36,46 @@ Here's a complete example::
 
     extension_pool.register(IconExtension)
 
-***************************************
+
 Hooking the extension to the admin site
-***************************************
+=======================================
 
-To make your extension editable, create an admin that subclasses
-``cms.extensions.PageExtensionAdmin``. This admin handles page permissions. If
-you want to use your own admin class, make sure to exclude the live versions of
-the extensions by using ``filter(extended_page__publisher_is_draft=True)`` on
-the queryset.
+To make your extension editable, you must first create an admin that
+subclasses ``cms.extensions.PageExtensionAdmin``. This admin handles page
+permissions. If you want to use your own admin class, make sure to exclude the
+live versions of the extensions by using
+``filter(extended_page__publisher_is_draft=True)`` on the queryset.
 
-If you save an extension, the corresponding page is marked as having
-unpublished changes. To see your extension live make sure to publish the page.
+Continuing with the example model above, here's a simple corresponding
+``PageExtensionAdmin`` class::
+
+    from django.contrib import admin
+    from cms.extensions import PageExtensionAdmin
+
+    from .models import IconExtension
+
+
+    class IconExtensionAdmin(PageExtensionAdmin):
+        pass
+
+    admin.site.register(IconExtension, IconExtensionAdmin)
+
+
+Since PageExtensionAdmin inherits from ModelAdmin, you'll be able to use the
+normal set of Django ModelAdmin properties, as appropriate to your
+circumstance.
+
+Once you've registered your admin class, a new model will appear in the top-
+level admin list.
+
+Note that the field that holds the relationship between the extension and a
+CMS Page is non-editable, so it will not appear in the admin views. This,
+unfortunately, leaves the operator without a means of "attaching" the page
+extention to the correct pages. The way address this is to use a CMSToolbar.
+
+
+Adding a Toolbar Menu Item for your Page extension
+==================================================
 
 You'll also want to make your model editable from the cms toolbar in order to
 associate each instance of the extension model with a page. (Page isn't an
@@ -100,9 +128,18 @@ a menu entry for the extension on each page::
                     current_page_menu = self.toolbar.get_or_create_menu('page')
                     current_page_menu.add_modal_item(_('Page Icon'), url=url, disabled=not_edit_mode)
 
-***************************
+
+Now when the operator invokes "Edit this page..." from the toolbar, there will
+be an additional menu item ``Page Icon...`` (in this case), which can be used
+to open a modal dialog where the operator can affect the new ``icon`` field.
+
+Note that when the extension is saved, the corresponding page is marked as
+having unpublished changes. To see the new extension values make sure to
+publish the page.
+
+
 Using extensions with menus
-***************************
+===========================
 
 If you want the extension to show up in the menu (e.g. if you had created an
 extension that added an icon to the page) use menu modifiers. Every ``node.id``
@@ -113,3 +150,26 @@ e.g. ``extension = page.yourextensionlowercased``. Now you can hook this
 extension by storing it on the node: ``node.extension = extension``. In the
 menu template you can access your icon on the child object:
 ``child.extension.icon``.
+
+
+Using extensions in templates
+=============================
+
+To access a page extension in page templates you can simply access the
+related_name property that is now available on the Page object.
+
+Assuming your Page Extension model class is named like the examples above
+(``IconExtension``)you can use something like::
+
+    {% load staticfiles %}
+
+    {# rest of template omitted ... #}
+
+    {% if request.current_page.iconextension %}
+        <img src="{% static request.current_page.iconextension.url %}">
+    {% endif %}
+
+It is important to remember that unless the operator has already assigned a
+page extension to every page, a page may not have the iconextension
+relationship available, hence the use of the ``{% if ... %}...{% endif %}``
+above.
