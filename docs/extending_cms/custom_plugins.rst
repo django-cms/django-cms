@@ -633,7 +633,7 @@ achieve this functionality:
 CMSPluginBase Attributes and Methods Reference
 **********************************************
 
-These are a list of attrbibutes and methods that can (or should) be overridden
+These are a list of attributes and methods that can (or should) be overridden
 on your Plugin definition.
 
 Attributes
@@ -780,7 +780,7 @@ _______________
 Default: ``None``
 
 The path to the template used to render the template. This is required if
-`render_plugin` is ``True``.
+``render_plugin`` is ``True``.
 
 See also: `render_plugin`_
 
@@ -865,7 +865,7 @@ See also: `text_enabled`_, `icon_src`_
 CMSPlugin Attributes and Methods Reference
 ******************************************
 
-These are a list of attrbibutes and methods that can (or should) be overridden
+These are a list of attributes and methods that can (or should) be overridden
 on your plugin's `model` definition.
 
 See also: `Storing Configuration`_
@@ -878,10 +878,9 @@ Attributes
 translatable_content_excluded_fields
 ------------------------------------
 
-Default: ``[]``
+Default: ``[ ]``
 
-A list of plugin fields which will not be exported while using
-:meth:`get_translatable_content`.
+A list of plugin fields which will not be exported while using :meth:`get_translatable_content`.
 
 See also: `get_translatable_content`_, `set_translatable_content`_
 
@@ -930,8 +929,7 @@ children plugins after the original parent has been copied.
 ``post_copy`` takes 2 arguments:
 
 * ``old_instance``: The old plugin instance instance
-* ``new_old_ziplist``: A list of tuples containing new copies and the old
-                       existing child plugins.
+* ``new_old_ziplist``: A list of tuples containing new copies and the old existing child plugins.
 
 See also: `Handling Relations`_, `copy_relations`_
 
@@ -945,8 +943,7 @@ written successfully, and ``False`` otherwise.
 
 set_translatable_content takes 1 argument:
 
-* ``fields``: A dictionary containing the field names and translated content
-              for each.
+* ``fields``: A dictionary containing the field names and translated content for each.
 
 Example::
 
