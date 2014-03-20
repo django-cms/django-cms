@@ -138,7 +138,7 @@ class ApphooksTestCase(CMSTestCase):
             with force_language("en"):
                 response = self.client.get(self.get_pages_root())
             self.assertTemplateUsed(response, 'sampleapp/home.html')
-            self.assertContains(response, '< --- empty --->')
+            self.assertContains(response, '<--noplaceholder-->')
             response = self.client.get('/en/blankapp/')
             self.assertTemplateUsed(response, 'nav_playground.html')
 
