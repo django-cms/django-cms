@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
 from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
 from cms.compat_forms import UserCreationForm
@@ -147,13 +146,16 @@ class PageForm(forms.ModelForm):
                 title.save()
                 try:
                     is_valid_url(title.path, page)
-                except ValidationError:
-                    exc = sys.exc_info()[0]
+                except ValidationError as exc:
                     title.slug = oldslug
                     title.save()
                     if 'slug' in cleaned_data:
                         del cleaned_data['slug']
-                    self._errors['slug'] = ErrorList(exc.messages)
+                    if hasattr(exc, 'messages'):
+                        errors = exc.messages
+                    else:
+                        errors = [unicode(exc.message)]
+                    self._errors['slug'] = ErrorList(errors)
         return cleaned_data
 
     def clean_slug(self):
