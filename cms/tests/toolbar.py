@@ -957,7 +957,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         exm.char_2 = "deux"
         exm.save()
 
-        request = self.get_page_request(page, user, edit=True)
+        request = self.get_page_request(page, user, edit=True, lang_code="en")
         response = detail_view_multi(request, exm.pk)
         self.assertContains(
             response,

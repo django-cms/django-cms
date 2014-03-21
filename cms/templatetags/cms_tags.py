@@ -690,10 +690,10 @@ class CMSEditableObject(InclusionTag):
         """
         request = context['request']
         if hasattr(request, 'toolbar'):
-            language = request.toolbar.toolbar_language
+            lang = request.toolbar.toolbar_language
         else:
-            language = get_language()
-        with force_language(language):
+            lang = get_language()
+        with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
                 instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
