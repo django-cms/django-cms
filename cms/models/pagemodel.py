@@ -151,6 +151,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return state == PUBLISHER_STATE_DIRTY or state == PUBLISHER_STATE_PENDING
 
     def get_absolute_url(self, language=None, fallback=True):
+        if not language:
+            language = get_language()
         if self.is_home:
             return reverse('pages-root')
         path = self.get_path(language, fallback) or self.get_slug(language, fallback)
@@ -490,12 +492,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return True
 
     def is_published(self, language, force_reload=False):
-        from cms.models import Title
-
-        try:
-            return self.get_title_obj(language, False, force_reload=force_reload).published
-        except Title.DoesNotExist:
-            return False
+        return self.get_title_obj(language, False, force_reload=force_reload).published
 
     def toggle_in_navigation(self, set_to=None):
         '''
@@ -518,11 +515,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return self.in_navigation
 
     def get_publisher_state(self, language, force_reload=False):
-        from cms.models import Title
-
         try:
             return self.get_title_obj(language, False, force_reload=force_reload).publisher_state
-        except (Title.DoesNotExist, AttributeError):
+        except AttributeError:
             return None
 
     def set_publisher_state(self, language, state, published=None):
@@ -621,10 +616,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     page.publisher_public.parent = page.parent.publisher_public
                     page.publisher_public.save()
                 if page.publisher_public.parent.is_published(language):
-                    from cms.models import Title
-                    try:
-                        public_title = Title.objects.get(page=page.publisher_public, language=language)
-                    except Title.DoesNotExist:
+                    from cms.models import Title, EmptyTitle
+                    public_title = Title.objects.get(page=page.publisher_public, language=language)
+                    if isinstance(public_title, EmptyTitle):
                         public_title = None
                     draft_title = Title.objects.get(page=page, language=language)
                     if public_title and not public_title.published:
@@ -750,8 +744,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
         """Helper function for accessing wanted / current title.
         If wanted title doesn't exists, EmptyTitle instance will be returned.
-        If fallback=False is used, titlemodels.Title.DoesNotExist will be raised
-        when a language does not exist.
         """
         language = self._get_title_cache(language, fallback, version_id, force_reload)
         if language in self.title_cache:
@@ -901,10 +893,17 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     if obj.__class__ == Title:
                         self.title_cache[obj.language] = obj
             else:
-                title = Title.objects.get_title(self, language, language_fallback=fallback)
-                if title:
+                titles = Title.objects.filter(page=self)
+                for title in titles:
                     self.title_cache[title.language] = title
-                    language = title.language
+                if language in self.title_cache:
+                    return language
+                else:
+                    if fallback:
+                        fallback_langs = i18n.get_fallback_languages(language)
+                        for lang in fallback_langs:
+                            if lang in self.title_cache:
+                                return lang
         return language
 
     def get_template(self):

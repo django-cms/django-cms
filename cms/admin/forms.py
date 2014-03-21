@@ -137,10 +137,7 @@ class PageForm(forms.ModelForm):
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
-            try:
-                title = page.get_title_obj(lang, fallback=False)
-            except titlemodels.Title.DoesNotExist:
-                title = None
+            title = page.get_title_obj(lang, fallback=False)
             if title and not isinstance(title, titlemodels.EmptyTitle) and slug:
                 oldslug = title.slug
                 title.slug = slug

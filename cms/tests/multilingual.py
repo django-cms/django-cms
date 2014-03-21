@@ -5,7 +5,7 @@ from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.compat import get_user_model
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
-from cms.models import Title
+from cms.models import Title, EmptyTitle
 from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -101,9 +101,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             
             # Ensure that the language version is not returned
             # since it does not exist
-            self.assertRaises(Title.DoesNotExist,
-                              page.get_title_obj,
-                              language=TESTLANG2, fallback=False)
+            self.assertTrue(isinstance(page.get_title_obj(language=TESTLANG2, fallback=False), EmptyTitle))
             
             # Now create it
             self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2),

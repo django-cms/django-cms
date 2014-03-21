@@ -12,7 +12,6 @@ from cms.models.permissionmodels import ACCESS_CHILDREN
 from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
 from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
@@ -194,10 +193,7 @@ def page_to_node(page, home, cut):
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
     # but otherwise, just request the title normally
     if not hasattr(page, 'title_cache') or lang in page.title_cache:
-        try:
-            app_name = page.get_application_urls(fallback=False)
-        except Title.DoesNotExist:
-            app_name = None
+        app_name = page.get_application_urls(fallback=False)
         if app_name: # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
             for menu in app.menus:

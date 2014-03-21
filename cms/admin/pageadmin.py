@@ -39,8 +39,7 @@ from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
                              PublicationDatesForm)
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
-from cms.models import Page, Title, CMSPlugin, PagePermission, EmptyTitle, GlobalPagePermission, \
-    titlemodels, StaticPlaceholder
+from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
@@ -274,11 +273,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             version_id = None
             if "history" in request.path or 'recover' in request.path:
                 version_id = request.path.split("/")[-2]
-            try:
-                title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
-                                              force_reload=True)
-            except titlemodels.Title.DoesNotExist:
-                title_obj = EmptyTitle(language)
+
+            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
+                                          force_reload=True)
             if 'site' in form.base_fields and form.base_fields['site'].initial is None:
                 form.base_fields['site'].initial = obj.site
             for name in [
@@ -787,7 +784,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         for title in new_titles:
             try:
                 is_valid_url(title.path, rev_page)
-            except ValidationError as exc:
+            except ValidationError:
                 for old_title in old_titles:
                     if old_title.language == title.language:
                         title.slug = old_title.slug
@@ -839,7 +836,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         for title in new_titles:
             try:
                 is_valid_url(title.path, rev_page)
-            except ValidationError as exc:
+            except ValidationError:
                 for old_title in old_titles:
                     if old_title.language == title.language:
                         title.slug = old_title.slug
