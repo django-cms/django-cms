@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from cms.api import copy_plugins_to_language
-from cms.models import Title, Page, StaticPlaceholder
+from cms.models import Page, StaticPlaceholder, EmptyTitle
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import get_language_list
 
@@ -42,9 +42,9 @@ class CopyLangCommand(BaseCommand):
         for page in Page.objects.on_site(site).drafts():
             # copy title
             if from_lang in page.get_languages():
-                try:
-                    title = page.get_title_obj(to_lang, fallback=False)
-                except Title.DoesNotExist:
+
+                title = page.get_title_obj(to_lang, fallback=False)
+                if isinstance(title, EmptyTitle):
                     title = page.get_title_obj(from_lang)
                     if verbose:
                         self.stdout.write('copying title %s from language %s\n' % (title.title, from_lang))

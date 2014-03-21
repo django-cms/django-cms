@@ -15,7 +15,7 @@ from django.utils.timezone import get_current_timezone_name
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
-from cms.models import Title, Page
+from cms.models import Page
 from cms.utils import get_template_from_request
 from cms.utils import get_language_from_request
 from cms.utils import get_cms_setting
@@ -143,10 +143,7 @@ def details(request, slug):
         # pointless
         # page = applications_page_check(request, page, slug)
         # Check for apphooks! This time for real!
-        try:
-            app_urls = page.get_application_urls(current_language, False)
-        except Title.DoesNotExist:
-            app_urls = []
+        app_urls = page.get_application_urls(current_language, False)
         skip_app = False
         if not page.is_published(current_language) and hasattr(request, 'toolbar') and request.toolbar.edit_mode:
             skip_app = True
