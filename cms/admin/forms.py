@@ -21,6 +21,7 @@ from django.db.models.fields import BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _, get_language
 from menus.menu_pool import menu_pool
 
@@ -154,7 +155,7 @@ class PageForm(forms.ModelForm):
                     if hasattr(exc, 'messages'):
                         errors = exc.messages
                     else:
-                        errors = [unicode(exc.message)]
+                        errors = [force_unicode(exc.message)]
                     self._errors['slug'] = ErrorList(errors)
         return cleaned_data
 

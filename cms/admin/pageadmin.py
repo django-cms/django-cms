@@ -795,7 +795,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         if hasattr(exc, 'messages'):
                             errors = exc.messages
                         else:
-                            errors = [unicode(exc.message)]
+                            errors = [force_unicode(exc.message)]
                         messages.error(request, " ".join(errors))
         return HttpResponse("ok")
 
