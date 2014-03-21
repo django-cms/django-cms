@@ -522,7 +522,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         try:
             return self.get_title_obj(language, False, force_reload=force_reload).publisher_state
-        except Title.DoesNotExist:
+        except (Title.DoesNotExist, AttributeError):
             return None
 
     def set_publisher_state(self, language, state, published=None):
