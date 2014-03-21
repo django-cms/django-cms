@@ -990,7 +990,6 @@ class StaticPlaceholderNode(Tag):
             if nodelist:
                 return nodelist.render(context)
             return ''
-            # TODO: caching?
         request = context.get('request', False)
         if not request:
             if nodelist:
@@ -1005,7 +1004,7 @@ class StaticPlaceholderNode(Tag):
         if not hasattr(request, 'static_placeholders'):
             request.static_placeholders = []
         request.static_placeholders.append(static_placeholder)
-        if request.toolbar.edit_mode:
+        if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
             placeholder = static_placeholder.draft
         else:
             placeholder = static_placeholder.public
