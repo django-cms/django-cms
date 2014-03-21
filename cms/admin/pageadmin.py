@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.page_resolver import is_valid_url
 from django.db.models import Q
 from functools import wraps
 import json
@@ -750,6 +751,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         import reversion
 
         page = get_object_or_404(Page, pk=object_id)
+        old_titles = list(page.title_set.all())
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
@@ -781,6 +783,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         rev_page.revision_id = previous_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
+        new_titles = rev_page.title_set.all()
+        for title in new_titles:
+            try:
+                is_valid_url(title.path, rev_page)
+            except ValidationError as exc:
+                for old_title in old_titles:
+                    if old_title.language == title.language:
+                        title.slug = old_title.slug
+                        title.save()
+                        messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
         return HttpResponse("ok")
 
     @require_POST
@@ -791,6 +803,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         import reversion
 
         page = get_object_or_404(Page, pk=object_id)
+        old_titles = list(page.title_set.all())
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
@@ -822,6 +835,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         rev_page.revision_id = next_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
+        new_titles = rev_page.title_set.all()
+        for title in new_titles:
+            try:
+                is_valid_url(title.path, rev_page)
+            except ValidationError as exc:
+                for old_title in old_titles:
+                    if old_title.language == title.language:
+                        title.slug = old_title.slug
+                        title.save()
+                        messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
         return HttpResponse("ok")
 
     @require_POST

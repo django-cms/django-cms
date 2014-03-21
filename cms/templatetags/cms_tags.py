@@ -342,7 +342,7 @@ class RenderPlugin(InclusionTag):
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
         page = request.current_page
-        if toolbar.edit_mode and (not page or page.has_change_permission(request)):
+        if toolbar and toolbar.edit_mode and (not page or page.has_change_permission(request)):
             edit = True
         if edit:
             from cms.middleware.toolbar import toolbar_plugin_processor
@@ -689,7 +689,11 @@ class CMSEditableObject(InclusionTag):
         Populate the contex with the requested attributes to trigger the changeform
         """
         request = context['request']
-        with force_language(request.toolbar.toolbar_language):
+        if hasattr(request, 'toolbar'):
+            lang = request.toolbar.toolbar_language
+        else:
+            lang = get_language()
+        with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
                 instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
@@ -990,7 +994,6 @@ class StaticPlaceholderNode(Tag):
             if nodelist:
                 return nodelist.render(context)
             return ''
-            # TODO: caching?
         request = context.get('request', False)
         if not request:
             if nodelist:
@@ -1005,7 +1008,7 @@ class StaticPlaceholderNode(Tag):
         if not hasattr(request, 'static_placeholders'):
             request.static_placeholders = []
         request.static_placeholders.append(static_placeholder)
-        if request.toolbar.edit_mode:
+        if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
             placeholder = static_placeholder.draft
         else:
             placeholder = static_placeholder.public
