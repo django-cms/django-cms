@@ -712,8 +712,8 @@ added to this plugin.
 See also: `parent_classes`_
 
 
-disable_child_plugin
---------------------
+disable_child_plugins
+---------------------
 
 Default: ``False``
 
