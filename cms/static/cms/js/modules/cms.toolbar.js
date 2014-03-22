@@ -352,7 +352,7 @@ $(document).ready(function () {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
 			// animate html
-			this.body.addClass('cms_toolbar-expanded').animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed);
+			this.body.addClass('cms-toolbar-expanded').animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed);
 			// set messages top to toolbar height
 			this.messages.css('top', 31);
 			// set new settings
@@ -367,7 +367,7 @@ $(document).ready(function () {
 			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideUp(speed);
 			// animate html
-			this.body.removeClass('cms_toolbar-expanded').animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
+			this.body.removeClass('cms-toolbar-expanded').animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
 			// set messages top to 0
 			this.messages.css('top', 0);
 			// set new settings
