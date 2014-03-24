@@ -92,7 +92,7 @@ INITIAL_COMMENT = "Initial version."
 
 class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     form = PageForm
-    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
+    search_fields = ('=id', 'title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"
     recover_form_template = "admin/cms/page/history/recover_header.html"
     add_general_fields = ['title', 'slug', 'language', 'template']
