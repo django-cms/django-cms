@@ -9,10 +9,10 @@ from django.contrib.sites.models import Site
 
 from cms.api import get_page_draft
 from cms.compat import user_model_label
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING, RIGHT
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.exceptions import LanguageError
 from cms.models import Title, Page
-from cms.toolbar.items import TemplateItem, ButtonList
+from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_objects
