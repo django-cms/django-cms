@@ -247,7 +247,8 @@ class PageToolbar(CMSToolbar):
             self.toolbar.add_item(TemplateItem("cms/toolbar/items/live_draft.html", extra_context={'request': self.request},
                                            side=self.toolbar.RIGHT), len(self.toolbar.right_items))
         else:
-            self.toolbar.add_item(TextItem(text="Editing Live", side=self.toolbar.RIGHT))
+            self.toolbar.add_item(TemplateItem("cms/toolbar/items/editing_done.html", extra_context={'request': self.request},
+                                           side=self.toolbar.RIGHT), len(self.toolbar.right_items))
 
     def change_language_menu(self):
         language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)

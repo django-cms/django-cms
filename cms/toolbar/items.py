@@ -265,25 +265,6 @@ class LinkItem(BaseItem):
             'extra_classes': self.extra_classes,
         }
 
-
-class TextItem(BaseItem):
-    template = "cms/toolbar/items/item_text.html"
-
-    def __init__(self, text, extra_classes=None, side=LEFT):
-        super(LinkItem, self).__init__(side)
-        self.text = text
-        self.extra_classes = extra_classes or []
-
-    def __repr__(self):
-        return '<TextItem:%s>' % force_unicode(self.text)
-
-    def get_context(self):
-        return {
-            'text': self.text,
-            'extra_classes': self.extra_classes,
-        }
-
-
 class SideframeItem(BaseItem):
     template = "cms/toolbar/items/item_sideframe.html"
 

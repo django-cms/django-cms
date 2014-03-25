@@ -557,11 +557,6 @@ cms.toolbar.items
     Same as :class:`Menu` but without the :meth:`Menu.get_or_create_menu` method.
 
 
-.. class:: LinkItem(name, url, active=False, disabled=False, extra_classes=None, side=LEFT)
-
-    Simple link item.
-
-
 .. class:: TextItem(text, extra_classes=None, side=LEFT)
     
     An item that simply displays text.
