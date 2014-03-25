@@ -562,6 +562,11 @@ cms.toolbar.items
     Simple link item.
 
 
+.. class:: TextItem(text, extra_classes=None, side=LEFT)
+    
+    An item that simply displays text.
+
+
 .. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT)
 
     Item that opens ``url`` in side frame.
