@@ -73,7 +73,7 @@ $(document).ready(function () {
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
 
 			// show edit mode
-			modes.eq(0).bind(this.click, function (e) {
+			modes.eq(1).bind(this.click, function (e) {
 				e.preventDefault();
 				// cancel if already active
 				if(that.settings.mode === 'edit') return false;
@@ -81,7 +81,7 @@ $(document).ready(function () {
 				that.hide();
 			});
 			// show structure mode
-			modes.eq(1).bind(this.click, function (e) {
+			modes.eq(0).bind(this.click, function (e) {
 				e.preventDefault();
 				// cancel if already active
 				if(that.settings.mode === 'structure') return false;
@@ -111,7 +111,7 @@ $(document).ready(function () {
 
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
-				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
+				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
 
 			// show clipboard
 			this.clipboard.css('opacity', 1).fadeIn(this.options.speed);
@@ -133,7 +133,7 @@ $(document).ready(function () {
 
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
-				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
+				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
 
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
