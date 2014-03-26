@@ -258,9 +258,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if 'page_type' in form.base_fields:
             if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj:
                 del form.base_fields['page_type']
-            else:
-                if not Page.objects.filter(parent__reverse_id=PAGE_TYPES_ID).count():
-                    del form.base_fields['page_type']
+            elif not Title.objects.filter(page__parent__reverse_id=PAGE_TYPES_ID, language=language).count():
+                del form.base_fields['page_type']
         if 'add_page_type' in request.GET:
             del form.base_fields['menu_title']
             del form.base_fields['meta_description']
@@ -368,6 +367,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context.update({
                 'title':  _("Add Page Copy"),
             })
+        else:
+            extra_context = self.update_language_tab_context(request, context=extra_context)
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
@@ -425,13 +426,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         })
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def _get_site_languages(self, obj):
+    def _get_site_languages(self, obj=None):
         site_id = None
         if obj:
             site_id = obj.site_id
+        else:
+            site_id = Site.objects.get_current().pk
         return get_language_tuple(site_id)
 
-    def update_language_tab_context(self, request, obj, context=None):
+    def update_language_tab_context(self, request, obj=None, context=None):
         if not context:
             context = {}
         language = get_language_from_request(request, obj)
