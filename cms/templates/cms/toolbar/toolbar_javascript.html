@@ -35,7 +35,8 @@ $(document).ready(function () {
 			'model': '{{ request.toolbar.get_object_model }}',
 			'page_id': '{% if request.current_page.publisher_is_draft %}{{ request.current_page.pk }}{% else %}{{ request.current_page.publisher_public_id }}{% endif %}',
 			'pk': '{{ request.toolbar.get_object_pk }}',
-			'url': '{% language request.toolbar.language %}{% url "admin:cms_page_resolve" %}{% endlanguage %}'
+			'url': '{% language request.toolbar.language %}{% url "admin:cms_page_resolve" %}{% endlanguage %}',
+			'tree': '{% language request.toolbar.language %}{% url "admin:cms_page_changelist" %}{% endlanguage %}'
 		},
 		'lang': {
 			'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}',
