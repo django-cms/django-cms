@@ -60,6 +60,9 @@ def save_permissions(data, obj):
 
 
 class PageForm(forms.ModelForm):
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
+                                 help_text=_('The current language of the content fields.'))
+    page_type = forms.ChoiceField(label=_("Page type"), required=False)
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
                             help_text=_('The default title'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
@@ -73,9 +76,6 @@ class PageForm(forms.ModelForm):
                                        widget=forms.Textarea(attrs={'maxlength': '155', 'rows': '4'}),
                                        help_text=_('A description of the page used by search engines.'),
                                        max_length=155)
-    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
-                                 help_text=_('The current language of the content fields.'))
-    page_type = forms.ChoiceField(label=_("Page type"), required=False)
 
     class Meta:
         model = Page
