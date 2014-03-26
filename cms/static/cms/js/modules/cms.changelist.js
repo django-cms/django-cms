@@ -19,17 +19,17 @@ $(document).ready(function () {
 
 			// load internal functions
 			if(!this.options.settings.filtered) {
-                this.setupFunctions();
-                this.setupTreePublishing();
-                this.setupUIHacks();
-                this.setupGlobals();
-                this.setupTree();
+				this.setupFunctions();
+				this.setupTreePublishing();
+				this.setupUIHacks();
+				this.setupGlobals();
+				this.setupTree();
 
-                // init tree component
-                initTree();
+				// init tree component
+				initTree();
 			} else {
-                // when filtered is active, prevent tree actions
-			    this.setupUIHacks();
+				// when filtered is active, prevent tree actions
+				this.setupUIHacks();
 			}
 		},
 
