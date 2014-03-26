@@ -18,14 +18,19 @@ $(document).ready(function () {
 			this.options = $.extend(true, {}, this.options, options);
 
 			// load internal functions
-			this.setupFunctions();
-			this.setupTreePublishing();
-			this.setupUIHacks();
-			this.setupGlobals();
-			this.setupTree();
+			if(!this.options.settings.filtered) {
+                this.setupFunctions();
+                this.setupTreePublishing();
+                this.setupUIHacks();
+                this.setupGlobals();
+                this.setupTree();
 
-			// init tree component
-			initTree();
+                // init tree component
+                initTree();
+			} else {
+                // when filtered is active, prevent tree actions
+			    this.setupUIHacks();
+			}
 		},
 
 		setupFunctions: function () {
@@ -175,6 +180,7 @@ $(document).ready(function () {
 
 				// publish page and update
 				window.location.href = $(this).attr('href');
+				console.log($(this).attr('href'));
 			});
 		},
 
