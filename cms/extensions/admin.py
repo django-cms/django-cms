@@ -7,7 +7,8 @@ from django.http import HttpResponseRedirect
 
 
 class ExtensionAdmin(admin.ModelAdmin):
-    pass
+    change_form_template = "admin/cms/extensions/change_form.html"
+    add_form_template = "admin/cms/extensions/change_form.html"
 
 
 class PageExtensionAdmin(ExtensionAdmin):
