@@ -343,8 +343,10 @@ $(document).ready(function () {
 			});
 		},
 
-		showError: function (msg) {
+		showError: function (msg, reload) {
 			this.openMessage(msg, 'center', this.options.messageDelay, true);
+            // force reload if param is passed
+			if(reload) CMS.API.Helpers.reloadBrowser(false, this.options.messageDelay);
 		},
 
 		// private methods
