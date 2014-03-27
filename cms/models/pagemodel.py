@@ -198,7 +198,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             cms_signals.page_moved.send(sender=Page, instance=public_page)
             public_page.save()
             page_utils.check_title_slugs(public_page)
-
         from cms.views import invalidate_cms_page_cache
         invalidate_cms_page_cache()
 
