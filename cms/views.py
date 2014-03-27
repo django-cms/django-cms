@@ -9,6 +9,7 @@ from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
 from django.template.response import TemplateResponse
+from django.utils.cache import add_never_cache_headers
 from django.utils.encoding import iri_to_uri, force_text
 from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
@@ -230,7 +231,8 @@ def _cache_page(response):
     if request.user.is_authenticated():
         save_cache = False
     if not save_cache:
-        response
+        add_never_cache_headers(response)
+        return response
     if save_cache:
         version = _get_cache_version()
         ttl = get_cms_setting('CACHE_DURATIONS')['content']
