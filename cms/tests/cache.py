@@ -7,6 +7,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
+from cms.utils import get_cms_setting
 from django.core.cache import cache
 from django.db import connection
 from django.template import Template, RequestContext
@@ -61,12 +62,11 @@ class CacheTestCase(CMSTestCase):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(7, 11)):
                 self.client.get('/en/')
-            with SettingsOverride(CMS_PLACEHOLDER_CACHE=False):
-                with self.assertNumQueries(FuzzyInt(9, 13)):
-                    self.client.get('/en/')
+        with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
+            with self.assertNumQueries(FuzzyInt(9, 13)):
+                self.client.get('/en/')
 
     def test_no_cache_plugin(self):
-        template = Template("{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}")
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
 
@@ -119,7 +119,6 @@ class CacheTestCase(CMSTestCase):
 
         plugin_pool.unregister_plugin(NoCachePlugin)
 
-
     def test_cache_page(self):
         from cms.views import _get_cache_version
         from cms.utils import get_cms_setting
@@ -136,7 +135,7 @@ class CacheTestCase(CMSTestCase):
         ]
         mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
-        with SettingsOverride(MIDDLEWARE_CLASSES = mw_classes):
+        with SettingsOverride(MIDDLEWARE_CLASSES=mw_classes):
 
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
@@ -189,7 +188,52 @@ class CacheTestCase(CMSTestCase):
             # set to False (disabled)
             #
             cache.clear()
-            settings.CMS_PAGE_CACHE = False
+            with SettingsOverride(CMS_PAGE_CACHE=False):
+
+
+                # Test that the page is initially uncached
+                with self.assertNumQueries(FuzzyInt(1, 20)):
+                    response = self.client.get('/en/')
+                self.assertEqual(response.status_code, 200)
+
+                #
+                # Test that subsequent requests of the same page are still requires DB
+                # access.
+                #
+                with self.assertNumQueries(FuzzyInt(1, 20)):
+                    response = self.client.get('/en/')
+                self.assertEqual(response.status_code, 200)
+
+    def test_invalidate_restart(self):
+        # Clear the entire cache for a clean slate
+        cache.clear()
+
+        # Ensure that we're testing in an environment WITHOUT the MW cache...
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware'
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        with SettingsOverride(MIDDLEWARE_CLASSES=mw_classes):
+
+            # Silly to do these tests if this setting isn't True
+            page_cache_setting = get_cms_setting('PAGE_CACHE')
+            self.assertTrue(page_cache_setting)
+
+            # Create a test page
+            page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+
+            # Add some content
+            placeholder = page1.placeholders.filter(slot="body")[0]
+            add_plugin(placeholder, "TextPlugin", 'en', body="English")
+            add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
+
+            # Create a request object
+            request = self.get_request(page1.get_path(), 'en')
+
+            # Ensure that user is NOT authenticated
+            self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
             with self.assertNumQueries(FuzzyInt(1, 20)):
@@ -197,12 +241,20 @@ class CacheTestCase(CMSTestCase):
             self.assertEqual(response.status_code, 200)
 
             #
-            # Test that subsequent requests of the same page are still requires DB
-            # access.
+            # Test that subsequent requests of the same page are cached by
+            # asserting that they require fewer queries.
             #
-            with self.assertNumQueries(FuzzyInt(1, 20)):
+            with self.assertNumQueries(0):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
+            old_plugins = plugin_pool.plugins
+            plugin_pool.clear()
+            plugin_pool.discover_plugins()
+            plugin_pool.plugins = old_plugins
+            with self.assertNumQueries(FuzzyInt(1, 20)):
+                response = self.client.get('/en/')
+                self.assertEqual(response.status_code, 200)
+
 
     def test_sekizai_plugin(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
