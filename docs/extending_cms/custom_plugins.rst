@@ -682,6 +682,9 @@ Default: :setting:`CMS_PLUGIN_CACHE`
 Is this plugin cacheable? If your plugin displays content based on the user or
 request or other dynamic properties set this to False.
 
+.. warning::
+    If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
+
 
 change_form_template
 --------------------
