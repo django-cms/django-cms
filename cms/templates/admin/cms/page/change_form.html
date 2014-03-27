@@ -13,12 +13,6 @@
 <script src="{% static "cms/js/modules/cms.changeform.js" %}"></script>
 {% endblock %}
 
-{% block breadcrumbs %}
-{% with has_change_permission=can_change %}
-	{{ block.super }}
-{% endwith %}
-{% endblock %}
-
 {% block content %}
 <div id="content-main">
 

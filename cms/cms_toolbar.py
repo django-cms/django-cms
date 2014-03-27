@@ -76,10 +76,10 @@ class PlaceholderToolbar(CMSToolbar):
     def add_structure_mode(self):
         switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                 extra_classes=['cms_toolbar-item-cms-mode-switcher'])
-        switcher.add_button(_("Content"), '?edit', active=not self.toolbar.build_mode,
-                            disabled=self.toolbar.build_mode)
         switcher.add_button(_("Structure"), '?build', active=self.toolbar.build_mode,
                             disabled=not self.toolbar.build_mode)
+        switcher.add_button(_("Content"), '?edit', active=not self.toolbar.build_mode,
+                            disabled=self.toolbar.build_mode)
 
 
 @toolbar_pool.register
@@ -224,6 +224,13 @@ class PageToolbar(CMSToolbar):
                     if static_placeholder.has_change_permission(self.request):
                         self.add_draft_live()
                         break
+            if not self.title:
+                self.toolbar.add_modal_button(
+                    _("Page settings"),
+                    "%s?language=%s" % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language),
+                    side=self.toolbar.RIGHT,
+                    extra_classes=["cms_btn-action"],
+                )
         else:
             added = False
             if statics:
@@ -397,14 +404,6 @@ class PageToolbar(CMSToolbar):
 
         current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
                                          disabled=not_edit_mode)
-
-        if not self.title:
-            self.toolbar.add_modal_button(
-                _("Page settings"),
-                "%s?language=%s" % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language),
-                side=self.toolbar.RIGHT,
-                extra_classes=["cms_btn-action"],
-            )
         current_page_menu.add_break(PAGE_MENU_LAST_BREAK)
         current_page_menu.add_modal_item(
             _("Save as Page Type"),
@@ -414,7 +413,6 @@ class PageToolbar(CMSToolbar):
                 self.toolbar.language),
             disabled=not_edit_mode
         )
-
 
     def add_history_menu(self):
         # history menu

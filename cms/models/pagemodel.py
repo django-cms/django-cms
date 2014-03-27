@@ -609,15 +609,16 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # become published.
         publish_set = self.get_descendants().filter(title_set__published=True,
                                                     title_set__language=language).select_related('publisher_public')
+        from cms.models import Title
         for page in publish_set:
-            if page.publisher_public:
+            if page.publisher_public_id:
                 if not page.publisher_public.parent_id:
                     page.publisher_public.parent = page.parent.publisher_public
                     page.publisher_public.save()
                 if page.publisher_public.parent.is_published(language):
-                    from cms.models import Title, EmptyTitle
-                    public_title = Title.objects.get(page=page.publisher_public, language=language)
-                    if isinstance(public_title, EmptyTitle):
+                    try:
+                        public_title = Title.objects.get(page=page.publisher_public, language=language)
+                    except Title.DoesNotExist:
                         public_title = None
                     draft_title = Title.objects.get(page=page, language=language)
                     if public_title and not public_title.published:
