@@ -180,7 +180,6 @@ $(document).ready(function () {
 
 				// publish page and update
 				window.location.href = $(this).attr('href');
-				console.log($(this).attr('href'));
 			});
 		},
 
