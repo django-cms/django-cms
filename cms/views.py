@@ -233,7 +233,7 @@ def _cache_page(response):
     if not save_cache:
         add_never_cache_headers(response)
         return response
-    if save_cache:
+    else:
         version = _get_cache_version()
         ttl = get_cms_setting('CACHE_DURATIONS')['content']
 
