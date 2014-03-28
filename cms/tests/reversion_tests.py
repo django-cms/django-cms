@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 import reversion
 from reversion.models import Revision, Version
 
-from cms.models import Page, Title
+from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
@@ -123,6 +123,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(Title.objects.all().count(), 2)
             self.assertEqual(CMSPlugin.objects.all().count(), 2)
             self.assertEqual(Revision.objects.all().count(), 5)
+            self.assertEqual(Placeholder.objects.count(), 5)
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
@@ -167,6 +168,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.client.post(undo_url)
             self.client.post(undo_url)
             self.assertEqual(2, CMSPlugin.objects.all().count())
+            self.assertEqual(Placeholder.objects.count(), 5)
 
     def test_undo_slug_collision(self):
         data1 = self.get_new_page_data()
