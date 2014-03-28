@@ -4,7 +4,7 @@ from cms.compat import get_user_model
 from cms.compat_forms import UserCreationForm
 from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget
-from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels, Title
+from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change
@@ -138,7 +138,7 @@ class PageForm(forms.ModelForm):
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
             title = page.get_title_obj(lang, fallback=False)
-            if title and not isinstance(title, titlemodels.EmptyTitle) and slug:
+            if title and not isinstance(title, EmptyTitle) and slug:
                 oldslug = title.slug
                 title.slug = slug
                 title.save()
