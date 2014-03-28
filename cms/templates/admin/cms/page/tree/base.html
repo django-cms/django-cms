@@ -44,11 +44,11 @@ $(document).ready(function () {
 	CMS.API.Helpers.csrf('{{ csrf_token }}');
 
 	// initialize tree
-	{% if not cl.is_filtered %}
 	new CMS.TreeManager({
 		'settings': {
 			'permission': {{ CMS_PERMISSION|js }},
-			'debug': {{ DEBUG|js }}
+			'debug': {{ DEBUG|js }},
+			'filtered': {% if cl.is_filtered %}true{% else %}false{% endif %}
 		},
 		'lang': {
 			'success': '{% trans "Successfully moved" %}',
@@ -57,7 +57,6 @@ $(document).ready(function () {
 			'publish': '{% trans "Are you sure you want to %s this page?" %}'
 		}
 	});
-	{% endif %}
 });
 })(CMS.$);
 </script>
@@ -106,7 +105,6 @@ $(document).ready(function () {
 
 {% block filters %}
 {% if cl.has_filters %}
-
 <a href="#" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
 <div id="changelist-filter" style="display:none;">
 <h2>{% trans 'Filter' %}</h2>

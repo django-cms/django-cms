@@ -249,7 +249,7 @@ $(document).ready(function () {
 					CMS.API.locked = false;
 					var msg = CMS.config.lang.error;
 					// trigger error
-					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+					that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			});
 		},
@@ -304,7 +304,7 @@ $(document).ready(function () {
 					CMS.API.locked = false;
 					var msg = CMS.config.lang.error;
 					// trigger error
-					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+					that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			};
 
@@ -353,7 +353,7 @@ $(document).ready(function () {
 						CMS.API.locked = false;
 						var msg = CMS.config.lang.error;
 						// trigger error
-						that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+					    that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
 					}
 				});
 			});
@@ -411,7 +411,7 @@ $(document).ready(function () {
 					CMS.API.locked = false;
 					var msg = CMS.config.lang.error;
 					// trigger error
-					that._showError(msg + jqXHR.status + ' ' + jqXHR.statusText);
+					that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
 				}
 			});
 
@@ -779,7 +779,7 @@ $(document).ready(function () {
 		},
 
 		_showError: function (msg) {
-			return CMS.API.Toolbar.showError(msg);
+			return CMS.API.Toolbar.showError(msg, true);
 		},
 
 		_showSuccess: function (el) {
