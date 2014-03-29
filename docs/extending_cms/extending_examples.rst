@@ -123,8 +123,10 @@ The Template
 
 You probably noticed the
 :attr:`render_template <cms.plugin_base.CMSPluginBase.render_template>`
-attribute in the above plugin class. In order for our plugin to work, that template must
-exist and is responsible for rendering the plugin. You should create a new file in your poll-app’s templates folder under ``polls`` called ``plugin.html``.
+attribute in the above plugin class. In order for our plugin to work, that
+template must exist and is responsible for rendering the plugin. You should
+create a new file in your poll-app’s templates folder under ``polls``
+called ``plugin.html``.
 
 
 The template should look something like this:
@@ -213,16 +215,22 @@ like this::
     )
 
 
-Now open your admin in your browser and edit a CMS Page. Open the 'Advanced
-Settings' tab and choose 'Polls App' for your 'Application'.
+Now open your Django Admin in your browser and navigate to the CMS app, then
+choose Pages. This should display the "page tree". From this page, create a
+page called "Polls". Save the page with the button: "Save and continue
+editing". Next, press "Advanced Settings" and choose "Poll App" in the drop-
+down menu labeled "Application". Finally, in the field named "Application
+instance name", enter "polls" and "Save".
+
 
 |apphooks|
 
 .. |apphooks| image:: ../images/cmsapphook.png
 
-Unfortunately, for these changes to take effect, you will have to restart
-your server. So do that and afterwards if you navigate to that CMS Page, you will see
-your polls application.
+Unfortunately, for these changes to take effect, you will have to restart your
+server (this is automatic when using runserver, but not other servers). So do
+that and afterwards if you navigate to that CMS Page, you will see your polls
+application.
 
 *************
 My First Menu
