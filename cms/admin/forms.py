@@ -243,13 +243,36 @@ class AdvancedSettingsForm(forms.ModelForm):
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
         apphook = cleaned_data.get('application_urls', None)
-        namespace = cleaned_data.get('application_namespace', None)
+        # The field 'application_namespace' is a misnomer. It should be
+        # 'instance_namespace'.
+        instance_namespace = cleaned_data.get('application_namespace', None)
         if apphook:
             apphook_pool.discover_apps()
-            if apphook_pool.apps[apphook].app_name and not namespace:
-                self._errors['application_urls'] = ErrorList(
-                    [_('You selected an apphook with an "app_name". You must enter a instance name.')])
-        if namespace and not apphook:
+            # The attribute on the apps 'app_name' is a misnomer, it should be
+            # 'application_namespace'.
+            application_namespace = apphook_pool.apps[apphook].app_name
+            if application_namespace and not instance_namespace:
+                if Page.objects.filter(
+                    publisher_is_draft=True,
+                    application_urls=apphook,
+                    application_namespace=application_namespace
+                ).exclude(pk=self.instance.pk).count():
+                    # Looks like there's already one with the default instance
+                    # namespace defined.
+                    self._errors['application_urls'] = ErrorList([
+                        _('''You selected an apphook with an "app_name".
+                            You must enter a unique instance name.''')
+                    ])
+                else:
+                    # OK, there are zero instances of THIS app that use the
+                    # default instance namespace, so, since the user didn't
+                    # provide one, we'll use the default. NOTE: The following
+                    # line is really setting the "instance namespace" of the
+                    # new app to the app’s "application namespace", which is
+                    # the default instance namespace.
+                    self.cleaned_data['application_namespace'] = application_namespace
+
+        if instance_namespace and not apphook:
             self._errors['application_namespace'] = ErrorList(
                 [_("If you enter an instance name you need an application url as well.")])
         return cleaned_data
