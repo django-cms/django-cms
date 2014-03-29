@@ -345,7 +345,8 @@ class PageToolbar(CMSToolbar):
                 active = self.page.template == path
                 if path == TEMPLATE_INHERITANCE_MAGIC:
                     templates_menu.add_break(TEMPLATE_MENU_BREAK)
-                templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active)
+                templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
+                                             on_success='REFRESH_PAGE')
         current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
 
         # advanced settings
