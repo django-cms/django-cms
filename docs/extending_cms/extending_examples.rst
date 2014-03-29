@@ -181,6 +181,7 @@ make your polls app look like this::
         urls.py
         views.py
 
+
 In this file, write::
 
     # -*- coding: utf-8 -*- 
@@ -198,6 +199,9 @@ In this file, write::
     apphook_pool.register(PollsApp) # register your app
     
 
+NOTE: If your polls module is not in the root of your project folder, then you
+may need to adjust the line above ``urls = ["polls.urls"]`` accordingly.
+
 Now remove the inclusion of the polls urls in your main ``urls.py`` so it looks
 like this::
 
@@ -214,6 +218,8 @@ like this::
         (r'^', include('cms.urls')),
     )
 
+
+Restart your server so that the PollsApp will now register.
 
 Now open your Django Admin in your browser and navigate to the CMS app, then
 choose Pages. This should display the "page tree". From this page, create a
@@ -289,7 +295,7 @@ In your ``menu.py`` write::
                 # argument.
                 node = NavigationNode(
                     poll.question,
-                    reverse('polls.views.detail', args=(poll.pk,)),
+                    reverse('polls:detail', args=(poll.pk,)),
                     poll.pk
                 )
                 nodes.append(node)
