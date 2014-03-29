@@ -2,22 +2,25 @@
 Extending the CMS: Examples
 ###########################
 
-From this point onwards, this tutorial assumes you have done the
-`Django Tutorial`_ and will show you how to integrate the tutorial's poll app into the
-django CMS. Hereafter, if a poll app is mentioned, we are referring to the one you get
-after completing the `Django Tutorial`_. 
-Also, make sure the poll app is in your :setting:`django:INSTALLED_APPS`.
+From this point onwards, this tutorial assumes you have done the `Django
+Tutorial`_ (for Django 1.6) and will show you how to integrate the tutorial's
+poll app into the django CMS. Hereafter, if a poll app is mentioned, we are
+referring to the one you get after completing the `Django Tutorial`_.  Also,
+make sure the poll app is in your :setting:`django:INSTALLED_APPS`.
 
 We assume your main ``urls.py`` looks something like this::
+
+    # -*- coding: utf-8 -*-
 
     from django.conf.urls import *
 
     from django.contrib import admin
+
     admin.autodiscover()
 
     urlpatterns = patterns('',
         (r'^admin/', include(admin.site.urls)),
-        (r'^polls/', include('polls.urls')),
+        (r'^polls/', include('polls.urls', namespace='polls')),
         (r'^', include('cms.urls')),
     )
 
@@ -35,10 +38,16 @@ poll and lets the user vote.
 
 In your poll application's ``models.py`` add the following::
 
+    # -*- coding: utf-8 -*-
+
     from django.db import models
+
     from cms.models import CMSPlugin
+
+    # existing Poll and Choice models...
+    ....
     
-    class PollPlugin(CMSPlugin):
+    class PollPluginModel(CMSPlugin):
         poll = models.ForeignKey('polls.Poll', related_name='plugins')
         
         def __unicode__(self):
@@ -63,11 +72,18 @@ in. After having followed the `Django Tutorial`_ and adding this file your polls
 app folder should look like this::
 
     polls/
+        templates/
+            polls/
+                detail.html
+                index.html
+                results.html
         __init__.py
+        admin.py
         cms_plugins.py
         models.py
         tests.py
-        views.py 
+        urls.py
+        views.py
 
 
 The plugin class is responsible for providing the django CMS with the necessary
@@ -75,15 +91,19 @@ information to render your Plugin.
 
 For our poll plugin, write the following plugin class::
 
+    # -*- coding: utf-8 -*-
+
+    from django.utils.translation import ugettext as _
+
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from polls.models import PollPlugin as PollPluginModel
-    from django.utils.translation import ugettext as _
+
+    from .models import PollPluginModel
     
     class PollPlugin(CMSPluginBase):
-        model = PollPluginModel # Model where data about this plugin is saved
-        name = _("Poll Plugin") # Name of the plugin
-        render_template = "polls/plugin.html" # template to render the plugin with
+        model = PollPluginModel                 # Model where data about this plugin is saved
+        name = _("Poll Plugin")                 # Name of the plugin
+        render_template = "polls/plugin.html"   # template to render the plugin with
     
         def render(self, context, instance, placeholder):
             context.update({'instance':instance})
@@ -104,7 +124,7 @@ The Template
 You probably noticed the
 :attr:`render_template <cms.plugin_base.CMSPluginBase.render_template>`
 attribute in the above plugin class. In order for our plugin to work, that template must
-exist and is responsible for rendering the plugin.
+exist and is responsible for rendering the plugin. You should create a new file in your poll-app’s templates folder under ``polls`` called ``plugin.html``.
 
 
 The template should look something like this:
@@ -113,7 +133,7 @@ The template should look something like this:
 
     <h1>{{ instance.poll.question }}</h1>
     
-    <form action="{% url polls.views.vote instance.poll.id %}" method="post">
+    <form action="{% url 'polls:vote' instance.poll.id %}" method="post">
     {% csrf_token %}
     {% for choice in instance.poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
@@ -133,8 +153,9 @@ My First App (apphook)
 **********************
 
 Right now, external apps are statically hooked into the main ``urls.py``. This
-is not the preferred approach in the django CMS. Ideally you attach your apps to CMS
-pages.
+is not the preferred approach in the django CMS. Ideally you attach your apps
+to CMS pages. This will allow the editors to move your page, and the attached
+application to different parts of the page tree, without breaking anything.
 
 For that purpose you write a :class:`CMSApp <cms.app_base.CMSApp>`. That is
 just a small class telling the CMS how to include that app.
@@ -143,35 +164,51 @@ CMS Apps live in a file called ``cms_app.py``, so go ahead and create it to
 make your polls app look like this::
 
     polls/
+        templates/
+            polls/
+                detail.html
+                index.html
+                plugin.html
+                results.html
         __init__.py
+        admin.py
         cms_app.py
         cms_plugins.py
         models.py
         tests.py
-        views.py 
+        urls.py
+        views.py
 
 In this file, write::
 
+    # -*- coding: utf-8 -*- 
+
+    from django.utils.translation import ugettext_lazy as _
+
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
-    from django.utils.translation import ugettext_lazy as _
     
     class PollsApp(CMSApp):
-        name = _("Poll App") # give your app a name, this is required
-        urls = ["polls.urls"] # link your app to url configuration(s)
+        name = _("Poll App")        # give your app a name, this is required
+        urls = ["polls.urls"]       # link your app to url configuration(s)
+        app_name = "polls"          # this is the application namespace
         
     apphook_pool.register(PollsApp) # register your app
     
+
 Now remove the inclusion of the polls urls in your main ``urls.py`` so it looks
 like this::
 
-    from django.conf.urls import *
+    # -*- coding: utf-8 -*- 
 
+    from django.conf.urls import *
     from django.contrib import admin
+
     admin.autodiscover()
 
     urlpatterns = patterns('',
         (r'^admin/', include(admin.site.urls)),
+        # delete the polls entry that was here, no longer needed!
         (r'^', include('cms.urls')),
     )
 
@@ -196,26 +233,38 @@ in the last step. So let's create a menu that shows a node for each poll you
 have active.
 
 For this we need a file called ``menu.py``. Create it and ensure your polls app
-looks like this::
+directory looks like this::
 
     polls/
+        templates/
+            polls/
+                detail.html
+                index.html
+                plugin.html
+                results.html
         __init__.py
+        admin.py
         cms_app.py
         cms_plugins.py
         menu.py
         models.py
         tests.py
+        urls.py
         views.py
 
 
 In your ``menu.py`` write::
 
+    # -*- coding: utf-8 -*-
+
+    from django.core.urlresolvers import reverse
+    from django.utils.translation import ugettext_lazy as _
+
     from cms.menu_bases import CMSAttachMenu
     from menus.base import Menu, NavigationNode
     from menus.menu_pool import menu_pool
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import ugettext_lazy as _
-    from polls.models import Poll
+
+    from .models import Poll
     
     class PollsMenu(CMSAttachMenu):
         name = _("Polls Menu") # give the menu a name, this is required.
@@ -237,6 +286,7 @@ In your ``menu.py`` write::
                 )
                 nodes.append(node)
             return nodes
+
     menu_pool.register_menu(PollsMenu) # register the menu.
 
 
@@ -245,20 +295,25 @@ Apphook first.
 
 So open your ``cms_app.py`` and write::
 
+    # -*- coding: utf-8 -*- 
+
+    from django.utils.translation import ugettext_lazy as _
+
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
-    from polls.menu import PollsMenu
-    from django.utils.translation import ugettext_lazy as _
-    
+
+    from .menu import PollsMenu
+
     class PollsApp(CMSApp):
-        name = _("Poll App")
-        urls = ["polls.urls"]
-        menus = [PollsMenu] # attach a CMSAttachMenu to this apphook.
+        name = _("Poll App")        # give your app a name, this is required
+        urls = ["polls.urls"]       # link your app to url configuration(s)
+        app_name = "polls"          # this is the application namespace
+        menus = [PollsMenu]         # attach a CMSAttachMenu to this apphook.
         
-    apphook_pool.register(PollsApp)
+    apphook_pool.register(PollsApp) # register your app
 
 
-.. _Django Tutorial: http://docs.djangoproject.com/en/1.2/intro/tutorial01/
+.. _Django Tutorial: http://docs.djangoproject.com/en/1.6/intro/tutorial01/
 
 .. _Python: http://www.python.org
 .. _Django: http://www.djangoproject.com
