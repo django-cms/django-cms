@@ -218,7 +218,7 @@ class AppHookSelect(Select):
     """
 
     class Media:
-        js = ('cms/js/modules/cms.app_hook_select.js', )
+        js = ('cms/js/modules/cms.base.js', 'cms/js/modules/cms.app_hook_select.js', )
 
     def __init__(self, attrs=None, choices=(), app_namespaces={}):
         self.app_namespaces = app_namespaces
