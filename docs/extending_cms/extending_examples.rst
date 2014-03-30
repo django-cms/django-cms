@@ -327,6 +327,11 @@ So open your ``cms_app.py`` and write::
     apphook_pool.register(PollsApp) # register your app
 
 
+Alternatively, you can attach it to any page directly using the "Attached
+Menu" field in the Advances Settings of the page’s admin. This is useful if
+you need to modify the menu independent of a CMS App.
+
+
 .. _Django Tutorial: http://docs.djangoproject.com/en/1.6/intro/tutorial01/
 
 .. _Python: http://www.python.org
