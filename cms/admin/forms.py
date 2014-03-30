@@ -191,6 +191,39 @@ class PublicationDatesForm(forms.ModelForm):
         fields = ['site', 'publication_date', 'publication_end_date']
 
 
+class SelectWithData(forms.Select):
+    def render_option(self, selected_choices, option_value, option_label, option_data=""):
+        from django.utils.safestring import mark_safe
+        from django.utils.encoding import force_text
+        from django.utils.html import format_html
+
+        if option_value is None:
+            option_value = ''
+        option_value = force_text(option_value)
+        if option_value in selected_choices:
+            selected_html = mark_safe(' selected="selected"')
+            if not self.allow_multiple_selected:
+                # Only allow for a single selection.
+                selected_choices.remove(option_value)
+        else:
+            selected_html = ''
+        return format_html('<option value="{0}"{1} data-namespace="{2}">{3}</option>',
+                           option_value,
+                           selected_html,
+                           option_data,
+                           force_text(option_label))
+
+    def render_options(self, choices, selected_choices):
+        from itertools import chain
+        from django.utils.encoding import force_text
+
+        selected_choices = set(force_text(v) for v in selected_choices)
+        output = []
+        for option_value, option_label, option_data in chain(self.choices, choices):
+            output.append(self.render_option(selected_choices, option_value, option_label, option_data))
+        return '\n'.join(output)
+
+
 class AdvancedSettingsForm(forms.ModelForm):
     from cms.forms.fields import PageSmartLinkField
     application_urls = forms.ChoiceField(label=_('Application'),
@@ -227,7 +260,8 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['navigation_extenders'].widget = forms.Select({},
                 [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
-            self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
+            self.fields['application_urls'].choices = [('', "---------"), ''] + apphook_pool.get_apphooks()
+            self.fields['application_urls'].widget = SelectWithData(attrs={'id':'application_urls'})
 
         if 'redirect' in self.fields:
             self.fields['redirect'].widget.language = self.fields['language'].initial
