@@ -221,8 +221,11 @@ class AppHookSelect(Select):
     class Media:
         js = ('cms/js/modules/cms.app_hook_select.js', )
 
-    def render_option(self, selected_choices, option_value, option_label, option_data=""):
+    def __init__(self, attrs=None, choices=(), app_namespaces={}):
+        self.app_namespaces = app_namespaces
+        super(AppHookSelect, self).__init__(attrs, choices)
 
+    def render_option(self, selected_choices, option_value, option_label):
         if option_value is None:
             option_value = ''
         option_value = force_text(option_value)
@@ -234,8 +237,8 @@ class AppHookSelect(Select):
         else:
             selected_html = ''
 
-        if option_data:
-            data_html = mark_safe(' data-namespace="%s"' % option_data)
+        if option_value in self.app_namespaces:
+            data_html = mark_safe(' data-namespace="%s"' % self.app_namespaces[option_value])
         else:
             data_html = ''
 
@@ -246,11 +249,10 @@ class AppHookSelect(Select):
                            force_text(option_label))
 
     def render_options(self, choices, selected_choices):
-
         selected_choices = set(force_text(v) for v in selected_choices)
         output = []
-        for option_value, option_label, option_data in chain(self.choices, choices):
-            output.append(self.render_option(selected_choices, option_value, option_label, option_data))
+        for option_value, option_label in chain(self.choices, choices):
+            output.append(self.render_option(selected_choices, option_value, option_label))
         return '\n'.join(output)
 
 
