@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 
+from itertools import chain
+
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.forms.widgets import Select, MultiWidget, TextInput
-from cms.utils.compat.dj import force_unicode
+from django.utils.encoding import force_text
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
+from cms.utils.compat.dj import force_unicode
 
 
 class PageSelectWidget(MultiWidget):
@@ -206,3 +210,47 @@ class UserSelectAdminWidget(Select):
             output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
     
+
+class AppHookSelect(Select):
+
+    """Special widget used for the App Hook selector in the Advanced Settings
+    of the Page Admin. It adds support for a data attribute per option and
+    includes supporting JS into the page.
+    """
+
+    class Media:
+        js = ('cms/js/modules/cms.app_hook_select.js', )
+
+    def render_option(self, selected_choices, option_value, option_label, option_data=""):
+
+        if option_value is None:
+            option_value = ''
+        option_value = force_text(option_value)
+        if option_value in selected_choices:
+            selected_html = mark_safe(' selected="selected"')
+            if not self.allow_multiple_selected:
+                # Only allow for a single selection.
+                selected_choices.remove(option_value)
+        else:
+            selected_html = ''
+
+        if option_data:
+            data_html = mark_safe(' data-namespace="%s"' % option_data)
+        else:
+            data_html = ''
+
+        return format_html('<option value="{0}"{1}{2}>{3}</option>',
+                           option_value,
+                           selected_html,
+                           data_html,
+                           force_text(option_label))
+
+    def render_options(self, choices, selected_choices):
+
+        selected_choices = set(force_text(v) for v in selected_choices)
+        output = []
+        for option_value, option_label, option_data in chain(self.choices, choices):
+            output.append(self.render_option(selected_choices, option_value, option_label, option_data))
+        return '\n'.join(output)
+
+

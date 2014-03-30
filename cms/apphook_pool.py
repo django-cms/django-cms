@@ -54,7 +54,7 @@ class ApphookPool(object):
         for app_class in self.apps.keys():
             app = self.apps[app_class]
             if app.urls:
-                hooks.append((app_class, app.name, self.apps[app_class].app_name))
+                hooks.append((app_class, app.name, self.apps[app_class].app_name if self.apps[app_class].app_name else ""))
             # Unfortunately, we lose the ordering since we now have a list of tuples. Let's reorder by app_name:
         hooks = sorted(hooks, key=lambda hook: hook[1])
         return hooks
