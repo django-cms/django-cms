@@ -227,8 +227,19 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['navigation_extenders'].widget = forms.Select({},
                 [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
-            self.fields['application_urls'].widget = AppHookSelect(attrs={'id':'application_urls'})
-            self.fields['application_urls'].choices = [('', "---------", '')] + apphook_pool.get_apphooks()
+            # Prepare a dict mapping the apps by class name ('PollApp') to
+            # their app_name attribute ('polls'), if any.
+            app_namespaces = {}
+            for app_class in apphook_pool.apps.keys():
+                app = apphook_pool.apps[app_class]
+                if app.app_name:
+                    app_namespaces[app_class] = app.app_name
+
+            self.fields['application_urls'].widget = AppHookSelect(
+                attrs={'id':'application_urls'},
+                app_namespaces=app_namespaces,
+            )
+            self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
 
         if 'redirect' in self.fields:
             self.fields['redirect'].widget.language = self.fields['language'].initial
@@ -274,8 +285,8 @@ class AdvancedSettingsForm(forms.ModelForm):
                     self.cleaned_data['application_namespace'] = application_namespace
 
         if instance_namespace and not apphook:
-            self._errors['application_namespace'] = ErrorList(
-                [_("If you enter an instance name you need an application url as well.")])
+            self.cleaned_data['application_namespace'] = None
+
         return cleaned_data
 
     def clean_application_namespace(self):
