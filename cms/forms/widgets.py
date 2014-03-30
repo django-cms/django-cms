@@ -6,7 +6,6 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.forms.widgets import Select, MultiWidget, TextInput
 from django.utils.encoding import force_text
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
@@ -242,11 +241,12 @@ class AppHookSelect(Select):
         else:
             data_html = ''
 
-        return format_html('<option value="{0}"{1}{2}>{3}</option>',
-                           option_value,
-                           selected_html,
-                           data_html,
-                           force_text(option_label))
+        return '<option value="%s"%s%s>%s</option>' % (
+            option_value,
+            selected_html,
+            data_html,
+            force_text(option_label),
+        )
 
     def render_options(self, choices, selected_choices):
         selected_choices = set(force_text(v) for v in selected_choices)
