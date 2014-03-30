@@ -39,6 +39,12 @@ $(document).ready(function () {
 
 		$app_ns_row.toggleClass('hidden', !$opt.data('namespace'));
 
+		// If we clear the app_hook, clear out the app_namespace too
+		if (!$this.val()) {
+			$app_ns.val('');
+			$app_ns.removeAttr('value');
+		}
+
 		// When we choose one that does NOT require a namespace, then make
 		// sure we reset to the previously set value, if any.
 		if (!$opt.data('namespace')){
