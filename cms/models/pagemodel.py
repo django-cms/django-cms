@@ -299,9 +299,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
-
-        page_copy = None
-
         pages = [self] + list(self.get_descendants().order_by('-rght'))
 
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
@@ -406,14 +403,10 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     ph.pk = None  # make a new instance
                     ph.save()
                     page.placeholders.add(ph)
-                    # update the page copy
-                    page_copy = page
                 if plugins:
                     copy_plugins_to(plugins, ph)
-
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return page_copy  # return the page_copy or None
 
     def save(self, no_signals=False, commit=True, **kwargs):
         """

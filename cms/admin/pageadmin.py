@@ -775,14 +775,28 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
-        plugins.delete()
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        for plugin in plugins:
+            plugin._no_reorder = True
+            plugin.delete()
+        # TODO: delete placeholders instead of finding duplicates for 3.1
+        #page.placeholders.all().delete()
 
         previous_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = previous_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
+        new_placeholders = rev_page.placeholders.all()
+        slots = {}
+        for new_ph in new_placeholders:
+            if not new_ph.slot in slots:
+                slots[new_ph.slot] = new_ph
+            else:
+                if new_ph in placeholder_ids:
+                    new_ph.delete()
+                elif slots[new_ph.slot] in placeholder_ids:
+                    slots[new_ph.slot].delete()
         new_titles = rev_page.title_set.all()
         for title in new_titles:
             try:
@@ -828,14 +842,27 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
-        plugins.delete()
-
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        for plugin in plugins:
+            plugin._no_reorder = True
+            plugin.delete()
+        # TODO: 3.1 remove the placeholder matching from below and just delete them
+        #page.placeholders.all().delete()
         next_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = next_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
+        new_placeholders = rev_page.placeholders.all()
+        slots = {}
+        for new_ph in new_placeholders:
+            if not new_ph.slot in slots:
+                slots[new_ph.slot] = new_ph
+            else:
+                if new_ph in placeholder_ids:
+                    new_ph.delete()
+                elif slots[new_ph.slot] in placeholder_ids:
+                    slots[new_ph.slot].delete()
         new_titles = rev_page.title_set.all()
         for title in new_titles:
             try:
