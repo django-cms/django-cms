@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.db import models
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.generic import GenericForeignKey
-from django.utils.translation import ugettext_lazy as _
+from django.conf import settings  # nopyflakes
+from django.db import models  # nopyflakes
+from django.core.exceptions import ValidationError  # nopyflakes
+from django.contrib.auth.models import Permission  # nopyflakes
+from django.contrib.contenttypes.models import ContentType # nopyflakes
+from django.contrib.contenttypes.generic import GenericForeignKey  # nopyflakes
+from django.utils.translation import ugettext_lazy as _  # nopyflakes
 
 
 class UserObjectPermissionManager(models.Manager):
