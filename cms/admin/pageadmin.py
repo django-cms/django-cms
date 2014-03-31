@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.utils.page_resolver import is_valid_url
 from django.db.models import Q
 from functools import wraps
 import json
@@ -748,6 +747,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
+        from cms.utils.page_resolver import is_valid_url
         import reversion
 
         page = get_object_or_404(Page, pk=object_id)
@@ -801,6 +801,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
         import reversion
+        from cms.utils.page_resolver import is_valid_url
 
         page = get_object_or_404(Page, pk=object_id)
         old_titles = list(page.title_set.all())
