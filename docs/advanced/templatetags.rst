@@ -102,12 +102,12 @@ Example::
 
 
 
-If you want to make your static placeholder to display on multiple sites (``django.contrib.sites``) you can add
-``global`` to the templatetag to achieve this.
+If you want to make your static placeholder site specific (``django.contrib.sites``) you can add
+``local`` to the templatetag to achieve this.
 
 Example::
 
-    {% static_placeholder "footer" global or %}There is no content.{% endstatic_placeholder %}
+    {% static_placeholder "footer" local or %}There is no content.{% endstatic_placeholder %}
 
 
 .. templatetag:: show_placeholder
