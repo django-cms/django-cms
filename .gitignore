@@ -39,3 +39,4 @@ man/
 share/
 echo .tox
 *.pyo
+*.egg
