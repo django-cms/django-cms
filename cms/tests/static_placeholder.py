@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import json
+
 from cms.api import add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.utils.compat.dj import force_unicode
 from django.contrib.admin.sites import site
+from django.core.urlresolvers import reverse
 from django.template.base import Template
 
 
@@ -21,7 +23,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
     def fill_placeholder(self, placeholder=None):
         if placeholder is None:
             placeholder = Placeholder(slot=u"some_slot")
-            placeholder.save() # a good idea, if not strictly necessary
+            placeholder.save()  # a good idea, if not strictly necessary
 
 
         # plugin in placeholder
@@ -66,6 +68,19 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             add_plugin(p, 'TextPlugin', 'en', body='test')
         rendered = t.render(self.get_context('/'))
         self.assertNotIn("No Content", rendered)
+        self.assertEqual(StaticPlaceholder.objects.filter(site_id__isnull=False, code='foobar').count(), 1)
+
+    def test_global(self):
+        self.assertObjectDoesNotExist(StaticPlaceholder.objects.all(), code='foobar')
+        self.assertObjectDoesNotExist(Placeholder.objects.all(), slot='foobar')
+        t = Template('{% load cms_tags %}{% static_placeholder "foobar" global or %}No Content{% endstatic_placeholder %}')
+        rendered = t.render(self.get_context('/'))
+        self.assertIn("No Content", rendered)
+        for p in Placeholder.objects.all():
+            add_plugin(p, 'TextPlugin', 'en', body='test')
+        rendered = t.render(self.get_context('/'))
+        self.assertNotIn("No Content", rendered)
+        self.assertEqual(StaticPlaceholder.objects.filter(site_id__isnull=True, code='foobar').count(), 1)
 
     def test_publish_stack(self):
         static_placeholder = StaticPlaceholder.objects.create(name='foo', code='bar', site_id=1)
@@ -140,4 +155,10 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             target = StaticPlaceholder.objects.get(pk=static_placeholder_target.pk)
             self.assertFalse(source.dirty)
             self.assertTrue(target.dirty)
+
+    def test_create_by_admin(self):
+        url = reverse("admin:cms_staticplaceholder_add")
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(url, data={'name': 'Name', 'code': 'content'})
+            self.assertEqual(response.status_code, 302)
 

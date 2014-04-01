@@ -99,6 +99,17 @@ Example::
 
 
 
+
+
+
+If you want to make your static placeholder to display on multiple sites sites (``django.contrib.sites``) you can add
+``global`` to the templatetag to achieve this.
+
+Example::
+
+    {% static_placeholder "footer" global or %}There is no content.{% endstatic_placeholder %}
+
+
 .. templatetag:: show_placeholder
 
 render_placeholder

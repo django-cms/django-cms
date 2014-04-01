@@ -1002,9 +1002,13 @@ class StaticPlaceholderNode(Tag):
         if isinstance(code, StaticPlaceholder):
             static_placeholder = code
         else:
-            site = Site.objects.get_current()
-            static_placeholder, __ = StaticPlaceholder.objects.get_or_create(code=code, site_id=site.pk, defaults={'name': code,
-                'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE})
+            if 'global' in extra_bits:
+                static_placeholder, __ = StaticPlaceholder.objects.get_or_create(code=code, site_id__isnull=True, defaults={'name': code,
+                    'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE})
+            else:
+                site = Site.objects.get_current()
+                static_placeholder, __ = StaticPlaceholder.objects.get_or_create(code=code, site_id=site.pk, defaults={'name': code,
+                    'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE})
         if not hasattr(request, 'static_placeholders'):
             request.static_placeholders = []
         request.static_placeholders.append(static_placeholder)
@@ -1015,8 +1019,6 @@ class StaticPlaceholderNode(Tag):
         placeholder.is_static = True
         content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
         return content
-
-
 register.tag(StaticPlaceholderNode)
 
 
