@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.db.models import Model  # nopyflakes
-from django.contrib.auth.models import Permission  # nopyflakes
-from django.contrib.contenttypes.models import ContentType  # nopyflakes
+from django.db.models import Model
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 
 class ObjectPermissionBackend(object):
@@ -26,8 +26,7 @@ class ObjectPermissionBackend(object):
         """
         from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
         ctype = ContentType.objects.get_for_model(obj)
-        related_name = UserObjectPermission \
-            .permission.field.related_query_name()  # @UndefinedVariable
+        related_name = UserObjectPermission.permission.field.related_query_name()
         user_filters = {
             '%s__user' % related_name: user_obj,
             '%s__content_type' % related_name: ctype,
