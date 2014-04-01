@@ -102,7 +102,7 @@ Example::
 
 
 
-If you want to make your static placeholder to display on multiple sites sites (``django.contrib.sites``) you can add
+If you want to make your static placeholder to display on multiple sites (``django.contrib.sites``) you can add
 ``global`` to the templatetag to achieve this.
 
 Example::
