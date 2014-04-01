@@ -26,6 +26,7 @@ from cms.utils.i18n import get_public_languages
 from cms.utils.i18n import get_redirect_on_fallback
 from cms.utils.i18n import get_language_list
 from cms.utils.i18n import is_language_prefix_patterns_used
+from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
 
 CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
@@ -71,7 +72,6 @@ def details(request, slug):
     # get the right model
     context = RequestContext(request)
     # Get a Page model object from the request
-    from cms.utils.page_resolver import get_page_from_request
     page = get_page_from_request(request, use_path=slug)
     if not page:
         return _handle_no_page(request, slug)
