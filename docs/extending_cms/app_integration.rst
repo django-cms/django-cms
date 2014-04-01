@@ -347,9 +347,12 @@ hook like this::
 
 
 .. note::
-    If you do that you will need to give the app a unique namespace in the advanced settings of the page.
-    You can then either reverse for the namespace(to target different apps) or the app_name (to target links inside the
-    same app).
+    If you do provide an ``app_label``, then you will need to also give the app
+    a unique namespace in the advanced settings of the page. If you do not, and
+    no other instance of the app exists using it, then the 'default instance
+    namespace' will be automatically set for you. You can then either reverse
+    for the namespace(to target different apps) or the app_name (to target
+    links inside the same app).
 
 If you use app namespace you will need to give all your view ``context`` a ``current_app``::
 

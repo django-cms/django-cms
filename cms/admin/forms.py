@@ -3,8 +3,8 @@ from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
 from cms.compat_forms import UserCreationForm
 from cms.constants import PAGE_TYPES_ID
-from cms.forms.widgets import UserSelectAdminWidget
-from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, titlemodels, Title
+from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect
+from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_list
 from cms.utils.mail import mail_page_user_change
@@ -60,6 +60,9 @@ def save_permissions(data, obj):
 
 
 class PageForm(forms.ModelForm):
+    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
+                                 help_text=_('The current language of the content fields.'))
+    page_type = forms.ChoiceField(label=_("Page type"), required=False)
     title = forms.CharField(label=_("Title"), widget=forms.TextInput(),
                             help_text=_('The default title'))
     slug = forms.CharField(label=_("Slug"), widget=forms.TextInput(),
@@ -73,9 +76,6 @@ class PageForm(forms.ModelForm):
                                        widget=forms.Textarea(attrs={'maxlength': '155', 'rows': '4'}),
                                        help_text=_('A description of the page used by search engines.'),
                                        max_length=155)
-    language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
-                                 help_text=_('The current language of the content fields.'))
-    page_type = forms.ChoiceField(label=_("Page type"), required=False)
 
     class Meta:
         model = Page
@@ -138,7 +138,7 @@ class PageForm(forms.ModelForm):
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
             title = page.get_title_obj(lang, fallback=False)
-            if title and not isinstance(title, titlemodels.EmptyTitle) and slug:
+            if title and not isinstance(title, EmptyTitle) and slug:
                 oldslug = title.slug
                 title.slug = slug
                 title.save()
@@ -227,6 +227,18 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['navigation_extenders'].widget = forms.Select({},
                 [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
+            # Prepare a dict mapping the apps by class name ('PollApp') to
+            # their app_name attribute ('polls'), if any.
+            app_namespaces = {}
+            for app_class in apphook_pool.apps.keys():
+                app = apphook_pool.apps[app_class]
+                if app.app_name:
+                    app_namespaces[app_class] = app.app_name
+
+            self.fields['application_urls'].widget = AppHookSelect(
+                attrs={'id':'application_urls'},
+                app_namespaces=app_namespaces,
+            )
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
 
         if 'redirect' in self.fields:
@@ -243,15 +255,38 @@ class AdvancedSettingsForm(forms.ModelForm):
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
         apphook = cleaned_data.get('application_urls', None)
-        namespace = cleaned_data.get('application_namespace', None)
+        # The field 'application_namespace' is a misnomer. It should be
+        # 'instance_namespace'.
+        instance_namespace = cleaned_data.get('application_namespace', None)
         if apphook:
             apphook_pool.discover_apps()
-            if apphook_pool.apps[apphook].app_name and not namespace:
-                self._errors['application_urls'] = ErrorList(
-                    [_('You selected an apphook with an "app_name". You must enter a instance name.')])
-        if namespace and not apphook:
-            self._errors['application_namespace'] = ErrorList(
-                [_("If you enter an instance name you need an application url as well.")])
+            # The attribute on the apps 'app_name' is a misnomer, it should be
+            # 'application_namespace'.
+            application_namespace = apphook_pool.apps[apphook].app_name
+            if application_namespace and not instance_namespace:
+                if Page.objects.filter(
+                    publisher_is_draft=True,
+                    application_urls=apphook,
+                    application_namespace=application_namespace
+                ).exclude(pk=self.instance.pk).count():
+                    # Looks like there's already one with the default instance
+                    # namespace defined.
+                    self._errors['application_urls'] = ErrorList([
+                        _('''You selected an apphook with an "app_name".
+                            You must enter a unique instance name.''')
+                    ])
+                else:
+                    # OK, there are zero instances of THIS app that use the
+                    # default instance namespace, so, since the user didn't
+                    # provide one, we'll use the default. NOTE: The following
+                    # line is really setting the "instance namespace" of the
+                    # new app to the app’s "application namespace", which is
+                    # the default instance namespace.
+                    self.cleaned_data['application_namespace'] = application_namespace
+
+        if instance_namespace and not apphook:
+            self.cleaned_data['application_namespace'] = None
+
         return cleaned_data
 
     def clean_application_namespace(self):
