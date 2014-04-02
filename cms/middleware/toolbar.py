@@ -2,7 +2,6 @@
 """
 Edit Toolbar middleware
 """
-from cms.plugin_pool import plugin_pool
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.i18n import force_language
 from django.contrib.admin.models import LogEntry
@@ -13,6 +12,7 @@ from cms.utils.placeholder import get_toolbar_plugin_struct
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
+    from cms.plugin_pool import plugin_pool
     original_context.push()
     child_plugin_classes = []
     plugin_class = instance.get_plugin_class()
