@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.views import invalidate_cms_page_cache
 import warnings
 
 from django.conf import settings
@@ -34,6 +33,7 @@ class PluginPool(object):
         if self.discovered:
             return
         self.discovered = True
+        from cms.views import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         load('cms_plugins')
 
