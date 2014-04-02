@@ -224,7 +224,7 @@ class PageToolbar(CMSToolbar):
                     if static_placeholder.has_change_permission(self.request):
                         self.add_draft_live()
                         break
-            if not self.title:
+            if not self.title and self.toolbar.edit_mode:
                 self.toolbar.add_modal_button(
                     _("Page settings"),
                     "%s?language=%s" % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language),
