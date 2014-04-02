@@ -353,7 +353,7 @@ $(document).ready(function () {
 						CMS.API.locked = false;
 						var msg = CMS.config.lang.error;
 						// trigger error
-					    that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+						that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
 					}
 				});
 			});
@@ -599,7 +599,7 @@ $(document).ready(function () {
 			});
 
 			// calculate subnav bounds
-			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10) {
+			if($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
 				dropdown.css('top', 'auto');
 				dropdown.css('bottom', offset);
 				// if parent is within a plugin, add additional offset
