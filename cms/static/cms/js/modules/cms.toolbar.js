@@ -330,10 +330,10 @@ $(document).ready(function () {
 						callback(that);
 						that._loader(false);
 					} else if(onSuccess) {
-						CMS.API.Helpers.reloadBrowser(onSuccess);
+						CMS.API.Helpers.reloadBrowser(onSuccess, false, true);
 					} else {
 						// reload
-						CMS.API.Helpers.reloadBrowser();
+						CMS.API.Helpers.reloadBrowser(false, false, true);
 					}
 				},
 				'error': function (jqXHR) {
