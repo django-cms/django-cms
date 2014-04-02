@@ -68,9 +68,9 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             add_plugin(p, 'TextPlugin', 'en', body='test')
         rendered = t.render(self.get_context('/'))
         self.assertNotIn("No Content", rendered)
-        self.assertEqual(StaticPlaceholder.objects.filter(site_id__isnull=False, code='foobar').count(), 1)
+        self.assertEqual(StaticPlaceholder.objects.filter(site_id__isnull=True, code='foobar').count(), 1)
 
-    def test_global(self):
+    def test_local(self):
         self.assertObjectDoesNotExist(StaticPlaceholder.objects.all(), code='foobar')
         self.assertObjectDoesNotExist(Placeholder.objects.all(), slot='foobar')
         t = Template('{% load cms_tags %}{% static_placeholder "foobar" local or %}No Content{% endstatic_placeholder %}')
@@ -80,7 +80,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             add_plugin(p, 'TextPlugin', 'en', body='test')
         rendered = t.render(self.get_context('/'))
         self.assertNotIn("No Content", rendered)
-        self.assertEqual(StaticPlaceholder.objects.filter(site_id__isnull=True, code='foobar').count(), 1)
+        self.assertEqual(StaticPlaceholder.objects.filter(site_id__isnull=False, code='foobar').count(), 1)
 
     def test_publish_stack(self):
         static_placeholder = StaticPlaceholder.objects.create(name='foo', code='bar', site_id=1)
