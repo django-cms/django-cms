@@ -92,7 +92,7 @@ $(document).ready(function () {
 			var language = 'language=' + CMS.config.request.language;
 			var page_id = 'page_id=' + CMS.config.request.page_id;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
-			// var initialized = false;
+			var initialized = false;
 
 			// push required params if defined
 			// only apply params on tree view
@@ -129,8 +129,8 @@ $(document).ready(function () {
 				});
 
 				// attach reload event
-				// if(initialized) that.reloadBrowser(false, false, true);
-				// initialized = true;
+				if(initialized) that.reloadBrowser(false, false, true);
+				initialized = true;
 			});
 
 			// cancel animation if sideframe is already shown
