@@ -99,6 +99,17 @@ Example::
 
 
 
+
+
+
+If you want to make your static placeholder site specific (``django.contrib.sites``) you can add
+``local`` to the templatetag to achieve this.
+
+Example::
+
+    {% static_placeholder "footer" local or %}There is no content.{% endstatic_placeholder %}
+
+
 .. templatetag:: show_placeholder
 
 render_placeholder
