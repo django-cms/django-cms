@@ -1002,7 +1002,7 @@ class StaticPlaceholderNode(Tag):
         if isinstance(code, StaticPlaceholder):
             static_placeholder = code
         else:
-            if 'local' in extra_bits:
+            if 'site' in extra_bits:
                 site = Site.objects.get_current()
                 static_placeholder, __ = StaticPlaceholder.objects.get_or_create(code=code, site_id=site.pk, defaults={'name': code,
                     'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE})
