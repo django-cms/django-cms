@@ -38,12 +38,29 @@ Should you be unable to find a suitable plugin for you needs, writing your own i
 
 More information on `our website <http://www.django-cms.org>`_. 
 
-*************
-Documentation
-*************
+******************
+Full Documentation
+******************
 
 Please head over to our `documentation <http://docs.django-cms.org/>`_ for all
 the details on how to install, extend and use the django CMS.
+
+********
+Tutorial
+********
+
+https://github.com/divio/django-cms-tutorial
+
+***********
+Quick Start
+***********
+
+    $ pip install --upgrade virtualenv
+    $ virtualenv env
+    $ source env/bin/activate
+    (env) $ pip install djangocms-installer
+    (env) $ djangocms -p . my_demo
+    (env) $ cd my_demo
 
 ************
 Getting Help
