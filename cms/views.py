@@ -9,13 +9,14 @@ from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
 from django.template.response import TemplateResponse
+from django.utils.cache import add_never_cache_headers
 from django.utils.encoding import iri_to_uri, force_text
 from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
-from cms.models import Title, Page
+from cms.models import Page
 from cms.utils import get_template_from_request
 from cms.utils import get_language_from_request
 from cms.utils import get_cms_setting
@@ -143,10 +144,7 @@ def details(request, slug):
         # pointless
         # page = applications_page_check(request, page, slug)
         # Check for apphooks! This time for real!
-        try:
-            app_urls = page.get_application_urls(current_language, False)
-        except Title.DoesNotExist:
-            app_urls = []
+        app_urls = page.get_application_urls(current_language, False)
         skip_app = False
         if not page.is_published(current_language) and hasattr(request, 'toolbar') and request.toolbar.edit_mode:
             skip_app = True
@@ -233,8 +231,9 @@ def _cache_page(response):
     if request.user.is_authenticated():
         save_cache = False
     if not save_cache:
-        response
-    if save_cache:
+        add_never_cache_headers(response)
+        return response
+    else:
         version = _get_cache_version()
         ttl = get_cms_setting('CACHE_DURATIONS')['content']
 

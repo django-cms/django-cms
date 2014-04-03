@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-06 13:45+0100\n"
-"PO-Revision-Date: 2014-03-06 12:45+0000\n"
+"POT-Creation-Date: 2014-04-03 11:35+0200\n"
+"PO-Revision-Date: 2014-04-03 11:23+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django-cms/language/tr/)\n"
 "MIME-Version: 1.0\n"
@@ -35,12 +35,12 @@ msgid "Placeholder"
 msgstr ""
 
 #: cms_toolbar.py:79
-msgid "Content"
-msgstr "İçerik"
-
-#: cms_toolbar.py:81
 msgid "Structure"
 msgstr "Yapı"
+
+#: cms_toolbar.py:81
+msgid "Content"
+msgstr "İçerik"
 
 #: cms_toolbar.py:99
 msgid "Users"
@@ -62,138 +62,138 @@ msgstr "Yönetim"
 msgid "User settings"
 msgstr "Kullanıcı ayarları"
 
-#: cms_toolbar.py:137 cms_toolbar.py:140 tests/toolbar.py:354
-#: tests/toolbar.py:360 tests/toolbar.py:366 tests/toolbar.py:372
+#: cms_toolbar.py:137 cms_toolbar.py:140 tests/toolbar.py:370
+#: tests/toolbar.py:376 tests/toolbar.py:382 tests/toolbar.py:388
 msgid "Logout"
 msgstr "Çıkış"
 
-#: cms_toolbar.py:144 admin/forms.py:76 admin/forms.py:173 admin/forms.py:210
+#: cms_toolbar.py:144 admin/forms.py:63 admin/forms.py:173 admin/forms.py:213
 #: models/settingmodels.py:12
 msgid "Language"
 msgstr "Dil"
 
-#: cms_toolbar.py:200
+#: cms_toolbar.py:205
 msgid "Publish changes"
 msgstr ""
 
-#: cms_toolbar.py:202
+#: cms_toolbar.py:207
 msgid "Publish page now"
 msgstr ""
 
-#: cms_toolbar.py:251
-#, python-format
-msgid "Add %(language)s Translation"
-msgstr "%(language)s çevirisi ekle"
-
-#: cms_toolbar.py:265
-#, python-format
-msgid "Delete %(language)s Translation"
-msgstr "%(language)s çevirisini sil"
-
-#: cms_toolbar.py:274
-#, python-format
-msgid "Are you sure you want copy all plugins from %s?"
-msgstr "%s kaynağından bütün eklentileri kopyalamak istediğinize emin misiniz?"
-
-#: cms_toolbar.py:275
-#, python-format
-msgid "Copy all plugins from %s"
-msgstr "%s kaynağından bütün eklentileri kopyala"
-
-#: cms_toolbar.py:285
-msgid "Pages"
-msgstr "Sayfalar"
-
-#: cms_toolbar.py:290 templates/admin/cms/page/permissions.html:6
-msgid "Page"
-msgstr "Sayfa"
-
-#: cms_toolbar.py:292
-msgid "Add Page"
-msgstr ""
-
-#: cms_toolbar.py:294
-msgid "New Page"
-msgstr ""
-
-#: cms_toolbar.py:301
-msgid "New Sub Page"
-msgstr ""
-
-#: cms_toolbar.py:309
-msgid "Duplicate this Page"
-msgstr ""
-
-#: cms_toolbar.py:317
-msgid "Edit this Page"
-msgstr "Bu sayfayı düzenle"
-
-#: cms_toolbar.py:322 cms_toolbar.py:398
+#: cms_toolbar.py:229 cms_toolbar.py:338
 #: templates/admin/cms/page/tree/menu_item.html:51
 msgid "Page settings"
 msgstr "Sayfa ayarları"
 
-#: cms_toolbar.py:326
+#: cms_toolbar.py:266
+#, python-format
+msgid "Add %(language)s Translation"
+msgstr "%(language)s çevirisi ekle"
+
+#: cms_toolbar.py:280
+#, python-format
+msgid "Delete %(language)s Translation"
+msgstr "%(language)s çevirisini sil"
+
+#: cms_toolbar.py:289
+#, python-format
+msgid "Are you sure you want copy all plugins from %s?"
+msgstr "%s kaynağından bütün eklentileri kopyalamak istediğinize emin misiniz?"
+
+#: cms_toolbar.py:290
+#, python-format
+msgid "Copy all plugins from %s"
+msgstr "%s kaynağından bütün eklentileri kopyala"
+
+#: cms_toolbar.py:300
+msgid "Pages"
+msgstr "Sayfalar"
+
+#: cms_toolbar.py:305 templates/admin/cms/page/permissions.html:6
+msgid "Page"
+msgstr "Sayfa"
+
+#: cms_toolbar.py:307
+msgid "Add Page"
+msgstr ""
+
+#: cms_toolbar.py:309
+msgid "New Page"
+msgstr ""
+
+#: cms_toolbar.py:317
+msgid "New Sub Page"
+msgstr ""
+
+#: cms_toolbar.py:325
+msgid "Duplicate this Page"
+msgstr ""
+
+#: cms_toolbar.py:333
+msgid "Edit this Page"
+msgstr "Bu sayfayı düzenle"
+
+#: cms_toolbar.py:342
 msgid "Templates"
 msgstr "Şablonlar"
 
-#: cms_toolbar.py:341 templates/admin/cms/page/tree/menu_item.html:52
+#: cms_toolbar.py:357 templates/admin/cms/page/tree/menu_item.html:52
 msgid "Advanced settings"
 msgstr "Gelişmiş ayarlar"
 
-#: cms_toolbar.py:348
+#: cms_toolbar.py:363
 msgid "Permissions"
 msgstr "Yetkiler"
 
-#: cms_toolbar.py:354 admin/pageadmin.py:313
+#: cms_toolbar.py:367 admin/pageadmin.py:309
 msgid "Publishing dates"
 msgstr ""
 
-#: cms_toolbar.py:360
+#: cms_toolbar.py:372
 msgid "Hide in navigation"
 msgstr "Menüde görünmesin"
 
-#: cms_toolbar.py:362
+#: cms_toolbar.py:374
 msgid "Display in navigation"
 msgstr "Menüde görünsün"
 
-#: cms_toolbar.py:368
+#: cms_toolbar.py:380
 msgid "Unpublish page"
 msgstr "Sayfayı yayından kaldır"
 
-#: cms_toolbar.py:371
+#: cms_toolbar.py:383
 msgid "Publish page"
 msgstr "yayınla"
 
-#: cms_toolbar.py:393
+#: cms_toolbar.py:405
 msgid "Delete page"
 msgstr "Sayfayı Sil"
 
-#: cms_toolbar.py:405
+#: cms_toolbar.py:409
 msgid "Save as Page Type"
 msgstr ""
 
-#: cms_toolbar.py:417 templates/admin/cms/page/history/revision_header.html:10
+#: cms_toolbar.py:419 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
 msgstr "Geçmiş"
 
-#: cms_toolbar.py:432
+#: cms_toolbar.py:434
 msgid "Undo"
 msgstr "Geri Al"
 
-#: cms_toolbar.py:433
+#: cms_toolbar.py:435
 msgid "Redo"
 msgstr "İleri Al"
 
-#: cms_toolbar.py:436
+#: cms_toolbar.py:438
 msgid "Are you sure you want to revert to live?"
 msgstr "Yayınlanmış hale döndürmek istediğinize emin misiniz?"
 
-#: cms_toolbar.py:437
+#: cms_toolbar.py:439
 msgid "Revert to live"
 msgstr "Yayınlanmış hale çevir"
 
-#: cms_toolbar.py:439
+#: cms_toolbar.py:441
 msgid "View history"
 msgstr "Geçmişi Görüntüle"
 
@@ -209,54 +209,54 @@ msgstr "Jenerik"
 msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
-#: admin/forms.py:63
+#: admin/forms.py:64 admin/forms.py:174 admin/forms.py:214
+msgid "The current language of the content fields."
+msgstr "İçerik alanlarının geçerli dili."
+
+#: admin/forms.py:65
+msgid "Page type"
+msgstr ""
+
+#: admin/forms.py:66
 msgid "Title"
 msgstr "Başlık"
 
-#: admin/forms.py:64
+#: admin/forms.py:67
 msgid "The default title"
 msgstr "Öntanımlı başlık"
 
-#: admin/forms.py:65
+#: admin/forms.py:68
 msgid "Slug"
 msgstr "rumuz"
 
-#: admin/forms.py:66
+#: admin/forms.py:69
 msgid "The part of the title that is used in the URL"
 msgstr "Başlığın URL'de kullanılan kısmı"
 
-#: admin/forms.py:67
+#: admin/forms.py:70
 msgid "Menu Title"
 msgstr "Menü Başlığı"
 
-#: admin/forms.py:68
+#: admin/forms.py:71
 msgid "Overwrite what is displayed in the menu"
 msgstr "Menüde gösterilenin üstüne yaz"
 
-#: admin/forms.py:69
+#: admin/forms.py:72
 msgid "Page Title"
 msgstr "Sayfa Başlığı"
 
-#: admin/forms.py:70
+#: admin/forms.py:73
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Tarayıcınızın üstünde veya yerimlerinde yazanın üzerine yaz"
 
-#: admin/forms.py:72
+#: admin/forms.py:75
 msgid "Description meta tag"
 msgstr ""
 
-#: admin/forms.py:74
+#: admin/forms.py:77
 msgid "A description of the page used by search engines."
 msgstr "Virgül ile ayrılmış anahtar kelimeler, bazen arama motorları tarafından kullanılır."
-
-#: admin/forms.py:77 admin/forms.py:174 admin/forms.py:211
-msgid "The current language of the content fields."
-msgstr "İçerik alanlarının geçerli dili."
-
-#: admin/forms.py:78
-msgid "Page type"
-msgstr ""
 
 #: admin/forms.py:134
 msgid "Another page with this slug already exists"
@@ -266,91 +266,92 @@ msgstr "Bu rumuza sahip başka bir sayfa mevcuttur."
 msgid "Slug must not be empty."
 msgstr ""
 
-#: admin/forms.py:195
+#: admin/forms.py:196
 msgid "Application"
 msgstr "Uygulama"
 
-#: admin/forms.py:197
+#: admin/forms.py:198
 msgid "Hook application to this page."
 msgstr "Uygulamayı bu sayfaya bağla."
 
-#: admin/forms.py:198
+#: admin/forms.py:199
 msgid "Overwrite URL"
 msgstr "URL'nin üzerine yaz"
 
-#: admin/forms.py:199
+#: admin/forms.py:200
 msgid "Keep this field empty if standard path should be used."
 msgstr "Standart yolu kullanmak için bu alanı boş bırakın."
 
-#: admin/forms.py:203
+#: admin/forms.py:204
 msgid "X Frame Options"
 msgstr ""
 
-#: admin/forms.py:204
+#: admin/forms.py:205
 msgid "Whether this page can be embedded in other pages or websites"
 msgstr ""
 
-#: admin/forms.py:208
+#: admin/forms.py:210
 msgid "Redirect"
 msgstr "Yönlendir"
 
-#: admin/forms.py:209
+#: admin/forms.py:211
 msgid "Redirects to this URL."
 msgstr "Bu URL'ye yönlendir."
 
-#: admin/forms.py:238
+#: admin/forms.py:211
+msgid "Start typing..."
+msgstr ""
+
+#: admin/forms.py:256
 msgid "A page with this reverse URL id exists already."
 msgstr "Bu ters URL id'si ile bir sayfa zaten var."
 
-#: admin/forms.py:245
+#: admin/forms.py:275
 msgid ""
-"You selected an apphook with an \"app_name\". You must enter a instance "
-"name."
+"You selected an apphook with an \"app_name\".\n"
+"                            You must enter a unique instance name."
 msgstr ""
 
-#: admin/forms.py:248
-msgid "If you enter an instance name you need an application url as well."
-msgstr ""
-
-#: admin/forms.py:254
+#: admin/forms.py:295
 msgid "A instance name with this name already exists."
 msgstr ""
 
-#: admin/forms.py:294 models/permissionmodels.py:60
+#: admin/forms.py:335 models/permissionmodels.py:60
 msgid "user"
 msgstr "kullanıcı"
 
-#: admin/forms.py:358
+#: admin/forms.py:399
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "Sayfa ekleme yetkisi aynı zamanda alt başlıkların yetkilerine de ihtiyaç duyar, yoksa sayfa ekleyen kişi içeriğini değiştiremez."
 
-#: admin/forms.py:363
+#: admin/forms.py:404
 msgid "Add page permission also requires edit page permission."
 msgstr "Sayfa ekleme yetkisi aynı zamanda sayfa düzenleme yetkisi de gerektirir."
 
-#: admin/forms.py:390
+#: admin/forms.py:431
 msgid "can_view"
 msgstr "görebilir"
 
-#: admin/forms.py:401
+#: admin/forms.py:442
 msgid "Please select user or group first."
 msgstr "Lütfen önce kullanıcı veya grup ekleyin."
 
-#: admin/forms.py:408 admin/forms.py:415 admin/forms.py:419
+#: admin/forms.py:449 admin/forms.py:456 admin/forms.py:460
 #: templates/admin/cms/usersettings/change_form.html:8
-#: templatetags/cms_tags.py:700
+#: templatetags/cms_tags.py:704
 msgid "Add"
 msgstr "Ekle"
 
-#: admin/forms.py:409 admin/forms.py:416 admin/forms.py:420
+#: admin/forms.py:450 admin/forms.py:457 admin/forms.py:461
 #: templates/cms/toolbar/toolbar.html:36
 #: templates/cms/toolbar/items/live_draft.html:7
 msgid "Change"
 msgstr "Düzenle"
 
-#: admin/forms.py:410 admin/forms.py:417 admin/forms.py:421
+#: admin/forms.py:451 admin/forms.py:458 admin/forms.py:462
+#: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/submit_row.html:8
 #: templates/admin/cms/page/plugin/delete_confirmation.html:9
 #: templates/admin/cms/page/tree/menu_item.html:66
@@ -358,59 +359,59 @@ msgstr "Düzenle"
 msgid "Delete"
 msgstr "Sil"
 
-#: admin/forms.py:411
+#: admin/forms.py:452
 msgid "Recover (any) pages"
 msgstr "Sayfaları (herhangi) kurtar"
 
-#: admin/forms.py:439
+#: admin/forms.py:480
 msgid "Notify user"
 msgstr "Kullanıcıyı bilgilendir"
 
-#: admin/forms.py:441
+#: admin/forms.py:482
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr "Kullanıcıya, kullanıcı adı ve parola değişikliği ile ilgili eposta gönder. Kullanıcının epostası olması gerekir."
 
-#: admin/forms.py:461
+#: admin/forms.py:502
 msgid "New password"
 msgstr "Yeni parola"
 
-#: admin/forms.py:463
+#: admin/forms.py:504
 msgid "New password confirmation"
 msgstr "Yeni parola onayı"
 
-#: admin/forms.py:488
+#: admin/forms.py:529
 msgid "Email notification requires valid email address."
 msgstr "Eposta bilgilendirmeleri geçerli bir eposta adresi gerektirir."
 
-#: admin/forms.py:490
+#: admin/forms.py:531
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "Sayfa ekleme yetkisi, sayfa düzenleme yetkisi de gerektirir!"
 
-#: admin/forms.py:492
+#: admin/forms.py:533
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "Kullanıcı ekleme yetkisi, kullanıcı düzenleme yetkisi de gerektirir!"
 
-#: admin/forms.py:494
+#: admin/forms.py:535
 msgid "To add permissions you also need to edit them!"
 msgstr "Yetkileri eklemek için aynı zamanda düzenleyebilmelisiniz de!"
 
-#: admin/pageadmin.py:310 templates/admin/cms/page/submit_row.html:10
+#: admin/pageadmin.py:306 templates/admin/cms/page/submit_row.html:10
 msgid "Advanced Settings"
 msgstr "Gelişmiş Ayarlar"
 
-#: admin/pageadmin.py:319
+#: admin/pageadmin.py:315
 msgid "Change Permissions"
 msgstr "Yetkileri Değiştir"
 
-#: admin/pageadmin.py:367
+#: admin/pageadmin.py:363
 msgid "Add Page Type"
 msgstr ""
 
-#: admin/pageadmin.py:371
+#: admin/pageadmin.py:367
 msgid "Add Page Copy"
 msgstr ""
 
@@ -419,144 +420,152 @@ msgstr ""
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(placeholder)s yer tutucusuna %(plugin_name)s eklentisi eklendi"
 
-#: admin/pageadmin.py:580
+#: admin/pageadmin.py:581
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
 msgstr "Eklenti %(placeholder)s yer tutucusuna kopyalandı"
 
-#: admin/pageadmin.py:590
+#: admin/pageadmin.py:592
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr " %(placeholder)s 'da  %(position)s pozisyonundaki %(plugin_name)s eklentisi düzenlendi"
 
-#: admin/pageadmin.py:600
+#: admin/pageadmin.py:604
 msgid "Plugins were moved"
 msgstr "Eklentiler taşındı"
 
-#: admin/pageadmin.py:607
+#: admin/pageadmin.py:611
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr " %(placeholder)s 'da  %(position)s pozisyonundaki %(plugin_name)s eklentisi silindi."
 
-#: admin/pageadmin.py:619
+#: admin/pageadmin.py:624
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 msgstr "\"%(name)s\" yer tutucusundaki bütün eklentiler silindi"
 
-#: admin/pageadmin.py:637
+#: admin/pageadmin.py:643
 msgid "You do not have permission to change pages."
 msgstr "Sayfaları değiştirme yetkiniz yok"
 
-#: admin/pageadmin.py:649
+#: admin/pageadmin.py:655
 msgid "Database error"
 msgstr "Veritabanı hatası"
 
-#: admin/pageadmin.py:750 admin/pageadmin.py:791 admin/pageadmin.py:1071
-#: admin/pageadmin.py:1107
+#: admin/pageadmin.py:758 admin/pageadmin.py:825 admin/pageadmin.py:1154
+#: admin/pageadmin.py:1189
 msgid "You do not have permission to change this page"
 msgstr "Bu sayfayı değiştirmek için yetkiniz yok"
 
-#: admin/pageadmin.py:826
+#: admin/pageadmin.py:809 admin/pageadmin.py:875
+msgid "Page reverted but slug stays the same because of url collisions."
+msgstr ""
+
+#: admin/pageadmin.py:883
 msgid "You do not have permission to change the template"
 msgstr "Şablonu değiştirme yetkiniz yok"
 
-#: admin/pageadmin.py:830
+#: admin/pageadmin.py:887
 msgid "Template not valid"
 msgstr "Şablon geçerli değil"
 
-#: admin/pageadmin.py:835
+#: admin/pageadmin.py:892
 #, python-format
 msgid "Template changed to %s"
 msgstr "Şablon %s olarak değiştirildi"
 
-#: admin/pageadmin.py:837
+#: admin/pageadmin.py:895
 msgid "The template was successfully changed"
 msgstr "Şablon başarıyla değiştirildi."
 
-#: admin/pageadmin.py:859
+#: admin/pageadmin.py:917
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Hata! Bu sayfayı taşımak için yetkiniz yok. Lütfen sayfayı yeniden yükleyin"
 
-#: admin/pageadmin.py:863
+#: admin/pageadmin.py:922
 msgid "Page moved"
 msgstr "Sayfa taşındı"
 
-#: admin/pageadmin.py:909 admin/placeholderadmin.py:253
+#: admin/pageadmin.py:968 admin/placeholderadmin.py:253
 #: admin/placeholderadmin.py:299
 msgid "Language must be set to a supported language!"
 msgstr "Dil, desteklenen bir dile ayarlanmalı!"
 
-#: admin/pageadmin.py:914 admin/placeholderadmin.py:318
+#: admin/pageadmin.py:973 admin/placeholderadmin.py:318
 msgid "You do not have permission to copy these plugins."
 msgstr "Bu eklentileri kopyalamaya yetkiniz yok"
 
-#: admin/pageadmin.py:917
+#: admin/pageadmin.py:976
 #, python-format
 msgid "Copied plugins from %(source_language)s to %(target_language)s"
 msgstr "Eklendi %(source_language)s kaynağından %(target_language)s hedefine kopyalandı"
 
-#: admin/pageadmin.py:967
+#: admin/pageadmin.py:1027
 msgid "You do not have permission to publish this page"
 msgstr "Bu sayfayı yayınlamak için yetkiniz yok"
 
-#: admin/pageadmin.py:982
+#: admin/pageadmin.py:1044 admin/pageadmin.py:1056
+msgid "Page not published! A parent page is not published yet."
+msgstr ""
+
+#: admin/pageadmin.py:1046
 msgid "The content was successfully published."
 msgstr ""
 
-#: admin/pageadmin.py:991
+#: admin/pageadmin.py:1058
 msgid "There was a problem publishing your content"
 msgstr ""
 
-#: admin/pageadmin.py:1042
+#: admin/pageadmin.py:1122
 msgid "You do not have permission to unpublish this page"
 msgstr ""
 
-#: admin/pageadmin.py:1044
+#: admin/pageadmin.py:1124
 msgid "This page was never published"
 msgstr ""
 
-#: admin/pageadmin.py:1047
+#: admin/pageadmin.py:1127
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr ""
 
-#: admin/pageadmin.py:1075
+#: admin/pageadmin.py:1158
 #, python-format
 msgid "The page \"%s\" was successfully reverted."
 msgstr "\"%s\" sayfası başarı ile önceki haline döndürüldü"
 
-#: admin/pageadmin.py:1111
+#: admin/pageadmin.py:1193
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r birincil anahtarlı %(name)s nesnesi mevcut değil."
 
-#: admin/pageadmin.py:1117
+#: admin/pageadmin.py:1199
 msgid "There only exists one translation for this page"
 msgstr "Bu sayfa için sadece bir çeviri mevcut"
 
-#: admin/pageadmin.py:1146
+#: admin/pageadmin.py:1228
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "%(language)s dilindeki başlık ve eklenti silindi"
 
-#: admin/pageadmin.py:1168 admin/placeholderadmin.py:505
+#: admin/pageadmin.py:1251 admin/placeholderadmin.py:505
 #: admin/placeholderadmin.py:545
 msgid "Are you sure?"
 msgstr "Emin misiniz?"
 
-#: admin/pageadmin.py:1208
+#: admin/pageadmin.py:1291
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Bu sayfanın menüde görünürlüğünü düzenleme yetkiniz yok"
 
-#: admin/pageadmin.py:1232
+#: admin/pageadmin.py:1315
 msgid "Page Types"
 msgstr ""
 
-#: admin/pageadmin.py:1285
+#: admin/pageadmin.py:1371
 msgid "You do not have permission to edit this page"
 msgstr "Bu sayfayı değiştirmek için yetkiniz yok"
 
@@ -640,7 +649,7 @@ msgstr "Kullanıcı detayları"
 msgid "Groups"
 msgstr "Gruplar"
 
-#: admin/useradmin.py:48 templates/cms/toolbar/items/login.html:5
+#: admin/useradmin.py:48 templates/cms/toolbar/items/login.html:6
 msgid "Password"
 msgstr "Parola"
 
@@ -648,15 +657,15 @@ msgstr "Parola"
 msgid "Copy permissions"
 msgstr "Kopyalama yetkileri"
 
-#: forms/fields.py:29
+#: forms/fields.py:30
 msgid "Select a valid site"
 msgstr "Geçerli bir site seç"
 
-#: forms/fields.py:30
+#: forms/fields.py:31
 msgid "Select a valid page"
 msgstr "Geçerli bir sayfa seç"
 
-#: forms/widgets.py:141
+#: forms/widgets.py:209
 msgid "Add Another"
 msgstr "Bir tane daha ekle"
 
@@ -785,7 +794,7 @@ msgstr "sayfalar"
 msgid "Empty"
 msgstr ""
 
-#: models/pagemodel.py:927
+#: models/pagemodel.py:934
 msgid "default"
 msgstr "öntanımlı"
 
@@ -941,46 +950,50 @@ msgstr "kullanıcı ayarları"
 msgid "user settings"
 msgstr "kullanıcı ayarları"
 
-#: models/static_placeholder.py:27
+#: models/static_placeholder.py:28
 msgid "by template"
 msgstr "şablon ile"
 
-#: models/static_placeholder.py:28
+#: models/static_placeholder.py:29
 msgid "by code"
 msgstr "kod ile"
 
-#: models/static_placeholder.py:31
+#: models/static_placeholder.py:32
 msgid "static placeholder name"
 msgstr ""
 
-#: models/static_placeholder.py:32
+#: models/static_placeholder.py:33
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr ""
 
-#: models/static_placeholder.py:34
+#: models/static_placeholder.py:35
 msgid "placeholder code"
 msgstr ""
 
-#: models/static_placeholder.py:35
+#: models/static_placeholder.py:36
 msgid "To render the static placeholder in templates."
 msgstr ""
 
-#: models/static_placeholder.py:36
+#: models/static_placeholder.py:37
 msgid "placeholder content"
 msgstr ""
 
-#: models/static_placeholder.py:40
+#: models/static_placeholder.py:41
 msgid "creation_method"
 msgstr ""
 
-#: models/static_placeholder.py:46
+#: models/static_placeholder.py:47
 msgid "static placeholder"
 msgstr ""
 
-#: models/static_placeholder.py:47
+#: models/static_placeholder.py:48
 msgid "static placeholders"
+msgstr ""
+
+#: models/static_placeholder.py:64
+msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
 #: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
@@ -1023,6 +1036,14 @@ msgstr "yönlendirme"
 msgid "is published"
 msgstr "yayınlanmış"
 
+#: templates/admin/cms/extensions/change_form.html:5
+#: templates/admin/cms/page/change_form.html:74
+#: templates/admin/cms/page/submit_row.html:5
+#: templates/admin/cms/page/tree/copy_premissions.html:19
+#: templates/admin/cms/usersettings/change_form.html:16
+msgid "Save"
+msgstr "Kaydet"
+
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
@@ -1048,29 +1069,22 @@ msgstr "Parola:"
 msgid "Change a page"
 msgstr "Bir sayfa düzenle"
 
-#: templates/admin/cms/page/change_form.html:49
+#: templates/admin/cms/page/change_form.html:44
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Aşağıdaki hataları düzeltin."
 msgstr[1] "Aşağıdaki hataları düzeltin."
 
-#: templates/admin/cms/page/change_form.html:67
+#: templates/admin/cms/page/change_form.html:62
 msgid "All permissions"
 msgstr "Tüm yetkiler"
 
-#: templates/admin/cms/page/change_form.html:68
-#: templates/admin/cms/page/tree/base.html:94
+#: templates/admin/cms/page/change_form.html:63
+#: templates/admin/cms/page/tree/base.html:80
 msgid "Loading..."
 msgstr "Yüklüyor..."
 
-#: templates/admin/cms/page/change_form.html:79
-#: templates/admin/cms/page/submit_row.html:5
-#: templates/admin/cms/page/tree/copy_premissions.html:19
-#: templates/admin/cms/usersettings/change_form.html:16
-msgid "Save"
-msgstr "Kaydet"
-
-#: templates/admin/cms/page/change_form.html:80
+#: templates/admin/cms/page/change_form.html:75
 #: templates/admin/cms/page/submit_row.html:15
 msgid "Save and continue editing"
 msgstr "Kaydet ve düzenlemeye devam et"
@@ -1178,56 +1192,64 @@ msgstr "Sayfa listesi"
 msgid "Search"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:53
+#: templates/admin/cms/page/tree/base.html:54
 msgid "Successfully moved"
 msgstr "Başarıyla taşındı"
 
-#: templates/admin/cms/page/tree/base.html:65
+#: templates/admin/cms/page/tree/base.html:55
+msgid "Changes within the tree might require a refresh."
+msgstr ""
+
+#: templates/admin/cms/page/tree/base.html:56
 msgid "An error occured. Please reload the page"
 msgstr "Bir hata oluştu. Lütfen sayfayı tekrar yükleyin."
 
-#: templates/admin/cms/page/tree/base.html:87
+#: templates/admin/cms/page/tree/base.html:57
+#, python-format
+msgid "Are you sure you want to %%s this page?"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base.html:73
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr "Silinmiş %(name)s leri geri getir"
 
-#: templates/admin/cms/page/tree/base.html:90
+#: templates/admin/cms/page/tree/base.html:76
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s ekle"
 
-#: templates/admin/cms/page/tree/base.html:102
+#: templates/admin/cms/page/tree/base.html:88
 msgid "Pages on:"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:123
+#: templates/admin/cms/page/tree/base.html:108
 msgid "Filter:"
 msgstr "Filtre:"
 
-#: templates/admin/cms/page/tree/base.html:123
+#: templates/admin/cms/page/tree/base.html:108
 msgid "on"
 msgstr "açık"
 
-#: templates/admin/cms/page/tree/base.html:123
+#: templates/admin/cms/page/tree/base.html:108
 msgid "off"
 msgstr "kapalı"
 
-#: templates/admin/cms/page/tree/base.html:125
+#: templates/admin/cms/page/tree/base.html:110
 msgid "Filter"
 msgstr "Filtre"
 
 #: templates/admin/cms/page/tree/base_header.html:10
-msgid "in menu"
+msgid "Menu"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base_header.html:11
-msgid "actions"
-msgstr "eylemler"
+msgid "Actions"
+msgstr ""
 
 #: templates/admin/cms/page/tree/base_header.html:12
-#: templates/admin/cms/page/tree/menu_item.html:71
-msgid "info"
-msgstr "bilgi"
+msgid "Info"
+msgstr ""
 
 #: templates/admin/cms/page/tree/base_header.html:26
 msgid ""
@@ -1293,6 +1315,14 @@ msgstr "Yayından kaldır"
 msgid "Publish"
 msgstr "Yayınla"
 
+#: templates/admin/cms/page/tree/menu_item.html:42
+msgid "in menu"
+msgstr ""
+
+#: templates/admin/cms/page/tree/menu_item.html:42
+msgid "not in menu"
+msgstr ""
+
 #: templates/admin/cms/page/tree/menu_item.html:51
 msgid "page settings"
 msgstr ""
@@ -1328,6 +1358,10 @@ msgstr "kes"
 #: templates/admin/cms/page/tree/menu_item.html:66
 msgid "delete"
 msgstr "sil"
+
+#: templates/admin/cms/page/tree/menu_item.html:71
+msgid "info"
+msgstr "bilgi"
 
 #: templates/admin/cms/page/tree/menu_item.html:75
 msgid "is restricted"
@@ -1365,8 +1399,8 @@ msgstr "Hepsini boşalt"
 msgid "Drop a plugin here"
 msgstr "Eklentiyi buraya bırakın"
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:695
-#: templatetags/cms_tags.py:698
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:699
+#: templatetags/cms_tags.py:702
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -1408,43 +1442,43 @@ msgstr ""
 msgid "It is being redirected to:"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:41
+#: templates/cms/toolbar/toolbar_javascript.html:42
 #, python-format
 msgid "Development version using django CMS %(cms_version)s"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:42
+#: templates/cms/toolbar/toolbar_javascript.html:43
 msgid "Cancel"
 msgstr "İptal"
 
-#: templates/cms/toolbar/toolbar_javascript.html:43
+#: templates/cms/toolbar/toolbar_javascript.html:44
 msgid "The following error occured:"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:44
+#: templates/cms/toolbar/toolbar_javascript.html:45
 msgid "Action successfull... reloading."
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:45
+#: templates/cms/toolbar/toolbar_javascript.html:46
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Bu eklentiyi silmek istediğinize emin misiniz?"
 
-#: templates/cms/toolbar/toolbar_javascript.html:46
+#: templates/cms/toolbar/toolbar_javascript.html:47
 msgid ""
 "Publishing this page will activate it within the menu and set it live. Are "
 "you sure?"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:64
+#: templates/cms/toolbar/toolbar_javascript.html:65
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Giriş başarısız.</strong> Lütfen bilgilerinizi kontrol edip tekrar deneyiniz."
 
-#: templates/cms/toolbar/toolbar_javascript.html:65
+#: templates/cms/toolbar/toolbar_javascript.html:66
 msgid "This page has unpublished changes."
 msgstr "Bu eklentide yayınlamamış değişiklikler var"
 
-#: templates/cms/toolbar/items/login.html:4 toolbar/toolbar.py:21
+#: templates/cms/toolbar/items/login.html:5 toolbar/toolbar.py:21
 msgid "Username"
 msgstr "Kullanıcı adı"
 
@@ -1460,19 +1494,19 @@ msgstr ""
 msgid "published"
 msgstr "yayınlanmış"
 
-#: templatetags/cms_admin.py:84
+#: templatetags/cms_admin.py:86
 msgid "unpublished parent"
 msgstr ""
 
-#: templatetags/cms_admin.py:87
+#: templatetags/cms_admin.py:89
 msgid "unpublished"
 msgstr ""
 
-#: templatetags/cms_admin.py:90
+#: templatetags/cms_admin.py:92
 msgid "no content"
 msgstr ""
 
-#: templatetags/cms_admin.py:185 templatetags/cms_admin.py:191
+#: templatetags/cms_admin.py:188 templatetags/cms_admin.py:194
 #, python-format
 msgid "<span>%(icon)s</span>"
 msgstr ""
@@ -1489,64 +1523,64 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr "Şablon etiketi `%(page_lookup)s\n` arama kriteri ile bir sayfa bulamadı. İstek yapılan URL: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:130 test_utils/cli.py:141
+#: test_utils/cli.py:129 test_utils/cli.py:140
 msgid "English"
 msgstr "İngilizce"
 
-#: test_utils/cli.py:131 test_utils/cli.py:153 test_utils/cli.py:176
+#: test_utils/cli.py:130 test_utils/cli.py:152 test_utils/cli.py:175
 msgid "French"
 msgstr "Fransızca"
 
-#: test_utils/cli.py:132 test_utils/cli.py:147 test_utils/cli.py:170
-#: test_utils/cli.py:189
+#: test_utils/cli.py:131 test_utils/cli.py:146 test_utils/cli.py:169
+#: test_utils/cli.py:188
 msgid "German"
 msgstr "Almanca"
 
-#: test_utils/cli.py:133 test_utils/cli.py:158
+#: test_utils/cli.py:132 test_utils/cli.py:157
 msgid "Brazilian Portuguese"
 msgstr "Brezilya Portekizcesi"
 
-#: test_utils/cli.py:134 test_utils/cli.py:183
+#: test_utils/cli.py:133 test_utils/cli.py:182
 msgid "Dutch"
 msgstr "Hollandaca"
 
-#: test_utils/cli.py:199
+#: test_utils/cli.py:198
 msgid "two columns"
 msgstr "iki sütun"
 
-#: test_utils/cli.py:200
+#: test_utils/cli.py:199
 msgid "three columns"
 msgstr "üç sütun"
 
-#: test_utils/cli.py:201
+#: test_utils/cli.py:200
 msgid "navigation examples"
 msgstr ""
 
-#: test_utils/cli.py:209
+#: test_utils/cli.py:208
 msgid "sidebar column"
 msgstr "background color"
 
-#: test_utils/cli.py:215
+#: test_utils/cli.py:213
 msgid "left column"
 msgstr "background color"
 
-#: test_utils/cli.py:220
+#: test_utils/cli.py:218
 msgid "Add a link"
 msgstr ""
 
-#: test_utils/cli.py:227
+#: test_utils/cli.py:224
 msgid "right column"
 msgstr "background color"
 
 #: test_utils/project/extensionapp/cms_toolbar.py:46
-msgid "Page Extension"
-msgstr ""
-
-#: test_utils/project/extensionapp/cms_toolbar.py:82
 msgid "Title Extension"
 msgstr ""
 
-#: test_utils/project/objectpermissionsapp/models.py:47
+#: test_utils/project/extensionapp/cms_toolbar.py:82
+msgid "Page Extension"
+msgstr ""
+
+#: test_utils/project/objectpermissionsapp/models.py:46
 msgid "object ID"
 msgstr ""
 
@@ -1578,16 +1612,16 @@ msgstr ""
 msgid "Namespaced App"
 msgstr ""
 
-#: test_utils/project/sampleapp/cms_toolbar.py:17
+#: test_utils/project/sampleapp/cms_toolbar.py:21
 #: test_utils/project/sampleapp/views.py:21
 msgid "Category"
 msgstr "Kategori"
 
-#: test_utils/project/sampleapp/cms_toolbar.py:18
+#: test_utils/project/sampleapp/cms_toolbar.py:22
 msgid "Categories"
 msgstr "Kategoriler"
 
-#: test_utils/project/sampleapp/cms_toolbar.py:19
+#: test_utils/project/sampleapp/cms_toolbar.py:23
 msgid "Add Category"
 msgstr "Kategori Ekle"
 
@@ -1623,7 +1657,7 @@ msgstr ""
 msgid "Change Category"
 msgstr "Kategori Düzenle"
 
-#: utils/conf.py:82
+#: utils/conf.py:83
 msgid "Inherit the template of the nearest ancestor"
 msgstr "En yakın üst sayfanın şablonunu kullan"
 

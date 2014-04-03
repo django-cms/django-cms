@@ -726,6 +726,8 @@ Default: ``True``
 
 Default value of the ``cache`` attribute of plugins. Should plugins be cached by default if not set explicitly?
 
+.. warning::
+    If you disable the plugin cache be sure to restart the server and clear the cache afterwards.
 
 .. setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 

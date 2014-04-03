@@ -3,6 +3,7 @@ from __future__ import with_statement
 import datetime
 import json
 from cms.test_utils.util.fuzzy_int import FuzzyInt
+from django.core.cache import cache
 import os
 
 from djangocms_googlemap.models import GoogleMap
@@ -568,6 +569,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test case for InheritPagePlaceholder
         """
+
         inheritfrompage = api.create_page('page to inherit from',
                                       'nav_playground.html',
                                       'en')
@@ -604,10 +606,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         page.publish('en')
 
         self.client.logout()
+        cache.clear()
         response = self.client.get(page.get_absolute_url())
         self.assertTrue(
-            'https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true' in response.content.decode('utf8'),
-            response.content)
+            'https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true' in response.content.decode('utf8').replace("&amp;", "&"))
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = api.create_page('page to inherit from',

@@ -457,7 +457,7 @@ $(document).ready(function () {
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
 						if(item.is('input')) item[0].click();
-						if(item.is('a')) that._loadContent(item.attr('href'), title);
+						if(item.is('a')) that._loadContent(item.prop('href'), title);
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
@@ -529,8 +529,8 @@ $(document).ready(function () {
 				}
 
 				// when the window has been changed pressing the blue or red button, we need to run a reload check
-				if(that.saved) {
-					iframe.hide();
+				// also check that no delete-confirmation is required
+				if(that.saved && !contents.find('.delete-confirmation').length) {
 					that.reloadBrowser(window.location.href, false, true);
 				} else {
 					iframe.show();

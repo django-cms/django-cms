@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from cms.appresolver import applications_page_check
 from django.utils.functional import SimpleLazyObject
 
 
 def get_page(request):
+    from cms.appresolver import applications_page_check
     from cms.utils.page_resolver import get_page_from_request
 
     if not hasattr(request, '_current_page_cache'):

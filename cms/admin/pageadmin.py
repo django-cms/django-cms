@@ -38,8 +38,7 @@ from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
                              PublicationDatesForm)
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
 from cms.admin.views import revert_plugins
-from cms.models import Page, Title, CMSPlugin, PagePermission, EmptyTitle, GlobalPagePermission, \
-    titlemodels, StaticPlaceholder
+from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
@@ -92,7 +91,7 @@ INITIAL_COMMENT = "Initial version."
 
 class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     form = PageForm
-    search_fields = ('title_set__slug', 'title_set__title', 'reverse_id')
+    search_fields = ('=id', 'title_set__slug', 'title_set__title', 'reverse_id')
     revision_form_template = "admin/cms/page/history/revision_header.html"
     recover_form_template = "admin/cms/page/history/recover_header.html"
     add_general_fields = ['title', 'slug', 'language', 'template']
@@ -258,9 +257,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if 'page_type' in form.base_fields:
             if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj:
                 del form.base_fields['page_type']
-            else:
-                if not Page.objects.filter(parent__reverse_id=PAGE_TYPES_ID).count():
-                    del form.base_fields['page_type']
+            elif not Title.objects.filter(page__parent__reverse_id=PAGE_TYPES_ID, language=language).count():
+                del form.base_fields['page_type']
         if 'add_page_type' in request.GET:
             del form.base_fields['menu_title']
             del form.base_fields['meta_description']
@@ -273,11 +271,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             version_id = None
             if "history" in request.path or 'recover' in request.path:
                 version_id = request.path.split("/")[-2]
-            try:
-                title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
-                                              force_reload=True)
-            except titlemodels.Title.DoesNotExist:
-                title_obj = EmptyTitle(language)
+
+            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
+                                          force_reload=True)
             if 'site' in form.base_fields and form.base_fields['site'].initial is None:
                 form.base_fields['site'].initial = obj.site
             for name in [
@@ -370,6 +366,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context.update({
                 'title':  _("Add Page Copy"),
             })
+        else:
+            extra_context = self.update_language_tab_context(request, context=extra_context)
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
@@ -427,13 +425,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         })
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def _get_site_languages(self, obj):
+    def _get_site_languages(self, obj=None):
         site_id = None
         if obj:
             site_id = obj.site_id
+        else:
+            site_id = Site.objects.get_current().pk
         return get_language_tuple(site_id)
 
-    def update_language_tab_context(self, request, obj, context=None):
+    def update_language_tab_context(self, request, obj=None, context=None):
         if not context:
             context = {}
         language = get_language_from_request(request, obj)
@@ -747,9 +747,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not 'reversion' in settings.INSTALLED_APPS:
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
+        from cms.utils.page_resolver import is_valid_url
         import reversion
 
         page = get_object_or_404(Page, pk=object_id)
+        old_titles = list(page.title_set.all())
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
@@ -773,14 +775,38 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
-        plugins.delete()
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        for plugin in plugins:
+            plugin._no_reorder = True
+            plugin.delete()
+        # TODO: delete placeholders instead of finding duplicates for 3.1
+        #page.placeholders.all().delete()
 
         previous_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = previous_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
+        new_placeholders = rev_page.placeholders.all()
+        slots = {}
+        for new_ph in new_placeholders:
+            if not new_ph.slot in slots:
+                slots[new_ph.slot] = new_ph
+            else:
+                if new_ph in placeholder_ids:
+                    new_ph.delete()
+                elif slots[new_ph.slot] in placeholder_ids:
+                    slots[new_ph.slot].delete()
+        new_titles = rev_page.title_set.all()
+        for title in new_titles:
+            try:
+                is_valid_url(title.path, rev_page)
+            except ValidationError:
+                for old_title in old_titles:
+                    if old_title.language == title.language:
+                        title.slug = old_title.slug
+                        title.save()
+                        messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
         return HttpResponse("ok")
 
     @require_POST
@@ -789,8 +815,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
         import reversion
+        from cms.utils.page_resolver import is_valid_url
 
         page = get_object_or_404(Page, pk=object_id)
+        old_titles = list(page.title_set.all())
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
@@ -814,14 +842,37 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
-        plugins.delete()
-
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        for plugin in plugins:
+            plugin._no_reorder = True
+            plugin.delete()
+        # TODO: 3.1 remove the placeholder matching from below and just delete them
+        #page.placeholders.all().delete()
         next_revision.revert(True)
         rev_page = get_object_or_404(Page, pk=page.pk)
         rev_page.revision_id = next_revision.pk
         rev_page.publisher_public_id = page.publisher_public_id
         rev_page.save()
+        new_placeholders = rev_page.placeholders.all()
+        slots = {}
+        for new_ph in new_placeholders:
+            if not new_ph.slot in slots:
+                slots[new_ph.slot] = new_ph
+            else:
+                if new_ph in placeholder_ids:
+                    new_ph.delete()
+                elif slots[new_ph.slot] in placeholder_ids:
+                    slots[new_ph.slot].delete()
+        new_titles = rev_page.title_set.all()
+        for title in new_titles:
+            try:
+                is_valid_url(title.path, rev_page)
+            except ValidationError:
+                for old_title in old_titles:
+                    if old_title.language == title.language:
+                        title.slug = old_title.slug
+                        title.save()
+                        messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
         return HttpResponse("ok")
 
     @require_POST
@@ -1112,8 +1163,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
-        # TODO: use admin base here!
-        if 'admin' not in referer:
+        if reverse('admin:index') not in referer:
             path = '%s?edit_off' % referer.split('?')[0]
         return HttpResponseRedirect(path)
 

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -9,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class UserObjectPermissionManager(models.Manager):
-
     def assign_perm(self, perm, user, obj):
         """
         Assigns permission with given ``perm`` for an instance ``obj`` and
@@ -54,8 +53,8 @@ class UserObjectPermission(models.Model):
         content_type = ContentType.objects.get_for_model(self.content_object)
         if content_type != self.permission.content_type:
             raise ValidationError("Cannot persist permission not designed for "
-                "this class (permission's type is %r and object's type is %r)"
-                % (self.permission.content_type, content_type))
+                                  "this class (permission's type is %r and object's type is %r)"
+                                  % (self.permission.content_type, content_type))
         return super(UserObjectPermission, self).save(*args, **kwargs)
 
     class Meta:

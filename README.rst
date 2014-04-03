@@ -3,8 +3,6 @@ django CMS
 ##########
 .. image:: https://api.travis-ci.org/divio/django-cms.png?branch=develop
     :target: http://travis-ci.org/divio/django-cms
-.. image:: https://coveralls.io/repos/divio/django-cms/badge.png?branch=develop
-    :target: https://coveralls.io/r/divio/django-cms
 .. image:: https://pypip.in/v/django-cms/badge.png
    :target: https://crate.io/packages/django-cms/
 .. image:: https://pypip.in/d/django-cms/badge.png
@@ -47,6 +45,25 @@ Documentation
 Please head over to our `documentation <http://docs.django-cms.org/>`_ for all
 the details on how to install, extend and use the django CMS.
 
+********
+Tutorial
+********
+
+https://github.com/divio/django-cms-tutorial
+
+***********
+Quick Start
+***********
+
+You can use the `django CMS installer <https://github.com/nephila/djangocms-installer>`_::
+
+    $ pip install --upgrade virtualenv
+    $ virtualenv env
+    $ source env/bin/activate
+    (env) $ pip install djangocms-installer
+    (env) $ djangocms -p . my_demo
+    (env) $ cd my_demo
+
 ************
 Getting Help
 ************
@@ -65,9 +82,3 @@ Credits
 * Many thanks to the
   `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!
-  
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/divio/django-cms/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
-

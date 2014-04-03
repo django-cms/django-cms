@@ -33,7 +33,14 @@ class PluginPool(object):
         if self.discovered:
             return
         self.discovered = True
+        from cms.views import invalidate_cms_page_cache
+        invalidate_cms_page_cache()
         load('cms_plugins')
+
+    def clear(self):
+        self.discovered = False
+        self.plugins = {}
+        self.patched = False
 
     def register_plugin(self, plugin):
         """

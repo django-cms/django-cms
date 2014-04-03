@@ -3,6 +3,7 @@ from __future__ import with_statement
 from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
+from django.core.urlresolvers import NoReverseMatch
 import warnings
 from cms.models.titlemodels import Title
 
@@ -91,11 +92,11 @@ class DefaultLanguageChanger(object):
 
     def __call__(self, lang):
         if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
-            try:
-                with force_language(lang):
+            with force_language(lang):
+                try:
                     return self.request.toolbar.obj.get_absolute_url()
-            except:
-                pass
+                except:
+                    pass
         return '%s%s' % (self.get_page_path(lang), self.app_path)
 
     def get_page_path(self, lang):
@@ -104,7 +105,7 @@ class DefaultLanguageChanger(object):
             with force_language(lang):
                 try:
                     return page.get_absolute_url(language=lang, fallback=False)
-                except Title.DoesNotExist:
+                except (Title.DoesNotExist, NoReverseMatch):
                     if hide_untranslated(lang) and settings.USE_I18N:
                         return '/%s/' % lang
                     else:

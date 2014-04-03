@@ -37,6 +37,9 @@ dynamic properties of the request set the ``cache=False`` attribute on the plugi
         name = _("MyPlugin")
         cache = False
 
+.. warning::
+    If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
+
 Content Cache Duration
 ======================
 

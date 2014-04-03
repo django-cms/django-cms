@@ -35,7 +35,7 @@ class Example1(models.Model):
         return self.char_1
 
     def get_absolute_url(self):
-        return reverse("detail", args=(self.pk,))
+        return reverse("example_detail", args=(self.pk,))
 
     def set_static_url(self, request):
         language = get_language_from_request(request)

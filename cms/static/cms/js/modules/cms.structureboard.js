@@ -73,7 +73,7 @@ $(document).ready(function () {
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
 
 			// show edit mode
-			modes.eq(0).bind(this.click, function (e) {
+			modes.eq(1).bind(this.click, function (e) {
 				e.preventDefault();
 				// cancel if already active
 				if(that.settings.mode === 'edit') return false;
@@ -81,7 +81,7 @@ $(document).ready(function () {
 				that.hide();
 			});
 			// show structure mode
-			modes.eq(1).bind(this.click, function (e) {
+			modes.eq(0).bind(this.click, function (e) {
 				e.preventDefault();
 				// cancel if already active
 				if(that.settings.mode === 'structure') return false;
@@ -111,7 +111,7 @@ $(document).ready(function () {
 
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
-				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
+				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
 
 			// show clipboard
 			this.clipboard.css('opacity', 1).fadeIn(this.options.speed);
@@ -133,7 +133,7 @@ $(document).ready(function () {
 
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
-				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
+				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
 
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
@@ -360,9 +360,9 @@ $(document).ready(function () {
 				// nestedSortable
 				'listType': 'div.cms_draggables',
 				'doNotClear': true,
-				'disableNestingClass': 'cms_draggable-disabled',
-				'errorClass': 'cms_draggable-disallowed',
-				'hoveringClass': 'cms_draggable-hover',
+				//'disableNestingClass': 'cms_draggable-disabled',
+				//'errorClass': 'cms_draggable-disallowed',
+				//'hoveringClass': 'cms_draggable-hover',
 				// methods
 				'start': function (e, ui) {
 					that.dragging = true;
@@ -431,9 +431,9 @@ $(document).ready(function () {
 					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
 
 					// now set the correct bounds
-					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
 					if(holder.length) bounds = holder.data('settings').plugin_restriction;
 					if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
+					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
 
 					// if parent has class disabled, dissalow drop
 					if(placeholder.parent().hasClass('cms_draggable-disabled')) return false;
@@ -462,15 +462,25 @@ $(document).ready(function () {
 				'hoverClass': 'cms_draggable-hover-allowed',
 				'over': function (event) {
 					dropzone = $('.cms_placeholder-' + that.getId($(event.target).parent().prev()));
-					if(!that.state) $(event.target).addClass('cms_draggable-disallowed');
+					timer = setInterval(function () {
+						// reset other empty placeholders
+						$('.cms_dragbar-empty').removeClass('cms_draggable-disallowed');
+						if(that.state) {
+							$(event.target).removeClass('cms_draggable-disallowed');
+						} else {
+							$(event.target).addClass('cms_draggable-disallowed');
+						}
+					}, 10);
 				},
 				'out': function (event) {
 					dropzone = null;
 					$(event.target).removeClass('cms_draggable-disallowed');
+					clearInterval(timer);
 				},
 				'drop': function (event) {
 					dropped = true;
 					droparea = $(event.target).parent().nextAll('.cms_draggables').first();
+					clearInterval(timer);
 				}
 			});
 		}

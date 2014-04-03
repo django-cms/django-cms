@@ -38,6 +38,7 @@ class ApphooksTestCase(CMSTestCase):
             del sys.modules[APP_MODULE]
 
         self.reload_urls()
+        apphook_pool.clear()
 
     def reload_urls(self):
         from django.conf import settings
@@ -137,7 +138,7 @@ class ApphooksTestCase(CMSTestCase):
             with force_language("en"):
                 response = self.client.get(self.get_pages_root())
             self.assertTemplateUsed(response, 'sampleapp/home.html')
-
+            self.assertContains(response, '<--noplaceholder-->')
             response = self.client.get('/en/blankapp/')
             self.assertTemplateUsed(response, 'nav_playground.html')
 
@@ -437,6 +438,7 @@ class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
 
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
+        apphook_pool.clear()
 
     def reload_urls(self):
         from django.conf import settings

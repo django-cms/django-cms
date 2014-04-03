@@ -159,7 +159,7 @@ def is_valid_url(url, instance, create_links=True, site=None):
         # This uses the same resolving function as ``get_page_from_path``
         if url.startswith(page_root):
             url = url[len(page_root):]
-        page_qs = get_page_queryset_from_path(url.strip('/'), site=site)
+        page_qs = get_page_queryset_from_path(url.strip('/'), site=site, draft=instance.publisher_is_draft)
         url_clashes = []
         # If queryset has pages checks for conflicting urls
         if page_qs is not None:
@@ -169,7 +169,7 @@ def is_valid_url(url, instance, create_links=True, site=None):
             for page in page_qs:
                 # Every page in the queryset except the current one is a conflicting page
                 # We have to exclude both copies of the page
-                if page and page.publisher_public.pk != instance.pk:
+                if page and page.publisher_public_id != instance.pk and page.pk != instance.pk:
                     if create_links:
                         # Format return message with page url
                         url_clashes.append('<a href="%(page_url)s%(pk)s" target="_blank">%(page_title)s</a>' % {

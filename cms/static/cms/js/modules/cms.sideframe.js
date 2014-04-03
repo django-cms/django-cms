@@ -92,14 +92,18 @@ $(document).ready(function () {
 			var language = 'language=' + CMS.config.request.language;
 			var page_id = 'page_id=' + CMS.config.request.page_id;
 			var holder = this.sideframe.find('.cms_sideframe-frame');
-			// var initialized = false;
+			var initialized = false;
 
 			// push required params if defined
-			var params = [];
-			if(CMS.config.request.language) params.push(language);
-			if(CMS.config.request.page_id) params.push(page_id);
+			// only apply params on tree view
+			if(url.indexOf(CMS.config.request.tree) >= 0) {
+				var params = [];
+				if(CMS.config.request.language) params.push(language);
+				if(CMS.config.request.page_id) params.push(page_id);
+				url = this._url(url, params);
+			}
 
-			var iframe = $('<iframe src="'+this._url(url, params)+'" class="" frameborder="0" />');
+			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
 				iframe.hide();
 			var width = this.settings.sideframe.position || this.options.sideframeWidth;
 
@@ -125,8 +129,8 @@ $(document).ready(function () {
 				});
 
 				// attach reload event
-				// if(initialized) that.reloadBrowser(false, false, true);
-				// initialized = true;
+				if(initialized) that.reloadBrowser(false, false, true);
+				initialized = true;
 			});
 
 			// cancel animation if sideframe is already shown

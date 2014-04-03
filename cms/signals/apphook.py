@@ -47,7 +47,7 @@ def apphook_post_title_checker(instance, **kwargs):
             old_title.published, old_title.page.application_urls, old_title.page.application_namespace, old_title.path)
         new_values = (
             instance.published, instance.page.application_urls, instance.page.application_namespace, instance.path)
-        if old_values != new_values:
+        if old_values != new_values and (old_values[2] or new_values[2]):
             request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
 
 
@@ -55,9 +55,9 @@ def apphook_post_delete_title_checker(instance, **kwargs):
     """
     Check if this was an apphook
     """
+    from cms.views import invalidate_cms_page_cache
+    invalidate_cms_page_cache()
     if instance.page.application_urls:
-        from cms.views import invalidate_cms_page_cache
-        invalidate_cms_page_cache()
         request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
 
 
@@ -66,8 +66,6 @@ def apphook_post_delete_page_checker(instance, **kwargs):
     Check if this was an apphook
     """
     if instance.application_urls:
-        from cms.views import invalidate_cms_page_cache
-        invalidate_cms_page_cache()
         request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
 
 # import the logging library

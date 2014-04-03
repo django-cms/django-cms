@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 import reversion
 from reversion.models import Revision, Version
 
-from cms.models import Page, Title
+from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
@@ -123,6 +123,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(Title.objects.all().count(), 2)
             self.assertEqual(CMSPlugin.objects.all().count(), 2)
             self.assertEqual(Revision.objects.all().count(), 5)
+            self.assertEqual(Placeholder.objects.count(), 5)
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
@@ -164,9 +165,41 @@ class ReversionTestCase(TransactionCMSTestCase):
             response = self.client.post(edit_url, {"body": "Hello World"})
             self.assertEqual(response.status_code, 200)
             self.assertEqual(3, CMSPlugin.objects.all().count())
-            response = self.client.post(undo_url)
-            response = self.client.post(undo_url)
+            self.client.post(undo_url)
+            self.client.post(undo_url)
             self.assertEqual(2, CMSPlugin.objects.all().count())
+            self.assertEqual(Placeholder.objects.count(), 5)
+
+    def test_undo_slug_collision(self):
+        data1 = self.get_new_page_data()
+        data2 = self.get_new_page_data()
+        data1['slug'] = 'page1'
+        data2['slug'] = 'page2'
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(URL_CMS_PAGE_ADD, data1)
+            self.assertEqual(response.status_code, 302)
+            response = self.client.post(URL_CMS_PAGE_ADD, data2)
+            self.assertEqual(response.status_code, 302)
+            page1 = Page.objects.get(title_set__slug='page1')
+            page2 = Page.objects.get(title_set__slug='page2')
+            data1['slug'] = 'page3'
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page1.pk, data1)
+            self.assertEqual(response.status_code, 302)
+            data2['slug'] = 'page1'
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, data2)
+            self.assertEqual(response.status_code, 302)
+
+            undo_url = reverse("admin:cms_page_undo", args=[page1.pk])
+            response = self.client.post(undo_url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(Title.objects.get(page=page1).slug, 'page3')
+            response = self.client.get(reverse("admin:cms_page_changelist"))
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get('/en/?edit')
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get('/en/page1/?edit')
+            self.assertEqual(response.status_code, 200)
+
 
     def test_recover(self):
         """

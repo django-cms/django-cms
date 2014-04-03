@@ -10,7 +10,6 @@ from django.template.context import RequestContext
 from django.utils.encoding import smart_str
 
 from cms.models import Page, GlobalPagePermission
-from cms.utils import permissions
 from cms.utils import get_language_from_request
 from cms.utils import get_language_list
 from cms.utils import get_cms_setting
@@ -69,7 +68,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
             request.user, page.site_id).exists()
         if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
             has_add_on_same_level_permission = True
-
+    from cms.utils import permissions
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site)
@@ -104,6 +103,7 @@ def render_admin_menu_item(request, page, template=None, language=None):
         return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
 
     # languages
+    from cms.utils import permissions
     languages = get_language_list(page.site_id)
     context = RequestContext(request, {
         'has_add_permission': permissions.has_page_add_permission(request),
