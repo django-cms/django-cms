@@ -45,7 +45,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 	li { float:left; position:relative; zoom:1; }
 	li a { float:left; padding:5px 10px; zoom:1; cursor:default; }
 	li ul { display:none; }
-	> li:first-child > a span { font-weight:600; line-height:12px; }
+	> li:first-child > a span { font-weight:800; line-height:12px; }
 
 	// hover effect
 	.cms_toolbar-item-navigation-hover {
@@ -74,7 +74,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 		> a span { background-position:right -300px !important; }
 
 		// add active style
-		.cms_toolbar-item-navigation-active a { font-weight:600; }
+		.cms_toolbar-item-navigation-active a { font-weight:800; }
 	}
 
 	.cms_toolbar-item-navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
