@@ -37,39 +37,6 @@ Here's a simple example which adds an ``icon`` field to the page::
 
     extension_pool.register(IconExtension)
 
-.. note::
-
-    If you own PageExtension includes ForeignKey or ManyToMany fields, you
-    should also override the method ``copy_relations(self, oldinstance, language)``
-    so that these fields are copied appropriately when the CMS makes a copy of
-    your extension to support versioning, etc.
-
-
-Here's an example that uses a ``ForeignKey`` and a `ManyToMany`` field::
-
-    from django.db import models
-
-    from cms.extensions import PageExtension
-    from cms.extensions.extension_pool import extension_pool
-
-
-    class OtherExtension(PageExtension):
-        favorite_color = models.ForeignKey('colors.Color')
-        categories = models.ManyToMany('categories.Category')
-
-        def copy_relations(self, other, language):
-
-            # FK's are easy to copy
-            self.favorite_color = other.favorite_color
-
-            # M2Ms are slightly less so
-            for category in other.categories.all():
-                category.pk = None      # This effectively copies the category on save
-                category.otherextension = self  # Point this the new instance (self)
-                category.save()
-
-    extension_pool.register(OtherExtension)
-
 
 Hooking the extension to the admin site
 =======================================
@@ -214,3 +181,33 @@ It is important to remember that unless the operator has already assigned a
 page extension to every page, a page may not have the iconextension
 relationship available, hence the use of the ``{% if ... %}...{% endif %}``
 above.
+
+
+Handling relations
+==================
+
+If your PageExtension or TitleExtension includes a ForeignKey *from* another
+model or includes a ManyToMany field, you should also override the method
+``copy_relations(self, oldinstance, language)`` so that these fields are
+copied appropriately when the CMS makes a copy of your extension to support
+versioning, etc.
+
+
+Here's an example that uses a `ManyToMany`` field::
+
+    from django.db import models
+    from cms.extensions import PageExtension
+    from cms.extensions.extension_pool import extension_pool
+
+
+    class MyPageExtension(PageExtension):
+
+        page_categories = models.ManyToMany('categories.Category')
+
+        def copy_relations(self, oldinstance, language):
+            for page_category in oldinstance.page_categories.all():
+                page_category.pk = None
+                page_category.mypageextension = self
+                page_category.save()
+
+    extension_pool.register(OtherExtension)
