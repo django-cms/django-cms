@@ -2,6 +2,7 @@ import uuid
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.copy_plugins import copy_plugins_to
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -55,6 +56,12 @@ class StaticPlaceholder(models.Model):
         # TODO: check for clashes if the random code is already taken
         if not self.code:
             self.code = u'static-%s' % uuid.uuid4()
+        if not self.site:
+            placeholders = StaticPlaceholder.objects.filter(code=self.code, site__isnull=True)
+            if self.pk:
+                placeholders.exclude(pk=self.pk)
+            if placeholders.exists():
+                raise ValidationError(_("A static placeholder with the same site and code already exists"))
 
     def publish(self, request, language, force=False):
         if force or self.has_publish_permission(request):
