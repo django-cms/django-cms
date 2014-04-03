@@ -73,7 +73,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
     def test_local(self):
         self.assertObjectDoesNotExist(StaticPlaceholder.objects.all(), code='foobar')
         self.assertObjectDoesNotExist(Placeholder.objects.all(), slot='foobar')
-        t = Template('{% load cms_tags %}{% static_placeholder "foobar" local or %}No Content{% endstatic_placeholder %}')
+        t = Template('{% load cms_tags %}{% static_placeholder "foobar" site or %}No Content{% endstatic_placeholder %}')
         rendered = t.render(self.get_context('/'))
         self.assertIn("No Content", rendered)
         for p in Placeholder.objects.all():
