@@ -275,27 +275,27 @@ def check_copy_relations(output):
                     ))
 
         for extension in chain(extension_pool.page_extensions, extension_pool.title_extensions):
-            if get_class('copy_relations', extension.__class__) is not BaseExtension:
+            if get_class('copy_relations', extension) is not BaseExtension:
                 # OK, looks like there is a 'copy_relations' defined in the
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                if rel.model != BaseExtension:
+                if rel != BaseExtension and rel != extension:
                     section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(extension),
-                        c_to_s(rel.model),
+                        c_to_s(rel.related.parent_model),
                     ))
             for rel in extension._meta.get_all_related_objects():
-                if rel.model != BaseExtension:
+                if rel.model != BaseExtension and rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(plugin_class),
+                        c_to_s(extension),
                         c_to_s(rel.model),
                     ))
 
         if not section.warnings:
             section.finish_success('All plugins and page/title extensions have "copy_relations" method if needed.')
         else:
-            section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations')
+            section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins/extensions.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations or https://django-cms.readthedocs.org/en/latest/extending_cms/extending_page_title.html#handling-relations.')
 
 
 def _load_all_templates(directory):
