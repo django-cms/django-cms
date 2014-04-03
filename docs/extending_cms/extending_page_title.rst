@@ -202,7 +202,7 @@ Here's an example that uses a `ManyToMany`` field::
 
     class MyPageExtension(PageExtension):
 
-        page_categories = models.ManyToMany('categories.Category')
+        page_categories = models.ManyToMany('categories.Category', blank=True, null=True)
 
         def copy_relations(self, oldinstance, language):
             for page_category in oldinstance.page_categories.all():
