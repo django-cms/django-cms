@@ -9,6 +9,7 @@ class Migration(DataMigration):
     def forwards(self, orm):
         for sp in orm['cms.StaticPlaceholder'].objects.all():
             sp.site = None
+
             sp.save()
 
     def backwards(self, orm):

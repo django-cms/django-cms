@@ -3,8 +3,6 @@ django CMS
 ##########
 .. image:: https://api.travis-ci.org/divio/django-cms.png?branch=develop
     :target: http://travis-ci.org/divio/django-cms
-.. image:: https://coveralls.io/repos/divio/django-cms/badge.png?branch=develop
-    :target: https://coveralls.io/r/divio/django-cms
 .. image:: https://pypip.in/v/django-cms/badge.png
    :target: https://crate.io/packages/django-cms/
 .. image:: https://pypip.in/d/django-cms/badge.png
@@ -65,8 +63,3 @@ Credits
 * Many thanks to the
   `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!
-  
-  
-.. image:: https://d2weczhvl823v0.cloudfront.net/divio/django-cms/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
