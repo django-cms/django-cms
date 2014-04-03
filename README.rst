@@ -55,7 +55,7 @@ https://github.com/divio/django-cms-tutorial
 Quick Start
 ***********
 
-You can use the django CMS installer::
+You can use the `django CMS installer <https://github.com/nephila/djangocms-installer>`_::
 
     $ pip install --upgrade virtualenv
     $ virtualenv env
