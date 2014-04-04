@@ -1,13 +1,22 @@
 # -*- coding: utf-8 -*-
 
+import django
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import models
+
 from cms.extensions import PageExtension, TitleExtension
 from cms.extensions.extension_pool import  extension_pool
-from django.conf import settings
-from django.db import models
+from distutils.version import LooseVersion
 
 class MyPageExtension(PageExtension):
     extra = models.CharField(blank=True, default='', max_length=255)
-    favorite_users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, null=True)
+
+    if LooseVersion(django.get_version()) < LooseVersion('1.5'):
+        favorite_users = models.ManyToManyField(User, blank=True, null=True)
+    else:
+        favorite_users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, null=True)
 
     def copy_relations(self, other, language):
         for favorite_user in other.favorite_users.all():
