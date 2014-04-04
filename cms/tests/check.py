@@ -13,6 +13,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.api import add_plugin
+from cms.test_utils.project.extensionapp.models import MyPageExtension
 
 
 class TestOutput(FileOutputWrapper):
@@ -107,6 +108,16 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
         del ArticlePluginModel.copy_relations
         self.assertCheck(True, warnings=1, errors=0)
         ArticlePluginModel.copy_relations = copy_rel
+
+    def test_copy_relations_on_page_extension(self):
+        """
+        Agreed. It is ugly, but it works.
+        """
+        self.assertCheck(True, warnings=0, errors=0)
+        copy_rel = MyPageExtension.copy_relations
+        del MyPageExtension.copy_relations
+        self.assertCheck(True, warnings=1, errors=0)
+        MyPageExtension.copy_relations = copy_rel
 
     def test_placeholder_tag_deprecation(self):
         self.assertCheck(True, warnings=0, errors=0)
