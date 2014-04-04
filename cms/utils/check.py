@@ -280,11 +280,10 @@ def check_copy_relations(output):
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                if rel != extension:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.related.parent_model),
-                    ))
+                section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                    c_to_s(extension),
+                    c_to_s(rel.related.parent_model),
+                ))
             for rel in extension._meta.get_all_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
