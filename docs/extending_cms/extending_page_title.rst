@@ -210,4 +210,4 @@ Here's an example that uses a `ManyToMany`` field::
                 page_category.mypageextension = self
                 page_category.save()
 
-    extension_pool.register(OtherExtension)
+    extension_pool.register(MyPageExtension)
