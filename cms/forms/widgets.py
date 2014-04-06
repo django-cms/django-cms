@@ -138,6 +138,7 @@ class PageSmartLinkWidget(TextInput):
     $(function(){
         $("#%(element_id)s").select2({
             placeholder: "%(placeholder_text)s",
+            allowClear: true,
             minimumInputLength: 3,
             ajax: {
                 url: "%(ajax_url)s",
