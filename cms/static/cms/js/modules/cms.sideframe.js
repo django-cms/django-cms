@@ -109,8 +109,10 @@ $(document).ready(function () {
 
 			// attach load event to iframe
 			iframe.bind('load', function () {
+				var contents = iframe.contents();
+
 				// after iframe is loaded append css
-				iframe.contents().find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
+				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
 				// remove loader
 				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
 				// than show
@@ -124,13 +126,16 @@ $(document).ready(function () {
 				that.settings = that.setSettings(that.settings);
 
 				// bind extra events
-				iframe.contents().find('body').bind(that.click, function () {
+				contents.find('body').bind(that.click, function () {
 					$(document).trigger(that.click);
 				});
 
 				// attach reload event
 				if(initialized) that.reloadBrowser(false, false, true);
 				initialized = true;
+
+				// adding django hacks
+				contents.find('.viewsitelink').attr('target', '_top');
 			});
 
 			// cancel animation if sideframe is already shown
