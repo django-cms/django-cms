@@ -60,9 +60,6 @@ $(document).ready(function () {
 				default: // handler for static content
 					this._setGeneric();
 			}
-
-			// set global setup
-			CMS.Toolbar.ready = true;
 		},
 
 		// initial methods
@@ -748,6 +745,9 @@ $(document).ready(function () {
 					el.find('> .cms_dragitem').addClass('cms_dragitem-expanded');
 				}
 			});
+
+			// set global setup
+			CMS.Toolbar.ready = true;
 		},
 
 		_expandAll: function (el) {
