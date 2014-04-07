@@ -1,15 +1,15 @@
 {% extends "admin/change_list.html" %}
 {% load i18n admin_static admin_list cms_admin cms_js_tags %}
 
-{% block title %}{% trans "List of pages" %}{% endblock %}
+{% block title %}{{ _("List of pages") }}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
 {% if not is_popup %}{% block breadcrumbs %}
 <div class="breadcrumbs">
-	<a href="../../">{% trans "Home" %}</a> &rsaquo;
+	<a href="../../">{{ _("Home") }}</a> &rsaquo;
 	<a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
     {% if request.REQUEST.q %}
-    &rsaquo; {% trans "Search" %}
+    &rsaquo; {{ _("Search") }}
     {% endif %}
 </div>
 {% endblock %}{% endif %}
@@ -51,10 +51,10 @@ $(document).ready(function () {
 			'filtered': {% if cl.is_filtered %}true{% else %}false{% endif %}
 		},
 		'lang': {
-			'success': '{% trans "Successfully moved" as success_str %}{{ success_str|escapejs }}',
-			'changes': '{% trans "Changes within the tree might require a refresh." as changes_str %}{{ changes_str|escapejs }}',
-			'error': '{% trans "An error occured. Please reload the page" as error_str %}{{ error_str|escapejs }}',
-			'publish': '{% trans "Are you sure you want to %s this page?" as publish_str %}{{ publish_str|escapejs }}'
+			'success': '{{ _("Successfully moved")|escapejs }}',
+			'changes': '{{ _("Changes within the tree might require a refresh.")|escapejs }}',
+			'error': '{{ _("An error occured. Please reload the page")|escapejs }}',
+			'publish': '{{ _("Are you sure you want to %s this page?")|escapejs }}'
 		}
 	});
 });
@@ -77,7 +77,7 @@ $(document).ready(function () {
 		{% endif %}
 	</ul>
 
-	<div id="loader-message">{% trans "Loading..." %}</div>
+	<div id="loader-message">{{ _("Loading...") }}</div>
 
 {% endblock %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
@@ -85,7 +85,7 @@ $(document).ready(function () {
 
 <form action="." method="post">
 {% if cl.has_access_to_multiple_sites %}
-	<div id="site-selector">{% trans "Pages on:" %}
+	<div id="site-selector">{{ _("Pages on:") }}
 		<select id="site-select" name="site__exact">
 			{% for site in cl.sites %}
 			<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>
@@ -105,9 +105,9 @@ $(document).ready(function () {
 
 {% block filters %}
 {% if cl.has_filters %}
-<a href="#" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
+<a href="#" id="changelist-filter-button">{{ _("Filter:") }} {% if cl.is_filtered %}{{ _("on") }}{% else %}{{ _("off") }}{% endif %}</a>
 <div id="changelist-filter" style="display:none;">
-<h2>{% trans 'Filter' %}</h2>
+<h2>{{ _("Filter") }}</h2>
 {% for spec in cl.filter_specs %}
 	{% clean_admin_list_filter cl spec %}
 {% endfor %}

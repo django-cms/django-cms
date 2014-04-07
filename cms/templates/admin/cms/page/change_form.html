@@ -2,7 +2,7 @@
 {% load i18n admin_static admin_modify cms_admin %}
 {% load url from future %}
 
-{% block title %}{% trans "Change a page" %}{% endblock %}
+{% block title %}{{ _("Change a page") }}{% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
@@ -59,8 +59,8 @@
 	<div class="inline-group">
 		<div class="tabular inline-related">
 			<fieldset id="inherited_permissions" class="module aligned collapse">
-			  <h2>{% trans 'All permissions' %}</h2>
-			  <div class="loading" rel="../permissions/">{% trans 'Loading...' %}</div>
+			  <h2>{{ _("All permissions") }}</h2>
+			  <div class="loading" rel="../permissions/">{{ _("Loading...") }}</div>
 			</fieldset>
 		</div>
 	</div>
@@ -71,8 +71,8 @@
 
 {% if add %}
 	<div class="submit-row"{% if is_popup %} style="overflow: auto;"{% endif %}>
-		<input type="submit" name="_save" class="default" value="{% trans 'Save' %}" {{ onclick_attrib }}/>
-		<input type="submit" name="_continue" value="{% trans 'Save and continue editing' %}" {{ onclick_attrib }}/>
+		<input type="submit" name="_save" class="default" value="{{ _("Save") }}" {{ onclick_attrib }}/>
+		<input type="submit" name="_continue" value="{{ _("Save and continue editing") }}" {{ onclick_attrib }}/>
 	</div>
 {% else %}
 	{% page_submit_row %}

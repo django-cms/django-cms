@@ -5,7 +5,7 @@
 
 	{# debug, tooltip #}
 	<div class="cms_debug-bar"></div>
-	<div class="cms_tooltip">{% trans "Double-click to edit" %}<span></span></div>
+	<div class="cms_tooltip">{{ _("Double-click to edit") }}<span></span></div>
 
 	{# start: toolbar #}
 	<div class="cms_toolbar">
@@ -30,15 +30,15 @@
 			{% if request.toolbar.can_change %}
 			<div class="cms_toolbar-item cms_toolbar-item_switch{% if not request.toolbar.edit_mode %} cms_toolbar-item_switch-active{% endif %}">
 				<a href="{% if request.toolbar.edit_mode %}?edit_off{% else %}?edit{% endif %}">
-					<span class="cms_toolbar-item_switch-on">{% trans "Live" %}</span>
-					<span class="cms_toolbar-item_switch-off">{% trans "Draft" %}</span>
+					<span class="cms_toolbar-item_switch-on">{{ _("Live") }}</span>
+					<span class="cms_toolbar-item_switch-off">{{ _("Draft") }}</span>
 				</a>
-				<span class="cms_toolbar-item_switch-knob">{% trans "Change" %}</span>
+				<span class="cms_toolbar-item_switch-knob">{{ _("Change") }}</span>
 			</div>
 			{% endif %}
 		</div>
 	</div>
-	<div class="cms_toolbar-trigger"><a href="#">{% trans "Toggle toolbar" %}</a></div>
+	<div class="cms_toolbar-trigger"><a href="#">{{ _("Toggle toolbar") }}</a></div>
 	{# end: toolbar #}
 
 	{# start: messages #}
@@ -80,7 +80,7 @@
 		</div>
 		<div class="cms_modal-foot">
 			<div class="cms_modal-breadcrumb">
-				<span class="cms_modal-breadcrumb-title">{% trans "Start" %}</span>
+				<span class="cms_modal-breadcrumb-title">{{ _("Start") }}</span>
 				<span class="cms_modal-breadcrumb-items">&nbsp;</span>
 			</div>
 			<div class="cms_modal-buttons"></div>
@@ -115,8 +115,8 @@
 	{% if request.toolbar.redirect_url %}
 	<div class="cms_screenblock">
 		<div class="cms_screenblock-inner">
-			<h1>{% trans "This page has no preview!" %}</h1>
-			<p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
+			<h1>{{ _("This page has no preview!") }}</h1>
+			<p>{{ _("It is being redirected to:") }} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
 		</div>
 	</div>
 	{% endif %}
