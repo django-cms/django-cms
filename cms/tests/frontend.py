@@ -153,7 +153,7 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
 class ToolbarBasicTests(CMSLiveTests):
 
     def setUp(self):
-        self.user = self._create_user('admin', True, True, True)
+        self.user = self.get_superuser()
         Site.objects.create(domain='example.org', name='example.org')
         self.base_url = self.live_server_url
         self.driver.implicitly_wait(2)
