@@ -130,7 +130,7 @@ class PagesTestCase(CMSTestCase):
         """
         Test a slug collision
         """
-        home = api.create_page("home", 'nav_playground.html', "en")
+        api.create_page("home", 'nav_playground.html', "en")
         page = api.create_page("page", 'nav_playground.html', "en")
         subPage = api.create_page("subpage", 'nav_playground.html', "en", parent=page)
         superuser = self.get_superuser()
