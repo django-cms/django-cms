@@ -40,11 +40,11 @@ $(document).ready(function () {
 		},
 		'lang': {
 			'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}',
-			'cancel': '{% trans "Cancel" %}',
-			'error': '<strong>{% trans "The following error occured:" %}</strong> ',
-			'success': '{% trans "Action successfull... reloading." %}',
-			'confirm': '{% trans "Are you sure you want to delete this plugin?" %}',
-			'publish': '{% trans "Publishing this page will activate it within the menu and set it live. Are you sure?" %}'
+			'cancel': '{{ _("Cancel") }}',
+			'error': '<strong>{{ _("The following error occured:") }}</strong> ',
+			'success': '{{ _("Action successfull... reloading.") }}',
+			'confirm': '{{ _("Are you sure you want to delete this plugin?") }}',
+			'publish': '{{ _("Publishing this page will activate it within the menu and set it live. Are you sure?") }}'
 		},
 		'urls': {
 			'settings': '{% url "admin:cms_usersettings_session_store" %}', // url to save settings
@@ -63,7 +63,7 @@ $(document).ready(function () {
 		},
 		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
 		'error': '{% if request.toolbar.login_form.errors or cms_toolbar_login_error %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}',
-		'publisher': '{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}'
+		'publisher': '{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{{ _("This page has unpublished changes.") }}{% endif %}'
 	};
 	CMS.settings = CMS.API.Helpers.getSettings();
 

@@ -7,9 +7,9 @@
 			<div class="col2">
                 {% for lang in site_languages %}
                 <div class="col-language">{{ lang|upper }}</div>{% endfor %}
-                <div class="col-navigation">{% trans "Menu" %}</div>
-				<div class="col-actions">{% trans "Actions" %}</div>
-                <div class="col-info">{% trans "Info" %}</div>
+                <div class="col-navigation">{{ _("Menu") }}</div>
+				<div class="col-actions">{{ _("Actions") }}</div>
+                <div class="col-info">{{ _("Info") }}</div>
 			</div>
 		</div>
 	</li>
