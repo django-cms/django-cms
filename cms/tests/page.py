@@ -126,6 +126,28 @@ class PagesTestCase(CMSTestCase):
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
             self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
 
+    def test_child_slug_collision(self):
+        """
+        Test a slug collision
+        """
+        home = api.create_page("home", 'nav_playground.html', "en")
+        page = api.create_page("page", 'nav_playground.html', "en")
+        subPage = api.create_page("subpage", 'nav_playground.html', "en", parent=page)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+
+            response = self.client.get(URL_CMS_PAGE_ADD+"?target=%s&position=right&site=1" % subPage.pk)
+            self.assertContains(response, '<input id="id_parent" name="parent" type="hidden" value="%s" />' % page.pk)
+
+            page_data = self.get_new_page_data(page.pk)
+            page_data['slug'] = 'subpage'
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
+            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
+
+
     def test_get_available_slug_recursion(self):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
         """

@@ -295,7 +295,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.inlines = []
             for name in ['slug', 'title']:
                 form.base_fields[name].initial = u''
-            form.base_fields['parent'].initial = request.GET.get('target', None)
+            if 'target' in request.GET:
+                target = request.GET['target']
+                if 'position' in request.GET:
+                    position = request.GET['position']
+                    if position == 'last-child' or position == 'first-child':
+                        form.base_fields['parent'].initial = request.GET.get('target', None)
+                    else:
+                        sibling = Page.objects.get(pk=target)
+                        form.base_fields['parent'].initial = sibling.parent_id
+                else:
+                    form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
         return form
 
