@@ -129,13 +129,6 @@ class Placeholder(models.Model):
             context.update({'width': width})
         return render_placeholder(self, context, lang=lang)
 
-    def get_media(self, request, context):
-        from cms.utils.plugins import get_plugin_media
-        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
-        if media_classes:
-            return reduce(operator.add, media_classes)
-        return Media()
-
     def _get_attached_fields(self):
         """
         Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.

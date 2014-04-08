@@ -176,7 +176,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
-        if (position in ('left', 'right') and not target.parent and is_inherited_template):
+        if position in ('left', 'right') and not target.parent and is_inherited_template:
             self.template = self.get_template()
         self.move_to(target, position)
 
@@ -461,7 +461,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             delattr(self, '_publisher_keep_state')
 
         if not DJANGO_1_5 and 'cls' in kwargs:
-            del (kwargs['cls'])
+            del kwargs['cls']
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
@@ -565,7 +565,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
-            #trigger home update
+            # trigger home update
             public_page.save()
             # invalidate the menu for this site
             menu_pool.clear(site_id=self.site_id)
@@ -964,7 +964,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
                 user_perm = user.has_perm(codename)
                 generic_perm = self.has_generic_permission(request, "view")
-                return (user_perm or generic_perm)
+                return user_perm or generic_perm
 
         else:
             if is_restricted or not get_cms_setting('PUBLIC_FOR') == 'all':
