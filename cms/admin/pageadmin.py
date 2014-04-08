@@ -14,7 +14,7 @@ from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction
@@ -1273,8 +1273,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         attrs += "&language=" + language
         with force_language(language):
             url = page.get_absolute_url(language) + attrs
-        site = current_site(request)
-
+        site = get_current_site(request)
         if not site == page.site:
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
             page.site.domain, url)
