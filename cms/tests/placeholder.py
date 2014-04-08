@@ -391,7 +391,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             del(placeholder_de._plugins_cache)
             cache.clear()
             content_de2 = render_placeholder(placeholder_de, context_de2)
-            self.assertNotRegexpMatches(content_de2, "en body")
+            self.assertFalse("en body" in content_de2)
             # remove the cached plugins instances
             del(placeholder_de._plugins_cache)
             cache.clear()
