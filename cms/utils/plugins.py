@@ -217,6 +217,8 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
             if found:
                 continue
             elif placeholder and get_placeholder_conf("language_fallback", placeholder.slot, template, False):
+                if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
+                    continue
                 fallbacks = get_fallback_languages(lang)
                 for fallback_language in fallbacks:
                     assign_plugins(request, [placeholder], template, fallback_language, no_fallback=True)
