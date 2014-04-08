@@ -124,7 +124,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return (model_unpickle, (model, defers, factory), data)
 
     def __str__(self):
-        return force_unicode(self.id)
+        return force_unicode(self.pk)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -281,7 +281,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         new_plugin.save()
         if plugin_instance:
             if plugin_instance.__class__ == CMSPlugin:
-                #get a new instance so references do not get mixed up
+                # get a new instance so references do not get mixed up
                 plugin_instance = CMSPlugin.objects.get(pk=plugin_instance.pk)
             plugin_instance.pk = new_plugin.pk
             plugin_instance.id = new_plugin.pk
@@ -405,7 +405,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         fields = []
         for field in self._meta.fields:
             if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices and
-                field.editable and field.name not in self.translatable_content_excluded_fields and field):
+                    field.editable and field.name not in self.translatable_content_excluded_fields and field):
                 fields.append(field)
 
         translatable_fields = {}
