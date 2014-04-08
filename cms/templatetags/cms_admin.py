@@ -48,12 +48,6 @@ class ShowAdminMenu(InclusionTag):
         # function have to be updated. 
         # This is done because item can be reloaded after some action over ajax.
         context.update(get_admin_menu_item_context(request, page, filtered, language))
-
-        # this here is just context specific for menu rendering - items itself does
-        # not use any of following variables
-        #context.update({
-        #    'no_children': no_children,
-        #})
         return context
 
 
@@ -123,19 +117,12 @@ class ShowLazyAdminMenu(InclusionTag):
         elif context.has_key('filtered'):
             filtered = context['filtered']
 
-
         language = context['preview_language']
         # following function is newly used for getting the context per item (line)
         # if something more will be required, then get_admin_menu_item_context
         # function have to be updated. 
         # This is done because item can be reloaded after some action over ajax.
         context.update(get_admin_menu_item_context(request, page, filtered, language))
-
-        # this here is just context specific for menu rendering - items itself does
-        # not use any of following variables
-        #context.update({
-        #    'no_children': no_children,
-        #})
         return context
 
 

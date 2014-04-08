@@ -1044,7 +1044,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
             self.permission_user_cache = user
             setattr(self, att_name, has_generic_permission(
-                self.id, user, perm_type, self.site_id))
+                self.pk, user, perm_type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
@@ -1060,7 +1060,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         This location can be customised using the CMS_PAGE_MEDIA_PATH setting
         """
-        return join(get_cms_setting('PAGE_MEDIA_PATH'), "%d" % self.id, filename)
+        return join(get_cms_setting('PAGE_MEDIA_PATH'), "%d" % self.pk, filename)
 
     def reload(self):
         """
