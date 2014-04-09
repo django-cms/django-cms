@@ -86,7 +86,10 @@ $(document).ready(function () {
 			// add remove event
 			this.triggerRemove.bind(this.click, function (e) {
 				e.preventDefault();
-				that.clear();
+				that.clear(function () {
+				    // remove element on success
+				    that.clipboard.hide();
+				});
 			});
 		},
 
