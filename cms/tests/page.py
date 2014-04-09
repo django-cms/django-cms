@@ -137,7 +137,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
 
             response = self.client.get(URL_CMS_PAGE_ADD+"?target=%s&position=right&site=1" % subPage.pk)
-            self.assertContains(response, '<input id="id_parent" name="parent" type="hidden" value="%s" />' % page.pk)
+            self.assertContains(response, 'value="%s"' % page.pk)
 
             page_data = self.get_new_page_data(page.pk)
             page_data['slug'] = 'subpage'
