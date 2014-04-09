@@ -89,7 +89,6 @@ def update_home(instance, **kwargs):
                                                                          publisher_public__published=True).count():
                 return
             home_pk = instance.pk
-            #instance.is_home = True
         for page in qs.filter(site=instance.site_id, is_home=True).exclude(pk=home_pk):
             if instance.pk == page.pk:
                 instance.is_home = False

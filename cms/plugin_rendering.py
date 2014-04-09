@@ -147,7 +147,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if slot:
         extra_context = get_placeholder_conf("extra_context", slot, template, {})
     for key, value in extra_context.items():
-        if not key in context:
+        if key not in context:
             context[key] = value
 
     content = []
@@ -158,7 +158,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if edit:
         if not hasattr(request.toolbar, 'placeholders'):
             request.toolbar.placeholders = {}
-        if not placeholder.pk in request.toolbar.placeholders:
+        if placeholder.pk not in request.toolbar.placeholders:
             request.toolbar.placeholders[placeholder.pk] = placeholder
     if edit:
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback, save_language))
@@ -197,7 +197,7 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
         slot = None
     context.push()
 
-    ## to restrict child-only plugins from draggables..
+    # to restrict child-only plugins from draggables..
     context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
     context['placeholder'] = placeholder
     context['language'] = save_language

@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
-import operator
-
-try:
-    reduce
-except NameError:
-    from functools import reduce
-
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.forms.widgets import Media
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
 from django.utils.timezone import get_current_timezone_name
@@ -128,13 +120,6 @@ class Placeholder(models.Model):
         if width:
             context.update({'width': width})
         return render_placeholder(self, context, lang=lang)
-
-    def get_media(self, request, context):
-        from cms.utils.plugins import get_plugin_media
-        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
-        if media_classes:
-            return reduce(operator.add, media_classes)
-        return Media()
 
     def _get_attached_fields(self):
         """
