@@ -22,8 +22,8 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-03 11:35+0200\n"
-"PO-Revision-Date: 2014-04-03 11:23+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2014-04-07 12:40+0000\n"
+"Last-Translator: Jérôme Place <djayp83@hotmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,7 +36,7 @@ msgstr ""
 
 #: cms_plugins.py:9
 msgid "Placeholder"
-msgstr "bloc"
+msgstr "Zone"
 
 #: cms_toolbar.py:79
 msgid "Structure"
@@ -292,7 +292,7 @@ msgstr "Options X Frame"
 
 #: admin/forms.py:205
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr "Que cette page peut être intégré dans d'autres pages ou sites web"
+msgstr "Est-ce que cette page peut être intégrée dans d'autres pages ou sites web"
 
 #: admin/forms.py:210
 msgid "Redirect"
@@ -314,7 +314,7 @@ msgstr "Une page avec cet identifiant existe déjà."
 msgid ""
 "You selected an apphook with an \"app_name\".\n"
 "                            You must enter a unique instance name."
-msgstr ""
+msgstr "Vous avez sélectionné un \"apphook\" avec un \"app_name\". \nVous devez saisir un nom d'instance unique"
 
 #: admin/forms.py:295
 msgid "A instance name with this name already exists."
@@ -466,7 +466,7 @@ msgstr "Vous n'avez pas la permission de modifier cette page"
 
 #: admin/pageadmin.py:809 admin/pageadmin.py:875
 msgid "Page reverted but slug stays the same because of url collisions."
-msgstr ""
+msgstr "La page a été rétablie mais le slug reste le même pour éviter les conflits d'url."
 
 #: admin/pageadmin.py:883
 msgid "You do not have permission to change the template"
@@ -964,13 +964,13 @@ msgstr "par code"
 
 #: models/static_placeholder.py:32
 msgid "static placeholder name"
-msgstr "nom du bloc static"
+msgstr "nom du bloc statique"
 
 #: models/static_placeholder.py:33
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
-msgstr "Nom descriptif pour identifier l'espace réservé. N'est pas visible par les utilisateurs"
+msgstr "Nom descriptif pour identifier ce bloc statique. N'est pas visible par les utilisateurs"
 
 #: models/static_placeholder.py:35
 msgid "placeholder code"
@@ -998,7 +998,7 @@ msgstr "blocs statiques"
 
 #: models/static_placeholder.py:64
 msgid "A static placeholder with the same site and code already exists"
-msgstr ""
+msgstr "Un bloc statique avec le même site et le même code existe déjà"
 
 #: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
 msgid "title"

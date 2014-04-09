@@ -4,6 +4,7 @@
 # 
 # Translators:
 # alex.vertinsky <alex@sms-pr.ru>, 2013
+# Andrew Koltsov <andrewkoltsov@gmail.com>, 2014
 # Denis Darii <sinednx@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # Gleb Chipiga <gleb.chipiga@gmail.com>, 2011
@@ -21,8 +22,8 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-03 11:35+0200\n"
-"PO-Revision-Date: 2014-04-03 11:23+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2014-04-03 15:40+0000\n"
+"Last-Translator: Andrew Koltsov <andrewkoltsov@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -313,7 +314,7 @@ msgstr "Страница с таким reverse URL уже существует."
 msgid ""
 "You selected an apphook with an \"app_name\".\n"
 "                            You must enter a unique instance name."
-msgstr ""
+msgstr "Вы выбрали триггер \"app_name\".\nВведите уникальное имя экземпляра."
 
 #: admin/forms.py:295
 msgid "A instance name with this name already exists."
@@ -465,7 +466,7 @@ msgstr "У вас нет прав для изменения данной стр�
 
 #: admin/pageadmin.py:809 admin/pageadmin.py:875
 msgid "Page reverted but slug stays the same because of url collisions."
-msgstr ""
+msgstr "Изменения в странице были отменены, но slug оставлен тем же во избежание коллизий в url."
 
 #: admin/pageadmin.py:883
 msgid "You do not have permission to change the template"
@@ -997,7 +998,7 @@ msgstr "Местозаполнители"
 
 #: models/static_placeholder.py:64
 msgid "A static placeholder with the same site and code already exists"
-msgstr ""
+msgstr "Именованная область с таким сайтом и кодом уже есть."
 
 #: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
 msgid "title"
