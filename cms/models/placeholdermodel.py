@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
-import operator
-
-try:
-    reduce
-except NameError:
-    from functools import reduce
-
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.forms.widgets import Media
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
 from django.utils.timezone import get_current_timezone_name
