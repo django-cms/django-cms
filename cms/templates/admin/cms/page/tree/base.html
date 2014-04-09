@@ -51,10 +51,10 @@ $(document).ready(function () {
 			'filtered': {% if cl.is_filtered %}true{% else %}false{% endif %}
 		},
 		'lang': {
-			'success': '{% trans "Successfully moved" as success_str %}{{ success_str|escapejs }}',
-			'changes': '{% trans "Changes within the tree might require a refresh." as changes_str %}{{ changes_str|escapejs }}',
-			'error': '{% trans "An error occured. Please reload the page" as error_str %}{{ error_str|escapejs }}',
-			'publish': '{% trans "Are you sure you want to %s this page?" as publish_str %}{{ publish_str|escapejs }}'
+			'success': '{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}',
+			'changes': '{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}',
+			'error': '{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}',
+			'publish': '{% filter escapejs %}{% trans "Are you sure you want to %s this page?" %}{% endfilter %}'
 		}
 	});
 });
