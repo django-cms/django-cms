@@ -805,7 +805,7 @@ text_enabled
 Default: ``False``
 
 Can the plugin be inserted inside the text plugin?  If this is ``True`` then
-:meth:`icon_src` must be overriden.
+:meth:`icon_src` must be overridden.
 
 See also: `icon_src`_, `icon_alt`_
 
@@ -926,7 +926,7 @@ See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
 post_copy
 ---------
 
-Can (should) be overriden to handle the copying of plugins which contain
+Can (should) be overridden to handle the copying of plugins which contain
 children plugins after the original parent has been copied.
 
 ``post_copy`` takes 2 arguments:

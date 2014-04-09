@@ -4,7 +4,7 @@ Plugins reference
 
 .. warning::
     In version 3 of the CMS we removed all the plugins from the
-    into seperate repositories to continue their development there.
+    into separate repositories to continue their development there.
     you are upgrading from a previous version. Please refer to
     :ref:`Upgrading from previous versions <upgrade-to-3.0>`
 
