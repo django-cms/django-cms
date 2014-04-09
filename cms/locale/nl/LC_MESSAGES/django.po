@@ -14,6 +14,7 @@
 # leonderijke <leon@cmsworks.nl>, 2012
 # maartendraijer <maarten@madra.nl>, 2013
 # maartendraijer <maarten@madra.nl>, 2013
+# rene_ytec <rene@ytec.nl>, 2014
 # Steven Vande Ryse <vande.ryse.steven@gmail.com>, 2012
 # kurdyma <transifex.com@kurdyenviolien.nl>, 2013-2014
 # kurdy <transifex.net@kurdyenviolien.nl>, 2013
@@ -23,8 +24,8 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-03 11:35+0200\n"
-"PO-Revision-Date: 2014-04-03 11:23+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2014-04-04 08:20+0000\n"
+"Last-Translator: rene_ytec <rene@ytec.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django-cms/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -315,7 +316,7 @@ msgstr "Er bestaat al een pagina met dit omgekeerde URL kenmerk."
 msgid ""
 "You selected an apphook with an \"app_name\".\n"
 "                            You must enter a unique instance name."
-msgstr ""
+msgstr "U hebt een apphook met een \"app_name\" geselecteerd. U moet een unieke instantie naam opgeven."
 
 #: admin/forms.py:295
 msgid "A instance name with this name already exists."
@@ -467,7 +468,7 @@ msgstr "Je bent niet toegestaan deze pagina de bewerken"
 
 #: admin/pageadmin.py:809 admin/pageadmin.py:875
 msgid "Page reverted but slug stays the same because of url collisions."
-msgstr ""
+msgstr "De pagina is teruggedraaid maar de slug blijft hetzelfde vanwege url-botsingen"
 
 #: admin/pageadmin.py:883
 msgid "You do not have permission to change the template"
@@ -999,7 +1000,7 @@ msgstr "statische placeholders"
 
 #: models/static_placeholder.py:64
 msgid "A static placeholder with the same site and code already exists"
-msgstr ""
+msgstr "Er bestaat al een statische placeholder met dezelfde site en code"
 
 #: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
 msgid "title"

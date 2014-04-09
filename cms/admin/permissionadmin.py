@@ -43,7 +43,7 @@ class PagePermissionInlineAdmin(TabularInline):
         """
         # can see only permissions for users which are under him in tree
 
-        ### here a exception can be thrown
+        # here an exception can be thrown
         try:
             qs = PagePermission.objects.subordinate_to_user(request.user)
             return qs.filter(can_view=False)

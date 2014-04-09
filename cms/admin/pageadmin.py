@@ -14,7 +14,7 @@ from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.db import router, transaction
@@ -295,7 +295,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.inlines = []
             for name in ['slug', 'title']:
                 form.base_fields[name].initial = u''
-            form.base_fields['parent'].initial = request.GET.get('target', None)
+            if 'target' in request.GET:
+                target = request.GET['target']
+                if 'position' in request.GET:
+                    position = request.GET['position']
+                    if position == 'last-child' or position == 'first-child':
+                        form.base_fields['parent'].initial = request.GET.get('target', None)
+                    else:
+                        sibling = Page.objects.get(pk=target)
+                        form.base_fields['parent'].initial = sibling.parent_id
+                else:
+                    form.base_fields['parent'].initial = request.GET.get('target', None)
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
         return form
 
@@ -1273,8 +1283,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         attrs += "&language=" + language
         with force_language(language):
             url = page.get_absolute_url(language) + attrs
-        site = current_site(request)
-
+        site = get_current_site(request)
         if not site == page.site:
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
             page.site.domain, url)

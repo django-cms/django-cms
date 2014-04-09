@@ -504,6 +504,14 @@ $(document).ready(function () {
 
 			// attach load event for iframe to prevent flicker effects
 			iframe.bind('load', function () {
+				// check if iframe can be accessed
+				try {
+				    iframe.contents();
+				} catch (error) {
+				    CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
+				    that.close();
+				}
+
 				// show messages in toolbar if provided
 				var messages = iframe.contents().find('.messagelist li');
 					if(messages.length) CMS.API.Toolbar.openMessage(messages.eq(0).text());

@@ -344,7 +344,7 @@ $(document).ready(function () {
 		},
 
 		showError: function (msg, reload) {
-			this.openMessage(msg, 'center', this.options.messageDelay, true);
+			this.openMessage(msg, 'center', 0, true);
 			// force reload if param is passed
 			if(reload) CMS.API.Helpers.reloadBrowser(false, this.options.messageDelay);
 		},

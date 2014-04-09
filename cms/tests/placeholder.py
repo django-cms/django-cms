@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import itertools
+from cms.toolbar.toolbar import CMSToolbar
+from sekizai.context import SekizaiContext
 import warnings
 
 from django.conf import settings
@@ -348,7 +350,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_de = title_de.page.placeholders.get(slot='col_left')
         add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
 
-        class NoPushPopContext(Context):
+        class NoPushPopContext(SekizaiContext):
             def push(self):
                 pass
 
@@ -380,7 +382,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^en body$")
-
+            context_de2 = NoPushPopContext()
+            request = self.get_request(language="de", page=page_en)
+            request.user = self.get_superuser()
+            request.toolbar = CMSToolbar(request)
+            request.toolbar.edit_mode = True
+            context_de2['request'] = request
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            content_de2 = render_placeholder(placeholder_de, context_de2)
+            self.assertFalse("en body" in content_de2)
             # remove the cached plugins instances
             del(placeholder_de._plugins_cache)
             cache.clear()

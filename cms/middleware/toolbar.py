@@ -4,7 +4,7 @@ Edit Toolbar middleware
 """
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.i18n import force_language
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from menus.menu_pool import menu_pool
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -13,6 +13,7 @@ from cms.utils.placeholder import get_toolbar_plugin_struct
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
     from cms.plugin_pool import plugin_pool
+
     original_context.push()
     child_plugin_classes = []
     plugin_class = instance.get_plugin_class()
@@ -66,7 +67,13 @@ class ToolbarMiddleware(object):
         if 'build' in request.GET and not request.session.get('cms_build', False):
             request.session['cms_build'] = True
         if request.user.is_staff:
-            request.session['cms_log_entries'] = LogEntry.objects.filter(user=request.user).count()
+            try:
+                request.cms_latest_entry = LogEntry.objects.filter(
+                    user=request.user,
+                    action_flag__in=(ADDITION, CHANGE)
+                ).only('pk').order_by('-pk')[0].pk
+            except IndexError:
+                request.cms_latest_entry = -1
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):
@@ -76,6 +83,7 @@ class ToolbarMiddleware(object):
 
     def process_response(self, request, response):
         from django.utils.cache import add_never_cache_headers
+
         found = False
         if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
             found = True
@@ -86,10 +94,14 @@ class ToolbarMiddleware(object):
         if found:
             add_never_cache_headers(response)
         if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:
-            count = LogEntry.objects.filter(user=request.user).count()
-            if request.session.get('cms_log_entries', 0) < count:
-                request.session['cms_log_entries'] = count
-                log = LogEntry.objects.filter(user=request.user)[0]
-                if log.action_flag == 1 or log.action_flag == 2:
-                    request.session['cms_log_latest'] = log.pk
+            try:
+                pk = LogEntry.objects.filter(
+                    user=request.user,
+                    action_flag__in=(ADDITION, CHANGE)
+                ).only('pk').order_by('-pk')[0].pk
+            except IndexError:
+                pk = -1
+            if hasattr(request, 'cms_latest_entry') and request.cms_latest_entry != pk:
+                log = LogEntry.objects.filter(user=request.user, action_flag__in=(ADDITION, CHANGE))[0]
+                request.session['cms_log_latest'] = log.pk
         return response
