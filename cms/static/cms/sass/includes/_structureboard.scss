@@ -96,6 +96,8 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 	.cms_draggable .cms_draggable .cms_submenu-quicksearch,
 	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
 	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:$color-grey-5; }
+
+	.cms_dragitem-text { @include inline-block(); width:90%; height:21px; overflow:hidden; }
 }
 
 // #DRAGGABLES/specific#
