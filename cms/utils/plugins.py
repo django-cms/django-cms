@@ -222,8 +222,9 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
                 fallbacks = get_fallback_languages(lang)
                 for fallback_language in fallbacks:
                     assign_plugins(request, [placeholder], template, fallback_language, no_fallback=True)
-                    plugins = placeholder._plugins_cache
-                    if plugins:
+                    fallback_plugins = placeholder._plugins_cache
+                    if fallback_plugins:
+                        plugins += fallback_plugins
                         break
     # If no plugin is present, create default plugins if enabled)
     if not plugins:
