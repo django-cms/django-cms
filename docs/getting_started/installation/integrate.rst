@@ -250,7 +250,7 @@ generic package:
 
     $ sudo brew install python
 
-Then create an enviroment and work on it instead of install the packages in the
+Then create an environment and work on it instead of install the packages in the
 system path:
 
 .. code-block:: bash
@@ -593,7 +593,7 @@ The django CMS handles media files (css stylesheets and javascript files)
 required by CMS plugins using `django-sekizai`_. This requires you to define at
 least two sekizai namespaces in your templates: ``js`` and ``css``. You can do
 so using the ``render_block`` template tag from the ``sekizai_tags`` template
-tag libary. We highly recommended putting the ``{% render_block "css" %}`` tag
+tag library. We highly recommended putting the ``{% render_block "css" %}`` tag
 as the last thing before the closing ``</head>`` HTML tag and the
 ``{% render_block "js" %}`` tag as the last thing before the closing ``</body>``
 HTML tag.

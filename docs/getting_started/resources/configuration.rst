@@ -169,15 +169,15 @@ plugins, as shown above with ``base.html content``.
 
     ``plugin_type`` 
         It's the plugin type to add to the placeholder
-        Exemple : 'TextPlugin'
+        Example : 'TextPlugin'
 
     ``values``
         Dictionnary to use for the plugin creation.
         It depends on the ``plugin_type``. See the documentation of each 
         plugin type to see which parameters are required and available.
-        Exemple for a Textplugin :
+        Example for a Textplugin :
         {'body':'<p>Lorem ipsum</p>'}
-        Exemple for a LinkPlugin :
+        Example for a LinkPlugin :
         {'name':'Django-CMS','url':'https://www.django-cms.org'}
 
     ``children``
@@ -187,7 +187,7 @@ plugins, as shown above with ``base.html content``.
         ``default_plugins`` : ``plugin_type``, ``values``, ``children`` 
         (yes, it is recursive).
 
-    Complete exemple of default_plugins usage::
+    Complete example of default_plugins usage::
 
         CMS_PLACEHOLDER_CONF = {
             'content': {
@@ -242,7 +242,7 @@ plugins, as shown above with ``base.html content``.
 
 ``inherit``
     Placeholder name or template name + placeholder name which inherit. In the
-    exemple, the configuration for "base.html content" inherits from "content"
+    example, the configuration for "base.html content" inherits from "content"
     and just overwrite the "plugins" setting to allow TeaserPlugin, thus you
     have not to duplicate your "content"'s configuration.
     
@@ -395,7 +395,7 @@ String. The verbose name of the language.
 
 public
 ------
-Determines whether this language accessible in the frontend. You may want for example to keep a langage private until your content has been fully translated.
+Determines whether this language is accessible in the frontend. You may want for example to keep a language private until your content has been fully translated.
 
 Type: Boolean
 Default: ``True``

@@ -54,7 +54,7 @@ placeholder (configuration is the same as for placeholders in the CMS) or you ca
 .. warning::
 
     For security reasons the related_name for a
-    :class:`~cms.models.fields.PlaceholderField` may not be surpressed using
+    :class:`~cms.models.fields.PlaceholderField` may not be suppressed using
     ``'+'`` to allow the cms to check permissions properly. Attempting to do
     so will raise a :exc:`ValueError`.
 

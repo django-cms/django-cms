@@ -122,7 +122,7 @@ available from https://github.com/divio/djangocms-text-ckeditor. You may of
 course use your preferred editor; others are available.
 
 Furthermore, we removed the following plugins from the core and moved them into
-seperate repositories.
+separate repositories.
 
 .. note::
     In order to update from the old ``cms.plugins.X`` to the new
