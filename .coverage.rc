@@ -2,7 +2,7 @@
 source =
     cms
     menus
-branch = True
+branch = False
 omit =
     cms/migrations/*
     cms/plugins/*/migrations/*
@@ -10,7 +10,9 @@ omit =
     cms/tests/*
     cms/test_utils/*
     menus/migrations/*
-    docs
+    docs/*
+    env/*
+    env*
 
 [report]
 exclude_lines =
