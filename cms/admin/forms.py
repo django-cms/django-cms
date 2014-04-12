@@ -96,7 +96,7 @@ class PageForm(forms.ModelForm):
             self.fields['language'].initial = get_language()
         if 'page_type' in self.fields:
             try:
-                type_root = Page.objects.get(publisher_is_draft=True, reverse_id=PAGE_TYPES_ID)
+                type_root = Page.objects.get(publisher_is_draft=True, reverse_id=PAGE_TYPES_ID, site=site_id)
             except Page.DoesNotExist:
                 type_root = None
             if type_root:
