@@ -141,7 +141,7 @@ class BasicToolbar(CMSToolbar):
             if self.request.user.get_full_name():
                 user_name = self.request.user.get_full_name()
             else:
-                user_name = self.request.user.username
+                user_name = self.request.user.get_username()
         except:
             user_name = ''
 

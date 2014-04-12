@@ -363,7 +363,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username))
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()))
         #
         # Test that the logout shows the logged-in user's name, if it was
         # populated in auth.User.
