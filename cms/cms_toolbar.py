@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import django
-
-from distutils.version import LooseVersion
-
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
@@ -20,6 +16,7 @@ from cms.models import Title, Page
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
+from cms.utils.compat import DJANGO_1_4
 from cms.utils.i18n import get_language_objects
 from cms.utils.i18n import force_language
 from cms.utils.i18n import get_language_object
@@ -146,10 +143,10 @@ class BasicToolbar(CMSToolbar):
             if self.request.user.get_full_name():
                 user_name = self.request.user.get_full_name()
             else:
-                if LooseVersion(django.get_version()) >= LooseVersion('1.5'):
-                    user_name = self.request.user.get_username()
-                else:
+                if DJANGO_1_4:
                     user_name = self.request.user.username
+                else:
+                    user_name = self.request.user.get_username()
         except:
             user_name = ''
 

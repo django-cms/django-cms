@@ -2,10 +2,7 @@
 
 from __future__ import with_statement
 import datetime
-import django
 import re
-
-from distutils.version import LooseVersion
 
 from django.template.defaultfilters import truncatewords
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -33,7 +30,7 @@ from cms.test_utils.project.placeholderapp.models import (Example1,
 from cms.test_utils.project.placeholderapp.views import (detail_view,
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered)
-
+from cms.utils.compat import DJANGO_1_4
 
 class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
@@ -411,10 +408,10 @@ class ToolbarTests(ToolbarTestBase):
         page4 = page4.get_public_object()
         self.get_page_request(page4, superuser, '/')
 
-        if LooseVersion(django.get_version()) >= LooseVersion('1.5'):
-            menu_name = _(u'Logout %s') % superuser.get_username()
-        else:
+        if DJANGO_1_4:
             menu_name = _(u'Logout %s') % superuser.username
+        else:
+            menu_name = _(u'Logout %s') % superuser.get_username()
 
         with self.login_user_context(superuser):
             # Published page, no redirect
