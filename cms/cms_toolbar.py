@@ -146,7 +146,7 @@ class BasicToolbar(CMSToolbar):
             if self.request.user.get_full_name():
                 user_name = self.request.user.get_full_name()
             else:
-                if LooseVersion(django.get_version()) > LooseVersion('1.4'):
+                if LooseVersion(django.get_version()) >= LooseVersion('1.5'):
                     user_name = self.request.user.get_username()
                 else:
                     user_name = self.request.user.username

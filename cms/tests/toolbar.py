@@ -411,7 +411,7 @@ class ToolbarTests(ToolbarTestBase):
         page4 = page4.get_public_object()
         self.get_page_request(page4, superuser, '/')
 
-        if LooseVersion(django.get_version()) > LooseVersion('1.4'):
+        if LooseVersion(django.get_version()) >= LooseVersion('1.5'):
             menu_name = _(u'Logout %s') % superuser.get_username()
         else:
             menu_name = _(u'Logout %s') % superuser.username
