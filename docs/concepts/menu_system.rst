@@ -68,7 +68,7 @@ A NavigationNode has attributes such as URL, title, parent and children - as one
 
 .. warning::
     You can't assume that a :py:class:`menus.base.NavigationNode` represents a django CMS Page. Firstly, some nodes may
-    represent objects from other applications. Secondly, you can't expect to be be able to access Page objects via 
+    represent objects from other applications. Secondly, you can't expect to be able to access Page objects via
     NavigationNodes.
 
 ***********************

@@ -72,7 +72,7 @@ level admin list.
 Note that the field that holds the relationship between the extension and a
 CMS Page is non-editable, so it will not appear in the admin views. This,
 unfortunately, leaves the operator without a means of "attaching" the page
-extention to the correct pages. The way to address this is to use a
+extension to the correct pages. The way to address this is to use a
 CMSToolbar.
 
 
