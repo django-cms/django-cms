@@ -1,6 +1,11 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import with_statement
 import datetime
+import django
 import re
+
+from distutils.version import LooseVersion
 
 from django.template.defaultfilters import truncatewords
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -405,30 +410,36 @@ class ToolbarTests(ToolbarTestBase):
         page4.publish('en')
         page4 = page4.get_public_object()
         self.get_page_request(page4, superuser, '/')
+
+        if LooseVersion(django.get_version()) > LooseVersion('1.4'):
+            menu_name = _(u'Logout %s') % superuser.get_username()
+        else:
+            menu_name = _(u'Logout %s') % superuser.username
+
         with self.login_user_context(superuser):
             # Published page, no redirect
             response = self.client.get(page1.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertFalse(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success)
+            self.assertFalse(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
 
             # Unpublished page, redirect
             response = self.client.get(page2.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with login restrictions, redirect
             response = self.client.get(page3.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with view permissions, redirect
             response = self.client.get(page4.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):

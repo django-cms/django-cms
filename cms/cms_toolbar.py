@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+import django
+
+from distutils.version import LooseVersion
+
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
@@ -141,7 +146,10 @@ class BasicToolbar(CMSToolbar):
             if self.request.user.get_full_name():
                 user_name = self.request.user.get_full_name()
             else:
-                user_name = self.request.user.get_username()
+                if LooseVersion(django.get_version()) > LooseVersion('1.4'):
+                    user_name = self.request.user.get_username()
+                else:
+                    user_name = self.request.user.username
         except:
             user_name = ''
 
