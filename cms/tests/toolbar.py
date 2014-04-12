@@ -410,25 +410,25 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page1.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertFalse(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success)
+            self.assertFalse(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success)
 
             # Unpublished page, redirect
             response = self.client.get(page2.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success, '/')
 
             # Published page with login restrictions, redirect
             response = self.client.get(page3.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success, '/')
 
             # Published page with view permissions, redirect
             response = self.client.get(page4.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()).item.on_success, '/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):
