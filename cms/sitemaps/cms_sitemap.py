@@ -31,6 +31,20 @@ class CMSSitemap(Sitemap):
         #   > Pages which cannot be accessed by anonymous users (like
         #     search engines are).
         #
+        # It is noted here: http://www.sitemaps.org/protocol.html that
+        # "locations" that differ from the place where the sitemap is found,
+        # are considered invalid. E.g., if your sitemap is located here:
+        #
+        #     http://example.com/sub/sitemap.xml
+        #
+        # valid locations *must* be rooted at http://example.com/sub/...
+        #
+        # This rules any redirected locations out.
+        #
+        # If, for some reason, you require redirecting pages (Titles) to be
+        # included, simply create a new class inheriting from this one, and
+        # supply a new items() method which doesn't filter out the redirects.
+        #
         all_titles = Title.objects.public().filter(
             Q(redirect='') | Q(redirect__isnull=True),
             page__login_required=False
