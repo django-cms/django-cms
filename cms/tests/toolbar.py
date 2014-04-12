@@ -337,6 +337,49 @@ class ToolbarTests(ToolbarTestBase):
         response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
         self.assertEqual(response.content.decode('utf-8'), '')
 
+    def test_toolbar_logout(self):
+        '''
+        Tests that the Logout menu item includes the user's full name, if the
+        relevant fields were populated in auth.User, else the user's username.
+        '''
+        superuser = self.get_superuser()
+
+        # Ensure that some other test hasn't set the name fields
+        if superuser.get_full_name():
+            # Looks like it has been set, clear them
+            superuser.first_name = ''
+            superuser.last_name = ''
+            superuser.save()
+
+        page = create_page("home", "nav_playground.html", "en",
+                            published=True)
+        page.publish('en')
+        self.get_page_request(page, superuser, '/')
+        #
+        # Test that the logout shows the username of the logged-in user if
+        # first_name and last_name haven't been provided.
+        #
+        with self.login_user_context(superuser):
+            response = self.client.get(page.get_absolute_url('en') + '?edit')
+            toolbar = response.context['request'].toolbar
+            admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username))
+        #
+        # Test that the logout shows the logged-in user's name, if it was
+        # populated in auth.User.
+        #
+        superuser.first_name = 'Super'
+        superuser.last_name = 'User'
+        superuser.save()
+        # Sanity check...
+        self.assertEqual('Super User', superuser.get_full_name())
+        self.get_page_request(page, superuser, '/')
+        with self.login_user_context(superuser):
+            response = self.client.get(page.get_absolute_url('en') + '?edit')
+            toolbar = response.context['request'].toolbar
+            admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_full_name()))
+
     def test_toolbar_logout_redirect(self):
         """
         Tests the logount AjaxItem on_success parameter in four different conditions:
@@ -367,25 +410,25 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page1.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertFalse(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success)
+            self.assertFalse(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success)
 
             # Unpublished page, redirect
             response = self.client.get(page2.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success, '/')
 
             # Published page with login restrictions, redirect
             response = self.client.get(page3.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success, '/')
 
             # Published page with view permissions, redirect
             response = self.client.get(page4.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout')).item.on_success, '/')
+            self.assertEquals(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username).item.on_success, '/')
 
 
 class EditModelTemplateTagTest(ToolbarTestBase):

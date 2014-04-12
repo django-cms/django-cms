@@ -131,14 +131,38 @@ class BasicToolbar(CMSToolbar):
         else:
             page = None
         redirect_url = '/'
+
+        #
+        # We'll show "Logout Joe Bloggs" if the name fields in auth.User are
+        # completed, else "Logout jbloggs". If anything goes wrong, it'll just
+        # be "Logout".
+        #
+        try:
+            if self.request.user.get_full_name():
+                user_name = self.request.user.get_full_name()
+            else:
+                user_name = self.request.user.username
+        except:
+            user_name = ''
+
+        if user_name:
+            logout_menu_text = _('Logout %s') % user_name
+        else:
+            logout_menu_text = _('Logout')
+
         if (page and
             (not page.is_published(self.current_lang) or page.login_required
                 or not page.has_view_permission(self.request, AnonymousUser()))):
-            admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
-                                     active=True, on_success=redirect_url)
+            on_success=redirect_url
         else:
-            admin_menu.add_ajax_item(_('Logout'), action=reverse('admin:logout'),
-                                     active=True)
+            on_success=None
+
+        admin_menu.add_ajax_item(
+            logout_menu_text,
+            action=reverse('admin:logout'),
+            active=True,
+            on_success=on_success
+        )
 
     def add_language_menu(self):
         language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
