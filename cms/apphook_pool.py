@@ -42,7 +42,7 @@ class ApphookPool(object):
                                        'cms.app_base.CMSApp, %r does not' % app)
         if hasattr(app, 'menu') and not app.menus:
             warnings.warn("You define a 'menu' attribute on your CMS App %r, "
-                          "but the 'menus' attribute is empty, did you make a typo?")
+                          "but the 'menus' attribute is empty, did you make a typo?" % app)
         name = app.__name__
         if name in self.apps.keys():
             raise AppAlreadyRegistered("[%s] a cms app with this name is already registered" % name)
