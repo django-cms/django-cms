@@ -604,7 +604,8 @@ class CMSToolbar(RenderBlock):
         toolbar = getattr(request, 'toolbar', None)
         if toolbar:
             toolbar.populate()
-        context['cms_toolbar_login_error'] = request.GET.get('cms-toolbar-login-error', False) == '1'
+        if request and 'cms-toolbar-login-error' in request.GET:
+            context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
         context['cms_version'] = __version__
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
