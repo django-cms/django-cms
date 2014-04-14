@@ -295,8 +295,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.inlines = []
             for name in ['slug', 'title']:
                 form.base_fields[name].initial = u''
-            if 'target' in request.GET:
-                target = request.GET['target']
+            if 'target' in request.GET or 'copy_target' in request.GET:
+                if 'target' in request.GET:
+                    target = request.GET['target']
+                if 'copy_target' in request.GET:
+                    target = request.GET['copy_target']
                 if 'position' in request.GET:
                     position = request.GET['position']
                     if position == 'last-child' or position == 'first-child':
