@@ -528,6 +528,9 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
 
+				// adding django hacks
+				contents.find('.viewsitelink').attr('target', '_top');
+
 				// set modal buttons
   				that._setButtons($(this));
 
