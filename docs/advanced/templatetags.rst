@@ -580,7 +580,7 @@ show_menu
 =========
 
 The ``show_menu`` tag renders the navigation of the current page. You can
-overwrite the appearance and the HTML if you add a ``cms/menu.html`` template
+overwrite the appearance and the HTML if you add a ``menu/menu.html`` template
 to your project or edit the one provided with django CMS. ``show_menu`` takes
 four optional parameters: ``start_level``, ``end_level``, ``extra_inactive``,
 and ``extra_active``.
