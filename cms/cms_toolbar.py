@@ -160,7 +160,7 @@ class BasicToolbar(CMSToolbar):
                 or not page.has_view_permission(self.request, AnonymousUser()))):
             on_success=redirect_url
         else:
-            on_success=None
+            on_success=self.toolbar.REFRESH_PAGE
 
         admin_menu.add_ajax_item(
             logout_menu_text,
@@ -375,7 +375,7 @@ class PageToolbar(CMSToolbar):
                 if path == TEMPLATE_INHERITANCE_MAGIC:
                     templates_menu.add_break(TEMPLATE_MENU_BREAK)
                 templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
-                                             on_success='REFRESH_PAGE')
+                                             on_success=self.toolbar.REFRESH_PAGE)
         current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
 
         # advanced settings
@@ -461,11 +461,11 @@ class PageToolbar(CMSToolbar):
                 has_undo = versions.count() > 1
             undo_action = reverse('admin:cms_page_undo', args=(self.page.pk,))
             redo_action = reverse('admin:cms_page_redo', args=(self.page.pk,))
-            history_menu.add_ajax_item(_('Undo'), action=undo_action, disabled=not has_undo)
-            history_menu.add_ajax_item(_('Redo'), action=redo_action, disabled=not has_redo)
+            history_menu.add_ajax_item(_('Undo'), action=undo_action, disabled=not has_undo, on_success=self.toolbar.REFRESH_PAGE)
+            history_menu.add_ajax_item(_('Redo'), action=redo_action, disabled=not has_redo, on_success=self.toolbar.REFRESH_PAGE)
             history_menu.add_break(HISTORY_MENU_BREAK)
         revert_action = reverse('admin:cms_page_revert_page', args=(self.page.pk, self.current_lang))
         revert_question = _('Are you sure you want to revert to live?')
         history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
-                                   disabled=not self.page.is_dirty(self.current_lang))
+                                   disabled=not self.page.is_dirty(self.current_lang), on_success=self.toolbar.REFRESH_PAGE)
         history_menu.add_modal_item(_('View history'), url=reverse('admin:cms_page_history', args=(self.page.pk,)))
