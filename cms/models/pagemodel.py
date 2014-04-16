@@ -214,7 +214,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             # If an old title exists, overwrite. Otherwise create new
             title.pk = old_titles.pop(title.language, None)
             title.page = target
-            title.publisher_is_draft = False
+            title.publisher_is_draft = target.publisher_is_draft
             title.publisher_public_id = old_pk
             if published:
                 title.publisher_state = PUBLISHER_STATE_DEFAULT
