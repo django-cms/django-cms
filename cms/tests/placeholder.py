@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import itertools
-from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_ON
+from cms.settings import CMS_TOOLBAR_URL__EDIT_ON
 from cms.toolbar.toolbar import CMSToolbar
 from sekizai.context import SekizaiContext
 import warnings
@@ -591,7 +591,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             user = self.get_superuser()
             self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
                               password=getattr(user, get_user_model().USERNAME_FIELD))
-            response = self.client.get("/en/?%s" % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get("/en/?%s" % CMS_TOOLBAR_URL__EDIT_ON)
             for placeholder in page.placeholders.all():
                 self.assertContains(
                     response, "'placeholder_id': '%s'" % placeholder.pk)

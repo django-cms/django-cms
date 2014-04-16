@@ -181,9 +181,9 @@ then append ``?edit`` to the page's URL.
 This will make the frontend editor top banner appear, and will eventually
 require you to login.
 
-*If you replace default ``CMS_ADMIN_TOOLBAR__EDIT_ON`` on yours (in project)
-- you may edited placeholders with append ``?CMS_ADMIN_TOOLBAR__EDIT_ON`` to
-the page's URL. Please replace ``CMS_ADMIN_TOOLBAR__EDIT_ON`` to it's value.
+*If you replace default ``CMS_TOOLBAR_URL__EDIT_ON`` on yours (in project)
+- you may edited placeholders with append ``?CMS_TOOLBAR_URL__EDIT_ON`` to
+the page's URL. Please replace ``CMS_TOOLBAR_URL__EDIT_ON`` to it's value.
 
 You are now using the so-called *frontend edit mode*:
 

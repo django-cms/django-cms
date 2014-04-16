@@ -6,7 +6,7 @@ from cms.compat import get_user_model
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
 from cms.models import Title, EmptyTitle
-from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_ON
+from cms.settings import CMS_TOOLBAR_URL__EDIT_ON
 from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -310,6 +310,6 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         page.publish('en')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             self.assertEqual(response.status_code, 200)
 

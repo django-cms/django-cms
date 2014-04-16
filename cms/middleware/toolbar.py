@@ -53,9 +53,9 @@ class ToolbarMiddleware(object):
         If we should show the toolbar for this request, put it on
         request.toolbar. Then call the request_hook on the toolbar.
         """
-        edit = settings.CMS_ADMIN_TOOLBAR__EDIT_ON
-        edit_off = settings.CMS_ADMIN_TOOLBAR__EDIT_OFF
-        build = settings.CMS_ADMIN_TOOLBAR__BUILD
+        edit = settings.CMS_TOOLBAR_URL__EDIT_ON
+        edit_off = settings.CMS_TOOLBAR_URL__EDIT_OFF
+        build = settings.CMS_TOOLBAR_URL__BUILD
 
         if edit in request.GET and not request.session.get('cms_edit', False):
             if not request.session.get('cms_edit', False):
