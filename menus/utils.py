@@ -3,9 +3,11 @@ from __future__ import with_statement
 from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse, resolve
+
 import warnings
 from cms.models.titlemodels import Title
+
 
 
 def mark_descendants(nodes):
@@ -72,6 +74,7 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
+
 class DefaultLanguageChanger(object):
     def __init__(self, request):
         self.request = request
@@ -90,15 +93,6 @@ class DefaultLanguageChanger(object):
                 self._app_path = self.request.path
         return self._app_path
 
-    def __call__(self, lang):
-        if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
-            with force_language(lang):
-                try:
-                    return self.request.toolbar.obj.get_absolute_url()
-                except:
-                    pass
-        return '%s%s' % (self.get_page_path(lang), self.app_path)
-
     def get_page_path(self, lang):
         page = getattr(self.request, 'current_page', None)
         if page:
@@ -115,6 +109,34 @@ class DefaultLanguageChanger(object):
                 return '/%s/' % lang
             else:
                 return "/"
+
+    def __call__(self, lang):
+        page_language = get_language_from_request(self.request)
+        with force_language(page_language):
+            try:
+                view = resolve(self.request.path)
+            except:
+                view = None
+        if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
+            with force_language(lang):
+                try:
+                    return self.request.toolbar.obj.get_absolute_url()
+                except:
+                    pass
+        elif view and not view.url_name in ('pages-details-by-slug', 'pages-root'):
+            view_name = view.url_name
+            if view.namespace:
+                "%s:%s" % (view.namespace, view_name)
+            url = None
+            with force_language(lang):
+                try:
+                    url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
+                except NoReverseMatch:
+                    pass
+            if url:
+                return url
+        return '%s%s' % (self.get_page_path(lang), self.app_path)
+
 
 def simple_language_changer(func):
     warnings.warn("simple_language_changer is deprecated and will be removed in "
