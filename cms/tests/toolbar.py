@@ -422,7 +422,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page1.get_absolute_url('en') + '?edit')
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertFalse(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
 
             # Unpublished page, redirect
             response = self.client.get(page2.get_absolute_url('en') + '?edit')
