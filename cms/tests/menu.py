@@ -387,7 +387,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_page_language_url(self):
         path = self.get_page(3).get_absolute_url()
         context = self.get_context(path=path)
-        tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
+        tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % 'en')
         url = tpl.render(context)
         self.assertEqual(url, "%s" % path)
 
