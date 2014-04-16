@@ -6,7 +6,6 @@ from django.contrib.sites.models import Site
 
 from cms.api import create_page
 from cms.models import Page, Placeholder
-from cms.settings import CMS_TOOLBAR_URL__EDIT_ON
 from cms.utils import get_cms_setting
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -61,7 +60,7 @@ class SiteTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(reverse('admin:cms_page_preview_page', args=[page.pk, 'de']))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response._headers['location'][1], 'http://sample2.com/de/?%s&language=de' % CMS_TOOLBAR_URL__EDIT_ON)
+            self.assertEqual(response._headers['location'][1], 'http://sample2.com/de/?%s&language=de' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
 
     def test_site_publish(self):
         self._login_context.__exit__(None, None, None)
