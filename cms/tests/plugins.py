@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import datetime
 import json
-from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_ON
+from cms.settings import CMS_TOOLBAR_URL__EDIT_ON
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from django.core.cache import cache
 import os
@@ -1185,7 +1185,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEqual(self.section_count, plugin.sections.count())
-        response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+        response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugin.sections.through._meta.db_table, 'manytomany_rel_articlepluginmodel_sections')
 

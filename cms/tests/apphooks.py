@@ -9,7 +9,7 @@ from cms.apphook_pool import apphook_pool
 from cms.compat import get_user_model
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.models import Title
-from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_ON
+from cms.settings import CMS_TOOLBAR_URL__EDIT_ON
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
@@ -209,13 +209,13 @@ class ApphooksTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             with force_language("en"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+                request = self.get_request(path + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
                 request.LANGUAGE_CODE = 'en'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEqual(attached_to_page.pk, public_page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+                request = self.get_request(path + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
                 request.LANGUAGE_CODE = 'de'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEqual(attached_to_page.pk, public_page.pk)

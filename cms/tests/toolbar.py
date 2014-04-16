@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 
 from cms.models import UserSettings, PagePermission
 from cms.models import Page
-from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_ON
+from cms.settings import CMS_TOOLBAR_URL__EDIT_ON
 from cms.views import details
 from cms.api import create_page, create_title
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
@@ -37,7 +37,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
         path = path or page and page.get_absolute_url()
         if edit:
-            path += '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON
+            path += '?%s' % CMS_TOOLBAR_URL__EDIT_ON
         request = RequestFactory().get(path)
         request.session = {}
         request.user = user
@@ -135,7 +135,7 @@ class ToolbarTests(ToolbarTestBase):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
         self.assertContains(response, '<div id="cms_toolbar"')
@@ -145,7 +145,7 @@ class ToolbarTests(ToolbarTestBase):
         create_page("toolbar-page", "col_two.html", "en", published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Generic</span>')
 
@@ -153,7 +153,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         create_page("toolbar-page", "col_two.html", "en", published=True)
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="LinkPlugin">')
         self.assertContains(response,
@@ -246,7 +246,7 @@ class ToolbarTests(ToolbarTestBase):
             superuser = self.get_superuser()
             create_page("toolbar-page", "col_two.html", "en", published=True)
             with self.login_user_context(superuser):
-                response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+                response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'PPPP')
 
@@ -260,13 +260,13 @@ class ToolbarTests(ToolbarTestBase):
         create_page('test', 'nav_playground.html', 'en', published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             self.assertEqual(response.status_code, 200)
             setting = UserSettings.objects.get(user=superuser)
             setting.language = 'it'
             setting.save()
             with SettingsOverride(LANGUAGES=(('en', 'english'),)):
-                response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+                response = self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
                 self.assertEqual(response.status_code, 200)
                 self.assertNotContains(response, '/it/')
 
@@ -363,7 +363,7 @@ class ToolbarTests(ToolbarTestBase):
         # first_name and last_name haven't been provided.
         #
         with self.login_user_context(superuser):
-            response = self.client.get(page.get_absolute_url('en') + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get(page.get_absolute_url('en') + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             if DJANGO_1_4:
@@ -382,7 +382,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual('Super User', superuser.get_full_name())
         self.get_page_request(page, superuser, '/')
         with self.login_user_context(superuser):
-            response = self.client.get(page.get_absolute_url('en') + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get(page.get_absolute_url('en') + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_full_name()))
@@ -420,25 +420,25 @@ class ToolbarTests(ToolbarTestBase):
 
         with self.login_user_context(superuser):
             # Published page, no redirect
-            response = self.client.get(page1.get_absolute_url('en') + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get(page1.get_absolute_url('en') + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
 
             # Unpublished page, redirect
-            response = self.client.get(page2.get_absolute_url('en') + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get(page2.get_absolute_url('en') + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with login restrictions, redirect
-            response = self.client.get(page3.get_absolute_url('en') + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get(page3.get_absolute_url('en') + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with view permissions, redirect
-            response = self.client.get(page4.get_absolute_url('en') + '?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+            response = self.client.get(page4.get_absolute_url('en') + '?%s' % CMS_TOOLBAR_URL__EDIT_ON)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
@@ -1158,7 +1158,7 @@ class ToolbarAPITests(TestCase):
         self.assertEqual(result.index, 0)
 
     def test_not_is_staff(self):
-        request = RequestFactory().get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
+        request = RequestFactory().get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON)
         request.session = {}
         request.LANGUAGE_CODE = 'en'
         request.user = AnonymousUser()

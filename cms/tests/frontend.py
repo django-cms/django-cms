@@ -3,7 +3,7 @@ import sys
 import datetime
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import AppAlreadyRegistered
-from cms.settings import CMS_ADMIN_TOOLBAR__BUILD, CMS_ADMIN_TOOLBAR__EDIT_ON
+from cms.settings import CMS_TOOLBAR_URL__BUILD, CMS_TOOLBAR_URL__EDIT_ON
 from cms.test_utils.project.placeholderapp.models import Example1
 from django.core.urlresolvers import clear_url_caches
 from cms.appresolver import clear_app_resolvers
@@ -163,7 +163,7 @@ class ToolbarBasicTests(CMSLiveTests):
     def test_toolbar_login(self):
         User = get_user_model()
         create_page('Home', 'simple.html', 'en', published=True)
-        url = '%s/?%s' % (self.live_server_url, CMS_ADMIN_TOOLBAR__EDIT_ON)
+        url = '%s/?%s' % (self.live_server_url, CMS_TOOLBAR_URL__EDIT_ON)
         self.assertTrue(User.objects.all().count(), 1)
         self.driver.get(url)
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
@@ -191,7 +191,7 @@ class ToolbarBasicTests(CMSLiveTests):
                     apphook=Example1App)
 
 
-        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk, CMS_ADMIN_TOOLBAR__EDIT_ON)
+        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk, CMS_TOOLBAR_URL__EDIT_ON)
         self.driver.get(url)
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
@@ -215,7 +215,7 @@ class ToolbarBasicTests(CMSLiveTests):
         )
         create_page('apphook', 'simple.html', 'en', published=True,
                     apphook=Example1App)
-        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk, CMS_ADMIN_TOOLBAR__EDIT_ON)
+        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk, CMS_TOOLBAR_URL__EDIT_ON)
         self.driver.get(url)
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
@@ -286,7 +286,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         super(PlaceholderBasicTests, self).setUp()
 
     def _login(self):
-        url = '%s/?%s' % (self.live_server_url, CMS_ADMIN_TOOLBAR__EDIT_ON)
+        url = '%s/?%s' % (self.live_server_url, CMS_TOOLBAR_URL__EDIT_ON)
         self.driver.get(url)
         
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
@@ -301,14 +301,14 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
     def test_copy_from_language(self):
         self._login()
-        self.driver.get('%s/it/?%s' % (self.live_server_url, CMS_ADMIN_TOOLBAR__EDIT_ON))
+        self.driver.get('%s/it/?%s' % (self.live_server_url, CMS_TOOLBAR_URL__EDIT_ON))
 
         # check if there are no plugins in italian version of the page
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 0)
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % CMS_ADMIN_TOOLBAR__BUILD)
+        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % CMS_TOOLBAR_URL__BUILD)
         build_button.click()
 
         submenu = self.driver.find_element_by_css_selector('.cms_dragbar .cms_submenu')
@@ -336,7 +336,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self._login()
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % CMS_ADMIN_TOOLBAR__BUILD)
+        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % CMS_TOOLBAR_URL__BUILD)
         build_button.click()
 
         cms_draggable = self.driver.find_element_by_css_selector('.cms_draggable:nth-child(1)')

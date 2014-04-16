@@ -15,7 +15,7 @@ from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden,
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from django.utils import timezone
-from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_OFF, CMS_ADMIN_TOOLBAR__EDIT_ON
+from cms.settings import CMS_TOOLBAR_URL__EDIT_OFF, CMS_TOOLBAR_URL__EDIT_ON
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
@@ -705,7 +705,7 @@ class AdminTests(AdminTestsBase):
             response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk, 'en')))
             self.assertEqual(response.status_code, 302)
             url = response['Location']
-            self.assertTrue(url.endswith('?%' % CMS_ADMIN_TOOLBAR__EDIT_OFF))
+            self.assertTrue(url.endswith('?%' % CMS_TOOLBAR_URL__EDIT_OFF))
 
     def test_remove_plugin_requires_post(self):
         ph = Placeholder.objects.create(slot='test')
@@ -790,11 +790,11 @@ class AdminTests(AdminTestsBase):
             request = self.get_request('/?public=true')
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, CMS_ADMIN_TOOLBAR__EDIT_ON))
+            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, CMS_TOOLBAR_URL__EDIT_ON))
             request = self.get_request()
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, CMS_ADMIN_TOOLBAR__EDIT_ON))
+            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, CMS_TOOLBAR_URL__EDIT_ON))
             current_site = Site.objects.create(domain='django-cms.org', name='django-cms')
             page.site = current_site
             page.save()
@@ -803,7 +803,7 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'],
-                             'http://django-cms.org%s?%s&language=en' % (base_url, CMS_ADMIN_TOOLBAR__EDIT_ON))
+                             'http://django-cms.org%s?%s&language=en' % (base_url, CMS_TOOLBAR_URL__EDIT_ON))
 
     def test_too_many_plugins_global(self):
         conf = {
@@ -1383,17 +1383,17 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
             with self.assertNumQueries(FuzzyInt(40, 66)):
-                output = force_unicode(self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON).content)
+                output = force_unicode(self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON).content)
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
             with self.assertNumQueries(FuzzyInt(40, 60)):
-                output = force_unicode(self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON).content)
+                output = force_unicode(self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON).content)
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(18, 34)):
-            force_unicode(self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON).content)
+            force_unicode(self.client.get('/en/?%s' % CMS_TOOLBAR_URL__EDIT_ON).content)
         with self.assertNumQueries(FuzzyInt(13, 15)):
             force_unicode(self.client.get('/en/').content)
 
