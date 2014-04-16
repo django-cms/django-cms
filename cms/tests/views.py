@@ -12,6 +12,7 @@ from django.template import Variable
 from cms.api import create_page
 from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission
+from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_ON
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -123,7 +124,7 @@ class ViewTests(SettingsOverrideTestCase):
                     redirect='/en/page2')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?edit')
+            response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
             self.assertEqual(response.status_code, 200)
 
     def test_login_required(self):
@@ -146,13 +147,13 @@ class ViewTests(SettingsOverrideTestCase):
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
         # Anon user
-        response = self.client.get("/en/?edit")
+        response = self.client.get("/en/?%s" % CMS_ADMIN_TOOLBAR__EDIT_ON)
         self.assertNotContains(response, "cms_toolbar-item_switch", 200)
 
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
-            response = self.client.get("/en/?edit")
+            response = self.client.get("/en/?%" % CMS_ADMIN_TOOLBAR__EDIT_ON)
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
         # Admin but with no permission
@@ -160,12 +161,12 @@ class ViewTests(SettingsOverrideTestCase):
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
         with self.login_user_context(user):
-            response = self.client.get("/en/?edit")
+            response = self.client.get("/en/?%s" % CMS_ADMIN_TOOLBAR__EDIT_ON)
         self.assertNotContains(response, "cms_toolbar-item_switch", 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
-            response = self.client.get("/en/?edit")
+            response = self.client.get("/en/?%s" % CMS_ADMIN_TOOLBAR__EDIT_ON)
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
 

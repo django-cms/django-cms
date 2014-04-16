@@ -3,6 +3,7 @@ from django.db.models import Q
 from functools import wraps
 import json
 import sys
+from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_OFF, CMS_ADMIN_TOOLBAR__EDIT_ON
 from cms.toolbar_pool import toolbar_pool
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 
@@ -1096,11 +1097,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         path = page.get_absolute_url(language, fallback=True)
                     else:
                         public_page = Page.objects.get(publisher_public=page.pk)
-                        path = '%s?edit_off' % public_page.get_absolute_url(language, fallback=True)
+                        path = '%s?%s' % (public_page.get_absolute_url(language, fallback=True), CMS_ADMIN_TOOLBAR__EDIT_OFF)
                 else:
-                    path = '%s?edit_off' % referrer
+                    path = '%s?%s' % (referrer, CMS_ADMIN_TOOLBAR__EDIT_OFF)
             else:
-                path = '/?edit_off'
+                path = '/?%s' % CMS_ADMIN_TOOLBAR__EDIT_OFF
 
         return HttpResponseRedirect(path)
 
@@ -1185,7 +1186,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
         if reverse('admin:index') not in referer:
-            path = '%s?edit_off' % referer.split('?')[0]
+            path = '%s?%s' % (referer.split('?')[0], CMS_ADMIN_TOOLBAR__EDIT_OFF)
         return HttpResponseRedirect(path)
 
     @create_revision()
@@ -1290,7 +1291,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """Redirecting preview function based on draft_id
         """
         page = get_object_or_404(Page, id=object_id)
-        attrs = "?edit"
+        attrs = "?%s" % CMS_ADMIN_TOOLBAR__EDIT_ON
         attrs += "&language=" + language
         with force_language(language):
             url = page.get_absolute_url(language) + attrs

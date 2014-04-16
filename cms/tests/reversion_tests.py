@@ -13,6 +13,7 @@ from reversion.models import Revision, Version
 
 from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.settings import CMS_ADMIN_TOOLBAR__EDIT_ON
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
@@ -195,9 +196,9 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(Title.objects.get(page=page1).slug, 'page3')
             response = self.client.get(reverse("admin:cms_page_changelist"))
             self.assertEqual(response.status_code, 200)
-            response = self.client.get('/en/?edit')
+            response = self.client.get('/en/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
             self.assertEqual(response.status_code, 200)
-            response = self.client.get('/en/page1/?edit')
+            response = self.client.get('/en/page1/?%s' % CMS_ADMIN_TOOLBAR__EDIT_ON)
             self.assertEqual(response.status_code, 200)
 
 
