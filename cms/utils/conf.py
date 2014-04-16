@@ -56,6 +56,9 @@ DEFAULTS = {
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
     'MAX_PAGE_PUBLISH_REVERSIONS': 10,
     'MAX_PAGE_HISTORY_REVERSIONS': 15,
+    'TOOLBAR_URL__EDIT_ON': 'edit',
+    'TOOLBAR_URL__EDIT_OFF': 'edit_off',
+    'TOOLBAR_URL__BUILD': 'build',
 }
 
 
@@ -75,6 +78,21 @@ def get_media_root():
 @default('CMS_MEDIA_URL')
 def get_media_url():
     return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
+
+
+@default('CMS_TOOLBAR_URL__EDIT_ON')
+def get_toolbar_url__edit_on():
+    return get_cms_setting('TOOLBAR_URL__EDIT_ON')
+
+
+@default('CMS_TOOLBAR_URL__EDIT_OFF')
+def get_toolbar_url__edit_off():
+    return get_cms_setting('TOOLBAR_URL__EDIT_OFF')
+
+
+@default('CMS_TOOLBAR_URL__BUILD')
+def get_toolbar_url__build():
+    return get_cms_setting('TOOLBAR_URL__BUILD')
 
 
 def get_templates():
@@ -229,6 +247,9 @@ COMPLEX = {
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
+    'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
+    'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
+    'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
 }
 
 
