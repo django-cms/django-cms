@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.settings import CMS_TOOLBAR_URL__EDIT_OFF
+from cms.utils.conf import get_cms_setting
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 
 from djangocms_text_ckeditor.models import Text
@@ -176,7 +176,7 @@ class PublishingTests(TestCase):
         with self.login_user_context(superuser):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], "http://testserver/en/?%s" % CMS_TOOLBAR_URL__EDIT_OFF)
+            self.assertEqual(response['Location'], "http://testserver/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
 
     def test_publish_single(self):
         name = self._testMethodName
