@@ -1026,7 +1026,7 @@ register.tag(StaticPlaceholderNode)
 class RenderPlaceholder(AsTag):
     """
     Render the content of the plugins contained in a placeholder.
-    The result can be assigned to a variable within the template's content by using the `as` keyword.
+    The result can be assigned to a variable within the template's context by using the `as` keyword.
     It behaves in the same way as the `PageAttribute` class, check its docstring for more details.
     """
     name = 'render_placeholder'
