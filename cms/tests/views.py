@@ -152,7 +152,7 @@ class ViewTests(SettingsOverrideTestCase):
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
-            response = self.client.get("/en/?%" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
         # Admin but with no permission
