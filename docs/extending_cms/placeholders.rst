@@ -181,9 +181,13 @@ then append ``?edit`` to the page's URL.
 This will make the frontend editor top banner appear, and will eventually
 require you to login.
 
-*If you replace default ``CMS_TOOLBAR_URL__EDIT_ON`` on yours (in project)
-- you may edited placeholders with append ``?CMS_TOOLBAR_URL__EDIT_ON`` to
-the page's URL. Please replace ``CMS_TOOLBAR_URL__EDIT_ON`` to it's value.
+If you need change ``?edit`` to custom string (eq: ``?admin_on``) you may
+set ``CMS_TOOLBAR_URL__EDIT_ON`` variable in yours ``settings.py`` to
+``"admin_on"``.
+
+Also you may change ``?edit_off`` or ``?build`` to custom string with
+set ``CMS_TOOLBAR_URL__EDIT_OFF`` or ``CMS_TOOLBAR_URL__BUILD`` variables
+in yours ``settings.py``.
 
 You are now using the so-called *frontend edit mode*:
 
