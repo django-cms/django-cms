@@ -135,6 +135,14 @@ only the english plugins:
 
     {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 
+.. versionadded:: 3.1.0
+    This template tag supports the ``as`` argument. With this you can assign the result
+    of the template tag to a new variable that you can use elsewhere in the template.
+
+    Example::
+
+        {% render_placeholder mymodel_instance.my_placeholder as placeholder_content %}
+        <p>{{ placeholder_content }}</p>
 
 
 show_placeholder
