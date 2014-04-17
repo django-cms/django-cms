@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from logging import Logger
 from os.path import join
 
 from django.utils.timezone import now
@@ -168,6 +169,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         check_title_slugs, overwrite_url on the moved page don't need any check
         as it remains the same regardless of the page position in the tree
         """
+        assert self.publisher_is_draft
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
 
@@ -178,6 +180,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # and moving to a top level position
         if position in ('left', 'right') and not target.parent and is_inherited_template:
             self.template = self.get_template()
+            if target.publisher_public_id and position == 'right':
+                public = target.publisher_public
+                if target.tree_id + 1 == public.tree_id:
+                    target = target.publisher_public
+                else:
+                    Logger.warn('mptt tree may need rebuilding: run manage.py cms fix-mptt')
         self.move_to(target, position)
 
         # fire signal
