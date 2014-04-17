@@ -704,7 +704,7 @@ class AdminTests(AdminTestsBase):
             response = self.client.get(reverse('admin:cms_page_revert_page', args=(self.page.pk, 'en')))
             self.assertEqual(response.status_code, 302)
             url = response['Location']
-            self.assertTrue(url.endswith('?%' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
+            self.assertTrue(url.endswith('?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
 
     def test_remove_plugin_requires_post(self):
         ph = Placeholder.objects.create(slot='test')
