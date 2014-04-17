@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import datetime
+from cms.utils.conf import get_cms_setting
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import AppAlreadyRegistered
 from cms.test_utils.project.placeholderapp.models import Example1

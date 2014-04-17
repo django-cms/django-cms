@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import sys
+from cms.utils.conf import get_cms_setting
 
 from django.core.urlresolvers import clear_url_caches, reverse
 
