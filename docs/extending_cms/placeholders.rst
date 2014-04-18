@@ -189,6 +189,12 @@ Also you may change ``?edit_off`` or ``?build`` to custom string with
 set ``CMS_TOOLBAR_URL__EDIT_OFF`` or ``CMS_TOOLBAR_URL__BUILD`` variables
 in yours ``settings.py``.
 
+Notice: when you changing  ``CMS_TOOLBAR_URL__EDIT_ON`` or
+``CMS_TOOLBAR_URL__EDIT_OFF`` or ``CMS_TOOLBAR_URL__BUILD`` please be
+careful because you may replace reserved strings in system (eq:
+``?page``). We recommended you use unique strings for this option
+(eq: ``secret_admin`` or ``company_name``).
+
 You are now using the so-called *frontend edit mode*:
 
 |edit-banner|
