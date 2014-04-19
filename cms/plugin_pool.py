@@ -140,10 +140,10 @@ class PluginPool(object):
 
                 splitter = '%s_' % model._meta.app_label
                 table_name = model._meta.db_table
+                splitted = table_name.split(splitter, 1)
                 if (table_name not in table_names
                 and splitter in table_name):
                     old_db_name = table_name
-                    splitted = table_name.split(splitter, 1)
                     table_name = 'cmsplugin_%s' % splitted[1]
                     if table_name in table_names:
                         model._meta.db_table = table_name
@@ -157,7 +157,7 @@ class PluginPool(object):
                         if (table_name not in table_names
                         and splitter in table_name):
                             old_db_name = table_name
-                            splitted = table_name.split(splitter, 1)
+                            table_name.split(splitter, 1)
                             table_name = 'cmsplugin_%s' % splitted[1]
                             if table_name in table_names:
                                 att.rel.through._meta.db_table = table_name
@@ -169,7 +169,7 @@ class PluginPool(object):
                         if (table_name not in table_names
                         and splitter in table_name):
                             old_db_name = table_name
-                            splitted = table_name.split(splitter, 1)
+                            table_name.split(splitter, 1)
                             table_name = 'cmsplugin_%s_items' % splitted[1]
                             if table_name in table_names:
                                 att.through._meta.db_table = table_name
