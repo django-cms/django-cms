@@ -451,12 +451,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             context = {}
         language = get_language_from_request(request, obj)
         languages = self._get_site_languages(obj)
+        # Dates and Advanced Settings are not language dependent, thus we hide the language
+        # selection bar: the language is forced through the form class
+        language_indpendent = context.get('publishing_dates', False) or context.get('advanced_settings', False)  
         context.update({
             'language': language,
             'language_tabs': languages,
-            # Dates are not language dependent, thus we hide the language
-            # selection bar: the language is forced through the form class
-            'show_language_tabs': len(list(languages)) > 1 and not context.get('publishing_dates', False),
+            'show_language_tabs': len(list(languages)) > 1 and not language_indpendent,
         })
         return context
 
