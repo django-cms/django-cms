@@ -154,7 +154,7 @@ class PluginPool(object):
                         model._meta.db_table = bad_table_name
                         warnings.warn(
                             'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
+                                bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
 
                 for att_name in model.__dict__.keys():
                     att = model.__dict__[att_name]
