@@ -13,8 +13,10 @@ from docopt import docopt
 from django import VERSION
 from django.utils import autoreload
 from django.utils.encoding import force_text
+from django.core.management import call_command
 
 import cms
+from cms.utils.compat import DJANGO_1_6
 from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
@@ -51,14 +53,16 @@ Options:
 
 def server(bind='127.0.0.1', port=8000, migrate_opt=False):
     if os.environ.get("RUN_MAIN") != "true":
-        from south.management.commands import syncdb, migrate
-        if migrate_opt:
-            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
-            migrate.Command().handle(interactive=False, verbosity=1)
+        if DJANGO_1_6:
+            from south.management.commands import syncdb, migrate
+            if migrate_opt:
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
+                migrate.Command().handle(interactive=False, verbosity=1)
+            else:
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
+                migrate.Command().handle(interactive=False, verbosity=1, fake=True)
         else:
-            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
-            migrate.Command().handle(interactive=False, verbosity=1, fake=True)
-        
+            call_command("migrate", database='default')
         from cms.compat import get_user_model
         User = get_user_model()        
         if not User.objects.filter(is_superuser=True).exists():

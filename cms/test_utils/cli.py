@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import os
 import dj_database_url
-from cms.utils.compat import DJANGO_1_5, PY2
+from cms.utils.compat import DJANGO_1_5, DJANGO_1_6, DJANGO_1_7, PY2
 import django
 
 gettext = lambda s: s
@@ -119,7 +119,6 @@ def configure(db_url, **extra):
             'cms.test_utils.project.fileapp',
             'cms.test_utils.project.objectpermissionsapp',
             'cms.test_utils.project.extensionapp',
-            'south',
             'reversion',
             'sekizai',
             'hvad',
@@ -259,63 +258,13 @@ def configure(db_url, **extra):
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ),
         ALLOWED_HOSTS=['localhost'],
-        # LOGGING={
-        #     'version': 1,
-        #     'disable_existing_loggers': True,
-        #     'formatters': {
-        #         'verbose': {
-        #             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        #         },
-        #         'simple': {
-        #             'format': '%(levelname)s %(message)s'
-        #         },
-        #     },
-        #     'handlers': {
-        #         'null': {
-        #             'level': 'DEBUG',
-        #             'class': 'django.utils.log.NullHandler',
-        #         },
-        #         'console': {
-        #             'level': 'DEBUG',
-        #             'class': 'logging.StreamHandler',
-        #             'formatter': 'simple'
-        #         },
-        #         'mail_admins': {
-        #             'level': 'ERROR',
-        #              'filters': ['require_debug_false'],
-        #             'class': 'django.utils.log.AdminEmailHandler',
-        #         }
-        #     },
-        #     'filters': {
-        #         'require_debug_false': {
-        #             '()': 'django.utils.log.RequireDebugFalse'
-        #         }
-        #     },
-        #     'loggers': {
-        #         'django': {
-        #             'handlers': ['console'],
-        #             'propagate': True,
-        #             'level': 'INFO',
-        #         },
-        #         'django.request': {
-        #             'handlers': ['console'],
-        #             'level': 'ERROR',
-        #             'propagate': False,
-        #         },
-        #         'django.db': {
-        #             'handlers': ['console'],
-        #             'level': 'ERROR',
-        #             'propagate': False,
-        #         },
-        #         'cms': {
-        #             'handlers': ['console'],
-        #             'level': 'INFO',
-        #         }
-        #     }
-        # }
     )
     from django.utils.functional import empty
 
+    if DJANGO_1_6:
+        defaults['INSTALLED_APPS'].append('south')
+    else:
+        defaults['SOUTH_MIGRATION_MODULES'] = 'cms.south_migration'
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
 
@@ -338,9 +287,12 @@ def configure(db_url, **extra):
             defaults.update(loads(extra_settings))
     
     settings.configure(**defaults)
-    from south.management.commands import patch_for_test_db_setup
+    if DJANGO_1_6:
+        from south.management.commands import patch_for_test_db_setup
 
-    patch_for_test_db_setup()
-    from django.contrib import admin
+        patch_for_test_db_setup()
+        from django.contrib import admin
 
-    admin.autodiscover()
+        admin.autodiscover()
+    else:
+        django.setup()
