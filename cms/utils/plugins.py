@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
 from django.template import NodeList, VariableNode, TemplateSyntaxError
 from django.template.loader import get_template
-from django.template.loader_tags import ConstantIncludeNode, ExtendsNode, BlockNode
+from django.template.loader_tags import IncludeNode, ExtendsNode, BlockNode
 from django.utils.translation import ugettext as _
 from sekizai.helpers import is_variable_extend_node
 
@@ -99,7 +99,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
             placeholders.append(node.get_name())
         # if it's a Constant Include Node ({% include "template_name.html" %})
         # scan the child template
-        elif isinstance(node, ConstantIncludeNode):
+        elif isinstance(node, IncludeNode):
             # if there's an error in the to-be-included template, node.template becomes None
             if node.template:
                 placeholders += _scan_placeholders(node.template.nodelist, current_block)
