@@ -25,7 +25,6 @@ class PlaceholderField(models.ForeignKey):
     def deconstruct(self):
         name, path, args, kwargs = super(PlaceholderField, self).deconstruct()
         kwargs['slotname'] = self.slotname
-        print kwargs
         return name, path, args, kwargs
 
     def _get_new_placeholder(self, instance):
