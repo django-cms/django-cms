@@ -1,3 +1,4 @@
 -r requirements_base.txt
 django>=1.6
+South>=0.7.2
 django-reversion>=1.8
