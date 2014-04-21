@@ -6,10 +6,10 @@
 #cms_toolbar {
 //######################################################################################################################
 // #SUBNAV#
-.cms_submenu { display:block; float:right; width:20px; height:15px; cursor:pointer; position:relative;
+.cms_submenu { display:block; width:20px; height:15px; cursor:pointer; position:absolute; right: 5px;
 	background:url('../img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
 
-.cms_submenu-lang { float:right; padding:0 5px;position:relative; top:-1px; right:-1px;
+.cms_submenu-lang { padding:0 5px;position:absolute; top:3px; right:3px;
 	border:1px solid $color-grey-10; background:white; @include border-radius(3px); }
 
 .cms_submenu-dropdown {
