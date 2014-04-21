@@ -318,7 +318,7 @@ class PageToolbar(CMSToolbar):
                 question = _('Are you sure you want copy all plugins from %s?') % language['name']
                 language_menu.add_ajax_item(_("Copy all plugins from %s") % language['name'], action=url,
                                             data={'source_language': language['code'],
-                                                'target_language': self.current_lang}, question=question)
+                                                'target_language': self.current_lang}, question=question, on_success=self.toolbar.REFRESH_PAGE)
 
     def change_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
@@ -403,7 +403,7 @@ class PageToolbar(CMSToolbar):
         else:
             nav_title = _("Display in navigation")
         nav_action = reverse('admin:cms_page_change_innavigation', args=(self.page.pk,))
-        current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode)
+        current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not_edit_mode, on_success=self.toolbar.REFRESH_PAGE)
         if self.title:
             # publisher
             if self.title.published:
@@ -413,7 +413,7 @@ class PageToolbar(CMSToolbar):
                 publish_title = _('Publish page')
                 publish_url = reverse('admin:cms_page_publish_page', args=(self.page.pk, self.current_lang))
 
-            current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode)
+            current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not_edit_mode, on_success=self.toolbar.REFRESH_PAGE)
         current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
         # delete
         delete_url = reverse('admin:cms_page_delete', args=(self.page.pk,))
