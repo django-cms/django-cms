@@ -51,7 +51,7 @@ class ApphookPool(object):
     def get_apphooks(self):
         hooks = []
 
-        if not self.discovered():
+        if not self.discovered:
             self.discover_apps()
 
         for app_name in self.apps:
