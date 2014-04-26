@@ -10,39 +10,43 @@ from cms.utils.django_load import load, iterload_objects
 
 
 class ApphookPool(object):
+
     def __init__(self):
         self.apps = {}
         self.discovered = False
-        self.block_register = False
 
     def clear(self):
+        # TODO: remove this method, it's Python, we don't need it.
         self.apps = {}
         self.discovered = False
 
     def register(self, app):
-        if not self.block_register:
-            # Quit early, If application is already registered
-            if app.__name__ in self.apps:
-                raise AppAlreadyRegistered(
-                    'A CMS application %r is already registered' % app.__name__)
+        # Quit early, If application is already registered
+        if app.__name__ in self.apps:
+            raise AppAlreadyRegistered(
+                'A CMS application %r is already registered' % app.__name__)
 
-            if not issubclass(app, CMSApp):
-                raise ImproperlyConfigured(
-                    'CMS application must inherit from cms.app_base.CMSApp, '
-                    'but %r does not' % app.__name__)
+        if not issubclass(app, CMSApp):
+            raise ImproperlyConfigured(
+                'CMS application must inherit from cms.app_base.CMSApp, '
+                'but %r does not' % app.__name__)
 
-            if not hasattr(app, 'menus') and hasattr(app, 'menu'):
-                warnings.warn("You define a 'menu' attribute on CMS application %r, "
-                    "but the 'menus' attribute is empty, did you make a typo?" % app.__name__)
+        if not hasattr(app, 'menus') and hasattr(app, 'menu'):
+            warnings.warn("You define a 'menu' attribute on CMS application %r, "
+                "but the 'menus' attribute is empty, did you make a typo?" % app.__name__)
 
-            self.apps[app.__name__] = app
+        self.apps[app.__name__] = app
 
     def discover_apps(self):
         apphooks = get_cms_setting('APPHOOKS')
 
-        if len(apphooks):
-            for app_class in iterload_objects(apphooks):
-                self.register(app_class)
+        if apphooks:
+            for cls in iterload_objects(apphooks):
+                try:
+                    self.register(cls)
+                except AppAlreadyRegistered, e:
+                    pass
+
         else:
             load('cms_app')
 
