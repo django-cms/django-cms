@@ -52,9 +52,6 @@ def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
     else:
         pages = Page.objects.public().published(site=site)
 
-    # Check if there are any pages
-    if not pages.all_root().exists():
-        return Page.objects.none()
     if not path:
         # if there is no path (slashes stripped) and we found a home, this is the
         # home page.

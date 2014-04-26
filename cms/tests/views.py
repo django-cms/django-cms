@@ -214,8 +214,8 @@ class ContextTests(SettingsOverrideTestCase):
             # django applications
             with self.assertNumQueries(num_queries):
                 response = self.client.get("/en/admin/")
-            # 2 queries run when determining current page
-            with self.assertNumQueries(2):
+            # One query when determining current page
+            with self.assertNumQueries(1):
                 self.assertFalse(response.context['request'].current_page)
                 self.assertFalse(response.context['request']._current_page_cache)
             # Zero more queries when determining the current template
@@ -229,7 +229,7 @@ class ContextTests(SettingsOverrideTestCase):
         # Number of queries when context processors is not enabled
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
             # Baseline number of queries
-            with self.assertNumQueries(FuzzyInt(15, 19)) as context:
+            with self.assertNumQueries(FuzzyInt(13, 17)) as context:
                 response = self.client.get("/en/page-2/")
                 if DJANGO_1_5:
                     num_queries_page = len(context.connection.queries) - context.starting_queries
