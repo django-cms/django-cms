@@ -214,8 +214,8 @@ class ContextTests(SettingsOverrideTestCase):
             # django applications
             with self.assertNumQueries(num_queries):
                 response = self.client.get("/en/admin/")
-            # 3 queries run when determining current page
-            with self.assertNumQueries(3):
+            # 2 queries run when determining current page
+            with self.assertNumQueries(2):
                 self.assertFalse(response.context['request'].current_page)
                 self.assertFalse(response.context['request']._current_page_cache)
             # Zero more queries when determining the current template
