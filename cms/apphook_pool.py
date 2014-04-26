@@ -44,7 +44,7 @@ class ApphookPool(object):
             for cls in iterload_objects(apphooks):
                 try:
                     self.register(cls)
-                except AppAlreadyRegistered, e:
+                except AppAlreadyRegistered:
                     pass
 
         else:
