@@ -104,13 +104,13 @@ def get_templates():
         if os.path.exists(os.path.join(tpldir, 'templates.conf')):
             tpl_conf = open(os.path.join(tpldir, 'templates.conf')).readlines()
             templates = [conf.split(":") for conf in tpl_conf if len(conf) > 0]
-            templates = [(data[0].strip(), data[1].strip()) for data in templates]
+            templates = [(data[0].strip(), _(data[1].strip())) for data in templates]
         else:
             templates = list((tpl, tpl) for tpl in os.listdir(tpldir))
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):
-        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
+        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _(constants.TEMPLATE_INHERITANCE_LABEL)))
     return templates
 
 

@@ -30,6 +30,7 @@ from cms.tests.sitemap import *  # nopyflakes
 from cms.tests.static_placeholder import *  # nopyflakes
 from cms.tests.staticfiles import *  # nopyflakes
 from cms.tests.templatetags import *  # nopyflakes
+from cms.tests.templates import *  # nopyflakes
 from cms.tests.toolbar import *  # nopyflakes
 from cms.tests.toolbar_pool import *  # nopyflakes
 from cms.tests.urlutils import *  # nopyflakes
@@ -44,4 +45,3 @@ from cms.tests.frontend import *  # nopyflakes
 from cms.tests.signals import *  # nopyflakes
 from cms.tests.no_i18n import *  # nopyflakes
 from cms.tests.cache import *  # nopyflakes
-

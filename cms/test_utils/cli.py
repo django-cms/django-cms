@@ -22,7 +22,9 @@ def configure(db_url, **extra):
         DB = dj_database_url.parse(db_url)
     else:
         DB = {}
+    PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
     defaults = dict(
+        PROJECT_PATH=PROJECT_PATH,
         CACHES={
             'default': {
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -64,7 +66,7 @@ def configure(db_url, **extra):
             "django.core.context_processors.static",
         ],
         TEMPLATE_DIRS=[
-            os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
+            os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
             #'debug_toolbar.middleware.DebugToolbarMiddleware',
