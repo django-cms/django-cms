@@ -50,7 +50,7 @@ $(document).ready(function () {
 				// clear timeout
 				clearTimeout(that.timer);
 
-				if(e.type === 'mouseleave') hide();
+				if(e.type === 'mouseleave' && !that.containers.has(e.toElement).length) hide();
 
 				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
 				var el = that.containers.eq(index);
