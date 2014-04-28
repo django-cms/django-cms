@@ -213,6 +213,16 @@ class AdvancedSettingsForm(forms.ModelForm):
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
 
+    fieldsets = (
+        (None, {
+            'fields': ('overwrite_url','redirect'),
+        }),
+        ('Language independent options', {
+            'fields': ('site', 'template', 'reverse_id', 'soft_root', 'navigation_extenders',
+            'application_urls', 'application_namespace', "xframe_options",)
+        })
+    )
+
     def __init__(self, *args, **kwargs):
         super(AdvancedSettingsForm, self).__init__(*args, **kwargs)
         self.fields['language'].widget = HiddenInput()

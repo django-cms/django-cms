@@ -238,6 +238,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
             obj.publish(language)
 
+    def get_fieldsets(self, request, obj=None):
+        form = self.get_form(request, obj, fields=None)
+        if getattr(form, 'fieldsets', None) is None:
+            fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
+            return [(None, {'fields': fields})]
+        else:
+            return form.fieldsets
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Get PageForm for the Page model and modify its fields depending on
