@@ -9,7 +9,7 @@
 .cms_submenu { display:block; width:20px; height:15px; cursor:pointer; position:absolute; right: 5px;
 	background:url('../img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
 
-.cms_submenu-lang { padding:0 5px;position:absolute; top:3px; right:3px;
+.cms_submenu-lang { padding:0 5px; position:absolute; top:3px; right:3px;
 	border:1px solid $color-grey-10; background:white; @include border-radius(3px); }
 
 .cms_submenu-dropdown {
