@@ -7,6 +7,7 @@ $(document).ready(function () {
 	 * Sideframe
 	 * Controls a cms specific sideframe
 	 */
+
 	CMS.Sideframe = new CMS.Class({
 
 		implement: [CMS.API.Helpers],
@@ -48,14 +49,14 @@ $(document).ready(function () {
             this.sideframe.find('.cms_sideframe-back').bind(this.click, function () {
                 //go back in iframe history
                 var iframe = $(this).parents('.cms_sideframe').find('iframe').get(0);
-                iframe.contentWindow.history.back();
+                that._moveInSidebarHistory(iframe, true);
 			});
 
             // attach forward event
             this.sideframe.find('.cms_sideframe-forward').bind(this.click, function () {
                 //go forward in iframe history
                 var iframe = $(this).parents('.cms_sideframe').find('iframe').get(0);
-                iframe.contentWindow.history.forward();
+                that._moveInSidebarHistory(iframe);
 			});
 
 			// attach close event
@@ -124,6 +125,7 @@ $(document).ready(function () {
 			// attach load event to iframe
 			iframe.bind('load', function () {
 				var contents = iframe.contents();
+                that._addToSidebarHistory(this.contentWindow.location.href)
 
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
@@ -366,7 +368,61 @@ $(document).ready(function () {
 			url = origin + tmp;
 
 			return url;
-		}
+		},
+
+        _addToSidebarHistory: function(url){
+            var currentPosition, currentHistory;
+
+            // If we come from the sidebar navigation arrows, do nothing
+            if (localStorage.fromSidebarNavigation && JSON.parse(localStorage.fromSidebarNavigation)){
+                localStorage.fromSidebarNavigation = JSON.stringify(false);
+            }
+            // If we are there for the first time, initialize the context
+            else if (!localStorage.sideframeHistory){
+                currentHistory = [url];
+                currentPosition = 0;
+                localStorage.sideframeHistory = JSON.stringify(currentHistory);
+                localStorage.currentSidebarHistoryPosition = JSON.stringify(currentPosition);
+            }
+            // Regular click on a new link, should be added to the navigation history
+            else {
+                currentHistory = JSON.parse(localStorage.sideframeHistory);
+                currentPosition = JSON.parse(localStorage.currentSidebarHistoryPosition);
+                currentHistory.splice(currentPosition+1, currentHistory.length, url);
+                localStorage.sideframeHistory = JSON.stringify(currentHistory);
+                localStorage.currentSidebarHistoryPosition = currentHistory.length-1;
+            }
+        },
+
+        _moveInSidebarHistory: function(iframe, reverse){
+            var currentPosition=0,
+                currentHistory,
+                newPosition=0;
+
+            // If we are not using the sidebar navigation without an history, proceed
+            if (localStorage.sideframeHistory){
+                currentHistory = JSON.parse(localStorage.sideframeHistory);
+                currentPosition = JSON.parse(localStorage.currentSidebarHistoryPosition);
+                newPosition = currentPosition || 0;
+
+                // Change the position according to the button used (back or forward)
+                if (reverse){
+                    newPosition=currentPosition-1;
+                }
+                else{
+                    newPosition =currentPosition+1;
+                }
+            }
+
+            // Only change the context and the page if we are not at the limit
+            if (newPosition >= 0 && newPosition <= currentHistory.length-1){
+                iframe.contentWindow.location.href = JSON.parse(localStorage.sideframeHistory)[newPosition];
+                localStorage.currentSidebarHistoryPosition = JSON.stringify(newPosition);
+                localStorage.fromSidebarNavigation = JSON.stringify(true);
+            }
+
+
+        }
 
 	});
 
