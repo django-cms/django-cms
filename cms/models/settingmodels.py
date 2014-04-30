@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
+
+# TODO: Replace with approprieate standatd function from Django
+from cms.utils.compat.dj import force_unicode
+
 
 user_model_label = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+
 
 @python_2_unicode_compatible
 class UserSettings(models.Model):
@@ -20,5 +25,3 @@ class UserSettings(models.Model):
 
     def __str__(self):
         return force_unicode(self.user)
-
-

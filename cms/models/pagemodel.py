@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db import models
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import get_language, ugettext_lazy as _
 from mptt.models import MPTTModel
 
@@ -22,7 +23,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.compat import DJANGO_1_5
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to

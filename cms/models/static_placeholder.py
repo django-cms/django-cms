@@ -1,15 +1,14 @@
 import uuid
-from cms.utils.compat.dj import python_2_unicode_compatible
-from cms.utils.copy_plugins import copy_plugins_to
+
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models.fields import PlaceholderField
 from cms.models.pluginmodel import CMSPlugin
-
+from cms.utils.copy_plugins import copy_plugins_to
 
 
 def static_slotname(instance):
