@@ -44,6 +44,20 @@ $(document).ready(function () {
 		_events: function () {
 			var that = this;
 
+            // attach back event
+            this.sideframe.find('.cms_sideframe-back').bind(this.click, function () {
+                //go back in iframe history
+                var iframe = $(this).parents('.cms_sideframe').find('iframe').get(0);
+                iframe.contentWindow.history.back();
+			});
+
+            // attach forward event
+            this.sideframe.find('.cms_sideframe-forward').bind(this.click, function () {
+                //go forward in iframe history
+                var iframe = $(this).parents('.cms_sideframe').find('iframe').get(0);
+                iframe.contentWindow.history.forward();
+			});
+
 			// attach close event
 			this.sideframe.find('.cms_sideframe-close').bind(this.click, function () {
 				that.close(true);
