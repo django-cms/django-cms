@@ -22,6 +22,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_5
+from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.helpers import reversion_register
 
