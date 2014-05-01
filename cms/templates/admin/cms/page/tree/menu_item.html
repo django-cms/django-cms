@@ -1,7 +1,7 @@
 {% load cms_admin i18n %}
 <script>
 (function($){
-	$('.col-actions [data-shift-href]').on('click', function(evt){
+	$('a[data-shift-href]').on('click', function(evt){
 		var href;
 		evt.preventDefault();
 		if (evt.shiftKey) {
