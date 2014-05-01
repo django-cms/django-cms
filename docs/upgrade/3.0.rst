@@ -424,10 +424,11 @@ See :ref:`CMS_TEMPLATE reference <page_template>` for details.
 Upgrading from 2.4
 ******************
 
-. note:: There are reports that upgrading the CMS from 2.4 to 3.0 may fail if
-         Django Debug Toolbar is installed. Please remove/disable Django Debug
-         Toolbar and other non-essential apps before attempting to upgrade,
-         then once complete, re-enable them.
+.. note::
+    There are reports that upgrading the CMS from 2.4 to 3.0 may fail if
+    Django Debug Toolbar is installed. Please remove/disable Django Debug
+    Toolbar and other non-essential apps before attempting to upgrade, then
+    once complete, re-enable them.
 
 If you want to upgrade from version 2.4 to 3.0, there's a few things you need to do.
 Start of by updating the cms' package::
