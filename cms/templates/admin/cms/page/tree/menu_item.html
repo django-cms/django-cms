@@ -1,5 +1,19 @@
 {% load cms_admin i18n %}
-
+<script>
+(function($){
+	$('.col-actions [data-shift-href]').on('click', function(evt){
+		var href;
+		evt.preventDefault();
+		if (evt.shiftKey) {
+			href = $(this).data('shift-href');
+		}
+		else {
+			href = $(this).attr('href');
+		}
+		window.location = href;					
+	});
+}(CMS.$));
+</script>
 <div class="cont {{ css_class }}{% if page.reverse_id == "page_types" %} cont-pagetype{% endif %}" data-page_id="{{ page.id }}">
 	<div class="col1">
 		{% if has_change_permission %}
@@ -26,7 +40,7 @@
 		{% if page.application_urls %}<div class="col-apphook"><a href="{{ page.id }}/advanced-settings/"><span class="icon apphook-icon" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}"></span></a></div>{% endif %}
 		{% for lang in site_languages %}
 		<div class="col-language">
-		    {% if has_change_permission %}
+			{% if has_change_permission %}
 				<a href="{% if lang in page.languages %}./{{ page.id }}/{{ lang }}/preview/{% else %}./{{ page.id }}/?language={{ lang }}{% endif %}" class="trigger-tooltip"{% if lang in page.languages %} target="_top"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
 				{% if lang in page.languages %}
 				<div class="language-tooltip" hidden="hidden">
@@ -49,8 +63,8 @@
 		<div class="col-actions">
 
 			{% if has_change_permission %}
-		   	<a href="{{ url }}{{ page.id }}/" class="edit" title="{% trans "Page settings" %}"><span>{% trans "page settings" %}</span></a>
-			<!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a-->
+			<a class="edit" href="{{ url }}{{ page.id }}/" data-shift-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
+			{# <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a--> #}
 			<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
 
 			{% if has_add_page_permission and has_add_on_same_level_permission %}
