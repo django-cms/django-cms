@@ -4,4 +4,4 @@ from django.utils.translation import ugettext_lazy as _
 
 class CMSConfig(AppConfig):
     name = 'cms'
-    verbose_name = _("Django CMS")
+    verbose_name = _("django CMS")
