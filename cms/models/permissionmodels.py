@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.db import models
-from django.utils import importlib
-from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
+from django.db import models
+from django.utils import importlib
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from cms.compat import is_user_swapped, user_model_label
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
 from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+# TODO: Replace with approprieate standatd function from Django
+from cms.utils.compat.dj import force_unicode
+
 
 # To avoid circular dependencies, don't use cms.compat.get_user_model, and
 # don't depend on the app registry, to get the custom user model if used
