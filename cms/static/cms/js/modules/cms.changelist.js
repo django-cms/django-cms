@@ -537,19 +537,25 @@ $(document).ready(function () {
 			// a manner that the alt-class is defined after the normal class,
 			// so that it can be overridden when the alt-key is depressed.
 			//
+			// NOTE: This 'preview' part of the 'alt-click to [alternative
+			// function]' feature may not work in some environments (Windows
+			// in a some virtual machine environments, notably), but is only a
+			// nice-'extra', not a requirement for the feature.
+			//
 			$(document).on('keydown keyup', function(evt){
 				if (evt.which === 18) {
 					$('a[data-alt-class]').each(function(){
-						$(this).toggleClass($(this).data('alt-class'), evt.type === 'keydown');
+						var self = $(this);
+						self.toggleClass(self.data('alt-class'), evt.type === 'keydown');
 					})
 				}
 			});
 
 			//
-			// Similarly, if the A-element has a data-attribute 'alt-href',
-			// then this click-handler uses that instead of the normal href
-			// attribute as the click-destination. Again, currently this is
-			// only on the edit button, but could be more in future.
+			// If the A-element has a data-attribute 'alt-href', then this
+			// click-handler uses that instead of the normal href attribute as
+			// the click-destination. Again, currently this is only on the
+			// edit button, but could be more in future.
 			//
 			$('a[data-alt-href]').on('click', function(evt){
 				var href;
