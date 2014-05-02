@@ -1,11 +1,19 @@
 {% load cms_admin i18n %}
 <script>
 (function($){
-	$('a[data-shift-href]').on('click', function(evt){
+	// If an A element has a data-attribute 'shift-class'
+	$(document).on('keydown keyup', function(evt){
+		if (evt.which === 18) {
+			$('a[data-alt-class]').each(function(){
+				$(this).toggleClass($(this).data('alt-class'), evt.type === 'keydown');
+			})
+		}
+	});
+	$('a[data-alt-href]').on('click', function(evt){
 		var href;
 		evt.preventDefault();
-		if (evt.shiftKey) {
-			href = $(this).data('shift-href');
+		if (evt.altKey) {
+			href = $(this).data('alt-href');
 		}
 		else {
 			href = $(this).attr('href');
@@ -63,7 +71,7 @@
 		<div class="col-actions">
 
 			{% if has_change_permission %}
-			<a class="edit" href="{{ url }}{{ page.id }}/" data-shift-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
+			<a class="edit" href="{{ url }}{{ page.id }}/" data-alt-class="advanced-settings" data-alt-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (ALT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
 			{# <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a--> #}
 			<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
 
