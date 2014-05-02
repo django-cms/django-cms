@@ -145,7 +145,7 @@ $(document).ready(function () {
 				// reanimate the frame
 				if(this.sideframe.outerWidth() < width) {
 					// The user has performed an action that requires the
-					// sideframe to be shown, this intent outweights any
+					// sideframe to be shown, this intent outweighs any
 					// previous intent to minimize the frame.
 					this.settings.sideframe.hidden = false;
 					this._show(width, animate);
