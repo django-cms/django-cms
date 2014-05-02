@@ -1,27 +1,4 @@
 {% load cms_admin i18n %}
-<script>
-(function($){
-	// If an A element has a data-attribute 'shift-class'
-	$(document).on('keydown keyup', function(evt){
-		if (evt.which === 18) {
-			$('a[data-alt-class]').each(function(){
-				$(this).toggleClass($(this).data('alt-class'), evt.type === 'keydown');
-			})
-		}
-	});
-	$('a[data-alt-href]').on('click', function(evt){
-		var href;
-		evt.preventDefault();
-		if (evt.altKey) {
-			href = $(this).data('alt-href');
-		}
-		else {
-			href = $(this).attr('href');
-		}
-		window.location = href;					
-	});
-}(CMS.$));
-</script>
 <div class="cont {{ css_class }}{% if page.reverse_id == "page_types" %} cont-pagetype{% endif %}" data-page_id="{{ page.id }}">
 	<div class="col1">
 		{% if has_change_permission %}
