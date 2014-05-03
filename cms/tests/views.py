@@ -192,15 +192,15 @@ class ContextTests(SettingsOverrideTestCase):
         # to cms.context_processors.cms_settings.
         # Executing this oputside queries assertion context ensure
         # repetability
-        self.client.get("/en/admin/")
+        self.client.get("/en/plain_view/")
 
         cache.clear()
         menu_pool.clear()
         context._standard_context_processors = None
         # Number of queries when context processors is not enabled
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
-            with self.assertNumQueries(FuzzyInt(0, 4)) as context:
-                response = self.client.get("/en/admin/")
+            with self.assertNumQueries(FuzzyInt(0, 12)) as context:
+                response = self.client.get("/en/plain_view/")
                 if DJANGO_1_5:
                     num_queries = len(context.connection.queries) - context.starting_queries
                 else:

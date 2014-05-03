@@ -1026,11 +1026,19 @@ class NoAdminPageTests(CMSTestCase):
     def setUp(self):
         admin = 'django.contrib.admin'
         noadmin_apps = [app for app in installed_apps() if not app == admin]
-        self._ctx = SettingsOverride(INSTALLED_APPS=noadmin_apps)
-        self._ctx.__enter__()
+        try:
+            from django.apps import apps
+            apps.set_installed_apps(noadmin_apps)
+        except ImportError:
+            self._ctx = SettingsOverride(INSTALLED_APPS=noadmin_apps)
+            self._ctx.__enter__()
 
     def tearDown(self):
-        self._ctx.__exit__(None, None, None)
+        try:
+            from django.apps import apps
+            apps.unset_installed_apps()
+        except ImportError:
+            self._ctx.__exit__(None, None, None)
 
     def test_get_page_from_request_fakeadmin_nopage(self):
         request = self.get_request('/en/admin/')

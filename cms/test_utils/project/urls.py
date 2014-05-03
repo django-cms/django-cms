@@ -29,6 +29,7 @@ urlpatterns += i18n_patterns('',
                                  kwargs={'authentication_form': LoginForm}),
                              url(r'^admin/', include(admin.site.urls)),
                              url(r'^example/$', 'cms.test_utils.project.placeholderapp.views.example_view'),
+                             url(r'^plain_view/$', 'cms.test_utils.project.sampleapp.views.plain_view'),
                              url(r'^', include('cms.urls')),
 )
 

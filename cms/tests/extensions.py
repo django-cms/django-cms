@@ -1,3 +1,4 @@
+import sys
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -60,6 +61,14 @@ class ExtensionsTestCase(TestCase):
         # Unregister an object that is not registered yet
         extension_pool.unregister(page_extension)
         extension_pool.unregister(title_extension)
+
+        try:
+            from django.apps import apps
+            del apps.all_models['cms']['testpageextension']
+            del apps.all_models['cms']['testtitleextension']
+        except ImportError:
+            pass
+
 
     def get_page_extension_class(self):
         from django.db import models
