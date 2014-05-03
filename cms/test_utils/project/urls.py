@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2
 
@@ -32,7 +33,7 @@ urlpatterns += i18n_patterns('',
 )
 
 
-if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+if settings.DEBUG and is_installed('debug_toolbar'):
     import debug_toolbar
     urlpatterns += patterns('',
         url(r'^__debug__/', include(debug_toolbar.urls)),

@@ -165,7 +165,7 @@ def define_check(func):
 @define_check
 def check_sekizai(output):
     with output.section("Sekizai") as section:
-        if 'sekizai' in settings.INSTALLED_APPS:
+        if is_installed('sekizai'):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")

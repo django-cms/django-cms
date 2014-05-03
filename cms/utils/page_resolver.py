@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, is_installed
 from cms.utils.compat.urls import unquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -28,7 +28,7 @@ def get_page_queryset(request=None):
 def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
     """ Returns a queryset of pages corresponding to the path given
     """
-    if 'django.contrib.admin' in settings.INSTALLED_APPS:
+    if is_installed('django.contrib.admin'):
         admin_base = reverse('admin:index')
 
         # Check if this is called from an admin request
@@ -103,7 +103,7 @@ def get_page_from_request(request, use_path=None):
         path = request.path
         pages_root = unquote(reverse("pages-root"))
         # otherwise strip off the non-cms part of the URL
-        if 'django.contrib.admin' in settings.INSTALLED_APPS:
+        if is_installed('django.contrib.admin'):
             admin_base = reverse('admin:index')
         else:
             admin_base = None

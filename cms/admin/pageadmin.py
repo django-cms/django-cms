@@ -29,7 +29,7 @@ from django.views.decorators.http import require_POST
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.plugin_pool import plugin_pool
 from cms.utils.conf import get_cms_setting
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, is_installed
 from cms.utils.compat.urls import unquote
 from cms.utils.helpers import find_placeholder_relation
 from cms.utils.urlutils import add_url_parameters
@@ -51,7 +51,7 @@ from cms.utils.transaction import wrap_transaction
 
 require_POST = method_decorator(require_POST)
 
-if 'reversion' in settings.INSTALLED_APPS:
+if is_installed('reversion'):
     from reversion.admin import VersionAdmin as ModelAdmin
     from reversion import create_revision
 else:  # pragma: no cover
@@ -520,7 +520,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         Returns True if the use has the right to recover pages
         """
-        if not "reversion" in settings.INSTALLED_APPS:
+        if not is_installed('reversion'):
             return False
         user = request.user
         if user.is_superuser:
@@ -597,7 +597,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return True
 
     def post_add_plugin(self, request, placeholder, plugin):
-        if 'reversion' in settings.INSTALLED_APPS and placeholder.page:
+        if is_installed('reversion') and placeholder.page:
             plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
             message = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
                 'plugin_name': plugin_name, 'placeholder': placeholder}
@@ -606,7 +606,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
         page = target_placeholder.page
-        if page and "reversion" in settings.INSTALLED_APPS:
+        if page and is_installed('reversion'):
             message = _(u"Copied plugins to %(placeholder)s") % {'placeholder': target_placeholder}
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
@@ -615,7 +615,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         page = plugin.placeholder.page
         if page:
             # if reversion is installed, save version of the page plugins
-            if 'reversion' in settings.INSTALLED_APPS and page:
+            if is_installed('reversion') and page:
                 plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
                 message = _(
                     u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {
@@ -628,7 +628,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
         page = target_placeholder.page
-        if page and 'reversion' in settings.INSTALLED_APPS:
+        if page and is_installed('reversion'):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
 
@@ -642,7 +642,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 'position': plugin.position,
                 'placeholder': plugin.placeholder,
             }
-            if 'reversion' in settings.INSTALLED_APPS:
+            if is_installed('reversion'):
                 self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
@@ -653,7 +653,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             comment = _('All plugins in the placeholder "%(name)s" were deleted.') % {
                 'name': force_unicode(placeholder)
             }
-            if 'reversion' in settings.INSTALLED_APPS:
+            if is_installed('reversion'):
                 self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
@@ -720,7 +720,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             'site_languages': languages,
             'open_menu_trees': open_menu_trees,
         }
-        if 'reversion' in settings.INSTALLED_APPS:
+        if is_installed('reversion'):
             context['has_recover_permission'] = self.has_recover_permission(request)
             context['has_change_permission'] = self.has_change_permission(request)
         context.update(extra_context or {})
@@ -773,7 +773,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     @require_POST
     def undo(self, request, object_id):
-        if not 'reversion' in settings.INSTALLED_APPS:
+        if not is_installed('reversion'):
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
         from cms.utils.page_resolver import is_valid_url
@@ -840,7 +840,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     @require_POST
     def redo(self, request, object_id):
-        if not 'reversion' in settings.INSTALLED_APPS:
+        if not is_installed('reversion'):
             return HttpResponseBadRequest('django reversion not installed')
         from reversion.models import Revision
         import reversion
@@ -917,7 +917,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         page.template = to_template
         page.save()
-        if "reversion" in settings.INSTALLED_APPS:
+        if is_installed('reversion'):
             message = _("Template changed to %s") % dict(get_cms_setting('TEMPLATES'))[to_template]
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
@@ -946,7 +946,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 HttpResponseForbidden(force_unicode(_("Error! You don't have permissions to move this page. Please reload the page"))))
             # move page
         page.move_page(target, position)
-        if "reversion" in settings.INSTALLED_APPS:
+        if is_installed('reversion'):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, _("Page moved"))
 
@@ -1001,7 +1001,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 if not self.has_copy_plugin_permission(request, placeholder, placeholder, plugins):
                     return HttpResponseForbidden(force_unicode(_('You do not have permission to copy these plugins.')))
                 copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
-            if page and "reversion" in settings.INSTALLED_APPS:
+            if page and is_installed('reversion'):
                 message = _(u"Copied plugins from %(source_language)s to %(target_language)s") % {
                     'source_language': source_language, 'target_language': target_language}
                 self.cleanup_history(page)
@@ -1084,7 +1084,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     messages.warning(request, _("Page not published! A parent page is not published yet."))
                 else:
                     messages.warning(request, _("There was a problem publishing your content"))
-        if "reversion" in settings.INSTALLED_APPS and page:
+        if is_installed('reversion') and page:
             self.cleanup_history(page, publish=True)
             helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
             # create a new publish reversion
@@ -1115,7 +1115,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return HttpResponseRedirect(path)
 
     def cleanup_history(self, page, publish=False):
-        if "reversion" in settings.INSTALLED_APPS and page:
+        if is_installed('reversion') and page:
             # delete revisions that are not publish revisions
             from reversion.models import Version
 
@@ -1271,7 +1271,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             if public:
                 public.save()
 
-            if "reversion" in settings.INSTALLED_APPS:
+            if is_installed('reversion'):
                 self.cleanup_history(obj)
                 helpers.make_revision_with_plugins(obj, request.user, message)
 

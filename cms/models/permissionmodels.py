@@ -19,7 +19,7 @@ from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 if is_user_swapped:
     user_app_name, user_model_name = user_model_label.rsplit('.', 1)
     User = None
-    for app in settings.INSTALLED_APPS:
+    for app in installed_apps():
         if app.endswith(user_app_name):
             user_app_models = importlib.import_module(app + ".models")
             User = getattr(user_app_models, user_model_name)

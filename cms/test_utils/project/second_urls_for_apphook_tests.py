@@ -1,3 +1,4 @@
+from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 from django.conf import settings
 from django.conf.urls import patterns, include, url
@@ -23,7 +24,7 @@ urlpatterns += i18n_patterns('',
 )
 
 
-if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+if settings.DEBUG and is_installed('debug_toolbar'):
     import debug_toolbar
     urlpatterns += patterns('',
         url(r'^__debug__/', include(debug_toolbar.urls)),

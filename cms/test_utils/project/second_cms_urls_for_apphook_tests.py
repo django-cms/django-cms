@@ -1,3 +1,4 @@
+from cms.utils.compat.dj import is_installed
 from django.conf.urls import include, url, patterns
 from cms.apphook_pool import apphook_pool
 from cms.views import details
@@ -29,7 +30,7 @@ if apphook_pool.get_apphooks():
 urlpatterns = patterns('', *urlpatterns)
 
 
-if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+if settings.DEBUG and is_installed('debug_toolbar'):
     import debug_toolbar
     urlpatterns += patterns('',
         url(r'^__debug__/', include(debug_toolbar.urls)),

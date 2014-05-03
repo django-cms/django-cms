@@ -38,3 +38,21 @@ except ImportError:
             else:                               # models.py module
                 app_paths.append(upath(app.__file__))
         return app_paths
+
+try:
+    from django.apps import apps
+
+    def is_installed(app_name):
+        return apps.is_installed(app_name)
+
+    def installed_apps():
+        return [app.name for app in apps.get_app_configs()]
+
+except ImportError:
+    from django.conf import settings
+
+    def is_installed(app_name):
+        return app_name in settings.INSTALLED_APPS
+
+    def installed_apps():
+        return settings.INSTALLED_APPS

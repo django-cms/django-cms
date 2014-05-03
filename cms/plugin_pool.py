@@ -20,7 +20,7 @@ from cms.models import CMSPlugin
 from cms.utils.django_load import load, get_subclasses
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, is_installed
 
 
 class PluginPool(object):
@@ -97,7 +97,7 @@ class PluginPool(object):
                                     dispatch_uid='cms_post_delete_plugin_%s' % plugin_name)
         signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
                                    dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
-        if 'reversion' in settings.INSTALLED_APPS:
+        if is_installed('reversion'):
             try:
                 from reversion.registration import RegistrationError
             except ImportError:

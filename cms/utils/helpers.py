@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.compat.dj import is_installed
 from django.conf import settings
 
 # modify reversions to match our needs if required...
@@ -13,7 +14,7 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
     """
     
     # reversion's merely recommended, not required
-    if not 'reversion' in settings.INSTALLED_APPS:
+    if not is_installed('reversion'):
         return
     
     if fields and exclude_fields:
