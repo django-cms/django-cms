@@ -51,6 +51,11 @@ Example::
     the ``js`` and ``css`` sekizai namespaces. For more information, see
     :ref:`sekizai-namespaces`.
 
+.. note::
+
+    Alternatively you can use :setting:`CMS_TEMPLATES_DIR` to define a directory
+    containing templates for django CMS.
+
 .. warning::
 
     django CMS requires some special templates to function correctly. These are
@@ -73,6 +78,36 @@ Enables the inheritance of templates from parent pages.
 When enabled, pages' ``Template`` options will include a new default: *Inherit
 from the parent page* (unless the page is a root page).
 
+
+.. setting:: CMS_TEMPLATES_DIR
+
+CMS_TEMPLATES_DIR
+=================
+
+Default: ``None``
+
+Instead of explicitly providing a set of templates via :setting:`CMS_TEMPLATES`
+a single directory can be provided using this configuration.
+
+The directory is scanned and all templates in it are loaded as templates for
+django CMS.
+
+Template loaded and their names can be customized using a INI-file called
+``templates.ini`` in the same directory. This file contains a single **templates**
+stanza with the templates files and names::
+
+    [templates]
+    col_two.html=Two columns templates
+    col_three.html=Three columns templates
+
+Templates label are passed through gettext for translation.
+
+.. note::
+
+    As templates are still loaded by the Django template loader, the given
+    directory must be reachable by the template loading system.
+    Currently **filesystem** and **app_directory** loader schemas are tested and
+    supported.
 
 .. setting:: CMS_PLACEHOLDER_CONF
 
