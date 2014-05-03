@@ -3,7 +3,6 @@ from __future__ import with_statement
 from contextlib import contextmanager
 import inspect
 from itertools import chain
-from cms.models import AliasPluginModel
 import os
 
 from django.conf import settings
@@ -13,8 +12,9 @@ from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
 
 from cms import constants
+from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_app_paths
+from cms.utils.compat.dj import get_app_paths, is_installed
 from cms.utils.compat.type_checks import int_types
 
 

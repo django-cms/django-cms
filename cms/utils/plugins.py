@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
 from django.template import NodeList, VariableNode, TemplateSyntaxError
 from django.template.loader import get_template
-from django.template.loader_tags import IncludeNode, ExtendsNode, BlockNode
+from django.template.loader_tags import ExtendsNode, BlockNode
 from django.utils.translation import ugettext as _
 from sekizai.helpers import is_variable_extend_node
 
@@ -19,8 +19,8 @@ from cms.utils import get_language_from_request, permissions
 from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
-from cms.utils.placeholder import validate_placeholder_name, \
-    get_placeholder_conf
+from cms.utils.placeholder import (validate_placeholder_name,
+                                   get_placeholder_conf)
 
 
 def get_page_from_plugin_or_404(cms_plugin):
@@ -97,12 +97,6 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
         # check if this is a placeholder first
         if isinstance(node, Placeholder):
             placeholders.append(node.get_name())
-        # if it's a Constant Include Node ({% include "template_name.html" %})
-        # scan the child template
-        elif isinstance(node, IncludeNode):
-            # if there's an error in the to-be-included template, node.template becomes None
-            if node.template:
-                placeholders += _scan_placeholders(node.template.nodelist, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
             placeholders += _extend_nodelist(node)

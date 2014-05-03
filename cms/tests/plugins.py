@@ -1430,6 +1430,7 @@ class NoDatabasePluginTests(TestCase):
 
         plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin),
                                        {'__module__': 'cms.tests.plugins'})
+        print plugin_class._meta.app_label
         self.assertEqual(plugin_class._meta.db_table, 'tests_testplugin2')
 
     def test_pickle(self):
