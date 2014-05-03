@@ -441,7 +441,7 @@ class AdminTestCase(AdminTestsBase):
             self.assertTemplateUsed(response, 'admin/login.html')
         else:
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, '/en/admin/login/?next=/en/admin/cms/page/1/permissions/')
+            self.assertRedirects(response, '/en/admin/login/?next=/en/admin/cms/page/%s/permissions/' % page.pk)
         admin_user = self.get_superuser()
         with self.login_user_context(admin_user):
             response = self.client.get(url)
