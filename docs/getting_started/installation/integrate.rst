@@ -15,7 +15,7 @@ Requirements
 * `Python`_ 2.6, 2.7 or 3.3.
 * `Django`_ 1.4.5, 1.5.x or 1.6.x
 * `South`_ 0.7.2 or higher
-* `django-classy-tags`_ 0.3.4.1 or higher
+* `django-classy-tags`_ 0.5 or higher
 * `django-mptt`_ 0.6 (strict due to API compatibility issues)
 * `django-sekizai`_ 0.7 or higher
 * `html5lib`_ 0.99 or higher
@@ -102,18 +102,7 @@ Installing
 Installing in a virtualenv using pip
 ====================================
 
-.. warning::
-
-    As django CMS 3.0 is still unreleased, you need to pick it from the github repository.
-    Use ::
-
-        pip install https://github.com/divio/django-cms/archive/3.0.0.beta3.zip
-
-    to install django CMS 3.0 beta3 or::
-
-        pip install https://github.com/divio/django-cms/archive/develop.zip
-
-    to target the development branch.
+``pip install django-cms``
 
 Installing inside a `virtualenv`_ is the preferred way to install any Django
 installation. This should work on any platform where python in installed.
@@ -145,25 +134,25 @@ its dependencies:
 ::
 
     # Bare minimum
-    django-cms==3.0
+    django-cms>=3.0
 
     # These dependencies are brought in by django CMS, but if you want to
     # lock-in their version, specify them
-    Django==1.6.2
+    Django>=1.6
 
-    django-classy-tags==0.4
-    South==0.8.4
-    html5lib==1.0b1
+    South==0.7.2
     django-mptt==0.6
     django-sekizai==0.7
+    django-classy-tags==0.5
+    djangocms-admin-style==0.2.2
+    html5lib==1.0b1
     six==1.3.0
-    djangocms-admin-style==0.1.2
 
     # Optional, recommended packages
     Pillow==2.0.0
     django-filer==0.9.5
     cmsplugin-filer==0.9.5
-    django-reversion==1.7
+    django-reversion==1.6.6
 
 .. note::
 
@@ -315,30 +304,35 @@ other highly recommended applications/libraries::
     'menus',  # helper for model independent hierarchical website navigation
     'south',  # intelligent schema and data migrations
     'sekizai',  # for javascript and css management
-    'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list before 'django.contrib.admin'.
+    'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
 
 
 Also add any (or all) of the following plugins, depending on your needs::
 
-    'cms.plugins.file',
-    'cms.plugins.flash',
-    'cms.plugins.googlemap',
-    'cms.plugins.picture',
-    'cms.plugins.teaser',
+    'djangocms_file',
+    'djangocms_flash',
+    'djangocms_googlemap',
+    'djangocms_inherit',
+    'djangocms_picture',
+    'djangocms_teaser',
+    'djangocms_video',
     'djangocms_link',
     'djangocms_snippet',
     'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
-    'cms.plugins.video',
+
+.. note::
+    
+    Most of the above plugins were previously distributed with django CMS,
+    however, most of them are now located in their own repositories and
+    renamed. Furthermore plugins: ``'cms.plugins.text'`` and
+    ``'cms.plugins.twitter'`` have been removed from the django CMS bundle.
+    Read :ref:`upgrade-to-3.0` for detailed information.
 
 .. warning::
 
     Adding the ``'djangocms_snippet'`` plugin is a potential security hazard.
     For more information, refer to `snippet_plugin`_.
-
-    In addition, ``'cms.plugins.text'`` and ``'cms.plugins.twitter'`` have
-    been removed from the Django-CMS bundle. Read :ref:`upgrade-to-3.0` for
-    detailed information.
 
 The plugins are described in more detail in chapter :doc:`Plugins reference <../resources/plugin_reference>`.
 There are even more plugins available on the django CMS `extensions page`_.
@@ -348,12 +342,12 @@ There are even more plugins available on the django CMS `extensions page`_.
 
 In addition, make sure you uncomment (enable) ``'django.contrib.admin'``
 
-You may also wish to use `django-filer`_ and its components with the `django CMS plugin`_
-instead of the :mod:`cms.plugins.file`, :mod:`cms.plugins.picture`,
-:mod:`cms.plugins.teaser` and :mod:`cms.plugins.video` core plugins.
-In this case you should check the `django-filer documentation <django-filer:installation_and_configuration>`_
-and `django CMS plugin documentation`_ for detailed installation information, and
-then return to this tutorial.
+You may also wish to use `django-filer`_ and its components with the `django
+CMS plugin`_ instead of the :mod:`djangocms_file`, :mod:`djangocms_picture`,
+:mod:`djangocms_teaser` and :mod:`djangocms_video` core plugins. In this case
+you should check the `django-filer documentation
+<django-filer:installation_and_configuration>`_ and `django CMS plugin documentation`_
+for detailed installation information, and then return to this tutorial.
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
@@ -383,8 +377,8 @@ at the right position::
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.doc.XViewMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
         'cms.middleware.language.LanguageCookieMiddleware',
     )
@@ -398,8 +392,8 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
         'django.core.context_processors.request',
         'django.core.context_processors.media',
         'django.core.context_processors.static',
-        'cms.context_processors.cms_settings',
         'sekizai.context_processors.sekizai',
+        'cms.context_processors.cms_settings',
     )
 
 .. note::
@@ -420,7 +414,7 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
 .. warning::
 
-    Django ``messages`` framework is now required for the toolbar to work
+    Django ``messages`` framework is now **required** for the toolbar to work
     properly.
 
     To enable it you must be check the following settings:
@@ -535,7 +529,8 @@ setting::
       ('template_2.html', 'Template Two'),
   )
 
-If you have followed this tutorial from the beginning, this code  should already be in your settings file.
+If you have followed this tutorial from the beginning, this code should
+already be in your settings file.
 
 Now, on with the actual template files!
 
@@ -648,8 +643,14 @@ the django CMS "It Worked" screen.
 
 .. |it-works-cms| image:: ../../images/it-works-cms.png
 
-Head over to the `admin panel <http://127.0.0.1:8000/admin/>` and log in with
-the user you created during the database setup.
+Use the new side-frame-based administration by appending '?edit' to your URL
+as follows: `http://127.0.0.1:8000/?edit`. This will reveal a login form.
+
+|login-form|
+
+.. |login-form| image:: ../../images/login-form.png
+
+Log in with the user you created during the database setup.
 
 To deploy your django CMS project on a production webserver, please refer to the
 `Django documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
@@ -658,27 +659,44 @@ To deploy your django CMS project on a production webserver, please refer to the
 Creating your first CMS Page!
 -----------------------------
 
-That's it. Now the best part: you can start using the CMS!
-Run your server with ``python manage.py runserver``, then point a web browser to
-`127.0.0.1:8000/admin/ <http://127.0.0.1:8000/admin/>`_ , and log in using the super
-user credentials you defined when you ran ``syncdb`` earlier.
+That's it. Now the best part: you can start using the CMS! If you haven't
+already, run your server with ``python manage.py runserver``, then point a web
+browser to `127.0.0.1:8000/?edit <http://127.0.0.1:8000/?edit>`_ , and log
+in using the super user credentials you defined when you ran ``syncdb``
+earlier.
 
 Once in the admin part of your site, you should see something like the following:
 
-|first-admin|
+|logged-in|
 
-.. |first-admin| image:: ../../images/first-admin.png
+.. |logged-in| image:: ../../images/logged-in.png
 
 
 Adding a page
 -------------
 
-Adding a page is as simple as clicking "Pages" in the admin view, then the "add page" button
-at the top right-hand corner of the screen.
+Adding a page is as simple as clicking the "Pages..." menu-item in the
+"example.com" (or similar) menu in the toolbar.
 
-This is where you select which template to use (remember, we created two), as well as
-pretty obvious things like which language the page is in (used for internationalisation),
-the page's title, and the url slug it will use.
+|pages-menu-item|
+
+.. |pages-menu-item| image:: ../../images/pages-menu-item.png
+
+This will reveal the new side-frame for administration.
+
+|no-pages|
+
+.. |no-pages| image:: ../../images/no-pages.png
+
+Now, click the "add page" button at the top right-hand corner of the screen.
+
+|basic-page-form|
+
+.. |basic-page-form| image:: ../../images/basic-page-form.png
+
+This is a basic form where you complete the title of the new page. The slug
+field is also required but a sensible value will be completed as you type the
+page’s title.
 
 Hitting the "Save" button, unsurprisingly, saves the page. It will now display in the list of
 pages.
@@ -687,69 +705,87 @@ pages.
 
 .. |my-first-page| image:: ../../images/my-first-page.png
 
+
+You can click the page title in the "page tree" to navigate to the page in the main window.
+
+|empty-page|
+
+.. |empty-page| image:: ../../images/empty-page.png
+
+
 Congratulations! You now have a fully functional django CMS installation!
 
 
 Publishing a page
 -----------------
 
-The following is a list of parameters that can be changed for each of your pages:
+There are multiple ways to publish a page including a blue button on the right
+side of the toolbar if the page is not currently published. Other ways include
+a "Publish page" menu item in the "Page" menu in the toolbar and a publish
+link inside the "tool-tip" over the colored, round icon in the language column
+of the page tree.
 
+Please review this image of the page-tree in the side-frame maximized with the
+page menu invoked.
 
-Visibility
-~~~~~~~~~~
+|page-options|
 
-By default, pages are "invisible". To let people access them you should mark
-them as "published".
+.. |page-options| image:: ../../images/page-options.png
 
 
 Menus
 ~~~~~
 
-Another option this view lets you tweak is whether or not the page should appear in
-your site's navigation (that is, whether there should be a menu entry to reach it
-or not)
+If you would like your page to appear in your menu (or note), you should
+familiarize yourself with the option to include or exclude the page from
+menus.
+
+Reviewing the image in `publishing a page`_ above, you should also see the
+"Hide in navigation" menu option. You can select this, or merely click on the
+green checkbox icon beneath "Menu" in the page tree to exclude this page from
+any menus.
+
+Similarly, when the page is currently not shown in menus, you can use the
+corresponding menu item "Show in navigation" or toggle the now red icon in the
+page tree to again show the page in your menus.
+
+
+Template
+~~~~~~~~
+
+Choosing a template for your page is as simple as selecting the desired
+template from the "Templates" sub-menu (see image in `publishing a page`_
+above). The list of available templates is determined by the CMS_TEMPLATES
+list as defined in your project’s settings.
 
 
 Adding content to a page
 ------------------------
 
-So far, our page doesn't do much. Make sure it's marked as "published", then
-click on the page's "edit" button.
+So far, our page doesn't do much. Make sure it's marked as "published" (see
+above), then click on the page's "edit" button.
 
-Ignore most of the interface for now and click the "view on site" button at the
-top right-hand corner of the screen. As expected, your page is blank for the
-time being, since our template is a really minimal one.
+To add content to your page, click the "structure" mode-button in the toolbar.
+This will reveal all of the page’s available placeholders and allow you to add
+CMS plugin instances to them.
 
-Let's get to it now then!
+On any placeholder, click the menu icon on the right side to reveal the list
+of available plugins. In this case, we'll choose the Text plugin. Invoking the
+Text plugin will display your installed WYSIWYG Text editor plugin. Type in
+some text and press "Save". When you save the plugin, your plugin will now be
+displayed "inside" the placeholder as shown in this progession of images.
 
-Press your browser's back button, so as to see the page's admin interface. If you followed
-the tutorial so far, your template (``template_1.html``) defines two placeholders.
-The admin interfaces shows you theses placeholders as sub menus:
+|add-text-plugin|
 
-|first-placeholders|
+.. |add-text-plugin| image:: ../../images/add-text-plugin.png
 
-.. |first-placeholders| image:: ../../images/first-placeholders.png
+To preview the page, click the "Content" mode button in the toolbar. You can
+continue editing existing plugins in Content mode simply by double-clicking
+the content they present. To add new plugins, or to re-arrange existing ones,
+click back into Structure more. When you're ready to share your content with
+the world, press the Publish button.
 
-Scroll down the "Available plugins" drop-down list. This displays the plugins you
-added to your :setting:`django:INSTALLED_APPS` settings. Choose the "text" plugin in the drop-down,
-then press the "Add" button. If the "text" plugin is not listed, you need to add
-'djangocms_text_ckeditor' to your :setting:`django:INSTALLED_APPS` settings.
-
-The right part of the plugin area displays a rich text editor (`TinyMCE`_).
-
-In the editor, type in some text and then press the "Save" button.
-
-The new text is only visible on the draft copy so far, but you can see it by using the
-top button "Preview draft". If you use the "View on site" button instead, you can see that the
-page is still blank to the normal users.
-
-To publish the changes you have made, click on the "Publish draft" button.
-Go back to your website using the top right-hand "View on site" button. That's it!
-
-|hello-cms-world|
-
-.. |hello-cms-world| image:: ../../images/hello-cms-world.png
+That's it!
 
 
 Where to go from here
