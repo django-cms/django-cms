@@ -13,7 +13,7 @@ urlpatterns = []
 def configure(db_url, **extra):
     from django.conf import settings
     if PY2:
-        siteid = long(1)
+        siteid = long(1)  # nopyflakes
     else:
         siteid = 1
 
