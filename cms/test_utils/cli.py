@@ -118,6 +118,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.fakemlng',
             'cms.test_utils.project.fileapp',
             'cms.test_utils.project.objectpermissionsapp',
+            'cms.test_utils.project.bunch_of_plugins',
             'cms.test_utils.project.extensionapp',
             'reversion',
             'sekizai',

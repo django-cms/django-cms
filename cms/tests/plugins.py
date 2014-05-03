@@ -1418,19 +1418,14 @@ class NoDatabasePluginTests(TestCase):
         self.assertTrue(link._render_meta.text_enabled)
 
     def test_db_table_hack(self):
-        # TODO: Django tests seem to leak models from test methods, somehow
-        # we should clear django.db.models.loading.app_cache in tearDown.
-        plugin_class = PluginModelBase('TestPlugin', (CMSPlugin,), {'__module__': 'cms.tests.plugins'})
-        self.assertEqual(plugin_class._meta.db_table, 'tests_testplugin')
+        # Plugin models has been moved away due to the Django 1.7 AppConfig
+        from cms.test_utils.project.bunch_of_plugins.models import TestPlugin1
+        self.assertEqual(TestPlugin1._meta.db_table, 'bunch_of_plugins_testplugin1')
 
     def test_db_table_hack_with_mixin(self):
-        class LeftMixin: pass
-
-        class RightMixin: pass
-
-        plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin),
-                                       {'__module__': 'cms.tests.plugins'})
-        self.assertEqual(plugin_class._meta.db_table, 'tests_testplugin2')
+        # Plugin models has been moved away due to the Django 1.7 AppConfig
+        from cms.test_utils.project.bunch_of_plugins.models import TestPlugin2
+        self.assertEqual(TestPlugin2._meta.db_table, 'bunch_of_plugins_testplugin2')
 
     def test_pickle(self):
         text = Text()
