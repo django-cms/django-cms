@@ -1348,7 +1348,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             try:
                 obj = log.get_edited_object()
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, ValueError):
                 obj = None
             del request.session['cms_log_latest']
             if obj and obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
