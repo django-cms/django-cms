@@ -31,7 +31,7 @@ def configure(db_url, **extra):
         DATABASES={
             'default': DB
         },
-        SITE_ID=1,
+        SITE_ID=long(1),
         USE_I18N=True,
         MEDIA_ROOT='/media/',
         STATIC_ROOT='/static/',

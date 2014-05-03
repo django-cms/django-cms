@@ -192,7 +192,9 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if not isinstance(settings.SITE_ID, int):
+    try:
+        settings.SITE_ID = int(settings.SITE_ID)
+    except (TypeError, ValueError):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )
