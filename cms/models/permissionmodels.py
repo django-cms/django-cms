@@ -12,7 +12,8 @@ from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
 from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.utils.compat.dj import (force_unicode, python_2_unicode_compatible,
+                                 installed_apps)
 
 # To avoid circular dependencies, don't use cms.compat.get_user_model, and
 # don't depend on the app registry, to get the custom user model if used
