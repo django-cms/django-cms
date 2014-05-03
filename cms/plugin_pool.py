@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, patterns, include
 from django.contrib.formtools.wizard.views import normalize_name

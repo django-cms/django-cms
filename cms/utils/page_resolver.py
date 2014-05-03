@@ -2,16 +2,16 @@
 from cms.utils.moderator import use_draft
 import re
 
-from django.conf import settings
+
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from cms.utils.compat.dj import force_unicode, is_installed
-from cms.utils.compat.urls import unquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 from cms.models.pagemodel import Page
+from cms.utils.compat.dj import force_unicode, is_installed
+from cms.utils.compat.urls import unquote
 from cms.utils.urlutils import any_path_re
 
 ADMIN_PAGE_RE_PATTERN = r'cms/page/(\d+)'

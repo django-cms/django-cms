@@ -12,10 +12,10 @@ refer to http://django-load.readthedocs.org/en/latest/index.html.
 import imp
 import traceback # changed
 
-from django.conf import settings
 from django.utils.importlib import import_module
 
 from .compat.dj import installed_apps
+
 
 def get_module(app, modname, verbose, failfast):
     """

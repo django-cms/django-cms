@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from django.db import models
 from django.utils import importlib
 from django.utils.translation import ugettext_lazy as _
@@ -11,9 +10,9 @@ from cms.compat import is_user_swapped, user_model_label
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
-from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import (force_unicode, python_2_unicode_compatible,
                                  installed_apps)
+from cms.utils.helpers import reversion_register
 
 # To avoid circular dependencies, don't use cms.compat.get_user_model, and
 # don't depend on the app registry, to get the custom user model if used

@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import os
 import dj_database_url
-from cms.utils.compat import DJANGO_1_5, DJANGO_1_6, DJANGO_1_7, PY2
+from cms.utils.compat import DJANGO_1_5, DJANGO_1_6, PY2
 import django
 
 gettext = lambda s: s

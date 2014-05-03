@@ -1,18 +1,18 @@
-import sys
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page
+from cms.compat import get_user_model
 from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.models import Page
-from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
-from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
 from cms.extensions import PageExtension
+from cms.models import Page
+from cms.test_utils.project.extensionapp.models import (MyPageExtension,
+                                                        MyTitleExtension)
+from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.tests import AdminTestsBase
-from cms.compat import get_user_model
 
 
 class ExtensionsTestCase(TestCase):
