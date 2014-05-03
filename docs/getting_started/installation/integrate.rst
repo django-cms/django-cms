@@ -14,7 +14,7 @@ Requirements
 
 * `Python`_ 2.6, 2.7 or 3.3.
 * `Django`_ 1.4.5, 1.5.x or 1.6.x
-* `South`_ 0.7.2 or higher
+* `South`_ 0.8.4 or higher
 * `django-classy-tags`_ 0.5 or higher
 * `django-mptt`_ 0.6 (strict due to API compatibility issues)
 * `django-sekizai`_ 0.7 or higher
@@ -140,7 +140,7 @@ its dependencies:
     # lock-in their version, specify them
     Django>=1.6
 
-    South==0.7.2
+    South==0.8.4
     django-mptt==0.6
     django-sekizai==0.7
     django-classy-tags==0.5
@@ -152,7 +152,7 @@ its dependencies:
     Pillow==2.0.0
     django-filer==0.9.5
     cmsplugin-filer==0.9.5
-    django-reversion==1.6.6
+    django-reversion==1.7
 
 .. note::
 
@@ -637,7 +637,7 @@ Up and running!
 
 That should be it. Restart your development server using ``python manage.py runserver``
 and point a web browser to `127.0.0.1:8000 <http://127.0.0.1:8000>`_ : you should get
-the django CMS "It Worked" screen.
+the django CMS "Installation Successful" screen.
 
 |it-works-cms|
 
@@ -688,7 +688,7 @@ This will reveal the new side-frame for administration.
 
 .. |no-pages| image:: ../../images/no-pages.png
 
-Now, click the "add page" button at the top right-hand corner of the screen.
+Now, click the "add page" button at the top right-hand corner of the side-frame.
 
 |basic-page-form|
 
@@ -719,11 +719,12 @@ Congratulations! You now have a fully functional django CMS installation!
 Publishing a page
 -----------------
 
-There are multiple ways to publish a page including a blue button on the right
-side of the toolbar if the page is not currently published. Other ways include
-a "Publish page" menu item in the "Page" menu in the toolbar and a publish
-link inside the "tool-tip" over the colored, round icon in the language column
-of the page tree.
+There are multiple ways to publish a page including a blue "Publishe page now"
+button on the right side of the toolbar if the page is not currently
+published. Other ways include a "Publish page" menu item in the "Page" menu in
+the toolbar and a publish link inside the "tool-tip" over the colored, round
+icon in the language column of the page tree. The latter is useful for
+publishing pages without first navigating to them.
 
 Please review this image of the page-tree in the side-frame maximized with the
 page menu invoked.
@@ -783,7 +784,7 @@ To preview the page, click the "Content" mode button in the toolbar. You can
 continue editing existing plugins in Content mode simply by double-clicking
 the content they present. To add new plugins, or to re-arrange existing ones,
 click back into Structure more. When you're ready to share your content with
-the world, press the Publish button.
+the world, press the "Publish page now" button.
 
 That's it!
 
