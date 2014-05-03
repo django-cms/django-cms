@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import SafeConfigParser as ConfigParser
 from functools import update_wrapper
 import os
 import pprint
@@ -101,12 +105,31 @@ def get_toolbar_url__build():
 def get_templates():
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
-        if os.path.exists(os.path.join(tpldir, 'templates.conf')):
-            tpl_conf = open(os.path.join(tpldir, 'templates.conf')).readlines()
-            templates = [conf.split(":") for conf in tpl_conf if len(conf) > 0]
-            templates = [(data[0].strip(), _(data[1].strip())) for data in templates]
+        # We must extract the relative path of CMS_TEMPLATES_DIR to the neares
+        # valid templates directory. Here we mimick what the filesystem and
+        # app_directories template loaders do
+        prefix = ''
+        # Relative to TEMPLATE_DIRS for filesystem loader
+        for basedir in settings.TEMPLATE_DIRS:
+            if tpldir.find(basedir) == 0:
+                prefix = tpldir.replace(basedir + os.sep, '')
+                break
+        # Relative to 'templates' directory that app_directory scans
+        if not prefix:
+            components = tpldir.split(os.sep)
+            try:
+                prefix = os.path.join(*components[components.index('templates') + 1:])
+            except ValueError:
+                # If templates is not found we use the directory name as prefix
+                # and hope for the best
+                prefix = os.path.basename(tpldir)
+        if os.path.exists(os.path.join(tpldir, 'templates.ini')):
+            config = ConfigParser()
+            config.read(os.path.join(tpldir, 'templates.ini'))
+            templates = [tpl for tpl in config.items('templates') if len(tpl) > 0]
+            templates = [(os.path.join(prefix, data[0].strip()), _(data[1].strip())) for data in templates]
         else:
-            templates = list((tpl, tpl) for tpl in os.listdir(tpldir))
+            templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):
