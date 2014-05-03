@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
 from django.template import NodeList, VariableNode, TemplateSyntaxError
 from django.template.loader import get_template
-from django.template.loader_tags import ExtendsNode, BlockNode
+from django.template.loader_tags import ExtendsNode, BlockNode, IncludeNode
 from django.utils.translation import ugettext as _
 from sekizai.helpers import is_variable_extend_node
 
@@ -97,6 +97,17 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
         # check if this is a placeholder first
         if isinstance(node, Placeholder):
             placeholders.append(node.get_name())
+        elif isinstance(node, IncludeNode):
+            # if there's an error in the to-be-included template, node.template becomes None
+            if node.template:
+                # This is required for Django 1.7 but works on older version too
+                # Check if it quacks like a template object, if not
+                # presume is a template path and get the object out of it
+                if not callable(getattr(node.template, 'render', None)):
+                    template = get_template(force_unicode(node.template).strip('"'))
+                else:
+                    template = node.template
+                placeholders += _scan_placeholders(template.nodelist, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
             placeholders += _extend_nodelist(node)
