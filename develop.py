@@ -20,6 +20,7 @@ from cms.utils.compat import DJANGO_1_6
 from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
+from cms.utils.compat import DJANGO_1_6
 
 __doc__ = '''django CMS development helper script. 
 
@@ -35,6 +36,7 @@ Usage:
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
+    develop.py makemigrations
     develop.py pyflakes
     develop.py authors
 
@@ -51,11 +53,12 @@ Options:
 '''
 
 
-def server(bind='127.0.0.1', port=8000, migrate_opt=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
     if os.environ.get("RUN_MAIN") != "true":
+        from cms.utils.compat.dj import get_user_model
         if DJANGO_1_6:
             from south.management.commands import syncdb, migrate
-            if migrate_opt:
+            if migrate_cmd:
                 syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
                 migrate.Command().handle(interactive=False, verbosity=1)
             else:
@@ -63,8 +66,7 @@ def server(bind='127.0.0.1', port=8000, migrate_opt=False):
                 migrate.Command().handle(interactive=False, verbosity=1, fake=True)
         else:
             call_command("migrate", database='default')
-        from cms.compat import get_user_model
-        User = get_user_model()        
+        User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
 
@@ -177,6 +179,11 @@ def shell():
     from django.core.management import call_command
     call_command('shell')
 
+
+def makemigrations():
+    from django.core.management import call_command
+    call_command('makemigrations', *['cms', 'menus'])
+    
 
 def generate_authors():
     print("Generating AUTHORS")
@@ -299,6 +306,8 @@ def main():
                 compilemessages()
             elif args['makemessages']:
                 makemessages()
+            elif args['makemigrations']:
+                makemigrations()
 
 
 if __name__ == '__main__':
