@@ -2,3 +2,4 @@
 django>=1.6
 South>=0.7.2
 django-reversion>=1.8
+https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
