@@ -8,9 +8,14 @@ from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
 from django.template import NodeList, VariableNode, TemplateSyntaxError
 from django.template.loader import get_template
-from django.template.loader_tags import ExtendsNode, BlockNode, IncludeNode
+from django.template.loader_tags import ExtendsNode, BlockNode
 from django.utils.translation import ugettext as _
 from sekizai.helpers import is_variable_extend_node
+
+try:
+    from django.template.loader_tags import ConstantIncludeNode as IncludeNode
+except ImportError:
+    from django.template.loader_tags import IncludeNode
 
 from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models import Page
