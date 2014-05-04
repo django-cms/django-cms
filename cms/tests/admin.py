@@ -22,7 +22,6 @@ from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page, publish_page
-from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import UserSettings, StaticPlaceholder
 from cms.models.pagemodel import Page
@@ -36,7 +35,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_4, DJANGO_1_6
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import get_user_model, force_unicode
 
 
 class AdminTestsBase(CMSTestCase):

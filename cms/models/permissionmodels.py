@@ -6,12 +6,12 @@ from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 
-from cms.compat import is_user_swapped, user_model_label
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
 from cms.utils.compat.dj import (force_unicode, python_2_unicode_compatible,
-                                 installed_apps)
+                                 installed_apps, is_user_swapped,
+                                 user_model_label)
 from cms.utils.helpers import reversion_register
 
 # To avoid circular dependencies, don't use cms.compat.get_user_model, and

@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-import sys
 import json
+import sys
+import warnings
 
-from cms.compat import get_user_model
-from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext,
-    SettingsOverride)
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
@@ -17,8 +14,12 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
+
+from cms.models import Page
+from cms.test_utils.util.context_managers import (UserLoginContext,
+    SettingsOverride)
+from cms.utils.compat.dj import get_user_model
 from cms.utils.compat.urls import urljoin, unquote
-import warnings
 from cms.utils.permissions import set_current_user
 
 

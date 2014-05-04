@@ -5,13 +5,13 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser, Group
 
 from cms.api import create_page
-from cms.compat import get_user_model, user_related_name
 from cms.menu import get_visible_pages
 from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.utils.compat.dj import get_user_model, user_related_name
 from menus.menu_pool import menu_pool
 
 __all__ = [

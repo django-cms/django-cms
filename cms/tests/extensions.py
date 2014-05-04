@@ -3,7 +3,6 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page
-from cms.compat import get_user_model
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
@@ -13,6 +12,7 @@ from cms.test_utils.project.extensionapp.models import (MyPageExtension,
                                                         MyTitleExtension)
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.tests import AdminTestsBase
+from cms.utils.compat.dj import get_user_model
 
 
 class ExtensionsTestCase(TestCase):

@@ -1,20 +1,14 @@
 # -*- coding: utf-8 -*-
 import sys
 import datetime
-from cms.utils.conf import get_cms_setting
-from cms.apphook_pool import apphook_pool
-from cms.exceptions import AppAlreadyRegistered
-from cms.test_utils.project.placeholderapp.models import Example1
-from django.core.urlresolvers import clear_url_caches
-from cms.appresolver import clear_app_resolvers
-from cms.test_utils.project.placeholderapp.cms_app import Example1App
-from django.core.cache import cache
 import os
 import time
 
-from django.utils import unittest
 from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.urlresolvers import clear_url_caches
 from django.test import LiveServerTestCase
+from django.utils import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -22,12 +16,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 
-from cms.models import Page, CMSPlugin
 from cms.api import create_page, create_title, add_plugin
+from cms.appresolver import clear_app_resolvers
+from cms.apphook_pool import apphook_pool
+from cms.exceptions import AppAlreadyRegistered
+from cms.models import Page, CMSPlugin
+from cms.test_utils.project.placeholderapp.cms_app import Example1App
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.testcases import CMSTestCase
-from cms.compat import get_user_model
+from cms.utils.compat.dj import get_user_model
+from cms.utils.conf import get_cms_setting
 
 
 class CMSLiveTests(LiveServerTestCase, CMSTestCase):

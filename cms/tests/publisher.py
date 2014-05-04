@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.utils.conf import get_cms_setting
-from cms.test_utils.util.fuzzy_int import FuzzyInt
 
 from djangocms_text_ckeditor.models import Text
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.urlresolvers import reverse
 
-from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
-from cms.utils.i18n import force_language
-from cms.compat import get_user_model
 from cms.api import create_page, add_plugin, create_title
+from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride, SettingsOverride
+from cms.test_utils.util.fuzzy_int import FuzzyInt
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import force_language
+from cms.utils.compat.dj import get_user_model
 
 
 class PublisherCommandTests(TestCase):

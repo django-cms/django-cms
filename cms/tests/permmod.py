@@ -3,46 +3,38 @@ from __future__ import with_statement
 
 from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import (AnonymousUser, Group, Permission)
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
 
-from cms.api import add_plugin
-from cms.api import assign_user_to_page
-from cms.api import create_page
-from cms.api import create_page_user
-from cms.api import publish_page
+from cms.api import (add_plugin, assign_user_to_page, create_page,
+                     create_page_user, publish_page)
 from cms.admin.forms import save_permissions
 from cms.constants import PUBLISHER_STATE_PENDING
-from cms.compat import get_user_model
-from cms.compat import user_related_name
 from cms.management.commands.subcommands.moderator import log
 from cms.models import Page, CMSPlugin, Title
-from cms.models.permissionmodels import ACCESS_DESCENDANTS
-from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.permissionmodels import PagePermission
-from cms.models.permissionmodels import GlobalPagePermission
+from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
+                                         ACCESS_PAGE_AND_DESCENDANTS,
+                                         PagePermission,
+                                         GlobalPagePermission)
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.testcases import URL_CMS_PAGE_ADD
-from cms.test_utils.testcases import URL_CMS_PLUGIN_REMOVE
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.testcases import URL_CMS_PLUGIN_ADD
-from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import disable_logger
-from cms.test_utils.util.context_managers import SettingsOverride
-from cms.test_utils.util.request_factory import RequestFactory
+from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
+                                      SettingsOverrideTestCase,
+                                      URL_CMS_PLUGIN_ADD, CMSTestCase)
+from cms.test_utils.util.context_managers import (disable_logger,
+                                                  SettingsOverride)
 from cms.test_utils.util.fuzzy_int import FuzzyInt
+from cms.test_utils.util.request_factory import RequestFactory
+from cms.utils.compat.dj import get_user_model, user_related_name
 from cms.utils.compat.urls import unquote
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
-from cms.utils.permissions import has_page_add_permission
-from cms.utils.permissions import has_page_change_permission
-from cms.utils.permissions import has_generic_permission
+from cms.utils.permissions import (has_page_add_permission,
+                                   has_page_change_permission,
+                                   has_generic_permission)
 
 
 def fake_mptt_attrs(page):
