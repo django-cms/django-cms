@@ -111,6 +111,7 @@ def _get_test_labels():
             for method, _ in cls.methods.items():
                 if method.startswith('test_'):
                     test_labels.append('cms.%s.%s' % (clsname, method))
+    test_labels = sorted(test_labels)
     return test_labels
 
 
