@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.db import models
 from django.utils import importlib
 from django.utils.translation import ugettext_lazy as _
@@ -9,9 +10,9 @@ from django.contrib.sites.models import Site
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
+from cms.utils.compat import DJANGO_1_6
 from cms.utils.compat.dj import (force_unicode, python_2_unicode_compatible,
-                                 installed_apps, is_user_swapped,
-                                 user_model_label)
+                                 is_user_swapped, user_model_label)
 from cms.utils.helpers import reversion_register
 
 # To avoid circular dependencies, don't use cms.compat.get_user_model, and
@@ -19,11 +20,21 @@ from cms.utils.helpers import reversion_register
 if is_user_swapped:
     user_app_name, user_model_name = user_model_label.rsplit('.', 1)
     User = None
-    for app in installed_apps():
-        if app.endswith(user_app_name):
-            user_app_models = importlib.import_module(app + ".models")
-            User = getattr(user_app_models, user_model_name)
-            break
+    if DJANGO_1_6:
+        for app in settings.INSTALLED_APPS:
+            if app.endswith(user_app_name):
+                user_app_models = importlib.import_module(app + ".models")
+                User = getattr(user_app_models, user_model_name)
+                break
+    else:
+        # This is sort of a hack
+        # AppConfig is not ready yet, and we blindly check if the user model
+        # application has already been loaded
+        from django.apps import apps
+        try:
+            User = apps.all_models[user_app_name][user_model_name.lower()]
+        except KeyError:
+            pass
     if User is None:
         raise ImproperlyConfigured(
             "You have defined a custom user model %s, but the app %s is not "

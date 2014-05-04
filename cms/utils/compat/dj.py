@@ -59,7 +59,6 @@ try:
         return [app.name for app in apps.get_app_configs()]
 
 except ImportError:
-    from django.conf import settings
 
     def is_installed(app_name):
         return app_name in settings.INSTALLED_APPS

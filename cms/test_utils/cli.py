@@ -272,7 +272,7 @@ def configure(db_url, **extra):
 
     if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in extra:
         custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
-        defaults['INSTALLED_APPS'].append(custom_user_app)
+        defaults['INSTALLED_APPS'].insert(defaults['INSTALLED_APPS'].index('cms'), custom_user_app)
 
     settings._wrapped = empty
     defaults.update(extra)
