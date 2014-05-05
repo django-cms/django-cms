@@ -42,12 +42,12 @@ class ApphookPool(object):
         self.apps[app.__name__] = app
 
     def discover_apps(self):
-        apphooks = get_cms_setting('APPHOOKS')
+        self.apphooks = get_cms_setting('APPHOOKS')
 
-        if apphooks:
-            for cls in iterload_objects(apphooks):
+        if self.apphooks:
+            for cls in iterload_objects(self.apphooks):
                 try:
-                    self.register(cls)
+                    self.register(cls, block=False)
                 except AppAlreadyRegistered:
                     pass
 
