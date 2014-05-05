@@ -264,9 +264,6 @@ def configure(db_url, **extra):
 
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
-        defaults['SOUTH_MIGRATION_MODULES'] = {
-            'cms': 'cms.south_migrations',
-        }
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
 
