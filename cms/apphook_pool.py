@@ -12,16 +12,20 @@ from cms.utils.django_load import load, iterload_objects
 class ApphookPool(object):
 
     def __init__(self):
+        self.apphooks = []
         self.apps = {}
         self.discovered = False
 
     def clear(self):
         # TODO: remove this method, it's Python, we don't need it.
+        self.apphooks = []
         self.apps = {}
         self.discovered = False
 
-    def register(self, app):
-        # Quit early, If application is already registered
+    def register(self, app, block=True):
+        if self.apphooks and block:
+            return
+
         if app.__name__ in self.apps:
             raise AppAlreadyRegistered(
                 'A CMS application %r is already registered' % app.__name__)
