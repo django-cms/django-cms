@@ -22,8 +22,8 @@ class ApphookPool(object):
         self.apps = {}
         self.discovered = False
 
-    def register(self, app, block=True):
-        if self.apphooks and block:
+    def register(self, app, discovering_apps=False):
+        if self.apphooks and not discovering_apps:
             return
 
         if app.__name__ in self.apps:
@@ -47,7 +47,7 @@ class ApphookPool(object):
         if self.apphooks:
             for cls in iterload_objects(self.apphooks):
                 try:
-                    self.register(cls, block=False)
+                    self.register(cls, discovering_apps=True)
                 except AppAlreadyRegistered:
                     pass
 
