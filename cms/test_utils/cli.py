@@ -2,7 +2,7 @@
 from __future__ import with_statement
 import os
 import dj_database_url
-from cms.utils.compat import DJANGO_1_5
+from cms.utils.compat import DJANGO_1_5, PY2
 import django
 
 gettext = lambda s: s
@@ -12,6 +12,10 @@ urlpatterns = []
 
 def configure(db_url, **extra):
     from django.conf import settings
+    if PY2:
+        siteid = long(1)  # nopyflakes
+    else:
+        siteid = 1
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
     if not 'DATABASES' in extra:
@@ -31,7 +35,7 @@ def configure(db_url, **extra):
         DATABASES={
             'default': DB
         },
-        SITE_ID=1,
+        SITE_ID=siteid,
         USE_I18N=True,
         MEDIA_ROOT='/media/',
         STATIC_ROOT='/static/',
