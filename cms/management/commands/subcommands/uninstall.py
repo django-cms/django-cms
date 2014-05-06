@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.plugin_pool import plugin_pool
 from django.core.management.base import LabelCommand
 
 from cms.management.commands.subcommands.base import SubcommandsCommand
@@ -37,6 +38,7 @@ class UninstallPluginsCommand(LabelCommand):
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
 
     def handle_label(self, label, **options):
+        plugin_pool.discover_plugins()
         queryset = CMSPlugin.objects.filter(plugin_type=label)
         number_of_plugins = queryset.count()
 
