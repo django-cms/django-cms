@@ -38,7 +38,7 @@ class UninstallPluginsCommand(LabelCommand):
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
 
     def handle_label(self, label, **options):
-        plugin_pool.discover_plugins()
+        plugin_pool.get_all_plugins()
         queryset = CMSPlugin.objects.filter(plugin_type=label)
         number_of_plugins = queryset.count()
 
