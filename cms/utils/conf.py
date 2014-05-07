@@ -105,6 +105,10 @@ def get_toolbar_url__build():
 def get_templates():
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
+        # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
+        # or a dictionary holding 'site: template dir' entries
+        if isinstance(tpldir, dict):
+            tpldir = tpldir[settings.SITE_ID]
         # We must extract the relative path of CMS_TEMPLATES_DIR to the neares
         # valid templates directory. Here we mimick what the filesystem and
         # app_directories template loaders do

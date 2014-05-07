@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import os.path
+from cms.test_utils.util.context_managers import SettingsOverride
+
 try:
     from configparser import ConfigParser
 except ImportError:
@@ -18,6 +20,11 @@ from cms.utils import get_cms_setting
 PATH_PREFIX = os.path.join('inner_dir', 'custom_templates')
 GOOD_PATH = os.path.join(settings.PROJECT_PATH, 'project', 'templates', PATH_PREFIX)
 BAD_PATH = os.path.join(settings.PROJECT_PATH, 'project', 'custom_templates')
+SITE_PATH = {
+    1: os.path.join(settings.PROJECT_PATH, 'project', 'templates', PATH_PREFIX),
+    2: os.path.join(settings.PROJECT_PATH, 'project', 'templates', '%s_2' % PATH_PREFIX),
+}
+
 
 class TemplatesConfig(CMSTestCase):
 
@@ -64,6 +71,22 @@ class TemplatesConfig(CMSTestCase):
             if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
                 tpl = loader.get_template(template[0])
                 self.assertTrue(tpl.name in files)
+
+    @override_settings(CMS_TEMPLATES_DIR=SITE_PATH)
+    def test_multisite(self):
+        """
+        Checking that templates can be loaded by the template loader
+        """
+        templates = get_cms_setting('TEMPLATES')
+        for template in templates:
+            if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
+                self.assertTrue(template[0].find('%s/' % SITE_PATH[1]) >= -1)
+        with SettingsOverride(SITE_ID=2):
+            templates = get_cms_setting('TEMPLATES')
+            for template in templates:
+                if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
+                    self.assertTrue(template[0].find('%s/' % SITE_PATH[2]) >= -1)
+
 
     @override_settings(CMS_TEMPLATES_DIR=BAD_PATH)
     def test_custom_templates_bad_dir(self):
