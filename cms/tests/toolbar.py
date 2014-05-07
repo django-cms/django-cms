@@ -666,7 +666,6 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 '''
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
-        import ipdb; ipdb.set_trace()
         self.assertContains(
             response,
             "new CMS.Plugin('cms_plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
