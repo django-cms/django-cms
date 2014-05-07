@@ -311,7 +311,6 @@ class PagesTestCase(CMSTestCase):
             req.REQUEST = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
 
-
     def test_page_obj_change_data_from_template_tags(self):
         from django import template
 

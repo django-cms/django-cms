@@ -87,9 +87,18 @@ CMS_TEMPLATES_DIR
 Default: ``None``
 
 Instead of explicitly providing a set of templates via :setting:`CMS_TEMPLATES`
-a single directory can be provided using this configuration.
+a directory can be provided using this configuration.
 
-The directory is scanned and all templates in it are loaded as templates for
+`CMS_TEMPLATES_DIR` can be set to the (absolute) path of the templates directory,
+or set to a dictionary with `SITE_ID: template path` items::
+
+    CMS_TEMPLATES_DIR: {
+        1: '/absolute/path/for/site/1/',
+        2: '/absolute/path/for/site/2/',
+    }
+
+
+The provided directory is scanned and all templates in it are loaded as templates for
 django CMS.
 
 Template loaded and their names can be customized using a INI-file called
