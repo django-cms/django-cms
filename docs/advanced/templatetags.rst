@@ -135,7 +135,7 @@ only the english plugins:
 
     {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 
-.. versionadded:: 3.0.1
+.. versionadded:: 3.0.2
     This template tag supports the ``as`` argument. With this you can assign the result
     of the template tag to a new variable that you can use elsewhere in the template.
 

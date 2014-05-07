@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.test_utils.project.placeholderapp.views import detail_view
 
 from django.core.cache import cache
 from django.template import Template, RequestContext
@@ -10,6 +11,7 @@ from cms.api import create_page, add_plugin
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
 from cms.test_utils.util.mock import AttributeObject
@@ -43,7 +45,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
     def setUp(self):
         super(RenderingTestCase, self).setUp()
         self.test_user = self._create_user("test", True, True)
-        
+
         with self.login_user_context(self.test_user):
             self.test_data = {
                 'title': u'RenderingTestCase-title',
@@ -206,6 +208,39 @@ class RenderingTestCase(SettingsOverrideTestCase):
             u'|{% placeholder "empty" or %}No content{% endplaceholder %}'
         r = self.render(t, self.test_page)
         self.assertEqual(r, u'|No content')
+
+    def test_render_placeholder_tag(self):
+        """
+        Tests the {% render_placeholder %} templatetag.
+        """
+        render_placeholder_body = "I'm the render placeholder body"
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+
+        t = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_placeholder ex1.placeholder %}</h1>
+<h2>{% render_placeholder ex1.placeholder as tempvar %}</h2>
+<h3>{{ tempvar }}</h3>
+{% endblock content %}
+'''
+        r = self.render(t, self.test_page, {'ex1': ex1})
+        self.assertInHTML(
+            '<h1>%s</h1>' % render_placeholder_body,
+            r)
+
+        self.assertInHTML(
+            '<h2></h2>',
+            r)
+
+        self.assertInHTML(
+            '<h3>%s</h3>' % render_placeholder_body,
+            r)
 
     def test_show_placeholder(self):
         """
