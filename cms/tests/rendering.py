@@ -230,17 +230,20 @@ class RenderingTestCase(SettingsOverrideTestCase):
 {% endblock content %}
 '''
         r = self.render(t, self.test_page, {'ex1': ex1})
-        self.assertInHTML(
+        self.assertIn(
             '<h1>%s</h1>' % render_placeholder_body,
-            r)
+            r
+        )
 
-        self.assertInHTML(
+        self.assertIn(
             '<h2></h2>',
-            r)
+            r
+        )
 
-        self.assertInHTML(
+        self.assertIn(
             '<h3>%s</h3>' % render_placeholder_body,
-            r)
+            r
+        )
 
     def test_show_placeholder(self):
         """
