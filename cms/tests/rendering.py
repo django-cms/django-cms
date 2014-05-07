@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.test_utils.project.placeholderapp.views import detail_view
 
 from django.core.cache import cache
 from django.template import Template, RequestContext
