@@ -230,7 +230,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             # Prepare a dict mapping the apps by class name ('PollApp') to
             # their app_name attribute ('polls'), if any.
             app_namespaces = {}
-            for hook in apphook_pool.apphook_pool.get_apphooks():
+            for hook in apphook_pool.get_apphooks():
                 app = apphook_pool.get_apphook(hook[0])
                 if app.app_name:
                     app_namespaces[hook[0]] = app.app_name
