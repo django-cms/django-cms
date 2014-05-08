@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from cms.models import UserSettings, PagePermission
 from cms.models import Page
 from cms.views import details
-from cms.api import create_page, create_title
+from cms.api import create_page, create_title, add_plugin
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.compat import is_user_swapped
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
@@ -524,6 +524,60 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertNotContains(
             response,
             '<div class="cms_plugin cms_plugin-%s cms_render_model"></div>' % ex1.pk)
+
+    def test_edit_render_placeholder(self):
+        """
+        Tests the {% render_placeholder %} templatetag.
+        """
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        render_placeholder_body = "I'm the render placeholder body"
+
+        plugin = add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_placeholder instance.placeholder %}</h1>
+<h2>{% render_placeholder instance.placeholder as tempvar %}</h2>
+<h3>{{ tempvar }}</h3>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '<h1><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
+            '<div class="cms_plugin cms_plugin-{1}">{2}</div></h1>'.format(ex1.placeholder.pk,
+                                                                           plugin.pk, render_placeholder_body)
+            )
+
+        self.assertContains(
+            response,
+            '<h2></h2>',
+        )
+
+        self.assertContains(
+            response,
+            '<h3><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
+            '<div class="cms_plugin cms_plugin-{1}">{2}</div></h3>'.format(ex1.placeholder.pk,
+                                                                           plugin.pk, render_placeholder_body)
+            )
+
+        self.assertContains(
+            response,
+            'CMS.Plugin(\'cms_plugin-{0}\''.format(plugin.pk)
+        )
+
+        self.assertContains(
+            response,
+            'CMS.Plugin(\'cms_placeholder-{0}\''.format(ex1.placeholder.pk)
+        )
 
     def test_filters(self):
         user = self.get_staff()

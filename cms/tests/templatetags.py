@@ -340,3 +340,19 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         with self.assertNumQueries(4):
             template.render(context)
 
+    def test_render_placeholder_as_var(self):
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        template = Template(
+            "{% load cms_tags %}{% placeholder test or %}< --- empty --->{% endplaceholder %}")
+        request = RequestFactory().get('/asdadsaasd/')
+        user = self.get_superuser()
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.edit_mode = True
+        request.toolbar.is_staff = True
+        context = RequestContext(request)
+        with self.assertNumQueries(4):
+            template.render(context)
+
