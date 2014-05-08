@@ -649,7 +649,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4", date_field=datetime.date(2012, 1, 1))
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}
+{% load cms_tags %}{% load url from future %}
 
 {% block content %}
 {% render_model_icon instance "char_1" %}
@@ -668,11 +668,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            "new CMS.Plugin('cms_plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
+            "new CMS.Plugin('cms_plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
 
         self.assertContains(
             response,
-            "new CMS.Plugin('cms_plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
+            "new CMS.Plugin('cms_plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
 
     def test_add_tag(self):
         user = self.get_staff()
