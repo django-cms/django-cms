@@ -94,6 +94,10 @@ $(document).ready(function () {
 			var holder = this.sideframe.find('.cms_sideframe-frame');
 			var initialized = false;
 
+			// Add a param so views can distinguish requests for the
+			// sideframe from other ones.
+			url = this._url(url, ['cms_sideframe=true'])
+
 			// push required params if defined
 			// only apply params on tree view
 			if(url.indexOf(CMS.config.request.tree) >= 0) {
