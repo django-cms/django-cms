@@ -701,6 +701,10 @@ class CMSEditableObject(InclusionTag):
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                if not context.get('attribute_name', None):
+                    # Make sure CMS.Plugin object will not clash in the frontend.
+                    extra_context['attribute_name'] = '-'.join(edit_fields) \
+                                                        if not isinstance('edit_fields', string_types) else edit_fields
             else:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
                 extra_context['attribute_name'] = 'add'
