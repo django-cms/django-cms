@@ -7,6 +7,10 @@ django CMS
    :target: https://crate.io/packages/django-cms/
 .. image:: https://pypip.in/d/django-cms/badge.png
    :target: https://crate.io/packages/django-cms/
+.. image:: https://pypip.in/wheel/django-cms/badge.png
+    :target: https://pypi.python.org/pypi/django-cms/
+.. image:: https://pypip.in/license/django-cms/badge.png
+    :target: https://pypi.python.org/pypi/django-cms/
 
 Open source enterprise content management system based on the django framework.
 
