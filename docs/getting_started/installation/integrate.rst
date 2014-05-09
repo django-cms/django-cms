@@ -549,6 +549,7 @@ Here is a simple example for a base template called ``base.html``:
   {% load cms_tags sekizai_tags %}
   <html>
     <head>
+        <title>{% page_attribute "page_title" %}</title>
         {% render_block "css" %}
     </head>
     <body>
