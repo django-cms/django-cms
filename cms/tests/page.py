@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from django.utils.timezone import now, make_aware, get_current_timezone
 from cms import constants, api
 import os.path
 
@@ -319,7 +320,7 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             change_user = str(superuser)
             #some databases don't store microseconds, so move the start flag back by 1 second
-            before_change = datetime.datetime.now()+datetime.timedelta(seconds=-1)
+            before_change = now()+datetime.timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
@@ -327,13 +328,13 @@ class PagesTestCase(CMSTestCase):
             req = HttpRequest()
             page.save()
             page.publish('en')
-            after_change = datetime.datetime.now()
+            after_change = now()
             req.current_page = page
             req.REQUEST = {}
 
             actual_result = t.render(template.Context({"request": req}))
             desired_result = "{0} changed on {1}".format(change_user, actual_result[-19:])
-            save_time = datetime.datetime.strptime(actual_result[-19:], "%Y-%m-%dT%H:%M:%S")
+            save_time = make_aware(datetime.datetime.strptime(actual_result[-19:], "%Y-%m-%dT%H:%M:%S"), get_current_timezone())
 
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
