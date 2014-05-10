@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from copy import deepcopy
 from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch, reverse, resolve
+from django.core.urlresolvers import NoReverseMatch, reverse, resolve, reverse_lazy
 
 import warnings
 from cms.models.titlemodels import Title
@@ -128,9 +129,16 @@ class DefaultLanguageChanger(object):
             if view.namespace:
                 "%s:%s" % (view.namespace, view_name)
             url = None
+            for idx, arg in enumerate(view.args):
+                if isinstance(arg, type):
+                    view.args[idx] = arg()
+            for key, arg in view.kwargs.items():
+                if isinstance(arg, type):
+                    view.kwargs[key] = arg()
+            kwargs = deepcopy(view.kwargs)
             with force_language(lang):
                 try:
-                    url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
+                    url = reverse(view_name, args=view.args, kwargs=kwargs, current_app=view.app_name)
                 except NoReverseMatch:
                     pass
             if url:
