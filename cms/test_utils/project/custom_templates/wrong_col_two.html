@@ -8,7 +8,6 @@
 	<h1>{% render_model request.current_page "titles" %} {% render_model_icon request.current_page %}</h1>
 	<div id="col1" class="grid_3">
         {% render_model request.current_page "menu_title" %}
-		{% include "sidebar_submenu.html" %}
 		{% block col_sidebar %}
 			{% with "220" as width %}
 	    		{% placeholder col_sidebar %}

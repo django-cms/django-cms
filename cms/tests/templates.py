@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
+from imp import load_module, PY_SOURCE
 import os.path
-from cms.test_utils.util.context_managers import SettingsOverride
-
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import SafeConfigParser as ConfigParser
 
 from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
@@ -15,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import get_cms_setting
 
 PATH_PREFIX = os.path.join('inner_dir', 'custom_templates')
@@ -44,12 +40,11 @@ class TemplatesConfig(CMSTestCase):
         """
         Test that using CMS_TEMPLATES_DIR both template list and template labels are extracted from the new directory
         """
-        template_dir = settings.CMS_TEMPLATES_DIR
-        config = ConfigParser()
-        config.read(os.path.join(template_dir, 'templates.ini'))
-        templates = [tpl for tpl in config.items('templates') if len(tpl) > 0]
-        original_labels = [force_text(_(template[1])) for template in templates]
-        original_files = [os.path.join(PATH_PREFIX, template[0]) for template in templates]
+        config_path = os.path.join(settings.CMS_TEMPLATES_DIR, '__init__.py')
+        with open(config_path, 'r') as openfile:
+            mod = load_module("mod", openfile, config_path, ('m', 'r', PY_SOURCE))
+        original_labels = [force_text(_(template[1])) for template in mod.TEMPLATES.items()]
+        original_files = [os.path.join(PATH_PREFIX, template[0].strip()) for template in mod.TEMPLATES.items()]
         templates = get_cms_setting('TEMPLATES')
         self.assertEqual(len(templates), 3)
         labels = [force_text(template[1]) for template in templates]

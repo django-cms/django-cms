@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import SafeConfigParser as ConfigParser
 from functools import update_wrapper
 import os
 import pprint
@@ -16,6 +12,7 @@ from cms import constants
 from cms.exceptions import CMSDeprecationWarning
 from cms.utils.compat.type_checks import int_types
 from cms.utils.compat.urls import urljoin
+from cms.utils.django_load import load_from_file
 
 
 __all__ = ['get_cms_setting']
@@ -127,11 +124,12 @@ def get_templates():
                 # If templates is not found we use the directory name as prefix
                 # and hope for the best
                 prefix = os.path.basename(tpldir)
-        if os.path.exists(os.path.join(tpldir, 'templates.ini')):
-            config = ConfigParser()
-            config.read(os.path.join(tpldir, 'templates.ini'))
-            templates = [tpl for tpl in config.items('templates') if len(tpl) > 0]
-            templates = [(os.path.join(prefix, data[0].strip()), _(data[1].strip())) for data in templates]
+        config_path = os.path.join(tpldir, '__init__.py')
+        # Try to load templates list and names from the template module
+        # If module file is not present skip configuration and just dump the filenames as templates
+        if config_path:
+            template_module = load_from_file(config_path)
+            templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
         else:
             templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
     else:
