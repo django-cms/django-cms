@@ -6,7 +6,6 @@
 {% block content %}
 	<h1>{% render_model request.current_page "page_title" %}</h1>
     <div id="col1" class="grid_3">
-		{% include "sidebar_submenu.html" %}
 		{% block col_sidebar %}
 			{% with "220" as width %}
 	    		{% placeholder col_sidebar %}
