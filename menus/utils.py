@@ -4,7 +4,7 @@ from copy import deepcopy
 from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch, reverse, resolve, reverse_lazy
+from django.core.urlresolvers import NoReverseMatch, reverse, resolve
 
 import warnings
 from cms.models.titlemodels import Title

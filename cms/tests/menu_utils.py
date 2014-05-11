@@ -1,7 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 
-from cms.api import create_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from menus.templatetags.menu_tags import PageLanguageUrl
