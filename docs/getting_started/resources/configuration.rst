@@ -101,20 +101,25 @@ or set to a dictionary with `SITE_ID: template path` items::
 The provided directory is scanned and all templates in it are loaded as templates for
 django CMS.
 
-Template loaded and their names can be customized using a INI-file called
-``templates.ini`` in the same directory. This file contains a single **templates**
-stanza with the templates files and names::
+Template loaded and their names can be customized using the templates dir as a
+python module, by creating a ``__init__.py`` file in the templates directory.
+The file contains a single ``TEMPLATES`` dictionary with the list of templates
+as keys and template names as values::::
 
-    [templates]
-    col_two.html=Two columns templates
-    col_three.html=Three columns templates
+    # -*- coding: utf-8 -*-
+    from django.utils.translation import ugettext_lazy as _
+    TEMPLATES = {
+        'col_two.html': _('Two columns'),
+        'col_three.html': _('Three columns'),
+    }
 
-Templates label are passed through gettext for translation.
+Being a normal python file, templates labels can be passed through gettext
+for translation.
 
 .. note::
 
     As templates are still loaded by the Django template loader, the given
-    directory must be reachable by the template loading system.
+    directory **must** be reachable by the template loading system.
     Currently **filesystem** and **app_directory** loader schemas are tested and
     supported.
 
