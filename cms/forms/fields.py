@@ -59,9 +59,12 @@ class PageSelectFormField(forms.MultiValueField):
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget
 
-    def __init__(self, max_length=None, min_length=None, placeholder_text=None, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, placeholder_text=None,
+                 ajax_view=None, *args, **kwargs):
         self.placeholder_text = placeholder_text
-        super(PageSmartLinkField, self).__init__(max_length, min_length, *args, **kwargs)
+        widget = self.widget(ajax_view=ajax_view)
+        super(PageSmartLinkField, self).__init__(max_length, min_length,
+                                                 widget=widget, *args, **kwargs)
 
     def widget_attrs(self, widget):
         attrs = super(PageSmartLinkField, self).widget_attrs(widget)
