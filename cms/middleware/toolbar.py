@@ -105,9 +105,13 @@ class ToolbarMiddleware(object):
                     user=request.user,
                     action_flag__in=(ADDITION, CHANGE)
                 ).only('pk').order_by('-pk')[0].pk
+                if hasattr(request, 'cms_latest_entry') and request.cms_latest_entry != pk:
+                    log = LogEntry.objects.filter(user=request.user, action_flag__in=(ADDITION, CHANGE))[0]
+                    request.session['cms_log_latest'] = log.pk
+            # If there were no LogEntries, just don't touch the session.
+            # Note that in the case of a user logging-in as another user,
+            # request may have a cms_latest_entry attribute, but there are no
+            # LogEntries for request.user.
             except IndexError:
-                pk = -1
-            if hasattr(request, 'cms_latest_entry') and request.cms_latest_entry != pk:
-                log = LogEntry.objects.filter(user=request.user, action_flag__in=(ADDITION, CHANGE))[0]
-                request.session['cms_log_latest'] = log.pk
+                pass
         return response

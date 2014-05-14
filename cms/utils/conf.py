@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
+import os
 import pprint
-from cms.utils.compat.urls import urljoin
-from cms import constants
-from cms.exceptions import CMSDeprecationWarning
+import warnings
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
-import os
-import warnings
+
+from cms import constants
+from cms.exceptions import CMSDeprecationWarning
+from cms.utils.compat.type_checks import int_types
+from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']
@@ -120,7 +123,7 @@ def _ensure_languages_settings_new(languages):
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, int):
+        if not isinstance(site, int_types):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -210,7 +213,7 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if not isinstance(settings.SITE_ID, int):
+    if not isinstance(settings.SITE_ID, int_types):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )

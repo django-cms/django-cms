@@ -2,8 +2,9 @@
 from __future__ import with_statement
 from contextlib import contextmanager
 import inspect
-import os
 from itertools import chain
+import os
+
 from django.conf import settings
 from django.template import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
@@ -13,6 +14,8 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import get_app_paths
+from cms.utils.compat.type_checks import int_types
+
 
 SUCCESS = 1
 WARNING = 2
@@ -194,7 +197,7 @@ def check_i18n(output):
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
                 section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
-        if isinstance(settings.SITE_ID, int):
+        if isinstance(settings.SITE_ID, int_types):
             for site, items in get_cms_setting('LANGUAGES').items():
                 if type(site) == int:
                     for lang in items:

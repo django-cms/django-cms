@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse
 from cms.models import UserSettings, PagePermission
 from cms.models import Page
 from cms.views import details
-from cms.api import create_page, create_title
+from cms.api import create_page, create_title, add_plugin
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.compat import is_user_swapped
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
@@ -526,6 +526,60 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<div class="cms_plugin cms_plugin-%s cms_render_model"></div>' % ex1.pk)
 
+    def test_edit_render_placeholder(self):
+        """
+        Tests the {% render_placeholder %} templatetag.
+        """
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        render_placeholder_body = "I'm the render placeholder body"
+
+        plugin = add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_placeholder instance.placeholder %}</h1>
+<h2>{% render_placeholder instance.placeholder as tempvar %}</h2>
+<h3>{{ tempvar }}</h3>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '<h1><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
+            '<div class="cms_plugin cms_plugin-{1}">{2}</div></h1>'.format(ex1.placeholder.pk,
+                                                                           plugin.pk, render_placeholder_body)
+            )
+
+        self.assertContains(
+            response,
+            '<h2></h2>',
+        )
+
+        self.assertContains(
+            response,
+            '<h3><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
+            '<div class="cms_plugin cms_plugin-{1}">{2}</div></h3>'.format(ex1.placeholder.pk,
+                                                                           plugin.pk, render_placeholder_body)
+            )
+
+        self.assertContains(
+            response,
+            'CMS.Plugin(\'cms_plugin-{0}\''.format(plugin.pk)
+        )
+
+        self.assertContains(
+            response,
+            'CMS.Plugin(\'cms_placeholder-{0}\''.format(ex1.placeholder.pk)
+        )
+
     def test_filters(self):
         user = self.get_staff()
         page = create_page('Test', 'col_two.html', 'en', published=True)
@@ -642,6 +696,38 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', ex1.pk))
+
+    def test_icon_followed_by_render_model_block_tag(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4", date_field=datetime.date(2012, 1, 1))
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}{% load url from future %}
+
+{% block content %}
+{% render_model_icon instance "char_1" %}
+
+{% render_model_block instance "char_2" %}
+    {{ instance }}
+    <h1>{{ instance.char_1 }} - {{  instance.char_2 }}</h1>
+    <span class="date">{{ instance.date_field|date:"Y" }}</span>
+    {% if instance.char_1 %}
+    <a href="{% url 'detail' instance.pk %}">successful if</a>
+    {% endif %}
+{% endrender_model_block %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            "new CMS.Plugin('cms_plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
+
+        self.assertContains(
+            response,
+            "new CMS.Plugin('cms_plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
 
     def test_add_tag(self):
         user = self.get_staff()

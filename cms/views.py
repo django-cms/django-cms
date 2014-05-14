@@ -69,8 +69,6 @@ def details(request, slug):
             response._headers = headers
             return response
 
-    # get the right model
-    context = RequestContext(request)
     # Get a Page model object from the request
     page = get_page_from_request(request, use_path=slug)
     if not page:
@@ -180,7 +178,8 @@ def details(request, slug):
         request.toolbar.set_object(page)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
-    # fill the context 
+    # fill the context
+    context = RequestContext(request)
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
@@ -245,7 +244,7 @@ def _cache_page(response):
         )
         # See note in invalidate_cms_page_cache()
         _set_cache_version(version)
-    
+
 
 def _get_cache_key(request):
     #md5 key of current path

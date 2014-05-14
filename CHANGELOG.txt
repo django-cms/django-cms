@@ -226,3 +226,6 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Renamed NamespaceAllreadyRegistered to NamespaceAlreadyRegistered in menus/exceptions.py
 - Frontend editor UI fixes
 - Fix in cms fix-mptt command
+
+==== 3.0.2 ===
+- Add 'as' form to render_placeholder templatetag to save the result in context
