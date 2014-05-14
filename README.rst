@@ -11,7 +11,7 @@ django CMS
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://pypip.in/license/django-cms/badge.svg
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://coveralls.io/repos/divio/django-cms/badge.svg
+.. image:: https://img.shields.io/coveralls/divio/django-cms.svg
     :target: https://coveralls.io/r/divio/django-cms
 
 
