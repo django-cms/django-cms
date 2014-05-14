@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-import urllib
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
@@ -254,7 +257,7 @@ class PageToolbar(CMSToolbar):
                     except Resolver404:
                         pass
                 if publish_url_args:
-                    publish_url = "%s?%s" % (publish_url, urllib.urlencode(publish_url_args))
+                    publish_url = "%s?%s" % (publish_url, urlencode(publish_url_args))
                 if publish_permission:
                     self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
                                             disabled=not dirty)
