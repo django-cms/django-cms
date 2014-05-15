@@ -82,9 +82,9 @@ class PlaceholderToolbar(CMSToolbar):
     def add_structure_mode(self):
         switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                 extra_classes=['cms_toolbar-item-cms-mode-switcher'])
-        switcher.add_button(_("Structure"), '?build', active=self.toolbar.build_mode,
+        switcher.add_button(_("Structure"), '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'), active=self.toolbar.build_mode,
                             disabled=not self.toolbar.build_mode)
-        switcher.add_button(_("Content"), '?edit', active=not self.toolbar.build_mode,
+        switcher.add_button(_("Content"), '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'), active=not self.toolbar.build_mode,
                             disabled=self.toolbar.build_mode)
 
 
@@ -375,7 +375,7 @@ class PageToolbar(CMSToolbar):
             )
         )
         current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
-        current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?edit')
+        current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         page_info_url = "%s?language=%s" % (
             reverse('admin:cms_page_change', args=(self.page.pk,)),
             self.toolbar.language

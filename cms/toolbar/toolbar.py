@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.conf import get_cms_setting
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.models import UserSettings, Placeholder
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
@@ -43,6 +44,8 @@ class CMSToolbar(ToolbarAPIMixin):
         self.login_form = CMSToolbarLoginForm(request=request)
         self.is_staff = self.request.user.is_staff
         self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
+        self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)

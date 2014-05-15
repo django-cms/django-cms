@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import shutil
 from os.path import join
+from cms.utils.conf import get_cms_setting
 
 from djangocms_text_ckeditor.models import Text
 from django.conf import settings
@@ -195,9 +196,9 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(Title.objects.get(page=page1).slug, 'page3')
             response = self.client.get(reverse("admin:cms_page_changelist"))
             self.assertEqual(response.status_code, 200)
-            response = self.client.get('/en/?edit')
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             self.assertEqual(response.status_code, 200)
-            response = self.client.get('/en/page1/?edit')
+            response = self.client.get('/en/page1/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             self.assertEqual(response.status_code, 200)
 
 

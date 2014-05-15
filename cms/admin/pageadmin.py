@@ -1099,11 +1099,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         path = page.get_absolute_url(language, fallback=True)
                     else:
                         public_page = Page.objects.get(publisher_public=page.pk)
-                        path = '%s?edit_off' % public_page.get_absolute_url(language, fallback=True)
+                        path = '%s?%s' % (public_page.get_absolute_url(language, fallback=True), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
                 else:
-                    path = '%s?edit_off' % referrer
+                    path = '%s?%s' % (referrer, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
             else:
-                path = '/?edit_off'
+                path = '/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
 
         return HttpResponseRedirect(path)
 
@@ -1188,7 +1188,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
         if reverse('admin:index') not in referer:
-            path = '%s?edit_off' % referer.split('?')[0]
+            path = '%s?%s' % (referer.split('?')[0], get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
         return HttpResponseRedirect(path)
 
     @create_revision()
@@ -1293,7 +1293,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """Redirecting preview function based on draft_id
         """
         page = get_object_or_404(Page, id=object_id)
-        attrs = "?edit"
+        attrs = "?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         attrs += "&language=" + language
         with force_language(language):
             url = page.get_absolute_url(language) + attrs
