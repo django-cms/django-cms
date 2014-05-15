@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser
@@ -240,8 +244,20 @@ class PageToolbar(CMSToolbar):
                     pk = self.page.pk
                 with force_language(self.current_lang):
                     publish_url = reverse('admin:cms_page_publish_page', args=(pk, self.current_lang))
+                publish_url_args = {}
                 if dirty_statics:
-                    publish_url += "?statics=%s" % ','.join(str(static.pk) for static in dirty_statics)
+                    publish_url_args['statics'] = ','.join(str(static.pk) for static in dirty_statics)
+                # detect if we are in an apphook
+                with(force_language(self.toolbar.language)):
+                    try:
+                        resolver = resolve(self.request.path)
+                        from cms.views import details
+                        if resolver.func != details:
+                            publish_url_args['redirect'] = self.request.path
+                    except Resolver404:
+                        pass
+                if publish_url_args:
+                    publish_url = "%s?%s" % (publish_url, urlencode(publish_url_args))
                 if publish_permission:
                     self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
                                             disabled=not dirty)

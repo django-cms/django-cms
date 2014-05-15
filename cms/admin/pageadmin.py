@@ -1084,6 +1084,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
+
+        if 'redirect' in request.GET:
+            return HttpResponseRedirect(request.GET['redirect'])
         referrer = request.META.get('HTTP_REFERER', '')
 
         path = reverse("admin:cms_page_changelist")
