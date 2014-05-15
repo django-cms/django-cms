@@ -97,7 +97,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context = context_to_copy
     context.push()
     request = context['request']
-    if not hasattr(request, 'placeholder'):
+    if not hasattr(request, 'placeholders'):
         request.placeholders = []
     request.placeholders.append(placeholder)
     if hasattr(placeholder, 'content_cache'):
