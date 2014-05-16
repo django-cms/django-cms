@@ -164,7 +164,7 @@ def compilemessages():
 def makemessages():
     from django.core.management import call_command
     os.chdir('cms')
-    call_command('makemessages', locale='en')
+    call_command('makemessages', locale=('en',))
 
 
 def shell():
@@ -291,7 +291,7 @@ def main():
             elif args['compilemessages']:
                 compilemessages()
             elif args['makemessages']:
-                compilemessages()
+                makemessages()
 
 
 if __name__ == '__main__':
