@@ -1,5 +1,6 @@
 language: python
 python:
+- 3.4
 - 3.3
 - 2.7
 - 2.6
@@ -46,6 +47,18 @@ notifications:
   - irc.freenode.org#django-cms-sprint
 matrix:
   exclude:
+  - python: 3.4
+    env: DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
+  - python: 3.4
+    env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+  - python: 3.4
+    env: DJANGO=1.4 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
+
+  - python: 3.4
+    env: DJANGO=1.5 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+  - python: 3.4
+    env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+
   - python: 3.3
     env: DJANGO=1.4 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
   - python: 3.3
@@ -64,5 +77,8 @@ matrix:
     env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
   - python: 3.3
     env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=1
+  - python: 3.4
+    env: DJANGO=1.4 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=1
+
 
   fast_finish: true
