@@ -361,8 +361,8 @@ function tree_component () {
 			if(this.settings.path == false) {
 				this.path = "";
 				jQuery("script").each( function () { 
-					if(this.src.toString().match(/tree_component.*?js$/)) {
-						_this.path = this.src.toString().replace(/tree_component.*?js$/, "");
+					if(this.src.toString().match(/tree_component.*?js.*$/)) {
+						_this.path = this.src.toString().replace(/tree_component.*?js.*$/, "");
 					}
 				});
 			}
