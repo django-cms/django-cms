@@ -18,7 +18,7 @@ your template before the line on which you call the templatetag.
 .. note::
 
     Please note that menus live in the :mod:`menus` application, which though
-    tightly coupled to the :mod:`menus` application exists independently of it.
+    tightly coupled to the :mod:`cms` application exists independently of it.
     Menus are usable by any application, not just by django CMS.
 
 *********
