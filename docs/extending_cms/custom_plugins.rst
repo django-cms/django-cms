@@ -274,7 +274,8 @@ clause.
 Handling Relations
 ==================
 
-If your custom plugin has foreign key (to it, or from it) or many-to-many
+Everytime the page with your custom plugin is published the plugin is copied.
+So if your custom plugin has foreign key (to it, or from it) or many-to-many
 relations you are responsible for copying those related objects, if required,
 whenever the CMS copies the plugin - **it won't do it for you automatically**.
 
