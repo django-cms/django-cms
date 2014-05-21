@@ -4,6 +4,8 @@
 # 
 # Translators:
 # Alireza Savand <alireza.savand@gmail.com>, 2012
+# Aryan Baghi <aryan@baghi.id.ir>, 2014
+# Aryan Baghi <aryan@baghi.id.ir>, 2014
 # cafeclick <cafeclick@rocketmail.com>, 2013
 # matinm <moosaei.matin@aol.com>, 2013
 # mesterhope <mester.hope.oz@gmail.com>, 2014
@@ -12,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-03 11:35+0200\n"
-"PO-Revision-Date: 2014-04-03 11:23+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2014-04-10 17:40+0000\n"
+"Last-Translator: Aryan Baghi <aryan@baghi.id.ir>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django-cms/language/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -109,19 +111,19 @@ msgstr "صفحه"
 
 #: cms_toolbar.py:307
 msgid "Add Page"
-msgstr ""
+msgstr "افزودن صفحه"
 
 #: cms_toolbar.py:309
 msgid "New Page"
-msgstr ""
+msgstr "صفحه جدید"
 
 #: cms_toolbar.py:317
 msgid "New Sub Page"
-msgstr ""
+msgstr "صفحه زیرین جدید"
 
 #: cms_toolbar.py:325
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "مضاعف سازی صفحه"
 
 #: cms_toolbar.py:333
 msgid "Edit this Page"
@@ -141,7 +143,7 @@ msgstr "دسترسى ها"
 
 #: cms_toolbar.py:367 admin/pageadmin.py:309
 msgid "Publishing dates"
-msgstr ""
+msgstr "تاریخ انتشار"
 
 #: cms_toolbar.py:372
 msgid "Hide in navigation"
@@ -294,7 +296,7 @@ msgstr "تغییرمسیر به این آدرس."
 
 #: admin/forms.py:211
 msgid "Start typing..."
-msgstr ""
+msgstr "شروع به نوشتن ..."
 
 #: admin/forms.py:256
 msgid "A page with this reverse URL id exists already."
@@ -516,11 +518,11 @@ msgstr "مشکلی در انتشار محتوای شما وجود دارد ."
 
 #: admin/pageadmin.py:1122
 msgid "You do not have permission to unpublish this page"
-msgstr ""
+msgstr "شما اجازه تغییر این صفحه از حالت انتشار به عدم انتشار را ندارید"
 
 #: admin/pageadmin.py:1124
 msgid "This page was never published"
-msgstr ""
+msgstr "این صفحه تا به حال منتشر نشده"
 
 #: admin/pageadmin.py:1127
 #, python-format
@@ -590,7 +592,7 @@ msgstr ""
 
 #: admin/placeholderadmin.py:80
 msgid "You do not have permission to edit this item"
-msgstr ""
+msgstr "شما اجازه ویرایش این صفحه را ندارید."
 
 #: admin/placeholderadmin.py:229
 msgid "You do not have permission to add a plugin"
@@ -598,7 +600,7 @@ msgstr "شما فاقد دسترسى لازم براى اضافه كردن اف�
 
 #: admin/placeholderadmin.py:255
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "زبان افزونه ی پدر باید یکسان باشد! "
 
 #: admin/placeholderadmin.py:353
 msgid "You do not have permission to edit this plugin"
@@ -765,15 +767,15 @@ msgstr ""
 
 #: models/pagemodel.py:104
 msgid "Deny"
-msgstr ""
+msgstr "رد کردن"
 
 #: models/pagemodel.py:105
 msgid "Only this website"
-msgstr ""
+msgstr "فقط این وب سایت"
 
 #: models/pagemodel.py:106
 msgid "Allow"
-msgstr ""
+msgstr "پذیرفتن"
 
 #: models/pagemodel.py:122 models/permissionmodels.py:114
 #: models/titlemodels.py:27
@@ -786,7 +788,7 @@ msgstr "صفحات"
 
 #: models/pagemodel.py:813
 msgid "Empty"
-msgstr ""
+msgstr "خالی"
 
 #: models/pagemodel.py:934
 msgid "default"
@@ -1175,7 +1177,7 @@ msgstr "دکمه‌ی ذخیره در زیر را بزنید تا این نگا�
 
 #: templates/admin/cms/page/plugin/error_form.html:4
 msgid "Edit model"
-msgstr ""
+msgstr "حالت ویرایش"
 
 #: templates/admin/cms/page/tree/base.html:4
 msgid "List of pages"
@@ -1183,7 +1185,7 @@ msgstr "فهرست صفحات"
 
 #: templates/admin/cms/page/tree/base.html:12
 msgid "Search"
-msgstr ""
+msgstr "جستجو"
 
 #: templates/admin/cms/page/tree/base.html:54
 msgid "Successfully moved"
@@ -1234,15 +1236,15 @@ msgstr "فیلتر"
 
 #: templates/admin/cms/page/tree/base_header.html:10
 msgid "Menu"
-msgstr ""
+msgstr "منو"
 
 #: templates/admin/cms/page/tree/base_header.html:11
 msgid "Actions"
-msgstr ""
+msgstr "کارها"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Info"
-msgstr ""
+msgstr "اطلاعات"
 
 #: templates/admin/cms/page/tree/base_header.html:26
 msgid ""
@@ -1314,11 +1316,11 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/menu_item.html:42
 msgid "not in menu"
-msgstr ""
+msgstr "در منو نباشد"
 
 #: templates/admin/cms/page/tree/menu_item.html:51
 msgid "page settings"
-msgstr ""
+msgstr "تنظيمات صفحه"
 
 #: templates/admin/cms/page/tree/menu_item.html:53
 #: templates/cms/toolbar/dragitem.html:12
@@ -1362,7 +1364,7 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/menu_item.html:76
 msgid "last change by"
-msgstr ""
+msgstr "آخرین تغییر توسط"
 
 #: templates/cms/toolbar/clipboard.html:24
 msgid "Empty Clipboard"
@@ -1382,7 +1384,7 @@ msgstr "كپى بردارى از همه"
 
 #: templates/cms/toolbar/dragbar.html:12
 msgid "Copy from"
-msgstr ""
+msgstr "کپی کردن از"
 
 #: templates/cms/toolbar/dragbar.html:14
 msgid "Empty all"
@@ -1403,11 +1405,11 @@ msgstr "افزونه‌های موجود"
 
 #: templates/cms/toolbar/dragitem_menu.html:10
 msgid "Scroll for more"
-msgstr ""
+msgstr "برای مشاهده بیشتر اسکرول کنید"
 
 #: templates/cms/toolbar/toolbar.html:8
 msgid "Double-click to edit"
-msgstr ""
+msgstr "برای ویرایش دو بار کلیک کنید"
 
 #: templates/cms/toolbar/toolbar.html:33
 #: templates/cms/toolbar/items/live_draft.html:4
@@ -1429,7 +1431,7 @@ msgstr "شروع"
 
 #: templates/cms/toolbar/toolbar.html:118
 msgid "This page has no preview!"
-msgstr ""
+msgstr "این صفحه هیچ پیش نمایشی ندارد!"
 
 #: templates/cms/toolbar/toolbar.html:119
 msgid "It is being redirected to:"
@@ -1446,11 +1448,11 @@ msgstr "لغو"
 
 #: templates/cms/toolbar/toolbar_javascript.html:44
 msgid "The following error occured:"
-msgstr ""
+msgstr "خطای مقابل رخ داده است:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:45
 msgid "Action successfull... reloading."
-msgstr ""
+msgstr "حرکت موفقیت آمیز بود ... در حال برگزاری مجدد."
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
 msgid "Are you sure you want to delete this plugin?"
@@ -1481,7 +1483,7 @@ msgstr "مدیریت محتوای جنگو"
 
 #: templatetags/cms_admin.py:74
 msgid "unpublished changes"
-msgstr ""
+msgstr "تغییرات منتشر نشده"
 
 #: templatetags/cms_admin.py:77
 msgid "published"
@@ -1493,11 +1495,11 @@ msgstr ""
 
 #: templatetags/cms_admin.py:89
 msgid "unpublished"
-msgstr ""
+msgstr "منتشر نشده"
 
 #: templatetags/cms_admin.py:92
 msgid "no content"
-msgstr ""
+msgstr "بدون محتوا"
 
 #: templatetags/cms_admin.py:188 templatetags/cms_admin.py:194
 #, python-format
@@ -1559,7 +1561,7 @@ msgstr "رنگ زمینه seekbar"
 
 #: test_utils/cli.py:218
 msgid "Add a link"
-msgstr ""
+msgstr "افزودن لینک"
 
 #: test_utils/cli.py:224
 msgid "right column"

@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-03 11:35+0200\n"
-"PO-Revision-Date: 2014-04-05 16:40+0000\n"
+"PO-Revision-Date: 2014-04-11 10:40+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -258,7 +258,7 @@ msgstr "Meta Tag Descrizione"
 
 #: admin/forms.py:77
 msgid "A description of the page used by search engines."
-msgstr "Una lista di parole chiave separate da virgola, talvolta usata dai motori di ricerca."
+msgstr "Descrizione della pagina, talvolta usata dai motori di ricerca."
 
 #: admin/forms.py:134
 msgid "Another page with this slug already exists"

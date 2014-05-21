@@ -4,7 +4,7 @@
 # 
 # Translators:
 # pykhmer <admin@pykhmer.org>, 2011
-# សុវិចិត្រ Sovichet ទេព Tep <sovichet.tep@gmail.com>, 2011
+# សុវិចិត្រ Sovichet ទេព Tep, 2011
 # vireax, 2011
 msgid ""
 msgstr ""

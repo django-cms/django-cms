@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-03 11:35+0200\n"
-"PO-Revision-Date: 2014-04-04 23:20+0000\n"
-"Last-Translator: galozek <weglarek.robert@gmail.com>\n"
+"PO-Revision-Date: 2014-04-11 08:40+0000\n"
+"Last-Translator: ar4s <arkadiusz.adamski@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -127,7 +127,7 @@ msgstr "Nowa podstrona"
 
 #: cms_toolbar.py:325
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "Duplikuj tę stronę"
 
 #: cms_toolbar.py:333
 msgid "Edit this Page"
@@ -252,7 +252,7 @@ msgstr "Nadpisuje to co jest wyświetlane u góry przeglądarki lub w jej zakła
 
 #: admin/forms.py:75
 msgid "Description meta tag"
-msgstr ""
+msgstr "Opis w meta tagu"
 
 #: admin/forms.py:77
 msgid "A description of the page used by search engines."
@@ -284,7 +284,7 @@ msgstr "Pozostaw to pole puste jeśli ma zostać użyta standardowa ścieżka"
 
 #: admin/forms.py:204
 msgid "X Frame Options"
-msgstr ""
+msgstr "Opcje X Frame"
 
 #: admin/forms.py:205
 msgid "Whether this page can be embedded in other pages or websites"
@@ -592,7 +592,7 @@ msgstr "Zarządzanie prawami dostępu do stron"
 #: admin/placeholderadmin.py:74
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "Pole %s nie zostało znalezione"
 
 #: admin/placeholderadmin.py:80
 msgid "You do not have permission to edit this item"
@@ -1199,7 +1199,7 @@ msgstr "Przeniesiono."
 
 #: templates/admin/cms/page/tree/base.html:55
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "Zmiany mogą wymagać przeładowania strony."
 
 #: templates/admin/cms/page/tree/base.html:56
 msgid "An error occured. Please reload the page"

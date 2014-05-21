@@ -6,14 +6,15 @@
 # dragomirescu catalin <diversesite@gmail.com>, 2014
 # Denis Darii <sinednx@gmail.com>, 2011
 # IlieLipan <ilie_lipan@yahoo.com>, 2012
+# jcuotpc <jcuotpc@gmail.com>, 2014
 # vially <vially2006@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-03 11:35+0200\n"
-"PO-Revision-Date: 2014-04-03 11:23+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
+"PO-Revision-Date: 2014-04-11 12:30+0000\n"
+"Last-Translator: jcuotpc <jcuotpc@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/django-cms/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1041,7 +1042,7 @@ msgstr "Salvează"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Login pentru administrare <a href=\"%(login_url)s\">aici</a>."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
@@ -1135,7 +1136,7 @@ msgstr "Tot"
 
 #: templates/admin/cms/page/permissions.html:53
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "Aceasta pagina nu mosteneste nici o permisiune."
 
 #: templates/admin/cms/page/submit_row.html:9
 msgid "Basic Infos"
@@ -1658,11 +1659,11 @@ msgstr "Moştenește şablonul de cel mai apropiat strămoş"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - contul Dv. de utilizator a fost creat."
 
 #: utils/mail.py:39
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - contul Dv. de utilizator a fost modificat."
 
 #: utils/page_resolver.py:153
 msgid "Invalid URL, use /my/url format."

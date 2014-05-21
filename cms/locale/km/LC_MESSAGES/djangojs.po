@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# សុវិចិត្រ Sovichet ទេព Tep <sovichet.tep@gmail.com>, 2011
+# សុវិចិត្រ Sovichet ទេព Tep, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
