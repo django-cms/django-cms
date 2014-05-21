@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser
@@ -78,9 +82,9 @@ class PlaceholderToolbar(CMSToolbar):
     def add_structure_mode(self):
         switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                 extra_classes=['cms_toolbar-item-cms-mode-switcher'])
-        switcher.add_button(_("Structure"), '?build', active=self.toolbar.build_mode,
+        switcher.add_button(_("Structure"), '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'), active=self.toolbar.build_mode,
                             disabled=not self.toolbar.build_mode)
-        switcher.add_button(_("Content"), '?edit', active=not self.toolbar.build_mode,
+        switcher.add_button(_("Content"), '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'), active=not self.toolbar.build_mode,
                             disabled=self.toolbar.build_mode)
 
 
@@ -240,8 +244,20 @@ class PageToolbar(CMSToolbar):
                     pk = self.page.pk
                 with force_language(self.current_lang):
                     publish_url = reverse('admin:cms_page_publish_page', args=(pk, self.current_lang))
+                publish_url_args = {}
                 if dirty_statics:
-                    publish_url += "?statics=%s" % ','.join(str(static.pk) for static in dirty_statics)
+                    publish_url_args['statics'] = ','.join(str(static.pk) for static in dirty_statics)
+                # detect if we are in an apphook
+                with(force_language(self.toolbar.language)):
+                    try:
+                        resolver = resolve(self.request.path)
+                        from cms.views import details
+                        if resolver.func != details:
+                            publish_url_args['redirect'] = self.request.path
+                    except Resolver404:
+                        pass
+                if publish_url_args:
+                    publish_url = "%s?%s" % (publish_url, urlencode(publish_url_args))
                 if publish_permission:
                     self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
                                             disabled=not dirty)
@@ -359,7 +375,7 @@ class PageToolbar(CMSToolbar):
             )
         )
         current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
-        current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?edit')
+        current_page_menu.add_link_item(_('Edit this Page'), disabled=self.toolbar.edit_mode, url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         page_info_url = "%s?language=%s" % (
             reverse('admin:cms_page_change', args=(self.page.pk,)),
             self.toolbar.language

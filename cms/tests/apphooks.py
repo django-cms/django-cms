@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import sys
+from cms.utils.conf import get_cms_setting
 
 from django.core.urlresolvers import clear_url_caches, reverse
 
@@ -203,18 +204,20 @@ class ApphooksTestCase(CMSTestCase):
         create_title('de', page.get_title(), page)
         page.publish('en')
         page.publish('de')
+        page.save()
         public_page = page.get_public_object()
 
         with self.login_user_context(superuser):
             with force_language("en"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?edit')
+                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 request.LANGUAGE_CODE = 'en'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-                self.assertEqual(attached_to_page.pk, public_page.pk)
+                response = self.client.get(path+"?edit")
+                self.assertContains(response, '?redirect=')
             with force_language("de"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?edit')
+                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 request.LANGUAGE_CODE = 'de'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEqual(attached_to_page.pk, public_page.pk)
@@ -305,6 +308,9 @@ class ApphooksTestCase(CMSTestCase):
                 reverse('namespaced_app_ns:current-app', current_app="instance_1")
                 reverse('namespaced_app_ns:current-app', current_app="instance_2")
                 reverse('namespaced_app_ns:current-app')
+
+
+
 
     def test_apphook_include_extra_parameters(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
+import os
 import pprint
-from cms.utils.compat.urls import urljoin
-from cms import constants
-from cms.exceptions import CMSDeprecationWarning
+import warnings
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
-import os
-import warnings
+
+from cms import constants
+from cms.exceptions import CMSDeprecationWarning
+from cms.utils.compat.type_checks import int_types
+from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']
@@ -56,6 +59,9 @@ DEFAULTS = {
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
     'MAX_PAGE_PUBLISH_REVERSIONS': 10,
     'MAX_PAGE_HISTORY_REVERSIONS': 15,
+    'TOOLBAR_URL__EDIT_ON': 'edit',
+    'TOOLBAR_URL__EDIT_OFF': 'edit_off',
+    'TOOLBAR_URL__BUILD': 'build',
 }
 
 
@@ -75,6 +81,21 @@ def get_media_root():
 @default('CMS_MEDIA_URL')
 def get_media_url():
     return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
+
+
+@default('CMS_TOOLBAR_URL__EDIT_ON')
+def get_toolbar_url__edit_on():
+    return get_cms_setting('TOOLBAR_URL__EDIT_ON')
+
+
+@default('CMS_TOOLBAR_URL__EDIT_OFF')
+def get_toolbar_url__edit_off():
+    return get_cms_setting('TOOLBAR_URL__EDIT_OFF')
+
+
+@default('CMS_TOOLBAR_URL__BUILD')
+def get_toolbar_url__build():
+    return get_cms_setting('TOOLBAR_URL__BUILD')
 
 
 def get_templates():
@@ -102,7 +123,7 @@ def _ensure_languages_settings_new(languages):
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, int):
+        if not isinstance(site, int_types):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -192,7 +213,7 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if not isinstance(settings.SITE_ID, int):
+    if not isinstance(settings.SITE_ID, int_types):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )
@@ -229,6 +250,9 @@ COMPLEX = {
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
+    'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
+    'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
+    'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
 }
 
 

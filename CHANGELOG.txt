@@ -221,7 +221,12 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added CMS_MAX_PAGE_HISTORY_REVERSIONS and changed default of CMS_MAX_PAGE_PUBLISH_REVERSIONS
 - Added option to {% static_placeholder %} to render only on the current site.
 
-==== 3.0.1 (XXXXX) ===
+==== 3.0.1 (2014-04-30) ===
 
 - Renamed NamespaceAllreadyRegistered to NamespaceAlreadyRegistered in menus/exceptions.py
+- Frontend editor UI fixes
+- Fix in cms fix-mptt command
 
+==== 3.0.2 ===
+- Add 'as' form to render_placeholder templatetag to save the result in context
+- Added changeable strings for "?edit", "?edit_off" and "?build" urls

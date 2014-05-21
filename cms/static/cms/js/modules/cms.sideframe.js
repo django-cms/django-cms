@@ -143,7 +143,13 @@ $(document).ready(function () {
 				// sideframe is already open
 				insertHolder(iframe);
 				// reanimate the frame
-				if(parseInt(this.sideframe.css('width')) <= width) this._show(width, animate);
+				if(this.sideframe.outerWidth() < width) {
+					// The user has performed an action that requires the
+					// sideframe to be shown, this intent outweighs any
+					// previous intent to minimize the frame.
+					this.settings.sideframe.hidden = false;
+					this._show(width, animate);
+				}
 			} else {
 				// load iframe after frame animation is done
 				setTimeout(function () {

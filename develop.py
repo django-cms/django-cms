@@ -12,6 +12,7 @@ import warnings
 from docopt import docopt
 from django import VERSION
 from django.utils import autoreload
+from django.utils.encoding import force_text
 
 import cms
 from cms.test_utils.cli import configure
@@ -164,13 +165,14 @@ def compilemessages():
 def makemessages():
     from django.core.management import call_command
     os.chdir('cms')
-    call_command('makemessages', locale='en')
+    call_command('makemessages', locale=('en',))
 
 
 def shell():
     from django.core.management import call_command
     call_command('shell')
-    
+
+
 def generate_authors():
     print("Generating AUTHORS")
 
@@ -182,12 +184,12 @@ def generate_authors():
     with open('AUTHORS', 'r') as f:
         for line in f.readlines():
             if line.startswith("*"):
-                author = line.decode('utf-8').strip("* \n")
+                author = force_text(line).strip("* \n")
                 if author.lower() not in seen_authors:
                     seen_authors.append(author.lower())
                     authors.append(author)
     for author in r.stdout.readlines():
-        author = author.decode('utf-8').strip()
+        author = force_text(author).strip()
         if author.lower() not in seen_authors:
             seen_authors.append(author.lower())
             authors.append(author)
@@ -291,7 +293,7 @@ def main():
             elif args['compilemessages']:
                 compilemessages()
             elif args['makemessages']:
-                compilemessages()
+                makemessages()
 
 
 if __name__ == '__main__':

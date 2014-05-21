@@ -701,6 +701,10 @@ class CMSEditableObject(InclusionTag):
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                if not context.get('attribute_name', None):
+                    # Make sure CMS.Plugin object will not clash in the frontend.
+                    extra_context['attribute_name'] = '-'.join(edit_fields) \
+                                                        if not isinstance('edit_fields', string_types) else edit_fields
             else:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
                 extra_context['attribute_name'] = 'add'
@@ -1023,17 +1027,28 @@ class StaticPlaceholderNode(Tag):
 register.tag(StaticPlaceholderNode)
 
 
-class RenderPlaceholder(Tag):
+class RenderPlaceholder(AsTag):
+    """
+    Render the content of the plugins contained in a placeholder.
+    The result can be assigned to a variable within the template's context by using the `as` keyword.
+    It behaves in the same way as the `PageAttribute` class, check its docstring for more details.
+    """
     name = 'render_placeholder'
     options = Options(
         Argument('placeholder'),
         Argument('width', default=None, required=False),
         'language',
         Argument('language', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False)
     )
 
-    def render_tag(self, context, placeholder, width, language=None):
+    def get_value(self, context, **kwargs):
         request = context.get('request', None)
+        placeholder = kwargs.get('placeholder')
+        width = kwargs.get('width')
+        language = kwargs.get('language')
+
         if not request:
             return ''
         if not placeholder:
@@ -1042,4 +1057,6 @@ class RenderPlaceholder(Tag):
             request.placeholders = []
         request.placeholders.append(placeholder)
         return safe(placeholder.render(context, width, lang=language))
+
+
 register.tag(RenderPlaceholder)

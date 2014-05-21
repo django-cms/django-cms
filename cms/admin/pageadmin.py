@@ -238,6 +238,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
             obj.publish(language)
 
+    def get_fieldsets(self, request, obj=None):
+        form = self.get_form(request, obj, fields=None)
+        if getattr(form, 'fieldsets', None) is None:
+            fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
+            return [(None, {'fields': fields})]
+        else:
+            return form.fieldsets
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Get PageForm for the Page model and modify its fields depending on
@@ -1076,6 +1084,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
+
+        if 'redirect' in request.GET:
+            return HttpResponseRedirect(request.GET['redirect'])
         referrer = request.META.get('HTTP_REFERER', '')
 
         path = reverse("admin:cms_page_changelist")
@@ -1088,11 +1099,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         path = page.get_absolute_url(language, fallback=True)
                     else:
                         public_page = Page.objects.get(publisher_public=page.pk)
-                        path = '%s?edit_off' % public_page.get_absolute_url(language, fallback=True)
+                        path = '%s?%s' % (public_page.get_absolute_url(language, fallback=True), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
                 else:
-                    path = '%s?edit_off' % referrer
+                    path = '%s?%s' % (referrer, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
             else:
-                path = '/?edit_off'
+                path = '/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
 
         return HttpResponseRedirect(path)
 
@@ -1177,7 +1188,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
         if reverse('admin:index') not in referer:
-            path = '%s?edit_off' % referer.split('?')[0]
+            path = '%s?%s' % (referer.split('?')[0], get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
         return HttpResponseRedirect(path)
 
     @create_revision()
@@ -1282,7 +1293,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """Redirecting preview function based on draft_id
         """
         page = get_object_or_404(Page, id=object_id)
-        attrs = "?edit"
+        attrs = "?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         attrs += "&language=" + language
         with force_language(language):
             url = page.get_absolute_url(language) + attrs
@@ -1340,7 +1351,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             try:
                 obj = log.get_edited_object()
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, ValueError):
                 obj = None
             del request.session['cms_log_latest']
             if obj and obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
