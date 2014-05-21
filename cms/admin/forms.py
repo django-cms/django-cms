@@ -208,7 +208,9 @@ class AdvancedSettingsForm(forms.ModelForm):
     )
 
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
-                               help_text=_('Redirects to this URL.'), placeholder_text=_('Start typing...'))
+                    help_text=_('Redirects to this URL.'), placeholder_text=_('Start typing...'),
+                    ajax_view='admin:cms_page_get_published_pagelist'
+    )
 
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
