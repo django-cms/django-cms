@@ -242,10 +242,10 @@ class AdvancedSettingsForm(forms.ModelForm):
             # Prepare a dict mapping the apps by class name ('PollApp') to
             # their app_name attribute ('polls'), if any.
             app_namespaces = {}
-            for app_class in apphook_pool.apps.keys():
-                app = apphook_pool.apps[app_class]
+            for hook in apphook_pool.get_apphooks():
+                app = apphook_pool.get_apphook(hook[0])
                 if app.app_name:
-                    app_namespaces[app_class] = app.app_name
+                    app_namespaces[hook[0]] = app.app_name
 
             self.fields['application_urls'].widget = AppHookSelect(
                 attrs={'id':'application_urls'},
@@ -271,10 +271,9 @@ class AdvancedSettingsForm(forms.ModelForm):
         # 'instance_namespace'.
         instance_namespace = cleaned_data.get('application_namespace', None)
         if apphook:
-            apphook_pool.discover_apps()
             # The attribute on the apps 'app_name' is a misnomer, it should be
             # 'application_namespace'.
-            application_namespace = apphook_pool.apps[apphook].app_name
+            application_namespace = apphook_pool.get_apphook(apphook).app_name
             if application_namespace and not instance_namespace:
                 if Page.objects.filter(
                     publisher_is_draft=True,
