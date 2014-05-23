@@ -19,7 +19,8 @@ $(document).ready(function () {
 			'newPlugin': false,
 			'urls': {
 				'css_modal': 'cms/css/cms.toolbar.modal.css'
-			}
+			},
+			'has_django_suit': false
 		},
 
 		initialize: function (options) {
@@ -418,16 +419,21 @@ $(document).ready(function () {
 
 		_setButtons: function (iframe) {
 			var that = this;
-			var row = iframe.contents().find('.submit-row:eq(0)');
-				row.hide(); // hide submit-row
-			var buttons = row.find('input, a');
+			var row;
+			if (!this.options.has_django_suit) {
+  			row = iframe.contents().find('.submit-row:eq(0)');
+			} else {
+  			row = iframe.contents().find('.save-box:eq(0)');
+			}
+			row.hide(); // hide submit-row
+			var buttons = row.find('input, a, button');
 			var render = $('<span />'); // seriously jquery...
 
 			// if there are no given buttons within the submit-row area
 			// scan deeper within the form itself
 			if(!buttons.length) {
 				row = iframe.contents().find('form:eq(0)');
-				buttons = row.find('input[type="submit"]');
+				buttons = row.find('input[type="submit"], button[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
 					.hide();
@@ -456,7 +462,7 @@ $(document).ready(function () {
 				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
-						if(item.is('input')) item[0].click();
+						if(item.is('input') || item.is('button')) item[0].click();
 						if(item.is('a')) that._loadContent(item.prop('href'), title);
 
 						// trigger only when blue action buttons are triggered
@@ -532,7 +538,7 @@ $(document).ready(function () {
 				contents.find('.viewsitelink').attr('target', '_top');
 
 				// set modal buttons
-  				that._setButtons($(this));
+				that._setButtons($(this));
 
 				// when an error occurs, reset the saved status so the form can be checked and validated again
 				if(iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
