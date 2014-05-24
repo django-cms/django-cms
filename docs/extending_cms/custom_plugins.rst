@@ -355,7 +355,7 @@ Advanced
 ********
 
 Inline Admin
-===========
+============
 
 If you want to have the foreign key relation as a inline admin, you can create a admin.StackedInline class 
 and put it in the Plugin to "inlines". Then you can use the inline Admin form for your foreign key references.
