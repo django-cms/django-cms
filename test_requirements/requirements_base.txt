@@ -11,7 +11,7 @@ django-mptt>=0.6
 django-sekizai>=0.7
 argparse
 dj-database-url
-selenium
+selenium==2.41
 django-debug-toolbar
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
 -e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
