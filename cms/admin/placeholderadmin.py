@@ -423,12 +423,14 @@ class PlaceholderAdminMixin(object):
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
         parent_id = request.POST.get('plugin_parent', None)
-        language = request.POST.get('plugin_language', plugin.language)
+        language = request.POST.get('plugin_language', None)
         source_placeholder = plugin.placeholder
         if not parent_id:
             parent_id = None
         else:
             parent_id = int(parent_id)
+        if not language and plugin.language:
+            language = plugin.language
         order = request.POST.getlist("plugin_order[]")
         if not self.has_move_plugin_permission(request, plugin, placeholder):
             return HttpResponseForbidden(force_unicode(_("You have no permission to move this plugin")))
