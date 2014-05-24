@@ -302,7 +302,7 @@ For foreign key relations *from* other objects
 
 Your plugin may have items with foreign keys to it, which will typically be
 the case if you set it up so that they are inlines in its admin. So you might
-have a two models, one for the plugin and one for those items::
+have two models, one for the plugin and one for those items::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
