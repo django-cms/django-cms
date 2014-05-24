@@ -354,6 +354,30 @@ to use *both* the copying techniques described above.
 Advanced
 ********
 
+Inline Admin
+============
+
+If you want to have the foreign key relation as a inline admin, you can create a admin.StackedInline class 
+and put it in the Plugin to "inlines". Then you can use the inline Admin form for your foreign key references.
+inline admin::
+
+    class ItemInlineAdmin(admin.StackedInline):
+        model = AssociatedItem
+
+
+    class ArticlePlugin(CMSPluginBase):
+        model = ArticlePluginModel
+        name = _("Article Plugin")
+        render_template = "article/index.html"
+        inlines = (ItemInlineAdmin,)
+
+        def render(self, context, instance, placeholder):
+            items = instance.associated_item.all()
+            context.update({
+                'items': items,
+                'instance': instance,
+            })
+            return context
 
 Plugin form
 ===========
