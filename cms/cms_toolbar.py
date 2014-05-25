@@ -34,11 +34,13 @@ from menus.utils import DefaultLanguageChanger
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
 LANGUAGE_MENU_IDENTIFIER = 'language-menu'
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
+PAGE_MENU_IDENTIFIER = 'page'
 PAGE_MENU_FIRST_BREAK = 'Page Menu First Break'
 PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'
 PAGE_MENU_THIRD_BREAK = 'Page Menu Third Break'
 PAGE_MENU_FOURTH_BREAK = 'Page Menu Fourth Break'
 PAGE_MENU_LAST_BREAK = 'Page Menu Last Break'
+HISTORY_MENU_IDENTIFIER = 'history'
 HISTORY_MENU_BREAK = 'History Menu Break'
 MANAGE_PAGES_BREAK = 'Manage Pages Break'
 ADMIN_SITES_BREAK = 'Admin Sites Break'
@@ -347,7 +349,7 @@ class PageToolbar(CMSToolbar):
     def add_page_menu(self):
         # menu for current page
         not_edit_mode = not self.toolbar.edit_mode
-        current_page_menu = self.toolbar.get_or_create_menu('page', _('Page'), position=1)
+        current_page_menu = self.toolbar.get_or_create_menu(PAGE_MENU_IDENTIFIER, _('Page'), position=1)
 
         add_page_menu = current_page_menu.get_or_create_menu('add_page', _("Add Page"))
         add_page_menu.add_sideframe_item(
@@ -462,7 +464,7 @@ class PageToolbar(CMSToolbar):
 
     def add_history_menu(self):
         # history menu
-        history_menu = self.toolbar.get_or_create_menu('history', _('History'), position=2)
+        history_menu = self.toolbar.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'), position=2)
         if 'reversion' in settings.INSTALLED_APPS:
             import reversion
             from reversion.models import Revision
