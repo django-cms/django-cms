@@ -36,9 +36,9 @@ setup(
         'django-classy-tags>=0.5',
         'south>=0.7.2',
         'html5lib',
-        'django-mptt==0.5.2,==0.6',
+        'django-mptt==0.5.2,==0.6,==0.6.1',
         'django-sekizai>=0.7',
-	    'djangocms-admin-style'
+        'djangocms-admin-style'
     ],
     tests_require=[
         'django-reversion==1.6.6',
