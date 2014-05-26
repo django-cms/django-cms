@@ -51,6 +51,11 @@ Example::
     the ``js`` and ``css`` sekizai namespaces. For more information, see
     :ref:`sekizai-namespaces`.
 
+.. note::
+
+    Alternatively you can use :setting:`CMS_TEMPLATES_DIR` to define a directory
+    containing templates for django CMS.
+
 .. warning::
 
     django CMS requires some special templates to function correctly. These are
@@ -73,6 +78,50 @@ Enables the inheritance of templates from parent pages.
 When enabled, pages' ``Template`` options will include a new default: *Inherit
 from the parent page* (unless the page is a root page).
 
+
+.. setting:: CMS_TEMPLATES_DIR
+
+CMS_TEMPLATES_DIR
+=================
+
+Default: ``None``
+
+Instead of explicitly providing a set of templates via :setting:`CMS_TEMPLATES`
+a directory can be provided using this configuration.
+
+`CMS_TEMPLATES_DIR` can be set to the (absolute) path of the templates directory,
+or set to a dictionary with `SITE_ID: template path` items::
+
+    CMS_TEMPLATES_DIR: {
+        1: '/absolute/path/for/site/1/',
+        2: '/absolute/path/for/site/2/',
+    }
+
+
+The provided directory is scanned and all templates in it are loaded as templates for
+django CMS.
+
+Template loaded and their names can be customized using the templates dir as a
+python module, by creating a ``__init__.py`` file in the templates directory.
+The file contains a single ``TEMPLATES`` dictionary with the list of templates
+as keys and template names as values::::
+
+    # -*- coding: utf-8 -*-
+    from django.utils.translation import ugettext_lazy as _
+    TEMPLATES = {
+        'col_two.html': _('Two columns'),
+        'col_three.html': _('Three columns'),
+    }
+
+Being a normal python file, templates labels can be passed through gettext
+for translation.
+
+.. note::
+
+    As templates are still loaded by the Django template loader, the given
+    directory **must** be reachable by the template loading system.
+    Currently **filesystem** and **app_directory** loader schemas are tested and
+    supported.
 
 .. setting:: CMS_PLACEHOLDER_CONF
 
