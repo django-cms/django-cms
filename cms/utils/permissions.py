@@ -54,7 +54,7 @@ def has_page_add_permission(request):
     from cms.utils.plugins import current_site
     site = current_site(request)
 
-    if target is not None:
+    if target:
         try:
             page = Page.objects.get(pk=target)
         except Page.DoesNotExist:
