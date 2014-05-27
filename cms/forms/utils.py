@@ -20,38 +20,34 @@ def update_site_and_page_choices(lang=None):
         title_queryset = Title.objects.filter(page__publisher_is_draft=False)
     else:
         title_queryset = Title.objects.filter(page__publisher_is_draft=True)
-    title_queryset = title_queryset.select_related('page', 'page__site').order_by('page__tree_id', 'page__lft', 'page__rght')
-    pages = defaultdict(SortedDict)
-    sites = {}
-    for title in title_queryset:
-        page = pages[title.page.site.pk].get(title.page.pk, {})
-        page[title.language] = title
-        pages[title.page.site.pk][title.page.pk] = page
-        sites[title.page.site.pk] = title.page.site.name
-    
-    site_choices = []
+    ordering = ('page__site', 'page__tree_id', 'page__lft', 'page__rght')
+
+    titles_data = ('page__site', 'page__site__name',
+                   'page', 'page__level', 'title', 'language')
+
+    fallback_langs = i18n.get_fallback_languages(lang)
+    langs = [lang] + fallback_langs
+    titles_values = title_queryset.filter(language__in=langs)\
+        .order_by(*ordering).values_list(*titles_data)
+
+    sites_dict, pages_dict = {}, defaultdict(SortedDict)
+    for site_id, site_name, page_id, page_lvl, title, _lang in titles_values:
+        sites_dict.setdefault(site_id, site_name)
+        # overwrite fallback title if it was set since this is the
+        #       requested language
+        overwrite = _lang == lang
+        # set fallback title only if title for requested language
+        #       was not set
+        set_fallback = (_lang in fallback_langs and
+                        page_id not in pages_dict[site_id])
+        if overwrite or set_fallback:
+            pages_dict[site_id][page_id] = mark_safe(
+                u"%s%s" % (u"&nbsp;&nbsp;" * page_lvl, title))
+
+    site_choices = sites_dict.items()
     page_choices = [('', '----')]
-    
-    language_order = [lang] + i18n.get_fallback_languages(lang)
-    
-    for sitepk, sitename in sites.items():
-        site_choices.append((sitepk, sitename))
-        
-        site_page_choices = []
-        for titles in pages[sitepk].values():
-            title = None
-            for language in language_order:
-                title = titles.get(language)
-                if title:
-                    break
-            if not title:
-                continue
-            
-            indent = u"&nbsp;&nbsp;" * title.page.level
-            page_title = mark_safe(u"%s%s" % (indent, title.title))
-            site_page_choices.append((title.page.pk, page_title))
-            
-        page_choices.append((sitename, site_page_choices))
+    for site_id, site_name in sites_dict.items():
+        page_choices.append((site_name, pages_dict[site_id].items()))
 
     # We set it to 1 day here because we actively invalidate this cache.
     cache.set(SITE_CHOICES_KEY, site_choices, 86400)
