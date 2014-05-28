@@ -20,7 +20,6 @@ $(document).ready(function () {
 			'urls': {
 				'css_modal': 'cms/css/cms.toolbar.modal.css'
 			},
-			'has_django_suit': false
 		},
 
 		initialize: function (options) {
@@ -418,9 +417,10 @@ $(document).ready(function () {
 		},
 
 		_setButtons: function (iframe) {
+			var django_suit = iframe.contents().find('.suit-columns').length > 0;
 			var that = this;
 			var row;
-			if (!this.options.has_django_suit) {
+			if (!django_suit) {
 				row = iframe.contents().find('.submit-row:eq(0)');
 			} else {
 				row = iframe.contents().find('.save-box:eq(0)');
