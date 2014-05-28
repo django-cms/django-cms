@@ -4,7 +4,7 @@ from cms.admin import forms
 from cms.admin.forms import PageUserForm
 from cms.api import create_page, create_page_user
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
-from cms.forms.utils import (get_site_choices, get_page_choices, 
+from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 
-class Mock_PageSelectFormField(PageSelectFormField): 
+class Mock_PageSelectFormField(PageSelectFormField):
     def __init__(self, required=False):
         # That's to have a proper mock object, without having to resort
         # to dirtier tricks. We want to test *just* compress here.
@@ -23,24 +23,24 @@ class Mock_PageSelectFormField(PageSelectFormField):
 class FormsTestCase(CMSTestCase):
     def setUp(self):
         cache.clear()
-        
+
     def test_get_site_choices(self):
         result = get_site_choices()
         self.assertEquals(result, [])
-        
+
     def test_get_page_choices(self):
         result = get_page_choices()
         self.assertEquals(result, [('', '----')])
-        
+
     def test_get_site_choices_without_moderator(self):
         with SettingsOverride(CMS_MODERATOR=False):
             result = get_site_choices()
             self.assertEquals(result, [])
-            
+
     def test_get_site_choices_without_moderator_with_superuser(self):
         with SettingsOverride(CMS_MODERATOR=False):
             # boilerplate (creating a page)
-            user_super = User(username="super", is_staff=True, is_active=True, 
+            user_super = User(username="super", is_staff=True, is_active=True,
                 is_superuser=True)
             user_super.set_password("super")
             user_super.save()
@@ -49,7 +49,7 @@ class FormsTestCase(CMSTestCase):
                 # The proper test
                 result = get_site_choices()
                 self.assertEquals(result, [(1,'example.com')])
-            
+
     def test_compress_function_raises_when_page_is_none(self):
         raised = False
         try:
@@ -60,22 +60,22 @@ class FormsTestCase(CMSTestCase):
         except forms.ValidationError:
             raised = True
         self.assertTrue(raised)
-        
+
     def test_compress_function_returns_none_when_not_required(self):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = (0, None) #(site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
         self.assertEquals(result, None)
-        
+
     def test_compress_function_returns_none_when_no_data_list(self):
         fake_field = Mock_PageSelectFormField(required=False)
         data_list = None
         result = fake_field.compress(data_list)
         self.assertEquals(result, None)
-        
+
     def test_compress_function_gets_a_page_when_one_exists(self):
         # boilerplate (creating a page)
-        user_super = User(username="super", is_staff=True, is_active=True, 
+        user_super = User(username="super", is_staff=True, is_active=True,
                           is_superuser=True)
         user_super.set_password("super")
         user_super.save()
@@ -86,7 +86,7 @@ class FormsTestCase(CMSTestCase):
             data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
             result = fake_field.compress(data_list)
             self.assertEquals(home_page,result)
-            
+
     def test_update_site_and_page_choices(self):
         with SettingsOverride(CMS_MODERATOR=False):
             Site.objects.all().delete()
@@ -107,17 +107,47 @@ class FormsTestCase(CMSTestCase):
             ])
             self.assertEqual(site_choices, [(site.pk, site.name)])
 
-        
+    def test_cache_invalidation_for_site_choices(self):
+        with SettingsOverride(CMS_MODERATOR=False):
+            Site.objects.all().delete()
+            site = Site.objects.create(domain='http://www.django-cms.org',
+                                       name='Django CMS')
+            create_page('Page 1', 'nav_playground.html', 'en', site=site)
+            self.assertEqual([(site.pk, site.name)], get_site_choices())
+            site.delete()
+            self.assertEqual([], get_site_choices())
+
+    def test_cache_invalidation_for_page_choices(self):
+        with SettingsOverride(CMS_MODERATOR=False):
+            Site.objects.all().delete()
+            site = Site.objects.create(domain='http://www.django-cms.org',
+                                       name='Django CMS')
+            p1 = create_page('Page 1', 'nav_playground.html', 'en', site=site)
+            p2 = create_page('Page 2', 'nav_playground.html', 'en', site=site)
+            self.assertEqual([
+                ('', '----'),
+                (site.name, [(p1.pk, 'Page 1'), (p2.pk, 'Page 2'),])
+            ], get_page_choices())
+            p2.delete()
+            self.assertEqual([
+                ('', '----'), (site.name, [(p1.pk, 'Page 1'), ])],
+                get_page_choices())
+            site.name = '_Django CMS'
+            site.save()
+            self.assertEqual([
+                ('', '----'), (u'_Django CMS', [(p1.pk, 'Page 1'), ])],
+                get_page_choices())
+
     def test_superlazy_iterator_behaves_properly_for_sites(self):
         normal_result = get_site_choices()
         lazy_result = SuperLazyIterator(get_site_choices)
-        
+
         self.assertEquals(normal_result, list(lazy_result))
-        
+
     def test_superlazy_iterator_behaves_properly_for_pages(self):
         normal_result = get_page_choices()
         lazy_result = SuperLazyIterator(get_page_choices)
-        
+
         self.assertEquals(normal_result, list(lazy_result))
 
     def test_page_user_form_initial(self):

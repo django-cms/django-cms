@@ -84,8 +84,8 @@ def get_page_choices(lang=None):
     all_page_choices = [('', '----')]
     for site_id, site_name in site_choices:
         page_choices = cached_page_choices.get(cache_key_names[site_id])
-        page_choices = page_choices or new_choices.get(site_id, {}).items()
-        all_page_choices.append((site_name, page_choices))
+        page_choices = page_choices or new_choices.get(site_id, {})
+        all_page_choices.append((site_name, page_choices.items()))
     return all_page_choices
 
 
