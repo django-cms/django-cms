@@ -61,7 +61,7 @@ class PageManager(PublisherManager):
         return self.get_query_set().valid_targets(page_id, request, perms, page)
 
     def published(self, site=None):
-        return self.get_query_set().published(site)
+        return self.get_query_set().published(site=site)
 
     def expired(self):
         return self.drafts().expired()
