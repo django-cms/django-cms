@@ -14,86 +14,98 @@ from django.utils.safestring import mark_safe
 
 def update_site_and_page_choices(lang=None):
     lang = lang or translation.get_language()
-    SITE_CHOICES_KEY = get_site_cache_key(lang)
-    PAGE_CHOICES_KEY = get_page_cache_key(lang)
+    return get_site_choices(lang), get_page_choices(lang)
+
+
+def _fetch_page_choices(lang=None, sites=None):
+    lang = lang or translation.get_language()
+    sites = sites or Site.objects.values_list('id', flat=True)
+
+    fallback_langs = i18n.get_fallback_languages(lang)
+    langs = [lang] + fallback_langs
+
     if settings.CMS_MODERATOR:
         title_queryset = Title.objects.filter(page__publisher_is_draft=False)
     else:
         title_queryset = Title.objects.filter(page__publisher_is_draft=True)
-    title_queryset = title_queryset.select_related('page', 'page__site').order_by('page__tree_id', 'page__lft', 'page__rght')
-    pages = defaultdict(SortedDict)
-    sites = {}
-    for title in title_queryset:
-        page = pages[title.page.site.pk].get(title.page.pk, {})
-        page[title.language] = title
-        pages[title.page.site.pk][title.page.pk] = page
-        sites[title.page.site.pk] = title.page.site.name
-    
-    site_choices = []
-    page_choices = [('', '----')]
-    
-    language_order = [lang] + i18n.get_fallback_languages(lang)
-    
-    for sitepk, sitename in sites.items():
-        site_choices.append((sitepk, sitename))
-        
-        site_page_choices = []
-        for titles in pages[sitepk].values():
-            title = None
-            for language in language_order:
-                title = titles.get(language)
-                if title:
-                    break
-            if not title:
-                continue
-            
-            indent = u"&nbsp;&nbsp;" * title.page.level
-            page_title = mark_safe(u"%s%s" % (indent, title.title))
-            site_page_choices.append((title.page.pk, page_title))
-            
-        page_choices.append((sitename, site_page_choices))
+    title_queryset = title_queryset.filter(
+        language__in=langs, page__site__in=sites)
+    ordering = ('page__site', 'page__tree_id', 'page__lft', 'page__rght')
+    fields = ('page__site', 'page', 'page__level', 'title', 'language')
+    titles_values = title_queryset.order_by(*ordering).values_list(*fields)
 
-    # We set it to 1 day here because we actively invalidate this cache.
-    cache.set(SITE_CHOICES_KEY, site_choices, 86400)
-    cache.set(PAGE_CHOICES_KEY, page_choices, 86400)
-    return site_choices, page_choices
+    pages_dict = defaultdict(SortedDict)
+    for site_id, page_id, page_lvl, title, _lang in titles_values:
+        # overwrite fallback title if it was set since this is the
+        #       requested language
+        overwrite = _lang == lang
+        # set fallback title only if title for requested language
+        #       was not set
+        set_fallback = (_lang in fallback_langs and
+                        page_id not in pages_dict[site_id])
+        if overwrite or set_fallback:
+            pages_dict[site_id][page_id] = mark_safe(
+                u"%s%s" % (u"&nbsp;&nbsp;" * page_lvl, title))
+    return pages_dict
+
 
 def get_site_choices(lang=None):
-    lang = lang or translation.get_language()
-    site_choices = cache.get(get_site_cache_key(lang))
+    # preserve function's signature even if lang is not used
+    SITE_CHOICES_KEY = get_site_cache_key()
+    site_choices = cache.get(SITE_CHOICES_KEY)
     if site_choices is None:
-        site_choices, page_choices = update_site_and_page_choices(lang)
+        if settings.CMS_MODERATOR:
+            sites_qs = Site.objects.filter(page__publisher_is_draft=False)
+        else:
+            sites_qs = Site.objects.filter(page__publisher_is_draft=True)
+
+        site_choices = list(sites_qs.values_list('id', 'name').distinct())
+        cache.set(SITE_CHOICES_KEY, site_choices, 86400)
     return site_choices
+
 
 def get_page_choices(lang=None):
     lang = lang or translation.get_language()
-    page_choices = cache.get(get_page_cache_key(lang))
-    if page_choices is None:
-        site_choices, page_choices = update_site_and_page_choices(lang)
-    return page_choices
+    site_choices = get_site_choices(lang)
+    site_ids = [site_id for site_id, _ in site_choices]
+    cache_key_names = {site_id: get_page_cache_key(lang, site_id)
+                       for site_id in site_ids}
+    cached_page_choices = cache.get_many(cache_key_names.values())
+    not_found_in_cache = [
+        site_id
+        for site_id in site_ids
+        if cache_key_names[site_id] not in cached_page_choices]
+    # fetch new page choices
+    new_choices = _fetch_page_choices(lang, not_found_in_cache)
+    cache.set_many({cache_key_names[site_id]: page_choices
+                    for site_id, page_choices in new_choices.items()}, 86400)
 
-def _get_key(prefix, lang):
-    return "%s-%s" % (prefix, lang)
+    # make choice list
+    all_page_choices = [('', '----')]
+    for site_id, site_name in site_choices:
+        page_choices = cached_page_choices.get(cache_key_names[site_id])
+        page_choices = page_choices or new_choices.get(site_id, {})
+        all_page_choices.append((site_name, page_choices.items()))
+    return all_page_choices
 
-def get_site_cache_key(lang):
-    return _get_key(settings.CMS_SITE_CHOICES_CACHE_KEY, lang)
 
-def get_page_cache_key(lang):
-    return _get_key(settings.CMS_PAGE_CHOICES_CACHE_KEY, lang)
+def get_site_cache_key(lang=None):
+    # preserve function's signature even if lang is not used
+    return settings.CMS_SITE_CHOICES_CACHE_KEY
 
-def _clean_many(prefix):
-    keys = []
-    for lang in [language[0] for language in settings.LANGUAGES]:
-        keys.append(_get_key(prefix, lang))
-    cache.delete_many(keys)
+def get_page_cache_key(lang, site_id):
+    return '-'.join((settings.CMS_PAGE_CHOICES_CACHE_KEY, lang, str(site_id)))
+
 
 def clean_site_choices_cache(sender, **kwargs):
-    _clean_many(settings.CMS_SITE_CHOICES_CACHE_KEY)
+    cache.delete(get_site_cache_key())
 
-def clean_page_choices_cache(sender, **kwargs):
-    _clean_many(settings.CMS_PAGE_CHOICES_CACHE_KEY)
+
+def clean_page_choices_cache(sender, instance, **kwargs):
+    cache.delete_many([get_page_cache_key(lang[0], instance.site_id)
+                       for lang in settings.LANGUAGES])
 
 post_save.connect(clean_page_choices_cache, sender=Page)
-post_save.connect(clean_site_choices_cache, sender=Site)
 post_delete.connect(clean_page_choices_cache, sender=Page)
+post_save.connect(clean_site_choices_cache, sender=Site)
 post_delete.connect(clean_site_choices_cache, sender=Site)
