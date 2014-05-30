@@ -921,9 +921,25 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
-            response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
-                'placeholderapp', 'example1', 'callable_item', ex1.pk))
+            response,"'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+    
+    def test_view_url(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,"'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
 
     def test_method_attribute(self):
         user = self.get_staff()

@@ -728,9 +728,13 @@ class CMSEditableObject(InclusionTag):
                         instance._meta.app_label, instance._meta.module_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
-                    view_url = 'admin:%s_%s_change' % (
-                        instance._meta.app_label, instance._meta.module_name)
-                    url_base = reverse(view_url, args=(instance.pk,))
+                    if not view_url:
+                        view_url = 'admin:%s_%s_change' % (
+                            instance._meta.app_label, instance._meta.module_name)
+                    if isinstance(instance, Page):
+                        url_base = reverse(view_url, args=(instance.pk, language))
+                    else:
+                        url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (
