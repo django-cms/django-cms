@@ -59,7 +59,7 @@ class StaticPlaceholder(models.Model):
         if not self.site:
             placeholders = StaticPlaceholder.objects.filter(code=self.code, site__isnull=True)
             if self.pk:
-                placeholders.exclude(pk=self.pk)
+                placeholders = placeholders.exclude(pk=self.pk)
             if placeholders.exists():
                 raise ValidationError(_("A static placeholder with the same site and code already exists"))
 
