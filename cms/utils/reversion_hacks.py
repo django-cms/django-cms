@@ -32,5 +32,9 @@ def register_draft_only(model_class, fields, follow, format):
     registration_info.fields = fields
     registration_info.follow = follow
     registration_info.format = format
-    revision_manager._registered_models[model_class] = registration_info
+    if hasattr(revision_manager, '_registration_key_for_model'):
+        model_key = revision_manager._registration_key_for_model(model_class)
+    else:
+        model_key = model_class
+    revision_manager._registered_models[model_key] = registration_info
     # Do not connect to the post save signal of the model.
