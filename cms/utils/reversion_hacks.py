@@ -2,6 +2,7 @@
 import reversion
 from reversion.revisions import RegistrationError, VersionAdapter
 
+
 def register_draft_only(model_class, fields, follow, format):
     """
     version of the reversion register function that only registers drafts and

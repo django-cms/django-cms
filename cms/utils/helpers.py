@@ -46,8 +46,12 @@ def make_revision_with_plugins(obj, user=None, message=None):
     revision_context = reversion.revision_context_manager
     
     cls = obj.__class__
-    
-    if cls in revision_manager._registered_models:
+    if hasattr(revision_manager, '_registration_key_for_model'):
+        model_key = revision_manager._registration_key_for_model(cls)
+    else:
+        model_key = cls
+
+    if model_key in revision_manager._registered_models:
         
         placeholder_relation = find_placeholder_relation(obj)
 
