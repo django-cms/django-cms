@@ -2,7 +2,6 @@
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
-from django.db import transaction
 import json
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -33,6 +32,7 @@ from django.http import HttpResponseRedirect
 
 from cms.utils import copy_plugins, permissions, get_language_from_request
 from cms.utils.i18n import get_language_list
+from cms.utils.transaction import wrap_transaction
 
 
 class FrontendEditableAdminMixin(object):
@@ -275,7 +275,7 @@ class PlaceholderAdminMixin(object):
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
-    @transaction.commit_on_success
+    @wrap_transaction
     def copy_plugins(self, request):
         """
         POST request should have the following data:
