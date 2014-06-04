@@ -17,7 +17,11 @@ def update_site_and_page_choices(lang=None):
     return get_site_choices(lang), get_page_choices(lang)
 
 
-def _fetch_page_choices(lang=None, sites=None):
+def _fetch_published_page_choices(lang=None, sites=None):
+    return _fetch_page_choices(lang, sites, True)
+
+
+def _fetch_page_choices(lang=None, sites=None, filter_published=False):
     lang = lang or translation.get_language()
     sites = sites or Site.objects.values_list('id', flat=True)
 
@@ -30,6 +34,8 @@ def _fetch_page_choices(lang=None, sites=None):
         title_queryset = Title.objects.filter(page__publisher_is_draft=True)
     title_queryset = title_queryset.filter(
         language__in=langs, page__site__in=sites)
+    if filter_published:
+        title_queryset = title_queryset.filter(page__published=True)
     ordering = ('page__site', 'page__tree_id', 'page__lft', 'page__rght')
     fields = ('page__site', 'page', 'page__level', 'title', 'language')
     titles_values = title_queryset.order_by(*ordering).values_list(*fields)
@@ -64,19 +70,22 @@ def get_site_choices(lang=None):
     return site_choices
 
 
-def get_page_choices(lang=None):
+def get_page_choices(lang=None, filter_published=False):
     lang = lang or translation.get_language()
     site_choices = get_site_choices(lang)
     site_ids = [site_id for site_id, _ in site_choices]
     cache_key_names = {site_id: get_page_cache_key(lang, site_id)
                        for site_id in site_ids}
     cached_page_choices = cache.get_many(cache_key_names.values())
-    not_found_in_cache = [
+    not_in_cache = [
         site_id
         for site_id in site_ids
         if cache_key_names[site_id] not in cached_page_choices]
-    # fetch new page choices
-    new_choices = _fetch_page_choices(lang, not_found_in_cache)
+
+    if filter_published:
+        new_choices = _fetch_published_page_choices(lang, not_in_cache)
+    else:
+        new_choices = _fetch_page_choices(lang, not_in_cache)
     cache.set_many({cache_key_names[site_id]: page_choices
                     for site_id, page_choices in new_choices.items()}, 86400)
 
@@ -89,9 +98,14 @@ def get_page_choices(lang=None):
     return all_page_choices
 
 
+def get_published_page_choices(lang=None):
+    return get_page_choices(lang, True)
+
+
 def get_site_cache_key(lang=None):
     # preserve function's signature even if lang is not used
     return settings.CMS_SITE_CHOICES_CACHE_KEY
+
 
 def get_page_cache_key(lang, site_id):
     return '-'.join((settings.CMS_PAGE_CHOICES_CACHE_KEY, lang, str(site_id)))

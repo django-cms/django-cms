@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from cms.forms.fields import PageSelectFormField, PlaceholderFormField
+from cms.forms.fields import PageSelectFormField, PlaceholderFormField,\
+    PublishedPageSelectFormField
 from cms.forms.widgets import PlaceholderPluginEditorWidget
 from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
@@ -92,3 +93,7 @@ class PageField(models.ForeignKey):
         field_class = "django.db.models.fields.related.ForeignKey"
         args, kwargs = introspector(self)
         return (field_class, args, kwargs)
+
+
+class PublishedPageField(PageField):
+    default_form_class = PublishedPageSelectFormField
