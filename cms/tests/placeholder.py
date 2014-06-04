@@ -921,6 +921,24 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
+    def test_no_limit_check_same_placeholder_move(self):
+        admin_instance = self.get_admin()
+        superuser = self.get_superuser()
+        source_placeholder = self.get_placeholder()
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        plugin_2 = add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
+                                                 'plugin_order': 1, })
+                response = admin_instance.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
+
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
         admin_instance = self.get_admin()
