@@ -399,6 +399,45 @@ class PluginChildClasses(InclusionTag):
 register.tag(PluginChildClasses)
 
 
+class ExtraMenuItems(InclusionTag):
+    """
+    Accepts a placeholder or a plugin and renders the additional menu items.
+    """
+
+    template = "cms/toolbar/dragitem_extra_menu.html"
+    name = "extra_menu_items"
+    options = Options(
+        Argument('obj')
+    )
+
+    def get_context(self, context, obj):
+        # Prepend frontedit toolbar output if applicable
+        request = context['request']
+        items = []
+        if isinstance(obj, CMSPlugin):
+            plugin = obj
+            plugin_class_inst = plugin.get_plugin_class_instance()
+            item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
+            if item:
+                items.append(item)
+            plugin_classes = plugin_pool.get_all_plugins()
+            for plugin_class in plugin_classes:
+                plugin_class_inst = plugin_class()
+                item = plugin_class_inst.get_extra_global_plugin_menu_items(request, plugin)
+                if item:
+                    items += item
+
+        elif isinstance(obj, PlaceholderModel):
+            plugin_classes = plugin_pool.get_all_plugins()
+            for plugin_class in plugin_classes:
+                plugin_class_inst = plugin_class()
+                item = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
+                if item:
+                    items += item
+        return {'items': items}
+register.tag(ExtraMenuItems)
+
+
 class PageAttribute(AsTag):
     """
     This template node is used to output an attribute from a page such

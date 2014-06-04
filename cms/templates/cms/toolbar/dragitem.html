@@ -13,6 +13,7 @@
 				<div class="cms_submenu-item"><a data-rel="cut" href="#">{% trans "Cut" %}</a></div>
 				<div class="cms_submenu-item"><a data-rel="edit" href="#">{% trans "Edit" %}</a></div>
 				<div class="cms_submenu-item"><a data-rel="delete" href="#">{% trans "Delete" %}</a></div>
+                {% extra_menu_items plugin %}
 				{% plugin_child_classes plugin %}
 			</div>
 		</div>
