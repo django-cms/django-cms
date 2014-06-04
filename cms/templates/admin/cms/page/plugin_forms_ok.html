@@ -25,12 +25,16 @@ jQuery(document).ready(function ($) {
         parent.hide_iframe({{ plugin_id }}, {% javascript_string %}{{ type }}{% end_javascript_string %}, {% javascript_string %}{{ name }}{% end_javascript_string %}, {% javascript_string %}
         	{% if cancel %}{% trans "Your changes to this plugin have not been saved." %}{% else %}{% trans "Plugin saved successfully." %}{% endif %}
         	{% end_javascript_string %});
-        	
 		} else {
 			// frontend edit
 			setTimeout(function () { window.parent.CMS.API.Helpers.reloadBrowser(); }, 1000);
 		}
 	} else {
+        {% if deleted %}
+        opener.editPluginPopupCallbacks[{{ plugin_id }}] = function(){
+            window.parent.removed_cancelled_plugin({{ plugin_id }});
+        };
+        {% endif %}
         opener.dismissEditPluginPopup(window, {% javascript_string %}{{ plugin_id }}{% end_javascript_string %}, {% javascript_string %}{{ icon }}{% end_javascript_string %}, {% javascript_string %}{{ alt }}{% end_javascript_string %});
 	}
 });
