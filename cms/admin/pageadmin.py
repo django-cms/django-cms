@@ -17,7 +17,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
-from django.db import router, transaction
+from django.db import router
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
@@ -46,6 +46,7 @@ from cms.utils.admin import jsonify_request
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
 from cms.utils.compat import DJANGO_1_4
+from cms.utils.transaction import wrap_transaction
 
 require_POST = method_decorator(require_POST)
 
@@ -915,7 +916,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(force_unicode(_("The template was successfully changed")))
 
-    @transaction.commit_on_success
+    @wrap_transaction
     def move_page(self, request, page_id, extra_context=None):
         """
         Move the page to the requested target, at the given position
@@ -977,7 +978,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return render_to_response('admin/cms/page/permissions.html', context)
 
     @require_POST
-    @transaction.commit_on_success
+    @wrap_transaction
     def copy_language(self, request, page_id):
         with create_revision():
             source_language = request.POST.get('source_language')
@@ -1000,8 +1001,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 helpers.make_revision_with_plugins(page, request.user, message)
             return HttpResponse("ok")
 
-
-    @transaction.commit_on_success
+    @wrap_transaction
     def copy_page(self, request, page_id, extra_context=None):
         """
         Copy the page and all its plugins and descendants to the requested target, at the given position
@@ -1034,7 +1034,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
-    @transaction.commit_on_success
+    @wrap_transaction
     @create_revision()
     def publish_page(self, request, page_id, language):
         try:
@@ -1134,8 +1134,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         revision.delete()
                         deleted.append(revision.pk)
 
-
-    @transaction.commit_on_success
+    @wrap_transaction
     def unpublish(self, request, page_id, language):
         """
         Publish or unpublish a language of a page
@@ -1170,7 +1169,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
         return HttpResponseRedirect(path)
 
-    @transaction.commit_on_success
+    @wrap_transaction
     def revert_page(self, request, page_id, language):
         page = get_object_or_404(Page, id=page_id)
         # ensure user has permissions to publish this page
