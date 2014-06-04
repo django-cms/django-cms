@@ -45,7 +45,6 @@ class AliasPlugin(CMSPluginBase):
             context['plugins'] = plugins
         if instance.alias_placeholder_id:
             content = render_placeholder(instance.alias_placeholder, context)
-            print content
             context['content'] = mark_safe(content)
         return context
 
