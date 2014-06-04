@@ -444,11 +444,13 @@ class PlaceholderAdminMixin(object):
             else:
                 parent = None
             plugin.move_to(parent, position='last-child')
-        try:
-            template = self.get_placeholder_template(request, placeholder)
-            has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
-        except PluginLimitReached as er:
-            return HttpResponseBadRequest(er)
+        if not placeholder == source_placeholder:
+            try:
+                template = self.get_placeholder_template(request, placeholder)
+                has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
+            except PluginLimitReached as er:
+                return HttpResponseBadRequest(er)
+
         plugin.save()
         for child in plugin.get_descendants(include_self=True):
             child.placeholder = placeholder
