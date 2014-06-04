@@ -22,8 +22,6 @@ class AliasTestCase(CMSTestCase):
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                                   slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
-        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
-
         class FakeRequest(object):
             current_page = page_en
             user = self.get_superuser()

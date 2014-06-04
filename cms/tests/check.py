@@ -22,10 +22,10 @@ class TestOutput(FileOutputWrapper):
         self.section_wrapper = TestSectionOutput
 
     def write(self, message):
-        pass
+        print message
 
     def write_stderr(self, message):
-        pass
+        print message
 
 
 class TestSectionOutput(FileSectionWrapper):
