@@ -654,6 +654,7 @@ achieve this functionality:
     </div>
 
 
+.. _extending_context_menus:
 Extending context menus of placeholders or plugins
 ==================================================
 
