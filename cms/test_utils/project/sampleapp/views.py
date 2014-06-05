@@ -1,10 +1,12 @@
 # Create your views here.
+from cms.utils.decorators import cms_perms
 from django.core.urlresolvers import reverse, resolve
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from cms.test_utils.project.sampleapp.models import Category
 from django.utils.translation import ugettext_lazy as _
+
 
 
 def sample_view(request, **kw):

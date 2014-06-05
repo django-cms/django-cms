@@ -410,6 +410,33 @@ Or, if you are rendering a plugin, of the context instance::
             # ...
 
 
+Apphook Permissions
+-------------------
+
+If you want that your views have the same permissions as the page it is attached, django CMS
+provides you with a decorator for your views.
+
+``cms.utils.decorators.cms_perms``
+
+Here is a simple example::
+
+    from cms.utils.decorators import cms_perms
+
+    @cms_perms
+    def my_view(request, **kw):
+        ...
+
+
+If you want to set permissions to all views of an apphook you can do that via
+your app class and set ``permissions=True``::
+
+    class SampleApp(CMSApp):
+        name = _("Sample App")
+        urls = ["project.sampleapp.urls"]
+        permissions = True
+
+
+
 Automatically restart server on apphook changes
 -----------------------------------------------
 
@@ -433,6 +460,7 @@ should not be needed.
 
     The signal is fired **after** a request. If you change something via API
     you need a request for the signal to fire.
+
 
 .. _integration_modifiers:
 

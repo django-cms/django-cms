@@ -7,6 +7,7 @@ class SampleApp(CMSApp):
     name = _("Sample App")
     urls = ["cms.test_utils.project.sampleapp.urls"]
     menus = [SampleAppMenu]
+    permissions = True
 
 apphook_pool.register(SampleApp)
 
