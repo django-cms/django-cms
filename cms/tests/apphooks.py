@@ -192,7 +192,7 @@ class ApphooksTestCase(CMSTestCase):
 
             apphook_pool.clear()
 
-    def test_get_page_for_apphook(self):
+    def test_apphook_permissions(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
 
