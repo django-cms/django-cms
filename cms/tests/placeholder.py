@@ -931,7 +931,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
             'language': 'en',
         }
         plugin_1 = add_plugin(**data)
-        plugin_2 = add_plugin(**data)
+        add_plugin(**data)
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
