@@ -654,6 +654,108 @@ achieve this functionality:
     </div>
 
 
+.. _extending_context_menus:
+
+Extending context menus of placeholders or plugins
+==================================================
+
+There are three possibilities to extend the context menus
+of placeholders or plugins.
+
+* You can either extend a placeholder context menu.
+* You can extend all plugin context menus.
+* You can extend the current plugin context menu.
+
+For this purpose you can overwrite 3 methods on CMSPluginBase.
+
+* :ref:`get_extra_placeholder_menu_items`
+* :ref:`get_extra_global_plugin_menu_items`
+* :ref:`get_extra_local_plugin_menu_items`
+
+Example::
+
+    class AliasPlugin(CMSPluginBase):
+        name = _("Alias")
+        allow_children = False
+        model = AliasPluginModel
+        render_template = "cms/plugins/alias.html"
+
+        def render(self, context, instance, placeholder):
+            context['instance'] = instance
+            context['placeholder'] = placeholder
+            if instance.plugin_id:
+                plugins = instance.plugin.get_descendants(include_self=True).order_by('placeholder', 'tree_id', 'level',
+                                                                                      'position')
+                plugins = downcast_plugins(plugins)
+                plugins[0].parent_id = None
+                plugins = build_plugin_tree(plugins)
+                context['plugins'] = plugins
+            if instance.alias_placeholder_id:
+                content = render_placeholder(instance.alias_placeholder, context)
+                print content
+                context['content'] = mark_safe(content)
+            return context
+
+        def get_extra_global_plugin_menu_items(self, request, plugin):
+            return [
+                PluginMenuItem(
+                    _("Create Alias"),
+                    reverse("admin:cms_create_alias"),
+                    data={'plugin_id': plugin.pk, 'csrfmiddlewaretoken': get_token(request)},
+                )
+            ]
+
+        def get_extra_placeholder_menu_items(self, request, placeholder):
+            return [
+                PluginMenuItem(
+                    _("Create Alias"),
+                    reverse("admin:cms_create_alias"),
+                    data={'placeholder_id': placeholder.pk, 'csrfmiddlewaretoken': get_token(request)},
+                )
+            ]
+
+        def get_plugin_urls(self):
+            urlpatterns = [
+                url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+            ]
+            urlpatterns = patterns('', *urlpatterns)
+            return urlpatterns
+
+        def create_alias(self, request):
+            if not request.user.is_staff:
+                return HttpResponseForbidden("not enough privileges")
+            if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
+                return HttpResponseBadRequest("plugin_id or placeholder_id POST parameter missing.")
+            plugin = None
+            placeholder = None
+            if 'plugin_id' in request.POST:
+                pk = request.POST['plugin_id']
+                try:
+                    plugin = CMSPlugin.objects.get(pk=pk)
+                except CMSPlugin.DoesNotExist:
+                    return HttpResponseBadRequest("plugin with id %s not found." % pk)
+            if 'placeholder_id' in request.POST:
+                pk = request.POST['placeholder_id']
+                try:
+                    placeholder = Placeholder.objects.get(pk=pk)
+                except Placeholder.DoesNotExist:
+                    return HttpResponseBadRequest("placeholder with id %s not found." % pk)
+                if not placeholder.has_change_permission(request):
+                    return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
+            clipboard = request.toolbar.clipboard
+            clipboard.cmsplugin_set.all().delete()
+            language = request.LANGUAGE_CODE
+            if plugin:
+                language = plugin.language
+            alias = AliasPluginModel(language=language, placeholder=clipboard, plugin_type="AliasPlugin")
+            if plugin:
+                alias.plugin = plugin
+            if placeholder:
+                alias.alias_placeholder = placeholder
+            alias.save()
+            return HttpResponse("ok")
+
+
 **********************************************
 CMSPluginBase Attributes and Methods Reference
 **********************************************
@@ -888,6 +990,33 @@ The default implementation is as follows::
 
 See also: `text_enabled`_, `icon_src`_
 
+.. _get_extra_placeholder_menu_items:
+
+get_extra_placeholder_menu_items
+--------------------------------
+
+``get_extra_placeholder_menu_items(self, request, placeholder)``
+
+overwrite to extends a placeholders context menu
+return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+.. _get_extra_global_plugin_menu_items:
+
+get_extra_global_plugin_menu_items
+----------------------------------
+
+``get_extra_global_plugin_menu_items(self, request, plugin)``
+extends all plugins context menu
+return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+.. _get_extra_local_plugin_menu_items:
+
+get_extra_local_plugin_menu_items
+---------------------------------
+
+``get_extra_local_plugin_menu_items(self, request, plugin)``
+extends the current plugins context menu
+return a list of ``cms.plugin_base.PluginMenuItem`` instances
 
 ******************************************
 CMSPlugin Attributes and Methods Reference

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 try:
     from django.contrib.admin.options import (RenameBaseModelAdminMethods as
                                               ModelAdminMetaClass)
@@ -128,7 +130,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         },
     }
 
-
     def __init__(self, model=None, admin_site=None):
         if admin_site:
             super(CMSPluginBase, self).__init__(self.model, admin_site)
@@ -139,7 +140,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         self.cms_plugin_instance = None
         self.placeholder = None
         self.page = None
-
 
     def render(self, context, instance, placeholder):
         context['instance'] = instance
@@ -322,6 +322,15 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         return self.get_plugin_urls()
     plugin_urls = property(plugin_urls)
 
+    def get_extra_placeholder_menu_items(self, request, placeholder):
+        pass
+
+    def get_extra_global_plugin_menu_items(self, request, plugin):
+        pass
+
+    def get_extra_local_plugin_menu_items(self, request, plugin):
+        pass
+
     def __repr__(self):
         return smart_str(self.name)
 
@@ -343,3 +352,11 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         raise Deprecated(
             "CMSPluginBase.get_plugin_media is deprecated in favor of django-sekizai"
         )
+
+
+class PluginMenuItem(object):
+    def __init__(self, name, url, data, question=None):
+        self.name = name
+        self.url = url
+        self.data = json.dumps(data)
+        self.question = question

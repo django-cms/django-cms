@@ -22,6 +22,8 @@ Release Notes
 .. toctree::
     :maxdepth: 1
 
+
+    upgrade/3.0.3
     upgrade/3.0
     upgrade/2.4
     upgrade/2.3.4
