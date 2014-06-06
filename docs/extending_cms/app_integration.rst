@@ -413,8 +413,20 @@ Or, if you are rendering a plugin, of the context instance::
 Apphook Permissions
 -------------------
 
-If you want that your views have the same permissions as the page it is attached, django CMS
-provides you with a decorator for your views.
+By default all apphooks have the same permissions set as the page they are assigned to.
+So if you set login required on page the attached apphook and all it's urls have the same
+requirements.
+
+To disable this behavior set ``permissions = False`` on your apphook::
+
+    class SampleApp(CMSApp):
+        name = _("Sample App")
+        urls = ["project.sampleapp.urls"]
+        permissions = False
+
+
+
+If you still want some of your views to have permission checks you can enable them via a decorator:
 
 ``cms.utils.decorators.cms_perms``
 
@@ -426,14 +438,6 @@ Here is a simple example::
     def my_view(request, **kw):
         ...
 
-
-If you want to set permissions to all views of an apphook you can do that via
-your app class and set ``permissions=True``::
-
-    class SampleApp(CMSApp):
-        name = _("Sample App")
-        urls = ["project.sampleapp.urls"]
-        permissions = True
 
 
 

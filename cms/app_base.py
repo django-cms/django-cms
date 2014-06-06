@@ -4,4 +4,4 @@ class CMSApp(object):
     urls = None
     menus = []
     app_name = None
-    permissions = False
+    permissions = True
