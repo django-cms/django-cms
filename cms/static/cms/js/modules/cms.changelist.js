@@ -560,7 +560,7 @@ $(document).ready(function () {
 			$('a[data-alt-href]').on('click', function(evt){
 				var href;
 				evt.preventDefault();
-				if (evt.altKey) {
+				if (evt.shiftKey) {
 					href = $(this).data('alt-href');
 				}
 				else {
