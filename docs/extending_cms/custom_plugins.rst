@@ -655,6 +655,7 @@ achieve this functionality:
 
 
 .. _extending_context_menus:
+
 Extending context menus of placeholders or plugins
 ==================================================
 
