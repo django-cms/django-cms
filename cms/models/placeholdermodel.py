@@ -54,6 +54,10 @@ class Placeholder(models.Model):
     def get_copy_url(self):
         return self._get_url('copy_plugins')
 
+    def get_extra_menu_items(self):
+        from cms.plugin_pool import plugin_pool
+        return plugin_pool.get_extra_placeholder_menu_items(self)
+
     def get_cache_key(self, lang):
         cache_key = '%srender_placeholder:%s.%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
         if settings.USE_TZ:

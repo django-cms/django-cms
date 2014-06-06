@@ -3,6 +3,7 @@ from __future__ import with_statement
 from contextlib import contextmanager
 import inspect
 from itertools import chain
+from cms.models import AliasPluginModel
 import os
 
 from django.conf import settings
@@ -271,7 +272,7 @@ def check_copy_relations(output):
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._meta.get_all_related_objects():
-                if rel.model != CMSPlugin:
+                if rel.model != CMSPlugin and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),
