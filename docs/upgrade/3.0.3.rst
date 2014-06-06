@@ -23,3 +23,15 @@ Plugins can now change the context menus of placeholders and plugins.
 For more details have a look at the docs:
 
 :ref:`extending_context_menus`
+
+
+Apphook Permissions
+===================
+
+Apphooks have now by default the same permissions as the page they are attached to.
+This means if a page has for example a login required enabled all views in the apphook
+will have the same behavior.
+
+Docs on how to disable or customize this behavior have a look here:
+
+:ref:`apphook_permissions`
