@@ -409,6 +409,7 @@ Or, if you are rendering a plugin, of the context instance::
                     current_app=current_app)
             # ...
 
+.. _apphook_permissions:
 
 Apphook Permissions
 -------------------

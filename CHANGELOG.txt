@@ -235,4 +235,5 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 ==== 3.0.3 (2014-06-XX) ===
 - Added an alias plugin for referencing plugins and placeholders
 - Added an api to change the context menus of plugins and placeholders from plugins
-
+- Apphooks respect the page permissions
+- Decorator for views with page permissions
