@@ -52,8 +52,12 @@ class PluginPool(object):
                 "CMS Plugins must be subclasses of CMSPluginBase, %r is not."
                 % plugin
             )
-        if plugin.render_plugin and not type(plugin.render_plugin) == property or hasattr(plugin.model, 'render_template'):
-            if plugin.render_template is None and not hasattr(plugin.model, 'render_template'):
+        if (plugin.render_plugin and not type(plugin.render_plugin) == property
+                or hasattr(plugin.model, 'render_template')
+                or hasattr(plugin.model, 'get_render_template')):
+            if (plugin.render_template is None and
+                    not hasattr(plugin.model, 'render_template') and
+                    not hasattr(plugin.model, 'get_render_template')):
                 raise ImproperlyConfigured(
                     "CMS Plugins must define a render template or set render_plugin=False: %s"
                     % plugin
@@ -61,8 +65,10 @@ class PluginPool(object):
             else:
                 from django.template import loader
 
-                template = hasattr(plugin.model,
-                                   'render_template') and plugin.model.render_template or plugin.render_template
+                template = (hasattr(plugin.model,'render_template') and
+                            plugin.model.render_template or
+                            plugin.render_template or
+                            hasattr(plugin, 'get_render_template'))
                 if isinstance(template, six.string_types) and template:
                     try:
                         loader.get_template(template)
