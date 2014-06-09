@@ -70,8 +70,8 @@ Admin Integration
 .. versionchanged:: 3.0
 
 If you install this model in the admin application, you have to use the mixin
-:class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` together with
-:class:`~django.contrib.admin.ModelAdmin` so that the interface renders
+:class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` together with,
+and must precede, :class:`~django.contrib.admin.ModelAdmin` so that the interface renders
 correctly::
 
     from django.contrib import admin
