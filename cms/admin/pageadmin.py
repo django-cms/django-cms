@@ -328,8 +328,9 @@ class PageAdmin(ModelAdmin):
 
         if obj:
             self.inlines = PAGE_ADMIN_INLINES
-            if not obj.has_publish_permission(request) and not 'published' in self.exclude:
-                self.exclude.append('published')
+            if not obj.has_publish_permission(request):
+                if not 'published' in self.exclude:
+                    self.exclude.append('published')
             elif 'published' in self.exclude:
                 self.exclude.remove('published')
 
