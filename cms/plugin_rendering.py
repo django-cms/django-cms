@@ -118,17 +118,14 @@ def render_placeholder(placeholder, context_to_copy,
         save_language = lang
 
     # Prepend frontedit toolbar output if applicable
-    edit = False
     toolbar = getattr(request, 'toolbar', None)
-
-    if getattr(toolbar, 'edit_mode', False):
-        edit = True
-    if edit and editable:
+    if getattr(toolbar, 'edit_mode', False) and not getattr(placeholder, 'is_flat', False) and editable:
         from cms.middleware.toolbar import toolbar_plugin_processor
-
         processors = (toolbar_plugin_processor,)
+        edit = True
     else:
         processors = None
+        edit = False
     from django.core.cache import cache
     if get_cms_setting('PLACEHOLDER_CACHE'):
         cache_key = placeholder.get_cache_key(lang)

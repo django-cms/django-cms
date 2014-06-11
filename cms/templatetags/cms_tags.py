@@ -34,6 +34,7 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting, get_site_id
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
@@ -1077,7 +1078,11 @@ class StaticPlaceholderNode(Tag):
             request.static_placeholders = []
         request.static_placeholders.append(static_placeholder)
         if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-            placeholder = static_placeholder.draft
+            if get_cms_setting('STATIC_PLACEHOLDER_PERMISSION') and not request.user.has_perm('cms.edit_static_placeholder'):
+                placeholder = static_placeholder.public
+                placeholder.is_flat = True
+            else:
+                placeholder = static_placeholder.draft
         else:
             placeholder = static_placeholder.public
         placeholder.is_static = True
