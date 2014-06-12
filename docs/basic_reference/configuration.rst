@@ -676,17 +676,6 @@ performance.
           limit.  Unfortunately, this means that non-superusers won't see any
           benefit from this setting.
 
-.. setting:: CMS_STATIC_PLACEHOLDER_PERMISSION
-
-CMS_STATIC_PLACEHOLDER_PERMISSION
-=================================
-
-Default: ``False``
-
-When enabled, a user needs the cms-permission "can edit static placeholder" to edit the
-content of static placeholders. Users without this permisson will see the placeholders
-public and cached content when in editing-mode.
-
 .. setting:: CMS_PUBLIC_FOR
 
 CMS_PUBLIC_FOR

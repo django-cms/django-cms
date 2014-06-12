@@ -399,7 +399,6 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
 class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
     settings_overrides = {
-        'CMS_STATIC_PLACEHOLDER_PERMISSION': True,
         'SITE_ID': 1,
         'CMS_PERMISSION': False,
     }

@@ -1078,7 +1078,7 @@ class StaticPlaceholderNode(Tag):
             request.static_placeholders = []
         request.static_placeholders.append(static_placeholder)
         if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-            if get_cms_setting('STATIC_PLACEHOLDER_PERMISSION') and not request.user.has_perm('cms.edit_static_placeholder'):
+            if not request.user.has_perm('cms.edit_static_placeholder'):
                 placeholder = static_placeholder.public
                 placeholder.is_flat = True
             else:

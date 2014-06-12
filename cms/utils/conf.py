@@ -49,7 +49,6 @@ DEFAULTS = {
     'PAGE_MEDIA_PATH': 'cms_page_media/',
     'TITLE_CHARACTER': '+',
     'PAGE_CACHE': True,
-    'STATIC_PLACEHOLDER_PERMISSION': False,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
     'CACHE_PREFIX': 'cms-',
