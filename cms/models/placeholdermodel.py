@@ -18,9 +18,16 @@ from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 
 @python_2_unicode_compatible
 class Placeholder(models.Model):
-    slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
+    """
+    Attributes:
+        is_static       Set to "True" for static placeholders by the template tag
+        is_editable     If False the content of the placeholder is not editable in the frontend
+    """
+    slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
     cache_placeholder = True
+    is_static = False
+    is_editable = True
 
     class Meta:
         app_label = 'cms'
