@@ -49,10 +49,10 @@ Options:
 '''
 
 
-def server(bind='127.0.0.1', port=8000, migrate=False):
+def server(bind='127.0.0.1', port=8000, migrate_opt=False):
     if os.environ.get("RUN_MAIN") != "true":
         from south.management.commands import syncdb, migrate
-        if migrate:
+        if migrate_opt:
             syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
             migrate.Command().handle(interactive=False, verbosity=1)
         else:
