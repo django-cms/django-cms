@@ -3,6 +3,7 @@
 <script type="text/javascript">
 	var _jQuery = window.jQuery || null;
 	var _$ = window.$;
+	var csrf_cookie_name = "{{CSRF_COOKIE_NAME|default:'csrftoken'}}";
 </script>
 {% endaddtoblock %}
 {% addtoblock "js" %}<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>{% endaddtoblock %}
