@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
+
 from django.contrib.sitemaps import Sitemap
+from django.db.models import Q
+from django.utils import translation
+
+from cms.models import Title
+
 
 def from_iterable(iterables):
     """
@@ -9,21 +15,52 @@ def from_iterable(iterables):
         for element in it:
             yield element
 
+
 class CMSSitemap(Sitemap):
     changefreq = "monthly"
     priority = 0.5
 
     def items(self):
-        from cms.utils.page_resolver import get_page_queryset
-        page_queryset = get_page_queryset(None)
-        all_pages = page_queryset.published().filter(login_required=False)
-        return all_pages
+        #
+        # It is counter-productive to provide entries for:
+        #   > Pages which redirect:
+        #       - If the page redirects to another page on this site, the
+        #         destination page will already be in the sitemap, and
+        #       - If the page redirects externally, then it shouldn't be
+        #         part of our sitemap anyway.
+        #   > Pages which cannot be accessed by anonymous users (like
+        #     search engines are).
+        #
+        # It is noted here: http://www.sitemaps.org/protocol.html that
+        # "locations" that differ from the place where the sitemap is found,
+        # are considered invalid. E.g., if your sitemap is located here:
+        #
+        #     http://example.com/sub/sitemap.xml
+        #
+        # valid locations *must* be rooted at http://example.com/sub/...
+        #
+        # This rules any redirected locations out.
+        #
+        # If, for some reason, you require redirecting pages (Titles) to be
+        # included, simply create a new class inheriting from this one, and
+        # supply a new items() method which doesn't filter out the redirects.
+        #
+        all_titles = Title.objects.public().filter(
+            Q(redirect='') | Q(redirect__isnull=True),
+            page__login_required=False
+        )
+        return all_titles
 
-    def lastmod(self, page):
-        modification_dates = [page.changed_date, page.publication_date]
+    def lastmod(self, title):
+        modification_dates = [title.page.changed_date, title.page.publication_date]
         plugins_for_placeholder = lambda placeholder: placeholder.get_plugins()
-        plugins = from_iterable(map(plugins_for_placeholder, page.placeholders.all()))
+        plugins = from_iterable(map(plugins_for_placeholder, title.page.placeholders.all()))
         plugin_modification_dates = map(lambda plugin: plugin.changed_date, plugins)
         modification_dates.extend(plugin_modification_dates)
         return max(modification_dates)
-    
+
+    def location(self, title):
+        translation.activate(title.language)
+        url = title.page.get_absolute_url(title.language)
+        translation.deactivate()
+        return url

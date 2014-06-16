@@ -1,44 +1,47 @@
+.. _custom-plugins:
+
 ##############
 Custom Plugins
 ##############
 
-CMS Plugins are reusable content publishers that can be inserted into django 
+CMS Plugins are reusable content publishers that can be inserted into django
 CMS pages (or indeed into any content that uses django CMS placeholders). They
-enable the publishing of information automatically, without further intervention.
+enable the publishing of information automatically, without further
+intervention.
 
-This means that your published web content, whatever it is, is kept 
+This means that your published web content, whatever it is, is kept
 up-to-date at all times.
 
 It's like magic, but quicker.
 
-Unless you're lucky enough to discover that your needs can be met by the 
-built-in plugins, or by the many available 3rd-party plugins, you'll have 
-to write your own custom CMS Plugin. Don't worry though -
-writing a CMS Plugin is rather simple.
+Unless you're lucky enough to discover that your needs can be met by the
+built-in plugins, or by the many available 3rd-party plugins, you'll have to
+write your own custom CMS Plugin. Don't worry though - writing a CMS Plugin is
+rather simple.
 
 *************************************
 Why would you need to write a plugin?
 *************************************
 
-A plugin is the most convenient way to integrate content from another Django 
+A plugin is the most convenient way to integrate content from another Django
 app into a django CMS page.
 
-For example, suppose you're developing a site for a record company in django 
+For example, suppose you're developing a site for a record company in django
 CMS. You might like to have a "Latest releases" box on your site's home page.
 
-Of course, you could every so often edit that page and update the information. 
-However, a sensible record company will manage its catalogue in Django too, 
+Of course, you could every so often edit that page and update the information.
+However, a sensible record company will manage its catalogue in Django too,
 which means Django already knows what this week's new releases are.
 
-This is an excellent opportunity to make use of that information to make your 
-life easier - all you need to do is create a django CMS plugin that you can 
-insert into your home page, and leave it to do the work of publishing information 
+This is an excellent opportunity to make use of that information to make your
+life easier - all you need to do is create a django CMS plugin that you can
+insert into your home page, and leave it to do the work of publishing information
 about the latest releases for you.
 
-Plugins are **reusable**. Perhaps your record company is producing a series of 
-reissues of seminal Swiss punk records; on your site's page about the series, 
-you could insert the same plugin, configured a little differently, that will 
-publish information about recent new releases in that series. 
+Plugins are **reusable**. Perhaps your record company is producing a series of
+reissues of seminal Swiss punk records; on your site's page about the series,
+you could insert the same plugin, configured a little differently, that will
+publish information about recent new releases in that series.
 
 ********
 Overview
@@ -56,7 +59,7 @@ These correspond to the familiar Model-View-Template scheme:
 * the plugin **view** that works out what needs to be displayed
 * the plugin **template** to render the information
 
-And so to build your plugin, you'll make it from: 
+And so to build your plugin, you'll make it from:
 
 * a subclass of :class:`cms.models.pluginmodel.CMSPlugin` to
   **store the configuration** for your plugin instances
@@ -78,11 +81,11 @@ The plugin **model**, the subclass of :class:`cms.models.pluginmodel.CMSPlugin`,
 is actually optional.
 
 You could have a plugin that doesn't need to be configured, because it only
-ever does one thing. 
+ever does one thing.
 
-For example, you could have a plugin that only publishes information 
-about the top-selling record of the past seven days. Obviously, this wouldn't 
-be very flexible - you wouldn't be able to use the same plugin for the 
+For example, you could have a plugin that only publishes information
+about the top-selling record of the past seven days. Obviously, this wouldn't
+be very flexible - you wouldn't be able to use the same plugin for the
 best-selling release of the last *month* instead.
 
 Usually, you find that it is useful to be able to configure your plugin, and this
@@ -132,7 +135,7 @@ There are three required attributes on those classes:
   If you do not require any special information, for example configuration, to
   be stored for your plugins, you can simply use
   :class:`cms.models.pluginmodel.CMSPlugin` (we'll look at that model more
-  closely in a bit). In a normal admin class, you don't need to supply this 
+  closely in a bit). In a normal admin class, you don't need to supply this
   information because ``admin.site.register(Model, Admin)`` takes care of it,
   but a plugin is not registered in that way.
 * ``name``: The name of your plugin as displayed in the admin. It is generally
@@ -142,14 +145,14 @@ There are three required attributes on those classes:
 * ``render_template``: The template to render this plugin with.
 
 In addition to those three attributes, you can also define a
-:meth:`render` method on your subclasses. It is specifically this `render` 
+:meth:`render` method on your subclasses. It is specifically this `render`
 method that is the **view** for your plugin.
 
-The `render` method takes three arguments:
+The :meth:`render` method takes three arguments:
 
 * ``context``: The context with which the page is rendered.
 * ``instance``: The instance of your plugin that is rendered.
-* ``placeholder``: The name of the placeholder that is rendered. 
+* ``placeholder``: The name of the placeholder that is rendered.
 
 This method must return a dictionary or an instance of
 :class:`django.template.Context`, which will be used as context to render the
@@ -204,7 +207,7 @@ In our ``models.py`` we add the following::
         guest_name = models.CharField(max_length=50, default='Guest')
 
 
-If you followed the Django tutorial, this shouldn't look too new to you. The 
+If you followed the Django tutorial, this shouldn't look too new to you. The
 only difference to normal models is that you subclass
 :class:`cms.models.pluginmodel.CMSPlugin` rather than
 :class:`django.db.models.base.Model`.
@@ -215,8 +218,8 @@ Now we need to change our plugin definition to use this model, so our new
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
     from django.utils.translation import ugettext_lazy as _
-    
-    from models import Hello
+
+    from .models import Hello
 
     class HelloPlugin(CMSPluginBase):
         model = Hello
@@ -237,11 +240,15 @@ new configuration:
 
 .. code-block:: html+django
 
-    <h1>Hello {% if request.user.is_authenticated %}{{ request.user.first_name }} {{ request.user.last_name}}{% else %}{{ instance.guest_name }}{% endif %}</h1>
+    <h1>Hello {% if request.user.is_authenticated %}
+      {{ request.user.first_name }} {{ request.user.last_name}}
+    {% else %}
+      {{ instance.guest_name }}
+    {% endif %}</h1>
 
-The only thing we changed there is that we use the template variable
-``{{ instance.guest_name }}`` instead of the hardcoded ``Guest`` string in the
-else clause.
+The only thing we changed there is that we use the template variable ``{{
+instance.guest_name }}`` instead of the hardcoded ``Guest`` string in the else
+clause.
 
 .. warning::
 
@@ -250,11 +257,11 @@ else clause.
     please use abstract base models.
 
 .. warning::
-    
-    You cannot name your model fields the same as any installed plugins
-    lower-cased model name, due to the implicit one-to-one relation Django uses
-    for subclassed models. If you use all core plugins, this includes:
-    ``file``, ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
+
+    You cannot name your model fields the same as any installed plugins lower-
+    cased model name, due to the implicit one-to-one relation Django uses for
+    subclassed models. If you use all core plugins, this includes: ``file``,
+    ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
     ``teaser``, ``twittersearch``, ``twitterrecententries`` and ``video``.
 
     Additionally, it is *recommended* that you avoid using ``page`` as a model
@@ -267,7 +274,8 @@ else clause.
 Handling Relations
 ==================
 
-If your custom plugin has foreign key (to it, or from it) or many-to-many
+Everytime the page with your custom plugin is published the plugin is copied.
+So if your custom plugin has foreign key (to it, or from it) or many-to-many
 relations you are responsible for copying those related objects, if required,
 whenever the CMS copies the plugin - **it won't do it for you automatically**.
 
@@ -282,8 +290,8 @@ the **old** instance of the plugin as an argument.
 
 You may however decide that the related objects shouldn't be copied - you may
 want to leave them alone, for example. Or, you might even want to choose some
-altogether different relations for it, or to create new ones when it's copied...
-it depends on your plugin and the way you want it to work.
+altogether different relations for it, or to create new ones when it's
+copied... it depends on your plugin and the way you want it to work.
 
 If you do want to copy related objects, you'll need to do this in two slightly
 different ways, depending on whether your plugin has relations *to* or *from*
@@ -292,23 +300,23 @@ other objects that need to be copied too:
 For foreign key relations *from* other objects
 ----------------------------------------------
 
-Your plugin may have items with foreign keys to it, which will typically be the
-case if you set it up so that they are inlines in its admin. So you might have a
-two models, one for the plugin and one for those items::
+Your plugin may have items with foreign keys to it, which will typically be
+the case if you set it up so that they are inlines in its admin. So you might
+have a two models, one for the plugin and one for those items::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
 
     class AssociatedItem(models.Model):
         plugin = models.ForeignKey(
-            ArticlePluginModel, 
+            ArticlePluginModel,
             related_name="associated_item"
             )
 
 You'll then need the ``copy_relations()`` method on your plugin model to loop
 over the associated items and copy them, giving the copies foreign keys to the
 new plugin::
-      
+
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
 
@@ -339,8 +347,8 @@ it becomes::
         def copy_relations(self, oldinstance):
             self.sections = oldinstance.sections.all()
 
-If your plugins have relational fields of both kinds, you may of course need to
-use *both* the copying techniques described above.
+If your plugins have relational fields of both kinds, you may of course need
+to use *both* the copying techniques described above.
 
 ********
 Advanced
@@ -360,8 +368,10 @@ change this.
 
 If you want to customise this the best way to do it is:
 
-* create a template of your own that extends ``cms/templates/admin/cms/page/plugin_change_form.html`` to provide the functionality you require
-* provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a ``change_form_template`` attribute pointing at your new template
+* create a template of your own that extends ``cms/templates/admin/cms/page/plugin_change_form.html``
+  to provide the functionality you require;
+* provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a
+  ``change_form_template`` attribute pointing at your new template.
 
 Extending ``admin/cms/page/plugin_change_form.html`` ensures that you'll keep
 a unified look and functionality across your plugins.
@@ -371,7 +381,6 @@ might have a snippet of JavaScript that needs to refer to a template
 variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
 block.super }}`` to inherit the existing items that were in the parent
 template.
-
 
 Or: ``cms/templates/admin/cms/page/plugin_change_form.html`` extends Django's
 own ``admin/base_site.html``, which loads a rather elderly version of jQuery,
@@ -393,7 +402,7 @@ Handling media
 If your plugin depends on certain media files, javascript or stylesheets, you
 can include them from your plugin template using `django-sekizai`_. Your CMS
 templates are always enforced to have the ``css`` and ``js`` sekizai namespaces,
-therefore those should be used to include the respective files. For more 
+therefore those should be used to include the respective files. For more
 information about django-sekizai, please refer to the
 `django-sekizai documentation`_.
 
@@ -419,7 +428,7 @@ A **good** example:
 .. code-block:: html+django
 
     {% load sekizai_tags %}
-    
+
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myjsfile.js"></script>{% endaddtoblock %}
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myotherfile.js"></script>{% endaddtoblock %}
     {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}myplugin/css/astylesheet.css"></script>{% endaddtoblock %}
@@ -436,7 +445,7 @@ A **bad** example:
 .. code-block:: html+django
 
     {% load sekizai_tags %}
-    
+
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myjsfile.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myotherfile.js"></script>{% endaddtoblock %}
     {% addtoblock "css" %}
@@ -449,6 +458,19 @@ A **bad** example:
     </script>{% endaddtoblock %}
 
 
+.. _plugin-context-processors:
+
+
+Plugin Context
+==============
+
+The plugin has access to the django template context. You can override
+variables using the ``with`` tag.
+
+Example::
+
+    {% with 320 as width %}{% placeholder "content" %}{% endwith %}
+
 
 Plugin Context Processors
 =========================
@@ -457,17 +479,18 @@ Plugin context processors are callables that modify all plugins' context before
 rendering. They are enabled using the :setting:`CMS_PLUGIN_CONTEXT_PROCESSORS`
 setting.
 
-A plugin context processor takes 2 arguments:
+A plugin context processor takes 3 arguments:
 
 * ``instance``: The instance of the plugin model
 * ``placeholder``: The instance of the placeholder this plugin appears in.
+* ``context``: The context that is in use, including the request.
 
 The return value should be a dictionary containing any variables to be added to
 the context.
 
 Example::
 
-    def add_verbose_name(instance, placeholder):
+    def add_verbose_name(instance, placeholder, context):
         '''
         This plugin context processor adds the plugin model's verbose_name to context.
         '''
@@ -501,8 +524,8 @@ A plugin processor takes 4 arguments:
 Example
 -------
 
-Suppose you want to wrap each plugin in the main placeholder in a colored
-box but it would be too complicated to edit each individual plugin's template:
+Suppose you want to wrap each plugin in the main placeholder in a colored box
+but it would be too complicated to edit each individual plugin's template:
 
 In your ``settings.py``::
 
@@ -541,103 +564,397 @@ In your ``yourapp.cms_plugin_processors.py``::
 .. _django-sekizai documentation: http://django-sekizai.readthedocs.org
 
 
-Plugin Attribute Reference
-==========================
+Nested Plugins
+==============
 
-A list of all attributes a plugin has and that can be overwritten:
+You can nest CMS Plugins in themselves. There's a few things required to
+achieve this functionality:
+
+`models.py`::
+
+    class ParentPlugin(CMSPlugin):
+        # add your fields here
+
+    class ChildPlugin(CMSPlugin):
+        # add your fields here
+
+`cms_plugins.py`::
+
+    from .models import ParentPlugin, ChildPlugin
+
+    class ParentCMSPlugin(CMSPluginBase):
+        render_template = 'parent.html'
+        name = 'Parent'
+        model = ParentPlugin
+        allow_children = True  # This enables the parent plugin to accept child plugins
+        # child_classes = ['ChildCMSPlugin']  # You can also specify a list of plugins that are accepted as children,
+                                                or leave it away completely to accept all
+
+        def render(self, context, instance, placeholder):
+            context['instance'] = instance
+            return context
+
+    plugin_pool.register_plugin(ParentCMSPlugin)
+
+
+    class ChildCMSPlugin(CMSPluginBase):
+        render_template = 'child.html'
+        name = 'Child'
+        model = ChildPlugin
+        require_parent = True  # Is it required that this plugin is a child of another plugin?
+        # parent_classes = ['ParentCMSPlugin']  # You can also specify a list of plugins that are accepted as parents,
+                                                or leave it away completely to accept all
+
+        def render(self, context, instance, placeholder):
+            context['instance'] = instance
+            return context
+
+    plugin_pool.register_plugin(ChildCMSPlugin)
+
+
+`parent.html`::
+
+    {% load cms_tags %}
+
+    <div class="plugin parent">
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
+    </div>
+
+
+`child.html`::
+
+    <div class="plugin child">
+        {{ instance }}
+    </div>
+
+
+**********************************************
+CMSPluginBase Attributes and Methods Reference
+**********************************************
+
+These are a list of attributes and methods that can (or should) be overridden
+on your Plugin definition.
+
+Attributes
+==========
+
+admin_preview
+-------------
+
+Default: ``False``
+
+Should the plugin be previewed in admin when you click on the plugin or save it?
+
+
+allow_children
+--------------
+
+Default: ``False``
+
+Can this plugin have child plugins? Or can other plugins be placed inside this
+plugin? If set to ``True`` you are responsible to render the children in your
+plugin template.
+
+Please use something like this or something similar::
+
+    {% load cms_tags %}
+    <div class="myplugin">
+    {{ instance.my_content }}
+    {% for plugin in instance.child_plugin_instances %}
+         {% render_plugin plugin %}
+    {% endfor %}
+    </div>
+
+
+Be sure to access ``instance.child_plugin_instances`` to get all children.
+They are pre-filled and ready to use. To finally render your child plugins use
+the ``{% render_plugin %}`` templatetag.
+
+See also: `child_classes`_, `parent_classes`_, `require_parent`_
+
+
+cache
+-----
+
+Default: :setting:`CMS_PLUGIN_CACHE`
+
+Is this plugin cacheable? If your plugin displays content based on the user or
+request or other dynamic properties set this to False.
+
+.. warning::
+    If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
 
 
 change_form_template
 --------------------
 
+Default: ``admin/cms/page/plugin_change_form.html``
+
 The template used to render the form when you edit the plugin.
-
-Default: 
-
-`admin/cms/page/plugin_change_form.html`
 
 Example::
 
-	class MyPlugin(CMSPluginBase):
-	    model = MyModel
-	    name = _("My Plugin")
-	    render_template = "cms/plugins/my_plugin.html"
-		change_form_template = "admin/cms/page/plugin_change_form.html"
-	
-frontend_edit_template
-----------------------
+    class MyPlugin(CMSPluginBase):
+        model = MyModel
+        name = _("My Plugin")
+        render_template = "cms/plugins/my_plugin.html"
+        change_form_template = "admin/cms/page/plugin_change_form.html"
 
-The template used for wrapping the plugin in frontend editing.
-
-Default:
-
-`cms/toolbar/placeholder_wrapper.html`
-	
-
-admin_preview
--------------
-
-Should the plugin be previewed in admin when you click on the plugin or save it?
-
-Default: False
-
-
-render_template
----------------
-
-The path to the template used to render the template.
-Is required.
-
-
-render_plugin
--------------
-
-Should the plugin be rendered at all, or doesn't it have any output?
-
-Default: True
-
-model
------
-
-The Model of the Plugin.
-Required.
-
-text_enabled
-------------
-
-Default: False
-Can the plugin be inserted inside the text plugin?
-
-If this is enabled the following function need to be overwritten as well:
-
-**icon_src()**
-
-Should return the path to an icon displayed in the text.
-
-**icon_alt()**
-
-Should return the alt text for the icon.
-
-page_only
----------
-
-Default: False
-
-Can this plugin only be attached to a placeholder that is attached to a page?
-Set this to true if you always need a page for this plugin.
-
-allow_children
---------------
-
-Default: False
-
-Can this plugin have child plugins? Or can other plugins be placed inside this plugin?
+See also: `frontend_edit_template`_
 
 
 child_classes
 -------------
 
-Default: None
-A List of Plugin Class Names. If this is set, only plugins listed here can be added to this plugin.
+Default: ``None``
 
-    
+A List of Plugin Class Names. If this is set, only plugins listed here can be
+added to this plugin.
+
+See also: `parent_classes`_
+
+
+disable_child_plugins
+---------------------
+
+Default: ``False``
+
+Disables dragging of child plugins in structure mode.
+
+
+frontend_edit_template
+----------------------
+
+Default: ``cms/toolbar/placeholder_wrapper.html``
+
+The template used for wrapping the plugin in frontend editing.
+
+See also: `change_form_template`_
+
+
+model
+-----
+
+Default: ``CMSPlugin``
+
+If the plugin requires per-instance settings, then this setting must be set to
+a model that inherits from :class:`CMSPlugin`.
+
+See also: `Storing Configuration`_
+
+
+page_only
+---------
+
+Default: ``False``
+
+Can this plugin only be attached to a placeholder that is attached to a page?
+Set this to ``True`` if you always need a page for this plugin.
+
+See also: `child_classes`_, `parent_classes`_, `require_parent`_,
+
+
+parent_classes
+--------------
+
+Default: ``None``
+
+A list of Plugin Class Names. If this is set, this plugin may only be added
+to plugins listed here.
+
+See also: `child_classes`_, `require_parent`_
+
+
+render_plugin
+-------------
+
+Default: ``True``
+
+Should the plugin be rendered at all, or doesn't it have any output?  If
+`render_plugin` is ``True``, then you must also define :meth:`render_template`
+
+See also: `render_template`_
+
+
+render_template
+_______________
+
+Default: ``None``
+
+The path to the template used to render the template. This is required if
+``render_plugin`` is ``True``.
+
+See also: `render_plugin`_
+
+
+require_parent
+--------------
+
+Default: ``False``
+
+Is it required that this plugin is a child of another plugin? Or can it be
+added to any placeholder, even one attached to a page.
+
+See also: `child_classes`_, `parent_classes`_
+
+
+text_enabled
+------------
+
+Default: ``False``
+
+Can the plugin be inserted inside the text plugin?  If this is ``True`` then
+:meth:`icon_src` must be overridden.
+
+See also: `icon_src`_, `icon_alt`_
+
+
+Methods
+=======
+
+icon_src
+--------
+
+By default, this returns an empty string, which, if left unoverridden would
+result in no icon rendered at all, which, in turn, would render the plugin
+uneditable by the operator inside a parent text plugin.
+
+Therefore, this should be overridden when the plugin has ``text_enabled`` set to
+``True`` to return the path to an icon to display in the text of the text
+plugin.
+
+icon_src takes 1 argument:
+
+* ``instance``: The instance of the plugin model
+
+Example::
+
+    def icon_src(self, instance):
+        return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
+
+See also: `text_enabled`_, `icon_alt`_
+
+
+icon_alt
+--------
+
+Although it is optional, authors of "text enabled" plugins should consider
+overriding this function as well.
+
+This function accepts the ``instance`` as a parameter and returns a string to be
+used as the alt text for the plugin's icon which will appear as a tooltip in
+most browsers.  This is useful, because if the same plugin is used multiple
+times within the same text plugin, they will typically all render with the
+same icon rendering them visually identical to one another. This alt text and
+related tooltip will help the operator distinguish one from the others.
+
+By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
+[instance]", but can be modified to return anything you like.
+
+:meth:`icon_alt` takes 1 argument:
+
+* ``instance``: The instance of the plugin model
+
+The default implementation is as follows::
+
+    def icon_alt(self, instance):
+        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+
+See also: `text_enabled`_, `icon_src`_
+
+
+******************************************
+CMSPlugin Attributes and Methods Reference
+******************************************
+
+These are a list of attributes and methods that can (or should) be overridden
+on your plugin's `model` definition.
+
+See also: `Storing Configuration`_
+
+
+Attributes
+==========
+
+
+translatable_content_excluded_fields
+------------------------------------
+
+Default: ``[ ]``
+
+A list of plugin fields which will not be exported while using :meth:`get_translatable_content`.
+
+See also: `get_translatable_content`_, `set_translatable_content`_
+
+
+Methods
+=======
+
+
+copy_relations
+--------------
+
+Handle copying of any relations attached to this plugin. Custom plugins have
+to do this themselves.
+
+``copy_relations`` takes 1 argument:
+
+* ``old_instance``: The source plugin instance
+
+See also: `Handling Relations`_, `post_copy`_
+
+
+get_translatable_content
+------------------------
+
+Get a dictionary of all content fields (field name / field value pairs) from
+the plugin.
+
+Example::
+
+    from djangocms_text_ckeditor.models import Text
+
+    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+    plugin.get_translatable_content()
+    # returns {'body': u'<p>I am text!</p>\n'}
+
+
+See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
+
+
+post_copy
+---------
+
+Can (should) be overridden to handle the copying of plugins which contain
+children plugins after the original parent has been copied.
+
+``post_copy`` takes 2 arguments:
+
+* ``old_instance``: The old plugin instance instance
+* ``new_old_ziplist``: A list of tuples containing new copies and the old existing child plugins.
+
+See also: `Handling Relations`_, `copy_relations`_
+
+
+set_translatable_content
+------------------------
+
+Takes a dictionary of plugin fields (field name / field value pairs) and
+overwrites the plugin's fields. Returns ``True`` if all fields have been
+written successfully, and ``False`` otherwise.
+
+set_translatable_content takes 1 argument:
+
+* ``fields``: A dictionary containing the field names and translated content for each.
+
+Example::
+
+    from djangocms_text_ckeditor.models import Text
+
+    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+    plugin.set_translatable_content({'body': u'<p>This is a different text!</p>\n'})
+    # returns True
+
+See also: `translatable_content_excluded_fields`_, `get_translatable_content`_

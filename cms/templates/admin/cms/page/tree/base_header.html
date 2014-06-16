@@ -1,0 +1,27 @@
+{% load i18n cms_admin %}
+
+<div id="sitemap" class="cms-tree">
+<ul class="header">
+	<li>
+		<div class="cont">
+			<div class="col2">
+                {% for lang in site_languages %}
+                <div class="col-language">{{ lang|upper }}</div>{% endfor %}
+                <div class="col-navigation">{% trans "Menu" %}</div>
+				<div class="col-actions">{% trans "Actions" %}</div>
+                <div class="col-info">{% trans "Info" %}</div>
+			</div>
+		</div>
+	</li>
+</ul>
+<div class="tree{% if not CMS_PERMISSION or has_add_permission %} root_allow_children{% endif %}">
+	<ul class="tree-default">
+		{% for page in cl.get_items %}{% show_admin_menu page %}{% endfor %}
+	</ul>
+</div>
+</div>
+
+{% if not cl.get_items %}
+<br />
+<p class="sitemap-noentry">{% blocktrans %}<em>There is no page around yet.</em><br /><a href="add/" class="addlink">Add page</a> now.{% endblocktrans %}</p>
+{% endif %}

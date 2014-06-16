@@ -2,8 +2,11 @@
 from __future__ import with_statement
 
 from cms.tests.menu_page_viewperm import ViewPermissionTests
+from cms.compat import get_user_model
 
-from django.contrib.auth.models import  User
+__all__ = [
+    'ViewPermissionComplexMenuStaffNodeTests',
+]
 
 
 class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
@@ -59,7 +62,11 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self.assertGrantedVisibility(all_pages, granted, username='user_1')
         # user 1 is member of group_b_access_page_and_children
         
-        user = User.objects.get(username='user_1')
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_1@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_1')
+
         urls = self.get_url_dict(all_pages)
         
         # call /
@@ -87,7 +94,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_d',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_1_nostaff')
-        user = User.objects.get(username='user_1_nostaff')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_1_nostaff@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_1_nostaff')
+
         urls = self.get_url_dict(all_pages)
         self.assertViewAllowed(urls["/en/page_b/page_b_a/"], user)
         self.assertViewAllowed(urls["/en/page_b/page_b_b/"], user)
@@ -120,7 +132,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_d_d',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_2')
-        user = User.objects.get(username='user_2')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_2@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_2')
+
         urls = self.get_url_dict(all_pages)
 
         self.assertViewNotAllowed(urls['/en/page_b/'], user)
@@ -145,7 +162,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_b_c',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_2_nostaff')
-        user = User.objects.get(username='user_2_nostaff')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_2_nostaff@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_2_nostaff')
+
         urls = self.get_url_dict(all_pages)
         # member of group that has access to this page
         self.assertViewAllowed(urls["/en/page_b/page_b_b/page_b_b_a/"], user)
@@ -188,7 +210,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_d_d',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_3')
-        user = User.objects.get(username='user_3')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_3@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_3')
+
         urls = self.get_url_dict(all_pages)
         url = self.get_pages_root()
         self.assertViewAllowed(urls[url], user)
@@ -228,7 +255,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_d_c',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_3_nostaff')
-        user = User.objects.get(username='user_3_nostaff')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_3_nostaff@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_3_nostaff')
+
         urls = self.get_url_dict(all_pages)
         # call /
         url = self.get_pages_root()
@@ -269,7 +301,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_d_d',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_4')
-        user = User.objects.get(username='user_4')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_4@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_4')
+
         urls = self.get_url_dict(all_pages)
         # call /
         url = self.get_pages_root()
@@ -305,7 +342,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_b_b_c',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_4_nostaff')
-        user = User.objects.get(username='user_4_nostaff')
+
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_4_nostaff@django-cms.org')
+        else:    
+            user = get_user_model().objects.get(username='user_4_nostaff')
+        
         urls = self.get_url_dict(all_pages)
         url = self.get_pages_root()
         self.assertViewNotAllowed(urls[url], user)
@@ -343,7 +385,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
                    'page_d_d',
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_5')
-        user = User.objects.get(username='user_5')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_5@django-cms.org')
+        else:
+            user = get_user_model().objects.get(username='user_5')
+
         urls = self.get_url_dict(all_pages)
         url = self.get_pages_root()
         self.assertViewAllowed(urls[url], user)
@@ -368,7 +415,12 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self._setup_view_restrictions()
         granted = ['page_d',]
         self.assertGrantedVisibility(all_pages, granted, username='user_5_nostaff')
-        user = User.objects.get(username='user_5_nostaff')
+        
+        if get_user_model().USERNAME_FIELD == 'email':
+            user = get_user_model().objects.get(email='user_5_nostaff@django-cms.org')
+        else:
+            user = get_user_model().objects.get(username='user_5_nostaff')
+        
         urls = self.get_url_dict(all_pages)
         url = self.get_pages_root()
         self.assertViewNotAllowed(urls[url], user)

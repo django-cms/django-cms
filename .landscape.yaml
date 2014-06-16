@@ -1,0 +1,13 @@
+doc-warnings: yes
+test-warnings: no
+strictness: veryhigh
+max-line-length: 120
+uses:
+    - django
+autodetect: yes
+ignore-paths:
+    - docs
+    - cms/migrations
+    - cms/tests/*
+    - cms/test_utils/*
+    - menus/migrations/*

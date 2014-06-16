@@ -1,157 +1,70 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify cms_tags cms_admin %}
+{% load i18n admin_static admin_modify cms_admin %}
 {% load url from future %}
+
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/csrf.js"></script>
-<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
-
-{% if not add %}
-<script type="text/javascript" src="{{ STATIC_URL }}cms/js/change_form.js"></script>
-{% endif %}
-<script type="text/javascript" src="{% admin_static_url %}js/urlify.js"></script>
-
-{% if add %}
-<script type="text/javascript">
-//<![CDATA[	
-
-	jQuery(document).ready(function (){
-        var title= jQuery('#id_title');
-        var slug = jQuery('#id_slug');
-        var update = function(){
-            var value = title.val();
-            if (window.UNIHANDECODER){
-                value = UNIHANDECODER.decode(value);
-            }
-            slug.val(URLify(value, 64));
-        };
-		title.keyup(update);
-        update();
-	});
-
-//]]>
-</script>
-{% endif %}
-
-<style type="text/css">
-<!--
-.language_button { 
-	font-weight:bold;
-	margin-bottom:-1px;
-	border-color:#ddd #aaa #ccc #ddd !important;
-	border:1px;
-	background:#fff url('{% cms_admin_icon_base %}nav-bg.gif') repeat-x center bottom !important;
-}
-
-#lang_tab_content h2.header {
-	margin:0;
-	padding:2px 5px 3px 5px;
-	font-size:11px;
-	text-align:left;
-	font-weight:bold;
-	background:#7ca0c7 url('{% cms_admin_icon_base %}default-bg.gif') repeat-x left top;
-	color:#fff;
-}
-
-.notfilled {
-    color: #808080 !important;
-}
--->
-</style>
-
-
+<script src="{% static "admin/js/urlify.js" %}"></script>
+<script src="{% static "cms/js/libs/jquery.min.js" %}"></script>
+<script src="{% static "cms/js/libs/class.min.js" %}"></script>
+<script src="{% static "cms/js/modules/cms.base.js" %}"></script>
+<script src="{% static "cms/js/modules/cms.changeform.js" %}"></script>
 {% endblock %}
 
+{% block content %}
+<div id="content-main">
 
-{% block breadcrumbs %}{% if not is_popup %}
-<div class="breadcrumbs">
-     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
-     {% if can_change %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo;
-     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original.get_title|truncatewords:"18" }}{% endif %}
-</div>
-{% endif %}{% endblock %}
+{% block object-tools %}{% endblock %}
 
-{% block content %}<div id="content-main">
-
-{% block object-tools %}
-{% if change %}{% if not is_popup %}
-  <ul class="object-tools">
-	{% if can_publish %}
-	<li><a href="publish/" class="publishlink">{% trans "Publish draft" %}</a></li>
-	<li><a href="preview/?language={{ language }}" class="previewdraftlink">{% trans "Preview draft" %}</a></li>
-	{% endif %}
-	{% if can_change and page.published and page.is_dirty %}<li><a href="revert/" class="revertlink">{% trans "Revert to public" %}</a></li>{% endif %}
-	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  	{% if page.publisher_public %}<li><a href="preview/?public=1&language={{ language }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
-  </ul>
-{% endif %}{% endif %}
-{% endblock %}
-
-
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}&amp;{%if request.GET.target %}position={{ request.GET.position }}{% endif %}" method="post" id="page_form">{% csrf_token %}{% block form_top %}{% endblock %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}{%if request.GET.position %}&amp;position={{ request.GET.position }}{% endif %}{% if request.GET.copy_target %}&amp;copy_target={{ request.GET.copy_target }}{% endif %}{% if request.GET.add_page_type %}&amp;add_page_type={{ request.GET.add_page_type }}{% endif %}" method="post" id="page_form">
+{% csrf_token %}
+{% block form_top %}{% endblock %}
 {{ adminForm.fields.parent }}
 
 <div style="display: none;"><input type="hidden" name="language" value="{{language}}" id="id_language"/></div>
 
-{% if show_language_tabs %}
+{% if show_language_tabs and not show_permissions %}
 <div id="page_form_lang_tabs">
-    {% for lang_code, lang_name in language_tabs %}
-        <input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
-            class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
-            id="debutton" name="{{lang_code}}" value="{{lang_name}}" /> 
-    {% endfor %}
+	{% for lang_code, lang_name in language_tabs %}
+		<input type="button" onclick="CMS.API.changeLanguage('./?language={{lang_code}}');"
+			class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
+			id="debutton" name="{{lang_code}}" value="{{lang_name}}" />
+	{% endfor %}
+	<div class="lang_tabs_line"></div>
 </div>
 {% endif %}
 
-
 <div id="lang_tab_content">
-{% if show_language_tabs %}
-<h2 class="header"></h2>
-{% endif %}
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
 {% if errors %}
-    <p class="errornote">
-    {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
-    </p>
-    <ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+<p class="errornote">
+{% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+</p>
+<ul class="errorlist">{% for error in adminform.form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
 {% endif %}
 
 {% for fieldset in adminform %}
-  {% include "admin/cms/page/includes/fieldset.html" %}
+	{% include "admin/cms/page/includes/fieldset.html" %}
 {% endfor %}
-
 
 {% for inline_admin_formset in inline_admin_formsets %}
-    {% include inline_admin_formset.opts.template %}
+	{% include inline_admin_formset.opts.template %}
 {% endfor %}
 
-
-{% if not add %}
+{% if show_permissions %}
 	{% if CMS_PERMISSION and can_change_permissions %}
-		<div class="inline-group">
-			<div class="tabular inline-related">
-				<fieldset id="inherited_permissions" class="module aligned collapse">
-				  <h2>{% trans 'All permissions' %}</h2>
-				  <div class="loading">{% trans 'Loading...' %}</div>
-				  <div class="load">./permissions/</div>
-				</fieldset>
-			</div>
+	<div class="inline-group">
+		<div class="tabular inline-related">
+			<fieldset id="inherited_permissions" class="module aligned collapse">
+			  <h2>{% trans 'All permissions' %}</h2>
+			  <div class="loading" rel="../permissions/">{% trans 'Loading...' %}</div>
+			</fieldset>
 		</div>
+	</div>
 	{% endif %}
-
-    <div class="inline-group">
-        <div class="tabular inline-related">
-            <fieldset id="page_states" class="module aligned collapse">
-              <h2 class="load_remote">{% trans 'Page states' %}</h2>
-              <div class="loading">{% trans 'Loading...' %}</div>
-              <div class="load">./moderation-states/</div>
-            </fieldset>
-        </div>
-    </div>
 {% endif %}
 
 {% block after_related_objects %}{% endblock %}
@@ -162,25 +75,20 @@
 		<input type="submit" name="_continue" value="{% trans 'Save and continue editing' %}" {{ onclick_attrib }}/>
 	</div>
 {% else %}
-	{% if not moderation_delete_request %}{% page_submit_row %}{% endif %}
+	{% page_submit_row %}
 {% endif %}
+</div>
+</form>
+</div>
 
-{% if add %}
-   <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
-
-{% endif %}
-{% for url in unihandecode_urls %}
-<script type="text/javascript" src="{{ url }}"></script>
-{% endfor %}
+{% for url in unihandecode_urls %}<script src="{{ url }}"></script>{% endfor %}
 {% if unihandecode_urls %}
-<script type="text/javascript">
-    var UNIHANDECODER = unihandecode.Unihan('{{ unihandecode_lang }}');
+<script>
+	var UNIHANDECODER = unihandecode.Unihan('{{ unihandecode_lang }}');
 </script>
 {% endif %}
 
 {# JavaScript for prepopulated fields #}
 {% prepopulated_fields_js %}
 
-</div>
-</form></div>
 {% endblock %}

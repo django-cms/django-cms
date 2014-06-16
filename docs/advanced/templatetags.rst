@@ -63,8 +63,86 @@ pages have plugins that generate content::
 See also the :setting:`CMS_PLACEHOLDER_CONF` setting where you can also add extra
 context variables and change some other placeholder behavior.
 
+.. templatetag:: static_placeholder
+
+static_placeholder
+==================
+.. versionadded:: 3.0
+
+The static_placeholder templatetag can be used anywhere in any template and is not bound to any page or model.
+It needs a name and it will create a placeholder that you can fill with plugins afterwards.
+The static_placeholder tag is normally used to display the same content on
+multiple locations or inside of apphooks or other 3rd party apps. Static_placeholder need to be published
+to show up on live pages.
+
+Example::
+
+    {% load cms_tags %}
+
+    {% static_placeholder "footer" %}
+
+
+.. warning::
+
+    Static_placeholders are not included in the undo/redo and page history pages
+
+
+If you want additional content to be displayed in case the static placeholder is
+empty, use the ``or`` argument and an additional ``{% endstatic_placeholder %}``
+closing tag. Everything between ``{% static_placeholder "..." or %}`` and ``{%
+endstatic_placeholder %}`` is rendered in the event that the placeholder has no plugins or
+the plugins do not generate any output.
+
+Example::
+
+    {% static_placeholder "footer" or %}There is no content.{% endstatic_placeholder %}
+
+
+
+
+
+
+If you want to make your static placeholder site specific (``django.contrib.sites``) you can add
+``site`` to the templatetag to achieve this.
+
+Example::
+
+    {% static_placeholder "footer" site or %}There is no content.{% endstatic_placeholder %}
+
 
 .. templatetag:: show_placeholder
+
+render_placeholder
+==================
+
+`{% render_placeholder %}` is used if you have a PlaceholderField in your own model and want
+to render it in the template.
+
+The :ttag:`render_placeholder` tag takes the following parameters:
+
+* :class:`~cms.models.fields.PlaceholderField` instance
+* ``width`` parameter for context sensitive plugins (optional)
+* ``language`` keyword plus ``language-code`` string to render content in the
+  specified language (optional)
+
+
+The following example renders the my_placeholder field from the mymodel_instance and will render
+only the english plugins:
+
+.. code-block:: html+django
+
+    {% load cms_tags %}
+
+    {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
+
+.. versionadded:: 3.0.2
+    This template tag supports the ``as`` argument. With this you can assign the result
+    of the template tag to a new variable that you can use elsewhere in the template.
+
+    Example::
+
+        {% render_placeholder mymodel_instance.my_placeholder as placeholder_content %}
+        <p>{{ placeholder_content }}</p>
 
 
 show_placeholder
@@ -157,6 +235,9 @@ Displays the URL of a page in the current language.
 Arguments:
 
 - ``page_lookup`` (see `page_lookup`_ for more information)
+- ``as var_name`` (version 3.0 or later, optional; page_url can now be used to assign the resulting
+  URL to a context variable ``var_name``)
+
 
 Example::
 
@@ -169,6 +250,21 @@ exception will not be raised. Additionally, if
 :setting:`django:SEND_BROKEN_LINK_EMAILS` is ``True`` and you have specified
 some addresses in :setting:`django:MANAGERS`, an email will be sent to those
 addresses to inform them of the broken link.
+
+.. versionadded:: 3.0
+    page_url now supports the ``as`` argument. When used this way, the tag
+    emits nothing, but sets a variable in the context with the specified name
+    to the resulting value.
+
+    When using the ``as`` argument PageNotFound exceptions are always
+    suppressed, regardless of the setting of :setting:`django:DEBUG` and the
+    tag will simply emit an empty string in these cases.
+
+Example::
+
+    {# Emit a 'canonical' tag when the page is displayed on an alternate url #}
+    {% page_url request.current_page as current_url %}{% if current_url and current_url != request.get_full_path %}<link rel="canonical" href="{% page_url request.current_page %}">{% endif %}
+
 
 .. templatetag:: page_attribute
 
@@ -185,7 +281,7 @@ Arguments:
   information)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
-``"page_title"``, ``"slug"``, ``"meta_description"``, ``"meta_keywords"``
+``"page_title"``, ``"slug"``, ``"meta_description"``, ``"changed_date"``, ``"changed_by"``
 (note that you can also supply that argument without quotes, but this is
 deprecated because the argument might also be a template variable).
 
@@ -234,17 +330,246 @@ Plugin needs to be an instance of a plugin model.
 
 Example::
 
-	{% load cms_tags %}
-	<div class="multicolumn">
-	{% for plugin in instance.child_plugin_instances %}
-		<div style="width: {{ plugin.width }}00px;">
-     		{% render_plugin plugin %}
-		</div>
-	{% endfor %}
-	</div>
+    {% load cms_tags %}
+    <div class="multicolumn">
+    {% for plugin in instance.child_plugin_instances %}
+        <div style="width: {{ plugin.width }}00px;">
+            {% render_plugin plugin %}
+        </div>
+    {% endfor %}
+    </div>
 	
-Normally the children of plugins can be accessed via the ``child_plugins`` atrribute of plugins.
+Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
+
+.. templatetag:: render_model
+.. versionadded:: 3.0
+
+render_model
+============
+
+.. warning::
+
+    ``render_model`` marks as safe the content of the rendered model
+    attribute. This may be a security risk if used on fields which may contains
+    non-trusted content. Be aware, and use the templatetag accordingly.
+
+``render_model`` is the way to add frontend editing to any Django model.
+It both render the content of the given attribute of the model instance and
+makes it clickable to edit the related model.
+
+If the toolbar is not enabled, the value of the attribute is rendered in the
+template without further action.
+
+If the toolbar is enabled, click to call frontend editing code is added.
+
+By using this templatetag you can show and edit page titles as well as fields in
+standard django models, see :ref:`frontend-editable-fields` for examples and
+further documentation.
+
+Example:
+
+.. code-block:: html+django
+
+    <h1>{% render_model my_model "title" "title,abstract" %}</h1>
+
+This will render to:
+
+.. code-block:: html+django
+
+    <!-- The content of the H1 is the active area that triggers the frontend editor -->
+    <h1><div class="cms_plugin cms_plugin-myapp-mymodel-title-1">{{ my_model.title }}</div></h1>
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``attribute``: the name of the attribute you want to show in the template; it
+  can be a context variable name; it's possible to target field, property or
+  callable for the specified model; when used on a page object this argument
+  accepts the special ``titles`` value which will show the page **title**
+  field, while allowing editing **title**, **menu title** and **page title**
+  fields in the same form;
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor; when templatetag is used on a page object this argument
+  accepts the special ``changelist`` value which allows editing the pages
+  **changelist** (items list);
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``filters`` (optional): a string containing chained filters to apply to the
+  output content; works the same way as :ttag:`django:filter` templatetag;
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+
+.. warning::
+
+    ``render_model`` is only partially compatible with django-hvad: using
+    it with hvad-translated fields
+    (say {% render_model object 'translated_field' %} return error if the
+    hvad-enabled object does not exists in the current language.
+    As a workaround ``render_model_icon`` can be used instead.
+
+
+.. templatetag:: render_model_block
+.. versionadded:: 3.0
+
+render_model_block
+==================
+
+``render_model_block`` is the block-level equivalent of ``render_model``:
+
+.. code-block:: html+django
+
+    {% render_model_block my_model %}
+        <h1>{{ instance.title }}</h1>
+        <div class="body">
+            {{ instance.date|date:"d F Y" }}
+            {{ instance.text }}
+        </div>
+    {% endrender_model_block %}
+
+This will render to:
+
+.. code-block:: html+django
+
+    <!-- This whole block is the active area that triggers the frontend editor -->
+    <div class="cms_plugin cms_plugin-myapp-mymodel-1">
+        <h1>{{ my_model.title }}</h1>
+        <div class="body">
+            {{ my_model.date|date:"d F Y" }}
+            {{ my_model.text }}
+        </div>
+    </div>
+
+In the block the ``my_model`` is aliased as ``instance`` and every attribute and
+method is available; also templatetags and filters are available in the block.
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor; when templatetag is used on a page object this argument
+  accepts the special ``changelist`` value which allows editing the pages
+  **changelist** (items list);
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+
+.. templatetag:: render_model_icon
+.. versionadded:: 3.0
+
+render_model_icon
+=================
+
+``render_model_icon`` is intended for use where the relevant object attribute
+is not available for user interaction (for example, already has a link on it,
+think of a title in a list of items and the titles are linked to the object
+detail view); when in edit mode, it renders an **edit** icon, which will trigger
+the editing changeform for the provided fields.
+
+
+.. code-block:: html+django
+
+    <h3><a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a> {% render_model_icon my_model %}</h3>
+
+It will render to something like:
+
+.. code-block:: html+django
+
+    <h3>
+        <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
+        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_icon">
+            <!-- The image below is the active area that triggers the frontend editor -->
+            <img src="/static/cms/img/toolbar/render_model_placeholder.png">
+        </div>
+    </h3>
+
+.. note::
+
+        Icon and position can be customized via CSS by setting a background
+        to the ``.cms_render_model_icon img`` selector.
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor; when templatetag is used on a page object this argument
+  accepts the special ``changelist`` value which allows editing the pages
+  **changelist** (items list);
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+
+.. templatetag:: render_model_add
+.. versionadded:: 3.0
+
+render_model_add
+================
+
+``render_model_add`` is similar to ``render_model_icon`` but it will enable to
+create instances of the given instance class; when in edit mode, it renders an
+**add** icon, which will trigger the editing addform for the provided model.
+
+
+.. code-block:: html+django
+
+    <h3><a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a> {% render_model_add my_model %}</h3>
+
+It will render to something like:
+
+.. code-block:: html+django
+
+    <h3>
+        <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
+        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_add">
+            <!-- The image below is the active area that triggers the frontend editor -->
+            <img src="/static/cms/img/toolbar/render_model_placeholder.png">
+        </div>
+    </h3>
+
+.. note::
+
+        Icon and position can be customized via CSS by setting a background
+        to the ``.cms_render_model_add img`` selector.
+
+..warning::
+
+    You **must** pass an instance of your model as instance parameter.
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor;
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+
+
+.. _django-hvad: https://github.com/kristianoellegaard/django-hvad
+
 
 *****************
 Menu Templatetags
@@ -263,8 +588,8 @@ show_menu
 =========
 
 The ``show_menu`` tag renders the navigation of the current page. You can
-overwrite the appearance and the HTML if you add a ``cms/menu.html`` template
-to your project or edit the one provided with django-cms. ``show_menu`` takes
+overwrite the appearance and the HTML if you add a ``menu/menu.html`` template
+to your project or edit the one provided with django CMS. ``show_menu`` takes
 four optional parameters: ``start_level``, ``end_level``, ``extra_inactive``,
 and ``extra_active``.
 
@@ -473,4 +798,11 @@ Example::
     {% cms_toolbar %}
     {% placeholder "home" %}
     ...
+
+
+.. note::
+
+    Be aware that you can not surround the cms_toolbar tag with block tags.
+    The toolbar tag will render everything below it to collect all plugins and placeholders, before
+    it renders itself. Block tags interfere with this.
 

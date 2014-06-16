@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
+import os
 import pprint
-import urlparse
-from cms import constants
-from cms.exceptions import CMSDeprecationWarning
+import warnings
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
-import os
-import warnings
+
+from cms import constants
+from cms.exceptions import CMSDeprecationWarning
+from cms.utils.compat.type_checks import int_types
+from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']
@@ -38,26 +41,27 @@ DEFAULTS = {
     'RAW_ID_USERS': False,
     'PUBLIC_FOR': 'all',
     'CONTENT_CACHE_DURATION': 60,
-    'SHOW_START_DATE': False,
-    'SHOW_END_DATE': False,
-    'URL_OVERWRITE': True,
-    'MENU_TITLE_OVERWRITE': False,
-    'REDIRECTS': False,
-    'SEO_FIELDS': False,
     'APPHOOKS': [],
-    'SOFTROOT': False,
+    'TOOLBARS': [],
     'SITE_CHOICES_CACHE_KEY': 'CMS:site_choices',
     'PAGE_CHOICES_CACHE_KEY': 'CMS:page_choices',
     'MEDIA_PATH': 'cms/',
     'PAGE_MEDIA_PATH': 'cms_page_media/',
     'TITLE_CHARACTER': '+',
+    'PAGE_CACHE': True,
+    'PLACEHOLDER_CACHE': True,
+    'PLUGIN_CACHE': True,
     'CACHE_PREFIX': 'cms-',
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
     'UNIHANDECODE_VERSION': None,
     'UNIHANDECODE_DECODERS': ['ja', 'zh', 'kr', 'vn', 'diacritic'],
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
-    'MAX_PAGE_PUBLISH_REVERSIONS': 25,
+    'MAX_PAGE_PUBLISH_REVERSIONS': 10,
+    'MAX_PAGE_HISTORY_REVERSIONS': 15,
+    'TOOLBAR_URL__EDIT_ON': 'edit',
+    'TOOLBAR_URL__EDIT_OFF': 'edit_off',
+    'TOOLBAR_URL__BUILD': 'build',
 }
 
 
@@ -74,14 +78,24 @@ def get_media_root():
     return os.path.join(settings.MEDIA_ROOT, get_cms_setting('MEDIA_PATH'))
 
 
-@default('CMS_MEDIA_ROOT')
+@default('CMS_MEDIA_URL')
 def get_media_url():
-    return urlparse.urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
+    return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
 
 
-@default('PLACEHOLDER_FRONTEND_EDITING')
-def get_placeholder_frontend_editing():
-    return True
+@default('CMS_TOOLBAR_URL__EDIT_ON')
+def get_toolbar_url__edit_on():
+    return get_cms_setting('TOOLBAR_URL__EDIT_ON')
+
+
+@default('CMS_TOOLBAR_URL__EDIT_OFF')
+def get_toolbar_url__edit_off():
+    return get_cms_setting('TOOLBAR_URL__EDIT_OFF')
+
+
+@default('CMS_TOOLBAR_URL__BUILD')
+def get_toolbar_url__build():
+    return get_cms_setting('TOOLBAR_URL__BUILD')
 
 
 def get_templates():
@@ -102,14 +116,14 @@ def _ensure_languages_settings_new(languages):
 
     for key in defaults:
         if key not in valid_language_keys:
-            raise ImproperlyConfigured("CMS_LANGUAGES has an invalid property in the default properties: s" % key)
+            raise ImproperlyConfigured("CMS_LANGUAGES has an invalid property in the default properties: %s" % key)
 
     for key in simple_defaults:
         if key not in defaults:
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, int):
+        if not isinstance(site, int_types):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -199,9 +213,17 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
+    if not isinstance(settings.SITE_ID, int_types):
+        raise ImproperlyConfigured(
+            "SITE_ID must be an integer"
+        )
     if not settings.USE_I18N:
         return _ensure_languages_settings(
             {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
+    if not settings.LANGUAGE_CODE in dict(settings.LANGUAGES):
+        raise ImproperlyConfigured(
+                        'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
+                    )
     languages = getattr(settings, 'CMS_LANGUAGES', {
         settings.SITE_ID: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
     })
@@ -225,10 +247,12 @@ COMPLEX = {
     'MEDIA_ROOT': get_media_root,
     'MEDIA_URL': get_media_url,
     # complex because not prefixed by CMS_
-    'PLACEHOLDER_FRONTEND_EDITING': get_placeholder_frontend_editing,
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
+    'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
+    'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
+    'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
 }
 
 
@@ -237,3 +261,14 @@ def get_cms_setting(name):
         return COMPLEX[name]()
     else:
         return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
+
+
+def get_site_id(site):
+    from django.contrib.sites.models import Site
+    if isinstance(site, Site):
+        return site.id
+    try:
+        return int(site)
+    except (TypeError, ValueError):
+        pass
+    return settings.SITE_ID

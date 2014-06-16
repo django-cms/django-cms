@@ -1,31 +1,45 @@
 ##########
 django CMS
 ##########
+.. image:: https://api.travis-ci.org/divio/django-cms.svg?branch=develop
+    :target: http://travis-ci.org/divio/django-cms
+.. image:: https://pypip.in/v/django-cms/badge.svg
+    :target: https://crate.io/packages/django-cms/
+.. image:: https://pypip.in/d/django-cms/badge.svg
+    :target: https://crate.io/packages/django-cms/
+.. image:: https://pypip.in/wheel/django-cms/badge.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+.. image:: https://pypip.in/license/django-cms/badge.svg
+    :target: https://pypi.python.org/pypi/django-cms/
 
-A Django application for managing hierarchical pages of content, possibly in
-multiple languages and/or on multiple sites.
 
-Django CMS handles the navigation rendering for you with clean, slug based URLs,
-and this navigation can be extended by custom Django applications
+Open source enterprise content management system based on the django framework.
 
-You can define editable areas, called placeholders, in your templates which you
-can fill with CMS plugins, by default we ship the following plugins:
+********
+Features
+********
 
-* File
-* Flash
-* Google Map
-* Link
-* Picture
-* HTML Snippet
-* Teaser
-* Text
-* Video
-* Twitter
+* Hierarchical pages
+* Extensive support for multilingual websites
+* Multi site support
+* Draft/Published workflows
+* Undo/Redo
+* Use the content blocks (placeholders) in your own apps (models)
+* Use the content blocks (stacks) anywhere in your templates
+* Edit content directly in the frontend on your pages
+* Hierarchical content plugins (columns, style changes etc)
+* Navigation rendering and extending from your apps
+* SEO friendly urls
+* Highly integrative into your own apps
 
-However this is not the end of the list, there are many
+
+You can define editable areas, called placeholders, in your templates which you fill
+with many different so called CMS content plugins.
+A list of all the plugins can be found here:
+
 `3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_ 
-already available for you to use. Should you be unable to find a suitable plugin
-for you needs, writing your own is very simple.
+
+Should you be unable to find a suitable plugin for you needs, writing your own is very simple.
 
 More information on `our website <http://www.django-cms.org>`_. 
 
@@ -35,6 +49,25 @@ Documentation
 
 Please head over to our `documentation <http://docs.django-cms.org/>`_ for all
 the details on how to install, extend and use the django CMS.
+
+********
+Tutorial
+********
+
+https://github.com/divio/django-cms-tutorial
+
+***********
+Quick Start
+***********
+
+You can use the `django CMS installer <https://github.com/nephila/djangocms-installer>`_::
+
+    $ pip install --upgrade virtualenv
+    $ virtualenv env
+    $ source env/bin/activate
+    (env) $ pip install djangocms-installer
+    (env) $ djangocms -p . my_demo
+    (env) $ cd my_demo
 
 ************
 Getting Help
@@ -47,15 +80,10 @@ to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 Credits
 *******
 
-* This is a fork of the
-  `django-page-cms <https://github.com/batiste/django-page-cms>`_.
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
-* Video plugin uses the
-  `OSFlashVideoPlayer <https://github.com/FlashJunior/OSFlashVideoPlayer/>`_.
-* Includes the `Wymeditor <http://www.wymeditor.org/>`_.
 * Python tree engine powered by
   `django-mptt <https://github.com/django-mptt/django-mptt>`_.
 * Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
-  `over 150 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
+  `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!

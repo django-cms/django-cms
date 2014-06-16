@@ -1,6 +1,6 @@
-########################
-Testing Your Extenstions
-########################
+#######################
+Testing Your Extensions
+#######################
 
 ************
 Testing Apps

@@ -1,13 +1,29 @@
-coverage==3.4
+coverage==3.7
+python-coveralls==2.4.0
+docopt==0.6.1
 unittest-xml-reporting==1.0.3
 sphinx
-Pillow==1.7.7
-django-classy-tags>=0.3.4.1
+Pillow==2.0
+django-classy-tags>=0.5
 South>=0.7.2
 html5lib>=0.90
-django-mptt==0.5.2
+django-mptt>=0.6
 django-sekizai>=0.7
 argparse
 dj-database-url
-transifex-client
--e git+git://github.com/KristianOellegaard/django-hvad.git#egg=hvad
+selenium
+django-debug-toolbar
+https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
+-e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
+-e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
+-e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
+-e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
+-e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
+-e git+git://github.com/divio/djangocms-flash.git#egg=djangocms-flash
+-e git+git://github.com/divio/djangocms-googlemap.git#egg=djangocms-googlemap
+-e git+git://github.com/divio/djangocms-inherit.git#egg=djangocms-inherit
+-e git+git://github.com/divio/djangocms-picture.git#egg=djangocms-picture
+-e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
+-e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
+-e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
+pyflakes

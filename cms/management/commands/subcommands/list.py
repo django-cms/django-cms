@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from cms.management.commands.subcommands.base import SubcommandsCommand
+from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.titlemodels import Title
 from cms.plugin_pool import plugin_pool
 from django.core.management.base import NoArgsCommand
-from django.db.utils import DatabaseError
 
 class ListApphooksCommand(NoArgsCommand):
     
     help = 'Lists all apphooks in pages'
     def handle_noargs(self, **options):
-        urls = Title.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
+        urls = Page.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
         for url in urls:
-            self.stdout.write('%s\n' % url)
+            self.stdout.write(u'%s\n' % url)
             
 def plugin_report():
     # structure of report:
@@ -57,10 +56,10 @@ class ListPluginsCommand(NoArgsCommand):
 
     help = 'Lists all plugins in CMSPlugin'
     def handle_noargs(self, **options):
-        self.stdout.write("==== Plugin report ==== \n\n")
-        self.stdout.write("There are %s plugin types in your database \n" % len(plugin_report()))
+        self.stdout.write(u"==== Plugin report ==== \n\n")
+        self.stdout.write(u"There are %s plugin types in your database \n" % len(plugin_report()))
         for plugin in plugin_report():   
-            self.stdout.write("\n%s \n" % plugin["type"])
+            self.stdout.write(u"\n%s \n" % plugin["type"])
 
             plugin_model = plugin["model"]
             instances = len(plugin["instances"])
@@ -70,16 +69,16 @@ class ListPluginsCommand(NoArgsCommand):
                 self.stdout.write(self.style.ERROR("  ERROR      : not installed \n"))
 
             elif plugin_model == CMSPlugin:
-                self.stdout.write("    model-less plugin \n")
-                self.stdout.write("    unsaved instance(s) : %s  \n" % unsaved_instances)
+                self.stdout.write(u"    model-less plugin \n")
+                self.stdout.write(u"    unsaved instance(s) : %s  \n" % unsaved_instances)
 
             else:
-                self.stdout.write("  model      : %s.%s  \n" % 
+                self.stdout.write(u"  model      : %s.%s  \n" %
                     (plugin_model.__module__, plugin_model.__name__))
                 if unsaved_instances: 
                     self.stdout.write(self.style.ERROR("  ERROR      : %s unsaved instance(s) \n" % unsaved_instances))
             
-            self.stdout.write("  instance(s): %s \n" % instances)
+            self.stdout.write(u"  instance(s): %s \n" % instances)
 
                    
 class ListCommand(SubcommandsCommand):

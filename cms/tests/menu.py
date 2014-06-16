@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
-from django.db import connection
+
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.contrib.sites.models import Site
+from django.template import Template, TemplateSyntaxError
+from django.utils.translation import activate
+
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.api import create_page
+from cms.compat import get_user_model, user_related_name
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -14,17 +22,10 @@ from cms.test_utils.util.context_managers import (SettingsOverride,
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User, Permission, Group
-from django.contrib.sites.models import Site
-from django.template import Template, TemplateSyntaxError
-from django.utils.translation import activate
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
-from django.utils.unittest.case import skipUnless
-
 
 
 class BaseMenuTest(SettingsOverrideTestCase):
@@ -108,6 +109,14 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[1].children), 1)
         self.assertEqual(len(nodes[1].children[0].children), 1)
 
+    def test_show_submenu_template_root_level_none_no_nephew_limit(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # default nephew limit, P2 and P9 in the nodes list
+        self.assertEqual(len(nodes), 2)
+
 
 class FixturesMenuTests(MenusFixture, BaseMenuTest):
     """
@@ -143,7 +152,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(menu_pool.menus), 1)
         with force_language("en"):
             response = self.client.get(self.get_pages_root())  # path = '/'
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         request = self.get_request()
 
         # test the cms menu class
@@ -168,18 +177,19 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[1].sibling, True)
         self.assertEqual(nodes[1].selected, False)
 
-    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(FuzzyInt(5, 7)):
             """
             The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
                 get the menu cache key
+                create a savepoint (in django>=1.6)
                 set the menu cache key
+                release the savepoint (in django>=1.6)
             """
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
@@ -300,8 +310,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
         # should include P3 as well
         self.assertEqual(len(nodes[0].children), 1)
-        # but not P1 as it's at the root_level
-        self.assertEqual(nodes[0].parent, None)
 
         context = self.get_context(path=self.get_page(2).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
@@ -312,7 +320,18 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # P2 is selected
         self.assertTrue(nodes[0].children[0].selected)
 
-        
+    def test_show_submenu_template_root_level_none(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 1 %}")
+        tpl.render(context)
+        nodes = context["children"]
+        # First node is P2 (P1 children) thus not selected
+        self.assertFalse(nodes[0].selected)
+        # nephew limit of 1, so only P2 is the nodes list
+        self.assertEqual(len(nodes), 1)
+        # P3 is a child of P2, but not in nodes list
+        self.assertTrue(nodes[0].children)
+
     def test_show_breadcrumb(self):
         context = self.get_context(path=self.get_page(3).get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
@@ -354,7 +373,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             context = self.get_context(path=self.get_page(3).get_absolute_url())
             tpl = Template("{% load menu_tags %}{% language_chooser %}")
             tpl.render(context)
-            self.assertEqual(len(context['languages']), 2)
+            self.assertEqual(len(context['languages']), 3)
             # try a different template and some different args
             tpl = Template("{% load menu_tags %}{% language_chooser 'menu/test_language_chooser.html' %}")
             tpl.render(context)
@@ -368,7 +387,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_page_language_url(self):
         path = self.get_page(3).get_absolute_url()
         context = self.get_context(path=path)
-        tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
+        tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % 'en')
         url = tpl.render(context)
         self.assertEqual(url, "%s" % path)
 
@@ -397,8 +416,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_unpublished(self):
         page2 = self.get_page(2)
-        page2.published = False
-        page2.save()
+        page2.title_set.update(published=False)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
@@ -774,22 +792,25 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].id, subpage.pk)
 
-    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_show_submenu_num_queries(self):
         page = self.get_page(6)
         context = self.get_context(page.get_absolute_url())
+
         # test standard show_menu
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(FuzzyInt(5, 7)):
             """
             The queries should be:
                 get all pages
                 get all page permissions
                 get all titles
                 get the menu cache key
+                create a savepoint (in django>=1.6)
                 set the menu cache key
+                release the savepoint (in django>=1.6)
             """
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
+
 
 class ShowMenuBelowIdTests(BaseMenuTest):
     def test_not_in_navigation(self):
@@ -823,7 +844,6 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         child = children[0]
         self.assertEqual(child.id, c.publisher_public.id)
 
-    @skipUnless(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'transaction queries')
     def test_not_in_navigation_num_queries(self):
         """
         Test for issue 521
@@ -846,14 +866,16 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(FuzzyInt(5, 7)):
                 """
                 The queries should be:
                     get all pages
                     get all page permissions
                     get all titles
                     get the menu cache key
+                    create a savepoint (in django>=1.6)
                     set the menu cache key
+                    release the savepoint (in django>=1.6)
                 """
                 # Actually seems to run:
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
@@ -901,7 +923,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             get_visible_pages(request, pages)
 
     def test_public_for_all(self):
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
         page = Page()
         page.pk = 1
@@ -912,7 +934,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         self.assertEqual(result, [1])
 
     def test_public_for_all_num_queries(self):
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         request = self.get_request(user)
         site = Site()
         site.pk = 1
@@ -959,6 +981,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_authed_basic_perm(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            User = get_user_model()
             user = User()
             user.username = "test"
             user.is_staff = True
@@ -977,6 +1000,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
+            User = get_user_model()
             user = User()
             user.username = "test"
             user.is_staff = True
@@ -995,11 +1019,10 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 GlobalpagePermission count query
                 """
                 get_visible_pages(request, pages, site)
-                #print connection.queries
 
     def test_authed_no_access(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = Page()
             page.pk = 1
@@ -1013,7 +1036,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site = Site()
         site.pk = 1
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = Page()
             page.pk = 1
@@ -1053,7 +1076,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, user=user, page=page)
@@ -1063,12 +1086,12 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions_num_queries(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, user=user, page=page)
             pages = [page]
-            with self.assertNumQueries(2):
+            with self.assertNumQueries(3):
                 """
                 The queries are:
                 PagePermission query for affected pages
@@ -1078,9 +1101,12 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions_view_groups(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
-            group.user_set.add(user)
+            
+            user_set = getattr(group, user_related_name)
+            user_set.add(user)
+            
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, group=group, page=page)
@@ -1090,14 +1116,17 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_page_permissions_view_groups_num_queries(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             group = Group.objects.create(name='testgroup')
-            group.user_set.add(user)
+
+            user_set = getattr(group, user_related_name)
+            user_set.add(user)
+            
             request = self.get_request(user)
             page = create_page('A', 'nav_playground.html', 'en')
             PagePermission.objects.create(can_view=True, group=group, page=page)
             pages = [page]
-            with self.assertNumQueries(3):
+            with self.assertNumQueries(4):
                 """
                 The queries are:
                 PagePermission query for affected pages
@@ -1108,7 +1137,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
 
     def test_global_permission(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = User.objects.create_user('user', 'user@domain.com', 'user')
+            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
             GlobalPagePermission.objects.create(can_view=True, user=user)
             request = self.get_request(user)
             page = Page()
@@ -1122,7 +1151,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
     def test_global_permission_num_queries(self):
         site = Site()
         site.pk = 1
-        user = User.objects.create_user('user', 'user@domain.com', 'user')
+        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         GlobalPagePermission.objects.create(can_view=True, user=user)
         request = self.get_request(user)
         site = Site()
@@ -1208,7 +1237,6 @@ class SoftrootTests(SettingsOverrideTestCase):
                 Instruments
     """
     settings_overrides = {
-        'CMS_SOFTROOT': True,
         'CMS_PERMISSION': False
     }
 
@@ -1288,7 +1316,7 @@ class SoftrootTests(SettingsOverrideTestCase):
         projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
         djangocms = create_page("django CMS", parent=projects, **stdkwargs)
         djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
-        people = create_page("People", parent=home, **stdkwargs)
+        create_page("People", parent=home, **stdkwargs)
         # On Projects
         context = self.get_context(projects.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1331,7 +1359,7 @@ class SoftrootTests(SettingsOverrideTestCase):
         projects = create_page("Projects", parent=home, soft_root=True, **stdkwargs)
         djangocms = create_page("django CMS", parent=projects, **stdkwargs)
         djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
-        people = create_page("People", parent=home, **stdkwargs)
+        create_page("People", parent=home, **stdkwargs)
         # On django CMS
         context = self.get_context(djangocms.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")

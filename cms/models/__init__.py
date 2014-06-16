@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings as d_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import get_resolver, get_script_prefix, \
-    NoReverseMatch
-from django.utils.encoding import iri_to_uri
-from moderatormodels import *
-from pagemodel import *
-from permissionmodels import *
-from placeholdermodel import *
-from pluginmodel import *
-from titlemodels import *
-import django.core.urlresolvers
+from .settingmodels import *  # nopyflakes
+from .pagemodel import *  # nopyflakes
+from .permissionmodels import *  # nopyflakes
+from .placeholdermodel import *  # nopyflakes
+from .pluginmodel import *  # nopyflakes
+from .titlemodels import *  # nopyflakes
+from .placeholderpluginmodel import *  # nopyflakes
+from .static_placeholder import *  # nopyflakes
+
 # must be last
-from cms import signals as s_import
+from cms import signals as s_import  # nopyflakes
 
 
 def validate_settings():
-    if not "django.core.context_processors.request" in d_settings.TEMPLATE_CONTEXT_PROCESSORS:
+    if "django.core.context_processors.request" not in d_settings.TEMPLATE_CONTEXT_PROCESSORS:
         raise ImproperlyConfigured('django-cms needs django.core.context_processors.request in settings.TEMPLATE_CONTEXT_PROCESSORS to work correctly.')
-    if not 'mptt' in d_settings.INSTALLED_APPS:
+    if 'mptt' not in d_settings.INSTALLED_APPS:
         raise ImproperlyConfigured('django-cms needs django-mptt installed.')
     if 'cms.middleware.multilingual.MultilingualURLMiddleware' in d_settings.MIDDLEWARE_CLASSES and 'django.middleware.locale.LocaleMiddleware' in d_settings.MIDDLEWARE_CLASSES:
         raise ImproperlyConfigured('django-cms MultilingualURLMiddleware replaces django.middleware.locale.LocaleMiddleware! Please remove django.middleware.locale.LocaleMiddleware from your MIDDLEWARE_CLASSES settings.')

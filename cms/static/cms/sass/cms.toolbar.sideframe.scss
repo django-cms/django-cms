@@ -1,0 +1,35 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//##################################################
+// #IMPORT SETTINGS#
+@import "settings/default";
+
+//##################################################
+// #SIDEFRAME#
+#header { display:none; }
+#container { padding-top:30px; }
+.cms_debug #container { padding-top:35px; }
+
+#container .breadcrumbs { display:block; background:$color-grey !important; }
+#content { padding-top:10px; }
+#content h1:first-child { margin-top:0; }
+
+.change-form #content { margin-top:0; }
+
+.submit-row { padding:10px 10px 5px !important; }
+.submit-row input.default, .object-tools .addlink {
+	font-weight:200 !important; padding:5px 12px !important; margin-bottom:5px !important;
+	border:1px solid adjust-hue($color-blue, 15deg) !important;
+	@include background-image($gradient-blue !important);
+	@include box-shadow(inset lighten($color-blue, 20%) 0px 1px 0px);
+	&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg) !important; @include box-shadow(none !important); }
+	&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%) !important; }
+}
+
+.object-tools .recoverlink, .submit-row input {
+	font-weight:200 !important; padding:5px 12px !important; margin-bottom:5px !important;
+	border:1px solid $color-grey-10 !important; @include box-shadow(none !important);
+}

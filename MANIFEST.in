@@ -7,5 +7,6 @@ recursive-include cms/templates *
 recursive-include cms/static *
 recursive-include cms/plugins *
 recursive-include menus/templates *
+recursive-include stacks/templates *
 recursive-include docs *
 recursive-exclude * *.pyc

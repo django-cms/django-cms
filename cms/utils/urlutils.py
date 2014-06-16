@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from urlparse import urlparse
+from cms.utils.compat.urls import urlparse
+from cms.utils.compat.dj import force_unicode
 import re
 
 # checks validity of absolute / relative url
@@ -36,7 +37,7 @@ def urljoin(*segments):
     >>> urljoin('/a', '')
     u'/a/'
     """
-    cleaned_segments = map(lambda segment: unicode(segment).strip("/"), segments)
+    cleaned_segments = map(lambda segment: force_unicode(segment).strip("/"), segments)
     nonempty_segments = filter(lambda segment: segment > "", cleaned_segments)
     url = ("/").join(nonempty_segments)
     

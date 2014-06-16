@@ -1,0 +1,64 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+#cms_toolbar {
+//##################################################################################################################
+// #COMMON#
+.cms_loader { background:$color-window url('../img/loader.gif') no-repeat center center !important; }
+
+//##################################################################################################################
+// #BUTTONS#
+.cms_btn { color:$color-grey; @include border-radius(3px);
+	border:1px solid $color-grey-10;
+	background:$color-grey-10; @include background-image($gradient-light);
+	@include box-shadow(inset lighten($color-grey-10, 5%) 0px 1px 0px);
+	&:hover, &:active, &:focus { background:$color-grey-10; border:1px solid $color-grey-10; @include box-shadow(none); }
+	&:active, &:focus { border:1px solid darken($color-grey-10, 10%); background:darken($color-grey-10, 10%); }
+}
+
+.cms_btn-disabled {
+	border-right:1px solid darken($color-grey-10, 10%); border-top:1px solid darken($color-grey-10, 10%);
+	@include box-shadow(inset 0px 1px 0px $color-grey-10);
+	background:darken($color-grey-5, 5%);
+	&:hover, &:active, &:focus { background-color:$color-grey-10; }
+}
+
+.cms_btn-active { color:white;
+	border:1px solid darken($color-grey, 20%) !important; border-bottom:none !important;
+	@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
+	background:$color-grey; @include background-image($gradient-dark);
+	&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
+	&:active, &:focus { background:darken($color-grey-70, 50%); }
+}
+
+.cms_btn-action { color:white;
+	border:1px solid adjust-hue($color-blue, 15deg) !important;
+	@include box-shadow(inset lighten($color-blue, 10%) 0px 1px 0px);
+	background:$color-blue; @include background-image($gradient-blue);
+	&:hover, &:active, &:focus { background:adjust-hue($color-blue, 15deg); @include box-shadow(none); }
+	&:active, &:focus { background:darken(adjust-hue($color-blue, 15deg), 10%); }
+}
+.cms_btn-caution {
+	color:white; border:1px solid adjust-hue($color-red, 15deg) !important;
+	@include box-shadow(inset lighten($color-red, 20%) 0px 1px 0px);
+	background:$color-red; @include background-image($gradient-red);
+	&:hover, &:active, &:focus { background:adjust-hue($color-red, 15deg); @include box-shadow(none); }
+	&:active, &:focus { background:darken(adjust-hue($color-red, 15deg), 10%); }
+}
+.cms_btn-publish { display:none; }
+.cms_btn-publish-active { display:block; }
+
+//######################################################################################################################
+// #TOOLTIP#
+.cms_tooltip { visibility:hidden; position:absolute; left:0; top:0; @include border-radius(3px);
+	font-size:11px; line-height:11px; font-weight:bold; white-space:nowrap; padding:5px 7px 7px 24px; margin:0;
+	color:$color-grey-10;
+	background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
+	span { float:right; position:absolute; right:0; top:20px; @include border-radius(3px 0 3px 3px);
+		color:white; font-weight:normal; padding:5px 7px; background:$color-grey-70; }
+}
+
+// end of toolbar
+}

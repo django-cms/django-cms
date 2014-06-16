@@ -1,0 +1,149 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+#cms_toolbar .cms_structure {
+//##################################################################################################################
+// #STRUCTURE#
+display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-index:9999;
+
+.cms_structure-dimmer { display:none;
+	position:fixed; top:0; right:0; bottom:0; left:0;
+	width:100%; height:100%; z-index:10;
+	background:rgba(255, 255, 255, 0.95);
+}
+.cms_structure-content { position:absolute; left:0; top:0; z-index:100; width:100%; height:100%; }
+
+//######################################################################################################################
+// #DRAGAREA#
+.cms_dragarea {
+	position:absolute; padding:5px 5px 4px; margin:0 0 5px;
+	@include border-radius(3px); background:$color-grey-70;
+	@include box-sizing(border-box);
+}
+.cms_dragarea-static { background:$color-grey-70 url('../img/toolbar/pattern.png'); }
+
+//######################################################################################################################
+// #DRAGBAR#
+.cms_dragbar {
+	font-size:13px; line-height:20px;
+	position:relative; left:0; top:0; z-index:9999;
+	@include border-radius(3px);
+
+	.cms_dragbar-title { font-size:12px; line-height:17px; text-transform:uppercase;
+		font-weight:500; padding:0 0 0 15px; height:16px; cursor:pointer;
+		color:white; @include text-shadow(0px 1px 0px black);
+
+		&:before { content:" "; position:absolute; left:0; top:0; width:16px; height:15px;
+			background:url('../img/toolbar/sprite_toolbar.png') no-repeat -85px -113px;
+		}
+		&:hover {
+			&:before { background-position:-105px -113px; }
+		}
+	}
+	.cms_dragbar-title-expanded {
+		&:before { background-position:-124px -114px; }
+		&:hover {
+			&:before { background-position:-144px -114px !important; }
+		}
+	}
+}
+
+// #DRAGBAR/empty#
+.cms_dragbar-empty { font-size:11px; text-transform:uppercase;
+	padding-top:0; padding-bottom:0; }
+.cms_dragbar-empty-wrapper { display:none; }
+
+//######################################################################################################################
+// #DRAGITEM#
+.cms_draggables { list-style-type:none; padding:0; margin:0; }
+.cms_draggables .cms_draggables { display:none; min-height:25px; padding-left:6px; }
+.cms_draggables .cms_draggables > .cms_draggable:first-child,
+.cms_draggables .cms_draggables > .cms_draggable:only-child,
+.cms_draggable > .cms_draggable { margin-top:0; }
+
+.cms_draggables > .cms_draggable:last-child { margin-bottom:1px; }
+.cms_draggables .cms_draggables > .cms_draggable:last-child { margin-bottom:2px; }
+
+// #DRAGGABLES/general#
+.cms_draggable, .cms_droppable { list-style-type:none;
+	position:relative; left:0; top:0; z-index:99; @include border-radius(3px);
+	padding:4px 5px 3px 5px; margin:5px 0 0; margin-left:0 !important;
+
+	// levels
+	.cms_draggable { position:relative; z-index:99; white-space:nowrap;
+		border-color:$color-grey-10; background:white;
+		&:hover { border-color:$color-grey-20; }
+	}
+	.cms_draggable .cms_draggable,
+	.cms_draggable .cms_draggable .cms_draggable .cms_draggable,
+	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable { background:$color-grey-5; }
+	.cms_draggable .cms_draggable .cms_draggable,
+	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable,
+	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable { background:white; }
+
+	// menu overwrites
+	.cms_submenu { display:none; margin-top:2px; }
+	.cms_submenu-dropdown { right:-6px; top:22px; }
+	.cms_submenu-quicksearch { right:-5px; top:-6px; @include border-radius(0); height:28px; border-left:1px dotted $color-grey-10;
+		background:$color-grey-5 url('../img/toolbar/sprite_toolbar.png') no-repeat right -415px; }
+	.cms_submenu-quicksearch input { color:black; margin-top:1px; }
+
+	.cms_draggable .cms_submenu-quicksearch,
+	.cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:white; }
+	.cms_draggable .cms_draggable .cms_submenu-quicksearch,
+	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
+	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:$color-grey-5; }
+
+	.cms_dragitem-text { @include inline-block(); width:90%; height:21px; overflow:hidden; }
+}
+
+// #DRAGGABLES/specific#
+.cms_draggable { z-index:100; color:black; border:1px solid $color-grey-5; background:$color-grey-5;
+	&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); } }
+.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
+
+.cms_dragitem { cursor:move; }
+.cms_dragitem-collapsable, .cms_dragitem-expanded { cursor:pointer; padding-left:15px; }
+.cms_dragitem-collapsable { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 1px -359px; }
+.cms_dragitem-expanded { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 0 -389px; }
+.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
+	width:100%; height:100%;
+	@include opacity(0.6); }
+
+// #DRAGGABLES/states#
+.cms_draggable-selected {}
+.cms_draggable-selected .cms_dragitem,
+.cms_draggable-selected .cms_dragitem strong { color:adjust-hue($color-blue, 15deg); }
+.cms_draggable-selected .cms_draggable .cms_dragitem,
+.cms_draggable-selected .cms_draggable .cms_dragitem strong { color:black; }
+
+.cms_draggable-allowed, .cms_draggable-hover-allowed, .cms_draggable-placeholder {
+	color:lighten($color-green, 40%); border-color:lighten($color-green, 40%); }
+.cms_draggable-hover-allowed, .cms_draggable-placeholder { color:white; background:rgba(102, 153, 51, 0.2); }
+.cms_dragitem-success { border:1px solid lighten($color-green, 40%); background:lighten($color-green, 40%); }
+
+.cms_draggable-disallowed, .cms_draggable-hover-disallowed {
+	color:saturate($color-red, 80%); border:1px dashed saturate($color-red, 80%);
+	background:rgba(255, 0, 0, 0.1); }
+
+//.cms_placeholder .cms_draggables .cms_draggable { margin-left:0 !important; }
+
+// hide arrow when adding plugin-in-plugin within disabled item
+.cms_draggable-disabled > .cms_dragitem-collapsable { background:none !important; padding-left:0; }
+.cms_draggable-disabled .cms_draggables { display:none !important; }
+
+// end of dragarea
+}
+
+// dragging state
+body > .cms_draggable { list-style-type:none; white-space:nowrap;
+	@include border-radius(3px); padding:4px 5px 3px 5px; margin:0;
+	border-color:$color-grey-10; background:white; }
+
+// hide elements when dragging
+body > .cms_draggable .cms_switcher { display:none !important; }
+body > .cms_draggable .cms_submenu { display:none !important; }
+body > .cms_draggable .cms_draggables { display:none !important; }
