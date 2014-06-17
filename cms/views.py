@@ -248,8 +248,9 @@ def _cache_page(response):
 
 def _get_cache_key(request):
     #md5 key of current path
-    cache_key = "%s:%s" % (
+    cache_key = "%s:%d:%s" % (
         get_cms_setting("CACHE_PREFIX"),
+        settings.SITE_ID,
         hashlib.md5(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
     )
     if settings.USE_TZ:
