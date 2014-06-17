@@ -28,6 +28,7 @@ from cms.utils.i18n import get_language_list
 from cms.utils.i18n import is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
+from django.utils.translation import get_language
 
 CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
 
@@ -74,7 +75,7 @@ def details(request, slug):
     if not page:
         return _handle_no_page(request, slug)
 
-    current_language = get_language_from_request(request)
+    current_language = get_language()
     # Check that the current page is available in the desired (current) language
     available_languages = []
     page_languages = list(page.get_languages())
