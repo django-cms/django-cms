@@ -392,7 +392,7 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
 
     def test_apphook_breaking_under_home_with_new_path_caching(self):
-        with SettingsOverride(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls'):
+        with SettingsOverride(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls_2'):
             home = create_page("home", "nav_playground.html", "en", published=True)
             child = create_page("child", "nav_playground.html", "en", published=True, parent=home)
             # not-home is what breaks stuff, because it contains the slug of the home page
