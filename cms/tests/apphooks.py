@@ -30,6 +30,7 @@ class ApphooksTestCase(CMSTestCase):
             del sys.modules[APP_MODULE]
 
         self.reload_urls()
+        apphook_pool.clear()
 
     def tearDown(self):
         clear_app_resolvers()
