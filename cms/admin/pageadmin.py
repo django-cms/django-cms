@@ -1192,8 +1192,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     @create_revision()
     def delete_translation(self, request, object_id, extra_context=None):
-
-        language = get_language_from_request(request)
+        if 'language' in request.GET:
+            language = request.GET['language']
+        else:
+            language = get_language_from_request(request)
 
         opts = Page._meta
         titleopts = Title._meta
