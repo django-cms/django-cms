@@ -97,16 +97,16 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         request = self.get_request()
 
         request.user = self._create_user('user_a', is_staff=True, is_superuser=False, permissions=['change_staticplaceholder'])
-	self.assertTrue( static_placeholder.has_change_permission(request) )
-	self.assertFalse( static_placeholder.has_publish_permission(request) )
+        self.assertTrue( static_placeholder.has_change_permission(request) )
+        self.assertFalse( static_placeholder.has_publish_permission(request) )
 
         request.user = self._create_user('user_b', is_staff=True, is_superuser=False, permissions=['change_staticplaceholder', 'publish_page'])
-	self.assertTrue( static_placeholder.has_change_permission(request) )
-	self.assertTrue( static_placeholder.has_publish_permission(request) )
+        self.assertTrue( static_placeholder.has_change_permission(request) )
+        self.assertTrue( static_placeholder.has_publish_permission(request) )
 
         request.user = self.get_superuser()
-	self.assertTrue( static_placeholder.has_change_permission(request) )
-	self.assertTrue( static_placeholder.has_publish_permission(request) )
+        self.assertTrue( static_placeholder.has_change_permission(request) )
+        self.assertTrue( static_placeholder.has_publish_permission(request) )
 
     def test_move_plugin(self):
         static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar', site_id=1)
