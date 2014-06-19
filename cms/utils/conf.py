@@ -12,7 +12,6 @@ from cms import constants
 from cms.exceptions import CMSDeprecationWarning
 from cms.utils.compat.type_checks import int_types
 from cms.utils.compat.urls import urljoin
-from cms.utils.django_load import load_from_file
 
 
 __all__ = ['get_cms_setting']
@@ -100,6 +99,7 @@ def get_toolbar_url__build():
 
 
 def get_templates():
+    from cms.utils.django_load import load_from_file
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
         # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory

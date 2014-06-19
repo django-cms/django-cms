@@ -16,7 +16,6 @@ from django.utils.encoding import force_text
 from django.core.management import call_command
 
 import cms
-from cms.utils.compat import DJANGO_1_6
 from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
