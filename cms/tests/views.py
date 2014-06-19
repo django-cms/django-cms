@@ -212,10 +212,10 @@ class ContextTests(SettingsOverrideTestCase):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=original_context):
             # no extra query is run when accessing urls managed by standard
             # django applications
-            with self.assertNumQueries(num_queries):
-                response = self.client.get("/en/admin/")
+            with self.assertNumQueries(FuzzyInt(0, num_queries)):
+                response = self.client.get("/en/plain_view/")
             # One query when determining current page
-            with self.assertNumQueries(1):
+            with self.assertNumQueries(FuzzyInt(0, 1)):
                 self.assertFalse(response.context['request'].current_page)
                 self.assertFalse(response.context['request']._current_page_cache)
             # Zero more queries when determining the current template

@@ -310,7 +310,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 395)):
+            with self.assertNumQueries(FuzzyInt(300, 397)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -327,7 +327,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 383)):
+            with self.assertNumQueries(FuzzyInt(300, 385)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
