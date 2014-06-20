@@ -302,12 +302,12 @@ class PageToolbar(CMSToolbar):
             if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
                 return self.add_draft_live_item()
 
+        elif self.placeholders:
+            return self.add_draft_live_item()
+
         for sp in self.statics:
             if sp.has_change_permission(self.request):
                 return self.add_draft_live_item()
-
-        if self.placeholders:
-            return self.add_draft_live_item()
 
     def add_draft_live_item(self, template='cms/toolbar/items/live_draft.html', extra_context=None):
         context = {'request': self.request}
