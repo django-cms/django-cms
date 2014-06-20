@@ -204,6 +204,7 @@ class TemplateItem(BaseItem):
 class SubMenu(ToolbarAPIMixin, BaseItem):
     template = "cms/toolbar/items/menu.html"
     sub_level = True
+    active = False
 
     def __init__(self, name, csrf_token, side=LEFT):
         ToolbarAPIMixin.__init__(self)
@@ -224,6 +225,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
 
     def get_context(self):
         return {
+            'active': self.active,
             'items': self.get_items(),
             'title': self.name,
             'sub_level': self.sub_level

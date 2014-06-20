@@ -74,7 +74,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 		> a span { background-position:right -300px !important; }
 
 		// add active style
-		.cms_toolbar-item-navigation-active a { font-weight:800; }
+		.cms_toolbar-item-navigation-active > a { font-weight:800; }
 	}
 
 	.cms_toolbar-item-navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
