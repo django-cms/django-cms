@@ -151,7 +151,7 @@ $(document).ready(function () {
 				// attach hover
 				lists.find('li').bind('mouseenter mouseleave', function () {
 					var el = $(this);
-					var parent = el.closest('.cms_toolbar-item-navigation-children');
+					var parent = el.closest('.cms_toolbar-item-navigation-children').add(el.parents('.cms_toolbar-item-navigation-children'));
 					var hasChildren = el.hasClass(children) || parent.length;
 
 					// do not attach hover effect if disabled
