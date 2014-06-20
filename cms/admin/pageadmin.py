@@ -247,20 +247,23 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         else:
             return form.fieldsets
 
+    def get_form_class(self, request, obj=None, **kwargs):
+        if 'advanced' in request.path:
+            return AdvancedSettingsForm
+        elif 'permission' in request.path:
+            return PagePermissionForm
+        elif 'dates' in request.path:
+            return PublicationDatesForm
+        return self.form
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
         language = get_language_from_request(request, obj)
-        if "advanced" in request.path:
-            form = super(PageAdmin, self).get_form(request, obj, form=AdvancedSettingsForm, **kwargs)
-        elif "permission" in request.path:
-            form = super(PageAdmin, self).get_form(request, obj, form=PagePermissionForm, **kwargs)
-        elif "dates" in request.path:
-            form = super(PageAdmin, self).get_form(request, obj, form=PublicationDatesForm, **kwargs)
-        else:
-            form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
+        form_cls = self.get_form_class(request, obj)
+        form = super(PageAdmin, self).get_form(request, obj, form=form_cls, **kwargs)
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language
         if 'page_type' in form.base_fields:
