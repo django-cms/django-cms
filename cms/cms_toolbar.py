@@ -190,6 +190,44 @@ class BasicToolbar(CMSToolbar):
 class PageToolbar(CMSToolbar):
     watch_models = [Page]
 
+    # Helpers
+
+    def init_from_request(self):
+        self.page = getattr(self, 'page', None)
+        self.placeholders = getattr(self.request, 'placeholders', [])
+        self.statics = getattr(self.request, 'static_placeholders', [])
+        self.dirty_statics = [sp for sp in self.statics if sp.dirty]
+
+    def has_publish_permission(self):
+        if not hasattr(self, 'publish_permission'):
+            publish_permission = bool(self.page or self.statics)
+
+            if self.page:
+                publish_permission = self.page.has_publish_permission(self.request)
+
+            if self.statics:
+                publish_permission &= all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
+
+            self.publish_permission = publish_permission
+
+        return self.publish_permission
+
+    def page_is_pending(self, page, language):
+        return (page.publisher_public_id and
+                page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
+
+    def in_apphook(self):
+        with force_language(self.toolbar.language):
+            try:
+                resolver = resolve(self.request.path)
+            except Resolver404:
+                return False
+            else:
+                from cms.views import details
+                return resolver.func != details
+
+    # Populate
+
     def populate(self):
         # always use draft if we have a page
         self.page = get_page_draft(self.request.current_page)
@@ -214,84 +252,74 @@ class PageToolbar(CMSToolbar):
             self.change_language_menu()
 
     def post_template_populate(self):
-        statics = getattr(self.request, 'static_placeholders', [])
-        dirty_statics = [stpl for stpl in statics if stpl.dirty]
-        placeholders = getattr(self.request, 'placeholders', [])
-        self.page = getattr(self, 'page', None)
-        if self.page or statics:
-            if self.toolbar.edit_mode:
-                # publish button
-                publish_permission = True
-                if self.page and not self.page.has_publish_permission(self.request):
-                    publish_permission = False
+        self.init_from_request()
+        self.add_publish_button()
+        self.add_draft_live()
 
-                for static_placeholder in dirty_statics:
-                    if not static_placeholder.has_publish_permission(self.request):
-                        publish_permission = False
+    # Buttons
 
-                classes = ["cms_btn-action", "cms_btn-publish"]
+    def add_publish_button(self, classes=('cms_btn-action', 'cms_btn-publish',)):
+        # only do dirty lookups if publish permission is granted else button isn't added anyway
+        if self.toolbar.edit_mode and self.has_publish_permission():
+            classes = list(classes or [])
+            pk = self.page.pk if self.page else 0
 
-                dirty = bool(self.page and self.page.is_dirty(self.current_lang)) or len(dirty_statics) > 0
-                dirty = bool(dirty or (self.page and self.page.publisher_public_id and self.page.publisher_public.get_publisher_state(
-                    self.current_lang) == PUBLISHER_STATE_PENDING))
-                if dirty:
-                    classes.append("cms_btn-publish-active")
-                if dirty_statics or (self.page and self.page.is_published(self.current_lang)):
-                    title = _("Publish changes")
-                else:
-                    title = _("Publish page now")
-                    classes.append("cms_publish-page")
-                pk = 0
-                if self.page:
-                    pk = self.page.pk
-                with force_language(self.current_lang):
-                    publish_url = reverse('admin:cms_page_publish_page', args=(pk, self.current_lang))
-                publish_url_args = {}
-                if dirty_statics:
-                    publish_url_args['statics'] = ','.join(str(static.pk) for static in dirty_statics)
-                # detect if we are in an apphook
-                with(force_language(self.toolbar.language)):
-                    try:
-                        resolver = resolve(self.request.path)
-                        from cms.views import details
-                        if resolver.func != details:
-                            publish_url_args['redirect'] = self.request.path
-                    except Resolver404:
-                        pass
-                if publish_url_args:
-                    publish_url = "%s?%s" % (publish_url, urlencode(publish_url_args))
-                if publish_permission:
-                    self.toolbar.add_button(title, url=publish_url, extra_classes=classes, side=self.toolbar.RIGHT,
-                                            disabled=not dirty)
-        if self.page:
-            if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
-                self.add_draft_live()
-            elif statics:
-                for static_placeholder in statics:
-                    if static_placeholder.has_change_permission(self.request):
-                        self.add_draft_live()
-                        break
-            if not self.title and self.toolbar.edit_mode:
-                self.toolbar.add_modal_button(
-                    _("Page settings"),
-                    "%s?language=%s" % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language),
-                    side=self.toolbar.RIGHT,
-                    extra_classes=["cms_btn-action"],
-                )
-        else:
-            added = False
-            if statics:
-                for static_placeholder in statics:
-                    if static_placeholder.has_change_permission(self.request):
-                        self.add_draft_live()
-                        added = True
-                        break
-            if not added and placeholders:
-                self.add_draft_live()
+            dirty = (bool(self.dirty_statics) or
+                     (self.page and (self.page.is_dirty(self.current_lang) or
+                                     self.page_is_pending(self.page, self.current_lang))))
+
+            if dirty:
+                classes.append('cms_btn-publish-active')
+
+            if self.dirty_statics or (self.page and self.page.is_published(self.current_lang)):
+                title = _('Publish changes')
+            else:
+                title = _('Publish page now')
+                classes.append('cms_publish-page')
+
+            params = {}
+
+            if self.dirty_statics:
+                params['statics'] = ','.join(str(sp.pk) for sp in self.dirty_statics)
+
+            if self.in_apphook():
+                params['redirect'] = self.request.path
+
+            with force_language(self.current_lang):
+                url = reverse('admin:cms_page_publish_page', args=(pk, self.current_lang))
+
+            if params:
+                url += '?%s' % urlencode(params)
+
+            self.toolbar.add_button(title, url=url, extra_classes=classes,
+                                    side=self.toolbar.RIGHT, disabled=not dirty)
 
     def add_draft_live(self):
-        self.toolbar.add_item(TemplateItem("cms/toolbar/items/live_draft.html", extra_context={'request': self.request},
-                                           side=self.toolbar.RIGHT), len(self.toolbar.right_items))
+        if self.page:
+            if self.toolbar.edit_mode and not self.title:
+                self.add_page_settings_button()
+
+            if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
+                return self.add_draft_live_item()
+
+        for sp in self.statics:
+            if sp.has_change_permission(self.request):
+                return self.add_draft_live_item()
+
+        if self.placeholders:
+            return self.add_draft_live_item()
+
+    def add_draft_live_item(self, template='cms/toolbar/items/live_draft.html', extra_context=None):
+        context = {'request': self.request}
+        context.update(extra_context or {})
+        pos = len(self.toolbar.right_items)
+        self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
+
+    def add_page_settings_button(self, extra_classes=('cms_btn-action',)):
+        url = '%s?language=%s' % (reverse('admin:cms_page_change', args=[self.page.pk]), self.toolbar.language)
+        self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
+
+    # Menus
 
     def change_language_menu(self):
         language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
