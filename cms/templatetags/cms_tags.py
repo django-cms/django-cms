@@ -334,11 +334,12 @@ class RenderPlugin(InclusionTag):
         Argument('plugin')
     )
 
-    def get_context(self, context, plugin):
-        # Prepend frontedit toolbar output if applicable
+    def get_processors(self, context, plugin):
+        #
+        # Prepend frontedit toolbar output if applicable. Moved to its own
+        # method to aide subclassing the whole RenderPlugin if required.
+        #
         edit = False
-        if not plugin:
-            return {'content': ''}
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
         page = request.current_page
@@ -346,10 +347,17 @@ class RenderPlugin(InclusionTag):
             edit = True
         if edit:
             from cms.middleware.toolbar import toolbar_plugin_processor
-
             processors = (toolbar_plugin_processor,)
         else:
             processors = None
+        return processors
+
+
+    def get_context(self, context, plugin):
+        if not plugin:
+            return {'content': ''}
+        
+        processors=self.get_processors(context, plugin)
 
         return {'content': plugin.render_plugin(context, processors=processors)}
 
