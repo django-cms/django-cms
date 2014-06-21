@@ -77,22 +77,16 @@ class CMSToolbar(ToolbarAPIMixin):
             self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:
-                # If the original view is decorated we try to extract the real function
-                # module instead of the decorator's one
-                try:
-                    decorator = resolve(self.request.path).func
-                    self.view_name = decorator.func_closure[0].cell_contents.__module__
-                except:
-                    self.view_name = resolve(self.request.path).func.__module__
+                self.app_name = resolve(self.request.path).app_name
             except Resolver404:
-                self.view_name = ""
+                self.app_name = ""
         toolbars = toolbar_pool.get_toolbars()
 
         self.toolbars = SortedDict()
         app_key = ''
         for key in toolbars:
             app_name = ".".join(key.split(".")[:-2])
-            if app_name in self.view_name and len(key) > len(app_key):
+            if app_name == self.app_name and len(key) > len(app_key):
                 app_key = key
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, key == app_key, app_key)
