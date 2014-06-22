@@ -432,7 +432,7 @@ $(document).ready(function () {
 			// if there are no given buttons within the submit-row area
 			// scan deeper within the form itself
 			if(!buttons.length) {
-				row = iframe.contents().find('form:eq(0)');
+				row = iframe.contents().find('#content form:eq(0)');
 				buttons = row.find('input[type="submit"], button[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
