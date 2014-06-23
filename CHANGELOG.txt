@@ -237,3 +237,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added an api to change the context menus of plugins and placeholders from plugins
 - Apphooks respect the page permissions
 - Decorator for views with page permissions
+- #3266 - api.create_page respects site
