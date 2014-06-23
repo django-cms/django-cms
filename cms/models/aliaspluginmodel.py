@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.models import CMSPlugin, Placeholder
 from cms.utils.compat.dj import python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.db import models
 
 
@@ -14,6 +15,6 @@ class AliasPluginModel(CMSPlugin):
 
     def __str__(self):
         if self.plugin_id:
-            return self.plugin.get_plugin_name()
+            return force_text(self.plugin.get_plugin_name())
         else:
-            return self.alias_placeholder.get_label()
+            return force_text(self.alias_placeholder.get_label())
