@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-try:
-    from urllib import urlencode
-except ImportError:
-    from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
+from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import User, AnonymousUser
