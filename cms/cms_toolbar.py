@@ -51,39 +51,42 @@ COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 class PlaceholderToolbar(CMSToolbar):
     """
     Adds placeholder edit buttons if placeholders or static placeholders are detected in the template
-
     """
 
-    def post_template_populate(self):
+    def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
-        statics = getattr(self.request, 'static_placeholders', [])
-        placeholders = getattr(self.request, 'placeholders', [])
-        if self.page:
-            if self.page.has_change_permission(self.request):
-                self.add_structure_mode()
-            elif statics:
-                for static_placeholder in statics:
-                    if static_placeholder.has_change_permission(self.request):
-                        self.add_structure_mode()
-                        break
-        else:
-            added = False
-            if statics:
-                for static_placeholder in statics:
-                    if static_placeholder.has_change_permission(self.request):
-                        self.add_structure_mode()
-                        added = True
-                        break
-            if not added and placeholders:
-                self.add_structure_mode()
+
+    def init_placeholders_from_request(self):
+        self.placeholders = getattr(self.request, 'placeholders', [])
+        self.statics = getattr(self.request, 'static_placeholders', [])
+
+    def populate(self):
+        self.init_from_request()
+
+    def post_template_populate(self):
+        self.init_placeholders_from_request()
+
+        self.add_structure_mode()
 
     def add_structure_mode(self):
-        switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
-                                                extra_classes=['cms_toolbar-item-cms-mode-switcher'])
-        switcher.add_button(_("Structure"), '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'), active=self.toolbar.build_mode,
-                            disabled=not self.toolbar.build_mode)
-        switcher.add_button(_("Content"), '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'), active=not self.toolbar.build_mode,
-                            disabled=self.toolbar.build_mode)
+        if self.page:
+            if self.page.has_change_permission(self.request):
+                return self.add_structure_mode_item()
+
+        elif self.placeholders:
+            return self.add_structure_mode_item()
+
+        for sp in self.statics:
+            if sp.has_change_permission(self.request):
+                return self.add_structure_mode_item()
+
+    def add_structure_mode_item(self, extra_classes=('cms_toolbar-item-cms-mode-switcher',)):
+        build_mode = self.toolbar.build_mode
+        build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+        edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT, extra_classes=extra_classes)
+        switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
+        switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
 
 
 @toolbar_pool.register
@@ -92,21 +95,27 @@ class BasicToolbar(CMSToolbar):
     Basic Toolbar for site and languages menu
     """
 
+    def init_from_request(self):
+        self.page = get_page_draft(self.request.current_page)
+
     def populate(self):
+        self.init_from_request()
+
         self.add_admin_menu()
-        if settings.USE_I18N:
-            self.add_language_menu()
+        self.add_language_menu()
 
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
-        if self.request.user.has_perm('user.change_user') and User in admin.site._registry:
-            admin_menu.add_sideframe_item(_('Users'), url=reverse(
-                "admin:" + user_model_label.replace('.', '_').lower() + "_changelist"))
-            # sites menu
+
+        # Users button
+        self.add_users_button(admin_menu)
+
+        # sites menu
         if get_cms_setting('PERMISSION'):
             sites_queryset = get_user_sites_queryset(self.request.user)
         else:
             sites_queryset = Site.objects.all()
+
         if len(sites_queryset) > 1:
             sites_menu = admin_menu.get_or_create_menu('sites', _('Sites'))
             sites_menu.add_sideframe_item(_('Admin Sites'), url=reverse('admin:sites_site_changelist'))
@@ -114,72 +123,70 @@ class BasicToolbar(CMSToolbar):
             for site in sites_queryset:
                 sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                          active=site.pk == self.current_site.pk)
-                # admin
+
+        # admin
         admin_menu.add_sideframe_item(_('Administration'), url=reverse('admin:index'))
         admin_menu.add_break(ADMINISTRATION_BREAK)
+
         # cms users
         admin_menu.add_sideframe_item(_('User settings'), url=reverse('admin:cms_usersettings_change'))
         admin_menu.add_break(USER_SETTINGS_BREAK)
+
         # logout
-        # If current page is not published or has view restrictions user is
-        # redirected to the home page:
+        self.add_logout_button(admin_menu)
+
+    def add_users_button(self, parent):
+        app_label, module_name = user_model_label.lower().split('.')
+        perm = '%s.change_%s' % (app_label, module_name)
+
+        if self.request.user.has_perm(perm) and User in admin.site._registry:
+            user_changelist_url = reverse('admin:%s_%s_changelist' % (app_label, module_name))
+            parent.add_sideframe_item(_('Users'), url=user_changelist_url)
+
+    def add_logout_button(self, parent):
+        # If current page is not published or has view restrictions user is redirected to the home page:
         # * published page: no redirect
         # * unpublished page: redirect to the home page
         # * published page with login_required: redirect to the home page
         # * published page with view permissions: redirect to the home page
-        if self.request.current_page:
-            if not self.request.current_page.is_published(self.current_lang):
-                page = self.request.current_page
-            else:
-                page = self.request.current_page.get_public_object()
-        else:
-            page = None
-        redirect_url = '/'
 
-        #
-        # We'll show "Logout Joe Bloggs" if the name fields in auth.User are
-        # completed, else "Logout jbloggs". If anything goes wrong, it'll just
-        # be "Logout".
-        #
-        try:
-            if self.request.user.get_full_name():
-                user_name = self.request.user.get_full_name()
-            else:
-                if DJANGO_1_4:
-                    user_name = self.request.user.username
-                else:
-                    user_name = self.request.user.get_username()
-        except:
-            user_name = ''
-
-        if user_name:
-            logout_menu_text = _('Logout %s') % user_name
-        else:
-            logout_menu_text = _('Logout')
-
-        if (page and
-            (not page.is_published(self.current_lang) or page.login_required
-                or not page.has_view_permission(self.request, AnonymousUser()))):
-            on_success = redirect_url
-        else:
+        if (self.page and self.page.is_published(self.current_lang) and not self.page.login_required and
+                self.page.has_view_permission(self.request, AnonymousUser())):
             on_success = self.toolbar.REFRESH_PAGE
+        else:
+            on_success = '/'
 
-        admin_menu.add_ajax_item(
-            logout_menu_text,
-            action=reverse('admin:logout'),
-            active=True,
-            on_success=on_success
-        )
+        # We'll show "Logout Joe Bloggs" if the name fields in auth.User are completed, else "Logout jbloggs". If
+        # anything goes wrong, it'll just be "Logout".
+
+        user_name = self.get_username()
+        logout_menu_text = _('Logout %s') % user_name if user_name else _('Logout')
+
+        parent.add_ajax_item(logout_menu_text, action=reverse('admin:logout'), active=True, on_success=on_success)
 
     def add_language_menu(self):
-        language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
-        language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
-        for code, name in get_language_tuple(self.current_site.pk):
-            try:
-                url = language_changer(code)
-            except NoReverseMatch:
-                url = DefaultLanguageChanger(self.request)(code)
-            language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+        if settings.USE_I18N:
+            language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
+            language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
+            for code, name in get_language_tuple(self.current_site.pk):
+                try:
+                    url = language_changer(code)
+                except NoReverseMatch:
+                    url = DefaultLanguageChanger(self.request)(code)
+                language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+
+    def get_username(self, user=None, default=''):
+        user = user or self.request.user
+        try:
+            name = user.get_full_name()
+            if name:
+                return name
+            elif DJANGO_1_4:
+                return user.username
+            else:
+                return user.get_username()
+        except (AttributeError, NotImplementedError):
+            return default
 
 
 @toolbar_pool.register
@@ -191,10 +198,12 @@ class PageToolbar(CMSToolbar):
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
         self.title = self.get_title()
+        self.permissions_activated = get_cms_setting('PERMISSION')
+
+    def init_placeholders_from_request(self):
         self.placeholders = getattr(self.request, 'placeholders', [])
         self.statics = getattr(self.request, 'static_placeholders', [])
         self.dirty_statics = [sp for sp in self.statics if sp.dirty]
-        self.permissions_activated = get_cms_setting('PERMISSION')
 
     def get_title(self):
         try:
@@ -253,12 +262,15 @@ class PageToolbar(CMSToolbar):
 
     def populate(self):
         self.init_from_request()
+
         self.change_admin_menu()
         self.add_page_menu()
         self.add_history_menu()
         self.change_language_menu()
 
     def post_template_populate(self):
+        self.init_placeholders_from_request()
+
         self.add_publish_button()
         self.add_draft_live()
 
