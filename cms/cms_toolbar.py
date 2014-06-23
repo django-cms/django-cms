@@ -19,7 +19,7 @@ from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.compat import DJANGO_1_4
-from cms.utils.i18n import get_language_tuple, get_language_objects, force_language
+from cms.utils.i18n import get_language_tuple, force_language
 from cms.utils import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
 from menus.utils import DefaultLanguageChanger
