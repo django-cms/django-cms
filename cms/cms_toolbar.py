@@ -2,7 +2,6 @@
 
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
-from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.models import User, AnonymousUser
@@ -19,6 +18,7 @@ from cms.utils.compat import DJANGO_1_4
 from cms.utils.i18n import get_language_tuple, force_language
 from cms.utils import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
+from cms.utils.urlutils import add_url_parameters
 from menus.utils import DefaultLanguageChanger
 
 
@@ -248,13 +248,6 @@ class PageToolbar(CMSToolbar):
                 from cms.views import details
                 return resolver.func != details
 
-    def url_with_params(self, url, *args, **params):
-        for arg in args:
-            params.update(arg)
-        if params:
-            return '%s?%s' % (url, urlencode(params))
-        return url
-
     # Populate
 
     def populate(self):
@@ -303,7 +296,7 @@ class PageToolbar(CMSToolbar):
             with force_language(self.current_lang):
                 url = reverse('admin:cms_page_publish_page', args=(pk, self.current_lang))
 
-            url = self.url_with_params(url, params)
+            url = add_url_parameters(url, params)
 
             self.toolbar.add_button(title, url=url, extra_classes=classes,
                                     side=self.toolbar.RIGHT, disabled=not dirty)
@@ -353,7 +346,7 @@ class PageToolbar(CMSToolbar):
                 page_change_url = reverse('admin:cms_page_change', args=(self.page.pk,))
                 title = _('Add %(language)s Translation')
                 for code, name in add:
-                    url = self.url_with_params(page_change_url, language=code)
+                    url = add_url_parameters(page_change_url, language=code)
                     language_menu.add_modal_item(title % {'language': name}, url=url)
 
             if remove:
@@ -362,7 +355,7 @@ class PageToolbar(CMSToolbar):
                 title = _('Delete %(language)s Translation')
                 disabled = len(remove) == 1
                 for code, name in remove:
-                    url = self.url_with_params(translation_delete_url, language=code)
+                    url = add_url_parameters(translation_delete_url, language=code)
                     language_menu.add_modal_item(title % {'language': name}, url=url, disabled=disabled)
 
             if copy:
@@ -382,7 +375,7 @@ class PageToolbar(CMSToolbar):
             params = {'language': self.toolbar.language}
             if self.page:
                 params['page_id'] = self.page.pk
-            url = self.url_with_params(url, params)
+            url = add_url_parameters(url, params)
             admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
 
     def add_page_menu(self):
@@ -404,7 +397,7 @@ class PageToolbar(CMSToolbar):
 
             for title, params in add_page_menu_sideframe_items:
                 params.update(language=self.toolbar.language)
-                add_page_menu.add_sideframe_item(title, url=self.url_with_params(app_page_url, params))
+                add_page_menu.add_sideframe_item(title, url=add_url_parameters(app_page_url, params))
 
             # first break
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
@@ -415,7 +408,7 @@ class PageToolbar(CMSToolbar):
 
             # page settings
             page_settings_url = reverse('admin:cms_page_change', args=(self.page.pk,))
-            page_settings_url = self.url_with_params(page_settings_url, language=self.toolbar.language)
+            page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.language)
             current_page_menu.add_modal_item(_('Page settings'), url=page_settings_url, disabled=not edit_mode,
                                              on_close=refresh)
 
@@ -435,7 +428,7 @@ class PageToolbar(CMSToolbar):
 
             # advanced settings
             advanced_url = reverse('admin:cms_page_advanced', args=(self.page.pk,))
-            advanced_url = self.url_with_params(advanced_url, language=self.toolbar.language)
+            advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
             advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not edit_mode
             current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
 
@@ -495,7 +488,7 @@ class PageToolbar(CMSToolbar):
 
             # page type
             page_type_url = reverse('admin:cms_page_add_page_type')
-            page_type_url = self.url_with_params(page_type_url, copy_target=self.page.pk, language=self.toolbar.language)
+            page_type_url = add_url_parameters(page_type_url, copy_target=self.page.pk, language=self.toolbar.language)
             current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=not edit_mode)
 
     def add_history_menu(self):
