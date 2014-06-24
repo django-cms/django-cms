@@ -5,9 +5,6 @@ from pyflakes import api
 from pyflakes.checker import Checker
 from pyflakes.reporter import Reporter
 
-import cms
-import menus
-
 
 def _pyflakes_report_with_nopyflakes(self, messageClass, node, *args, **kwargs):
     with open(self.filename, 'r') as code:
@@ -35,7 +32,7 @@ def _check_recursive(paths, reporter):
     return num_warnings
 
 
-def pyflakes():
+def pyflakes(packages):
     """
     Unfortunately, pyflakes does not have a way to suppress certain errors or
     a way to configure the checker class, so we have to monkey patch it.
@@ -46,9 +43,5 @@ def pyflakes():
     Checker.__init__ = _pyflakes_no_migrations
     Checker.report = _pyflakes_report_with_nopyflakes
     reporter = Reporter(sys.stdout, sys.stderr)
-    paths = [
-        os.path.abspath(os.path.dirname(cms.__file__)),
-        os.path.abspath(os.path.dirname(menus.__file__)),
-        os.path.abspath(__file__),
-    ]
+    paths = [os.path.dirname(package.__file__) for package in packages]
     return _check_recursive(paths, reporter)
