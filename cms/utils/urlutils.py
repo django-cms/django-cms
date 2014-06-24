@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.utils.http import urlencode
 from cms.utils.compat.urls import urlparse
 from cms.utils.compat.dj import force_unicode
 import re
 
 # checks validity of absolute / relative url
 any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$') 
+
 
 def levelize_path(path):
     """Splits given path to list of paths removing latest level in each step.
@@ -21,6 +23,7 @@ def levelize_path(path):
         if sub_path:
             paths.append(sub_path)
     return paths
+
 
 def urljoin(*segments):
     """Joins url segments together and appends trailing slash if required.
@@ -48,6 +51,7 @@ def urljoin(*segments):
         url += "/"
     return url
 
+
 def is_media_request(request):
     """
     Check if a request is a media request.
@@ -59,4 +63,19 @@ def is_media_request(request):
                 return True
         else:
             return True
-    return False 
+    return False
+
+
+def add_url_parameters(url, *args, **params):
+    """
+    adds parameters to an url -> url?p1=v1&p2=v2...
+    :param url: url without any parameters
+    :param args: one or more dictionaries containing url parameters
+    :param params: url parameters as keyword arguments
+    :return: url with parameters if any
+    """
+    for arg in args:
+        params.update(arg)
+    if params:
+        return '%s?%s' % (url, urlencode(params))
+    return url
