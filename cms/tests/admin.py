@@ -1348,9 +1348,10 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(Page.objects.count(), 3)
             self.assertEqual(Page.objects.filter(reverse_id="page_types").count(), 1)
             page_types = Page.objects.get(reverse_id='page_types')
+            url = response.url if hasattr(response, 'url') else response['Location']
             expected_url_params = QueryDict(
                 'target=%s&position=first-child&add_page_type=1&copy_target=%s&language=en' % (page_types.pk, page.pk))
-            response_url_params = QueryDict(urlparse(response.url).query)
+            response_url_params = QueryDict(urlparse(url).query)
             self.assertDictEqual(expected_url_params, response_url_params)
             response = self.client.get("%s?copy_target=%s&language=%s" % (
                 reverse("admin:cms_page_add_page_type"), page.pk, 'en'), follow=True)
