@@ -248,6 +248,18 @@ class PageToolbar(CMSToolbar):
                 from cms.views import details
                 return resolver.func != details
 
+    def get_on_delete_redirect_url(self):
+        parent, language = self.page.parent, self.current_lang
+
+        # if the current page has a parent in the request's current language redirect to it
+        if parent and language in parent.get_languages():
+            with force_language(language):
+                return parent.get_absolute_url(language=language)
+
+        # else redirect to root, do not redirect to Page.objects.get_home() because user could have deleted the last
+        # page, if DEBUG == False this could cause a 404
+        return reverse('pages-root')
+
     # Populate
 
     def populate(self):
@@ -466,20 +478,7 @@ class PageToolbar(CMSToolbar):
 
             # delete
             delete_url = reverse('admin:cms_page_delete', args=(self.page.pk,))
-            with force_language(self.current_lang):
-                # We use force_language because it makes no sense to redirect a user
-                # who just deleted a german page to an english page (user's default language)
-                # simply because the url /en/some-german-page-slug will show nothing
-                if self.page.parent:
-                    # If this page has a parent, then redirect to it
-                    on_delete_redirect_url = self.page.parent.get_absolute_url(language=self.current_lang)
-                else:
-                    # If there's no parent, we redirect to the root.
-                    # Can't call Page.objects.get_home() because the user could very well delete the homepage
-                    # causing get_home to throw an error.
-                    # Let's keep in mind that if the user has deleted the last page, and django is running on
-                    # DEBUG == False this redirect will cause a 404...
-                    on_delete_redirect_url = reverse('pages-root')
+            on_delete_redirect_url = self.get_on_delete_redirect_url()
             current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
                                              disabled=not edit_mode)
 
