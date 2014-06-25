@@ -7,8 +7,12 @@ from django.contrib import admin
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.sites.models import Site
 
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:
+    get_user_model = lambda: User
+
 from cms.api import get_page_draft
-from cms.compat import user_model_label
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.models import Title, Page
 from cms.toolbar.items import TemplateItem
@@ -133,12 +137,14 @@ class BasicToolbar(CMSToolbar):
         self.add_logout_button(admin_menu)
 
     def add_users_button(self, parent):
-        app_label, module_name = user_model_label.lower().split('.')
-        perm = '%s.change_%s' % (app_label, module_name)
+        User = get_user_model()
 
-        if self.request.user.has_perm(perm) and User in admin.site._registry:
-            user_changelist_url = reverse('admin:%s_%s_changelist' % (app_label, module_name))
-            parent.add_sideframe_item(_('Users'), url=user_changelist_url)
+        if User in admin.site._registry:
+            opts = User._meta
+
+            if self.request.user.has_perm('%s.%s' % (opts.app_label, opts.get_change_permission())):
+                user_changelist_url = reverse('admin:%s_%s_changelist' % (opts.app_label, opts.module_name))
+                parent.add_sideframe_item(_('Users'), url=user_changelist_url)
 
     def add_logout_button(self, parent):
         # If current page is not published or has view restrictions user is redirected to the home page:
