@@ -32,6 +32,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.urls import unquote
 from cms.utils.helpers import find_placeholder_relation
+from cms.utils.urlutils import add_url_parameters
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
@@ -1334,22 +1335,18 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def add_page_type(self, request):
         site = Site.objects.get_current()
-        language = request.GET.get('language')
+        language = request.GET.get('language') or get_language()
         target = request.GET.get('copy_target')
-        try:
-            type_root = Page.objects.get(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site_id=site.pk)
-        except Page.DoesNotExist:
-            type_root = Page(reverse_id=PAGE_TYPES_ID, site=site, in_navigation=False)
-            type_root.save()
-            language = get_language()
-            type_title = Title(title=_("Page Types"), language=language, slug=PAGE_TYPES_ID, page=type_root)
-            type_title.save()
-        return HttpResponseRedirect("%s?target=%s&position=first-child&add_page_type=1&copy_target=%s&language=%s" % (
-            reverse("admin:cms_page_add"),
-            type_root.pk,
-            target,
-            language
-        ))
+
+        type_root, created = Page.objects.get_or_create(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site=site,
+                                                        defaults={'in_navigation': False})
+        type_title, created = Title.objects.get_or_create(page=type_root, language=language, slug=PAGE_TYPES_ID,
+                                                          defaults={'title': _('Page Types')})
+
+        url = add_url_parameters(reverse('admin:cms_page_add'), target=type_root.pk, position='first-child',
+                                 add_page_type=1, copy_target=target, language=language)
+
+        return HttpResponseRedirect(url)
 
     def resolve(self, request):
         if not request.user.is_staff:
