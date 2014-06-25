@@ -1,15 +1,12 @@
 import uuid
+
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.copy_plugins import copy_plugins_to
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
 from cms.models.fields import PlaceholderField
-from cms.models.pluginmodel import CMSPlugin
-
 
 
 def static_slotname(instance):
@@ -65,14 +62,7 @@ class StaticPlaceholder(models.Model):
 
     def publish(self, request, language, force=False):
         if force or self.has_publish_permission(request):
-            for plugin in CMSPlugin.objects.filter(placeholder=self.public, language=language).order_by('-level'):
-                inst, cls = plugin.get_plugin_instance()
-                if inst and getattr(inst, 'cmsplugin_ptr', False):
-                    inst.cmsplugin_ptr._no_reorder = True
-                    inst.delete()
-                else:
-                    plugin._no_reorder = True
-                    plugin.delete()
+            self.public.clear(language=language)
             plugins = self.draft.get_plugins_list(language=language)
             copy_plugins_to(plugins, self.public, no_signals=True)
             self.dirty = False
