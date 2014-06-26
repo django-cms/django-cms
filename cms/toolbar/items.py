@@ -4,6 +4,7 @@ from collections import defaultdict
 from cms.utils.compat.dj import force_unicode
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 from django.template.loader import render_to_string
+from django.utils import six
 from django.utils.functional import Promise
 
 
@@ -29,8 +30,7 @@ def may_be_lazy(thing):
         return thing
 
 
-class ToolbarAPIMixin(object):
-    __metaclass__ = abc.ABCMeta
+class ToolbarAPIMixin(six.with_metaclass(abc.ABCMeta)):
     REFRESH_PAGE = REFRESH_PAGE
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
@@ -171,8 +171,7 @@ class ToolbarAPIMixin(object):
         return item
 
 
-class BaseItem(object):
-    __metaclass__ = abc.ABCMeta
+class BaseItem(six.with_metaclass(abc.ABCMeta)):
     template = None
 
     def __init__(self, side=LEFT):
