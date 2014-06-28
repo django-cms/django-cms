@@ -19,7 +19,7 @@ $(document).ready(function () {
 			'newPlugin': false,
 			'urls': {
 				'css_modal': 'cms/css/cms.toolbar.modal.css'
-			},
+			}
 		},
 
 		initialize: function (options) {
@@ -417,10 +417,10 @@ $(document).ready(function () {
 		},
 
 		_setButtons: function (iframe) {
-			var django_suit = iframe.contents().find('.suit-columns').length > 0;
+			var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
 			var that = this;
 			var row;
-			if (!django_suit) {
+			if (!djangoSuit) {
 				row = iframe.contents().find('.submit-row:eq(0)');
 			} else {
 				row = iframe.contents().find('.save-box:eq(0)');
