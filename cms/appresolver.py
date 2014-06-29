@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-import sys
 from cms.apphook_pool import apphook_pool
 from cms.utils.compat.type_checks import string_types
 from cms.utils.i18n import force_language, get_language_list
@@ -42,8 +41,9 @@ def applications_page_check(request, current_page=None, path=None):
             page_id = resolver.resolve_page_id(path)
             # yes, it is application page
             page = Page.objects.public().get(id=page_id)
-            # If current page was matched, then we have some override for content
-            # from cms, but keep current page. Otherwise return page to which was application assigned.
+            # If current page was matched, then we have some override for
+            # content from cms, but keep current page. Otherwise return page
+            # to which was application assigned.
             return page
         except Resolver404:
             # Raised if the page is not managed by an apphook
@@ -83,12 +83,12 @@ class AppRegexURLResolver(RegexURLResolver):
                 else:
                     try:
                         sub_match = pattern.resolve(new_path)
-                    except Resolver404:
-                        exc = sys.exc_info()[0]
-                        if 'tried' in exc.args[0]:
-                            tried.extend([[pattern] + t for t in exc.args[0]['tried']])
-                        elif 'path' in exc.args[0]:
-                            tried.extend([[pattern] + t for t in exc.args[0]['path']])
+                    except Resolver404 as e:
+                        tried_match = e.args[0].get('tried')
+                        if tried_match is not None:
+                            tried.extend([[pattern] + t for t in tried_match])
+                        else:
+                            tried.extend([pattern])
                     else:
                         if sub_match:
                             return pattern.page_id
@@ -96,7 +96,7 @@ class AppRegexURLResolver(RegexURLResolver):
             raise Resolver404({'tried': tried, 'path': new_path})
 
 
-def recurse_patterns(path, pattern_list, page_id, default_args=None):
+def recurse_patterns(path, pattern_list, page_id, default_args=None, nested=False):
     """
     Recurse over a list of to-be-hooked patterns for a given path prefix
     """
@@ -106,7 +106,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None):
         # make sure we don't get patterns that start with more than one '^'!
         app_pat = app_pat.lstrip('^')
         path = path.lstrip('^')
-        regex = r'^%s%s' % (path, app_pat)
+        regex = r'^%s%s' % (path, app_pat) if not nested else r'^%s' % (app_pat)
         if isinstance(pattern, RegexURLResolver):
             # this is an 'include', recurse!
             resolver = RegexURLResolver(regex, 'cms_appresolver',
@@ -117,7 +117,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None):
             if default_args:
                 args.update(default_args)
             # see lines 243 and 236 of urlresolvers.py to understand the next line
-            resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args)
+            resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
         else:
             # Re-do the RegexURLPattern with the new regular expression
             args = pattern.default_args
@@ -130,14 +130,22 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None):
     return newpatterns
 
 
-def _flatten_patterns(patterns):
-    flat = []
+def _set_permissions(patterns, exclude_permissions):
     for pattern in patterns:
         if isinstance(pattern, RegexURLResolver):
-            flat += _flatten_patterns(pattern.url_patterns)
+            if pattern.namespace in exclude_permissions:
+                continue
+            _set_permissions(pattern.url_patterns, exclude_permissions)
         else:
-            flat.append(pattern)
-    return flat
+            from cms.utils.decorators import cms_perms
+            pattern._callback = cms_perms(pattern.callback)
+
+
+def _set_namespaces(patterns, app_name, namespace):
+    for pattern in patterns:
+        if isinstance(pattern, RegexURLResolver):
+            pattern.app_name = pattern.app_name if pattern.app_name else app_name
+            pattern.namespace = pattern.namespace if pattern.namespace else namespace
 
 
 def get_app_urls(urls):
@@ -164,7 +172,6 @@ def get_patterns_for_title(path, title):
             path += '/'
         page_id = title.page.id
         url_patterns += recurse_patterns(path, pattern_list, page_id)
-    url_patterns = _flatten_patterns(url_patterns)
     return url_patterns
 
 
@@ -225,9 +232,9 @@ def get_app_patterns():
                 resolver = AppRegexURLResolver(r'', 'app_resolver', app_name=app_ns, namespace=inst_ns)
                 resolver.page_id = page_id
             if app.permissions:
-                from cms.utils.decorators import cms_perms
-                for pat in current_patterns:
-                    pat._callback = cms_perms(pat.callback)
+                _set_permissions(current_patterns, app.exclude_permissions)
+            _set_namespaces(current_patterns, app_ns, inst_ns)
+
             extra_patterns = patterns('', *current_patterns)
             resolver.url_patterns_dict[lang] = extra_patterns
         app_patterns.append(resolver)
