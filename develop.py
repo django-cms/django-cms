@@ -298,7 +298,7 @@ def main():
                         num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
                     sys.exit(num_failures)
             elif args['server']:
-                server(args['--bind'], args['--port'], migrate)
+                server(args['--bind'], args['--port'], args.get('--migrate', True))
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
