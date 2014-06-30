@@ -141,13 +141,6 @@ def _set_permissions(patterns, exclude_permissions):
             pattern._callback = cms_perms(pattern.callback)
 
 
-def _set_namespaces(patterns, app_name, namespace):
-    for pattern in patterns:
-        if isinstance(pattern, RegexURLResolver):
-            pattern.app_name = pattern.app_name if pattern.app_name else app_name
-            pattern.namespace = pattern.namespace if pattern.namespace else namespace
-
-
 def get_app_urls(urls):
     for urlconf in urls:
         if isinstance(urlconf, string_types):
@@ -233,7 +226,6 @@ def get_app_patterns():
                 resolver.page_id = page_id
             if app.permissions:
                 _set_permissions(current_patterns, app.exclude_permissions)
-            _set_namespaces(current_patterns, app_ns, inst_ns)
 
             extra_patterns = patterns('', *current_patterns)
             resolver.url_patterns_dict[lang] = extra_patterns
