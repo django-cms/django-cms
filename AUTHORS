@@ -9,8 +9,8 @@ Current or previous core committers:
 * Jonas Obrist
 * Martin Koistinen
 * Patrick Lauber
-* Peter Ciciman
 * Paulo Alvarado
+* Peter Ciciman
 * Stefan Foulis
 * Øyvind Saltvik
 
@@ -19,7 +19,7 @@ Current and previous core designers:
 
 * Christian Bertschy
 
-Contributors (based on gitlog) (403):
+Contributors (based on gitlog) (409):
 
 * A. Bram Neijt
 * aaloy
@@ -64,6 +64,7 @@ Contributors (based on gitlog) (403):
 * behrooz
 * Behrooz Nobakht
 * Belegnar
+* Ben Stähli
 * Beni Wohlwend
 * Benjamin
 * Benjamin Liles
@@ -103,6 +104,7 @@ Contributors (based on gitlog) (403):
 * Conrado Bührer
 * Corey Farwell
 * Craig de Stigter
+* Damian Moore
 * Damir Arbula
 * DamirArbula
 * Daniel Barden
@@ -115,6 +117,7 @@ Contributors (based on gitlog) (403):
 * Darii Denis Home
 * Darren Pearce
 * Darryl Woods
+* Dave Bell
 * David Grant
 * David Jean Louis
 * David Lam
@@ -322,10 +325,12 @@ Contributors (based on gitlog) (403):
 * poweredbypenguins
 * Pratik Vyas
 * pumalo
+* Rafal Radulski
 * raidsan
 * Rainer Koirikivi
 * Rajesh
 * Rajesh K.
+* Rajesh P.
 * Rebecca Breu
 * Remco Wendt
 * Restless Being
@@ -344,6 +349,7 @@ Contributors (based on gitlog) (403):
 * Roman Kozlovskiy
 * root
 * rtpm
+* Russ Ferriday
 * Samuel Lüscher
 * sbussetti
 * Schoen
