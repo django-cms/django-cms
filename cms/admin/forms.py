@@ -1,17 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.apphook_pool import apphook_pool
-from cms.compat import get_user_model
-from cms.compat_forms import UserCreationForm
-from cms.constants import PAGE_TYPES_ID
-from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect
-from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle
-from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, get_language_list
-from cms.utils.mail import mail_page_user_change
-from cms.utils.page import is_valid_page_slug
-from cms.utils.page_resolver import is_valid_url
-from cms.utils.permissions import get_current_user, get_subordinate_users, get_subordinate_groups, \
-    get_user_permission_level
 from django import forms
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -21,8 +8,22 @@ from django.db.models.fields import BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
-from cms.utils.compat.dj import force_unicode
 from django.utils.translation import ugettext_lazy as _, get_language
+
+from cms.apphook_pool import apphook_pool
+from cms.constants import PAGE_TYPES_ID
+from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect
+from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle
+from cms.utils.compat.dj import get_user_model, force_unicode
+from cms.utils.compat.forms import UserCreationForm
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_tuple, get_language_list
+from cms.utils.mail import mail_page_user_change
+from cms.utils.page import is_valid_page_slug
+from cms.utils.page_resolver import is_valid_url
+from cms.utils.permissions import (get_current_user, get_subordinate_users,
+                                   get_subordinate_groups,
+                                   get_user_permission_level)
 from menus.menu_pool import menu_pool
 
 

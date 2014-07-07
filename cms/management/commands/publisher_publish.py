@@ -11,8 +11,8 @@ class Command(NoArgsCommand):
         self.publish_pages()
         
     def publish_pages(self):
-        from cms.compat import get_user_model
         from cms.models import Page
+        from cms.utils.compat.dj import get_user_model
         from cms.utils.permissions import set_current_user
         
         # thread locals middleware needs to know, who are we - login as a first

@@ -16,13 +16,12 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from django.utils import timezone
 from django.utils.six.moves.urllib.parse import urlparse
-from cms.test_utils.util.fuzzy_int import FuzzyInt
+
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page, publish_page
-from cms.compat import get_user_model
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import UserSettings, StaticPlaceholder
 from cms.models.pagemodel import Page
@@ -33,9 +32,10 @@ from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_4
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat import DJANGO_1_4, DJANGO_1_6
+from cms.utils.compat.dj import get_user_model, force_unicode
 
 
 class AdminTestsBase(CMSTestCase):
@@ -310,7 +310,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 395)):
+            with self.assertNumQueries(FuzzyInt(300, 397)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -327,7 +327,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 382)):
+            with self.assertNumQueries(FuzzyInt(300, 385)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -435,8 +435,12 @@ class AdminTestCase(AdminTestsBase):
         page = create_page('test-page', 'nav_playground.html', 'en')
         url = reverse('admin:cms_page_get_permissions', args=(page.pk,))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/login.html')
+        if DJANGO_1_6:
+            self.assertEqual(response.status_code, 200)
+            self.assertTemplateUsed(response, 'admin/login.html')
+        else:
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, '/en/admin/login/?next=/en/admin/cms/page/%s/permissions/' % page.pk)
         admin_user = self.get_superuser()
         with self.login_user_context(admin_user):
             response = self.client.get(url)

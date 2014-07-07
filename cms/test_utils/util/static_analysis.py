@@ -17,7 +17,8 @@ def _pyflakes_report_with_nopyflakes(self, messageClass, node, *args, **kwargs):
 
 
 def _pyflakes_no_migrations(self, tree, filename='(none)', builtins=None):
-    if os.path.basename(os.path.dirname(filename)) == 'migrations':
+    if os.path.basename(os.path.dirname(filename)) in ('migrations',
+                                                       'south_migrations'):
         self.messages = []
     else:
         Checker.___init___(self, tree, filename, builtins)

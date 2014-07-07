@@ -17,6 +17,8 @@ When using a custom user model (i.e. the AUTH_USER_MODEL Django setting), there 
 
 DjangoCMS expects a user model with at minimum the following fields: email, password, first_name, last_name, is_active, is_staff, and is_superuser.  Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as the USERNAME_FIELD (see Django documentation for more details).
 
+Additionally, the application in which the model is defined **must** be loaded before `cms` in `INSTALLED_APPS`.
+
 .. note::
 
     In most cases, it is better to create a UserProfile model with a one to one relationship to auth.User rather than creating a custom user model.  Custom user models are only necessary if you intended to alter the default behavior of the User model, not simply extend it.

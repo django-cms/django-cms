@@ -13,17 +13,19 @@ from django.template.base import Template
 from django.utils.html import escape
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
-from cms.middleware.toolbar import ToolbarMiddleware
-from cms.toolbar.toolbar import CMSToolbar
 from cms.api import create_page, create_title, add_plugin
-from cms.compat import get_user_model
+from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models.pagemodel import Page, Placeholder
-from cms.templatetags.cms_tags import _get_page_by_untyped_arg, _show_placeholder_for_page, _get_placeholder
+from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
+                                       _show_placeholder_for_page,
+                                       _get_placeholder)
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase, CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting, get_site_id
 from cms.utils.plugins import get_placeholders
+from cms.utils.compat.dj import get_user_model
 
 
 class TemplatetagTests(TestCase):

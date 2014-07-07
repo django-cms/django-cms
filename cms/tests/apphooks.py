@@ -7,12 +7,12 @@ from django.core.urlresolvers import clear_url_caches, reverse
 
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
-from cms.compat import get_user_model
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.models import Title
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
+from cms.utils.compat.dj import get_user_model
 from cms.utils.compat.type_checks import string_types
 from cms.utils.i18n import force_language
 
