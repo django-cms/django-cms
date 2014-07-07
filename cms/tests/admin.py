@@ -11,10 +11,11 @@ from django.contrib.admin.sites import site
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse)
+from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse, QueryDict)
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from django.utils import timezone
+from django.utils.six.moves.urllib.parse import urlparse
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
@@ -1348,9 +1349,15 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(Page.objects.count(), 3)
             self.assertEqual(Page.objects.filter(reverse_id="page_types").count(), 1)
             page_types = Page.objects.get(reverse_id='page_types')
-            self.assertRedirects(response,
-                                 "/en/admin/cms/page/add/?target=%s&position=first-child&add_page_type=1&copy_target=%s&language=en" % (
-                                     page_types.pk, page.pk))
+            url = response.url if hasattr(response, 'url') else response['Location']
+            expected_url_params = QueryDict(
+                'target=%s&position=first-child&add_page_type=1&copy_target=%s&language=en' % (page_types.pk, page.pk))
+            response_url_params = QueryDict(urlparse(url).query)
+            self.assertDictEqual(expected_url_params, response_url_params)
+            response = self.client.get("%s?copy_target=%s&language=%s" % (
+                reverse("admin:cms_page_add_page_type"), page.pk, 'en'), follow=True)
+            self.assertEqual(response.status_code, 200)
+
             # test no page types if no page types there
             response = self.client.get(reverse('admin:cms_page_add'))
             self.assertNotContains(response, "page_type")

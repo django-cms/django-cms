@@ -32,6 +32,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.urls import unquote
 from cms.utils.helpers import find_placeholder_relation
+from cms.utils.urlutils import add_url_parameters
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
@@ -247,68 +248,72 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         else:
             return form.fieldsets
 
+    def get_inline_classes(self, request, obj=None, **kwargs):
+        if obj and 'permission' in request.path:
+            return PERMISSION_ADMIN_INLINES
+        return []
+
+    def get_form_class(self, request, obj=None, **kwargs):
+        if 'advanced' in request.path:
+            return AdvancedSettingsForm
+        elif 'permission' in request.path:
+            return PagePermissionForm
+        elif 'dates' in request.path:
+            return PublicationDatesForm
+        return self.form
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
         language = get_language_from_request(request, obj)
-        if "advanced" in request.path:
-            form = super(PageAdmin, self).get_form(request, obj, form=AdvancedSettingsForm, **kwargs)
-        elif "permission" in request.path:
-            form = super(PageAdmin, self).get_form(request, obj, form=PagePermissionForm, **kwargs)
-        elif "dates" in request.path:
-            form = super(PageAdmin, self).get_form(request, obj, form=PublicationDatesForm, **kwargs)
-        else:
-            form = super(PageAdmin, self).get_form(request, obj, form=PageForm, **kwargs)
+        form_cls = self.get_form_class(request, obj)
+        form = super(PageAdmin, self).get_form(request, obj, form=form_cls, **kwargs)
+
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language
+
         if 'page_type' in form.base_fields:
             if 'copy_target' in request.GET or 'add_page_type' in request.GET or obj:
                 del form.base_fields['page_type']
-            elif not Title.objects.filter(page__parent__reverse_id=PAGE_TYPES_ID, language=language).count():
+            elif not Title.objects.filter(page__parent__reverse_id=PAGE_TYPES_ID, language=language).exists():
                 del form.base_fields['page_type']
+
         if 'add_page_type' in request.GET:
             del form.base_fields['menu_title']
             del form.base_fields['meta_description']
             del form.base_fields['page_title']
-        if obj:
-            if "permission" in request.path:
-                self.inlines = PERMISSION_ADMIN_INLINES
-            else:
-                self.inlines = []
-            version_id = None
-            if "history" in request.path or 'recover' in request.path:
-                version_id = request.path.split("/")[-2]
 
-            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
-                                          force_reload=True)
+        self.inlines = self.get_inline_classes(request, obj, **kwargs)
+
+        if obj:
+            if 'history' in request.path or 'recover' in request.path:
+                version_id = request.path.split('/')[-2]
+            else:
+                version_id = None
+
+            title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id, force_reload=True)
+
             if 'site' in form.base_fields and form.base_fields['site'].initial is None:
                 form.base_fields['site'].initial = obj.site
-            for name in [
-                'slug',
-                'title',
-                'meta_description',
-                'menu_title',
-                'page_title',
-                'redirect',
-            ]:
+
+            for name in ('slug', 'title', 'meta_description', 'menu_title', 'page_title', 'redirect'):
                 if name in form.base_fields:
                     form.base_fields[name].initial = getattr(title_obj, name)
+
             if 'overwrite_url' in form.base_fields:
                 if title_obj.has_url_overwrite:
                     form.base_fields['overwrite_url'].initial = title_obj.path
                 else:
-                    form.base_fields['overwrite_url'].initial = ""
+                    form.base_fields['overwrite_url'].initial = ''
+
         else:
-            self.inlines = []
-            for name in ['slug', 'title']:
+            for name in ('slug', 'title'):
                 form.base_fields[name].initial = u''
+
             if 'target' in request.GET or 'copy_target' in request.GET:
-                if 'target' in request.GET:
-                    target = request.GET['target']
-                if 'copy_target' in request.GET:
-                    target = request.GET['copy_target']
+                target = request.GET.get('copy_target') or request.GET.get('target')
                 if 'position' in request.GET:
                     position = request.GET['position']
                     if position == 'last-child' or position == 'first-child':
@@ -318,7 +323,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         form.base_fields['parent'].initial = sibling.parent_id
                 else:
                     form.base_fields['parent'].initial = request.GET.get('target', None)
+
             form.base_fields['site'].initial = request.session.get('cms_admin_site', None)
+
         return form
 
     def advanced(self, request, object_id):
@@ -1328,22 +1335,18 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def add_page_type(self, request):
         site = Site.objects.get_current()
-        language = request.GET.get('language')
+        language = request.GET.get('language') or get_language()
         target = request.GET.get('copy_target')
-        try:
-            type_root = Page.objects.get(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site_id=site.pk)
-        except Page.DoesNotExist:
-            type_root = Page(reverse_id=PAGE_TYPES_ID, site=site, in_navigation=False)
-            type_root.save()
-            language = get_language()
-            type_title = Title(title=_("Page Types"), language=language, slug=PAGE_TYPES_ID, page=type_root)
-            type_title.save()
-        return HttpResponseRedirect("%s?target=%s&position=first-child&add_page_type=1&copy_target=%s&language=%s" % (
-            reverse("admin:cms_page_add"),
-            type_root.pk,
-            target,
-            language
-        ))
+
+        type_root, created = Page.objects.get_or_create(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site=site,
+                                                        defaults={'in_navigation': False})
+        type_title, created = Title.objects.get_or_create(page=type_root, language=language, slug=PAGE_TYPES_ID,
+                                                          defaults={'title': _('Page Types')})
+
+        url = add_url_parameters(reverse('admin:cms_page_add'), target=type_root.pk, position='first-child',
+                                 add_page_type=1, copy_target=target, language=language)
+
+        return HttpResponseRedirect(url)
 
     def resolve(self, request):
         if not request.user.is_staff:
