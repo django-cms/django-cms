@@ -7,6 +7,7 @@ import os
 
 from django.conf import settings
 from django.template import Lexer, TOKEN_BLOCK
+from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
@@ -15,7 +16,6 @@ from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import get_app_paths, is_installed
-from cms.utils.compat.type_checks import int_types
 
 
 SUCCESS = 1
@@ -198,7 +198,7 @@ def check_i18n(output):
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
                 section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
-        if isinstance(settings.SITE_ID, int_types):
+        if isinstance(settings.SITE_ID, six.integer_types):
             for site, items in get_cms_setting('LANGUAGES').items():
                 if type(site) == int:
                     for lang in items:

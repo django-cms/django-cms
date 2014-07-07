@@ -245,3 +245,5 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - fallback language fixes for pages
 - Implemented transaction.atomic in django 1.4/1.5 way
 - Added a automatic dynamic template directory for page templates
+- Removed file cms/utils/compat/type_checks.py, use django.utils.six module instead
+- Use PY3 from django.utils.six instead of PY2 from cms.utils.compat to check Python version
