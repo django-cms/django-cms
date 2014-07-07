@@ -61,6 +61,12 @@ class Migration(DataMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'cms.aliaspluginmodel': {
+            'Meta': {'object_name': 'AliasPluginModel', '_ormbases': ['cms.CMSPlugin']},
+            'alias_placeholder': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'alias_placeholder'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            u'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
+            'plugin': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'alias_reference'", 'null': 'True', 'to': "orm['cms.CMSPlugin']"})
+        },
         'cms.cmsplugin': {
             'Meta': {'object_name': 'CMSPlugin'},
             'changed_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
