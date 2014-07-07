@@ -1,11 +1,12 @@
-from cms.utils.conf import get_cms_setting
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.i18n import i18n_patterns
-
-
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+from cms.utils.conf import get_cms_setting
+from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2
+
 
 admin.autodiscover()
 
@@ -21,6 +22,10 @@ urlpatterns = patterns('',
 urlpatterns += staticfiles_urlpatterns()
 
 urlpatterns += i18n_patterns('',
+                             url(r'^sample/login_other/$', 'django.contrib.auth.views.login',
+                                 kwargs={'authentication_form': LoginForm2}),
+                             url(r'^sample/login/$', 'django.contrib.auth.views.login',
+                                 kwargs={'authentication_form': LoginForm}),
                              url(r'^admin/', include(admin.site.urls)),
                              url(r'^example/$', 'cms.test_utils.project.placeholderapp.views.example_view'),
                              url(r'^', include('cms.urls')),
