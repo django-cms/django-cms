@@ -74,11 +74,12 @@ class StaticPlaceholder(models.Model):
         if request.user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + "change")
+        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
 
     def has_publish_permission(self, request):
         if request.user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + "change") and \
-               self.has_generic_permission(request, "publish")
+        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
+               request.user.has_perm(opts.app_label + '.' + 'publish_page')
+
