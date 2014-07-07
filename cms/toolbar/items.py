@@ -1,10 +1,13 @@
-import abc
 import json
+from abc import ABCMeta
 from collections import defaultdict
+
+from django.template.loader import render_to_string
+from django.utils import six
+from django.utils.functional import Promise
+
 from cms.utils.compat.dj import force_unicode
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
-from django.template.loader import render_to_string
-from django.utils.functional import Promise
 
 
 class ItemSearchResult(object):
@@ -29,8 +32,7 @@ def may_be_lazy(thing):
         return thing
 
 
-class ToolbarAPIMixin(object):
-    __metaclass__ = abc.ABCMeta
+class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
     REFRESH_PAGE = REFRESH_PAGE
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
@@ -171,8 +173,7 @@ class ToolbarAPIMixin(object):
         return item
 
 
-class BaseItem(object):
-    __metaclass__ = abc.ABCMeta
+class BaseItem(six.with_metaclass(ABCMeta)):
     template = None
 
     def __init__(self, side=LEFT):
@@ -347,8 +348,7 @@ class Break(BaseItem):
         self.identifier = identifier
 
 
-class BaseButton(object):
-    __metaclass__ = abc.ABCMeta
+class BaseButton(six.with_metaclass(ABCMeta)):
     template = None
 
     def render(self):
