@@ -19,7 +19,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import signals
+from django.db.models import signals, Model
 from mptt.models import MPTTModel, MPTTModelBase
 
 
@@ -428,6 +428,12 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
                 return False
 
         return True
+
+    def delete(self, no_mptt=False, *args,  **kwargs):
+        if no_mptt:
+            Model.delete(self, *args, **kwargs)
+        else:
+            super(CMSPlugin, self).delete(*args, **kwargs)
 
 
 reversion_register(CMSPlugin)

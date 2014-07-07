@@ -28,6 +28,22 @@ class Placeholder(models.Model):
     def __str__(self):
         return self.slot
 
+    def clear(self, language=None):
+        if language:
+            qs = self.cmsplugin_set.filter(language=language)
+        else:
+            qs = self.cmsplugin_set.all()
+        qs = qs.order_by('-level').select_related()
+        for plugin in qs:
+            inst, cls = plugin.get_plugin_instance()
+            if inst and getattr(inst, 'cmsplugin_ptr', False):
+                inst.cmsplugin_ptr._no_reorder = True
+                inst._no_reorder = True
+                inst.delete(no_mptt=True)
+            else:
+                plugin._no_reorder = True
+                plugin.delete(no_mptt=True)
+
     def get_label(self):
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
         name = _(name)
