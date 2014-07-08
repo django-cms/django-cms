@@ -232,7 +232,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added changeable strings for "?edit", "?edit_off" and "?build" urls
 - utils.page_resolver was optimized. get_page_from_path() api changed
 
-==== 3.0.3 (2014-06-XX) ===
+==== 3.0.3 (2014-07-07) ===
 - Added an alias plugin for referencing plugins and placeholders
 - Added an api to change the context menus of plugins and placeholders from plugins
 - Apphooks respect the page permissions
@@ -245,5 +245,9 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - fallback language fixes for pages
 - Implemented transaction.atomic in django 1.4/1.5 way
 - Added a automatic dynamic template directory for page templates
+
+==== 3.0.4 (2014-08-XX) ===
 - Removed file cms/utils/compat/type_checks.py, use django.utils.six module instead
+- Removed file cms/utils/compat/string_io.py, use django.utils.six module instead
+- Removed file cms/utils/compat/input.py, use django.utils.six module instead
 - Use PY3 from django.utils.six instead of PY2 from cms.utils.compat to check Python version
