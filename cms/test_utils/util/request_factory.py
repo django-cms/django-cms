@@ -5,8 +5,8 @@ from django.test.client import (FakePayload, MULTIPART_CONTENT, encode_multipart
     BOUNDARY, CONTENT_TYPE_RE)
 from django.utils import six
 from django.utils.encoding import smart_str
+from django.utils.six.moves import StringIO
 
-from cms.utils.compat.string_io import StringIO
 from cms.utils.compat.urls import urlencode, urlparse, unquote
 
 
