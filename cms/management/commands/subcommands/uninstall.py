@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from cms.plugin_pool import plugin_pool
 from django.core.management.base import LabelCommand
+from django.utils.six.moves import input
 
 from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
-from cms.utils.compat.input import raw_input
+from cms.plugin_pool import plugin_pool
 
 
 class UninstallApphooksCommand(LabelCommand):
@@ -19,7 +19,7 @@ class UninstallApphooksCommand(LabelCommand):
 
         if number_of_apphooks > 0:
             if options.get('interactive'):
-                confirm = raw_input("""
+                confirm = input("""
 You have requested to remove %d %r apphooks.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
@@ -44,7 +44,7 @@ class UninstallPluginsCommand(LabelCommand):
 
         if number_of_plugins > 0:
             if options.get('interactive'):
-                confirm = raw_input("""
+                confirm = input("""
 You have requested to remove %d %r plugins.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))

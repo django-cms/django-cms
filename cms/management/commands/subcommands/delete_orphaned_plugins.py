@@ -1,6 +1,7 @@
 from django.core.management.base import NoArgsCommand
+from django.utils.six.moves import input
+
 from cms.management.commands.subcommands.list import plugin_report
-from cms.utils.compat.input import raw_input
 
 
 class DeleteOrphanedPluginsCommand(NoArgsCommand):
@@ -28,7 +29,7 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
                 unsaved_instances.append(instance)
 
         if options.get('interactive'):
-            confirm = raw_input("""
+            confirm = input("""
 You have requested to delete any instances of uninstalled plugins and unsaved plugin instances.
 There are %d uninstalled plugins and %d unsaved_plugins.
 Are you sure you want to do this?
