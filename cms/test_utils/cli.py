@@ -2,8 +2,12 @@
 from __future__ import with_statement
 import os
 import dj_database_url
-from cms.utils.compat import DJANGO_1_5, DJANGO_1_6, PY2
+
 import django
+from django.utils import six
+
+from cms.utils.compat import DJANGO_1_5, DJANGO_1_6
+
 
 gettext = lambda s: s
 
@@ -12,10 +16,10 @@ urlpatterns = []
 
 def configure(db_url, **extra):
     from django.conf import settings
-    if PY2:
-        siteid = long(1)  # nopyflakes
-    else:
+    if six.PY3:
         siteid = 1
+    else:
+        siteid = long(1)  # nopyflakes
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
     if not 'DATABASES' in extra:

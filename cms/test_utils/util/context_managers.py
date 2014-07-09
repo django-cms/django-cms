@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
+import sys
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp
-import sys
 
 from django.conf import settings
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.template import context
+from django.utils.six.moves import StringIO
 from django.utils.translation import get_language, activate
 
-from cms.utils.compat.string_io import StringIO
 from cms.utils.compat.dj import get_user_model
 
 

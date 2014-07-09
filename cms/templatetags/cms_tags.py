@@ -1,12 +1,29 @@
 # -*- coding: utf-8 -*-
 from copy import copy
-from itertools import chain
 from datetime import datetime
+from itertools import chain
+import re
+
+from django import template
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.mail import mail_managers
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import safe
+from django.template.loader import render_to_string
+from django.utils import six
+from django.utils.encoding import smart_text
+from django.utils.html import escape
+from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _, get_language
 from classytags.arguments import Argument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from sekizai.helpers import Watcher
+from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
+
 from cms import __version__
 from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
@@ -14,25 +31,11 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_cms_setting, get_site_id
-from cms.utils.compat.type_checks import string_types, int_types
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
-from django import template
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.mail import mail_managers
-from django.core.urlresolvers import reverse
-from django.template.loader import render_to_string
-from django.utils.encoding import smart_text
-from django.utils.html import escape
-from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _, get_language
-import re
-from sekizai.helpers import Watcher
-from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
+
 
 register = template.Library()
 
@@ -75,9 +78,9 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if request.current_page and request.current_page.pk == page_lookup.pk:
             return request.current_page
         return page_lookup
-    if isinstance(page_lookup, string_types):
+    if isinstance(page_lookup, six.string_types):
         page_lookup = {'reverse_id': page_lookup}
-    elif isinstance(page_lookup, int_types):
+    elif isinstance(page_lookup, six.integer_types):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
@@ -751,7 +754,7 @@ class CMSEditableObject(InclusionTag):
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
-                                                        if not isinstance('edit_fields', string_types) else edit_fields
+                                                        if not isinstance('edit_fields', six.string_types) else edit_fields
             else:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
                 extra_context['attribute_name'] = 'add'

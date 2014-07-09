@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+from django.template import Template, Context
+from django.template.loader import render_to_string
+from django.utils import six
+from django.utils.safestring import mark_safe
+
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
-from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import get_placeholder_conf, restore_sekizai_context
-from django.template import Template, Context
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 
 
 # these are always called before all other plugin context processors
@@ -51,7 +52,7 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     """
     if not processors:
         processors = []
-    if isinstance(template, string_types):
+    if isinstance(template, six.string_types):
         content = render_to_string(template, context_instance=context)
     elif isinstance(template, Template):
         content = template.render(context)

@@ -9,10 +9,10 @@ from django.db.models import signals
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 from django.template.defaultfilters import slugify
+from django.utils import six
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
-from cms.utils.compat.type_checks import string_types
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
@@ -63,7 +63,7 @@ class PluginPool(object):
 
                 template = hasattr(plugin.model,
                                    'render_template') and plugin.model.render_template or plugin.render_template
-                if isinstance(template, string_types) and template:
+                if isinstance(template, six.string_types) and template:
                     try:
                         loader.get_template(template)
                     except TemplateDoesNotExist:
