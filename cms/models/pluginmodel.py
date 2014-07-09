@@ -148,6 +148,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return plugin_class(plugin_class.model, admin)
 
     def get_plugin_instance(self, admin=None):
+        '''
+        Given a plugin instance (usually as a CMSPluginBase), this method
+        returns a tuple containing:
+
+            instance - The instance AS THE APPROPRIATE SUBCLASS OF
+                       CMSPluginBase and not necessarily just 'self', which is
+                       often just a CMSPluginBase,
+
+            plugin   - the associated plugin class instance (subclass
+                       of CMSPlugin)
+        '''
         plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin
