@@ -75,6 +75,7 @@ Extending the CMS
     extending_cms/extending_examples
     extending_cms/extending_page_title
     extending_cms/custom_plugins
+    extending_cms/text_editor_plugin
     extending_cms/app_integration
     extending_cms/api_references
     extending_cms/placeholders
