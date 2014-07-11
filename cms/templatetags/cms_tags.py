@@ -342,25 +342,22 @@ class RenderPlugin(InclusionTag):
         # Prepend frontedit toolbar output if applicable. Moved to its own
         # method to aide subclassing the whole RenderPlugin if required.
         #
-        edit = False
+
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
-        page = request.current_page
-        if toolbar and toolbar.edit_mode and (not page or page.has_change_permission(request)):
-            edit = True
-        if edit:
-            from cms.middleware.toolbar import toolbar_plugin_processor
-            processors = (toolbar_plugin_processor,)
-        else:
-            processors = None
-        return processors
+        page = getattr(request, 'current_page', None)
 
+        if toolbar and toolbar.edit_mode and (not page or page.get_draft_object().has_change_permission(request)):
+            from cms.middleware.toolbar import toolbar_plugin_processor
+            return toolbar_plugin_processor,
+
+        return None
 
     def get_context(self, context, plugin):
         if not plugin:
             return {'content': ''}
         
-        processors=self.get_processors(context, plugin)
+        processors = self.get_processors(context, plugin)
 
         return {'content': plugin.render_plugin(context, processors=processors)}
 
