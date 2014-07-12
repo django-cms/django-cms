@@ -59,6 +59,8 @@ class PlaceholderToolbar(CMSToolbar):
     """
 
     def post_template_populate(self):
+        if not self.request.user.is_authenticated():
+            return
         self.page = get_page_draft(self.request.current_page)
         statics = getattr(self.request, 'static_placeholders', [])
         placeholders = getattr(self.request, 'placeholders', [])
@@ -97,6 +99,8 @@ class BasicToolbar(CMSToolbar):
     """
 
     def populate(self):
+        if not self.request.user.is_authenticated():
+            return
         self.add_admin_menu()
         if settings.USE_I18N:
             self.add_language_menu()
@@ -191,6 +195,8 @@ class PageToolbar(CMSToolbar):
     watch_models = [Page]
 
     def populate(self):
+        if not self.request.user.is_authenticated():
+            return
         # always use draft if we have a page
         self.page = get_page_draft(self.request.current_page)
         try:
@@ -214,6 +220,8 @@ class PageToolbar(CMSToolbar):
             self.change_language_menu()
 
     def post_template_populate(self):
+        if not self.request.user.is_authenticated():
+            return
         statics = getattr(self.request, 'static_placeholders', [])
         dirty_statics = [stpl for stpl in statics if stpl.dirty]
         placeholders = getattr(self.request, 'placeholders', [])
