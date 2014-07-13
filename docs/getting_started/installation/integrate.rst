@@ -524,7 +524,7 @@ way:
 
     admin.autodiscover()
 
-    cms_urlpatterns = patterns('',
+    cms_urlpatterns = i18n_patterns('',
         url(r'^admin/', include(admin.site.urls)),
         url(r'^pages/$', include('cms.urls')),
     )
