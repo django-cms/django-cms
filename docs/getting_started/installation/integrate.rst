@@ -490,7 +490,7 @@ URL configuration
 =================
 
 You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
-urlpatterns. We suggest starting with the following
+urlpatterns. If your project is fairly fresh, we suggest starting with the following
 ``~/workspace/myproject/myproject/urls.py``::
 
     from django.conf.urls import include, patterns, url
@@ -512,6 +512,39 @@ urlpatterns. We suggest starting with the following
         url(r'', include('django.contrib.staticfiles.urls')),
     ) + urlpatterns
 
+Otherwise, it might be more beneficial to include the URLS in the following
+way:
+
+``~/workspace/myproject/myproject/urls.py``::
+
+    from django.conf.urls import include, patterns, url
+    from django.conf.urls.i18n import i18n_patterns
+    from django.contrib import admin
+    from django.conf import settings
+
+    admin.autodiscover()
+
+    cms_urlpatterns = i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^pages/$', include('cms.urls')),
+    )
+
+    urlpatterns = (
+        url('^$', 'mysite.views.url', home), # Your already-established home page.
+        # .... your other URL patterns ...
+    ) + cms_urlpatterns
+
+    if settings.DEBUG:
+        urlpatterns += patterns('',
+            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+            url(r'', include('django.contrib.staticfiles.urls')),
+        )
+        urlpatterns += cms_urlpatterns
+
+This will ensure the CMS url patterns don't override your already-established
+URLS. Note that the prefix can be called something else besides ``pages``, as
+long as you remember to naivgate to that same prefix to access DjangoCMS
 
 Creating templates
 ==================
@@ -646,6 +679,10 @@ the django CMS "Installation Successful" screen.
 
 Use the new side-frame-based administration by appending '?edit' to your URL
 as follows: `http://127.0.0.1:8000/?edit`. This will reveal a login form.
+
+.. note:: If you used a different URL prefix as mentioned in
+          `URL Configuration`_ (e.g. `page`), the url will be
+          `http://127.0.0.1:8000/page/?edit`
 
 |login-form|
 
