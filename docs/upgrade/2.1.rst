@@ -1,9 +1,10 @@
-*************************************
+#####################################
 Upgrading from 2.1.x and Django 1.2.x
-*************************************
+#####################################
 
+**********************
 Upgrading dependencies
-======================
+**********************
 
 Upgrade both your version of django CMS and Django by running
 the following commands.
@@ -26,8 +27,9 @@ with django CMS
 
     pip install --upgrade django-mptt==0.5.1
 
+**************************
 Updates to ``settings.py``
-==========================
+**************************
 
 The following changes will need to be made in your settings.py file::
 
@@ -73,8 +75,9 @@ The following changes will need to be made in your settings.py file::
     sekizai
     django.contrib.staticfiles
 
+****************
 Template Updates
-================
+****************
 
 Make sure to add sekizai tags and ``cms_toolbar`` to your CMS templates.
 
@@ -99,8 +102,9 @@ Here is a simple example for a base template called ``base.html``:
     </body>
   </html>
 
+****************
 Database Updates
-================
+****************
 
 Run the following commands to upgrade your database
 
@@ -109,8 +113,9 @@ Run the following commands to upgrade your database
     python manage.py syncdb
     python manage.py migrate
 
+************
 Static Media
-============
+************
 
 Add the following to ``urls.py`` to serve static media when developing::
 
