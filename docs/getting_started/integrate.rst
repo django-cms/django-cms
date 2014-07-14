@@ -322,7 +322,7 @@ Also add any (or all) of the following plugins, depending on your needs::
     'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
 
 .. note::
-    
+
     Most of the above plugins were previously distributed with django CMS,
     however, most of them are now located in their own repositories and
     renamed. Furthermore plugins: ``'cms.plugins.text'`` and
