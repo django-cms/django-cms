@@ -220,19 +220,19 @@ Soft Roots
 What Soft Roots do
 ==================
 
-A *soft root* is a page that acts as the root for a menu 
+A *soft root* is a page that acts as the root for a menu
 navigation tree.
 
-Typically, this will be a page that is the root of a significant 
+Typically, this will be a page that is the root of a significant
 new section on your site.
 
-When the *soft root* feature is enabled, the navigation menu 
-for any page will start at the nearest *soft root*, rather than 
+When the *soft root* feature is enabled, the navigation menu
+for any page will start at the nearest *soft root*, rather than
 at the real root of the site's page hierarchy.
 
-This feature is useful when your site has deep page hierarchies 
-(and therefore multiple levels in its navigation trees). In such 
-a case, you usually don't want to present site visitors with deep 
+This feature is useful when your site has deep page hierarchies
+(and therefore multiple levels in its navigation trees). In such
+a case, you usually don't want to present site visitors with deep
 menus of nested items.
 
 For example, you're on the page "Introduction to Bleeding", so the menu might look like this:
@@ -265,7 +265,7 @@ For example, you're on the page "Introduction to Bleeding", so the menu might lo
 
 which is frankly overwhelming.
 
-By making "Department of Mediaeval Surgery" a *soft root*, the 
+By making "Department of Mediaeval Surgery" a *soft root*, the
 menu becomes much more manageable:
 
 * Department of Mediaeval Surgery

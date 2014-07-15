@@ -3,7 +3,7 @@ Using South with django CMS
 ###########################
 
 South is an incredible piece of software that lets you handle database
-migrations. This document is by no means meant to replace the 
+migrations. This document is by no means meant to replace the
 excellent `documentation`_ available online, but rather to give a quick primer
 on why you should use South and how to get started quickly.
 
