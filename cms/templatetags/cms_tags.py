@@ -1107,7 +1107,7 @@ class RenderPlaceholder(AsTag):
             return ''
         if not placeholder:
             return ''
-        if not hasattr(request, 'placeholder'):
+        if not hasattr(request, 'placeholders'):
             request.placeholders = []
         request.placeholders.append(placeholder)
         return safe(placeholder.render(context, width, lang=language))
