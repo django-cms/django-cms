@@ -1116,6 +1116,6 @@ class RenderPlaceholder(AsTag):
         return self._get_value(context, editable=False, **kwargs)
 
     def get_value(self, context, **kwargs):
-        return self._get_value(context, **kwargs)
+        return self._get_value(context, editable=True, **kwargs)
 
 register.tag(RenderPlaceholder)
