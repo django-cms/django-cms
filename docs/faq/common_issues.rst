@@ -22,8 +22,9 @@ the `menus_cachekey` table. Just delete all those entries.
 Sandbox access violation: Blocked a frame
 *****************************************
 
-Some applications for Django such as `djangosecure` will set the header 
-`x-frame-options: DENY`. This will break certain toolbar functionality.
+Setting an `x-frame-options` header will break certain toolbar funcationality.
+
+For example, `djangosecure` will set the header `x-frame-options: DENY` for you.
 
 Example error in browser console:
 
@@ -33,4 +34,4 @@ Example error in browser console:
     accessed is sandboxed and lacks the "allow-same-origin" flag. 
 
 Ensure you are sending no `x-frame-options` header or set it to 
-`ALLOW-SAME-ORIGIN`.
+`SAMEORIGIN` or certain URIs `ALLOW-FROM uri`.
