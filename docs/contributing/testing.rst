@@ -10,8 +10,8 @@ A project like django CMS simply can't afford to incorporate new code that
 doesn't come with its own tests.
 
 Tests provide some necessary minimum confidence: they can show the code will
-behave as it expected, and help identify what's going wrong if something breaks
-it.
+behave as it is expected, and help identify what's going wrong if something
+breaks it.
 
 Not insisting on good tests when code is committed is like letting a gang of
 teenagers without a driving licence borrow your car on a Friday night, even if
