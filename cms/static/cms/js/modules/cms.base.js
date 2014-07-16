@@ -5,7 +5,7 @@
 window.django = window.django || undefined;
 
 // ensuring jQuery namespace is set correctly
-window.jQuery = (django) ? django.jQuery : window.jQuery || undefined;
+window.jQuery = (django && django.jQuery) ? django.jQuery : window.jQuery || undefined;
 
 // ensuring Class namespace is set correctly
 window.Class = window.Class || undefined;
