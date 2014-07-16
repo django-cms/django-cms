@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 
+from django.contrib import admin
+from django.utils.translation import ugettext as _
+
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
+from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
-from cms.compat import get_user_model
-from django.contrib import admin
-from django.utils.translation import ugettext as _
 
 PERMISSION_ADMIN_INLINES = []
 

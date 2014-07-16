@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.utils.conf import get_cms_setting
 from django.utils.translation import ugettext as _
 from django.contrib import admin
 
@@ -7,9 +6,10 @@ from cms.admin.forms import PageUserForm, PageUserGroupForm
 from cms.admin.permissionadmin import GenericCmsPermissionAdmin
 from cms.exceptions import NoPermissionsException
 from cms.models import PageUser, PageUserGroup
+from cms.utils.compat.dj import get_user_model
+from cms.utils.compat.forms import UserAdmin
+from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_subordinate_users
-from cms.compat import get_user_model
-from cms.compat_forms import UserAdmin
 
 class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     form = PageUserForm

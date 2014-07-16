@@ -77,16 +77,16 @@ class CMSToolbar(ToolbarAPIMixin):
             self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:
-                self.view_name = resolve(self.request.path).func.__module__
+                self.app_name = resolve(self.request.path).app_name
             except Resolver404:
-                self.view_name = ""
+                self.app_name = ""
         toolbars = toolbar_pool.get_toolbars()
 
         self.toolbars = SortedDict()
         app_key = ''
         for key in toolbars:
             app_name = ".".join(key.split(".")[:-2])
-            if app_name in self.view_name and len(key) > len(app_key):
+            if app_name == self.app_name and len(key) > len(app_key):
                 app_key = key
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, key == app_key, app_key)

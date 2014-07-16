@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
+
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.sites.models import Site
+from django.http import Http404, HttpResponseRedirect
+
 from cms.api import create_page, create_title, publish_page, add_plugin
-from cms.compat import get_user_model
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
 from cms.models import Title, EmptyTitle
@@ -11,11 +15,9 @@ from cms.test_utils.testcases import (SettingsOverrideTestCase,
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
+from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_languages
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.sites.models import Site
 
-from django.http import Http404, HttpResponseRedirect
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 

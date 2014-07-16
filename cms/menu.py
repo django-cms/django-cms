@@ -5,7 +5,6 @@ from django.contrib.sites.models import Site
 from django.utils.translation import get_language
 
 from cms.apphook_pool import apphook_pool
-from cms.compat import user_related_name
 from cms.models.permissionmodels import ACCESS_DESCENDANTS
 from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import ACCESS_CHILDREN
@@ -13,6 +12,7 @@ from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
 from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.utils import get_language_from_request
+from cms.utils.compat.dj import user_related_name
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset

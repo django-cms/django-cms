@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
+from cms.utils.compat.dj import is_installed
+
 
 # modify reversions to match our needs if required...
-
-
 def reversion_register(model_class, fields=None, follow=(), format="json", exclude_fields=None):
     """CMS interface to reversion api - helper function. Registers model for 
     reversion only if reversion is available.
@@ -13,7 +12,7 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
     """
     
     # reversion's merely recommended, not required
-    if not 'reversion' in settings.INSTALLED_APPS:
+    if not is_installed('reversion'):
         return
     
     if fields and exclude_fields:

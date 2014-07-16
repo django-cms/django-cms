@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, patterns, include
 from django.contrib.formtools.wizard.views import normalize_name
@@ -10,17 +9,17 @@ from django.db.models import signals
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 from django.template.defaultfilters import slugify
+from django.utils import six
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
-from cms.utils.compat.type_checks import string_types
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
 from cms.utils.django_load import load, get_subclasses
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, is_installed
 
 
 class PluginPool(object):
@@ -64,7 +63,7 @@ class PluginPool(object):
 
                 template = hasattr(plugin.model,
                                    'render_template') and plugin.model.render_template or plugin.render_template
-                if isinstance(template, string_types) and template:
+                if isinstance(template, six.string_types) and template:
                     try:
                         loader.get_template(template)
                     except TemplateDoesNotExist:
@@ -97,7 +96,7 @@ class PluginPool(object):
                                     dispatch_uid='cms_post_delete_plugin_%s' % plugin_name)
         signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
                                    dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
-        if 'reversion' in settings.INSTALLED_APPS:
+        if is_installed('reversion'):
             try:
                 from reversion.registration import RegistrationError
             except ImportError:

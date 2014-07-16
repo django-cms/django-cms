@@ -3,10 +3,10 @@ from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
 
-from cms.compat import get_user_model, user_related_query_name
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
+from cms.utils.compat.dj import get_user_model, user_related_query_name
 
 
 try:

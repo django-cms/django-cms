@@ -2,7 +2,7 @@
 
 from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup
-from cms.compat import user_related_name
+from cms.utils.compat.dj import user_related_name
 from menus.menu_pool import menu_pool
 
 
