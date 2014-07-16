@@ -22,16 +22,27 @@ the `menus_cachekey` table. Just delete all those entries.
 Sandbox access violation: Blocked a frame
 *****************************************
 
-Setting an `x-frame-options` header will break certain toolbar funcationality.
+Setting an `x-frame-options` header with certain values will break certain 
+toolbar funcationality. This is independent of any `x-frame-options` functionality 
+offerred by DjangoCMS.
 
-For example, `djangosecure` will set the header `x-frame-options: DENY` for you.
-
-Example error in browser console:
+Example error in browser console (as worded by Chrome):
 
     Uncaught SecurityError: Failed to read the 'contentDocument' property 
     from 'HTMLIFrameElement': Sandbox access violation: Blocked a frame at 
     "http://0.0.0.0:8000" from accessing a frame at "null".  The frame being 
     accessed is sandboxed and lacks the "allow-same-origin" flag. 
+    
+Some examples, places that might set a `x-frame-options` header:
 
-Ensure you are sending no `x-frame-options` header or set it to 
-`SAMEORIGIN` or certain URIs `ALLOW-FROM uri`.
+* Django security middleware like ``django.middleware.clickjacking.XFrameOptionsMiddleware``
+* Third-party apps like ``djangosecure``
+* Your server (Apache, Nginx, etc.) or cloud provider
+* Client-side browswer plugins with clickjacking protection like No-Script 
+or commerical security suites
+
+If you set a `x-frame-options` header independently from DjangoCMS, because the value 
+is `SAMEORIGIN` or allow frames from certain URIs `ALLOW-FROM uri`. For more information, 
+please read X-Frame-Options article on Mozilla Developer Network:
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options
