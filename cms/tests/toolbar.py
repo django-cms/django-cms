@@ -100,11 +100,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-
-        if is_user_swapped:
-            self.assertEqual(len(admin_items), 6, admin_items)
-        else:
-            self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
