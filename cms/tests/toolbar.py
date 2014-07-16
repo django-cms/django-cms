@@ -27,7 +27,6 @@ from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.compat import DJANGO_1_4
-from cms.utils.compat.dj import is_user_swapped
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 
