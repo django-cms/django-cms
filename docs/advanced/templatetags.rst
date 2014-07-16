@@ -144,6 +144,10 @@ only the english plugins:
         {% render_placeholder mymodel_instance.my_placeholder as placeholder_content %}
         <p>{{ placeholder_content }}</p>
 
+    When used in this manner, the placeholder will not be displayed for
+    editing when the CMS is in edit mode.
+
+
 
 show_placeholder
 ================

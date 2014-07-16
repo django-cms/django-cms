@@ -562,11 +562,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<h2></h2>',
         )
 
+        #
+        # NOTE: Using the render_placeholder "as" form should /not/ render
+        # frontend placeholder editing support.
+        #
         self.assertContains(
             response,
-            '<h3><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
-            '<div class="cms_plugin cms_plugin-{1}">{2}</div></h3>'.format(ex1.placeholder.pk,
-                                                                           plugin.pk, render_placeholder_body)
+            '<h3>{0}</h3>'.format(render_placeholder_body)
             )
 
         self.assertContains(

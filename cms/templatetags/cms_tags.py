@@ -1097,7 +1097,7 @@ class RenderPlaceholder(AsTag):
         Argument('varname', required=False, resolve=False)
     )
 
-    def get_value(self, context, **kwargs):
+    def _get_value(self, context, editable=True, **kwargs):
         request = context.get('request', None)
         placeholder = kwargs.get('placeholder')
         width = kwargs.get('width')
@@ -1107,10 +1107,15 @@ class RenderPlaceholder(AsTag):
             return ''
         if not placeholder:
             return ''
-        if not hasattr(request, 'placeholder'):
+        if not hasattr(request, 'placeholders'):
             request.placeholders = []
         request.placeholders.append(placeholder)
-        return safe(placeholder.render(context, width, lang=language))
+        return safe(placeholder.render(context, width, lang=language, editable=editable))
 
+    def get_value_for_context(self, context, **kwargs):
+        return self._get_value(context, editable=False, **kwargs)
+
+    def get_value(self, context, **kwargs):
+        return self._get_value(context, **kwargs)
 
 register.tag(RenderPlaceholder)

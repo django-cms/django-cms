@@ -132,14 +132,17 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
-    def render(self, context, width, lang=None):
+    def render(self, context, width, lang=None, editable=True):
+        '''
+        Set editable = False to disable front-end rendering for this render.
+        '''
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
             context.update({'width': width})
-        return render_placeholder(self, context, lang=lang)
+        return render_placeholder(self, context, lang=lang, editable=editable)
 
     def _get_attached_fields(self):
         """
