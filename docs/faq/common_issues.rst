@@ -24,7 +24,7 @@ Sandbox access violation: Blocked a frame
 
 Setting an x-frame-options header with DENY value will break certain toolbar 
 functionality. This is independent of any `x-frame-options` functionality 
-offerred by DjangoCMS.
+offerred by django CMS.
 
 Example error in browser console (as worded by Chrome):
 
