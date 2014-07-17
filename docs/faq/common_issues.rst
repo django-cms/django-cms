@@ -22,8 +22,8 @@ the `menus_cachekey` table. Just delete all those entries.
 Sandbox access violation: Blocked a frame
 *****************************************
 
-Setting an `x-frame-options` header with certain values will break certain 
-toolbar funcationality. This is independent of any `x-frame-options` functionality 
+Setting an x-frame-options header with DENY value will break certain toolbar 
+functionality. This is independent of any `x-frame-options` functionality 
 offerred by DjangoCMS.
 
 Example error in browser console (as worded by Chrome):
@@ -38,8 +38,7 @@ Some examples, places that might set a `x-frame-options` header:
 * Django security middleware like ``django.middleware.clickjacking.XFrameOptionsMiddleware``
 * Third-party apps like ``djangosecure``
 * Your server (Apache, Nginx, etc.) or cloud provider
-* Client-side browswer plugins with clickjacking protection like No-Script 
-or commerical security suites
+* Client-side browswer plugins with clickjacking protection
 
 If you set a `x-frame-options` header independently from DjangoCMS, because the value 
 is `SAMEORIGIN` or allow frames from certain URIs `ALLOW-FROM uri`. For more information, 
