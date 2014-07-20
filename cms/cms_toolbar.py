@@ -13,7 +13,6 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from cms.api import get_page_draft
-from cms.compat import user_model_label
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.exceptions import LanguageError
 from cms.models import Title, Page
@@ -21,6 +20,7 @@ from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.compat import DJANGO_1_4
+from cms.utils.compat.dj import is_installed, user_model_label
 from cms.utils.i18n import get_language_objects
 from cms.utils.i18n import force_language
 from cms.utils.i18n import get_language_object
@@ -465,7 +465,7 @@ class PageToolbar(CMSToolbar):
     def add_history_menu(self):
         # history menu
         history_menu = self.toolbar.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'), position=2)
-        if 'reversion' in settings.INSTALLED_APPS:
+        if is_installed('reversion'):
             import reversion
             from reversion.models import Revision
 

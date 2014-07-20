@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
-from djangocms_text_ckeditor.models import Text
-from cms.compat import get_user_model
-from cms.models import Page, CMSPlugin
 from django.core.urlresolvers import clear_url_caches
-from cms.test_utils.util.context_managers import SettingsOverride
 from django.template import Template
+from djangocms_text_ckeditor.models import Text
+
 from cms.api import create_page
-from cms.test_utils.testcases import SettingsOverrideTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PLUGIN_ADD, URL_CMS_PAGE_CHANGE_TEMPLATE
+from cms.models import Page, CMSPlugin
+from cms.test_utils.testcases import (SettingsOverrideTestCase,
+                                      URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT,
+                                      URL_CMS_PLUGIN_ADD,
+                                      URL_CMS_PAGE_CHANGE_TEMPLATE)
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.compat.dj import get_user_model
 
 
 class TestNoI18N(SettingsOverrideTestCase):

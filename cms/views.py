@@ -17,7 +17,7 @@ from django.utils.timezone import get_current_timezone_name
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Page
-from cms.utils import get_template_from_request
+from cms.utils import get_template_from_request, get_language_code
 from cms.utils import get_language_from_request
 from cms.utils import get_cms_setting
 from cms.utils.i18n import get_fallback_languages
@@ -28,6 +28,7 @@ from cms.utils.i18n import get_language_list
 from cms.utils.i18n import is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
+from django.utils.translation import get_language
 
 CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
 
@@ -73,8 +74,19 @@ def details(request, slug):
     page = get_page_from_request(request, use_path=slug)
     if not page:
         return _handle_no_page(request, slug)
-
-    current_language = get_language_from_request(request)
+    current_language = request.REQUEST.get('language', None)
+    if current_language:
+        current_language = get_language_code(current_language)
+        if not current_language in get_language_list(page.site_id):
+            current_language = None
+    if current_language is None:
+        current_language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
+        if current_language:
+            current_language = get_language_code(current_language)
+            if not current_language in get_language_list(page.site_id):
+                current_language = None
+    if current_language is None:
+        current_language = get_language_code(get_language())
     # Check that the current page is available in the desired (current) language
     available_languages = []
     page_languages = list(page.get_languages())

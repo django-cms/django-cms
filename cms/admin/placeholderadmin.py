@@ -537,8 +537,7 @@ class PlaceholderAdminMixin(object):
             if perms_needed:
                 return HttpResponseForbidden(force_unicode(_("You do not have permission to clear this placeholder")))
             self.log_deletion(request, placeholder, obj_display)
-            for plugin in plugins:
-                plugin.delete()
+            placeholder.clear()
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {
                 'obj': force_unicode(obj_display)})
             self.post_clear_placeholder(request, placeholder)

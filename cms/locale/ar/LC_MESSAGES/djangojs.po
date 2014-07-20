@@ -3,12 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# draco003 <info@draco-003.com>, 2013
+# Ahmed H <info@draco-003.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-03 10:50+0200\n"
+"POT-Creation-Date: 2014-05-21 15:00+0200\n"
 "PO-Revision-Date: 2013-12-12 08:53+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django-cms/language/ar/)\n"

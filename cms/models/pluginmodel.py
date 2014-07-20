@@ -19,7 +19,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import signals
+from django.db.models import signals, Model
 from mptt.models import MPTTModel, MPTTModelBase
 
 
@@ -148,6 +148,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return plugin_class(plugin_class.model, admin)
 
     def get_plugin_instance(self, admin=None):
+        '''
+        Given a plugin instance (usually as a CMSPluginBase), this method
+        returns a tuple containing:
+
+            instance - The instance AS THE APPROPRIATE SUBCLASS OF
+                       CMSPluginBase and not necessarily just 'self', which is
+                       often just a CMSPluginBase,
+
+            plugin   - the associated plugin class instance (subclass
+                       of CMSPlugin)
+        '''
         plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin
@@ -428,6 +439,12 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
                 return False
 
         return True
+
+    def delete(self, no_mptt=False, *args,  **kwargs):
+        if no_mptt:
+            Model.delete(self, *args, **kwargs)
+        else:
+            super(CMSPlugin, self).delete(*args, **kwargs)
 
 
 reversion_register(CMSPlugin)

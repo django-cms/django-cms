@@ -7,13 +7,14 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from django.template import TemplateSyntaxError, base
 from django.test import TestCase
 
-from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
+from cms.api import add_plugin
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
-from cms.api import add_plugin
 from cms.test_utils.project.extensionapp.models import MyPageExtension
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
+from cms.utils.compat import DJANGO_1_6
 
 
 class TestOutput(FileOutputWrapper):
@@ -62,7 +63,18 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_no_sekizai(self):
-        with SettingsOverride(INSTALLED_APPS=['cms', 'menus']):
+        if DJANGO_1_6:
+            with SettingsOverride(INSTALLED_APPS=['cms', 'menus']):
+                old_libraries = base.libraries
+                base.libraries = {}
+                old_templatetags_modules = base.templatetags_modules
+                base.templatetags_modules = []
+                self.assertRaises(TemplateSyntaxError, check, TestOutput())
+                base.libraries = old_libraries
+                base.templatetags_modules = old_templatetags_modules
+        else:
+            from django.apps import apps
+            apps.set_available_apps(['cms', 'menus'])
             old_libraries = base.libraries
             base.libraries = {}
             old_templatetags_modules = base.templatetags_modules
@@ -70,6 +82,7 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
             self.assertRaises(TemplateSyntaxError, check, TestOutput())
             base.libraries = old_libraries
             base.templatetags_modules = old_templatetags_modules
+            apps.unset_available_apps()
 
     def test_no_sekizai_template_context_processor(self):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[]):

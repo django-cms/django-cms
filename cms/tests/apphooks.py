@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import sys
-from cms.utils.conf import get_cms_setting
 
 from django.core.urlresolvers import clear_url_caches, reverse
+from django.utils import six
 
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
-from cms.compat import get_user_model
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.models import Title
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
-from cms.utils.compat.type_checks import string_types
+from cms.utils.compat.dj import get_user_model
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
+
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
@@ -30,6 +31,7 @@ class ApphooksTestCase(CMSTestCase):
             del sys.modules[APP_MODULE]
 
         self.reload_urls()
+        apphook_pool.clear()
 
     def tearDown(self):
         clear_app_resolvers()
@@ -82,7 +84,7 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, string_types):
+        if isinstance(title_langs, six.string_types):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
             titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
@@ -210,34 +212,34 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
 
     def test_get_page_for_apphook_on_preview_or_edit(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_3'):
+            if get_user_model().USERNAME_FIELD == 'email':
+                superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin@admin.com')
+            else:
+                superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
 
-        if get_user_model().USERNAME_FIELD == 'email':
-            superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin@admin.com')
-        else:    
-            superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-        
-        page = create_page("home", "nav_playground.html", "en",
-                           created_by=superuser, published=True, apphook=APP_NAME)
-        create_title('de', page.get_title(), page)
-        page.publish('en')
-        page.publish('de')
-        page.save()
-        public_page = page.get_public_object()
+            page = create_page("home", "nav_playground.html", "en",
+                               created_by=superuser, published=True, apphook=APP_NAME)
+            create_title('de', page.get_title(), page)
+            page.publish('en')
+            page.publish('de')
+            page.save()
+            public_page = page.get_public_object()
 
-        with self.login_user_context(superuser):
-            with force_language("en"):
-                path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-                request.LANGUAGE_CODE = 'en'
-                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-                response = self.client.get(path+"?edit")
-                self.assertContains(response, '?redirect=')
-            with force_language("de"):
-                path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-                request.LANGUAGE_CODE = 'de'
-                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-                self.assertEqual(attached_to_page.pk, public_page.pk)
+            with self.login_user_context(superuser):
+                with force_language("en"):
+                    path = reverse('sample-settings')
+                    request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                    request.LANGUAGE_CODE = 'en'
+                    attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+                    response = self.client.get(path+"?edit")
+                    self.assertContains(response, '?redirect=')
+                with force_language("de"):
+                    path = reverse('sample-settings')
+                    request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                    request.LANGUAGE_CODE = 'de'
+                    attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+                    self.assertEqual(attached_to_page.pk, public_page.pk)
 
     def test_get_root_page_for_apphook_with_instance_namespace(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
@@ -392,7 +394,7 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
 
     def test_apphook_breaking_under_home_with_new_path_caching(self):
-        with SettingsOverride(CMS_PERMISSION=False):
+        with SettingsOverride(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls_2'):
             home = create_page("home", "nav_playground.html", "en", published=True)
             child = create_page("child", "nav_playground.html", "en", published=True, parent=home)
             # not-home is what breaks stuff, because it contains the slug of the home page

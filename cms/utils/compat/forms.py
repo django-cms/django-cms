@@ -2,7 +2,7 @@
 from django.utils import importlib
 from django.db import models
 
-from cms.compat import is_user_swapped, user_model_label
+from .dj import is_user_swapped, user_model_label
 
 
 # overide with custom classes if they exist

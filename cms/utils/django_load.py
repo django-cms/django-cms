@@ -12,8 +12,10 @@ refer to http://django-load.readthedocs.org/en/latest/index.html.
 import imp
 import traceback # changed
 
-from django.conf import settings
 from django.utils.importlib import import_module
+
+from .compat.dj import installed_apps
+
 
 def get_module(app, modname, verbose, failfast):
     """
@@ -50,7 +52,7 @@ def load(modname, verbose=False, failfast=False):
 
     If failfast is True, import errors will not be surpressed.
     """
-    for app in settings.INSTALLED_APPS:
+    for app in installed_apps():
         get_module(app, modname, verbose, failfast)
 
 
@@ -63,7 +65,7 @@ def iterload(modname, verbose=False, failfast=False):
 
     If failfast is True, import errors will not be surpressed.
     """
-    for app in settings.INSTALLED_APPS:
+    for app in installed_apps():
         module = get_module(app, modname, verbose, failfast)
         if module:
             yield module

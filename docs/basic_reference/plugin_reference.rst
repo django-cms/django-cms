@@ -220,8 +220,8 @@ may of course use your preferred editor; others are available.
 Video
 *****
 
-Available on `GitHub (divio/djangocms-file) <http://github.com/divio/djangocms-file>`_
-and on `PyPi (djangocms-file) <https://pypi.python.org/pypi/djangocms-file>`_.
+Available on `GitHub (divio/djangocms-video) <http://github.com/divio/djangocms-video>`_
+and on `PyPi (djangocms-video) <https://pypi.python.org/pypi/djangocms-video>`_.
 
 Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 <http://github.com/FlashJunior/OSFlashVideoPlayer>`_. When uploading videos use either

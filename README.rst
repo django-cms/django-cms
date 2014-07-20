@@ -25,7 +25,7 @@ Features
 * Draft/Published workflows
 * Undo/Redo
 * Use the content blocks (placeholders) in your own apps (models)
-* Use the content blocks (stacks) anywhere in your templates
+* Use the content blocks (static placeholders) anywhere in your templates
 * Edit content directly in the frontend on your pages
 * Hierarchical content plugins (columns, style changes etc)
 * Navigation rendering and extending from your apps

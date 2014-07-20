@@ -4,7 +4,7 @@ Installing django CMS into an existing project
 
 
 This document assumes you are familiar with Python and Django. It should
-outline the steps necessary for you to follow the :doc:`../tutorial`.
+outline the steps necessary for you to follow the :doc:`tutorial`.
 
 .. _requirements:
 
@@ -220,7 +220,7 @@ or
 
 This will install Django, django CMS, South, Pillow, and your database's driver globally.
 
-You have now everything that is needed for you to follow the :doc:`../tutorial`.
+You have now everything that is needed for you to follow the :doc:`tutorial`.
 
 
 On Mac OSX
@@ -322,7 +322,7 @@ Also add any (or all) of the following plugins, depending on your needs::
     'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
 
 .. note::
-    
+
     Most of the above plugins were previously distributed with django CMS,
     however, most of them are now located in their own repositories and
     renamed. Furthermore plugins: ``'cms.plugins.text'`` and
@@ -334,8 +334,9 @@ Also add any (or all) of the following plugins, depending on your needs::
     Adding the ``'djangocms_snippet'`` plugin is a potential security hazard.
     For more information, refer to `snippet_plugin`_.
 
-The plugins are described in more detail in chapter :doc:`Plugins reference <../resources/plugin_reference>`.
-There are even more plugins available on the django CMS `extensions page`_.
+The plugins are described in more detail in chapter :doc:`Plugins reference
+<../basic_reference/plugin_reference>`. There are even more plugins available on the django CMS
+`extensions page`_.
 
 .. _snippet_plugin: https://github.com/divio/djangocms-snippet
 .. _extensions page: http://www.django-cms.org/en/extensions/
@@ -642,14 +643,14 @@ the django CMS "Installation Successful" screen.
 
 |it-works-cms|
 
-.. |it-works-cms| image:: ../../images/it-works-cms.png
+.. |it-works-cms| image:: ../images/it-works-cms.png
 
 Use the new side-frame-based administration by appending '?edit' to your URL
 as follows: `http://127.0.0.1:8000/?edit`. This will reveal a login form.
 
 |login-form|
 
-.. |login-form| image:: ../../images/login-form.png
+.. |login-form| image:: ../images/login-form.png
 
 Log in with the user you created during the database setup.
 
@@ -670,7 +671,7 @@ Once in the admin part of your site, you should see something like the following
 
 |logged-in|
 
-.. |logged-in| image:: ../../images/logged-in.png
+.. |logged-in| image:: ../images/logged-in.png
 
 
 Adding a page
@@ -681,19 +682,19 @@ Adding a page is as simple as clicking the "Pages..." menu-item in the
 
 |pages-menu-item|
 
-.. |pages-menu-item| image:: ../../images/pages-menu-item.png
+.. |pages-menu-item| image:: ../images/pages-menu-item.png
 
 This will reveal the new side-frame for administration.
 
 |no-pages|
 
-.. |no-pages| image:: ../../images/no-pages.png
+.. |no-pages| image:: ../images/no-pages.png
 
 Now, click the "add page" button at the top right-hand corner of the side-frame.
 
 |basic-page-form|
 
-.. |basic-page-form| image:: ../../images/basic-page-form.png
+.. |basic-page-form| image:: ../images/basic-page-form.png
 
 This is a basic form where you complete the title of the new page. The slug
 field is also required but a sensible value will be completed as you type the
@@ -704,14 +705,14 @@ pages.
 
 |my-first-page|
 
-.. |my-first-page| image:: ../../images/my-first-page.png
+.. |my-first-page| image:: ../images/my-first-page.png
 
 
 You can click the page title in the "page tree" to navigate to the page in the main window.
 
 |empty-page|
 
-.. |empty-page| image:: ../../images/empty-page.png
+.. |empty-page| image:: ../images/empty-page.png
 
 
 Congratulations! You now have a fully functional django CMS installation!
@@ -732,7 +733,7 @@ page menu invoked.
 
 |page-options|
 
-.. |page-options| image:: ../../images/page-options.png
+.. |page-options| image:: ../images/page-options.png
 
 
 Menus
@@ -779,7 +780,7 @@ displayed "inside" the placeholder as shown in this progession of images.
 
 |add-text-plugin|
 
-.. |add-text-plugin| image:: ../../images/add-text-plugin.png
+.. |add-text-plugin| image:: ../images/add-text-plugin.png
 
 To preview the page, click the "Content" mode button in the toolbar. You can
 continue editing existing plugins in Content mode simply by double-clicking
