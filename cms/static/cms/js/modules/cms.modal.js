@@ -565,6 +565,7 @@ $(document).ready(function () {
 					contents.find('body').bind('keydown.cms', function (e) {
 						if(e.keyCode === 27) that.close();
 					});
+					contents.find('body').addClass('cms_modal-window');
 
 					// figure out if .object-tools is available
 					if(contents.find('.object-tools').length) {
