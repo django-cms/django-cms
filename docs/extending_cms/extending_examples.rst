@@ -61,7 +61,7 @@ In your poll application's ``models.py`` add the following::
     :class:`models.Model <django.db.models.Model>`.
 
 Run ``manage.py syncdb`` to create the database tables for this model or see
-:doc:`../../getting_started/resources/using_south` to see how to do it using `South`_.
+:doc:`../../basic_reference/using_south` to see how to do it using `South`_.
 
 
 The Plugin Class
