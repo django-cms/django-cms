@@ -812,12 +812,12 @@ class CMSEditableObject(InclusionTag):
         Renders the requested attribute
         """
         extra_context = copy(context)
+        attr_value = None
         if hasattr(instance, 'lazy_translation_getter'):
-            extra_context['content'] = instance.lazy_translation_getter(attribute, '')
-        # NOTE: Just because the instance has translations doesn't mean the
-        # desired attribute is translated.
-        if not extra_context['content']:
-            extra_context['content'] = getattr(instance, attribute, '')
+            attr_value = instance.lazy_translation_getter(attribute, '')
+        if not attr_value:
+            attr_value = getattr(instance, attribute, '')
+        extra_context['content'] = attr_value
         # This allow the requested item to be a method, a property or an
         # attribute
         if callable(extra_context['content']):
