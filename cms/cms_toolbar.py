@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 try:
-    from urllib import urlencode
+    from urllib import urlencode as _urlencode
+    urlencode = lambda d: _urlencode({ k.encode('utf8'): v.encode('utf8') for k,v in d.items() })
 except ImportError:
     from urllib.parse import urlencode
 
