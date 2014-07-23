@@ -814,7 +814,9 @@ class CMSEditableObject(InclusionTag):
         extra_context = copy(context)
         if hasattr(instance, 'lazy_translation_getter'):
             extra_context['content'] = instance.lazy_translation_getter(attribute, '')
-        else:
+        # NOTE: Just because the instance has translations doesn't mean the
+        # desired attribute is translated.
+        if not extra_context['content']:
             extra_context['content'] = getattr(instance, attribute, '')
         # This allow the requested item to be a method, a property or an
         # attribute
