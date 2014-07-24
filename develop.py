@@ -179,9 +179,23 @@ def shell():
     call_command('shell')
 
 
-def makemigrations():
+def makemigrations(migrate_plugins=True):
     from django.core.management import call_command
-    call_command('makemigrations', *['cms', 'menus'])
+    applications = [
+        # core applications
+        'cms', 'menus',
+        # testing applications
+        'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp', 'fakemlng', 'one_thing', 'extensionapp',
+        'objectpermissionsapp', 'bunch_of_plugins',
+    ]
+    if migrate_plugins:
+        applications.extend([
+            # official plugins
+            'djangocms_inherit', 'djangocms_googlemap', 'djangocms_column', 'djangocms_style', 'djangocms_link',
+            'djangocms_file', 'djangocms_text_ckeditor', 'djangocms_picture', 'djangocms_teaser', 'djangocms_file',
+            'djangocms_flash', 'djangocms_video',
+        ])
+    call_command('makemigrations', *applications)
     
 
 def generate_authors():
