@@ -6,9 +6,9 @@ class TestPlugin1(CMSPlugin):
     pass
 
 
-class LeftMixin: pass
+class LeftMixin(object): pass
 
-class RightMixin: pass
+class RightMixin(object): pass
 
 
 class TestPlugin2(LeftMixin, CMSPlugin, RightMixin):
