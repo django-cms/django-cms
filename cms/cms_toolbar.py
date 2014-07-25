@@ -8,7 +8,7 @@ try:
         if isinstance(q, dict):
             q = dict(k.encode('utf8'), v.encode('utf8') for k,v in q.items())
         elif isinstance(q, Iterable):
-            q = tuple(k.encode('utf8'), v.encode('utf8') for k,v in q)
+            q = tuple((k.encode('utf8'), v.encode('utf8')) for k,v in q)
 
         return _urlencode(q)
 except ImportError:
