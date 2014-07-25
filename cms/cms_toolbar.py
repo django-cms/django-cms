@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
 try:
     from urllib import urlencode as _urlencode
-    urlencode = lambda d: _urlencode({ k.encode('utf8'): v.encode('utf8') for k,v in d.items() })
+
+    from collections import Iterable
+
+    def urlencode(q):
+        if isinstance(q, dict):
+            q = dict(k.encode('utf8'), v.encode('utf8') for k,v in q.items())
+        elif isinstance(q, Iterable):
+            q = tuple(k.encode('utf8'), v.encode('utf8') for k,v in q)
+
+        return _urlencode(q)
 except ImportError:
     from urllib.parse import urlencode
 
