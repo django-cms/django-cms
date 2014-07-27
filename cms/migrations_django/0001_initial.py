@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
                 ('soft_root', models.BooleanField(default=False, help_text='All ancestors will not be displayed in the navigation', db_index=True, verbose_name='soft root')),
                 ('reverse_id', models.CharField(max_length=40, blank=True, help_text='A unique identifier that is used with the page_url templatetag for linking to this page', null=True, verbose_name='id', db_index=True)),
                 ('navigation_extenders', models.CharField(db_index=True, max_length=80, null=True, verbose_name='attached menu', blank=True)),
-                ('template', models.CharField(default=b'INHERIT', help_text='The template used to render the content.', max_length=100, verbose_name='template', choices=[(b'col_two.html', 'two columns'), (b'col_three.html', 'three columns'), (b'nav_playground.html', 'navigation examples'), (b'simple.html', 'simple'), (b'static.html', 'static placeholders'), (b'INHERIT', 'Inherit the template of the nearest ancestor')])),
+                ('template', models.CharField(default='INHERIT', help_text='The template used to render the content.', max_length=100, verbose_name='template', choices=[('col_two.html', 'two columns'), ('col_three.html', 'three columns'), ('nav_playground.html', 'navigation examples'), ('simple.html', 'simple'), ('static.html', 'static placeholders'), ('INHERIT', 'Inherit the template of the nearest ancestor')])),
                 ('login_required', models.BooleanField(default=False, verbose_name='login required')),
                 ('limit_visibility_in_menu', models.SmallIntegerField(default=None, choices=[(1, 'for logged in users only'), (2, 'for anonymous users only')], blank=True, help_text='limit when this page is visible in the menu', null=True, verbose_name='menu visibility', db_index=True)),
                 ('is_home', models.BooleanField(default=False, db_index=True, editable=False)),
@@ -107,10 +107,10 @@ class Migration(migrations.Migration):
                 ('site', models.ForeignKey(verbose_name='site', to='sites.Site', help_text='The site the page is accessible at.')),
             ],
             options={
-                'ordering': (b'tree_id', b'lft'),
+                'ordering': ('tree_id', 'lft'),
                 'verbose_name': 'page',
                 'verbose_name_plural': 'pages',
-                'permissions': ((b'view_page', b'Can view page'), (b'publish_page', b'Can publish page')),
+                'permissions': (('view_page', 'Can view page'), ('publish_page', 'Can publish page')),
             },
             bases=(models.Model,),
         ),
@@ -180,7 +180,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='page',
-            unique_together=set([(b'reverse_id', b'site', b'publisher_is_draft'), (b'publisher_is_draft', b'application_namespace')]),
+            unique_together=set([('reverse_id', 'site', 'publisher_is_draft'), ('publisher_is_draft', 'application_namespace')]),
         ),
         migrations.AddField(
             model_name='cmsplugin',
@@ -199,7 +199,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('name', models.CharField(max_length=255)),
                 ('cmsplugin_ptr', models.OneToOneField(auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
-                ('placeholder_ref', cms.models.fields.PlaceholderField(slotname=b'clipboard', editable=False, to='cms.Placeholder', null=True)),
+                ('placeholder_ref', cms.models.fields.PlaceholderField(slotname='clipboard', editable=False, to='cms.Placeholder', null=True)),
             ],
             options={
             },
@@ -209,10 +209,10 @@ class Migration(migrations.Migration):
             name='StaticPlaceholder',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(default=b'', help_text='Descriptive name to identify this static placeholder. Not displayed to users.', max_length=255, verbose_name='static placeholder name', blank=True)),
+                ('name', models.CharField(default='', help_text='Descriptive name to identify this static placeholder. Not displayed to users.', max_length=255, verbose_name='static placeholder name', blank=True)),
                 ('code', models.CharField(help_text='To render the static placeholder in templates.', max_length=255, verbose_name='placeholder code', blank=True)),
                 ('dirty', models.BooleanField(default=False, editable=False)),
-                ('creation_method', models.CharField(default=b'code', max_length=20, verbose_name='creation_method', blank=True, choices=[(b'template', 'by template'), (b'code', 'by code')])),
+                ('creation_method', models.CharField(default='code', max_length=20, verbose_name='creation_method', blank=True, choices=[('template', 'by template'), ('code', 'by code')])),
                 ('draft', cms.models.fields.PlaceholderField(slotname=cms.models.static_placeholder.static_slotname, editable=False, to='cms.Placeholder', null=True, verbose_name='placeholder content')),
                 ('public', cms.models.fields.PlaceholderField(slotname=cms.models.static_placeholder.static_slotname, editable=False, to='cms.Placeholder', null=True)),
                 ('site', models.ForeignKey(blank=True, to='sites.Site', null=True)),
@@ -225,7 +225,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='staticplaceholder',
-            unique_together=set([(b'code', b'site')]),
+            unique_together=set([('code', 'site')]),
         ),
         migrations.CreateModel(
             name='Title',
@@ -253,13 +253,13 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='title',
-            unique_together=set([(b'language', b'page')]),
+            unique_together=set([('language', 'page')]),
         ),
         migrations.CreateModel(
             name='UserSettings',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('language', models.CharField(help_text='The language for the admin interface and toolbar', max_length=10, verbose_name='Language', choices=[(b'en', b'English'), (b'fr', b'French'), (b'de', b'German'), (b'pt-br', b'Brazilian Portuguese'), (b'nl', b'Dutch'), (b'es-mx', 'Espa\xf1ol')])),
+                ('language', models.CharField(help_text='The language for the admin interface and toolbar', max_length=10, verbose_name='Language', choices=[('en', 'English'), ('fr', 'French'), ('de', 'German'), ('pt-br', 'Brazilian Portuguese'), ('nl', 'Dutch'), ('es-mx', 'Espa\xf1ol')])),
                 ('clipboard', models.ForeignKey(blank=True, editable=False, to='cms.Placeholder', null=True)),
                 ('user', models.ForeignKey(editable=False, to=settings.AUTH_USER_MODEL, unique=True)),
             ],
