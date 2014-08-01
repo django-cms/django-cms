@@ -265,11 +265,11 @@ class PageToolbar(CMSToolbar):
                                             disabled=not dirty)
         if self.page:
             if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
-                self.add_draft_live()
+                self.add_draft_live(True)
             elif statics:
                 for static_placeholder in statics:
                     if static_placeholder.has_change_permission(self.request):
-                        self.add_draft_live()
+                        self.add_draft_live(True)
                         break
             if not self.title and self.toolbar.edit_mode:
                 self.toolbar.add_modal_button(
@@ -283,14 +283,18 @@ class PageToolbar(CMSToolbar):
             if statics:
                 for static_placeholder in statics:
                     if static_placeholder.has_change_permission(self.request):
-                        self.add_draft_live()
+                        self.add_draft_live(False)
                         added = True
                         break
             if not added and placeholders:
-                self.add_draft_live()
+                self.add_draft_live(False)
 
-    def add_draft_live(self):
-        self.toolbar.add_item(TemplateItem("cms/toolbar/items/live_draft.html", extra_context={'request': self.request},
+    def add_draft_live(self, is_page):
+        if is_page:
+            self.toolbar.add_item(TemplateItem("cms/toolbar/items/live_draft.html", extra_context={'request': self.request},
+                                           side=self.toolbar.RIGHT), len(self.toolbar.right_items))
+        else:
+            self.toolbar.add_item(TemplateItem("cms/toolbar/items/editing_done.html", extra_context={'request': self.request},
                                            side=self.toolbar.RIGHT), len(self.toolbar.right_items))
 
     def change_language_menu(self):

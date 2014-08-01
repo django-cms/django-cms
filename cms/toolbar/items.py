@@ -268,7 +268,6 @@ class LinkItem(BaseItem):
             'extra_classes': self.extra_classes,
         }
 
-
 class SideframeItem(BaseItem):
     template = "cms/toolbar/items/item_sideframe.html"
 
