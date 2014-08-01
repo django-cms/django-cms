@@ -76,8 +76,8 @@ File and image handling
 Revision management
 -------------------
 
-* `django-reversion`_ 1.6.6 (with Django 1.4.X), 1.7 (with Django 1.5.X)
-  or 1.8 (with Django 1.6.X)  to support versions of your content (If using
+* `django-reversion`_ 1.6.6 (with Django 1.4.X), 1.7.X and 1.8 (exact) (with Django 1.5.X)
+  or 1.8.X (with Django 1.6.X and Django 1.7.X) to support versions of your content (If using
   a different Django version it is a good idea to check the page
   `Compatible-Django-Versions`_ in the django-reversion wiki in order
   to make sure that the package versions are compatible.)
