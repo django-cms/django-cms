@@ -66,11 +66,18 @@ class PluginPool(object):
                 if isinstance(template, six.string_types) and template:
                     try:
                         loader.get_template(template)
-                    except TemplateDoesNotExist:
-                        raise ImproperlyConfigured(
-                            "CMS Plugins must define a render template (%s) that exist: %s"
-                            % (plugin, template)
-                        )
+                    except TemplateDoesNotExist as e:
+                        # Note that the template loader will throw
+                        # TemplateDoesNotExist if the plugin's render_template
+                        # does in fact exist, but it includes a template that
+                        # doesn't.
+                        if e.message == template:
+                            raise ImproperlyConfigured(
+                                "CMS Plugins must define a render template (%s) that exists: %s"
+                                % (plugin, template)
+                            )
+                        else:
+                            pass
                     except TemplateSyntaxError:
                         pass
         else:
