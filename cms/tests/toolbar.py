@@ -27,7 +27,6 @@ from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.compat import DJANGO_1_4
-from cms.utils.compat.dj import is_user_swapped
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 
@@ -100,11 +99,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-
-        if is_user_swapped:
-            self.assertEqual(len(admin_items), 6, admin_items)
-        else:
-            self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
