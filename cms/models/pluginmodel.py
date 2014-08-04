@@ -450,6 +450,19 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 reversion_register(CMSPlugin)
 
 
+def get_plugin_media_path(instance, filename):
+    """
+    Django 1.7 requires that unbound function used in fields' definitions are defined outside the parent class
+     (see https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values)
+    This function is used withing field definition:
+
+        file = models.FileField(_("file"), upload_to=get_plugin_media_path)
+
+    and it invokes the bounded method on the given instance at runtime
+    """
+    return instance.get_media_path(filename)
+
+
 def deferred_class_factory(model, attrs):
     """
     Returns a class object that is a copy of "model" with the specified "attrs"
