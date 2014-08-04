@@ -15,7 +15,7 @@ What's the difference?
 
 The difference between a page extension and a title extension is related to
 the difference between the Page and Title models. Titles support pages by
-providing a storage mechanism, amoung other things, for language-specific
+providing a storage mechanism, among other things, for language-specific
 properties of Pages. So, if you find that you need to extend the page model in
 a language-specific manner, for example, if you need to create language-
 specific keywords for each language of your pages, then you may need to use a
