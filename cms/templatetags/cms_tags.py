@@ -345,9 +345,9 @@ class RenderPlugin(InclusionTag):
 
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
-        page = getattr(request, 'current_page', None)
+        placeholder = plugin.placeholder
 
-        if toolbar and toolbar.edit_mode and (not page or page.get_draft_object().has_change_permission(request)):
+        if toolbar and toolbar.edit_mode and placeholder.has_change_permission(request):
             from cms.middleware.toolbar import toolbar_plugin_processor
             return toolbar_plugin_processor,
 
