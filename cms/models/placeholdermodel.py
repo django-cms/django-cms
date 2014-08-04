@@ -107,21 +107,10 @@ class Placeholder(models.Model):
             return self._get_object_permission(obj, request, key)
 
     def _get_object_permission(self, obj, request, key):
-        found = False
-        model = obj.__class__
-        opts = model._meta
+        opts = obj._meta
         perm_accessor = getattr(opts, 'get_%s_permission' % key)
         perm_code = '%s.%s' % (opts.app_label, perm_accessor())
-        # if they don't have the permission for this attached model or object, bail out
-        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
-            return False
-        else:
-            found = True
-        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
-            return False
-        else:
-            found = True
-        return found
+        return request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)
 
     def has_change_permission(self, request):
         return self._get_permission(request, 'change')
