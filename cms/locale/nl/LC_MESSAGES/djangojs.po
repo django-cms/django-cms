@@ -5,14 +5,14 @@
 # Translators:
 # Chris Wesseling <chris.wesseling@xs4all.nl>, 2011
 # Jacques de Hooge <>, 2012
-# rene_ytec <rene@ytec.nl>, 2014
+# René Mulder <rene@ytec.nl>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-03 10:50+0200\n"
+"POT-Creation-Date: 2014-05-21 15:00+0200\n"
 "PO-Revision-Date: 2014-04-04 08:30+0000\n"
-"Last-Translator: rene_ytec <rene@ytec.nl>\n"
+"Last-Translator: René Mulder <rene@ytec.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django-cms/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

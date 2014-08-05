@@ -334,11 +334,12 @@ class RenderPlugin(InclusionTag):
         Argument('plugin')
     )
 
-    def get_context(self, context, plugin):
-        # Prepend frontedit toolbar output if applicable
+    def get_processors(self, context, plugin):
+        #
+        # Prepend frontedit toolbar output if applicable. Moved to its own
+        # method to aide subclassing the whole RenderPlugin if required.
+        #
         edit = False
-        if not plugin:
-            return {'content': ''}
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
         page = request.current_page
@@ -346,10 +347,17 @@ class RenderPlugin(InclusionTag):
             edit = True
         if edit:
             from cms.middleware.toolbar import toolbar_plugin_processor
-
             processors = (toolbar_plugin_processor,)
         else:
             processors = None
+        return processors
+
+
+    def get_context(self, context, plugin):
+        if not plugin:
+            return {'content': ''}
+        
+        processors=self.get_processors(context, plugin)
 
         return {'content': plugin.render_plugin(context, processors=processors)}
 
@@ -397,6 +405,45 @@ class PluginChildClasses(InclusionTag):
 
 
 register.tag(PluginChildClasses)
+
+
+class ExtraMenuItems(InclusionTag):
+    """
+    Accepts a placeholder or a plugin and renders the additional menu items.
+    """
+
+    template = "cms/toolbar/dragitem_extra_menu.html"
+    name = "extra_menu_items"
+    options = Options(
+        Argument('obj')
+    )
+
+    def get_context(self, context, obj):
+        # Prepend frontedit toolbar output if applicable
+        request = context['request']
+        items = []
+        if isinstance(obj, CMSPlugin):
+            plugin = obj
+            plugin_class_inst = plugin.get_plugin_class_instance()
+            item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
+            if item:
+                items.append(item)
+            plugin_classes = plugin_pool.get_all_plugins()
+            for plugin_class in plugin_classes:
+                plugin_class_inst = plugin_class()
+                item = plugin_class_inst.get_extra_global_plugin_menu_items(request, plugin)
+                if item:
+                    items += item
+
+        elif isinstance(obj, PlaceholderModel):
+            plugin_classes = plugin_pool.get_all_plugins()
+            for plugin_class in plugin_classes:
+                plugin_class_inst = plugin_class()
+                item = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
+                if item:
+                    items += item
+        return {'items': items}
+register.tag(ExtraMenuItems)
 
 
 class PageAttribute(AsTag):
@@ -728,9 +775,13 @@ class CMSEditableObject(InclusionTag):
                         instance._meta.app_label, instance._meta.module_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
-                    view_url = 'admin:%s_%s_change' % (
-                        instance._meta.app_label, instance._meta.module_name)
-                    url_base = reverse(view_url, args=(instance.pk,))
+                    if not view_url:
+                        view_url = 'admin:%s_%s_change' % (
+                            instance._meta.app_label, instance._meta.module_name)
+                    if isinstance(instance, Page):
+                        url_base = reverse(view_url, args=(instance.pk, language))
+                    else:
+                        url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (

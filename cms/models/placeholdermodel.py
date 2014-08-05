@@ -28,6 +28,22 @@ class Placeholder(models.Model):
     def __str__(self):
         return self.slot
 
+    def clear(self, language=None):
+        if language:
+            qs = self.cmsplugin_set.filter(language=language)
+        else:
+            qs = self.cmsplugin_set.all()
+        qs = qs.order_by('-level').select_related()
+        for plugin in qs:
+            inst, cls = plugin.get_plugin_instance()
+            if inst and getattr(inst, 'cmsplugin_ptr', False):
+                inst.cmsplugin_ptr._no_reorder = True
+                inst._no_reorder = True
+                inst.delete(no_mptt=True)
+            else:
+                plugin._no_reorder = True
+                plugin.delete(no_mptt=True)
+
     def get_label(self):
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
         name = _(name)
@@ -53,6 +69,10 @@ class Placeholder(models.Model):
 
     def get_copy_url(self):
         return self._get_url('copy_plugins')
+
+    def get_extra_menu_items(self):
+        from cms.plugin_pool import plugin_pool
+        return plugin_pool.get_extra_placeholder_menu_items(self)
 
     def get_cache_key(self, lang):
         cache_key = '%srender_placeholder:%s.%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))

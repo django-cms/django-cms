@@ -213,17 +213,21 @@ def get_app_patterns():
         app = apphook_pool.get_apphook(title.page.application_urls)
         app_ns = app.app_name, title.page.application_namespace
         with force_language(title.language):
-            hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title))
+            hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title), app)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs
     app_patterns = []
     for page_id in hooked_applications.keys():
         resolver = None
         for lang in hooked_applications[page_id].keys():
-            (app_ns, inst_ns), current_patterns = hooked_applications[page_id][lang]
+            (app_ns, inst_ns), current_patterns, app = hooked_applications[page_id][lang]
             if not resolver:
                 resolver = AppRegexURLResolver(r'', 'app_resolver', app_name=app_ns, namespace=inst_ns)
                 resolver.page_id = page_id
+            if app.permissions:
+                from cms.utils.decorators import cms_perms
+                for pat in current_patterns:
+                    pat._callback = cms_perms(pat.callback)
             extra_patterns = patterns('', *current_patterns)
             resolver.url_patterns_dict[lang] = extra_patterns
         app_patterns.append(resolver)

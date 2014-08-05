@@ -17,6 +17,8 @@ When using a custom user model (i.e. the AUTH_USER_MODEL Django setting), there 
 
 DjangoCMS expects a user model with at minimum the following fields: email, password, first_name, last_name, is_active, is_staff, and is_superuser.  Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as the USERNAME_FIELD (see Django documentation for more details).
 
+Additionally, the application in which the model is defined **must** be loaded before `cms` in `INSTALLED_APPS`.
+
 .. note::
 
     In most cases, it is better to create a UserProfile model with a one to one relationship to auth.User rather than creating a custom user model.  Custom user models are only necessary if you intended to alter the default behavior of the User model, not simply extend it.
@@ -51,6 +53,11 @@ Example::
     the ``js`` and ``css`` sekizai namespaces. For more information, see
     :ref:`sekizai-namespaces`.
 
+.. note::
+
+    Alternatively you can use :setting:`CMS_TEMPLATES_DIR` to define a directory
+    containing templates for django CMS.
+
 .. warning::
 
     django CMS requires some special templates to function correctly. These are
@@ -74,6 +81,50 @@ When enabled, pages' ``Template`` options will include a new default: *Inherit
 from the parent page* (unless the page is a root page).
 
 
+.. setting:: CMS_TEMPLATES_DIR
+
+CMS_TEMPLATES_DIR
+=================
+
+Default: ``None``
+
+Instead of explicitly providing a set of templates via :setting:`CMS_TEMPLATES`
+a directory can be provided using this configuration.
+
+`CMS_TEMPLATES_DIR` can be set to the (absolute) path of the templates directory,
+or set to a dictionary with `SITE_ID: template path` items::
+
+    CMS_TEMPLATES_DIR: {
+        1: '/absolute/path/for/site/1/',
+        2: '/absolute/path/for/site/2/',
+    }
+
+
+The provided directory is scanned and all templates in it are loaded as templates for
+django CMS.
+
+Template loaded and their names can be customized using the templates dir as a
+python module, by creating a ``__init__.py`` file in the templates directory.
+The file contains a single ``TEMPLATES`` dictionary with the list of templates
+as keys and template names as values::::
+
+    # -*- coding: utf-8 -*-
+    from django.utils.translation import ugettext_lazy as _
+    TEMPLATES = {
+        'col_two.html': _('Two columns'),
+        'col_three.html': _('Three columns'),
+    }
+
+Being a normal python file, templates labels can be passed through gettext
+for translation.
+
+.. note::
+
+    As templates are still loaded by the Django template loader, the given
+    directory **must** be reachable by the template loading system.
+    Currently **filesystem** and **app_directory** loader schemas are tested and
+    supported.
+
 .. setting:: CMS_PLACEHOLDER_CONF
 
 CMS_PLACEHOLDER_CONF
@@ -95,10 +146,10 @@ Example::
             'language_fallback': True,
             'default_plugins':[
                 {
-                    'plugin_type':'TextPlugin', 
-                    'values':{
-                        'body':'<p>Lorem ipsum dolor sit amet...</p>'
-                    }, 
+                    'plugin_type': 'TextPlugin',
+                    'values': {
+                        'body':'<p>Lorem ipsum dolor sit amet...</p>',
+                    },
                 },
             ]
             'child_classes': {
@@ -163,17 +214,17 @@ plugins, as shown above with ``base.html content``.
 .. _placeholder_default_plugins:
 
 ``default_plugins``
-    You can specify the list of default plugins which will be automagically 
+    You can specify the list of default plugins which will be automagically
     added when the placeholder will be created (or rendered).
     Each element of the list is a dictionary with following keys :
 
-    ``plugin_type`` 
+    ``plugin_type``
         It's the plugin type to add to the placeholder
         Example : 'TextPlugin'
 
     ``values``
         Dictionnary to use for the plugin creation.
-        It depends on the ``plugin_type``. See the documentation of each 
+        It depends on the ``plugin_type``. See the documentation of each
         plugin type to see which parameters are required and available.
         Example for a Textplugin :
         {'body':'<p>Lorem ipsum</p>'}
@@ -181,10 +232,10 @@ plugins, as shown above with ``base.html content``.
         {'name':'Django-CMS','url':'https://www.django-cms.org'}
 
     ``children``
-        It is a list of dictionnaries to configure default plugins 
-        to add as children for the current plugin (it must accepts children). 
-        Each dictionnary accepts same args than dictionnaries of 
-        ``default_plugins`` : ``plugin_type``, ``values``, ``children`` 
+        It is a list of dictionnaries to configure default plugins
+        to add as children for the current plugin (it must accepts children).
+        Each dictionnary accepts same args than dictionnaries of
+        ``default_plugins`` : ``plugin_type``, ``values``, ``children``
         (yes, it is recursive).
 
     Complete example of default_plugins usage::
@@ -195,7 +246,7 @@ plugins, as shown above with ``base.html content``.
                 'plugins': ['TextPlugin', 'LinkPlugin'],
                 'default_plugins':[
                     {
-                        'plugin_type':'TextPlugin', 
+                        'plugin_type':'TextPlugin',
                         'values':{
                             'body':'<p>Great websites : %(_tag_child_1)s and %(_tag_child_2)s</p>'
                         },
@@ -203,14 +254,14 @@ plugins, as shown above with ``base.html content``.
                             {
                                 'plugin_type':'LinkPlugin',
                                 'values':{
-                                    'name':'django', 
+                                    'name':'django',
                                     'url':'https://www.djangoproject.com/'
                                 },
                             },
                             {
                                 'plugin_type':'LinkPlugin',
                                 'values':{
-                                    'name':'django-cms', 
+                                    'name':'django-cms',
                                     'url':'https://www.django-cms.org'
                                 },
                                 # If using LinkPlugin from djangocms-link which
@@ -245,7 +296,7 @@ plugins, as shown above with ``base.html content``.
     example, the configuration for "base.html content" inherits from "content"
     and just overwrite the "plugins" setting to allow TeaserPlugin, thus you
     have not to duplicate your "content"'s configuration.
-    
+
 .. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
 CMS_PLUGIN_CONTEXT_PROCESSORS
@@ -795,7 +846,7 @@ CMS_DEFAULT_X_FRAME_OPTIONS
 
 Default: ``Page.X_FRAME_OPTIONS_INHERIT``
 
-This setting is the default value for a Page's X Frame Options setting. 
+This setting is the default value for a Page's X Frame Options setting.
 This should be an integer preferably taken from the Page object e.g.
 
 - X_FRAME_OPTIONS_INHERIT

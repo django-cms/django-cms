@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import itertools
-from cms.utils.conf import get_cms_setting
-from cms.toolbar.toolbar import CMSToolbar
-from sekizai.context import SekizaiContext
 import warnings
 
 from django.conf import settings
@@ -22,18 +19,19 @@ from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
+from sekizai.context import SekizaiContext
 
 from cms import constants
+from cms.admin.placeholderadmin import PlaceholderAdmin, PlaceholderAdminMixin
 from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
-from cms.admin.placeholderadmin import PlaceholderAdmin, PlaceholderAdminMixin
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
+from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from cms.test_utils.project.placeholderapp.models import (
     Example1,
     TwoPlaceholderExample,
@@ -43,11 +41,12 @@ from cms.test_utils.project.placeholderapp.models import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils.compat.dj import force_unicode
+from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.compat.dj import force_unicode, get_user_model
+from cms.utils.compat.tests import UnittestCompatMixin
+from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
 from cms.utils.plugins import get_placeholders, assign_plugins
-from cms.compat import get_user_model
-from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
@@ -920,6 +919,24 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
+
+    def test_no_limit_check_same_placeholder_move(self):
+        admin_instance = self.get_admin()
+        superuser = self.get_superuser()
+        source_placeholder = self.get_placeholder()
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
+                                                 'plugin_order': 1, })
+                response = admin_instance.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
 
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()

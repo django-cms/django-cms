@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import with_statement
 import datetime
 import re
-from cms.utils.conf import get_cms_setting
 
 from django.template.defaultfilters import truncatewords
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -13,25 +11,26 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 
-from cms.models import UserSettings, PagePermission
-from cms.models import Page
-from cms.views import details
 from cms.api import create_page, create_title, add_plugin
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
-from cms.compat import is_user_swapped
+from cms.middleware.toolbar import ToolbarMiddleware
+from cms.models import Page, UserSettings, PagePermission
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
-from cms.middleware.toolbar import ToolbarMiddleware
-from cms.test_utils.testcases import (SettingsOverrideTestCase,
-                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.project.placeholderapp.models import (Example1,
                                                           MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import (detail_view,
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered)
+from cms.test_utils.testcases import (SettingsOverrideTestCase,
+                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
+from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.compat import DJANGO_1_4
+from cms.utils.compat.dj import is_user_swapped
+from cms.utils.conf import get_cms_setting
+from cms.views import details
+
 
 class ToolbarTestBase(SettingsOverrideTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
@@ -921,9 +920,25 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
-            response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
-                'placeholderapp', 'example1', 'callable_item', ex1.pk))
+            response,"'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+    
+    def test_view_url(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,"'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
 
     def test_method_attribute(self):
         user = self.get_staff()

@@ -12,6 +12,7 @@
 				<div class="cms_submenu-item"><a data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
 			{% endif %}{% endfor %}
 			<div class="cms_submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
+            {% extra_menu_items placeholder %}
 			{% plugin_child_classes placeholder %}
 		</div>
 	</div>

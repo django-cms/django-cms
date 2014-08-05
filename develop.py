@@ -13,11 +13,13 @@ from docopt import docopt
 from django import VERSION
 from django.utils import autoreload
 from django.utils.encoding import force_text
+from django.core.management import call_command
 
 import cms
 from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
+from cms.utils.compat import DJANGO_1_6
 
 __doc__ = '''django CMS development helper script. 
 
@@ -33,6 +35,7 @@ Usage:
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
+    develop.py makemigrations
     develop.py pyflakes
     develop.py authors
 
@@ -49,18 +52,20 @@ Options:
 '''
 
 
-def server(bind='127.0.0.1', port=8000, migrate=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
     if os.environ.get("RUN_MAIN") != "true":
-        from south.management.commands import syncdb, migrate
-        if migrate:
-            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
-            migrate.Command().handle(interactive=False, verbosity=1)
+        from cms.utils.compat.dj import get_user_model
+        if DJANGO_1_6:
+            from south.management.commands import syncdb, migrate
+            if migrate_cmd:
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
+                migrate.Command().handle(interactive=False, verbosity=1)
+            else:
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
+                migrate.Command().handle(interactive=False, verbosity=1, fake=True)
         else:
-            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
-            migrate.Command().handle(interactive=False, verbosity=1, fake=True)
-        
-        from cms.compat import get_user_model
-        User = get_user_model()        
+            call_command("migrate", database='default')
+        User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
 
@@ -107,6 +112,7 @@ def _get_test_labels():
             for method, _ in cls.methods.items():
                 if method.startswith('test_'):
                     test_labels.append('cms.%s.%s' % (clsname, method))
+    test_labels = sorted(test_labels)
     return test_labels
 
 
@@ -172,6 +178,11 @@ def shell():
     from django.core.management import call_command
     call_command('shell')
 
+
+def makemigrations():
+    from django.core.management import call_command
+    call_command('makemigrations', *['cms', 'menus'])
+    
 
 def generate_authors():
     print("Generating AUTHORS")
@@ -287,13 +298,15 @@ def main():
                         num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
                     sys.exit(num_failures)
             elif args['server']:
-                server(args['--bind'], args['--port'], migrate)
+                server(args['--bind'], args['--port'], args.get('--migrate', True))
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
                 compilemessages()
             elif args['makemessages']:
                 makemessages()
+            elif args['makemigrations']:
+                makemigrations()
 
 
 if __name__ == '__main__':

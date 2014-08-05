@@ -409,6 +409,38 @@ Or, if you are rendering a plugin, of the context instance::
                     current_app=current_app)
             # ...
 
+.. _apphook_permissions:
+
+Apphook Permissions
+-------------------
+
+By default all apphooks have the same permissions set as the page they are assigned to.
+So if you set login required on page the attached apphook and all it's urls have the same
+requirements.
+
+To disable this behavior set ``permissions = False`` on your apphook::
+
+    class SampleApp(CMSApp):
+        name = _("Sample App")
+        urls = ["project.sampleapp.urls"]
+        permissions = False
+
+
+
+If you still want some of your views to have permission checks you can enable them via a decorator:
+
+``cms.utils.decorators.cms_perms``
+
+Here is a simple example::
+
+    from cms.utils.decorators import cms_perms
+
+    @cms_perms
+    def my_view(request, **kw):
+        ...
+
+
+
 
 Automatically restart server on apphook changes
 -----------------------------------------------
@@ -433,6 +465,7 @@ should not be needed.
 
     The signal is fired **after** a request. If you change something via API
     you need a request for the signal to fire.
+
 
 .. _integration_modifiers:
 

@@ -4,13 +4,13 @@
 # 
 # Translators:
 # Boris Chervenkov <office@sentido.bg>, 2012
-# amarov <boyko.amarov@gmail.com>, 2013
+# Boyko Amarov <boyko.amarov@gmail.com>, 2013
 # suleyman <posta@suleymans.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-03 10:50+0200\n"
+"POT-Creation-Date: 2014-05-21 15:00+0200\n"
 "PO-Revision-Date: 2013-12-12 08:53+0000\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django-cms/language/bg/)\n"

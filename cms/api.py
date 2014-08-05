@@ -18,7 +18,6 @@ from django.template.defaultfilters import slugify
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.compat import get_user_model
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import PageUser, PagePermission, \
     GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS
@@ -28,6 +27,7 @@ from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
+from cms.utils.compat.dj import get_user_model
 from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
@@ -191,7 +191,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         application_urls = None
 
     if reverse_id:
-        if Page.objects.drafts().filter(reverse_id=reverse_id).count():
+        if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).count():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(

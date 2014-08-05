@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
-from django.utils.timezone import now, make_aware, get_current_timezone
-from cms import constants, api
 import os.path
 
 from django.conf import settings
@@ -12,8 +10,9 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
-from django.utils import timezone
+from django.utils.timezone import now as tz_now, make_aware, get_current_timezone
 
+from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
@@ -21,16 +20,18 @@ from cms.middleware.user import CurrentUserMiddleware
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from djangocms_link.cms_plugins import LinkPlugin
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride, SettingsOverride, UserLoginContext)
 from cms.utils import get_cms_setting
+from cms.utils.compat.dj import installed_apps
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
+
+from djangocms_link.cms_plugins import LinkPlugin
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 
 
 class PageMigrationTestCase(CMSTestCase):
@@ -131,9 +132,9 @@ class PagesTestCase(CMSTestCase):
         """
         Test a slug collision
         """
-        api.create_page("home", 'nav_playground.html', "en")
-        page = api.create_page("page", 'nav_playground.html', "en")
-        subPage = api.create_page("subpage", 'nav_playground.html', "en", parent=page)
+        create_page("home", 'nav_playground.html', "en")
+        page = create_page("page", 'nav_playground.html', "en")
+        subPage = create_page("subpage", 'nav_playground.html', "en", parent=page)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
 
@@ -147,7 +148,6 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
             self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
-
 
     def test_get_available_slug_recursion(self):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
@@ -249,7 +249,7 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be edited multiple times with moderator
         """
-        api.create_page("home", "nav_playground.html", "en", published=True)
+        create_page("home", "nav_playground.html", "en", published=True)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
@@ -271,7 +271,6 @@ class PagesTestCase(CMSTestCase):
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'new title')
-
 
     def test_meta_description_fields_from_admin(self):
         """
@@ -311,7 +310,6 @@ class PagesTestCase(CMSTestCase):
             req.REQUEST = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
 
-
     def test_page_obj_change_data_from_template_tags(self):
         from django import template
 
@@ -320,7 +318,7 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             change_user = str(superuser)
             #some databases don't store microseconds, so move the start flag back by 1 second
-            before_change = now()+datetime.timedelta(seconds=-1)
+            before_change = tz_now()+datetime.timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
@@ -328,7 +326,7 @@ class PagesTestCase(CMSTestCase):
             req = HttpRequest()
             page.save()
             page.publish('en')
-            after_change = now()
+            after_change = tz_now()
             req.current_page = page
             req.REQUEST = {}
 
@@ -481,7 +479,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(CMSSitemap().items().count(), 0)
 
     def test_sitemap_includes_last_modification_date(self):
-        one_day_ago = timezone.now() - datetime.timedelta(days=1)
+        one_day_ago = tz_now() - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=one_day_ago)
         page.creation_date = one_day_ago
         page.save()
@@ -492,7 +490,7 @@ class PagesTestCase(CMSTestCase):
         self.assertTrue(actual_last_modification_time > one_day_ago)
 
     def test_sitemap_uses_publication_date_when_later_than_modification(self):
-        now = timezone.now()
+        now = tz_now()
         now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en", published=True, publication_date=now)
@@ -525,7 +523,6 @@ class PagesTestCase(CMSTestCase):
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
-
 
     def test_templates(self):
         """
@@ -663,7 +660,7 @@ class PagesTestCase(CMSTestCase):
         Test that a page which has a end date in the past gives a 404, not a
         500.
         """
-        yesterday = timezone.now() - datetime.timedelta(days=1)
+        yesterday = tz_now() - datetime.timedelta(days=1)
         with SettingsOverride(CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en',
                                publication_end_date=yesterday, published=True)
@@ -1028,12 +1025,20 @@ class NoAdminPageTests(CMSTestCase):
 
     def setUp(self):
         admin = 'django.contrib.admin'
-        noadmin_apps = [app for app in settings.INSTALLED_APPS if not app == admin]
-        self._ctx = SettingsOverride(INSTALLED_APPS=noadmin_apps)
-        self._ctx.__enter__()
+        noadmin_apps = [app for app in installed_apps() if not app == admin]
+        try:
+            from django.apps import apps
+            apps.set_installed_apps(noadmin_apps)
+        except ImportError:
+            self._ctx = SettingsOverride(INSTALLED_APPS=noadmin_apps)
+            self._ctx.__enter__()
 
     def tearDown(self):
-        self._ctx.__exit__(None, None, None)
+        try:
+            from django.apps import apps
+            apps.unset_installed_apps()
+        except ImportError:
+            self._ctx.__exit__(None, None, None)
 
     def test_get_page_from_request_fakeadmin_nopage(self):
         request = self.get_request('/en/admin/')

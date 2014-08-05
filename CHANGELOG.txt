@@ -227,7 +227,21 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Frontend editor UI fixes
 - Fix in cms fix-mptt command
 
-==== 3.0.2 ===
+==== 3.0.2 (2014-05-21 ===
 - Add 'as' form to render_placeholder templatetag to save the result in context
 - Added changeable strings for "?edit", "?edit_off" and "?build" urls
 - utils.page_resolver was optimized. get_page_from_path() api changed
+
+==== 3.0.3 (2014-06-XX) ===
+- Added an alias plugin for referencing plugins and placeholders
+- Added an api to change the context menus of plugins and placeholders from plugins
+- Apphooks respect the page permissions
+- Decorator for views with page permissions
+- #3266 - api.create_page respects site
+- Fixed how permissions are checked for static placeholder.
+- Reduced queries on placeholder.clear by 60%
+- auto-detect django-suit instead of using explicit setting
+- Added the ability to mark (Sub)Menu's 'active'.
+- fallback language fixes for pages
+- Implemented transaction.atomic in django 1.4/1.5 way
+- Added a automatic dynamic template directory for page templates

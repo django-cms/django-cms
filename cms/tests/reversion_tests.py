@@ -201,7 +201,6 @@ class ReversionTestCase(TransactionCMSTestCase):
             response = self.client.get('/en/page1/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             self.assertEqual(response.status_code, 200)
 
-
     def test_recover(self):
         """
         Test that you can recover a page

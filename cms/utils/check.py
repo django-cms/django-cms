@@ -12,8 +12,9 @@ from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
 
 from cms import constants
+from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_app_paths
+from cms.utils.compat.dj import get_app_paths, is_installed
 from cms.utils.compat.type_checks import int_types
 
 
@@ -164,7 +165,7 @@ def define_check(func):
 @define_check
 def check_sekizai(output):
     with output.section("Sekizai") as section:
-        if 'sekizai' in settings.INSTALLED_APPS:
+        if is_installed('sekizai'):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
@@ -271,7 +272,7 @@ def check_copy_relations(output):
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._meta.get_all_related_objects():
-                if rel.model != CMSPlugin:
+                if rel.model != CMSPlugin and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),

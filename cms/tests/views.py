@@ -192,15 +192,15 @@ class ContextTests(SettingsOverrideTestCase):
         # to cms.context_processors.cms_settings.
         # Executing this oputside queries assertion context ensure
         # repetability
-        self.client.get("/en/admin/")
+        self.client.get("/en/plain_view/")
 
         cache.clear()
         menu_pool.clear()
         context._standard_context_processors = None
         # Number of queries when context processors is not enabled
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
-            with self.assertNumQueries(FuzzyInt(0, 4)) as context:
-                response = self.client.get("/en/admin/")
+            with self.assertNumQueries(FuzzyInt(0, 12)) as context:
+                response = self.client.get("/en/plain_view/")
                 if DJANGO_1_5:
                     num_queries = len(context.connection.queries) - context.starting_queries
                 else:
@@ -212,10 +212,10 @@ class ContextTests(SettingsOverrideTestCase):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=original_context):
             # no extra query is run when accessing urls managed by standard
             # django applications
-            with self.assertNumQueries(num_queries):
-                response = self.client.get("/en/admin/")
+            with self.assertNumQueries(FuzzyInt(0, num_queries)):
+                response = self.client.get("/en/plain_view/")
             # One query when determining current page
-            with self.assertNumQueries(1):
+            with self.assertNumQueries(FuzzyInt(0, 1)):
                 self.assertFalse(response.context['request'].current_page)
                 self.assertFalse(response.context['request']._current_page_cache)
             # Zero more queries when determining the current template
