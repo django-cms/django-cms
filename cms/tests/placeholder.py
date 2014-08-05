@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import itertools
 import warnings
+from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings
 from django.contrib import admin
@@ -9,7 +10,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
@@ -114,9 +114,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
     def test_fieldsets_requests(self):
-        response = self.client.get(reverse('admin:placeholderapp_example1_add'))
+        response = self.client.get(admin_reverse('placeholderapp_example1_add'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_twoplaceholderexample_add'))
+        response = self.client.get(admin_reverse('placeholderapp_twoplaceholderexample_add'))
         self.assertEqual(response.status_code, 200)
 
     def test_page_only_plugins(self):
@@ -127,7 +127,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             char_4='four'
         )
         ex.save()
-        response = self.client.get(reverse('admin:placeholderapp_example1_change', args=(ex.pk,)))
+        response = self.client.get(admin_reverse('placeholderapp_example1_change', args=(ex.pk,)))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
 
@@ -147,7 +147,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ph2_pl1 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin1').cmsplugin_ptr
         ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
-        response = self.client.post(reverse('admin:placeholderapp_twoplaceholderexample_move_plugin'), {
+        response = self.client.post(admin_reverse('placeholderapp_twoplaceholderexample_move_plugin'), {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
             'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
@@ -178,7 +178,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
-                reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
+                admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
             self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
@@ -197,7 +197,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
-                reverse('admin:cms_page_change', args=(page.pk,)),
+                admin_reverse('cms_page_change', args=(page.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
             self.assertContains(response, "CMS.API.Helpers.reloadBrowser")

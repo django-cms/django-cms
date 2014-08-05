@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse
+from cms.utils.urlutils import admin_reverse
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
@@ -87,11 +87,11 @@ class Placeholder(models.Model):
         if pk:
             args.append(pk)
         if not model:
-            return reverse('admin:cms_page_%s' % key, args=args)
+            return admin_reverse('cms_page_%s' % key, args=args)
         else:
             app_label = model._meta.app_label
             model_name = model.__name__.lower()
-            return reverse('admin:%s_%s_%s' % (app_label, model_name, key), args=args)
+            return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
     def _get_permission(self, request, key):
         """

@@ -1,10 +1,9 @@
 {% extends "admin/cms/page/history/revision_header.html" %}
-{% load i18n %}
-{% load url from future %}
+{% load i18n cms_tags %}
 
 {% block extrahead %}
 {{ block.super }}
-<script src="{% url "admin:jsi18n" %}"></script>
+<script src="{% cms_admin_url "jsi18n" %}"></script>
 {{ media }}
 {% endblock %}
 

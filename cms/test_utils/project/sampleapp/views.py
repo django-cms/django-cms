@@ -1,5 +1,6 @@
 # Create your views here.
-from django.core.urlresolvers import reverse, resolve
+from cms.utils.urlutils import admin_reverse
+from django.core.urlresolvers import resolve
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -19,7 +20,7 @@ def category_view(request, id):
     cat = Category.objects.get(pk=id)
     if request.user.is_staff:
         category_menu = request.toolbar.get_or_create_menu('category', _('Category'))
-        change_url = reverse('admin:sampleapp_category_change', args=(cat.pk,))
+        change_url = admin_reverse('sampleapp_category_change', args=(cat.pk,))
         category_menu.add_modal_item(_("Change Category"), url=change_url)
     return render_to_response('sampleapp/category_view.html',
                               RequestContext(request, {'category': cat}))

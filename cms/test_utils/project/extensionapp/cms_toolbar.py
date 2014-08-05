@@ -3,7 +3,8 @@ from cms.api import get_page_draft
 from cms.test_utils.project.extensionapp.models import MyTitleExtension, MyPageExtension
 from cms.utils import get_cms_setting
 from cms.utils.permissions import has_page_change_permission
-from django.core.urlresolvers import reverse, NoReverseMatch
+from cms.utils.urlutils import admin_reverse
+from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 
 from cms.toolbar_pool import toolbar_pool
@@ -34,9 +35,9 @@ class MyTitleExtensionToolbar(CMSToolbar):
                 mytitleextension = None
             try:
                 if mytitleextension:
-                    url = reverse('admin:extensionapp_mytitleextension_change', args=(mytitleextension.pk,))
+                    url = admin_reverse('extensionapp_mytitleextension_change', args=(mytitleextension.pk,))
                 else:
-                    url = reverse('admin:extensionapp_mytitleextension_add') + '?extended_object=%s' % self.page.pk
+                    url = admin_reverse('extensionapp_mytitleextension_add') + '?extended_object=%s' % self.page.pk
             except NoReverseMatch:
                 # not in urls
                 pass
@@ -70,9 +71,9 @@ class MyPageExtensionToolbar(CMSToolbar):
                 mypageextension = None
             try:
                 if mypageextension:
-                    url = reverse('admin:extensionapp_mypageextension_change', args=(mypageextension.pk,))
+                    url = admin_reverse('extensionapp_mypageextension_change', args=(mypageextension.pk,))
                 else:
-                    url = reverse('admin:extensionapp_mypageextension_add') + '?extended_object=%s' % self.page.pk
+                    url = admin_reverse('extensionapp_mypageextension_add') + '?extended_object=%s' % self.page.pk
             except NoReverseMatch:
                 # not in urls
                 pass
