@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):
@@ -96,7 +96,7 @@ class AliasPlugin(CMSPluginBase):
                 return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
         clipboard = request.toolbar.clipboard
         clipboard.cmsplugin_set.all().delete()
-        language = request.LANGUAGE_CODE
+        language = get_language()
         if plugin:
             language = plugin.language
         alias = AliasPluginModel(language=language, placeholder=clipboard, plugin_type="AliasPlugin")
