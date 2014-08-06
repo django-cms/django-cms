@@ -33,7 +33,7 @@ from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticP
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
-from cms.utils import get_language_from_request, get_cms_setting, get_site_id
+from cms.utils import get_language_from_request, get_site_id
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
@@ -364,6 +364,7 @@ class RenderPlugin(InclusionTag):
         if not plugin:
             return {'content': ''}
 
+        placeholder = context.get('cms_placeholder_instance', None)
         processors=self.get_processors(context, plugin)
 
         return {'content': plugin.render_plugin(context, placeholder=placeholder, processors=processors)}
