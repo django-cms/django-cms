@@ -18,7 +18,7 @@ from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 
 @python_2_unicode_compatible
 class Placeholder(models.Model):
-    slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
     cache_placeholder = True
 
