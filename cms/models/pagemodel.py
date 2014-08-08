@@ -141,8 +141,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 title = self.title_set.all()[0]
             except IndexError:
                 title = None
-        if title is None:
-            title = u""
+        if not title:
+            title = ''
         return force_text(title)
 
     def __repr__(self):
