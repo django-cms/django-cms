@@ -1,26 +1,30 @@
 # -*- coding: utf-8 -*-
-from datetime import date
+from __future__ import unicode_literals
+
+import datetime
 import json
 import os
 import warnings
+
+from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.db import models
+from django.db.models import signals, Model
+from django.db.models.base import model_unpickle
+from django.db.models.query_utils import DeferredAttribute
+from django.utils import timezone
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
+from mptt.models import MPTTModel, MPTTModelBase
+
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_5
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.helpers import reversion_register
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.db import models
-from django.db.models.base import model_unpickle
-from django.db.models.query_utils import DeferredAttribute
-from django.utils import timezone
-from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import signals, Model
-from mptt.models import MPTTModel, MPTTModelBase
 
 
 class BoundRenderMeta(object):
@@ -124,18 +128,19 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return (model_unpickle, (model, defers, factory), data)
 
     def __str__(self):
-        return force_unicode(self.pk)
+        return force_text(self.pk)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
 
-        return plugin_pool.get_plugin(self.plugin_type).name
+        return force_text(plugin_pool.get_plugin(self.plugin_type).name)
 
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
-        if instance is not None:
-            return force_unicode(instance)
-        return _("<Empty>")
+        if instance:
+            return instance
+        else:
+            return _('<Empty>')
 
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
@@ -212,7 +217,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         if pages.count():
             return pages[0].get_media_path(filename)
         else:  # django 1.0.2 compatibility
-            today = date.today()
+            today = datetime.date.today()
             return os.path.join(get_cms_setting('PAGE_MEDIA_PATH'),
                                 str(today.year), str(today.month), str(today.day), filename)
 
@@ -232,7 +237,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         if instance:
             return plugin.icon_src(instance)
         else:
-            return u''
+            return ''
 
     def get_instance_icon_alt(self):
         """
@@ -240,9 +245,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         """
         instance, plugin = self.get_plugin_instance()
         if instance:
-            return force_unicode(plugin.icon_alt(instance))
+            return plugin.icon_alt(instance)
         else:
-            return u''
+            return ''
 
     def save(self, no_signals=False, *args, **kwargs):
         if no_signals:  # ugly hack because of mptt
@@ -363,25 +368,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         breadcrumb = []
         if not self.parent_id:
             try:
-                url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[self.pk]))
+                url = reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name), args=[self.pk])
             except NoReverseMatch:
-                url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
-                            args=[self.pk]))
-            breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
+                url = reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name), args=[self.pk])
+            breadcrumb.append({'title': self.get_plugin_name(), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
             try:
-                url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[parent.pk]))
+                url = reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name), args=[parent.pk])
             except NoReverseMatch:
-                url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
-                            args=[parent.pk]))
-            breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
+                url = reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name), args=[parent.pk])
+            breadcrumb.append({'title': parent.get_plugin_name(), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):

@@ -1,12 +1,15 @@
+from __future__ import unicode_literals
+
 import uuid
 
-from cms.utils.compat.dj import python_2_unicode_compatible
-from cms.utils.copy_plugins import copy_plugins_to
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+
 from cms.models.fields import PlaceholderField
+from cms.utils.copy_plugins import copy_plugins_to
 
 
 def static_slotname(instance):
@@ -26,12 +29,12 @@ class StaticPlaceholder(models.Model):
         (CREATION_BY_CODE, _('by code')),
     )
     name = models.CharField(
-        verbose_name=_(u'static placeholder name'), max_length=255, blank=True, default='',
-        help_text=_(u'Descriptive name to identify this static placeholder. Not displayed to users.'))
+        verbose_name=_('static placeholder name'), max_length=255, blank=True, default='',
+        help_text=_('Descriptive name to identify this static placeholder. Not displayed to users.'))
     code = models.CharField(
-        verbose_name=_(u'placeholder code'), max_length=255, blank=True,
-        help_text=_(u'To render the static placeholder in templates.'))
-    draft = PlaceholderField(static_slotname, verbose_name=_(u'placeholder content'), related_name='static_draft')
+        verbose_name=_('placeholder code'), max_length=255, blank=True,
+        help_text=_('To render the static placeholder in templates.'))
+    draft = PlaceholderField(static_slotname, verbose_name=_('placeholder content'), related_name='static_draft')
     public = PlaceholderField(static_slotname, editable=False, related_name='static_public')
     dirty = models.BooleanField(default=False, editable=False)
     creation_method = models.CharField(
@@ -41,8 +44,8 @@ class StaticPlaceholder(models.Model):
     site = models.ForeignKey(Site, null=True, blank=True)
 
     class Meta:
-        verbose_name = _(u'static placeholder')
-        verbose_name_plural = _(u'static placeholders')
+        verbose_name = _('static placeholder')
+        verbose_name_plural = _('static placeholders')
         app_label = 'cms'
         unique_together = (('code', 'site'),)
 
@@ -52,13 +55,13 @@ class StaticPlaceholder(models.Model):
     def clean(self):
         # TODO: check for clashes if the random code is already taken
         if not self.code:
-            self.code = u'static-%s' % uuid.uuid4()
+            self.code = 'static-%s' % uuid.uuid4()
         if not self.site:
             placeholders = StaticPlaceholder.objects.filter(code=self.code, site__isnull=True)
             if self.pk:
                 placeholders = placeholders.exclude(pk=self.pk)
             if placeholders.exists():
-                raise ValidationError(_("A static placeholder with the same site and code already exists"))
+                raise ValidationError(_('A static placeholder with the same site and code already exists'))
 
     def publish(self, request, language, force=False):
         if force or self.has_publish_permission(request):

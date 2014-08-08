@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from __future__ import unicode_literals
+
 from django.conf import settings
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from django.db import models
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
+
 
 user_model_label = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+
 
 @python_2_unicode_compatible
 class UserSettings(models.Model):
     user = models.ForeignKey(user_model_label, unique=True, editable=False, related_name='djangocms_usersettings')
-    language = models.CharField(_("Language"), max_length=10, choices=settings.LANGUAGES,
-                                help_text=_("The language for the admin interface and toolbar"))
+    language = models.CharField(_('Language'), max_length=10, choices=settings.LANGUAGES,
+                                help_text=_('The language for the admin interface and toolbar'))
     clipboard = models.ForeignKey('cms.Placeholder', blank=True, null=True, editable=False)
 
     class Meta:
@@ -19,6 +23,4 @@ class UserSettings(models.Model):
         app_label = 'cms'
 
     def __str__(self):
-        return force_unicode(self.user)
-
-
+        return force_text(self.user)
