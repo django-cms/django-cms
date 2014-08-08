@@ -24,6 +24,12 @@ def validate_settings():
     if 'django.core.context_processors.request' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
         raise ImproperlyConfigured('django CMS requires django.core.context_processors.request in settings.TEMPLATE_CONTEXT_PROCESSORS to work correctly.')
 
+    multilingual_middleware = 'cms.middleware.multilingual.MultilingualURLMiddleware'
+    locale_middleware =  'django.middleware.locale.LocaleMiddleware'
+
+    if multilingual_middleware in settings.MIDDLEWARE_CLASSES and locale_middleware in settings.MIDDLEWARE_CLASSES:
+        raise ImproperlyConfigured('django CMS MultilingualURLMiddleware replaces django.middleware.locale.LocaleMiddleware! Please remove django.middleware.locale.LocaleMiddleware from your MIDDLEWARE_CLASSES settings.')
+
 
 def setup():
     """
