@@ -362,7 +362,7 @@ class RenderPlugin(InclusionTag):
     def get_context(self, context, plugin):
         if not plugin:
             return {'content': ''}
-        
+
         processors=self.get_processors(context, plugin)
 
         return {'content': plugin.render_plugin(context, processors=processors)}

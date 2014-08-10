@@ -22,9 +22,9 @@ $(document).ready(function () {
 		'onClose': {% if refresh_page %}'REFRESH_PAGE'{% else %}{% if redirect_on_close %}'{{ redirect_on_close }}'{% else %}false{% endif %}{% endif %},
 		'urls': {
 			'add_plugin': '{% if add_url %}{{ add_url }}{% else %}{% cms_admin_url "cms_page_add_plugin" %}}{% endif %}',
-			'edit_plugin': '{% if edit_url %}{{ edit_url }}{% else %}{% cms_admin_url "cms_page_edit_plugin" instance.pk %}{% endif %}',
+			'edit_plugin': '{% if edit_url %}{{ edit_url }}{% elif instance %}{% cms_admin_url "cms_page_edit_plugin" instance.pk %}{% endif %}',
 			'move_plugin': '{% if move_url %}{{ move_url }}{% else %}{% cms_admin_url "cms_page_move_plugin" %}{% endif %}',
-			'delete_plugin': '{% if delete_url %}{{ delete_url }}{% else %}{% cms_admin_url "cms_page_delete_plugin" instance.pk %}{% endif %}',
+			'delete_plugin': '{% if delete_url %}{{ delete_url }}{% elif instance %}{% cms_admin_url "cms_page_delete_plugin" instance.pk %}{% endif %}',
 			'copy_plugin': '{% cms_admin_url "cms_page_copy_plugins" %}'
 		} {% endlanguage %}
 	});
