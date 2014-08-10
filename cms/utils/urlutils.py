@@ -89,9 +89,9 @@ def admin_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None,
     if ':' in viewname:
         raise ValueError(
             "viewname in admin_reverse may not already have a namespace "
-            "defined: {!r}".format(viewname)
+            "defined: {0!r}".format(viewname)
         )
-    viewname = "{}:{}".format(admin_namespace, viewname)
+    viewname = "{0}:{1}".format(admin_namespace, viewname)
     return reverse(
         viewname,
         urlconf=urlconf,
