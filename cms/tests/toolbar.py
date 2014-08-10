@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import datetime
 import re
+from cms.utils.urlutils import admin_reverse
 
 from django.template.defaultfilters import truncatewords
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -307,7 +308,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         create_page("home", "nav_playground.html", "en",
                            published=True)
-        resolve_url = reverse('admin:cms_page_resolve')
+        resolve_url = admin_reverse('cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
@@ -326,7 +327,7 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
-            url = reverse('admin:cms_page_resolve')
+            url = admin_reverse('cms_page_resolve')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})

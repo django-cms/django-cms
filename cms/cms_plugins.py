@@ -6,8 +6,8 @@ from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import downcast_plugins, build_plugin_tree
+from cms.utils.urlutils import admin_reverse
 from django.conf.urls import patterns, url
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.safestring import mark_safe
@@ -52,7 +52,7 @@ class AliasPlugin(CMSPluginBase):
         return [
             PluginMenuItem(
                 _("Create Alias"),
-                reverse("admin:cms_create_alias"),
+                admin_reverse("cms_create_alias"),
                 data={'plugin_id': plugin.pk, 'csrfmiddlewaretoken': get_token(request)},
             )
         ]
@@ -61,7 +61,7 @@ class AliasPlugin(CMSPluginBase):
         return [
             PluginMenuItem(
                 _("Create Alias"),
-                reverse("admin:cms_create_alias"),
+                admin_reverse("cms_create_alias"),
                 data={'placeholder_id': placeholder.pk, 'csrfmiddlewaretoken': get_token(request)},
             )
         ]

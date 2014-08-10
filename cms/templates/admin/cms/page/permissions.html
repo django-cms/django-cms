@@ -1,5 +1,4 @@
-{% load i18n cms_admin %}
-{% load url from future %}
+{% load i18n cms_admin cms_tags %}
 {% if permission_set %}
 	<table>
 		<thead><tr>
@@ -20,14 +19,14 @@
 				<tr class="{% cycle 'row1' 'row2' %}">
 					<td class="page">
 						{% if meta.0 %}
-							{% if meta.1 %}<a href="{% url 'admin:cms_globalpagepermission_change' permission.id %}">{% trans "(global)" %}</a>
+							{% if meta.1 %}<a href="{% cms_admin_url 'cms_globalpagepermission_change' permission.id %}">{% trans "(global)" %}</a>
 							{% else %}{% trans "(global)" %}
 							{% endif %}
 						{% else %}
 							{% ifequal permission.page_id page.id %}
 								{% trans "(current)" %}
 							{% else %}
-								{% if meta.1 %}<a href="{% url 'admin:cms_page_change' permission.page.id %}">{{ permission.page }}</a>
+								{% if meta.1 %}<a href="{% cms_admin_url 'cms_page_change' permission.page.id %}">{{ permission.page }}</a>
 								{% else %}{{ permission.page }}
 								{% endif %}
 							{% endifequal %}

@@ -1,5 +1,4 @@
-{% load i18n l10n sekizai_tags admin_static %}
-{% load url from future %}
+{% load i18n l10n sekizai_tags admin_static cms_tags %}
 
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />{% endaddtoblock %}
 
@@ -35,8 +34,8 @@ $(document).ready(function () {
 			'model': '{{ request.toolbar.get_object_model }}',
 			'page_id': '{% if request.current_page.publisher_is_draft %}{{ request.current_page.pk }}{% else %}{{ request.current_page.publisher_public_id }}{% endif %}',
 			'pk': '{{ request.toolbar.get_object_pk }}',
-			'url': '{% language request.toolbar.language %}{% url "admin:cms_page_resolve" %}{% endlanguage %}',
-			'tree': '{% language request.toolbar.language %}{% url "admin:cms_page_changelist" %}{% endlanguage %}'
+			'url': '{% language request.toolbar.language %}{% cms_admin_url "cms_page_resolve" %}{% endlanguage %}',
+			'tree': '{% language request.toolbar.language %}{% cms_admin_url "cms_page_changelist" %}{% endlanguage %}'
 		},
 		'lang': {
 			'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}',
@@ -47,7 +46,7 @@ $(document).ready(function () {
 			'publish': '{% trans "Are you sure you want to publish this page?" %}'
 		},
 		'urls': {
-			'settings': '{% url "admin:cms_usersettings_session_store" %}', // url to save settings
+			'settings': '{% cms_admin_url "cms_usersettings_session_store" %}', // url to save settings
 			'static': '{{ STATIC_URL }}'
 		},
 		'settings': {
@@ -59,7 +58,7 @@ $(document).ready(function () {
 		},
 		'clipboard': {
 			'id': '{{ request.toolbar.clipboard.pk|unlocalize }}',
-			'url': '{% if request.toolbar.clipboard.pk %}{% url "admin:cms_page_clear_placeholder" request.toolbar.clipboard.pk %}{% endif %}'
+			'url': '{% if request.toolbar.clipboard.pk %}{% cms_admin_url "cms_page_clear_placeholder" request.toolbar.clipboard.pk %}{% endif %}'
 		},
 		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
 		'error': '{% if request.toolbar.login_form.errors or cms_toolbar_login_error %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}',

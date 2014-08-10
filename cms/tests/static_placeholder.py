@@ -7,8 +7,8 @@ from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.utils.compat.dj import force_unicode
+from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.sites import site
-from django.core.urlresolvers import reverse
 from django.template.base import Template
 
 
@@ -173,7 +173,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             self.assertTrue(target.dirty)
 
     def test_create_by_admin(self):
-        url = reverse("admin:cms_staticplaceholder_add")
+        url = admin_reverse("cms_staticplaceholder_add")
         with self.login_user_context(self.get_superuser()):
             response = self.client.post(url, data={'name': 'Name', 'code': 'content'})
             self.assertEqual(response.status_code, 302)

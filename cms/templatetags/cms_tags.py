@@ -3,6 +3,8 @@ from copy import copy
 from datetime import datetime
 from itertools import chain
 import re
+from classytags.values import StringValue
+from cms.utils.urlutils import admin_reverse
 
 from django import template
 from django.conf import settings
@@ -17,7 +19,8 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
-from classytags.arguments import Argument, MultiValueArgument
+from classytags.arguments import Argument, MultiValueArgument, \
+    MultiKeywordArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
@@ -726,7 +729,7 @@ class CMSEditableObject(InclusionTag):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        output = render_to_string(template, data)
+        output = render_to_string(template, data).strip()
         context.pop()
         if kwargs.get('varname'):
             context[kwargs['varname']] = output
@@ -1121,3 +1124,52 @@ class RenderPlaceholder(AsTag):
         return self._get_value(context, **kwargs)
 
 register.tag(RenderPlaceholder)
+
+
+NULL = object()
+
+
+class EmptyListValue(list, StringValue):
+    """
+    A list of template variables for easy resolving
+    """
+    def __init__(self, value=NULL):
+        list.__init__(self)
+        if value is not NULL:
+            self.append(value)
+
+    def resolve(self, context):
+        resolved = [item.resolve(context) for item in self]
+        return self.clean(resolved)
+
+
+class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
+    sequence_class = EmptyListValue
+
+    def parse(self, parser, token, tagname, kwargs):
+        if '=' in token:
+            if self.name not in kwargs:
+                kwargs[self.name] = self.sequence_class()
+            return False
+        return super(MultiValueArgumentBeforeKeywordArgument, self).parse(
+            parser,
+            token,
+            tagname,
+            kwargs
+        )
+
+
+class CMSAdminURL(AsTag):
+    name = 'cms_admin_url'
+    options = Options(
+        Argument('viewname'),
+        MultiValueArgumentBeforeKeywordArgument('args', required=False),
+        MultiKeywordArgument('kwargs', required=False),
+        'as',
+        Argument('varname', resolve=False, required=False)
+    )
+
+    def get_value(self, context, viewname, args, kwargs):
+        return admin_reverse(viewname, args=args, kwargs=kwargs)
+
+register.tag(CMSAdminURL)
