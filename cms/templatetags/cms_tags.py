@@ -729,7 +729,7 @@ class CMSEditableObject(InclusionTag):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        output = render_to_string(template, data)
+        output = render_to_string(template, data).strip()
         context.pop()
         if kwargs.get('varname'):
             context[kwargs['varname']] = output
