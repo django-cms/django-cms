@@ -370,7 +370,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             try:
                 url = admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name), args=[self.pk])
             except NoReverseMatch:
-                url = admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name), args=[self.pk]))
+                url = admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name), args=[self.pk])
             breadcrumb.append({'title': self.get_plugin_name(), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
