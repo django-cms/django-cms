@@ -274,8 +274,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         ## config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
         child_classes = ph_conf.get(self.__class__.__name__, None)
-        
-        if child_classes:
+        if child_classes is not None:
             return child_classes
         if self.child_classes:
             return self.child_classes
@@ -292,8 +291,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         ## config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
         parent_classes = ph_conf.get(self.__class__.__name__, None)
-        
-        if parent_classes:
+        if parent_classes is not None:
             return parent_classes
         elif self.parent_classes:
             return self.parent_classes
