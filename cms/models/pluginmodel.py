@@ -7,6 +7,7 @@ import os
 import warnings
 
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.urlresolvers import NoReverseMatch
 from django.db import models
 from django.db.models import signals, Model
 from django.db.models.base import model_unpickle
