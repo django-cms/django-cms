@@ -12,7 +12,7 @@ from .aliaspluginmodel import *  # nopyflakes
 from cms import signals as s_import  # nopyflakes
 
 
-# Temporary support for django below version 1.6
+# Temporary support for django version 1.6 and below
 from cms.utils.compat import DJANGO_1_6
 
 if DJANGO_1_6:
