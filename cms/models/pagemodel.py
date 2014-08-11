@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from logging import Logger
 from os.path import join
 
-from django.utils.timezone import now
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
 from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.timezone import now
 from django.utils.translation import get_language, ugettext_lazy as _
 from mptt.models import MPTTModel
 
@@ -22,12 +25,12 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.compat import DJANGO_1_5
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from menus.menu_pool import menu_pool
+
 
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
@@ -138,9 +141,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 title = self.title_set.all()[0]
             except IndexError:
                 title = None
-        if title is None:
-            title = u""
-        return force_unicode(title)
+        if not title:
+            title = ''
+        return force_text(title)
 
     def __repr__(self):
         # This is needed to solve the infinite recursion when

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from datetime import timedelta
-from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.utils.compat.dj import python_2_unicode_compatible
+
 from django.db import models
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+
+from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
@@ -41,20 +45,19 @@ class Title(models.Model):
         app_label = 'cms'
 
     def __str__(self):
-        return u"%s (%s, %s)" % (self.title, self.slug, self.language)
+        return '%s (%s, %s)' % (self.title, self.slug, self.language)
 
     def update_path(self):
         # Build path from parent page's path and slug
-        slug = u'%s' % self.slug
+        slug = '%s' % self.slug
         if not self.has_url_overwrite:
-            self.path = u'%s' % slug
+            self.path = '%s' % slug
             if self.page.parent_id:
                 parent_page = self.page.parent_id
 
                 parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
                 if parent_title:
-                    self.path = u'%s/%s' % (parent_title.path, slug)
-
+                    self.path = '%s/%s' % (parent_title.path, slug)
 
     @property
     def overwrite_url(self):
@@ -108,11 +111,8 @@ class Title(models.Model):
 
 
 class EmptyTitle(object):
-
-    def __init__(self, language):
-        self.language = language
-
-    """Empty title object, can be returned from Page.get_title_obj() if required
+    """
+    Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
     """
     title = ""
@@ -125,6 +125,9 @@ class EmptyTitle(object):
     menu_title = ""
     page_title = ""
     published = False
+
+    def __init__(self, language):
+        self.language = language
 
     @property
     def overwrite_url(self):

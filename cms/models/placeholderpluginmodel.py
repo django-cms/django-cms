@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
-from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.copy_plugins import copy_plugins_to
-from django.db import models
+
 
 @python_2_unicode_compatible
 class PlaceholderReference(CMSPlugin):
