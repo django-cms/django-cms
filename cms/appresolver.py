@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-<<<<<<< HEAD
 
 import sys
-=======
-from cms.apphook_pool import apphook_pool
-from cms.utils.compat.type_checks import string_types
-from cms.utils.i18n import force_language, get_language_list
-from cms.models.pagemodel import Page
->>>>>>> Support of nested namespaced URLconfs in hooked apps.
 
 from django.conf import settings
 from django.conf.urls import patterns
