@@ -440,7 +440,28 @@ Here is a simple example::
         ...
 
 
+If you have your own permission check in your app, or just don't want to wrap some nested apps
+with CMS permission decorator, then use ``exclude_permissions`` property of apphook::
 
+    class SampleApp(CMSApp):
+        name = _("Sample App")
+        urls = ["project.sampleapp.urls"]
+        permissions = True
+        exclude_permissions = ["some_nested_app"]
+
+
+For example, django-oscar_ apphook integration needs to be used with exclude permissions of dashboard app,
+because it use `customizable access function`__. So, your apphook in this case will looks like this::
+
+    class OscarApp(CMSApp):
+        name = _("Oscar")
+        urls = [
+            patterns('', *application.urls[0])
+        ]
+        exclude_permissions = ['dashboard']
+
+.. _django-oscar: https://github.com/tangentlabs/django-oscar
+.. __: https://github.com/tangentlabs/django-oscar/blob/0.7.2/oscar/apps/dashboard/nav.py#L57
 
 Automatically restart server on apphook changes
 -----------------------------------------------
