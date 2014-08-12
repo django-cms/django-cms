@@ -11,7 +11,7 @@ def validate_dependencies():
     if not app_is_installed('mptt'):
         raise ImproperlyConfigured('django CMS requires django-mptt package.')
 
-    if not app_is_installed('reversion'):
+    if app_is_installed('reversion'):
         from reversion.admin import VersionAdmin
         if not hasattr(VersionAdmin, 'get_urls'):
             raise ImproperlyConfigured('django CMS requires newer version of reversion (VersionAdmin must contain get_urls method)')
