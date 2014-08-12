@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-import sys
-
 from django.conf import settings
 from django.conf.urls import patterns
 from django.contrib.sites.models import Site
