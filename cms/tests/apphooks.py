@@ -118,7 +118,7 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
             hooks = apphook_pool.get_apphooks()
             app_names = [hook[0] for hook in hooks]
-            self.assertEqual(len(hooks), 3)
+            self.assertEqual(len(hooks), 4)
             self.assertIn(NS_APP_NAME, app_names)
             self.assertIn(APP_NAME, app_names)
             apphook_pool.clear()
@@ -200,8 +200,10 @@ class ApphooksTestCase(CMSTestCase):
 
             with force_language("en"):
                 path = reverse('sample-settings')
+
             response = self.client.get(path)
             self.assertEqual(response.status_code, 200)
+
             page = en_title.page.publisher_public
             page.login_required = True
             page.save()
@@ -209,6 +211,26 @@ class ApphooksTestCase(CMSTestCase):
 
             response = self.client.get(path)
             self.assertEqual(response.status_code, 302)
+            apphook_pool.clear()
+
+    def test_apphooks_with_excluded_permissions(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+            en_title = self.create_base_structure('SampleAppWithExcludedPermissions', 'en')
+
+            with force_language("en"):
+                excluded_path = reverse('excluded:example')
+                not_excluded_path = reverse('not_excluded:example')
+
+            page = en_title.page.publisher_public
+            page.login_required = True
+            page.save()
+            page.publish('en')
+
+            excluded_response = self.client.get(excluded_path)
+            not_excluded_response = self.client.get(not_excluded_path)
+            self.assertEqual(excluded_response.status_code, 200)
+            self.assertEqual(not_excluded_response.status_code, 302)
+
             apphook_pool.clear()
 
     def test_get_page_for_apphook_on_preview_or_edit(self):
