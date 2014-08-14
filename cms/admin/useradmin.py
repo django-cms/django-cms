@@ -16,7 +16,7 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     add_form = PageUserForm
     model = PageUser
     
-    list_display = ('email', 'first_name', 'last_name', 'created_by')
+    list_display = ('username', 'email', 'get_full_name', 'created_by')
 
     if get_user_model().USERNAME_FIELD != 'email':
         list_display += (get_user_model().USERNAME_FIELD,)
@@ -35,7 +35,7 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     
     add_fieldsets = fieldsets
 
-    ordering = ('last_name', 'first_name', 'email')
+    ordering = ('username', 'email')
 
     if get_user_model().USERNAME_FIELD != 'email':
         ordering = (get_user_model().USERNAME_FIELD,) + ordering
