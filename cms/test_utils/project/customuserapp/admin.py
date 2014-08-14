@@ -7,6 +7,6 @@ from cms.utils.compat.dj import get_user_model
 
 if getattr(OriginalUser._meta, 'swapped', False):
     class UserAdmin(OriginalUserAdmin):
-        pass
+        list_display = ('username', 'email', 'get_full_name', 'is_staff')
 
     admin.site.register(get_user_model(), UserAdmin)
