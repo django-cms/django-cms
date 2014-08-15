@@ -23,9 +23,10 @@ from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 
+
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
     """
-    Ensure the CMSPlugin subclasses have sane values and set some defaults if 
+    Ensure the CMSPlugin subclasses have sane values and set some defaults if
     they're not given.
     """
     def __new__(cls, name, bases, attrs):
@@ -65,7 +66,8 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
                 if not f.auto_created and f.editable:
                     if hasattr(f, 'advanced'):
                         advanced_fields.append(f.name)
-                    else: basic_fields.append(f.name)
+                    else:
+                        basic_fields.append(f.name)
             if advanced_fields:
                 new_plugin.fieldsets = [
                     (
@@ -77,8 +79,8 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
                     (
                         _('Advanced options'),
                         {
-                            'fields' : advanced_fields,
-                            'classes' : ('collapse',)
+                            'fields': advanced_fields,
+                            'classes': ('collapse',)
                         }
                     )
                 ]
@@ -155,7 +157,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         We just need the popup interface here
         """
         context.update({
-            'preview': not "no_preview" in request.GET,
+            'preview': "no_preview" not in request.GET,
             'is_popup': True,
             'plugin': self.cms_plugin_instance,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
@@ -166,7 +168,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     def has_add_permission(self, request, *args, **kwargs):
         """Permission handling change - if user is allowed to change the page
         he must be also allowed to add/change/delete plugins..
-        
+
         Not sure if there will be plugin permission requirement in future, but
         if, then this must be changed.
         """
@@ -220,19 +222,19 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             kwargs.setdefault('post_url_continue', post_url_continue)
         return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
 
-    def log_addition(self, request, object):
+    def log_addition(self, request, obj):
         pass
 
-    def log_change(self, request, object, message):
+    def log_change(self, request, obj, message):
         pass
 
-    def log_deletion(self, request, object, object_repr):
+    def log_deletion(self, request, obj, object_repr):
         pass
 
     def icon_src(self, instance):
         """
         Overwrite this if text_enabled = True
- 
+
         Return the URL for an image to be used for an icon for this
         plugin instance in a text editor.
         """
@@ -271,11 +273,10 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         if page:
             template = page.template
 
-        ## config overrides..
+        # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
         child_classes = ph_conf.get(self.__class__.__name__, None)
-        
-        if child_classes:
+        if child_classes is not None:
             return child_classes
         if self.child_classes:
             return self.child_classes
@@ -289,11 +290,10 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         if page:
             template = page.template
 
-        ## config overrides..
+        # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
         parent_classes = ph_conf.get(self.__class__.__name__, None)
-        
-        if parent_classes:
+        if parent_classes is not None:
             return parent_classes
         elif self.parent_classes:
             return self.parent_classes
@@ -337,16 +337,15 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     def __str__(self):
         return self.name
 
-    #===========================================================================
+    # ===============
     # Deprecated APIs
-    #===========================================================================
+    # ===============
 
     @property
     def pluginmedia(self):
         raise Deprecated(
             "CMSPluginBase.pluginmedia is deprecated in favor of django-sekizai"
         )
-
 
     def get_plugin_media(self, request, context, plugin):
         raise Deprecated(
