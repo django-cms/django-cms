@@ -699,7 +699,7 @@ show_breadcrumb
 ===============
 
 Renders the breadcrumb navigation of the current page.
-The template for the HTML can be found at ``cms/breadcrumb.html``::
+The template for the HTML can be found at ``menu/breadcrumb.html``::
 
     {% show_breadcrumb %}
 
@@ -710,7 +710,7 @@ Or with a custom template and only display level 2 or higher::
 Usually, only pages visible in the navigation are shown in the
 breadcrumb. To include *all* pages in the breadcrumb, write::
 
-    {% show_breadcrumb 0 "cms/breadcrumb.html" 0 %}
+    {% show_breadcrumb 0 "menu/breadcrumb.html" 0 %}
 
 If the current URL is not handled by the CMS or by a navigation extender,
 the current menu node can not be determined.
